@@ -3,7 +3,7 @@
 // Fetch-based HTTP Client untuk komunikasi dengan Backend
 // =====================================================
 
-const BASE_URL = 'http://localhost:3001/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 /**
  * Wrapper untuk native fetch dengan penambahan token Authorization
