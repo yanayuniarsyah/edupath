@@ -34,6 +34,7 @@ app.use(cors({
   origin: [
     'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175',
     'http://localhost:5176', 'http://localhost:5177', 'https://edupath.elyana.biz.id',
+    'https://edupath.co.id', 'http://edupath.co.id', 'https://www.edupath.co.id'
   ],
   credentials: true,
 }));
