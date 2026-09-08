@@ -1,0 +1,21 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Arahkan request aset langsung ke folder dist
+  RewriteCond %{REQUEST_URI} ^/assets/
+  RewriteRule ^assets/(.*)$ dist/assets/$1 [L]
+
+  # Arahkan favicon
+  RewriteRule ^favicon\.ico$ dist/favicon.ico [L]
+  RewriteRule ^favicon\.svg$ dist/favicon.svg [L]
+
+  # Jangan ganggu jika mengakses API / folder server
+  RewriteCond %{REQUEST_URI} ^/api/
+  RewriteRule ^ - [L]
+
+  # Untuk semua request lain, jika file/folder tidak ada di root,
+  # alihkan ke dist/index.html (History Mode Vue)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ dist/index.html [L]
+</IfModule>
