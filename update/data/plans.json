@@ -1,0 +1,39 @@
+[
+  {
+    "id": "19bd7057-d479-4298-8a77-cab2250636fa",
+    "created_at": "6/9/2026, 08.58.37",
+    "name": "Free",
+    "price": 0,
+    "duration": 30,
+    "features": [
+      "Akses 3 subtes dasar",
+      "Student Potential Path",
+      "Mini Kuis 5 soal/hari"
+    ]
+  },
+  {
+    "id": "16f664a1-c727-4b46-96ab-6585edd6e17e",
+    "created_at": "6/9/2026, 08.58.37",
+    "name": "Pro",
+    "price": 149000,
+    "duration": 30,
+    "features": [
+      "Semua subtes UTBK",
+      "AI Adaptive Path",
+      "Tryout tak terbatas",
+      "Laporan analitik detail"
+    ]
+  },
+  {
+    "id": "b715fb33-f065-445f-939b-49cccbf520dd",
+    "created_at": "6/9/2026, 08.58.37",
+    "name": "Pro Annual",
+    "price": 990000,
+    "duration": 365,
+    "features": [
+      "Semua fitur Pro",
+      "Hemat 45%",
+      "Konsultasi 1-on-1 bulanan"
+    ]
+  }
+]

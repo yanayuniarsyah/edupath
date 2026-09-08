@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPath.ai | Hack UTBK Gen Z Way</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        bgDark: '#050505',
+                        brand: {
+                            lime: '#c0ff00',
+                            surface: '#121212',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-fast': 'float 4s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                        'marquee': 'marquee 25s linear infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-20px) rotate(2deg)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow-x: hidden;
+            /* Menyembunyikan kursor default untuk desktop jika ingin full custom, 
+               tapi kita biarkan default dan tambah efek glow di belakangnya */
+        }
+        
+        /* Cursor Glow Effect */
+        #cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(192,255,0,0.15) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .glass-pill {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: #121212;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .bouncy-card:hover {
+            transform: translateY(-10px) scale(1.02) rotate(-1deg);
+            border-color: #c0ff00;
+            box-shadow: 0 20px 40px -10px rgba(192, 255, 0, 0.15);
+            z-index: 10;
+        }
+
+        .marquee-container {
+            display: flex;
+            width: 200%;
+        }
+
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        .text-gradient-mono {
+            background: linear-gradient(to right, #ffffff, #888888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(120px);
+            z-index: 0; /* Di bawah konten, di atas cursor glow */
+            opacity: 0.3;
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite alternate;
+        }
+
+        /* Scroll Reveal Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-delay-1 { transition-delay: 150ms; }
+        .reveal-delay-2 { transition-delay: 300ms; }
+        .reveal-delay-3 { transition-delay: 450ms; }
+        
+        /* Typed cursor */
+        .typed-cursor {
+            opacity: 1;
+            animation: blink 0.7s infinite;
+            color: #c0ff00;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-lime selection:text-black">
+
+    <!-- Efek Glow yang mengikuti kursor -->
+    <div id="cursor-glow" class="hidden md:block"></div>
+
+    <div class="fixed inset-0 pointer-events-none">
+        <div class="blob w-[500px] h-[500px] bg-white/10 -top-40 -left-40"></div>
+        <div class="blob w-[600px] h-[600px] bg-brand-lime/10 -bottom-60 left-1/4" style="animation-delay: 4s;"></div>
+    </div>
+
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] md:w-[85%] max-w-6xl z-50 transition-all duration-300" id="navbar">
+        <div class="glass-pill rounded-full px-6 py-3 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+            <a href="#" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center font-black text-black text-xl group-hover:bg-brand-lime group-hover:rotate-12 transition-all duration-300">
+                    E
+                </div>
+                <span class="font-black text-2xl tracking-tighter text-white">EduPath<span class="text-brand-lime">.ai</span></span>
+            </a>
+
+            <div class="hidden lg:flex items-center gap-8 font-semibold text-gray-400 text-sm">
+                <a href="#masalah" class="hover:text-white hover:-translate-y-1 transition-all">Masalah</a>
+                <a href="#fitur" class="hover:text-white hover:-translate-y-1 transition-all">Fitur Gen Z</a>
+                <a href="#testimoni" class="hover:text-white hover:-translate-y-1 transition-all">Bukti Nyata</a>
+                <a href="#harga" class="hover:text-white hover:-translate-y-1 transition-all">Harga</a>
+            </div>
+
+            <div class="hidden lg:flex items-center gap-4">
+                <a href="#" class="font-bold text-gray-300 hover:text-white transition-colors">Masuk</a>
+                <a href="#harga" class="bg-brand-lime text-black px-6 py-2.5 rounded-full font-black text-sm hover:scale-105 hover:-translate-y-1 active:scale-95 transition-all duration-300 shadow-[0_0_15px_rgba(192,255,0,0.4)]">
+                    Mulai Gratis 🚀
+                </a>
+            </div>
+
+            <button id="mobile-menu-btn" class="lg:hidden text-white p-2 rounded-full bg-white/10 active:scale-90 transition-transform">
+                <i data-lucide="align-right" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <div id="mobile-menu" class="hidden absolute top-20 left-0 right-0 glass-pill rounded-3xl p-6 flex flex-col gap-4 text-center transform origin-top transition-all border border-white/10 bg-[#0a0a0a]">
+            <a href="#masalah" class="font-bold text-lg text-gray-300 hover:text-white py-2">Masalah</a>
+            <a href="#fitur" class="font-bold text-lg text-gray-300 hover:text-white py-2">Fitur</a>
+            <a href="#harga" class="font-bold text-lg text-gray-300 hover:text-white py-2">Harga</a>
+            <a href="#harga" class="mt-4 bg-brand-lime text-black py-4 rounded-2xl font-black text-lg">Mulai Gratis Sekarang</a>
+        </div>
+    </nav>
+
+    <header class="relative pt-40 pb-20 lg:pt-52 lg:pb-32 overflow-hidden min-h-screen flex items-center" id="hero-section">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                
+                <div class="text-center lg:text-left relative z-20 reveal">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-white/5 text-white font-bold text-sm mb-8 hover:bg-white/10 transition-colors cursor-default">
+                        <span class="relative flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-lime opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-lime"></span>
+                        </span>
+                        Sistem AI Evaluasi 2026 Telah Aktif
+                    </div>
+
+                    <h1 class="text-5xl sm:text-7xl lg:text-[85px] font-black leading-[1.05] tracking-tight mb-6">
+                        Tembus PTN <br>
+                        <span class="text-brand-lime italic relative inline-block group">
+                            Impian
+                            <!-- Underline animasi -->
+                            <span class="absolute -bottom-2 left-0 w-full h-2 bg-brand-lime transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                        </span> dengan <br>
+                        <span class="text-gradient-mono">AI Tutor.</span>
+                    </h1>
+
+                    <p class="text-lg sm:text-xl text-gray-400 font-medium mb-10 max-w-lg mx-auto lg:mx-0 reveal reveal-delay-1">
+                        Skor UTBK 700+ untuk pejuang PTN tanpa sistem SKS (Sistem Kebut Semalam) & menghafal ribuan rumus secara buta. Belajar pinter, bukan sekadar keras.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start reveal reveal-delay-2">
+                        <a href="#harga" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-black font-black text-lg hover:bg-brand-lime hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(192,255,0,0.5)]">
+                            <i data-lucide="rocket" class="w-5 h-5"></i> Coba Gratis
+                        </a>
+                        <a href="#fitur" class="w-full sm:w-auto px-8 py-4 rounded-full glass-pill font-bold text-white hover:bg-white/10 transition-colors flex items-center justify-center gap-2 border border-white/20 group">
+                            Lihat Demo <i data-lucide="play" class="w-5 h-5 text-white group-hover:text-brand-lime transition-colors"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="mt-12 flex items-center justify-center lg:justify-start gap-4 reveal reveal-delay-3">
+                        <div class="flex -space-x-4 hover:space-x-1 transition-all duration-300">
+                            <img class="w-12 h-12 rounded-full border-2 border-bgDark object-cover grayscale hover:grayscale-0 transition-all duration-300 z-30" src="https://i.pravatar.cc/100?img=1" alt="User">
+                            <img class="w-12 h-12 rounded-full border-2 border-bgDark object-cover grayscale hover:grayscale-0 transition-all duration-300 z-20" src="https://i.pravatar.cc/100?img=2" alt="User">
+                            <img class="w-12 h-12 rounded-full border-2 border-bgDark object-cover grayscale hover:grayscale-0 transition-all duration-300 z-10" src="https://i.pravatar.cc/100?img=3" alt="User">
+                            <div class="w-12 h-12 rounded-full border-2 border-bgDark bg-white text-black flex items-center justify-center font-bold text-xs z-0 hover:bg-brand-lime transition-colors">+10k</div>
+                        </div>
+                        <div class="text-sm font-semibold text-gray-400">
+                            Dipercaya <span class="text-white counter" data-target="10000">0</span>+ Pejuang
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative h-[500px] hidden lg:block" id="parallax-container">
+                    <div class="parallax-element absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 bouncy-card rounded-[2rem] p-6 animate-float z-20" data-speed="0.05">
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="font-black text-xl text-white">Target Kelulusan</span>
+                            <span class="bg-white/10 text-white px-3 py-1 rounded-full text-xs font-bold border border-white/10">FK UI</span>
+                        </div>
+                        <div class="relative w-40 h-40 mx-auto mb-6 flex items-center justify-center rounded-full border-8 border-white/5 border-t-brand-lime border-r-brand-lime rotate-45 transition-transform hover:rotate-90 duration-500 shadow-[0_0_30px_rgba(192,255,0,0.1)]">
+                            <div class="-rotate-45 text-center">
+                                <span class="block text-3xl font-black text-white"><span class="counter" data-target="82">0</span>%</span>
+                                <span class="text-[10px] text-gray-400 uppercase font-bold">Peluang</span>
+                            </div>
+                        </div>
+                        <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-xs font-semibold text-gray-300 min-h-[60px]">
+                            <strong class="text-brand-lime">🤖 AI Warning:</strong> <span id="typewriter-text"></span><span class="typed-cursor">|</span>
+                        </div>
+                    </div>
+
+                    <div class="parallax-element absolute top-10 right-0 glass-pill px-6 py-4 rounded-2xl animate-float-delayed z-30 flex items-center gap-4 rotate-6 border border-white/10 hover:rotate-0 transition-transform" data-speed="0.08">
+                        <div class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center text-2xl group-hover:scale-110">📈</div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-bold uppercase">Tryout Terakhir</p>
+                            <p class="text-2xl font-black text-white"><span class="counter" data-target="715">0</span> <span class="text-sm text-gray-500">Poin</span></p>
+                        </div>
+                    </div>
+
+                    <div class="parallax-element absolute bottom-10 left-0 glass-pill px-6 py-4 rounded-2xl animate-float-fast z-30 flex items-center gap-4 -rotate-3 border border-brand-lime/30 bg-brand-lime/5 hover:rotate-0 transition-transform" data-speed="0.1">
+                        <div class="w-12 h-12 rounded-full bg-brand-lime text-black flex items-center justify-center text-2xl group-hover:rotate-12 transition-transform">⏱️</div>
+                        <div>
+                            <p class="text-xs text-brand-lime/80 font-bold uppercase">Waktu Hemat</p>
+                            <p class="text-2xl font-black text-brand-lime"><span class="counter" data-target="120">0</span> <span class="text-sm text-brand-lime/50">Jam</span></p>
+                        </div>
+                    </div>
+                    
+                    <svg class="absolute top-0 right-10 w-full h-full text-white/5 animate-spin-slow -z-10" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                      <path fill="currentColor" d="M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.6,-46.1C91.4,-33.1,98,-16.6,97.7,-0.2C97.4,16.2,90.2,32.4,80.3,45.4C70.4,58.4,57.7,68.2,43.6,75.9C29.5,83.6,14.7,89.2,-0.4,89.9C-15.6,90.6,-31.2,86.4,-45.1,78.5C-59.1,70.6,-71.4,59,-79.8,44.9C-88.3,30.8,-92.9,15.4,-92.4,0.3C-91.9,-14.8,-86.3,-29.7,-77.8,-43.3C-69.3,-56.9,-57.9,-69.3,-43.9,-76.5C-29.9,-83.7,-14.9,-85.7,0.4,-86.4C15.7,-87.1,31.4,-86.5,44.7,-76.4Z" transform="translate(100 100)" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="py-6 border-y border-white/10 bg-[#0a0a0a] overflow-hidden relative rotate-1 scale-105 my-10 z-20 group">
+        <div class="marquee-container animate-marquee whitespace-nowrap flex items-center group-hover:[animation-play-state:paused] cursor-pointer">
+            <div class="flex items-center gap-12 px-6 hover:text-brand-lime transition-colors">
+                <span class="text-2xl font-black text-white flex items-center gap-3"><span class="text-brand-lime">🔥</span> 10,000+ Pejuang PTN</span>
+                <span class="text-white/20">✦</span>
+                <span class="text-2xl font-black text-white flex items-center gap-3">🎯 87.4% Tingkat Kelulusan</span>
+                <span class="text-white/20">✦</span>
+                <span class="text-2xl font-black text-white flex items-center gap-3">📝 150k+ Soal Dikerjakan</span>
+                <span class="text-white/20">✦</span>
+                <span class="text-2xl font-black text-white flex items-center gap-3">⭐ 9.8/10 Rating Kepuasan</span>
+                <span class="text-white/20">✦</span>
+            </div>
+            <div class="flex items-center gap-12 px-6">
+                <span class="text-2xl font-black text-white flex items-center gap-3"><span class="text-brand-lime">🔥</span> 10,000+ Pejuang PTN</span>
+                <span class="text-white/20">✦</span>
+                <span class="text-2xl font-black text-white flex items-center gap-3">🎯 87.4% Tingkat Kelulusan</span>
+                <span class="text-white/20">✦</span>
+                <span class="text-2xl font-black text-white flex items-center gap-3">📝 150k+ Soal Dikerjakan</span>
+                <span class="text-white/20">✦</span>
+                <span class="text-2xl font-black text-white flex items-center gap-3">⭐ 9.8/10 Rating Kepuasan</span>
+                <span class="text-white/20">✦</span>
+            </div>
+        </div>
+    </div>
+
+    <section id="masalah" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-20 reveal">
+                <h2 class="text-5xl lg:text-6xl font-black mb-6 leading-tight text-white">Mengapa <span class="text-brand-lime underline decoration-wavy decoration-brand-lime underline-offset-8">90% Siswa</span> Gagal Ujian?</h2>
+                <p class="text-xl text-gray-400 font-medium">Mengerjakan ribuan soal tanpa mengetahui di mana letak kelemahan terbesarmu hanyalah membuang waktu secara sia-sia.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 pt-10">
+                <div class="bouncy-card rounded-[2rem] p-8 -rotate-2 transform translate-y-4 relative overflow-hidden group reveal reveal-delay-1">
+                    <div class="absolute inset-0 bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-16 h-16 rounded-2xl bg-white text-black flex items-center justify-center text-3xl font-black mb-8 -mt-12 shadow-lg border-4 border-bgDark group-hover:bg-brand-lime group-hover:rotate-12 transition-all">
+                        01
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-4">Blind Spot Belajar</h3>
+                    <p class="text-gray-400 font-medium leading-relaxed">Belajar acak tanpa menyadari materi esensial apa yang menahan kenaikan skor Anda secara konstan. Gak terarah!</p>
+                </div>
+
+                <div class="bouncy-card rounded-[2rem] p-8 rotate-1 z-10 relative overflow-hidden group border-brand-lime/20 reveal reveal-delay-2">
+                    <div class="absolute inset-0 bg-brand-lime/[0.05] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-16 h-16 rounded-2xl bg-brand-lime text-black flex items-center justify-center text-3xl font-black mb-8 -mt-12 shadow-[0_0_20px_rgba(192,255,0,0.3)] border-4 border-bgDark group-hover:-rotate-12 transition-all">
+                        02
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-4">Hafalan Buta Rumus</h3>
+                    <p class="text-gray-400 font-medium leading-relaxed">Menghafal rumus mati matematika tanpa melatih logika dasar untuk soal HOTS. Otak dipaksa hafal, bukan mikir.</p>
+                </div>
+
+                <div class="bouncy-card rounded-[2rem] p-8 -rotate-1 transform translate-y-8 relative overflow-hidden group reveal reveal-delay-3">
+                    <div class="absolute inset-0 bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-16 h-16 rounded-2xl bg-white text-black flex items-center justify-center text-3xl font-black mb-8 -mt-12 shadow-lg border-4 border-bgDark group-hover:bg-brand-lime group-hover:rotate-12 transition-all">
+                        03
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-4">Skor TO Mandek</h3>
+                    <p class="text-gray-400 font-medium leading-relaxed">Mengulang latihan yang terlalu mudah/rumit tanpa kalibrasi model IRT terkomputerisasi. Skor stuck di situ aja.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 relative overflow-hidden">
+        <div class="absolute inset-0 bg-white/[0.02] -skew-y-3 z-0 transform origin-top-left border-y border-white/5"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                
+                <div class="lg:w-1/2 reveal">
+                    <div class="inline-block px-4 py-2 rounded-full bg-brand-lime/10 border border-brand-lime/30 text-brand-lime font-black text-sm mb-6 uppercase tracking-wider animate-pulse">
+                        ⚡ Solusi Adaptif
+                    </div>
+                    <h2 class="text-4xl sm:text-5xl font-black text-white mb-6 leading-tight">Persiapan Terukur Dengan <br><span class="text-brand-lime">Analitik Presisi</span></h2>
+                    <p class="text-gray-400 text-lg mb-8 font-medium">EduPath mendeteksi kelemahan spesifik Anda dalam waktu 10 menit, membuat jalur belajar khusus, dan memandu Anda menyelesaikannya materi per materi.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-[#121212] border border-white/10 hover:border-brand-lime transition-colors group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-brand-lime text-black flex items-center justify-center shrink-0 font-black group-hover:scale-110 group-hover:rotate-12 transition-all">✓</div>
+                            <div>
+                                <h4 class="font-bold text-white text-lg group-hover:text-brand-lime transition-colors">Sistem Evaluasi Model IRT SNBT Riil</h4>
+                                <p class="text-sm text-gray-400 mt-1">Mengukur probabilitas kelulusan akurat sesuai standar seleksi nasional sesungguhnya.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-[#121212] border border-white/10 hover:border-white transition-colors group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shrink-0 font-black group-hover:scale-110 group-hover:rotate-12 transition-all">✓</div>
+                            <div>
+                                <h4 class="font-bold text-white text-lg">Rekomendasi Prioritas Otomatis</h4>
+                                <p class="text-sm text-gray-400 mt-1">AI memangkas waktu belajar pada topik yang sudah dikuasai, fokus ke *blind spot*.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2 w-full relative reveal reveal-delay-2">
+                    <div class="bouncy-card rounded-[2.5rem] p-8 shadow-2xl relative z-10 bg-[#0a0a0a]">
+                        <div class="flex items-center gap-2 mb-8 border-b border-white/10 pb-4">
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors cursor-pointer"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors cursor-pointer"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500 hover:bg-green-400 transition-colors cursor-pointer"></div>
+                            </div>
+                            <span class="ml-4 text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-brand-lime animate-ping"></span> Live Diagnosis</span>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Progress Bar Interaktif -->
+                            <div class="group">
+                                <div class="flex justify-between font-bold mb-3">
+                                    <span class="text-white group-hover:text-brand-lime transition-colors">Aljabar Dasar</span>
+                                    <span class="text-brand-lime"><span class="counter" data-target="85">0</span>% Sukses</span>
+                                </div>
+                                <div class="w-full h-4 bg-white/5 rounded-full overflow-hidden border border-white/10">
+                                    <div class="h-full bg-brand-lime rounded-full relative overflow-hidden transition-all duration-1000 ease-out w-0 progress-fill" data-width="85%">
+                                        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full animate-[marquee_2s_linear_infinite]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="group">
+                                <div class="flex justify-between font-bold mb-3">
+                                    <span class="text-white">Bangun Ruang Geometri</span>
+                                    <span class="text-red-400"><span class="counter" data-target="35">0</span>% Kritis</span>
+                                </div>
+                                <div class="w-full h-4 bg-white/5 rounded-full overflow-hidden border border-white/10">
+                                    <div class="h-full bg-red-500 rounded-full transition-all duration-1000 ease-out w-0 progress-fill" data-width="35%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 bg-white/5 p-5 rounded-2xl border border-white/10 flex gap-4 transform translate-y-4 -translate-x-4 shadow-xl rotate-1 hover:rotate-0 transition-transform">
+                            <div class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shrink-0 text-xl animate-bounce">🤖</div>
+                            <div>
+                                <strong class="text-white block mb-1">Rekomendasi AI</strong>
+                                <p class="text-sm text-gray-400 font-medium leading-relaxed">Sistem otomatis mengarahkan siswa ke sub-kelas Geometri 3D.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="fitur" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 reveal">
+                <div class="max-w-2xl">
+                    <h2 class="text-4xl sm:text-5xl font-black text-white mb-4">Alat Tempur <span class="text-brand-lime">Terlengkap</span></h2>
+                    <p class="text-xl text-gray-400 font-medium">Fitur spesifik didesain untuk gaya belajar serba cepat, dengan *instant feedback*.</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-12 gap-6">
+                <div class="md:col-span-8 bouncy-card rounded-[2rem] p-8 flex flex-col justify-between hover:border-brand-lime group reveal reveal-delay-1">
+                    <div class="flex justify-between items-start mb-12">
+                        <div class="w-16 h-16 rounded-2xl bg-white text-black flex items-center justify-center text-3xl group-hover:bg-brand-lime group-hover:rotate-12 transition-all">
+                            <i data-lucide="brain-circuit" class="w-8 h-8"></i>
+                        </div>
+                        <span class="bg-white/10 px-4 py-2 rounded-full text-xs font-bold uppercase border border-white/10 text-white animate-pulse">Core System</span>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-black text-white mb-3">AI Adaptive Assessment™</h3>
+                        <p class="text-gray-400 font-medium text-lg leading-relaxed max-w-2xl">
+                            Sistem mendeteksi instan materi yang lemah, mengubah susunan subtes *real-time* menyesuaikan porsi pemahaman Anda.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="md:col-span-4 bouncy-card rounded-[2rem] p-8 bg-brand-lime text-black border-none hover:scale-105 group reveal reveal-delay-2 cursor-pointer shadow-[0_0_30px_rgba(192,255,0,0.2)] hover:shadow-[0_0_50px_rgba(192,255,0,0.4)]">
+                    <div class="mb-8">
+                        <span class="bg-black/10 px-3 py-1 rounded-full text-xs font-black uppercase inline-flex items-center gap-1 group-hover:bg-black/20 transition-colors"><i data-lucide="clock" class="w-3 h-3 animate-spin-slow"></i> 5 Menit Kelar</span>
+                    </div>
+                    <h3 class="text-2xl font-black mb-3">Micro-Lessons</h3>
+                    <p class="font-semibold opacity-80 leading-relaxed">
+                        Modul video 3-7 menit yang langsung kupas trik cepat & eliminasi jawaban.
+                    </p>
+                </div>
+
+                <div class="md:col-span-4 bouncy-card rounded-[2rem] p-8 group reveal reveal-delay-1">
+                    <div class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center mb-6 group-hover:bg-brand-lime group-hover:text-black transition-colors">
+                        <i data-lucide="bot" class="w-6 h-6 group-hover:animate-bounce"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-white mb-2">AI Companion 24/7</h3>
+                    <p class="text-gray-400 font-medium">Asisten interaktif bongkar kerumitan soal jam berapa pun.</p>
+                </div>
+
+                <div class="md:col-span-4 bouncy-card rounded-[2rem] p-8 group reveal reveal-delay-2">
+                    <div class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center mb-6 group-hover:bg-white group-hover:text-black transition-colors">
+                        <i data-lucide="headphones" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-white mb-2">Pomodoro Lofi Room</h3>
+                    <p class="text-gray-400 font-medium">Ruang belajar *co-working* virtual dengan iringan lofi.</p>
+                </div>
+
+                <div class="md:col-span-4 bouncy-card rounded-[2rem] p-8 group reveal reveal-delay-3">
+                    <div class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center mb-6 group-hover:bg-brand-lime group-hover:text-black transition-colors">
+                        <i data-lucide="message-circle" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-white mb-2">Auto Report WA Ortu</h3>
+                    <p class="text-gray-400 font-medium">Kirim laporan progres otomatis ke WhatsApp orang tua.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimoni" class="py-24 relative bg-[#0a0a0a] border-y border-white/5 transform -skew-y-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transform skew-y-2 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-16 reveal">
+                <h2 class="text-4xl sm:text-5xl font-black text-white mb-4">Bukti Nyata Pejuang PTN</h2>
+                <p class="text-xl text-gray-400 font-medium">Realita dari mereka yang sukses tembus kampus impian pakai cara pinter.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-16">
+                <div class="bouncy-card rounded-[2rem] p-8 relative overflow-hidden group reveal reveal-delay-1">
+                    <div class="absolute -right-6 -top-6 text-9xl text-white/5 font-black font-serif italic group-hover:text-white/10 transition-colors">"</div>
+                    <div class="flex items-center gap-4 mb-6 relative z-10">
+                        <img src="https://i.pravatar.cc/100?img=11" alt="Ahmad" class="w-16 h-16 rounded-full border-2 border-white/20 object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all">
+                        <div>
+                            <h4 class="font-black text-white text-xl">Ahmad</h4>
+                            <p class="font-bold text-gray-400 text-sm">FK UI Angkatan 2025</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 font-medium text-lg leading-relaxed relative z-10">
+                        "Dulu skor TO mandiri macet. Setelah AI EduPath arahin fokus ke Bangun Ruang, skor naik tajam ke 715. Lolos UI bosku!"
+                    </p>
+                </div>
+
+                <div class="bouncy-card rounded-[2rem] p-8 relative overflow-hidden group reveal reveal-delay-2">
+                    <div class="absolute -right-6 -top-6 text-9xl text-white/5 font-black font-serif italic group-hover:text-brand-lime/10 transition-colors">"</div>
+                    <div class="flex items-center gap-4 mb-6 relative z-10">
+                        <img src="https://i.pravatar.cc/100?img=5" alt="Dewi" class="w-16 h-16 rounded-full border-2 border-brand-lime/50 object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all">
+                        <div>
+                            <h4 class="font-black text-white text-xl">Dewi</h4>
+                            <p class="font-bold text-brand-lime text-sm">Aktuaria UGM Angkatan 2025</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 font-medium text-lg leading-relaxed relative z-10">
+                        "Paling suka Pomodoro Room-nya. AI Tutor-nya mantap banget kalau nanya malem-malem. Worth it parah."
+                    </p>
+                </div>
+            </div>
+
+            <div class="max-w-2xl mx-auto bg-[#121212] rounded-[2rem] p-8 border border-white/10 relative shadow-2xl reveal reveal-delay-3">
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-black font-black px-6 py-1 rounded-full text-sm animate-bounce">
+                    🏆 EduRank Live
+                </div>
+                <div class="space-y-4 mt-4">
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/20 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <span class="text-2xl font-black text-gray-600">1</span>
+                            <span class="font-bold text-white text-lg">Dewi (Aktuaria UGM)</span>
+                        </div>
+                        <span class="font-black text-white text-xl">715 Poin</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-brand-lime/10 border border-brand-lime/50 transform scale-105 shadow-xl hover:scale-110 transition-transform cursor-default">
+                        <div class="flex items-center gap-4">
+                            <span class="text-2xl font-black text-brand-lime">2</span>
+                            <span class="font-black text-white text-lg">Anda (Siswa Mandiri)</span>
+                        </div>
+                        <span class="font-black text-brand-lime text-xl flex items-center gap-2">
+                            <i data-lucide="trending-up" class="w-5 h-5"></i> 648
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="harga" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-20 reveal">
+                <h2 class="text-5xl lg:text-6xl font-black text-white mb-6">Investasi <span class="text-brand-lime">Masa Depan</span></h2>
+                <p class="text-xl text-gray-400 font-medium">Pilih paket akses sesuai kebutuhan. Tanpa basa-basi.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
+                <div class="bouncy-card rounded-[2rem] p-8 reveal reveal-delay-1">
+                    <h4 class="font-black text-white text-2xl mb-2">Mandiri</h4>
+                    <p class="text-sm text-gray-400 mb-6 font-medium">Buat si penyendiri yang rajin.</p>
+                    <div class="mb-8">
+                        <span class="text-5xl font-black text-white">149k</span><span class="text-gray-500 font-bold">/bln</span>
+                    </div>
+                    <ul class="space-y-4 font-bold text-gray-400 mb-8">
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-white"></i> Video Materi Terstruktur</li>
+                        <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-white"></i> 5x Tryout Nasional / bln</li>
+                    </ul>
+                    <button class="w-full py-4 rounded-xl bg-white/5 border border-white/20 font-black text-white hover:bg-white hover:text-black transition-all hover:-translate-y-1">Pilih Paket</button>
+                </div>
+
+                <div class="rounded-[2.5rem] p-[2px] bg-brand-lime relative transform lg:scale-110 shadow-[0_0_40px_rgba(192,255,0,0.15)] z-20 hover:scale-[1.12] transition-transform duration-300 reveal reveal-delay-2">
+                    <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-brand-lime text-black font-black px-6 py-2 rounded-full text-sm uppercase tracking-wider shadow-lg animate-pulse">
+                        Paling Laku 🔥
+                    </div>
+                    <div class="bg-[#0a0a0a] rounded-[2.4rem] p-8 h-full flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-black text-white text-3xl mb-2">Utama (PRO)</h4>
+                            <p class="text-sm text-gray-400 mb-6 font-medium">Buka potensi maksimal AI Adaptif.</p>
+                            <div class="mb-8">
+                                <span class="text-6xl font-black text-brand-lime">299k</span><span class="text-gray-500 font-bold">/bln</span>
+                            </div>
+                            <ul class="space-y-4 font-bold text-white mb-8">
+                                <li class="flex items-center gap-3"><i data-lucide="zap" class="w-5 h-5 text-brand-lime fill-brand-lime"></i> AI Adaptive Path™</li>
+                                <li class="flex items-center gap-3"><i data-lucide="zap" class="w-5 h-5 text-brand-lime fill-brand-lime"></i> 4x Live Class / Minggu</li>
+                                <li class="flex items-center gap-3"><i data-lucide="zap" class="w-5 h-5 text-brand-lime fill-brand-lime"></i> Akses Klinik PR 24/7</li>
+                            </ul>
+                        </div>
+                        <button class="w-full py-4 rounded-xl bg-brand-lime text-black font-black text-lg hover:bg-white transition-all hover:-translate-y-1 shadow-[0_0_15px_rgba(192,255,0,0.3)]">Mulai Gaspol 🚀</button>
+                    </div>
+                </div>
+
+                <div class="bouncy-card rounded-[2rem] p-8 reveal reveal-delay-3">
+                    <h4 class="font-black text-white text-2xl mb-2">Elite VIP</h4>
+                    <p class="text-sm text-gray-400 mb-6 font-medium">Pendampingan 1-on-1 sampe tembus.</p>
+                    <div class="mb-8">
+                        <span class="text-5xl font-black text-white">799k</span><span class="text-gray-500 font-bold">/bln</span>
+                    </div>
+                    <ul class="space-y-4 font-bold text-gray-400 mb-8">
+                        <li class="flex items-center gap-3"><i data-lucide="star" class="w-5 h-5 text-white fill-white"></i> 1-on-1 Mentoring</li>
+                        <li class="flex items-center gap-3"><i data-lucide="star" class="w-5 h-5 text-white fill-white"></i> Garansi Kelulusan*</li>
+                    </ul>
+                    <button class="w-full py-4 rounded-xl bg-white/5 border border-white/20 font-black text-white hover:bg-white hover:text-black transition-all hover:-translate-y-1">Tanya Admin</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-[#050505] py-16 border-t border-white/10 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-12">
+                <div class="flex items-center gap-2 group cursor-pointer">
+                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center font-black text-black text-2xl group-hover:-rotate-12 transition-transform">
+                        E
+                    </div>
+                    <span class="font-black text-3xl tracking-tighter text-white">EduPath<span class="text-brand-lime">.ai</span></span>
+                </div>
+                
+                <div class="flex flex-wrap justify-center gap-8 font-bold text-gray-500">
+                    <a href="#" class="hover:text-white hover:-translate-y-1 transition-all">Privacy Policy</a>
+                    <a href="#" class="hover:text-white hover:-translate-y-1 transition-all">Terms of Service</a>
+                    <a href="#" class="hover:text-brand-lime hover:-translate-y-1 transition-all">WhatsApp Admin</a>
+                </div>
+            </div>
+            <div class="text-center font-bold text-gray-600 pt-8 border-t border-white/10 flex flex-col items-center gap-2">
+                <p>&copy; 2026 EduPath. Code your future.</p>
+                <p class="text-xs bg-white/5 px-3 py-1 rounded-full border border-white/10">Built for Gen Z ⚡</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('top-2', 'w-[98%]', 'md:w-[90%]');
+                navbar.classList.remove('top-6', 'w-[95%]', 'md:w-[85%]');
+            } else {
+                navbar.classList.remove('top-2', 'w-[98%]', 'md:w-[90%]');
+                navbar.classList.add('top-6', 'w-[95%]', 'md:w-[85%]');
+            }
+        });
+
+        // Mobile Menu
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            const icon = mobileBtn.querySelector('i');
+            if(mobileMenu.classList.contains('hidden')) {
+                icon.setAttribute('data-lucide', 'align-right');
+            } else {
+                icon.setAttribute('data-lucide', 'x');
+            }
+            lucide.createIcons();
+        });
+
+        // 1. Mouse Glow Cursor
+        const glow = document.getElementById('cursor-glow');
+        document.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // 2. Parallax Effect in Hero (Mouse Move)
+        const parallaxContainer = document.getElementById('hero-section');
+        const parallaxElements = document.querySelectorAll('.parallax-element');
+        parallaxContainer.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX * 2) / 100;
+            const y = (window.innerHeight - e.pageY * 2) / 100;
+
+            parallaxElements.forEach(el => {
+                const speed = el.getAttribute('data-speed') || 0.05;
+                el.style.transform = `translateX(${x * speed * 100}px) translateY(${y * speed * 100}px)`;
+            });
+        });
+        parallaxContainer.addEventListener('mouseleave', () => {
+            parallaxElements.forEach(el => {
+                el.style.transform = `translateX(0px) translateY(0px)`;
+            });
+        });
+
+        // 3. Typewriter Effect
+        const typeText = "Fokus ke Geometri 3D untuk +45 Poin.";
+        const typeElement = document.getElementById('typewriter-text');
+        let typeIndex = 0;
+        
+        function typeWriter() {
+            if (typeIndex < typeText.length) {
+                typeElement.innerHTML += typeText.charAt(typeIndex);
+                typeIndex++;
+                setTimeout(typeWriter, 50);
+            } else {
+                // Loop the typing effect
+                setTimeout(() => {
+                    typeElement.innerHTML = "";
+                    typeIndex = 0;
+                    typeWriter();
+                }, 4000);
+            }
+        }
+        // Start typing after short delay
+        setTimeout(typeWriter, 1000);
+
+        // 4. Scroll Reveal & Number Counter Observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const runCounter = (el) => {
+            const target = parseInt(el.getAttribute('data-target'));
+            const duration = 2000; // 2 seconds
+            const step = target / (duration / 16); // 60fps
+            let current = 0;
+
+            const updateCounter = () => {
+                current += step;
+                if (current < target) {
+                    el.innerText = Math.ceil(current).toLocaleString('id-ID');
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    el.innerText = target.toLocaleString('id-ID');
+                }
+            };
+            updateCounter();
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Trigger Reveal Animation
+                    entry.target.classList.add('active');
+                    
+                    // Trigger Progress Bars
+                    const progressBars = entry.target.querySelectorAll('.progress-fill');
+                    progressBars.forEach(bar => {
+                        bar.style.width = bar.getAttribute('data-width');
+                    });
+
+                    // Trigger Counters
+                    const counters = entry.target.querySelectorAll('.counter');
+                    counters.forEach(counter => {
+                        if(!counter.classList.contains('counted')) {
+                            runCounter(counter);
+                            counter.classList.add('counted');
+                        }
+                    });
+                    
+                    // Stop observing once animated (optional, keeping it clean)
+                    // observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+        
+        // Also observe elements that just contain counters or progress bars if they don't have reveal class
+        document.querySelectorAll('.counter:not(.reveal .counter), .progress-fill:not(.reveal .progress-fill)').forEach(el => {
+            observer.observe(el.closest('section') || el.parentElement);
+        });
+
+    </script>
+</body>
+</html>

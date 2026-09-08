@@ -1,0 +1,17 @@
+[
+  {
+    "id": "154f5f9c-f3b8-4894-b36f-05837fa9bd13",
+    "created_at": "6/9/2026, 08.58.37",
+    "name": "Siswa Demo",
+    "email": "demo@edupath.id",
+    "password": "$2a$10$TRO9bqF2s8snW50tCbDEge8bXratnnof5BNU2geh0WRMS7/sYFHyS",
+    "phone": "081234567890",
+    "school": "SMA Negeri 1 Jakarta",
+    "target_ptn": "UI",
+    "plan": "free",
+    "streak": 7,
+    "coins": 350,
+    "total_score": 542.5,
+    "is_active": true
+  }
+]
