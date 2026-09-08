@@ -1,6 +1,9 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # Jika pengunjung membuka domain utama (tanpa path apapun)
+  RewriteRule ^$ dist/index.html [L]
+
   # Arahkan request aset langsung ke folder dist
   RewriteCond %{REQUEST_URI} ^/assets/
   RewriteRule ^assets/(.*)$ dist/assets/$1 [L]
@@ -13,9 +16,8 @@
   RewriteCond %{REQUEST_URI} ^/api/
   RewriteRule ^ - [L]
 
-  # Untuk semua request lain, jika file/folder tidak ada di root,
+  # Untuk semua request lain, jika file tidak ada di root,
   # alihkan ke dist/index.html (History Mode Vue)
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^ dist/index.html [L]
+  RewriteRule ^(.*)$ dist/index.html [L]
 </IfModule>
