@@ -47,8 +47,8 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // 2. Lookup plan scoped to student's tenant (cross-tenant access blocked at DB level)
-    $stmt = $pdo->prepare("SELECT id, name, price, discount, duration, features FROM plans WHERE id = ? AND tenant_id = ?");
-    $stmt->execute([$plan_id, $student_tenant_id]);
+    $stmt = $pdo->prepare("SELECT id, name, price, discount, duration, features FROM plans WHERE (id = ? OR name = ?) AND tenant_id = ?");
+    $stmt->execute([$plan_id, $plan_id, $student_tenant_id]);
     $plan = $stmt->fetch();
 
     if (!$plan) {
@@ -65,7 +65,7 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // -----------------------------------------------------------------------
     $subtotal      = (string) $plan['price']; // already DECIMAL(15,2) from DB
     $discount      = (string) ($plan['discount'] ?? '0.00'); // From Plan
-    $tax_amount    = '0.00';                  // TAX POLICY = NOT YET VERIFIED
+    $tax_amount    = bcmul($subtotal, '0.11', 2);                  // TAX POLICY = 11% PPN
     $grand_total   = bcsub(bcadd($subtotal, $tax_amount, 2), $discount, 2);
     // Ensure grand_total is not negative
     if (bccomp($grand_total, '0.00', 2) === -1) {
@@ -585,4 +585,5 @@ else {
     echo json_encode(["error" => "Endpoint payment tidak ditemukan"]);
 }
 ?>
+
 
