@@ -1244,8 +1244,7 @@
           </div>
 
           <!-- 11. Dynamic Section: PRICING WITH BILLING TOGGLE -->
-          <div id="pricing" class="space-y-12 scroll-mt-24">
-            <div class="text-center max-w-2xl mx-auto space-y-4 reveal">
+          <div id="pricing" class="space-y-12 scroll-mt-24"><div class="text-center max-w-4xl xl:max-w-5xl mx-auto space-y-4 reveal">
               <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
                 💎 INVESTASI LEHER KE ATAS • BEBAS RISIKO
               </span>
@@ -4232,6 +4231,8 @@ export default {
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 </style>
+
+
 
 
 
