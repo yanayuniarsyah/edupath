@@ -1253,10 +1253,7 @@
                 Investasi Terbaik <br />
                 <span style="color: #c0ff00;">Menembus PTN Impian</span>
               </h2>
-              <p class="text-sm md:text-base text-white/60 leading-relaxed font-medium">
-                Bimbel konvensional memungut Rp 15–30 juta untuk metode satu buku yang sama bagi semua murid.<br />
-                Di EduPath, Anda berinvestasi pada kecerdasan AI adaptif yang melatih langsung titik lemah spesifik Anda.
-              </p>
+              <p class="text-sm md:text-base text-white/60 leading-relaxed font-medium flex flex-col gap-1"><span>Bimbel konvensional memungut Rp 15–30 juta untuk metode satu buku yang sama bagi semua murid.</span><span>Di EduPath, Anda berinvestasi pada kecerdasan AI adaptif yang melatih langsung titik lemah spesifik Anda.</span></p>
               
               <!-- Interactive Billing Cycle Toggle with 40% DISC Badge -->
               <div class="pt-2">
@@ -4235,6 +4232,9 @@ export default {
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 </style>
+
+
+
 
 
 
