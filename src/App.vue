@@ -10,7 +10,7 @@
     <!-- Background Blobs & Neural Canvas (Public only) -->
     <div v-if="!isLoggedIn" class="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/5 blur-[120px] pointer-events-none z-0 animate-pulse"></div>
     <div v-if="!isLoggedIn" class="fixed bottom-[-20%] left-1/4 w-[600px] h-[600px] rounded-full bg-primary/8 blur-[130px] pointer-events-none z-0" style="animation: float 10s ease-in-out infinite alternate"></div>
-    <canvas id="bg-canvas" :style="{ opacity: canvasOpacity }" class="fixed inset-0 w-full h-full z-[-1] pointer-events-none transition-opacity duration-700"></canvas>
+    <canvas id="bg-canvas" :style="{ opacity: canvasOpacity }" class="fixed inset-0 w-full h-full z-0 pointer-events-none transition-opacity duration-700"></canvas>
 
 
     <!-- Sidebar Navigation — auto-hide (icon rail), expand on hover -->
@@ -3248,7 +3248,7 @@ export default {
   setup() {
     const ambientGlowRef = ref(null);
     const canvasOpacity = ref(0);
-    const handleScroll = (e) => { canvasOpacity.value = e.target.scrollTop > 300 ? 0.7 : 0; };
+    const handleScroll = (e) => { canvasOpacity.value = e.target.scrollTop > 300 ? 0.4 : 0; };
     const mobileSidebarOpen = ref(false);
     const toggleMobileSidebar = () => { mobileSidebarOpen.value = !mobileSidebarOpen.value; };
 
@@ -4235,4 +4235,6 @@ export default {
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 </style>
+
+
 
