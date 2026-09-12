@@ -1,8 +1,8 @@
 ---
 deployment:
   tasks:
-    - /bin/cp -Rf dist/* /home/kumonwah/public_html/
-    - /bin/cp -f dist/.htaccess /home/kumonwah/public_html/
-    - /bin/mkdir -p /home/kumonwah/public_html/api
-    - /bin/cp -Rf api/* /home/kumonwah/public_html/api/
-    - /bin/cp -f api/.htaccess /home/kumonwah/public_html/api/
+    - /bin/cp -Rf dist/* /home/kumonwah/edupath.co.id/
+    - /bin/cp -f dist/.htaccess /home/kumonwah/edupath.co.id/
+    - /bin/mkdir -p /home/kumonwah/edupath.co.id/api
+    - /bin/cp -Rf api/* /home/kumonwah/edupath.co.id/api/
+    - /bin/cp -f api/.htaccess /home/kumonwah/edupath.co.id/api/
