@@ -7,9 +7,11 @@
     <!-- Ambient Glow (Public only) -->
     <div v-if="!isLoggedIn" id="ambient-glow" ref="ambientGlowRef" class="opacity-80"></div>
     
-    <!-- Background Blobs (Public only) -->
+    <!-- Background Blobs & Neural Canvas (Public only) -->
     <div v-if="!isLoggedIn" class="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/5 blur-[120px] pointer-events-none z-0 animate-pulse"></div>
     <div v-if="!isLoggedIn" class="fixed bottom-[-20%] left-1/4 w-[600px] h-[600px] rounded-full bg-primary/8 blur-[130px] pointer-events-none z-0" style="animation: float 10s ease-in-out infinite alternate"></div>
+    <canvas id="bg-canvas" :style="{ opacity: canvasOpacity }" class="fixed inset-0 w-full h-full z-[-1] pointer-events-none transition-opacity duration-700"></canvas>
+
 
     <!-- Sidebar Navigation — auto-hide (icon rail), expand on hover -->
     <aside
@@ -89,7 +91,7 @@
     </aside>
 
     <!-- Main Content Area -->
-    <main class="relative z-10 flex-grow overflow-y-auto overflow-x-hidden max-h-screen flex flex-col w-full" :class="isLoggedIn ? 'p-6 pl-6 ml-[72px] bg-[#f8fafc]' : ''">
+    <main @scroll="handleScroll" class="relative z-10 flex-grow overflow-y-auto overflow-x-hidden max-h-screen flex flex-col w-full" :class="isLoggedIn ? 'p-6 pl-6 ml-[72px] bg-[#f8fafc]' : ''">
       
       <!-- Public Top Navbar (Only visible when Logged Out) -->
       <header v-if="!isLoggedIn" class="w-full flex justify-center pt-3 px-3 sm:pt-4 sm:px-4 shrink-0 z-30 fixed top-0 left-0 right-0">
@@ -189,10 +191,10 @@
             </button>
 
             <!-- 6. Afiliasi -->
-            <a href="https://elyana.biz.id/affiliate.html" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300 transition-colors py-1 flex items-center gap-1 whitespace-nowrap text-amber-400 font-bold">
+            <button @click="scrollToSection('affiliate-section')" class="hover:text-amber-300 transition-colors py-1 flex items-center gap-1 whitespace-nowrap text-amber-400 font-bold">
               <span>Afiliasi</span>
               <i class="ph-bold ph-arrow-up-right text-[10px]"></i>
-            </a>
+            </button>
           </nav>
 
           <div class="flex items-center gap-2">
@@ -400,9 +402,7 @@
               <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#c0ff00]/30 bg-[#c0ff00]/10 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
                 🎯 SIMULASI INTERAKTIF AI
               </span>
-              <h2 class="text-4xl md:text-6xl font-black font-heading text-white leading-tight">
-                Hitung Peluang <span style="color: #c0ff00;">Lolos PTN-mu</span>
-              </h2>
+              <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight whitespace-nowrap">Hitung Peluang <span style="color: #c0ff00;">Lolos PTN-mu</span></h2>
               <p class="text-base md:text-lg text-white/50 font-medium max-w-2xl mx-auto">
                 Geser slider sesuai kondisimu saat ini. Sistem AI EduPath akan mengkalkulasi proyeksi lonjakan nilai dan peluang kelulusanmu secara real-time!
               </p>
@@ -1250,11 +1250,12 @@
                 💎 INVESTASI LEHER KE ATAS • BEBAS RISIKO
               </span>
               <h2 class="text-4xl md:text-6xl font-black font-heading text-white leading-tight">
-                Investasi Terbaik Menembus <br class="hidden sm:inline" />
-                <span style="color: #c0ff00;">PTN Impian</span>
+                Investasi Terbaik <br />
+                <span style="color: #c0ff00;">Menembus PTN Impian</span>
               </h2>
               <p class="text-sm md:text-base text-white/60 leading-relaxed font-medium">
-                Bimbel konvensional memungut Rp 15–30 juta untuk metode satu buku yang sama bagi semua murid. Di EduPath, Anda berinvestasi pada kecerdasan AI adaptif yang melatih langsung titik lemah spesifik Anda.
+                Bimbel konvensional memungut Rp 15–30 juta untuk metode satu buku yang sama bagi semua murid.<br />
+                Di EduPath, Anda berinvestasi pada kecerdasan AI adaptif yang melatih langsung titik lemah spesifik Anda.
               </p>
               
               <!-- Interactive Billing Cycle Toggle with 40% DISC Badge -->
@@ -1335,7 +1336,7 @@
                 <div class="pt-8">
                   <button 
                     class="w-full py-3.5 rounded-xl bg-white/10 hover:bg-white hover:text-black text-white font-black text-xs md:text-sm border border-white/15 transition-all shadow-sm active:scale-95" 
-                    @click="startLearning"
+                    @click="purchasePlan('Mandiri', 180000)"
                   >
                     Pilih Paket Mandiri
                   </button>
@@ -1513,76 +1514,96 @@
             </div>
           </div>
 
-          <!-- 12.5 Affiliate Partner Showcase Card -->
-          <div id="affiliate-banner" class="scroll-mt-24 rounded-3xl p-8 md:p-12 relative overflow-hidden border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-[#0d131f] to-black shadow-[0_10px_50px_rgba(245,158,11,0.12)]">
-            <!-- Ambient Glow -->
-            <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
-            
-            <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-              <div class="space-y-4 max-w-2xl text-left">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-black uppercase tracking-wider">
-                  <i class="ph-bold ph-hand-coins text-amber-400 text-sm"></i>
-                  <span>PROGRAM MITRA AFILIASI RESMI</span>
+          <!-- Affiliate Section (Merged from affiliate.html) -->
+          <div id="affiliate-section" class="scroll-mt-24 space-y-12 pb-24">
+            <!-- Hero -->
+            <section class="glass-panel rounded-3xl p-6 sm:p-12 relative overflow-hidden border border-amber-500/20 text-center space-y-6">
+              <div class="absolute -right-20 -top-20 w-80 h-80 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+              <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-yellow-500/15 rounded-full blur-3xl pointer-events-none"></div>
+              <div class="max-w-3xl mx-auto space-y-4 relative z-10">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
+                  <i class="ph-bold ph-lightning"></i> 1 KODE REFERRAL UNTUK 8 PRODUK UNGGULAN
                 </div>
-                
-                <h3 class="text-3xl md:text-5xl font-black font-heading text-white leading-tight">
-                  Raih Komisi <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-500">20%</span> Pertama<br />
-                  <span class="text-2xl md:text-3xl text-white/70 font-black">+ <span class="text-amber-300">10% Recurring</span> Setiap Perpanjangan</span>
-                </h3>
-                
-                <p class="text-sm md:text-base text-white/70 leading-relaxed font-medium">
-                  Rekomendasikan EduPath ke teman atau komunitasmu. Kamu dapat komisi <strong class="text-amber-300">20%</strong> saat mereka pertama kali berlangganan — dan terus dapat <strong class="text-amber-300">10%</strong> setiap kali mereka perpanjang, selama mereka masih aktif.
+                <h2 class="text-3xl sm:text-5xl font-black font-heading text-white tracking-tight leading-tight">
+                  Raih Komisi <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">20% Tahun Pertama</span><br class="hidden sm:inline">+ <span class="text-emerald-400">10% Recurring</span> Seumur Hidup
+                </h2>
+                <p class="text-white/70 text-sm sm:text-base leading-relaxed">
+                  Dapatkan penghasilan pasif berkelanjutan dari setiap langganan software bisnis di ekosistem Elyana. Tracking otomatis, transparan, pencairan terjadwal, dan dipotong PPh resmi sesuai regulasi pajak.
                 </p>
+                <div class="flex flex-wrap justify-center gap-3 pt-2">
+                  <button @click="showAffiliateRegisterModal = true" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_35px_rgba(245,158,11,0.5)] flex items-center gap-2">
+                    <i class="ph-bold ph-rocket"></i> Daftar Jadi Mitra (Gratis)
+                  </button>
+                </div>
+              </div>
+            </section>
 
-                <!-- Value Highlights Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                  <div class="p-3.5 rounded-xl bg-white/[0.03] border border-amber-500/20 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0 font-black text-sm">
-                      20%
+            <!-- Products Grid -->
+            <section class="space-y-4">
+              <div class="text-center space-y-1">
+                <span class="text-xs font-bold text-amber-400 uppercase">// 8 PRODUK SIAP DIJUAL</span>
+                <h2 class="text-2xl font-black font-heading text-white">Solusi Digital Bernilai Tinggi yang Dibutuhkan Pasar</h2>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                <div class="p-5 rounded-2xl space-y-3 bg-white/5 border border-white/10">
+                  <div class="flex justify-between items-start">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <i class="ph-bold ph-storefront"></i>
                     </div>
-                    <div>
-                      <div class="text-xs font-bold text-white">Komisi Akuisisi</div>
-                      <div class="text-[10px] text-white/50">Per referral pertama</div>
-                    </div>
+                    <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">20% Thn-1 | 10% Rec</span>
                   </div>
-
-                  <div class="p-3.5 rounded-xl bg-white/[0.03] border border-amber-500/20 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0 font-black text-sm">
-                      10%
-                    </div>
-                    <div>
-                      <div class="text-xs font-bold text-white">Recurring Seumur Hidup</div>
-                      <div class="text-[10px] text-white/50">Tiap perpanjangan langganan</div>
-                    </div>
+                  <div>
+                    <h3 class="font-bold text-white text-sm">ROS Resto Platform</h3>
+                    <p class="text-[11px] text-white/50 mt-1">Platform POS, Kitchen Display System (KDS), dan manajemen inventori restoran modern.</p>
                   </div>
-
-                  <div class="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0 font-black">
-                      <i class="ph-bold ph-lightning text-base"></i>
+                </div>
+                <div class="p-5 rounded-2xl space-y-3 bg-white/5 border border-white/10">
+                  <div class="flex justify-between items-start">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <i class="ph-bold ph-graduation-cap"></i>
                     </div>
-                    <div>
-                      <div class="text-xs font-bold text-white">Pencairan Mudah</div>
-                      <div class="text-[10px] text-white/50">Cair langsung ke rekening</div>
+                    <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">20% Thn-1 | 10% Rec</span>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-white text-sm">EduPath Learning Platform</h3>
+                    <p class="text-[11px] text-white/50 mt-1">Sistem pembelajaran adaptif dengan konten SNBT terukur.</p>
+                  </div>
+                </div>
+                <div class="p-5 rounded-2xl space-y-3 bg-white/5 border border-white/10">
+                  <div class="flex justify-between items-start">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <i class="ph-bold ph-book"></i>
                     </div>
+                    <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">20% Thn-1 | 10% Rec</span>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-white text-sm">Elyana Exam Prep</h3>
+                    <p class="text-[11px] text-white/50 mt-1">Koleksi soal dan simulasi ujian SNBT yang terkurasi.</p>
                   </div>
                 </div>
               </div>
+            </section>
 
-              <!-- CTA Card / Action -->
-              <div class="shrink-0 flex flex-col items-center sm:items-end w-full lg:w-auto text-center lg:text-right space-y-3">
-                <a 
-                  href="https://elyana.biz.id/affiliate.html" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-black font-black text-sm transition-all hover:scale-105 hover:shadow-[0_0_35px_rgba(245,158,11,0.5)] active:scale-95 flex items-center justify-center gap-2 group shadow-xl"
-                >
-                  <span>Gabung Mitra Afiliasi</span>
-                  <i class="ph-bold ph-arrow-up-right text-base group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
-                </a>
-                <span class="text-xs text-white/50 font-medium">Gratis daftar &bull; 20% akuisisi + 10% recurring</span>
+            <!-- Stats Section -->
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+              <div class="p-5 rounded-2xl text-center bg-white/5 border border-white/10">
+                <span class="text-[10px] text-white/50 font-bold uppercase">Total Klik Referral</span>
+                <span class="block text-4xl font-black font-mono text-amber-300 mt-2">1,248</span>
+                <span class="text-[10px] text-emerald-400 font-bold mt-1">+12 hari ini</span>
               </div>
-            </div>
+              <div class="p-5 rounded-2xl text-center bg-white/5 border border-white/10">
+                <span class="text-[10px] text-white/50 font-bold uppercase">Referral Aktif</span>
+                <span class="block text-4xl font-black font-mono text-emerald-400 mt-2">124</span>
+                <span class="text-[10px] text-white/50 font-bold mt-1">18 Akuisisi + 6 Recurring (Bulan ini)</span>
+              </div>
+              <div class="p-5 rounded-2xl text-center bg-white/5 border border-white/10">
+                <span class="text-[10px] text-white/50 font-bold uppercase">Total Komisi (IDR)</span>
+                <span class="block text-4xl font-black font-mono text-[#c0ff00] mt-2">Rp 4.48M</span>
+                <span class="text-[10px] text-amber-300 font-bold mt-1">Estimasi Global Payout</span>
+              </div>
+            </section>
           </div>
+
 
           <!-- 13. Final CTA — SAMPLE style -->
           <div class="text-center py-20 rounded-3xl p-8 space-y-6 max-w-4xl mx-auto relative overflow-hidden" style="background: #121212; border: 1px solid rgba(255,255,255,0.08);">
@@ -1652,11 +1673,11 @@
                     </button>
                   </li>
                   <li>
-                    <a href="https://elyana.biz.id/affiliate.html" target="_blank" rel="noopener noreferrer" class="text-amber-400 hover:text-amber-300 transition-all font-bold flex items-center gap-1.5">
+                    <button @click="scrollToSection('affiliate-section'); sidebarExpanded = false" class="text-amber-400 hover:text-amber-300 transition-all font-bold flex items-center gap-1.5 cursor-pointer bg-transparent border-0 p-0 text-left">
                       <i class="ph-bold ph-hand-coins text-sm"></i>
                       <span>Afiliasi 20% + 10% Recurring</span>
                       <i class="ph-bold ph-arrow-up-right text-[10px]"></i>
-                    </a>
+                    </button>
                   </li>
                 </ul>
               </div>
@@ -1709,6 +1730,51 @@
             </div>
           </footer>
 
+        </section>
+
+        <!-- TAB: AFFILIATE -->
+        <section v-if="currentTab === 'affiliate'" class="animate-fade-in space-y-6">
+          <div class="max-w-4xl mx-auto space-y-8">
+            <div class="text-center space-y-3">
+              <span class="px-3.5 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-black uppercase tracking-wider inline-flex items-center gap-2">
+                <i class="ph-bold ph-hand-coins text-amber-400 text-sm"></i>
+                <span>PROGRAM MITRA AFILIASI RESMI</span>
+              </span>
+              <h2 class="text-3xl md:text-5xl font-black font-heading text-white">Dashboard Afiliasi EduPath</h2>
+              <p class="text-sm text-white/70 max-w-xl mx-auto font-medium">
+                Bagikan link referral Anda dan dapatkan komisi 20% dari setiap pendaftaran pertama serta 10% recurring setiap perpanjangan.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="light-mode-card rounded-2xl p-6 text-center bg-slate-900/80 border border-amber-500/30 text-white">
+                <span class="text-xs text-white/50 font-bold uppercase">Total Klik Referral</span>
+                <span class="block text-4xl font-black font-mono text-amber-300 mt-2">148</span>
+                <span class="text-[10px] text-emerald-400 font-bold mt-1 inline-block">+12 hari ini</span>
+              </div>
+              <div class="light-mode-card rounded-2xl p-6 text-center bg-slate-900/80 border border-amber-500/30 text-white">
+                <span class="text-xs text-white/50 font-bold uppercase">Referral Aktif</span>
+                <span class="block text-4xl font-black font-mono text-emerald-400 mt-2">24</span>
+                <span class="text-[10px] text-white/50 font-bold mt-1 inline-block">18 Akuisisi + 6 Recurring</span>
+              </div>
+              <div class="light-mode-card rounded-2xl p-6 text-center bg-slate-900/80 border border-amber-500/30 text-white">
+                <span class="text-xs text-white/50 font-bold uppercase">Total Komisi (IDR)</span>
+                <span class="block text-4xl font-black font-mono text-[#c0ff00] mt-2">Rp 1.480.000</span>
+                <span class="text-[10px] text-amber-300 font-bold mt-1 inline-block">Siap Dicairkan</span>
+              </div>
+            </div>
+
+            <div class="light-mode-card rounded-2xl p-6 md:p-8 space-y-6 bg-slate-900/90 border border-amber-500/30 text-white">
+              <h3 class="text-lg font-black font-heading">Link Referral Khusus Anda</h3>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <input type="text" readonly value="https://edupath.id/ref/STUDENT2026" class="w-full bg-black/50 border border-amber-500/30 rounded-xl px-4 py-3 text-xs text-amber-300 font-mono outline-none" />
+                <button @click="copyCompanyAddress" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-black font-black text-xs hover:scale-105 active:scale-95 transition-all shrink-0">
+                  Salin Link
+                </button>
+              </div>
+              <p class="text-xs text-white/50">Bagikan link ini melalui WhatsApp, Instagram Story, atau Telegram komunitas belajar Anda.</p>
+            </div>
+          </div>
         </section>
 
         <!-- TAB 1: DASHBOARD -->
@@ -2684,6 +2750,52 @@
 
     </main>
 
+    <!-- Checkout Modal -->
+    <div v-if="checkoutModalData.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeCheckoutModal"></div>
+      <div class="relative bg-slate-900 border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-fade-in text-white">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-black font-heading">Invoice Pembelian</h2>
+          <button @click="closeCheckoutModal" class="text-white/50 hover:text-white transition-colors">
+            <i class="ph-bold ph-x text-xl"></i>
+          </button>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+            <div class="text-xs text-white/50 font-bold uppercase tracking-wider mb-1">Paket yang dipilih</div>
+            <div class="text-lg font-black text-[#c0ff00]">Paket {{ checkoutModalData.planName }}</div>
+          </div>
+          
+          <div class="space-y-2 text-sm font-medium pt-2">
+            <div class="flex justify-between text-white/70">
+              <span>Harga Dasar</span>
+              <span>Rp {{ checkoutModalData.amount.toLocaleString('id-ID') }}</span>
+            </div>
+            <div class="flex justify-between text-white/70">
+              <span>PPN (11%)</span>
+              <span>Rp {{ checkoutModalData.tax.toLocaleString('id-ID') }}</span>
+            </div>
+            <div class="h-px w-full bg-white/10 my-2"></div>
+            <div class="flex justify-between text-base font-black">
+              <span>Total Tagihan</span>
+              <span class="text-[#c0ff00]">Rp {{ checkoutModalData.total.toLocaleString('id-ID') }}</span>
+            </div>
+          </div>
+          
+          <div class="pt-6">
+            <button 
+              class="w-full py-3.5 rounded-xl text-sm font-black transition-all hover:scale-105 active:scale-95 bg-[#c0ff00] text-black flex items-center justify-center gap-2"
+              @click="confirmCheckout"
+            >
+              <i class="ph-bold ph-credit-card"></i>
+              Lanjutkan ke Midtrans
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Interactive Login Modal -->
     <div v-if="showLoginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-fade-in">
       <div class="glass-card max-w-sm w-full p-8 rounded-3xl space-y-6 relative border-primary/30">
@@ -3081,10 +3193,41 @@
       <span class="text-xs font-semibold text-white">{{ toastMessage }}</span>
     </div>
   </div>
+    <!-- Affiliate Register Modal -->
+    <div v-if="showAffiliateRegisterModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      <div class="bg-[#121212] border border-amber-500/30 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.2)]">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
+          <h3 class="text-xl font-black font-heading text-white flex items-center gap-2">
+            <i class="ph-bold ph-hand-coins text-amber-400"></i>
+            Daftar Mitra Afiliasi
+          </h3>
+          <button @click="showAffiliateRegisterModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition-colors">✕</button>
+        </div>
+        <div class="p-6">
+          <form @submit.prevent="showAffiliateRegisterModal = false" class="space-y-4">
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-white/70">Nama Lengkap</label>
+              <input type="text" placeholder="Masukkan nama" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-white/70">Email Aktif</label>
+              <input type="email" placeholder="nama@email.com" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-white/70">Nomor WhatsApp</label>
+              <input type="tel" placeholder="08..." class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+            </div>
+            <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2 mt-2">
+              <i class="ph-bold ph-paper-plane-right"></i> Kirim Pendaftaran
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { 
   SKILL_MAP, 
   TARGET_UNIVERSITIES, 
@@ -3094,6 +3237,7 @@ import {
   SIMULATOR_DATABASE
 } from './EduData.js';
 import api from './api';
+import { initNeuralCanvas } from './neuralCanvas';
 import StudentPotentialPath from './components/StudentPotentialPath.vue';
 
 export default {
@@ -3103,6 +3247,8 @@ export default {
   },
   setup() {
     const ambientGlowRef = ref(null);
+    const canvasOpacity = ref(0);
+    const handleScroll = (e) => { canvasOpacity.value = e.target.scrollTop > 300 ? 0.7 : 0; };
     const mobileSidebarOpen = ref(false);
     const toggleMobileSidebar = () => { mobileSidebarOpen.value = !mobileSidebarOpen.value; };
 
@@ -3113,6 +3259,7 @@ export default {
     const showDisclaimerModal = ref(false);
     const showParentConsentModal = ref(false);
     const showContactModal = ref(false);
+    const showAffiliateRegisterModal = ref(false);
     const sidebarExpanded = ref(false);
     const toolsDropdownOpen = ref(false);
 
@@ -3371,9 +3518,35 @@ export default {
       { id: 'diagnostic', label: 'Asesmen Kesiapan', icon: 'ph-brain' },
       { id: 'learning', label: 'Materi & Drill', icon: 'ph-books' },
       { id: 'simulator', label: 'Ujian 2027 Simulasi', icon: 'ph-calculator' },
-      { id: 'studyroom', label: 'Pomodoro Room', icon: 'ph-headphones' }
+      { id: 'studyroom', label: 'Pomodoro Room', icon: 'ph-headphones' },
+      { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' }
     ]);
     const isLoginMode = ref(true);
+    
+    const initScrollReveal = () => {
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('active');
+            }
+          });
+        }, { threshold: 0.05 });
+        setTimeout(() => {
+          document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }, 100);
+      }
+    };
+
+    watch(currentTab, (newTab) => {
+      const tabInfo = tabs.value.find(t => t.id === newTab);
+      if (tabInfo) {
+        document.title = `${tabInfo.label} | EduPath`;
+      } else {
+        document.title = 'EduPath - Platform Belajar Adaptif & Persiapan SNBT Terukur';
+      }
+      initScrollReveal();
+    });
     const authForm = ref({ name: '', email: 'demo@edupath.id', password: 'demo123' });
     const authLoading = ref(false);
     const authError = ref('');
@@ -3532,34 +3705,64 @@ export default {
       }
     };
 
-    const purchasePlan = async (planName, amount) => {
+    const checkoutModalData = ref({
+      isOpen: false,
+      planName: '',
+      amount: 0,
+      tax: 0,
+      total: 0
+    });
+
+    const purchasePlan = (planName, amount) => {
       if (!isLoggedIn.value) {
         showLoginModal.value = true;
         showToast('Silakan Masuk Akun untuk membeli paket.');
         return;
       }
+      const tax = Math.round(amount * 0.11);
+      const total = amount + tax;
+      checkoutModalData.value = {
+        isOpen: true,
+        planName,
+        amount,
+        tax,
+        total
+      };
+    };
+
+    const confirmCheckout = async () => {
+      const data = checkoutModalData.value;
       try {
-        const response = await api.checkout(planName, amount);
+        const response = await api.checkout(data.planName, data.total);
         if (response.success && response.token) {
-          window.snap.pay(response.token, {
-            onSuccess: function(result) {
-              showToast('Pembayaran berhasil! Paket Pro diaktifkan.');
-              // Idealnya me-refresh data user
-            },
-            onPending: function(result) {
-              showToast('Menunggu pembayaran Anda diselesaikan.');
-            },
-            onError: function(result) {
-              showToast('Pembayaran gagal, silakan coba lagi.');
-            },
-            onClose: function() {
-              showToast('Anda menutup pop-up sebelum menyelesaikan pembayaran.');
-            }
-          });
+          if (window.snap) {
+            window.snap.pay(response.token, {
+              onSuccess: function(result) {
+                showToast(`Pembayaran berhasil! Paket ${data.planName} diaktifkan.`);
+                checkoutModalData.value.isOpen = false;
+              },
+              onPending: function(result) {
+                showToast('Menunggu pembayaran Anda diselesaikan.');
+                checkoutModalData.value.isOpen = false;
+              },
+              onError: function(result) {
+                showToast('Pembayaran gagal, silakan coba lagi.');
+              },
+              onClose: function() {
+                showToast('Anda menutup pop-up sebelum menyelesaikan pembayaran.');
+              }
+            });
+          } else {
+            showToast('Sistem Pembayaran (Midtrans) tidak dimuat dengan benar. Silakan coba lagi nanti.');
+          }
         }
       } catch (err) {
         showToast(err.message || 'Gagal menghubungi server pembayaran.');
       }
+    };
+
+    const closeCheckoutModal = () => {
+      checkoutModalData.value.isOpen = false;
     };
 
     const scrollToSection = (id) => {
@@ -3861,26 +4064,22 @@ export default {
       }
 
       // Scroll Reveal Observer
-      if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('active');
-            }
-          });
-        }, { threshold: 0.05 });
-        setTimeout(() => {
-          document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-        }, 100);
-      }
+      initScrollReveal();
+      initNeuralCanvas();
+      
+      
     });
 
     onUnmounted(() => {
       if (countdownTimer) clearInterval(countdownTimer);
       if (activityTimer) clearInterval(activityTimer);
+      
     });
 
     return {
+      checkoutModalData,
+      confirmCheckout,
+      closeCheckoutModal,
       ambientGlowRef,
       isLoggedIn,
       currentUser,
@@ -3900,6 +4099,7 @@ export default {
       showDisclaimerModal,
       showParentConsentModal,
       showContactModal,
+      showAffiliateRegisterModal,
       copyCompanyAddress,
       sidebarExpanded,
       login,
@@ -3920,6 +4120,8 @@ export default {
       progressPercentage,
       recalcTargetGap,
       currentTab,
+      canvasOpacity,
+      handleScroll,
       tabs,
       dailyMissions,
       checkMissionReward,
@@ -4033,3 +4235,4 @@ export default {
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 </style>
+

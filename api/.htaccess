@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  
+  # Route requests like /api/auth/login to /api/auth.php?action=login
+  RewriteRule ^auth/(.*)$ auth.php?action=$1 [QSA,L]
+  RewriteRule ^admin/(.*)$ admin.php?action=$1 [QSA,L]
+  RewriteRule ^progress/(.*)$ progress.php?action=$1 [QSA,L]
+  RewriteRule ^payment/(.*)$ payment.php?action=$1 [QSA,L]
+  RewriteRule ^quiz/(.*)$ quiz.php?action=$1 [QSA,L]
+</IfModule>

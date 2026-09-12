@@ -1,0 +1,777 @@
+{
+    "schemas": {
+        "plans": [
+            {
+                "COLUMN_NAME": "id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "PRI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "tenant_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "name",
+                "COLUMN_TYPE": "varchar(100)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "price",
+                "COLUMN_TYPE": "decimal(15,2)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "duration",
+                "COLUMN_TYPE": "int(11)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "features",
+                "COLUMN_TYPE": "longtext",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "created_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "updated_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": "on update current_timestamp()"
+            }
+        ],
+        "orders": [
+            {
+                "COLUMN_NAME": "id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "PRI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "tenant_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "order_id",
+                "COLUMN_TYPE": "varchar(100)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "UNI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "student_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "affiliate_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "plan_name",
+                "COLUMN_TYPE": "varchar(100)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "amount",
+                "COLUMN_TYPE": "decimal(15,2)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "status",
+                "COLUMN_TYPE": "varchar(20)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "'pending'",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "snap_token",
+                "COLUMN_TYPE": "varchar(255)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "created_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "updated_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": "on update current_timestamp()"
+            }
+        ],
+        "invoices": [
+            {
+                "COLUMN_NAME": "id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "PRI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "tenant_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "student_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "order_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "UNI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "subtotal",
+                "COLUMN_TYPE": "decimal(15,2)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "discount",
+                "COLUMN_TYPE": "decimal(15,2)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "0.00",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "tax_amount",
+                "COLUMN_TYPE": "decimal(15,2)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "0.00",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "grand_total",
+                "COLUMN_TYPE": "decimal(15,2)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "currency",
+                "COLUMN_TYPE": "varchar(3)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "'IDR'",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "historical_pricing_snapshot",
+                "COLUMN_TYPE": "longtext",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "created_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "updated_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": "on update current_timestamp()"
+            }
+        ],
+        "payments": [
+            {
+                "COLUMN_NAME": "id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "PRI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "tenant_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "invoice_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "order_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "gateway",
+                "COLUMN_TYPE": "varchar(50)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "'midtrans'",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "payment_method",
+                "COLUMN_TYPE": "varchar(50)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "'qris'",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "gateway_transaction_id",
+                "COLUMN_TYPE": "varchar(100)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "amount",
+                "COLUMN_TYPE": "decimal(15,2)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "currency",
+                "COLUMN_TYPE": "varchar(3)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "'IDR'",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "status",
+                "COLUMN_TYPE": "varchar(50)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "'pending'",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "created_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "updated_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": "on update current_timestamp()"
+            }
+        ],
+        "payment_events_history": [
+            {
+                "COLUMN_NAME": "id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "PRI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "payment_reference",
+                "COLUMN_TYPE": "varchar(100)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "gateway_transaction_id",
+                "COLUMN_TYPE": "varchar(100)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "event_status",
+                "COLUMN_TYPE": "varchar(50)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "processing_result",
+                "COLUMN_TYPE": "varchar(50)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "raw_payload",
+                "COLUMN_TYPE": "longtext",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "received_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            }
+        ],
+        "subscriptions": [
+            {
+                "COLUMN_NAME": "id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "PRI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "tenant_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "student_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "plan_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "status",
+                "COLUMN_TYPE": "varchar(50)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "'active'",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "payment_reference",
+                "COLUMN_TYPE": "varchar(100)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "UNI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "plan_name_snapshot",
+                "COLUMN_TYPE": "varchar(100)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "started_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "expires_at",
+                "COLUMN_TYPE": "datetime",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "created_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "updated_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": "on update current_timestamp()"
+            }
+        ],
+        "entitlements": [
+            {
+                "COLUMN_NAME": "id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "PRI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "tenant_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "student_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "feature_key",
+                "COLUMN_TYPE": "varchar(100)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "subscription_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "expires_at",
+                "COLUMN_TYPE": "datetime",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "revoked_at",
+                "COLUMN_TYPE": "datetime",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "NULL",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "created_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            }
+        ],
+        "affiliates": [
+            {
+                "COLUMN_NAME": "id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "PRI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "user_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "tenant_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "referral_code",
+                "COLUMN_TYPE": "varchar(50)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "UNI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "commission_rate",
+                "COLUMN_TYPE": "decimal(5,2)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "10.00",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "created_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "updated_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": "on update current_timestamp()"
+            }
+        ],
+        "commissions": [
+            {
+                "COLUMN_NAME": "id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "PRI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "affiliate_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "tenant_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "MUL",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "order_id",
+                "COLUMN_TYPE": "varchar(36)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "UNI",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "amount",
+                "COLUMN_TYPE": "decimal(15,2)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "commission_rate_snapshot",
+                "COLUMN_TYPE": "decimal(5,2)",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": null,
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "status",
+                "COLUMN_TYPE": "varchar(20)",
+                "IS_NULLABLE": "YES",
+                "COLUMN_DEFAULT": "'pending'",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "created_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": ""
+            },
+            {
+                "COLUMN_NAME": "updated_at",
+                "COLUMN_TYPE": "timestamp",
+                "IS_NULLABLE": "NO",
+                "COLUMN_DEFAULT": "current_timestamp()",
+                "COLUMN_KEY": "",
+                "EXTRA": "on update current_timestamp()"
+            }
+        ]
+    },
+    "data_counts": {
+        "plans": 1,
+        "orders": 0,
+        "invoices": 0,
+        "payments": 0,
+        "payment_events_history": 0,
+        "subscriptions": 0,
+        "entitlements": 0,
+        "affiliates": 0,
+        "commissions": 0
+    },
+    "webhook_col_refs": {
+        "orders": {
+            "plan_id": "MISSING",
+            "paid_at": "MISSING",
+            "subscription_id": "MISSING"
+        },
+        "subscriptions": {
+            "student_id": "EXISTS",
+            "plan_id": "EXISTS",
+            "payment_reference": "EXISTS",
+            "expires_at": "EXISTS",
+            "plan_name_snapshot": "EXISTS"
+        },
+        "affiliates": {
+            "commission_rate": "EXISTS"
+        },
+        "commissions": {
+            "affiliate_id": "EXISTS",
+            "tenant_id": "EXISTS",
+            "order_id": "EXISTS",
+            "amount": "EXISTS",
+            "commission_rate_snapshot": "EXISTS",
+            "status": "EXISTS"
+        }
+    },
+    "plans_columns": [
+        "id",
+        "tenant_id",
+        "name",
+        "price",
+        "duration",
+        "features",
+        "created_at",
+        "updated_at"
+    ],
+    "plan_entitlements": {
+        "count": 2,
+        "sample": [
+            {
+                "id": "1026df07-ad6b-11f1-8e58-3c9c0f6f48e7",
+                "plan_id": "9cddc683-ced3-4564-4de9-0fc099b896da",
+                "feature_key": "tryout_unlimited",
+                "created_at": "2026-09-11 05:57:56"
+            },
+            {
+                "id": "10274e53-ad6b-11f1-8e58-3c9c0f6f48e7",
+                "plan_id": "9cddc683-ced3-4564-4de9-0fc099b896da",
+                "feature_key": "premium_materials",
+                "created_at": "2026-09-11 05:57:56"
+            }
+        ]
+    },
+    "plans_data": [
+        {
+            "id": "9cddc683-ced3-4564-4de9-0fc099b896da",
+            "tenant_id": "553af312-fb50-4e24-93ee-0d1abd52a62d",
+            "name": "Test Plan 1",
+            "price": "50000.00",
+            "duration": 30,
+            "features": "[\"tryout_unlimited\",\"premium_materials\"]",
+            "created_at": "2026-09-11 05:57:56",
+            "updated_at": "2026-09-11 09:48:14"
+        }
+    ]
+}

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth scroll-pt-32">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Program Kemitraan Afiliasi | Elyana Ecosystem</title>
+  <meta name="description" content="Program Kemitraan Afiliasi Resmi Elyana Ecosystem - Komisi 20% Tahun Pertama + 10% Recurring Seumur Hidup untuk 8 Lini Produk Digital.">
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://elyana.biz.id/affiliate.html" />
+  <meta property="og:site_name" content="Elyana Affiliate Hub" />
+  <meta property="og:title" content="Program Kemitraan Afiliasi | Elyana Ecosystem" />
+  <meta property="og:description" content="Raih Komisi 20% Thn-1 + 10% Recurring Seumur Hidup dengan 1 Kode Referral Tunggal untuk 8 Lini Produk SaaS Ekosistem Elyana." />
+  <meta property="og:image" content="https://elyana.biz.id/og-image.jpg" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="affiliate.css">
+  <script defer src="affiliate.js"></script>
+</head>
+<body class="antialiased min-h-screen flex flex-col bg-[#020617] text-gray-100">
+  <!-- Header -->
+  <header class="glass-panel border-b border-white/10 py-3.5 px-6 sticky top-0 z-50 flex justify-between items-center">
+    <a href="index.html" class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl border border-cyan-500/40 bg-cyan-500/10 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+        <i class="fa-solid fa-handshake-angle text-cyan-400 text-sm"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="font-display font-bold text-lg text-white tracking-tight">elyana<span class="text-cyan-400">.affiliate</span></span>
+        <span class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">PARTNER HUB</span>
+      </div>
+    </a>
+    <div id="affiliate-header-actions" class="flex items-center gap-3">
+      <a href="index.html" class="p-1.5 px-3 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs transition-all font-mono">Home</a>
+      <button onclick="openUnifiedLoginModal()" class="px-4 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 text-xs font-mono font-bold transition-all shadow-[0_0_15px_rgba(6,182,212,0.2)] flex items-center gap-2">
+        <i class="fa-solid fa-arrow-right-to-bracket text-cyan-400"></i> Masuk / Login
+      </button>
+    </div>
+  </header>
+  <!-- Top Navigation Menu -->
+  <nav class="glass-panel py-2 px-4 flex justify-center gap-6 mb-4 sticky top-[68px] z-40 shadow-lg" aria-label="Main navigation">
+    <a href="#hero" class="text-cyan-300 hover:text-white transition-colors">Beranda</a>
+    <a href="#products" class="text-cyan-300 hover:text-white transition-colors">Produk</a>
+    <a href="#stats" class="text-cyan-300 hover:text-white transition-colors">Statistik</a>
+    <a href="#faq" class="text-cyan-300 hover:text-white transition-colors">FAQ</a>
+  </nav>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-10">
+    <!-- Hero -->
+    <section id="hero" class="scroll-mt-32 glass-panel rounded-3xl p-6 sm:p-12 relative overflow-hidden border border-cyan-500/20 text-center space-y-6">
+      <div class="absolute -right-20 -top-20 w-80 h-80 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <img src="/affiliate-hero.jpg" alt="Affiliate Hero" class="mx-auto max-w-full rounded-xl mb-6 shadow-lg">
+      <div class="max-w-3xl mx-auto space-y-4 relative z-10">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold">
+          <i class="fa-solid fa-bolt"></i> 1 KODE REFERRAL UNTUK 8 PRODUK UNGGULAN
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-tight">
+          Raih Komisi <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">20% Tahun Pertama</span><br class="hidden sm:inline">+ <span class="text-emerald-400">10% Recurring</span> Seumur Hidup
+        </h1>
+        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+          Dapatkan penghasilan pasif berkelanjutan dari setiap langganan software bisnis di ekosistem Elyana. Tracking otomatis, transparan, pencairan terjadwal, dan dipotong PPh resmi sesuai regulasi pajak.
+        </p>
+        <div class="flex flex-wrap justify-center gap-3 pt-2">
+          <button onclick="openRegisterModal()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-slate-950 font-display font-extrabold text-sm transition-all shadow-xl flex items-center gap-2">
+            <i class="fa-solid fa-rocket"></i> Daftar Jadi Mitra (Gratis)
+          </button>
+          <a href="#kalkulator" class="px-5 py-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 text-xs font-mono font-bold flex items-center gap-2">
+            <i class="fa-solid fa-calculator text-cyan-400"></i> Hitung Simulasi Komisi
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products Grid -->
+    <section id="products" class="scroll-mt-32 space-y-4">
+      <div class="text-center space-y-1">
+        <span class="text-xs font-mono text-cyan-400 font-bold uppercase">// 8 PRODUK SIAP DIJUAL</span>
+        <h2 class="text-2xl font-display font-bold text-white">Solusi Digital Bernilai Tinggi yang Dibutuhkan Pasar</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+        <!-- Example product card – duplicate for each product -->
+        <div class="glass-card p-5 rounded-2xl space-y-3">
+          <div class="flex justify-between items-start">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <i class="fa-solid fa-utensils"></i>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold">20% Thn-1 | 10% Rec</span>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-white text-base">ROS Resto Platform</h3>
+            <p class="text-xs text-slate-400 mt-1">Platform POS, Kitchen Display System (KDS), dan manajemen inventori restoran modern.</p>
+          </div>
+        </div>
+        <!-- Product Cards -->
+        <div class="glass-card p-5 rounded-2xl space-y-3" data-product-id="2">
+          <div class="flex justify-between items-start">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold">20% Thn-1 | 10% Rec</span>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-white text-base">EduPath Learning Platform</h3>
+            <p class="text-xs text-slate-400 mt-1">Sistem pembelajaran adaptif dengan konten SNBT terukur.</p>
+          </div>
+        </div>
+        <div class="glass-card p-5 rounded-2xl space-y-3" data-product-id="3">
+          <div class="flex justify-between items-start">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <i class="fa-solid fa-book"></i>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold">20% Thn-1 | 10% Rec</span>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-white text-base">Elyana Exam Prep</h3>
+            <p class="text-xs text-slate-400 mt-1">Koleksi soal dan simulasi ujian SNBT yang terkurasi.</p>
+          </div>
+        </div>
+        <div class="glass-card p-5 rounded-2xl space-y-3" data-product-id="4">
+          <div class="flex justify-between items-start">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold">20% Thn-1 | 10% Rec</span>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-white text-base">Elyana Analytics</h3>
+            <p class="text-xs text-slate-400 mt-1">Dashboard analitik performa belajar dan retensi siswa.</p>
+          </div>
+        </div>
+        <div class="glass-card p-5 rounded-2xl space-y-3" data-product-id="5">
+          <div class="flex justify-between items-start">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <i class="fa-solid fa-bullhorn"></i>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold">20% Thn-1 | 10% Rec</span>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-white text-base">Elyana Marketing Suite</h3>
+            <p class="text-xs text-slate-400 mt-1">Alat pemasaran digital terintegrasi untuk edukator.</p>
+          </div>
+        </div>
+        <div class="glass-card p-5 rounded-2xl space-y-3" data-product-id="6">
+          <div class="flex justify-between items-start">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold">20% Thn-1 | 10% Rec</span>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-white text-base">Elyana CRM</h3>
+            <p class="text-xs text-slate-400 mt-1">Manajemen relasi klien dan prospek untuk institusi pendidikan.</p>
+          </div>
+        </div>
+        <div class="glass-card p-5 rounded-2xl space-y-3" data-product-id="7">
+          <div class="flex justify-between items-start">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <i class="fa-solid fa-cloud"></i>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold">20% Thn-1 | 10% Rec</span>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-white text-base">Elyana Cloud Storage</h3>
+            <p class="text-xs text-slate-400 mt-1">Penyimpanan terpusat untuk materi belajar dan media.</p>
+          </div>
+        </div>
+        <div class="glass-card p-5 rounded-2xl space-y-3" data-product-id="8">
+          <div class="flex justify-between items-start">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold">20% Thn-1 | 10% Rec</span>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-white text-base">Elyana AI Assistant</h3>
+            <p class="text-xs text-slate-400 mt-1">Asisten virtual berbasis AI untuk tutor dan dukungan belajar.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section id="stats" class="scroll-mt-32 grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+      <div class="glass-card p-5 rounded-2xl text-center">
+        <span class="text-xs text-white/50 font-bold uppercase">Total Klik Referral</span>
+        <span id="stats-clicks" class="block text-4xl font-black font-mono text-amber-300 mt-2">0</span>
+        <span class="text-[10px] text-emerald-400 font-bold mt-1">+12 hari ini</span>
+      </div>
+      <div class="glass-card p-5 rounded-2xl text-center">
+        <span class="text-xs text-white/50 font-bold uppercase">Referral Aktif</span>
+        <span id="stats-active" class="block text-4xl font-black font-mono text-emerald-400 mt-2">0</span>
+        <span class="text-[10px] text-white/50 font-bold mt-1">18 Akuisisi + 6 Recurring</span>
+      </div>
+      <div class="glass-card p-5 rounded-2xl text-center">
+        <span class="text-xs text-white/50 font-bold uppercase">Total Komisi (IDR)</span>
+        <span id="stats-commission" class="block text-4xl font-black font-mono text-[#c0ff00] mt-2">Rp 0</span>
+        <span class="text-[10px] text-amber-300 font-bold mt-1">Siap Dicairkan</span>
+      </div>
+    </section>
+
+    <!-- CTA Card -->
+    <section class="shrink-0 flex flex-col items-center sm:items-end w-full lg:w-auto text-center lg:text-right space-y-3">
+      <button onclick="openRegisterModal()" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-black font-black text-sm transition-all hover:scale-105 hover:shadow-[0_0_35px_rgba(245,158,11,0.5)] active:scale-95 flex items-center justify-center gap-2 group shadow-xl">
+        <span>Gabung Mitra Afiliasi</span>
+        <i class="ph-bold ph-arrow-up-right text-base group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+      </button>
+      <span class="text-xs text-white/50 font-medium">Gratis daftar • 20% akuisisi + 10% recurring</span>
+    </section>
+    <!-- Registration Modal (hidden) -->
+    <div id="register-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+      <div class="glass-panel rounded-lg p-6 w-11/12 max-w-md">
+        <h2 class="text-2xl font-bold mb-4 text-white">Daftar Mitra Affiliate</h2>
+        <form id="register-form" class="space-y-4">
+          <input type="text" name="name" placeholder="Nama Lengkap" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none" required />
+          <input type="email" name="email" placeholder="Email" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none" required />
+          <input type="tel" name="whatsapp" placeholder="WhatsApp" class="w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none" required />
+          <button type="submit" class="w-full py-2 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-bold">Kirim Pendaftaran</button>
+        </form>
+        <button onclick="closeRegisterModal()" class="mt-4 text-sm text-gray-400 underline">Tutup</button>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <section id="faq" class="scroll-mt-32 space-y-4">
+      <h3 class="text-xl font-display font-bold text-white">FAQ</h3>
+      <details class="bg-slate-800/30 rounded-xl p-4">
+        <summary class="cursor-pointer text-cyan-400">Bagaimana cara mendaftar?</summary>
+        <p class="text-slate-300">Klik tombol “Daftar Jadi Mitra” dan ikuti proses pendaftaran.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="py-6 text-center text-sm text-slate-400">
+    © 2026 Elyana. Semua hak dilindungi.
+  </footer>
+</body>
+</html>

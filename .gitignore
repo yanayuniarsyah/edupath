@@ -1,3 +1,44 @@
-node_modules
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output — jangan commit dist ke repo
+# cPanel deployment menggunakan git push, bukan dist
+dist/
+dist-ssr/
+
+# Environment files — JANGAN commit file dengan secret asli
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+api/.env
+
+# OS
 .DS_Store
-*.local
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Vite timestamp files
+vite.config.mjs.timestamp-*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Archive files (tidak perlu di-track)
+*.zip
+
+# Test artifacts
+test.json
+test_results.json

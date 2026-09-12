@@ -123,7 +123,7 @@
             </button>
           </div>
           <p class="text-[11px] text-white/40 italic">
-            *Hasil asesmen berupa profil eksplorasi potensi edukatif, bukan diagnosis psikologis klinis.
+            *SPP merupakan alat eksplorasi diri untuk membantu siswa mengenali kecenderungan minat dan pola belajar. SPP bukan tes IQ, diagnosis psikologis, tes psikologi klinis, penentu jurusan, atau prediksi kelulusan perguruan tinggi.
           </p>
         </div>
 
@@ -270,35 +270,38 @@
             </p>
           </div>
 
-          <!-- Options -->
+          <!-- 1-5 Likert Scale Options -->
           <div class="space-y-3">
             <button
-              v-for="(option, idx) in currentQuestion.options"
-              :key="idx"
-              @click="selectOption(option)"
+              v-for="value in [1, 2, 3, 4, 5]"
+              :key="value"
+              @click="selectOption(value)"
               :class="[
-                'w-full text-left p-4 md:p-5 rounded-2xl border transition-all flex items-start gap-4 group',
-                selectedAnswers[currentQuestionIdx]?.id === option.id
+                'w-full text-left p-4 md:p-5 rounded-2xl border transition-all flex items-center justify-between group',
+                selectedAnswers[currentQuestionIdx] === value
                   ? 'bg-[#c0ff00]/15 border-[#c0ff00] shadow-[0_0_20px_rgba(192,255,0,0.15)] text-white'
                   : 'bg-white/[0.02] border-white/10 hover:border-white/30 hover:bg-white/[0.05] text-white/80'
               ]"
             >
-              <div
-                :class="[
-                  'w-7 h-7 shrink-0 rounded-full border flex items-center justify-center font-black text-xs transition-colors mt-0.5',
-                  selectedAnswers[currentQuestionIdx]?.id === option.id
-                    ? 'bg-[#c0ff00] text-black border-[#c0ff00]'
-                    : 'border-white/30 text-white/60 group-hover:border-white group-hover:text-white'
-                ]"
-              >
-                {{ String.fromCharCode(65 + idx) }}
-              </div>
-              <div class="space-y-1">
-                <div class="font-bold text-sm md:text-base text-white group-hover:text-[#c0ff00] transition-colors">
-                  {{ option.title }}
+              <div class="flex items-center gap-4">
+                <div
+                  :class="[
+                    'w-8 h-8 shrink-0 rounded-full border flex items-center justify-center font-black text-sm transition-colors',
+                    selectedAnswers[currentQuestionIdx] === value
+                      ? 'bg-[#c0ff00] text-black border-[#c0ff00]'
+                      : 'border-white/30 text-white/60 group-hover:border-white group-hover:text-white'
+                  ]"
+                >
+                  {{ value }}
                 </div>
-                <div class="text-xs text-white/50 leading-relaxed">
-                  {{ option.desc }}
+                <div class="font-bold text-sm md:text-base text-white group-hover:text-[#c0ff00] transition-colors">
+                  {{ 
+                    value === 1 ? (currentQuestion.dimension === 'Interest' ? 'Sangat Tidak Suka' : 'Sangat Tidak Setuju') :
+                    value === 2 ? (currentQuestion.dimension === 'Interest' ? 'Tidak Suka' : 'Tidak Setuju') :
+                    value === 3 ? 'Netral / Ragu-ragu' :
+                    value === 4 ? (currentQuestion.dimension === 'Interest' ? 'Suka' : 'Setuju') :
+                    (currentQuestion.dimension === 'Interest' ? 'Sangat Suka' : 'Sangat Setuju')
+                  }}
                 </div>
               </div>
             </button>
@@ -316,11 +319,11 @@
             <div v-else></div>
 
             <button
-              :disabled="!selectedAnswers[currentQuestionIdx]"
+              :disabled="!selectedAnswers[currentQuestionIdx] || isSubmitting"
               @click="nextQuestion"
               class="px-6 py-2.5 rounded-full bg-[#c0ff00] disabled:bg-white/10 text-black disabled:text-white/30 font-black text-xs md:text-sm hover:scale-105 active:scale-95 disabled:hover:scale-100 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(192,255,0,0.3)] disabled:shadow-none"
             >
-              <span>{{ currentQuestionIdx === questions.length - 1 ? 'Lihat Potential Profile' : 'Lanjut' }}</span>
+              <span>{{ isSubmitting ? 'Memproses...' : (currentQuestionIdx === questions.length - 1 ? 'Lihat Potential Profile' : 'Lanjut') }}</span>
               <i class="ph-bold ph-arrow-right"></i>
             </button>
           </div>
@@ -341,42 +344,42 @@
 
             <h2 class="text-xs font-bold tracking-[0.3em] uppercase text-white/40 font-mono">YOUR POTENTIAL PROFILE</h2>
             <h3 class="text-3xl sm:text-4xl md:text-5xl font-black text-white font-heading">
-              Potential Archetype: <span class="text-[#c0ff00] underline decoration-[#c0ff00]/40 underline-offset-8">{{ profile.archetype }}</span>
+              Hasil <span class="text-[#c0ff00] underline decoration-[#c0ff00]/40 underline-offset-8">Eksplorasimu</span>
             </h3>
             <p class="text-xs md:text-sm text-white/60 max-w-xl mx-auto">
               Profil eksplorasi berdasarkan sintesis 4 dimensi pemikiran, minat, strategi belajar, dan daya tahan belajarmu.
             </p>
           </div>
 
-          <!-- Grid: Strengths, Growth, Learning Profile -->
+          <!-- Grid: Strengths, Growth, Gambaran Learning -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <!-- Your Strengths -->
+            <!-- Kekuatan Relatif -->
             <div class="p-6 rounded-2xl bg-white/[0.04] border border-white/10 space-y-4 hover:border-emerald-400/40 transition-all">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 font-mono flex items-center gap-1.5">
-                  <i class="ph-bold ph-lightning text-base"></i> Your Strengths
+                  <i class="ph-bold ph-lightning text-base"></i> Kekuatan Relatif
                 </span>
                 <span class="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-bold">Pilar Utama</span>
               </div>
               <ul class="space-y-3 text-sm">
-                <li v-for="(strength, sIdx) in profile.strengths" :key="sIdx" class="flex items-start gap-2.5 text-white/90 font-semibold">
+                <li v-for="(strength, sIdx) in profile.relativeStrength" :key="sIdx" class="flex items-start gap-2.5 text-white/90 font-semibold">
                   <i class="ph-bold ph-check text-emerald-400 mt-1 shrink-0"></i>
                   <span>{{ strength }}</span>
                 </li>
               </ul>
             </div>
 
-            <!-- Your Growth Areas + WLC Bridge -->
+            <!-- Area Pengembangan + WLC Bridge -->
             <div class="p-6 rounded-2xl bg-white/[0.04] border border-white/10 space-y-4 hover:border-amber-400/40 transition-all">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wider text-amber-400 font-mono flex items-center gap-1.5">
-                  <i class="ph-bold ph-trend-up text-base"></i> Your Growth Areas
+                  <i class="ph-bold ph-trend-up text-base"></i> Area Pengembangan
                 </span>
                 <span class="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-bold">Ruang Upgrade</span>
               </div>
               <ul class="space-y-3 text-sm">
-                <li v-for="(growth, gIdx) in profile.growthAreas" :key="gIdx" class="flex items-start gap-2.5 text-white/90 font-semibold">
+                <li v-for="(growth, gIdx) in profile.developmentArea" :key="gIdx" class="flex items-start gap-2.5 text-white/90 font-semibold">
                   <i class="ph-bold ph-arrow-elbow-right-up text-amber-400 mt-1 shrink-0"></i>
                   <span>{{ growth }}</span>
                 </li>
@@ -396,26 +399,26 @@
               </div>
             </div>
 
-            <!-- Your Learning Profile -->
+            <!-- Gambaran Learning -->
             <div class="p-6 rounded-2xl bg-gradient-to-br from-[#c0ff00]/10 to-transparent border border-[#c0ff00]/30 space-y-4">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wider text-[#c0ff00] font-mono flex items-center gap-1.5">
-                  <i class="ph-bold ph-book-open text-base"></i> Learning Profile
+                  <i class="ph-bold ph-book-open text-base"></i> Gambaran Learning
                 </span>
                 <span class="text-[10px] px-2 py-0.5 rounded-md bg-[#c0ff00]/20 text-[#c0ff00] font-bold">Karakter</span>
               </div>
               <blockquote class="text-xs md:text-sm text-white/90 font-medium italic leading-relaxed border-l-2 border-[#c0ff00] pl-3 py-1">
-                "{{ profile.learningProfile }}"
+                "{{ profile.learning }}"
               </blockquote>
             </div>
           </div>
 
-          <!-- Fields Worth Exploring -->
+          <!-- Area Eksplorasi (Interest / RIASEC Top 3) -->
           <div class="p-6 md:p-8 rounded-2xl bg-white/[0.03] border border-white/10 space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <h4 class="font-black text-lg md:text-xl text-white">Fields Worth Exploring</h4>
-                <p class="text-xs text-white/50">Rekomendasi rumpun studi & jurusan berdasarkan kecocokan potensi alamimu.</p>
+                <h4 class="font-black text-lg md:text-xl text-white">Area Eksplorasi (Interest / RIASEC Top 3)</h4>
+                <p class="text-xs text-white/50">Area ini bukan rekomendasi jurusan otomatis. Gunakan sebagai titik awal untuk mencari tahu lebih jauh tentang bidang studi yang menarik buatmu.</p>
               </div>
               <span class="text-xs font-mono text-[#c0ff00] font-bold">Tingkat Keselarasan Potensi</span>
             </div>
@@ -454,13 +457,13 @@
                 
                 <div class="space-y-1">
                   <div class="text-[10px] uppercase font-mono tracking-widest text-[#c0ff00]">Digital Potential Card</div>
-                  <div class="text-xl font-black text-white font-heading">{{ profile.archetype }}</div>
+                  <div class="text-xl font-black text-white font-heading">Profil Potensi</div>
                   <div class="text-xs text-white/80 font-bold">{{ studentData.name || 'Siswa Mandiri' }}</div>
                   <div class="text-[10px] text-white/50">{{ studentData.school || 'SMA Negeri Indonesia' }} • Target: {{ studentData.targetUniv || 'PTN Impian' }}</div>
                 </div>
 
                 <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-[10px] text-white/70 italic">
-                  "{{ profile.learningProfile.slice(0, 85) }}..."
+                  "{{ profile.learning.slice(0, 85) }}..."
                 </div>
 
                 <div class="flex items-center justify-between pt-2 border-t border-white/10 text-[9px] text-white/40 font-mono">
@@ -550,10 +553,10 @@
             <!-- Big CTA to Academic Readiness Check with Context -->
             <div class="pt-2">
               <button
-                @click="triggerReadinessWithContext"
+                @click="handleEduPathCTA"
                 class="px-8 md:px-10 py-4 rounded-full bg-[#c0ff00] text-black font-black text-sm md:text-base hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_35px_rgba(192,255,0,0.6)] inline-flex items-center gap-2 group"
               >
-                <span>Take Academic Readiness Check ({{ studentData.targetUniv || 'Target PTN' }})</span>
+                <span>Mulai Persiapan Masuk Perguruan Tinggi</span>
                 <i class="ph-bold ph-arrow-right text-xl group-hover:translate-x-1 transition-transform"></i>
               </button>
             </div>
@@ -799,6 +802,7 @@
 
 <script>
 import { ref, reactive, computed } from 'vue';
+import api from '../api';
 
 export default {
   name: 'StudentPotentialPath',
@@ -810,6 +814,8 @@ export default {
     const copySuccess = ref(false);
     const schoolLinkCopied = ref(false);
     const selectedAnswers = ref([]);
+    const attemptId = ref(null);
+    const isSubmitting = ref(false);
 
     // Lead Capture Data
     const studentData = reactive({
@@ -835,153 +841,68 @@ export default {
       return `https://wa.me/6281234567890?text=${encodeURIComponent(text)}`;
     });
 
-    // 4 Dimension Interactive Questions
+    // 30 Canonical Questions
     const questions = [
-      {
-        dimension: 'Potential (Pola Berpikir & Kekuatan)',
-        question: 'Ketika menghadapi soal rumit atau masalah baru yang belum pernah diajarkan di kelas, apa respon spontanmu?',
-        context: 'Mengukur kekuatan naluri kognitif dalam memproses ketidakpastian.',
-        options: [
-          {
-            id: 'pot_1',
-            title: 'Membongkar Prinsip Dasarnya (Analytical Thinking)',
-            desc: 'Mencari tahu konsep inti dan rumus fundamentalnya sampai benar-benar paham akar masalahnya.'
-          },
-          {
-            id: 'pot_2',
-            title: 'Melihat Pola & Alternatif Solusi (Strategic Innovation)',
-            desc: 'Mencoba berbagai sudut pandang berbeda, mencari jalan pintas atau formula kreatif yang efisien.'
-          },
-          {
-            id: 'pot_3',
-            title: 'Mencari Data & Eksperimen Langsung (Pragmatic Builder)',
-            desc: 'Mengumpulkan referensi soal terdahulu dan menguji alur sistematis langkah demi langkah.'
-          },
-          {
-            id: 'pot_4',
-            title: 'Menghubungkan Ide dengan Narasi & Dampak (Creative Catalyst)',
-            desc: 'Menghubungkan masalah dengan konteks nyata, visualisasi konsep, dan komunikasi ide.'
-          }
-        ]
-      },
-      {
-        dimension: 'Interest (Bidang Minat & Eksplorasi)',
-        question: 'Jika kamu diberikan waktu luang 1 minggu penuh untuk menyelesaikan sebuah proyek bebas, topik mana yang paling membuatmu penasaran?',
-        context: 'Memetakan daya tarik intrinsik terhadap rumpun disiplin ilmu.',
-        options: [
-          {
-            id: 'int_1',
-            title: 'Bisnis, Pasar Modal, & Strategi Manajemen',
-            desc: 'Menganalisis tren industri, merancang startup/produk, dan mengelola ekosistem ekonomi bernilai tinggi.'
-          },
-          {
-            id: 'int_2',
-            title: 'Teknologi AI, Software, & Data Analytics',
-            desc: 'Membangun algoritma cerdas, coding aplikasi, dan mengolah big data masa depan.'
-          },
-          {
-            id: 'int_3',
-            title: 'Sains Eksakta, Kedokteran, & Rekayasa Teknik',
-            desc: 'Memecahkan misteri kesehatan biologis, bioteknologi, material alam, atau inovasi fisik.'
-          },
-          {
-            id: 'int_4',
-            title: 'Komunikasi Publik, Kebijakan Sosial, & Media Kreatif',
-            desc: 'Membentuk narasi opini, advokasi diplomasi, penyiaran media massa, dan seni komunikasi.'
-          }
-        ]
-      },
-      {
-        dimension: 'Learning (Kecenderungan Cara Belajar)',
-        question: 'Kapan kamu merasa sebuah materi paling menempel dan tidak gampang lupa di kepalamu?',
-        context: 'Menemukan format instruksional paling pas agar retensi materi maksimal.',
-        options: [
-          {
-            id: 'lrn_1',
-            title: 'Paham Filosofi "Why" di Balik Konsepnya',
-            desc: 'Kamu butuh mengerti alasan logika di balik rumus sebelum bisa memakainya dengan percaya diri.'
-          },
-          {
-            id: 'lrn_2',
-            title: 'Visual Skematis, Bagan Alur, & Visualisasi Grafis',
-            desc: 'Grafik hubungan sebab-akibat dan mind map jauh lebih cepat kamu cerna daripada teks padat.'
-          },
-          {
-            id: 'lrn_3',
-            title: 'Tantangan Bertingkat (Step-by-Step Escalation)',
-            desc: 'Mulai dari soal mudah, lalu perlahan dinaikkan tingkat kesulitannya ke level HOTS tinggi.'
-          },
-          {
-            id: 'lrn_4',
-            title: 'Diskusi Langsung & Membedah Studi Kasus Aktual',
-            desc: 'Menjelaskan ulang ke teman atau mendiskusikan implementasi soal pada kasus nyata di lapangan.'
-          }
-        ]
-      },
-      {
-        dimension: 'Growth (Persistence, Konsistensi & Grit)',
-        question: 'Ketika skor tryoutmu mengalami penurunan tajam padahal kamu sudah belajar keras, apa respon mentalmu?',
-        context: 'Memetakan resiliensi mental dan kemandirian regulasi diri (self-direction).',
-        options: [
-          {
-            id: 'gro_1',
-            title: 'Refleksi Blind-Spot & Restrukturisasi Jadwal (Growth Mindset)',
-            desc: 'Menganalisis kenapa bisa salah, mencatat pola kelemahan, dan merestrukturisasi target belajar.'
-          },
-          {
-            id: 'gro_2',
-            title: 'Butuh Reset Mental Singkat lalu Disiplin Melanjutkan Rutinitas',
-            desc: 'Sempat drop emosional 1-2 hari, namun disiplin rutinitas kembali menarikmu ke meja belajar.'
-          },
-          {
-            id: 'gro_3',
-            title: 'Fokus Latihan Soal Intensif pada Bab Tertentu',
-            desc: 'Menghajar bab yang menyumbang kesalahan terbanyak sampai tuntas tanpa menyerah.'
-          },
-          {
-            id: 'gro_4',
-            title: 'Memerlukan Bimbingan Mentor & Panduan Habit Harian',
-            desc: 'Sering cemas apakah ritme belajarmu sudah benar sehingga butuh panduan sistematis yang terukur.'
-          }
-        ]
-      }
+      { id: 'EFC_MAST_01', dimension: 'Potential', question: 'Saya yakin mampu memahami konsep materi UTBK yang menurut saya rumit.' },
+      { id: 'EFC_MAST_02', dimension: 'Potential', question: 'Saya merasa yakin bisa memecahkan soal ujian mandiri yang paling sulit sekalipun.' },
+      { id: 'EFC_CHAL_01', dimension: 'Potential', question: 'Saya merasa sanggup menghadapi format soal ujian yang baru dan belum pernah saya pelajari.' },
+      { id: 'EFC_CHAL_02', dimension: 'Potential', question: 'Saya percaya diri mengerjakan paket soal latihan yang melebihi standar sekolah saya.' },
+      { id: 'INT_REAL_01', dimension: 'Interest', question: 'Mempelajari cara kerja komponen mekanik pada kendaraan atau mesin.' },
+      { id: 'INT_REAL_02', dimension: 'Interest', question: 'Melakukan pekerjaan yang melibatkan perakitan perangkat elektronik secara langsung.' },
+      { id: 'INT_INVS_01', dimension: 'Interest', question: 'Melakukan percobaan laboratorium untuk menemukan jawaban atas fenomena ilmiah.' },
+      { id: 'INT_INVS_02', dimension: 'Interest', question: 'Membaca jurnal penelitian atau menganalisis kumpulan data statistik.' },
+      { id: 'INT_ARTS_01', dimension: 'Interest', question: 'Menulis karya fiksi, merancang skenario, atau menyusun naskah drama.' },
+      { id: 'INT_ARTS_02', dimension: 'Interest', question: 'Mendesain ilustrasi grafis, logo, atau membuat komposisi karya seni rupa.' },
+      { id: 'INT_SOCL_01', dimension: 'Interest', question: 'Memberikan bimbingan atau mengajari teman yang sedang kesulitan dalam belajar.' },
+      { id: 'INT_SOCL_02', dimension: 'Interest', question: 'Menjadi pendengar yang baik dan membantu menyelesaikan konflik dalam kelompok studi.' },
+      { id: 'INT_ENTR_01', dimension: 'Interest', question: 'Mengambil peran sebagai ketua atau pemimpin dalam proyek tugas sekolah.' },
+      { id: 'INT_ENTR_02', dimension: 'Interest', question: 'Mempresentasikan proposal dan meyakinkan orang lain untuk menyetujui ide saya.' },
+      { id: 'INT_CONV_01', dimension: 'Interest', question: 'Mengelompokkan data penelitian ke dalam tabel atau spreadsheet yang rapi.' },
+      { id: 'INT_CONV_02', dimension: 'Interest', question: 'Mengelola pembukuan, jadwal, atau arsip administrasi secara sistematis.' },
+      { id: 'SRL_PLAN_01', dimension: 'Learning', question: 'Saya membuat target mingguan untuk menyelesaikan bab-bab pelajaran tertentu.' },
+      { id: 'SRL_PLAN_02', dimension: 'Learning', question: 'Sebelum mulai latihan soal, saya memastikan semua catatan penting sudah saya siapkan.' },
+      { id: 'SRL_PLAN_03', dimension: 'Learning', question: 'Saya membagi materi belajar yang panjang menjadi bagian-bagian kecil agar lebih mudah dipelajari harian.' },
+      { id: 'SRL_CTRL_01', dimension: 'Learning', question: 'Saya menjauhkan diri dari gangguan fisik seperti notifikasi HP saat sesi belajar berlangsung.' },
+      { id: 'SRL_CTRL_02', dimension: 'Learning', question: 'Saya secara sadar memaksa diri saya untuk kembali fokus saat pikiran mulai melayang ketika membaca.' },
+      { id: 'SRL_CTRL_03', dimension: 'Learning', question: 'Saya membuka media sosial atau game di tengah-tengah waktu mengerjakan latihan soal.' },
+      { id: 'SRL_REFL_01', dimension: 'Learning', question: 'Saya mencatat bagian mana saja yang saya kerjakan salah setelah melihat skor tryout.' },
+      { id: 'SRL_REFL_02', dimension: 'Learning', question: 'Saya mempertimbangkan apakah pola belajar saya saat ini masih efektif untuk mencapai target.' },
+      { id: 'SRL_REFL_03', dimension: 'Learning', question: 'Saya mengabaikan pembahasan soal yang saya jawab salah karena merasa sudah tidak penting.' },
+      { id: 'GRT_PERS_01', dimension: 'Growth', question: 'Saya terus mencoba mengerjakan soal yang sama meskipun memakan waktu jauh lebih lama dari biasanya.' },
+      { id: 'GRT_PERS_02', dimension: 'Growth', question: 'Saya tidak berhenti belajar meskipun topik yang saya hadapi sangat membosankan.' },
+      { id: 'GRT_PERS_03', dimension: 'Growth', question: 'Saya mengulangi latihan pada materi yang sama walau sudah berulang kali mendapat nilai buruk.' },
+      { id: 'GRT_PERS_04', dimension: 'Growth', question: 'Saya berhenti berusaha menyelesaikan soal rumit setelah beberapa percobaan pertama gagal.' },
+      { id: 'GRT_PERS_05', dimension: 'Growth', question: 'Saya melewati bab materi yang sulit dipahami dan enggan mencobanya lagi di kemudian hari.' }
     ];
 
-    // Default synthesized profile (Upgraded to 6 rich archetypes)
+    // Profile from Backend
     const profile = reactive({
-      archetype: 'Analytical Explorer',
-      strengths: ['Analytical Thinking', 'Problem Solving', 'Curiosity'],
-      growthAreas: ['Consistency', 'Persistence'],
-      learningProfile: 'Kamu cenderung berkembang pesat ketika memahami "why" di balik sebuah konsep dan diberi tantangan soal yang meningkat secara bertahap.',
-      fields: [
-        { name: 'Business & Management', desc: 'Strategi, Keuangan, Analisis Bisnis', stars: 5, matchRate: 95 },
-        { name: 'Technology & Data', desc: 'Ilmu Komputer, AI, Sains Data', stars: 4, matchRate: 88 },
-        { name: 'Engineering', desc: 'Teknik Industri, Elektro, Sistem', stars: 4, matchRate: 82 },
-        { name: 'Communication', desc: 'Manajemen Media, Hubungan Publik', stars: 3, matchRate: 74 }
-      ]
+      archetype: '',
+      strengths: [],
+      growthAreas: [],
+      learningProfile: '',
+      fields: []
     });
 
-    // School sample statistics
-    const schoolStats = {
-      potentialAreas: [
-        { name: 'Business & Management', pct: 26, count: 130 },
-        { name: 'Technology & Data', pct: 22, count: 110 },
-        { name: 'Engineering & Hard Sciences', pct: 19, count: 95 },
-        { name: 'Health & Medical Sciences', pct: 15, count: 75 },
-        { name: 'Humanities & Social Politics', pct: 10, count: 50 },
-        { name: 'Creative Arts & Media', pct: 8, count: 40 }
-      ],
-      growthAreas: [
-        { title: 'Consistency & Study Habit', desc: 'Tantangan menjaga jadwal belajar mandiri tanpa pengawasan guru.', pct: 42 },
-        { title: 'Complex Problem Solving (HOTS)', desc: 'Kesulitan saat menghadapi soal multidisiplin yang membutuhkan sintesis konsep.', pct: 31 },
-        { title: 'Learning Independence & Self-Direction', desc: 'Kebutuhan petunjuk langkah demi langkah saat menemui materi baru.', pct: 27 }
-      ]
-    };
+    const schoolStats = reactive({
+      potentialAreas: [],
+      growthAreas: []
+    });
 
-    const proceedToQuestions = () => {
-      sppStage.value = 'questions';
-      currentQuestionIdx.value = 0;
-      selectedAnswers.value = [];
+    const proceedToQuestions = async () => {
+      api.trackEvent('spp_start');
+      try {
+        isSubmitting.value = true;
+        const res = await api.sppCreateAttempt();
+        attemptId.value = res.attempt_id;
+        sppStage.value = 'questions';
+        currentQuestionIdx.value = 0;
+        selectedAnswers.value = [];
+      } catch (err) {
+        alert("Gagal memulai attempt: " + err.message);
+      } finally {
+        isSubmitting.value = false;
+      }
     };
 
     const loadSampleResult = () => {
@@ -989,84 +910,53 @@ export default {
       studentData.school = 'SMAN 8 Jakarta';
       studentData.targetUniv = 'ITB Bandung';
       studentData.targetMajor = 'Teknik Informatika';
-      calculateProfile();
+      profile.archetype = 'Analytical Explorer';
       sppStage.value = 'result';
+          api.trackEvent('spp_result_view');
+          api.trackEvent('spp_exploration_view');
     };
 
-    const selectOption = (option) => {
-      selectedAnswers.value[currentQuestionIdx.value] = option;
+    const selectOption = (value) => {
+      selectedAnswers.value[currentQuestionIdx.value] = value;
     };
 
-    const nextQuestion = () => {
+    const nextQuestion = async () => {
       if (currentQuestionIdx.value < questions.length - 1) {
         currentQuestionIdx.value++;
       } else {
-        // Synthesize results based on selections
-        calculateProfile();
-        sppStage.value = 'result';
-      }
-    };
-
-    const calculateProfile = () => {
-      const pot = selectedAnswers.value[0]?.id;
-      const intChoice = selectedAnswers.value[1]?.id;
-
-      // 6 Distinct Archetypes Synthesis
-      if (intChoice === 'int_2' && (pot === 'pot_1' || pot === 'pot_3')) {
-        profile.archetype = 'Systematic Tech Visionary';
-        profile.strengths = ['Algorithmic Thinking', 'Logic Formulation', 'System Architecture'];
-        profile.growthAreas = ['Creative Ideation', 'Study Habit Consistency'];
-        profile.learningProfile = 'Kamu berkembang pesat lewat logika struktural yang jelas, visualisasi kode, dan pembuktian empiris bertahap.';
-        profile.fields = [
-          { name: 'Technology & AI', desc: 'Software Engineering, Data Science', stars: 5, matchRate: 98 },
-          { name: 'Engineering Systems', desc: 'Teknik Elektro, Robotika, Mekatronika', stars: 4, matchRate: 89 },
-          { name: 'Applied Mathematics', desc: 'Statistika Terapan, Kriptografi', stars: 4, matchRate: 84 },
-          { name: 'Business Tech', desc: 'Product Management, FinTech', stars: 3, matchRate: 77 }
-        ];
-      } else if (intChoice === 'int_1' && (pot === 'pot_2' || pot === 'pot_1')) {
-        profile.archetype = 'The Strategic Architect';
-        profile.strengths = ['Strategic Thinking', 'Decision Making', 'Resource Optimization'];
-        profile.growthAreas = ['Detail Persistence', 'Patience with Abstract Theory'];
-        profile.learningProfile = 'Kamu unggul ketika melihat gambaran besar (big picture) suatu sistem dan memahami implikasi strategis di dunia nyata.';
-        profile.fields = [
-          { name: 'Business & Management', desc: 'Manajemen Bisnis, Keuangan, Kewirausahaan', stars: 5, matchRate: 96 },
-          { name: 'Industrial Engineering', desc: 'Optimasi Proses & Manajemen Rantai Pasok', stars: 4, matchRate: 89 },
-          { name: 'Economics & Policy', desc: 'Ekonomi Makro, Analisis Investasi', stars: 4, matchRate: 83 },
-          { name: 'Corporate Law', desc: 'Hukum Bisnis & Tata Kelola', stars: 3, matchRate: 75 }
-        ];
-      } else if (intChoice === 'int_4') {
-        profile.archetype = 'The Creative Catalyst';
-        profile.strengths = ['Persuasive Communication', 'Empathy & Insight', 'Narrative Synthesis'];
-        profile.growthAreas = ['Quantitative Consistency', 'Mathematical Rigor'];
-        profile.learningProfile = 'Kamu menyerap materi paling cepat melalui metafora kontekstual, diskusi interaktif, dan studi kasus sosial manusia.';
-        profile.fields = [
-          { name: 'Communication & Media', desc: 'Ilmu Komunikasi, Jurnalistik, Hubungan Publik', stars: 5, matchRate: 95 },
-          { name: 'Social Politics & Diplomacy', desc: 'Hubungan Internasional, Ilmu Politik', stars: 4, matchRate: 88 },
-          { name: 'Creative Design & Arts', desc: 'DKV, Desain Komunikasi Visual, Multimedia', stars: 4, matchRate: 82 },
-          { name: 'Psychology & Behavioral', desc: 'Psikologi Terapan, Konseling Organisasi', stars: 4, matchRate: 80 }
-        ];
-      } else if (intChoice === 'int_3') {
-        profile.archetype = 'The Systematic Investigator';
-        profile.strengths = ['Empirical Rigor', 'Critical Investigation', 'Deep Focus'];
-        profile.growthAreas = ['Speed in High Stakes', 'Risk Tolerance'];
-        profile.learningProfile = 'Kamu berkembang dengan metode berbasis bukti, penalaran saintifik langkah demi langkah, dan verifikasi fakta konsep.';
-        profile.fields = [
-          { name: 'Medicine & Health Sciences', desc: 'Pendidikan Dokter, Farmasi, Biomedis', stars: 5, matchRate: 97 },
-          { name: 'Pure Sciences', desc: 'Biologi Molekuler, Kimia Terapan, Fisika', stars: 4, matchRate: 90 },
-          { name: 'Biomedical Engineering', desc: 'Teknik Biomedis & Instrumen Kesehatan', stars: 4, matchRate: 85 },
-          { name: 'Environmental Sciences', desc: 'Bioteknologi Lingkungan & Sumber Daya', stars: 3, matchRate: 78 }
-        ];
-      } else {
-        profile.archetype = 'Analytical Explorer';
-        profile.strengths = ['Analytical Thinking', 'Problem Solving', 'Curiosity'];
-        profile.growthAreas = ['Consistency', 'Persistence'];
-        profile.learningProfile = 'Kamu cenderung berkembang pesat ketika memahami "why" di balik sebuah konsep dan diberi tantangan soal yang meningkat secara bertahap.';
-        profile.fields = [
-          { name: 'Business & Management', desc: 'Strategi, Keuangan, Analisis Bisnis', stars: 5, matchRate: 95 },
-          { name: 'Technology & Data', desc: 'Ilmu Komputer, AI, Sains Data', stars: 4, matchRate: 88 },
-          { name: 'Engineering', desc: 'Teknik Industri, Elektro, Sistem', stars: 4, matchRate: 82 },
-          { name: 'Communication', desc: 'Manajemen Media, Hubungan Publik', stars: 3, matchRate: 74 }
-        ];
+        // Submit all 30 responses
+        try {
+          isSubmitting.value = true;
+          const responses = {};
+          questions.forEach((q, idx) => {
+            responses[q.id] = selectedAnswers.value[idx];
+          });
+          
+          api.trackEvent('spp_submit');
+          await api.sppSubmitAttempt(attemptId.value, responses, 300); // placeholder duration
+          const result = await api.sppGetResult(attemptId.value);
+          
+          // Map backend result to frontend profile object
+          if (result && result.score_data) {
+             profile.archetype = result.score_data.archetype || 'Explorer';
+             profile.relativeStrength = result.score_data.relative_strength || [];
+             profile.developmentArea = result.score_data.development_area || [];
+             profile.learning = (result.score_data.narrative_keys && result.score_data.narrative_keys.learning) || 'Siswa menunjukkan pola pembelajaran mandiri.';
+             profile.fields = (result.score_data.riasec_top3 || []).map(r => ({
+               name: r.type,
+               desc: `Cocok untuk tipe ${r.type}`,
+               stars: r.score >= 80 ? 5 : 4,
+               matchRate: Math.round(r.score)
+             }));
+          }
+          sppStage.value = 'result';
+          api.trackEvent('spp_result_view');
+          api.trackEvent('spp_exploration_view');
+        } catch (err) {
+          alert("Gagal mengirim jawaban: " + err.message);
+        } finally {
+          isSubmitting.value = false;
+        }
       }
     };
 
@@ -1074,11 +964,12 @@ export default {
       sppStage.value = 'intro';
       currentQuestionIdx.value = 0;
       selectedAnswers.value = [];
+      attemptId.value = null;
     };
 
     const shareCard = async () => {
       const nameTag = studentData.name ? `${studentData.name} (${studentData.school})` : 'Gue';
-      const shareText = `${nameTag} baru aja cek potensi diri di Student Potential Path (SPP)! Archetype gue: ${profile.archetype}. Target kampus: ${studentData.targetUniv || 'PTN Impian'}. Coba cek potensimu juga di EduPath secara gratis!`;
+      const shareText = `${nameTag} baru aja cek potensi diri di Student Potential Path (SPP)! Telah menyelesaikan SPP!. Target kampus: ${studentData.targetUniv || 'PTN Impian'}. Coba cek potensimu juga di EduPath secara gratis!`;
       if (navigator.clipboard) {
         try {
           await navigator.clipboard.writeText(shareText + ' ' + window.location.href);
@@ -1106,7 +997,7 @@ export default {
       }
     };
 
-    const triggerReadinessWithContext = () => {
+    const handleEduPathCTA = () => {
       emit('take-readiness', {
         studentName: studentData.name,
         school: studentData.school,
@@ -1120,7 +1011,7 @@ export default {
       activeMode,
       sppStage,
       currentQuestionIdx,
-      currentQuestion: questions[0],
+      currentQuestion: computed(() => questions[currentQuestionIdx.value]),
       questions,
       selectedAnswers,
       studentData,
@@ -1133,6 +1024,7 @@ export default {
       schoolStats,
       copySuccess,
       schoolLinkCopied,
+      isSubmitting,
       proceedToQuestions,
       loadSampleResult,
       selectOption,
@@ -1140,13 +1032,8 @@ export default {
       retakeAssessment,
       shareCard,
       copySchoolLink,
-      triggerReadinessWithContext
+      handleEduPathCTA
     };
-  },
-  watch: {
-    currentQuestionIdx(newVal) {
-      this.currentQuestion = this.questions[newVal];
-    }
   }
 };
 </script>

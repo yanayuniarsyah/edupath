@@ -267,6 +267,9 @@
               <option value="utama">Utama</option>
               <option value="vip">VIP</option>
             </select>
+            <button @click="showStudentModal = true" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-2">
+              <i class="ph-bold ph-plus"></i> Tambah Siswa
+            </button>
           </div>
 
           <!-- Students Table -->
@@ -303,6 +306,11 @@
         <div v-if="activeTab === 'questions'" class="space-y-6 animate-fade-in">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-black text-slate-800">Manajemen Bank Soal</h2>
+            
+            <button @click="showImportModal = true" class="px-4 py-2 bg-emerald-50 text-emerald-600 font-bold rounded-xl hover:bg-emerald-100 mr-2">
+              <i class="ph-bold ph-file-csv mr-1"></i> Import CSV
+            </button>
+
             <button @click="openQuestionModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-colors shadow-sm">
               + Tambah Soal
             </button>
@@ -311,7 +319,7 @@
           <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div class="p-4 border-b border-slate-100 flex gap-3">
               <input v-model="qSearch" type="text" placeholder="Cari soal..." class="flex-grow px-4 py-2 text-xs text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
-              <select v-model="qSubtest" class="px-3 py-2 text-xs font-bold text-slate-800 bg-white border border-slate-200 rounded-xl outline-none cursor-pointer">
+              <select v-model="qSubMateri" class="px-3 py-2 text-xs font-bold text-slate-800 bg-white border border-slate-200 rounded-xl outline-none cursor-pointer">
                 <option value="all">Semua Subtes</option>
                 <option value="Penalaran Umum">Penalaran Umum</option>
                 <option value="Penalaran Matematika">Penalaran Matematika</option>
@@ -332,7 +340,7 @@
                 <thead>
                   <tr class="bg-slate-50 border-b border-slate-100">
                     <th class="text-left px-5 py-3 font-black text-slate-500 uppercase tracking-wider w-1/2">Soal</th>
-                    <th class="text-left px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Subtes</th>
+                    <th class="text-left px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Sub Materi</th>
                     <th class="text-left px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Kategori & Level</th>
                     <th class="text-left px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Status</th>
                     <th class="text-right px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Aksi</th>
@@ -343,7 +351,7 @@
                     <td class="px-5 py-3.5">
                       <div class="line-clamp-2 text-slate-700">{{ q.question }}</div>
                     </td>
-                    <td class="px-5 py-3.5 font-bold text-slate-600">{{ q.subtes }}</td>
+                    <td class="px-5 py-3.5 font-bold text-slate-600">{{ q.sub_materi }}</td>
                     <td class="px-5 py-3.5">
                       <div class="flex flex-col gap-1 items-start">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 uppercase">{{ q.usage_type || 'Latihan' }}</span>
@@ -392,7 +400,7 @@
                 <thead>
                   <tr class="bg-slate-50 border-b border-slate-100">
                     <th class="text-left px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Judul Materi</th>
-                    <th class="text-left px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Subtes</th>
+                    <th class="text-left px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Sub Materi</th>
                     <th class="text-left px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Guru/PJ</th>
                     <th class="text-left px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Status</th>
                     <th class="text-right px-5 py-3 font-black text-slate-500 uppercase tracking-wider">Aksi</th>
@@ -401,7 +409,7 @@
                 <tbody class="divide-y divide-slate-50">
                   <tr v-for="m in filteredMaterials" :key="m.id" class="hover:bg-slate-50">
                     <td class="px-5 py-3.5 font-bold text-slate-700">{{ m.title }}</td>
-                    <td class="px-5 py-3.5 font-bold text-slate-600">{{ m.subtes }}</td>
+                    <td class="px-5 py-3.5 font-bold text-slate-600">{{ m.sub_materi }}</td>
                     <td class="px-5 py-3.5 font-bold text-slate-500 text-xs">{{ m.teacher_name || '-' }}</td>
                     <td class="px-5 py-3.5">
                       <span class="px-2 py-0.5 rounded-full font-black text-[10px]" :class="m.is_active !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'">
@@ -505,6 +513,45 @@
     </div>
 
     <!-- Modals -->
+    
+    <!-- Student Modal -->
+    <div v-if="showStudentModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
+          <h3 class="font-black text-lg text-slate-800">Tambah Siswa Baru</h3>
+          <button @click="showStudentModal = false" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-xl"></i></button>
+        </div>
+        <form @submit.prevent="saveStudent" class="p-6 space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Nama Lengkap</label>
+            <input v-model="studentForm.name" required type="text" class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Email</label>
+            <input v-model="studentForm.email" required type="email" class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Password</label>
+            <input v-model="studentForm.password" required type="password" class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Paket</label>
+            <select v-model="studentForm.plan" required class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400">
+              <option value="free">Free</option>
+              <option value="mandiri">Mandiri</option>
+              <option value="utama">Utama</option>
+              <option value="vip">VIP</option>
+            </select>
+          </div>
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <button type="button" @click="showStudentModal = false" class="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors">Batal</button>
+            <button type="submit" :disabled="isSaving" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition-colors disabled:opacity-50">
+              Simpan
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- Plan Modal -->
     <div v-if="showPlanModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -518,10 +565,14 @@
             <label class="block text-xs font-bold text-slate-500 mb-1">Nama Paket</label>
             <input v-model="pForm.name" required type="text" class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
           </div>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-3 gap-4">
             <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Harga (Rp)</label>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Harga Asli (Rp)</label>
               <input v-model="pForm.price" required type="number" class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Diskon (Rp) opsional</label>
+              <input v-model="pForm.discount" type="number" class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Durasi (Hari)</label>
@@ -529,8 +580,13 @@
             </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">Fitur (pisahkan dengan koma)</label>
-            <textarea v-model="pForm.featuresStr" required rows="3" class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400"></textarea>
+            <label class="block text-xs font-bold text-slate-500 mb-2">Entitlement (Fitur Akses)</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <label v-for="ent in entitlementsDict" :key="ent.key" class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors" :class="{'bg-indigo-50 border-indigo-200': pForm.features.includes(ent.key)}">
+                <input type="checkbox" :value="ent.key" v-model="pForm.features" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
+                <span class="text-sm text-slate-700 font-medium">{{ ent.label }}</span>
+              </label>
+            </div>
           </div>
           <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button type="button" @click="closePlanModal" class="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors">Batal</button>
@@ -589,8 +645,8 @@
         <form @submit.prevent="saveQuestion" class="p-6 space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Subtes</label>
-              <select v-model="qForm.subtes" required class="w-full p-2 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400">
+              <label class="block text-xs font-bold text-slate-500 mb-1">Sub Materi</label>
+              <select v-model="qForm.sub_materi" required class="w-full p-2 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400">
                 <option value="Penalaran Umum">Penalaran Umum</option>
                 <option value="Penalaran Matematika">Penalaran Matematika</option>
                 <option value="Literasi B. Indonesia">Literasi B. Indonesia</option>
@@ -617,7 +673,7 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Level Kognitif</label>
-              <select v-model="qForm.cognitive_level" required class="w-full p-2 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400">
+              <select v-model="qForm.cognitive_demand" required class="w-full p-2 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400">
                 <option value="C1">C1 - Mengingat</option>
                 <option value="C2">C2 - Memahami</option>
                 <option value="C3">C3 - Aplikasi</option>
@@ -627,8 +683,46 @@
               </select>
             </div>
           </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Sumber Soal</label>
+              <select v-model="qForm.source_type" required class="w-full p-2 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400">
+                <option value="author_created">Dibuat Sendiri (Author)</option>
+                <option value="official_source">Sumber Resmi</option>
+                <option value="licensed">Lisensi Pihak Ketiga</option>
+                <option value="adapted">Diadaptasi / Dimodifikasi</option>
+                <option value="unknown">Tidak Diketahui</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Status Hak Cipta</label>
+              <select v-model="qForm.rights_status" required class="w-full p-2 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400">
+                <option value="unknown">Belum Di-review (Unknown)</option>
+                <option value="owned">Milik Sendiri</option>
+                <option value="fair_use">Fair Use (Edukasi)</option>
+                <option value="licensed">Berlisensi Sah</option>
+                <option value="restricted">Restricted / Tidak Boleh Dipublish</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Nama Sumber (Opsional)</label>
+              <input v-model="qForm.source_name" type="text" placeholder="Misal: UTBK 2023" class="w-full p-2 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Tahun (Opsional)</label>
+              <input v-model="qForm.source_year" type="number" placeholder="2023" class="w-full p-2 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Referensi URL/Buku</label>
+              <input v-model="qForm.source_reference" type="text" placeholder="URL atau hal." class="w-full p-2 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
+            </div>
+          </div>
           <div>
             <label class="block text-xs font-bold text-slate-500 mb-1">Pertanyaan</label>
+
             <textarea v-model="qForm.question" required rows="3" class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400"></textarea>
           </div>
           <div class="space-y-3">
@@ -662,8 +756,8 @@
             <input v-model="mForm.title" required type="text" class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">Subtes</label>
-            <select v-model="mForm.subtes" required class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400">
+            <label class="block text-xs font-bold text-slate-500 mb-1">Sub Materi</label>
+            <select v-model="mForm.sub_materi" required class="w-full p-3 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400">
               <option value="Penalaran Umum">Penalaran Umum</option>
               <option value="Penalaran Matematika">Penalaran Matematika</option>
               <option value="Literasi B. Indonesia">Literasi B. Indonesia</option>
@@ -707,7 +801,7 @@ const activeTab = ref('overview');
 const studentSearch = ref('');
 const studentPlanFilter = ref('all');
 const qSearch = ref('');
-const qSubtest = ref('all');
+const qSubMateri = ref('all');
 
 // ── Stats (Overview Dashboard) ──
 const stats = reactive({
@@ -841,8 +935,6 @@ onMounted(() => {
   if (isAuthenticated.value) {
     fetchDashboard();
     fetchStudents();
-    loadQuestions();
-    loadMaterials();
     loadPlansAndStaff();
   }
 });
@@ -854,8 +946,8 @@ const questionsLoading = ref(false);
 const fetchQuestions = async () => {
   questionsLoading.value = true;
   try {
-    const res = await api.getAdminQuestions(1, qSubtest.value === 'all' ? '' : qSubtest.value);
-    serverQuestions.value = res.questions || [];
+    const res = await api.getAdminQuestions(1, qSubMateri.value === 'all' ? '' : qSubMateri.value);
+    serverQuestions.value = Array.isArray(res) ? res : (res.questions || []);
   } catch (err) {
     console.error("Gagal memuat soal", err);
   } finally {
@@ -873,9 +965,73 @@ const filteredQuestions = computed(() => {
 });
 
 const showQuestionModal = ref(false);
+
+const showImportModal = ref(false);
+const stagingData = ref([]);
+const currentBatchId = ref('');
+const hasErrors = computed(() => stagingData.value.some(r => r.status === 'error'));
+
+
+const handleFileUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  try {
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data, { type: 'array' });
+    const firstSheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[firstSheetName];
+    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    
+    if (jsonData.length === 0) {
+      alert("File kosong atau format salah.");
+      return;
+    }
+
+    const res = await fetch('/api/importer.php?action=upload', {
+      method: 'POST',
+      headers: { 
+        'Authorization': 'Bearer ' + localStorage.getItem('edupath_token'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(jsonData)
+    }).then(r => r.json());
+    
+    if (res.error) throw new Error(res.error);
+    
+    currentBatchId.value = res.batch_id;
+    stagingData.value = await fetch('/api/importer.php?action=preview&batch_id=' + res.batch_id, {
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('edupath_token') }
+    }).then(r => r.json());
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
+const commitImport = async () => {
+  try {
+    const res = await fetch('/api/importer.php?action=commit', {
+      method: 'POST',
+      headers: { 
+        'Authorization': 'Bearer ' + localStorage.getItem('edupath_token'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ batch_id: currentBatchId.value })
+    }).then(r => r.json());
+    
+    if (res.error) throw new Error(res.error);
+    alert('Berhasil mengimpor ' + res.inserted + ' soal!');
+    showImportModal.value = false;
+    stagingData.value = [];
+    loadQuestions();
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
 const isEditingQuestion = ref(false);
 const isSaving = ref(false);
-const qForm = reactive({ id: null, subtes: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_level: 'C3' });
+const qForm = reactive({ id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', source_name: '', source_year: null, source_reference: '' });
 
 const openQuestionModal = (q = null) => {
   if (q) {
@@ -883,7 +1039,7 @@ const openQuestionModal = (q = null) => {
     Object.assign(qForm, q);
   } else {
     isEditingQuestion.value = false;
-    Object.assign(qForm, { id: null, subtes: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_level: 'C3' });
+    Object.assign(qForm, { id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', source_name: '', source_year: null, source_reference: '' });
   }
   showQuestionModal.value = true;
 };
@@ -938,14 +1094,14 @@ const filteredMaterials = computed(() => {
   let list = serverMaterials.value;
   if (mSearch.value) {
     const s = mSearch.value.toLowerCase();
-    list = list.filter(m => (m.title && m.title.toLowerCase().includes(s)) || (m.subtes && m.subtes.toLowerCase().includes(s)));
+    list = list.filter(m => (m.title && m.title.toLowerCase().includes(s)) || (m.sub_materi && m.sub_materi.toLowerCase().includes(s)));
   }
   return list;
 });
 
 const showMaterialModal = ref(false);
 const isEditingMaterial = ref(false);
-const mForm = reactive({ id: null, title: '', content: '', subtes: 'Penalaran Umum', teacher_name: '' });
+const mForm = reactive({ id: null, title: '', content: '', sub_materi: 'Penalaran Umum', teacher_name: '' });
 
 const openMaterialModal = (m = null) => {
   if (m) {
@@ -953,7 +1109,7 @@ const openMaterialModal = (m = null) => {
     Object.assign(mForm, m);
   } else {
     isEditingMaterial.value = false;
-    Object.assign(mForm, { id: null, title: '', content: '', subtes: 'Penalaran Umum', teacher_name: '' });
+    Object.assign(mForm, { id: null, title: '', content: '', sub_materi: 'Penalaran Umum', teacher_name: '' });
   }
   showMaterialModal.value = true;
 };
@@ -1020,11 +1176,15 @@ const exportOptions = [
 // --- Scripts for Plans & Staff ---
 const plans = ref([]);
 const staffMembers = ref([]);
+const entitlementsDict = ref([]);
 
 // Modals State
+const showStudentModal = ref(false);
+const studentForm = reactive({ name: '', email: '', password: '', plan: 'free' });
+
 const showPlanModal = ref(false);
 const isEditingPlan = ref(false);
-const pForm = reactive({ id: null, name: '', price: 0, duration: 30, featuresStr: '' });
+const pForm = reactive({ id: null, name: '', price: '', discount: 0, duration: '', features: [] });
 
 const showStaffModal = ref(false);
 const isEditingStaff = ref(false);
@@ -1032,12 +1192,22 @@ const sForm = reactive({ id: null, username: '', name: '', role: 'teacher', pass
 
 const loadPlansAndStaff = async () => {
   try {
-    const [pRes, sRes] = await Promise.all([
+    const [pRes, sRes, eRes] = await Promise.all([
       api.getAdminPlans(),
-      api.getAdminStaff()
+      api.getAdminStaff(),
+      api.getEntitlementsDictionary()
     ]);
-    plans.value = pRes.plans || [];
+    plans.value = pRes || [];
+    // Ensure features is parsed from JSON if it comes as string from DB
+    plans.value.forEach(p => {
+      if (typeof p.features === 'string') {
+        try { p.features = JSON.parse(p.features); } catch (e) { p.features = []; }
+      }
+      if (!Array.isArray(p.features)) p.features = [];
+    });
+    
     staffMembers.value = sRes.staff || [];
+    entitlementsDict.value = eRes || [];
   } catch (err) {
     console.error(err);
   }
@@ -1046,10 +1216,10 @@ const loadPlansAndStaff = async () => {
 const openPlanModal = (p = null) => {
   if (p) {
     isEditingPlan.value = true;
-    Object.assign(pForm, { ...p, featuresStr: p.features.join(', ') });
+    Object.assign(pForm, { ...p, features: [...(p.features || [])] });
   } else {
     isEditingPlan.value = false;
-    Object.assign(pForm, { id: null, name: '', price: 0, duration: 30, featuresStr: '' });
+    Object.assign(pForm, { id: null, name: '', price: '', discount: 0, duration: '', features: [] });
   }
   showPlanModal.value = true;
 };
@@ -1059,7 +1229,7 @@ const closePlanModal = () => showPlanModal.value = false;
 const savePlan = async () => {
   try {
     isSaving.value = true;
-    const payload = { ...pForm, features: pForm.featuresStr.split(',').map(f => f.trim()).filter(f => f) };
+    const payload = { ...pForm };
     if (isEditingPlan.value) await api.updateAdminPlan(pForm.id, payload);
     else await api.createAdminPlan(payload);
     await loadPlansAndStaff();
@@ -1085,6 +1255,20 @@ const openStaffModal = (s = null) => {
 };
 
 const closeStaffModal = () => showStaffModal.value = false;
+
+const saveStudent = async () => {
+  isSaving.value = true;
+  try {
+    await api.createAdminStudent(studentForm);
+    await fetchStudents();
+    showStudentModal.value = false;
+    Object.assign(studentForm, { name: '', email: '', password: '', plan: 'free' });
+  } catch (err) {
+    alert(err.message || "Gagal menyimpan siswa");
+  } finally {
+    isSaving.value = false;
+  }
+};
 
 const saveStaff = async () => {
   try {

@@ -311,3 +311,15 @@ input[type=range]::-moz-range-thumb:hover {
 
 
 
+
+.floating-einstein {
+  position: fixed;
+  right: -5%;
+  bottom: 10%;
+  width: 450px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 1;
+  animation: float 8s ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+}

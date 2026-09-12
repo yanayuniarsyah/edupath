@@ -1,0 +1,35 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # HTTPS Enforcement (Production)
+  # Redirect HTTP to HTTPS
+  RewriteCond %{HTTPS} off
+  # Only enforce if not on localhost (for local development)
+  RewriteCond %{HTTP_HOST} !^localhost
+  RewriteCond %{HTTP_HOST} !^127\.0\.0\.1
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Route everything else to index.html for Vue Router (SPA)
+  # Ignore /api directory so it goes to backend
+  RewriteCond %{REQUEST_URI} !^/api/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ index.html [QSA,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Security Headers
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+  
+  # Content-Security-Policy (CSP)
+  # - default-src 'self'
+  # - allow scripts from 'self', midtrans
+  # - allow styles from 'self', fonts.googleapis.com
+  # - allow fonts from fonts.gstatic.com
+  # - allow images from 'self', data:, midtrans
+  # - allow connect to 'self', api urls, midtrans
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.midtrans.com https://app.sandbox.midtrans.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* ws://localhost:* https://edupath.co.id https://app.midtrans.com https://app.sandbox.midtrans.com; frame-src 'self' https://app.midtrans.com https://app.sandbox.midtrans.com;"
+</IfModule>
