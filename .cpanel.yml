@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/kumonwah/edupath.co.id/
+    - export DEPLOYPATH=/home/kumonwah/public_html
     - /bin/cp -Rfv dist/* $DEPLOYPATH/
     - /bin/cp -fv dist/.htaccess $DEPLOYPATH/
     - /bin/mkdir -p $DEPLOYPATH/api
