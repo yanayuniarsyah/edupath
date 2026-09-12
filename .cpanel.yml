@@ -1,9 +1,8 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/kumonwah/public_html
-    - /bin/cp -Rfv dist/* $DEPLOYPATH/
-    - /bin/cp -fv dist/.htaccess $DEPLOYPATH/
-    - /bin/mkdir -p $DEPLOYPATH/api
-    - /bin/cp -Rfv api/* $DEPLOYPATH/api/
-    - /bin/cp -fv api/.htaccess $DEPLOYPATH/api/
+    - /bin/cp -Rfv dist/* /home/kumonwah/public_html/
+    - /bin/cp -fv dist/.htaccess /home/kumonwah/public_html/
+    - /bin/mkdir -p /home/kumonwah/public_html/api
+    - /bin/cp -Rfv api/* /home/kumonwah/public_html/api/
+    - /bin/cp -fv api/.htaccess /home/kumonwah/public_html/api/
