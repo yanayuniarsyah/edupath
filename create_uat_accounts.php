@@ -23,16 +23,25 @@ try {
     }
 
     // 2. Create an Affiliate Account
+    $user_id = "USR-UAT-" . bin2hex(random_bytes(4));
     $affiliate_id = "AFF-UAT-" . bin2hex(random_bytes(4));
     $affiliate_email = "affiliate.uat@edupath.id";
     $referral_code = "UATAFF2025";
     $affiliate_pass = password_hash("password123", PASSWORD_BCRYPT);
 
-    $stmt = $pdo->prepare("SELECT id FROM affiliates WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE identity_key = ?");
     $stmt->execute([$affiliate_email]);
-    if (!$stmt->fetch()) {
-        $pdo->prepare("INSERT INTO affiliates (id, name, email, password_hash, referral_code, commission_rate, tenant_id) VALUES (?, ?, ?, ?, ?, ?, ?)")
-            ->execute([$affiliate_id, "UAT Affiliate Partner", $affiliate_email, $affiliate_pass, $referral_code, 20.00, $tenant_id]);
+    $existing_user = $stmt->fetch();
+    
+    if (!$existing_user) {
+        // Create user
+        $pdo->prepare("INSERT INTO users (id, identity_key, password) VALUES (?, ?, ?)")
+            ->execute([$user_id, $affiliate_email, $affiliate_pass]);
+        
+        // Make user an affiliate
+        $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate) VALUES (?, ?, ?, ?, ?)")
+            ->execute([$affiliate_id, $user_id, $tenant_id, $referral_code, 20.00]);
+            
         echo "<p>✅ Created Affiliate Account: <b>$affiliate_email</b> (Pass: password123, Code: $referral_code)</p>";
     } else {
         echo "<p>✅ Affiliate Account already exists: <b>$affiliate_email</b> (Pass: password123, Code: $referral_code)</p>";
