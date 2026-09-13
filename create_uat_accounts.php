@@ -55,8 +55,8 @@ try {
     $stmt = $pdo->prepare("SELECT id FROM admins WHERE username = ?");
     $stmt->execute([$admin_email]);
     if (!$stmt->fetch()) {
-        $pdo->prepare("INSERT INTO admins (id, username, password_hash, role) VALUES (?, ?, ?, ?)")
-            ->execute([$admin_id, $admin_email, $admin_pass, 'superadmin']);
+        $pdo->prepare("INSERT INTO admins (id, tenant_id, username, password, name) VALUES (?, ?, ?, ?, ?)")
+            ->execute([$admin_id, $tenant_id, $admin_email, $admin_pass, 'Superadmin UAT']);
         echo "<p>✅ Created Superadmin Account: <b>$admin_email</b> (Pass: admin123)</p>";
     } else {
         echo "<p>✅ Superadmin Account already exists: <b>$admin_email</b> (Pass: admin123)</p>";
