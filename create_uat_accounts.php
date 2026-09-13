@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/api/config.php';
 
 echo "<h1>Setup UAT Accounts - EduPath B2C (Fix Final)</h1>";
@@ -7,6 +7,9 @@ try {
     $tenant_id = "default_tenant";
     
     // Clean up old UAT data just in case
+    $pdo->exec("DELETE FROM affiliates WHERE referral_code = 'UATAFF2025'");
+    $pdo->exec("DELETE FROM admins WHERE username = 'admin.uat@edupath.id'");
+    $pdo->exec("DELETE FROM students WHERE email IN ('student.uat@edupath.id', 'affiliate.uat@edupath.id')");
     $pdo->exec("DELETE FROM users WHERE identity_key IN ('student.uat@edupath.id', 'affiliate.uat@edupath.id', 'admin.uat@edupath.id')");
 
     // 1. STUDENT ACCOUNT
