@@ -7,7 +7,8 @@
 require_once __DIR__ . '/env.php';
 
 // --- Load .env ---
-load_env(__DIR__ . '/.env');
+// Gunakan file .env yang ada di root direktori proyek
+load_env(dirname(__DIR__) . '/.env');
 
 // ----------------------------------------------------------------
 $allowed_origins_raw = env('ALLOWED_ORIGINS', 'http://localhost:5173');
