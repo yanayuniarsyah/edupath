@@ -15,10 +15,28 @@ try {
     $stmt->execute([$student_email]);
     if (!$stmt->fetch()) {
         $pdo->prepare("INSERT INTO users (id, identity_key, password) VALUES (?, ?, ?)")->execute([$student_id, $student_email, $student_pass]);
+        
         $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id) VALUES (?, ?, ?, ?, ?, ?)")
             ->execute([$student_id, "UAT Student", $student_email, $student_pass, "Universitas Indonesia - Ilmu Komputer", $tenant_id]);
+            
+        $role_id = "UR-" . bin2hex(random_bytes(4));
+        $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'student', ?)")
+            ->execute([$role_id, $student_id, $tenant_id, $student_id]);
+            
         echo "<p>✅ Created Student Account: <b>$student_email</b> (Pass: password123)</p>";
     } else {
+        // Fix for existing UAT accounts missing user_roles
+        $stmt_check = $pdo->prepare("SELECT id FROM user_roles WHERE user_id = (SELECT id FROM users WHERE identity_key = ?) AND role = 'student'");
+        $stmt_check->execute([$student_email]);
+        if (!$stmt_check->fetch()) {
+            $student_id_query = $pdo->prepare("SELECT id FROM users WHERE identity_key = ?");
+            $student_id_query->execute([$student_email]);
+            $s_id = $student_id_query->fetchColumn();
+            
+            $role_id = "UR-" . bin2hex(random_bytes(4));
+            $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'student', ?)")
+                ->execute([$role_id, $s_id, $tenant_id, $s_id]);
+        }
         echo "<p>✅ Student Account already exists: <b>$student_email</b> (Pass: password123)</p>";
     }
 
