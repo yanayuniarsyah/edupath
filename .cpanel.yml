@@ -4,3 +4,7 @@ deployment:
     - /bin/cp -a dist/. /home/kumonwah/edupath.co.id/
     - /bin/mkdir -p /home/kumonwah/edupath.co.id/api
     - /bin/cp -a api/. /home/kumonwah/edupath.co.id/api/
+    - /bin/cp -a .htaccess /home/kumonwah/edupath.co.id/ 2>/dev/null || true
+    - /bin/cp -a install_db.php /home/kumonwah/edupath.co.id/ 2>/dev/null || true
+    - /bin/cp -a create_uat_accounts.php /home/kumonwah/edupath.co.id/ 2>/dev/null || true
+    - /bin/cp -a schema_dump.json /home/kumonwah/edupath.co.id/ 2>/dev/null || true
