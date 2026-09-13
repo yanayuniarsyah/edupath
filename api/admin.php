@@ -188,6 +188,66 @@ elseif ($action === 'affiliates' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt->execute([$payload->tenant_id]);
     echo json_encode($stmt->fetchAll());
 }
+elseif ($action === 'commissions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $stmt = $pdo->prepare("
+        SELECT c.*, a.referral_code, u.identity_key as affiliate_email, 
+               o.plan_name as order_plan_name, s.name as student_name
+        FROM commissions c
+        JOIN affiliates a ON c.affiliate_id = a.id
+        JOIN users u ON a.user_id = u.id
+        JOIN orders o ON c.order_id = o.id
+        JOIN students s ON o.student_id = s.id
+        WHERE c.tenant_id = ?
+        ORDER BY c.created_at DESC
+    ");
+    $stmt->execute([$payload->tenant_id]);
+    echo json_encode($stmt->fetchAll());
+}
+elseif ($action === 'payout_commission' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $commission_id = $input['commission_id'] ?? '';
+    $payout_reference = $input['payout_reference'] ?? '';
+
+    if (empty($commission_id)) {
+        http_response_code(400); echo json_encode(["error" => "Commission ID required"]); exit;
+    }
+
+    try {
+        $pdo->beginTransaction();
+        
+        // Lock commission row
+        $stmt = $pdo->prepare("SELECT status FROM commissions WHERE id = ? AND tenant_id = ? FOR UPDATE");
+        $stmt->execute([$commission_id, $payload->tenant_id]);
+        $comm = $stmt->fetch();
+        
+        if (!$comm) {
+            $pdo->rollBack();
+            http_response_code(404); echo json_encode(["error" => "Commission not found"]); exit;
+        }
+        
+        if ($comm['status'] === 'paid') {
+            $pdo->rollBack();
+            http_response_code(400); echo json_encode(["error" => "Commission already paid"]); exit;
+        }
+
+        // Update to paid with audit trail
+        $update = $pdo->prepare("
+            UPDATE commissions 
+            SET status = 'paid', 
+                paid_by = ?, 
+                paid_at = NOW(), 
+                payout_reference = ? 
+            WHERE id = ?
+        ");
+        $update->execute([$payload->user_id, $payout_reference, $commission_id]);
+        
+        $pdo->commit();
+        echo json_encode(["success" => true]);
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        http_response_code(500); echo json_encode(["error" => "Database error"]);
+    }
+}
 elseif ($action === 'tenants') {
     if ($payload->role !== 'superadmin') {
         http_response_code(403);
@@ -268,6 +328,11 @@ elseif ($action === 'entitlements_dictionary') {
         ]);
     }
 }
+elseif ($action === 'products') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        echo json_encode($pdo->query("SELECT * FROM products ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC));
+    }
+}
 elseif ($action === 'plans') {
     $VALID_ENTITLEMENTS = ['tryout_unlimited', 'ai_adaptive_path', 'premium_materials', 'feature_quiz'];
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -291,11 +356,13 @@ elseif ($action === 'plans') {
         $features = is_array($input['features']) ? $input['features'] : [];
         $valid_features = array_intersect($features, $VALID_ENTITLEMENTS);
         $discount = isset($input['discount']) ? (float)$input['discount'] : 0.00;
+        $product_id = !empty($input['product_id']) ? $input['product_id'] : null;
+        $billing_cycle = $input['billing_cycle'] ?? 'monthly';
         
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare("INSERT INTO plans (id, tenant_id, name, price, discount, duration, features) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$id, null, $input['name'], $input['price'], $discount, $input['duration'], json_encode(array_values($valid_features))]);
+            $stmt = $pdo->prepare("INSERT INTO plans (id, tenant_id, name, price, discount, duration, features, product_id, billing_cycle) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$id, null, $input['name'], $input['price'], $discount, $input['duration'], json_encode(array_values($valid_features)), $product_id, $billing_cycle]);
             
             $stmt_ent = $pdo->prepare("INSERT IGNORE INTO plan_entitlements (id, plan_id, feature_key) VALUES (UUID(), ?, ?)");
             foreach ($valid_features as $fk) {
@@ -316,11 +383,13 @@ elseif ($action === 'plans') {
         $valid_features = array_intersect($features, $VALID_ENTITLEMENTS);
         
         $discount = isset($input['discount']) ? (float)$input['discount'] : 0.00;
+        $product_id = !empty($input['product_id']) ? $input['product_id'] : null;
+        $billing_cycle = $input['billing_cycle'] ?? 'monthly';
         
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare("UPDATE plans SET name=?, price=?, discount=?, duration=?, features=? WHERE id=?");
-            $stmt->execute([$input['name'], $input['price'], $discount, $input['duration'], json_encode(array_values($valid_features)), $id]);
+            $stmt = $pdo->prepare("UPDATE plans SET name=?, price=?, discount=?, duration=?, features=?, product_id=?, billing_cycle=? WHERE id=?");
+            $stmt->execute([$input['name'], $input['price'], $discount, $input['duration'], json_encode(array_values($valid_features)), $product_id, $billing_cycle, $id]);
             
             $pdo->prepare("DELETE FROM plan_entitlements WHERE plan_id = ?")->execute([$id]);
             

@@ -468,6 +468,107 @@
           </div>
         </div>
 
+        <!-- Manajemen Afiliasi -->
+        <div v-if="activeTab === 'affiliates'" class="space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-black text-slate-800">Afiliasi & Komisi</h2>
+          </div>
+
+          <!-- Affiliates List -->
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+            <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+              <h3 class="font-bold text-slate-800 text-sm">Daftar Mitra Afiliasi</h3>
+              <button @click="loadAdminAffiliates" class="text-indigo-600 hover:text-indigo-700 text-xs font-bold flex items-center gap-1">
+                <i class="ph-bold ph-arrows-clockwise" :class="{'animate-spin': isLoadingAffiliates}"></i> Refresh
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="bg-slate-50/50 text-slate-500 border-b border-slate-100">
+                    <th class="py-3 px-4 text-left font-bold w-1/3">Mitra (Email)</th>
+                    <th class="py-3 px-4 text-left font-bold">Kode Referral</th>
+                    <th class="py-3 px-4 text-left font-bold">Komisi Default</th>
+                    <th class="py-3 px-4 text-left font-bold">Terdaftar Pada</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="isLoadingAffiliates">
+                    <td colspan="4" class="py-8 text-center text-slate-400 font-medium">Memuat data mitra...</td>
+                  </tr>
+                  <tr v-else-if="affiliatesList.length === 0">
+                    <td colspan="4" class="py-8 text-center text-slate-400 font-medium">Belum ada mitra afiliasi</td>
+                  </tr>
+                  <tr v-for="aff in affiliatesList" :key="aff.id" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td class="py-3 px-4 font-semibold text-slate-700">{{ aff.identity_key }}</td>
+                    <td class="py-3 px-4 font-mono text-indigo-600 font-bold">{{ aff.referral_code }}</td>
+                    <td class="py-3 px-4 text-slate-600">{{ aff.commission_rate }}%</td>
+                    <td class="py-3 px-4 text-slate-500">{{ new Date(aff.created_at).toLocaleDateString('id-ID') }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Commissions List -->
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+              <h3 class="font-bold text-slate-800 text-sm">Riwayat Komisi</h3>
+              <button @click="loadAdminCommissions" class="text-indigo-600 hover:text-indigo-700 text-xs font-bold flex items-center gap-1">
+                <i class="ph-bold ph-arrows-clockwise" :class="{'animate-spin': isLoadingCommissions}"></i> Refresh
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="bg-slate-50/50 text-slate-500 border-b border-slate-100">
+                    <th class="py-3 px-4 text-left font-bold w-1/4">Siswa (Paket)</th>
+                    <th class="py-3 px-4 text-left font-bold w-1/4">Mitra (Kode)</th>
+                    <th class="py-3 px-4 text-left font-bold">Nominal (Rp)</th>
+                    <th class="py-3 px-4 text-left font-bold">Status</th>
+                    <th class="py-3 px-4 text-right font-bold w-32">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="isLoadingCommissions">
+                    <td colspan="5" class="py-8 text-center text-slate-400 font-medium">Memuat data komisi...</td>
+                  </tr>
+                  <tr v-else-if="commissionsList.length === 0">
+                    <td colspan="5" class="py-8 text-center text-slate-400 font-medium">Belum ada data komisi</td>
+                  </tr>
+                  <tr v-for="comm in commissionsList" :key="comm.id" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td class="py-3 px-4">
+                      <div class="font-bold text-slate-800">{{ comm.student_name }}</div>
+                      <div class="text-[10px] text-slate-500">{{ comm.order_plan_name }}</div>
+                    </td>
+                    <td class="py-3 px-4">
+                      <div class="font-bold text-slate-700">{{ comm.affiliate_email }}</div>
+                      <div class="font-mono text-[10px] text-indigo-600 font-bold">{{ comm.referral_code }}</div>
+                    </td>
+                    <td class="py-3 px-4 font-mono font-bold text-slate-800">
+                      {{ formatCurrency(comm.amount) }}
+                    </td>
+                    <td class="py-3 px-4">
+                      <span :class="['px-2 py-1 rounded-md text-[10px] font-bold uppercase', comm.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700']">
+                        {{ comm.status }}
+                      </span>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                      <button v-if="comm.status === 'pending'" @click="openPayoutModal(comm)" class="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 w-full">
+                        <i class="ph-bold ph-check-circle"></i> Bayar
+                      </button>
+                      <div v-else class="text-[10px] text-slate-400 text-center flex flex-col items-center">
+                        <i class="ph-bold ph-check-circle text-emerald-500 mb-0.5 text-sm"></i>
+                        Telah Dibayar
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- Manajemen Staff -->
         <div v-if="activeTab === 'staff'" class="space-y-6 animate-fade-in">
           <div class="flex justify-between items-center">
@@ -514,6 +615,40 @@
 
     <!-- Modals -->
     
+    <!-- Payout Modal -->
+    <div v-if="showPayoutModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl animate-fade-in">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="font-black text-lg text-slate-800">Cairkan Komisi</h3>
+          <button @click="closePayoutModal" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-xl"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="bg-amber-50 text-amber-700 p-3 rounded-xl text-xs font-medium border border-amber-200">
+            Pastikan Anda telah mentransfer dana ke rekening mitra sebelum menandai komisi ini sebagai lunas.
+          </div>
+          <div>
+            <label class="block text-slate-500 text-xs font-bold mb-1.5 uppercase tracking-wider">Mitra</label>
+            <div class="font-bold text-slate-800">{{ selectedCommission?.affiliate_email }}</div>
+          </div>
+          <div>
+            <label class="block text-slate-500 text-xs font-bold mb-1.5 uppercase tracking-wider">Nominal</label>
+            <div class="font-black text-2xl text-emerald-600">{{ formatCurrency(selectedCommission?.amount) }}</div>
+          </div>
+          <div>
+            <label class="block text-slate-500 text-xs font-bold mb-1.5 uppercase tracking-wider">Referensi Pembayaran (Opsional)</label>
+            <input v-model="payoutReference" type="text" placeholder="Misal: TRX-BCA-123" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm font-medium transition-colors" />
+          </div>
+        </div>
+        <div class="p-6 border-t border-slate-100 flex gap-3">
+          <button @click="closePayoutModal" class="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors text-sm">Batal</button>
+          <button @click="submitPayout" :disabled="isPayingOut" class="flex-1 py-3 rounded-xl font-bold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors text-sm flex items-center justify-center gap-2">
+            <i v-if="isPayingOut" class="ph-bold ph-spinner animate-spin"></i>
+            <span v-else>Tandai Lunas</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Student Modal -->
     <div v-if="showStudentModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in">
@@ -924,6 +1059,7 @@ const navItems = [
   { id: 'questions',    label: 'Bank Soal',           icon: 'ph-books',         badge: null },
   { id: 'materials',    label: 'Manajemen Materi',    icon: 'ph-file-text',     badge: null },
   { id: 'packages',     label: 'Manajemen Paket',     icon: 'ph-package',       badge: null },
+  { id: 'affiliates',   label: 'Afiliasi & Komisi',   icon: 'ph-hand-coins',    badge: null },
   { id: 'staff',        label: 'Manajemen Staff',     icon: 'ph-users-three',   badge: null },
   { id: 'reports',      label: 'Laporan & Analitik',  icon: 'ph-chart-bar',     badge: null },
 ];
@@ -1179,6 +1315,74 @@ const staffMembers = ref([]);
 const entitlementsDict = ref([]);
 
 // Modals State
+// ── Affiliates & Commissions ──
+const affiliatesList = ref([]);
+const commissionsList = ref([]);
+const isLoadingAffiliates = ref(false);
+const isLoadingCommissions = ref(false);
+
+const loadAdminAffiliates = async () => {
+  isLoadingAffiliates.value = true;
+  try {
+    affiliatesList.value = await api.getAdminAffiliates();
+  } catch (err) {
+    alert('Gagal memuat daftar afiliasi');
+  } finally {
+    isLoadingAffiliates.value = false;
+  }
+};
+
+const loadAdminCommissions = async () => {
+  isLoadingCommissions.value = true;
+  try {
+    commissionsList.value = await api.getAdminCommissions();
+  } catch (err) {
+    alert('Gagal memuat daftar komisi');
+  } finally {
+    isLoadingCommissions.value = false;
+  }
+};
+
+// Payout Modal
+const showPayoutModal = ref(false);
+const selectedCommission = ref(null);
+const payoutReference = ref('');
+const isPayingOut = ref(false);
+
+const openPayoutModal = (comm) => {
+  selectedCommission.value = comm;
+  payoutReference.value = '';
+  showPayoutModal.value = true;
+};
+
+const closePayoutModal = () => {
+  showPayoutModal.value = false;
+  selectedCommission.value = null;
+  payoutReference.value = '';
+};
+
+const submitPayout = async () => {
+  if (!selectedCommission.value) return;
+  isPayingOut.value = true;
+  try {
+    await api.payoutCommission(selectedCommission.value.id, payoutReference.value);
+    closePayoutModal();
+    loadAdminCommissions();
+  } catch (err) {
+    alert(err.message || 'Gagal mencairkan komisi');
+  } finally {
+    isPayingOut.value = false;
+  }
+};
+
+// ── Watch activeTab to load data ──
+watch(activeTab, (newTab) => {
+  if (newTab === 'affiliates') {
+    loadAdminAffiliates();
+    loadAdminCommissions();
+  }
+});
+
 const showStudentModal = ref(false);
 const studentForm = reactive({ name: '', email: '', password: '', plan: 'free' });
 

@@ -1730,7 +1730,24 @@
 
         <!-- TAB: AFFILIATE -->
         <section v-if="currentTab === 'affiliate'" class="animate-fade-in space-y-6">
-          <div class="max-w-4xl mx-auto space-y-8">
+          <div v-if="isLoadingAffiliate" class="flex justify-center p-12">
+            <i class="ph-bold ph-spinner animate-spin text-4xl text-amber-400"></i>
+          </div>
+          <div v-else-if="affiliateData?.status === 'not_joined'" class="max-w-4xl mx-auto space-y-8 text-center p-12">
+            <span class="px-3.5 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-black uppercase tracking-wider inline-flex items-center gap-2">
+              <i class="ph-bold ph-hand-coins text-amber-400 text-sm"></i>
+              <span>PROGRAM MITRA AFILIASI RESMI</span>
+            </span>
+            <h2 class="text-3xl md:text-5xl font-black font-heading text-white">Gabung Afiliasi EduPath</h2>
+            <p class="text-sm text-white/70 max-w-xl mx-auto font-medium">
+              Dapatkan komisi pasif dengan membagikan link referral Anda kepada teman-teman.
+            </p>
+            <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-black font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_35px_rgba(245,158,11,0.5)]">
+              <span v-if="isJoiningAffiliate"><i class="ph-bold ph-spinner animate-spin"></i> Mendaftar...</span>
+              <span v-else>Daftar Sekarang Secara Gratis</span>
+            </button>
+          </div>
+          <div v-else class="max-w-4xl mx-auto space-y-8">
             <div class="text-center space-y-3">
               <span class="px-3.5 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-black uppercase tracking-wider inline-flex items-center gap-2">
                 <i class="ph-bold ph-hand-coins text-amber-400 text-sm"></i>
@@ -1738,37 +1755,50 @@
               </span>
               <h2 class="text-3xl md:text-5xl font-black font-heading text-white">Dashboard Afiliasi EduPath</h2>
               <p class="text-sm text-white/70 max-w-xl mx-auto font-medium">
-                Bagikan link referral Anda dan dapatkan komisi 20% dari setiap pendaftaran pertama serta 10% recurring setiap perpanjangan.
+                Bagikan link referral Anda dan dapatkan komisi {{ affiliateData?.commission_rate }}% dari setiap pendaftaran pertama.
               </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div class="light-mode-card rounded-2xl p-6 text-center bg-slate-900/80 border border-amber-500/30 text-white">
-                <span class="text-xs text-white/50 font-bold uppercase">Total Klik Referral</span>
-                <span class="block text-4xl font-black font-mono text-amber-300 mt-2">148</span>
-                <span class="text-[10px] text-emerald-400 font-bold mt-1 inline-block">+12 hari ini</span>
+                <span class="text-xs text-white/50 font-bold uppercase">Total Referral</span>
+                <span class="block text-4xl font-black font-mono text-emerald-400 mt-2">{{ affiliateData?.stats?.total_referrals }}</span>
+                <span class="text-[10px] text-white/50 font-bold mt-1 inline-block">Siswa Mendaftar</span>
               </div>
               <div class="light-mode-card rounded-2xl p-6 text-center bg-slate-900/80 border border-amber-500/30 text-white">
-                <span class="text-xs text-white/50 font-bold uppercase">Referral Aktif</span>
-                <span class="block text-4xl font-black font-mono text-emerald-400 mt-2">24</span>
-                <span class="text-[10px] text-white/50 font-bold mt-1 inline-block">18 Akuisisi + 6 Recurring</span>
+                <span class="text-xs text-white/50 font-bold uppercase">Komisi Dicairkan</span>
+                <span class="block text-4xl font-black font-mono text-[#c0ff00] mt-2">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_paid || 0) }}</span>
+                <span class="text-[10px] text-emerald-400 font-bold mt-1 inline-block">Sudah Ditransfer</span>
               </div>
               <div class="light-mode-card rounded-2xl p-6 text-center bg-slate-900/80 border border-amber-500/30 text-white">
-                <span class="text-xs text-white/50 font-bold uppercase">Total Komisi (IDR)</span>
-                <span class="block text-4xl font-black font-mono text-[#c0ff00] mt-2">Rp 1.480.000</span>
-                <span class="text-[10px] text-amber-300 font-bold mt-1 inline-block">Siap Dicairkan</span>
+                <span class="text-xs text-white/50 font-bold uppercase">Komisi Tertunda</span>
+                <span class="block text-4xl font-black font-mono text-amber-300 mt-2">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_pending || 0) }}</span>
+                <span class="text-[10px] text-amber-300 font-bold mt-1 inline-block">Menunggu Pencairan</span>
               </div>
             </div>
 
             <div class="light-mode-card rounded-2xl p-6 md:p-8 space-y-6 bg-slate-900/90 border border-amber-500/30 text-white">
               <h3 class="text-lg font-black font-heading">Link Referral Khusus Anda</h3>
               <div class="flex flex-col sm:flex-row gap-3">
-                <input type="text" readonly value="https://edupath.id/ref/STUDENT2026" class="w-full bg-black/50 border border-amber-500/30 rounded-xl px-4 py-3 text-xs text-amber-300 font-mono outline-none" />
-                <button @click="copyCompanyAddress" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-black font-black text-xs hover:scale-105 active:scale-95 transition-all shrink-0">
+                <input type="text" readonly :value="`${baseUrl}/ref/${affiliateData?.referral_code}`" class="w-full bg-black/50 border border-amber-500/30 rounded-xl px-4 py-3 text-xs text-amber-300 font-mono outline-none" id="refLinkInput" />
+                <button @click="copyReferralLink" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-black font-black text-xs hover:scale-105 active:scale-95 transition-all shrink-0">
                   Salin Link
                 </button>
               </div>
               <p class="text-xs text-white/50">Bagikan link ini melalui WhatsApp, Instagram Story, atau Telegram komunitas belajar Anda.</p>
+            </div>
+            
+            <div v-if="affiliateData?.history?.length > 0" class="mt-8 bg-slate-900/80 rounded-2xl border border-white/10 p-6 text-white">
+              <h3 class="text-lg font-black font-heading mb-4">Riwayat Komisi Terakhir</h3>
+              <div class="space-y-3">
+                <div v-for="(hist, idx) in affiliateData.history" :key="idx" class="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div>
+                    <div class="text-sm font-bold text-white">Rp {{ new Intl.NumberFormat('id-ID').format(hist.amount) }}</div>
+                    <div class="text-[10px] text-white/50">{{ new Date(hist.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) }}</div>
+                  </div>
+                  <span :class="['px-2 py-1 rounded-md text-[10px] font-bold uppercase', hist.status === 'paid' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400']">{{ hist.status }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -3259,6 +3289,18 @@ export default {
     const sidebarExpanded = ref(false);
     const toolsDropdownOpen = ref(false);
 
+    const baseUrl = window.location.origin;
+    const copyReferralLink = () => {
+      const link = `${baseUrl}/ref/${affiliateData.value?.referral_code}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link);
+      }
+      toastMessage.value = 'Link referral disalin!';
+      setTimeout(() => {
+        toastMessage.value = '';
+      }, 3000);
+    };
+
     const copyCompanyAddress = () => {
       const addressText = 'PT Kreasi Hasanah Indonesia';
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -3597,6 +3639,15 @@ export default {
       }
     };
 
+    const fetchPlans = async () => {
+      try {
+        const data = await api.getPlans();
+        if (data.products) publicPlans.value = data.products;
+      } catch (e) {
+        console.error('Failed to fetch plans', e);
+      }
+    };
+
     const checkAuth = async () => {
       const token = localStorage.getItem('auth_token');
       if (token) {
@@ -3617,6 +3668,13 @@ export default {
     };
 
     onMounted(() => {
+      // Capture affiliate referral code
+      const params = new URLSearchParams(window.location.search);
+      const refCode = params.get('ref');
+      if (refCode) {
+        localStorage.setItem('affiliate_ref', refCode);
+      }
+      fetchPlans();
       checkAuth();
     });
 
@@ -3709,17 +3767,34 @@ export default {
       total: 0
     });
 
-    const purchasePlan = (planName, amount) => {
+    const purchasePlan = (planNameFallback, fallbackAmount) => {
       if (!isLoggedIn.value) {
         showLoginModal.value = true;
         showToast('Silakan Masuk Akun untuk membeli paket.');
         return;
       }
+
+      let amount = fallbackAmount;
+      let planId = planNameFallback;
+
+      for (const p of publicPlans.value) {
+        if (p.plans) {
+          const cycle = isAnnualBilling.value ? 'yearly' : 'monthly';
+          const found = p.plans.find(x => x.name.toLowerCase().includes(planNameFallback.toLowerCase()) && x.billing_cycle === cycle);
+          if (found) { 
+            amount = parseFloat(found.price);
+            planId = found.id;
+            break;
+          }
+        }
+      }
+
       const tax = Math.round(amount * 0.11);
       const total = amount + tax;
       checkoutModalData.value = {
         isOpen: true,
-        planName,
+        planId,
+        planName: planNameFallback,
         amount,
         tax,
         total
@@ -3729,7 +3804,7 @@ export default {
     const confirmCheckout = async () => {
       const data = checkoutModalData.value;
       try {
-        const response = await api.checkout(data.planName, data.total);
+        const response = await api.checkout(data.planId);
         if (response.success && response.token) {
           if (window.snap) {
             window.snap.pay(response.token, {
@@ -4096,6 +4171,8 @@ export default {
       showParentConsentModal,
       showContactModal,
       showAffiliateRegisterModal,
+      baseUrl,
+      copyReferralLink,
       copyCompanyAddress,
       sidebarExpanded,
       login,
@@ -4231,6 +4308,10 @@ export default {
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 </style>
+
+
+
+
 
 
 

@@ -46,8 +46,8 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // 2. Lookup plan scoped to student's tenant (cross-tenant access blocked at DB level)
-    $stmt = $pdo->prepare("SELECT id, name, price, discount, duration, features FROM plans WHERE (id = ? OR name = ?) AND tenant_id = ?");
+    // 2. Lookup plan scoped to student's tenant (cross-tenant access blocked at DB level or global plans)
+    $stmt = $pdo->prepare("SELECT id, name, price, discount, duration, features, billing_cycle FROM plans WHERE (id = ? OR name = ?) AND (tenant_id = ? OR tenant_id IS NULL)");
     $stmt->execute([$plan_id, $plan_id, $student_tenant_id]);
     $plan = $stmt->fetch();
 
@@ -92,6 +92,7 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             "order_id"     => $order_ref,
             "gross_amount" => $gross_amount_int
         ],
+        "enabled_payments" => ["qris", "gopay", "shopeepay"],
         "customer_details" => [
             "first_name" => $student['name'],
             "email"      => $student['email'],
@@ -164,8 +165,8 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $pdo->prepare("
                 INSERT INTO orders
-                  (id, tenant_id, plan_id, order_id, student_id, affiliate_id, plan_name, amount, status, snap_token)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+                  (id, tenant_id, plan_id, order_id, student_id, affiliate_id, plan_name, amount, status, snap_token, billing_cycle_snapshot)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
             ")->execute([
                 $order_id,
                 $student_tenant_id,   // canonical — from authenticated student
@@ -175,7 +176,8 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $affiliate_id,
                 $plan['name'],
                 $grand_total,         // immutable at time of order — matches invoice
-                $snap_token
+                $snap_token,
+                $plan['billing_cycle'] ?? 'one-time'
             ]);
 
             // b. Create immutable Commercial Invoice snapshot
@@ -277,7 +279,7 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($transaction_status === 'pending') {
         $new_status = 'pending';
     } elseif ($transaction_status === 'refund' || $transaction_status === 'partial_refund') {
-        $new_status = 'refunded'; // record event; provisioning not affected here
+        $new_status = 'refunded';
     }
 
     // UUID helper — local (no global scope)
@@ -513,11 +515,21 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                             'order_tenant_id'     => $order['tenant_id'],
                         ]);
                     } else {
+                        // Check if this is a first transaction or renewal
+                        $stmt_first = $pdo->prepare("SELECT id FROM orders WHERE student_id = ? AND status IN ('paid', 'settlement') AND id != ? LIMIT 1");
+                        $stmt_first->execute([$order['student_id'], $order['id']]);
+                        $is_renewal = (bool) $stmt_first->fetch();
+
+                        // Business rule: 20% first transaction, 10% renewal
+                        $actual_rate = $is_renewal ? '10.00' : '20.00';
+                        // Optionally respect affiliate's custom rate if we need to scale (e.g. if they have > 20% negotiated)
+                        if (bccomp((string)$affiliate['commission_rate'], $actual_rate, 2) === 1) {
+                             $actual_rate = (string)$affiliate['commission_rate'];
+                        }
+
                         // P1-D: bcmul — no float arithmetic for monetary commission calculation
-                        // commission_rate is DECIMAL(5,2) from DB; amount is DECIMAL(15,2)
-                        $rate_str            = (string) $affiliate['commission_rate'];
                         $amount_str          = (string) $order['amount'];
-                        $commission_amount   = bcmul($amount_str, bcdiv($rate_str, '100', 10), 2);
+                        $commission_amount   = bcmul($amount_str, bcdiv($actual_rate, '100', 10), 2);
 
                         $comm_id = $mkuuid();
                         $pdo->prepare("
@@ -530,7 +542,7 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                             $order_tenant_id,   // use order tenant, not affiliate tenant
                             $order['id'],
                             $commission_amount,
-                            $affiliate['commission_rate'],
+                            $actual_rate,
                         ]);
                     }
                 }
@@ -538,6 +550,13 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($new_status === 'paid' && $is_duplicate_event) {
             // Idempotent duplicate of 'paid' — subscription/entitlement already provisioned, skip
             $processing_result = 'duplicate';
+        } elseif ($new_status === 'refunded' || $new_status === 'failed') {
+            // REFUND / CANCEL FLOW: cancel pending commission
+            $pdo->prepare("
+                UPDATE commissions 
+                SET status = 'cancelled' 
+                WHERE order_id = ? AND status = 'pending'
+            ")->execute([$order['id']]);
         }
 
         // 10. P0-B: WRITE PAYMENT EVENT HISTORY — always inside transaction
