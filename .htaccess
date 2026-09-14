@@ -33,3 +33,7 @@
   # - allow connect to 'self', api urls, midtrans
   Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.midtrans.com https://app.sandbox.midtrans.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* ws://localhost:* https://edupath.co.id https://app.midtrans.com https://app.sandbox.midtrans.com; frame-src 'self' https://app.midtrans.com https://app.sandbox.midtrans.com;"
 </IfModule>
+
+<FilesMatch ^\.html$>
+  Header set Cache-Control no-cache, no-store, must-revalidate
+</FilesMatch>
