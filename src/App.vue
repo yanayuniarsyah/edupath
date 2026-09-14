@@ -1806,28 +1806,28 @@
               <!-- Stat 2 -->
               <div class="relative overflow-hidden rounded-3xl p-6 bg-emerald-50 border border-emerald-100 shadow-sm group hover:border-emerald-200 transition-colors">
                 <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <i class="ph-fill ph-wallet text-4xl text-emerald-500"></i>
+                  <i class="ph-fill ph-wallet text-4xl text-emerald-600"></i>
                 </div>
                 <div class="relative z-10 space-y-3">
-                  <span class="text-xs text-emerald-600 font-bold uppercase tracking-wider">Komisi Cair</span>
+                  <span class="text-xs text-slate-600 font-bold uppercase tracking-wider">Komisi Cair</span>
                   <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-emerald-500">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_paid || 0) }}</span>
+                    <span class="text-4xl font-black text-slate-900">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_paid || 0) }}</span>
                   </div>
-                  <span class="text-[10px] text-emerald-600/70 font-bold inline-block">Sudah ditransfer ke rekening</span>
+                  <span class="text-[10px] text-slate-500 font-bold inline-block">Sudah ditransfer ke rekening</span>
                 </div>
               </div>
 
               <!-- Stat 3 -->
               <div class="relative overflow-hidden rounded-3xl p-6 bg-amber-50 border border-amber-100 shadow-sm group hover:border-amber-200 transition-colors">
                 <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <i class="ph-fill ph-hourglass-high text-4xl text-amber-500"></i>
+                  <i class="ph-fill ph-hourglass-high text-4xl text-amber-600"></i>
                 </div>
                 <div class="relative z-10 space-y-3">
-                  <span class="text-xs text-amber-600 font-bold uppercase tracking-wider">Komisi Tertunda</span>
+                  <span class="text-xs text-slate-600 font-bold uppercase tracking-wider">Komisi Tertunda</span>
                   <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-amber-500">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_pending || 0) }}</span>
+                    <span class="text-4xl font-black text-slate-900">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_pending || 0) }}</span>
                   </div>
-                  <span class="text-[10px] text-amber-600/70 font-bold inline-block">Menunggu jadwal pencairan</span>
+                  <span class="text-[10px] text-slate-500 font-bold inline-block">Menunggu jadwal pencairan</span>
                 </div>
               </div>
 
