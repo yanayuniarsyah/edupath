@@ -36,7 +36,7 @@
         <nav class="flex flex-col gap-1.5">
           <template v-for="tab in tabs" :key="tab.id">
             <button 
-              :title="tab.name"
+              :title="tab.label"
               :class="['flex items-center rounded-xl text-xs font-bold transition-all text-left group', 
                 sidebarExpanded ? 'gap-3 px-3.5 py-2.5' : 'justify-center px-0 py-2.5',
                 currentTab === tab.id 
@@ -45,8 +45,8 @@
               ]"
               @click="handleTabClick(tab.id)"
             >
-              <i :class="['ph-bold shrink-0', tab.iconName, sidebarExpanded ? 'text-lg' : 'text-xl', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/60 group-hover:text-white']"></i>
-              <span v-show="sidebarExpanded" class="font-bold tracking-tight whitespace-nowrap">{{ tab.name }}</span>
+              <i :class="['ph-bold shrink-0', tab.icon, sidebarExpanded ? 'text-lg' : 'text-xl', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/60 group-hover:text-white']"></i>
+              <span v-show="sidebarExpanded" class="font-bold tracking-tight whitespace-nowrap">{{ tab.label }}</span>
             </button>
 
             <!-- Sub Menu Materi di Side Menu (Auto Hide) -->
