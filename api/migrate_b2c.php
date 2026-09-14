@@ -1,5 +1,5 @@
 <?php
-require 'api/config.php';
+require 'config.php';
 
 try {
     // 1. Create products table
