@@ -3928,12 +3928,14 @@ export default {
 
     watch(() => isLoggedIn.value, (newVal) => {
       if (newVal && pendingPurchasePlanId.value) {
-        // Trigger purchase automatically
-        purchasePlan(pendingPurchaseName.value, pendingPurchaseAmount.value);
-        // Clear the pending state
-        pendingPurchasePlanId.value = null;
-        pendingPurchaseName.value = null;
-        pendingPurchaseAmount.value = null;
+        // Trigger purchase automatically after a slight delay to allow auth transitions to complete
+        setTimeout(() => {
+          purchasePlan(pendingPurchaseName.value, pendingPurchaseAmount.value);
+          // Clear the pending state
+          pendingPurchasePlanId.value = null;
+          pendingPurchaseName.value = null;
+          pendingPurchaseAmount.value = null;
+        }, 500);
       }
     });
 
