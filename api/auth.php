@@ -57,6 +57,9 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    $id = bin2hex(random_bytes(16));
+    $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
+
     try {
         $pdo->beginTransaction();
         
