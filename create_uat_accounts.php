@@ -18,51 +18,93 @@ try {
     $pdo->exec("DELETE FROM users WHERE identity_key IN ('student.uat@edupath.id', 'affiliate.uat@edupath.id', 'admin.uat@edupath.id')");
     $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
 
-    // 1. STUDENT ACCOUNT
-    $u_stu_id = "USR-UAT-STU";
-    $s_id = "STU-UAT-1";
-    $stu_email = "student.uat@edupath.id";
     $pass_hash = password_hash("password123", PASSWORD_BCRYPT);
-    
-    // Create/update User
-    $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE password=VALUES(password), is_active=1")->execute([$u_stu_id, $stu_email, $pass_hash]);
-    
-    // Create/update Student
-    $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), password=VALUES(password), target_ptn=VALUES(target_ptn), tenant_id=VALUES(tenant_id)")->execute([$s_id, "UAT Student", $stu_email, $pass_hash, "UI", $tenant_id]);
-    
-    // Role
-    $pdo->prepare("INSERT IGNORE INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'student', ?)")->execute(["UR-STU", $u_stu_id, $tenant_id, $s_id]);
-    
+    $adm_pass = password_hash("admin123", PASSWORD_BCRYPT);
+
+    function upsert_user($pdo, $email, $password) {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE identity_key = ?");
+        $stmt->execute([$email]);
+        $row = $stmt->fetch();
+        if ($row) {
+            $pdo->prepare("UPDATE users SET password = ?, is_active = 1 WHERE id = ?")->execute([$password, $row['id']]);
+            return $row['id'];
+        }
+        $id = "USR-" . bin2hex(random_bytes(4));
+        $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1)")->execute([$id, $email, $password]);
+        return $id;
+    }
+
+    function upsert_student($pdo, $email, $name, $password, $tenant_id) {
+        $stmt = $pdo->prepare("SELECT id FROM students WHERE email = ?");
+        $stmt->execute([$email]);
+        $row = $stmt->fetch();
+        if ($row) {
+            $pdo->prepare("UPDATE students SET name = ?, password = ?, tenant_id = ? WHERE id = ?")->execute([$name, $password, $tenant_id, $row['id']]);
+            return $row['id'];
+        }
+        $id = "STU-" . bin2hex(random_bytes(4));
+        $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id) VALUES (?, ?, ?, ?, 'UI', ?)")->execute([$id, $name, $email, $password, $tenant_id]);
+        return $id;
+    }
+
+    function upsert_admin($pdo, $username, $name, $password, $tenant_id) {
+        $stmt = $pdo->prepare("SELECT id FROM admins WHERE username = ?");
+        $stmt->execute([$username]);
+        $row = $stmt->fetch();
+        if ($row) {
+            $pdo->prepare("UPDATE admins SET name = ?, password = ?, tenant_id = ? WHERE id = ?")->execute([$name, $password, $tenant_id, $row['id']]);
+            return $row['id'];
+        }
+        $id = "ADM-" . bin2hex(random_bytes(4));
+        $pdo->prepare("INSERT INTO admins (id, tenant_id, username, password, name) VALUES (?, ?, ?, ?, ?)")->execute([$id, $tenant_id, $username, $password, $name]);
+        return $id;
+    }
+
+    function assign_role($pdo, $user_id, $tenant_id, $role, $reference_id) {
+        $stmt = $pdo->prepare("SELECT id FROM user_roles WHERE user_id = ? AND role = ?");
+        $stmt->execute([$user_id, $role]);
+        $row = $stmt->fetch();
+        if ($row) {
+            $pdo->prepare("UPDATE user_roles SET tenant_id = ?, reference_id = ? WHERE id = ?")->execute([$tenant_id, $reference_id, $row['id']]);
+        } else {
+            $id = "UR-" . bin2hex(random_bytes(4));
+            $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, ?, ?)")->execute([$id, $user_id, $tenant_id, $role, $reference_id]);
+        }
+    }
+
+    // 1. STUDENT ACCOUNT
+    $stu_email = "student.uat@edupath.id";
+    $u_stu_id = upsert_user($pdo, $stu_email, $pass_hash);
+    $s_id = upsert_student($pdo, $stu_email, "UAT Student", $pass_hash, $tenant_id);
+    assign_role($pdo, $u_stu_id, $tenant_id, 'student', $s_id);
     echo "<p>✅ Student Account: <b>$stu_email</b> (Pass: password123)</p>";
 
-    // 2. AFFILIATE ACCOUNT (must also be a student to login to B2C panel)
-    $u_aff_id = "USR-UAT-AFF";
-    $s_aff_id = "STU-UAT-AFF";
-    $aff_id = "AFF-UAT-1";
+    // 2. AFFILIATE ACCOUNT
     $aff_email = "affiliate.uat@edupath.id";
     $ref_code = "UATAFF2025";
+    $u_aff_id = upsert_user($pdo, $aff_email, $pass_hash);
+    $s_aff_id = upsert_student($pdo, $aff_email, "UAT Affiliate", $pass_hash, $tenant_id);
+    assign_role($pdo, $u_aff_id, $tenant_id, 'student', $s_aff_id);
     
-    $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE password=VALUES(password), is_active=1")->execute([$u_aff_id, $aff_email, $pass_hash]);
-    
-    $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), password=VALUES(password), target_ptn=VALUES(target_ptn), tenant_id=VALUES(tenant_id)")->execute([$s_aff_id, "UAT Affiliate", $aff_email, $pass_hash, "UI", $tenant_id]);
-    
-    $pdo->prepare("INSERT IGNORE INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'student', ?)")->execute(["UR-AFF", $u_aff_id, $tenant_id, $s_aff_id]);
-    
-    $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate) VALUES (?, ?, ?, ?, 20.00) ON DUPLICATE KEY UPDATE user_id=VALUES(user_id), tenant_id=VALUES(tenant_id), commission_rate=VALUES(commission_rate)")->execute([$aff_id, $u_aff_id, $tenant_id, $ref_code]);
-    
+    // Affiliate table
+    $stmt = $pdo->prepare("SELECT id FROM affiliates WHERE user_id = ?");
+    $stmt->execute([$u_aff_id]);
+    $aff = $stmt->fetch();
+    if ($aff) {
+        $pdo->prepare("UPDATE affiliates SET referral_code = ?, tenant_id = ? WHERE id = ?")->execute([$ref_code, $tenant_id, $aff['id']]);
+    } else {
+        // clear if someone else has the code
+        $pdo->prepare("DELETE FROM affiliates WHERE referral_code = ?")->execute([$ref_code]);
+        $id = "AFF-" . bin2hex(random_bytes(4));
+        $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate) VALUES (?, ?, ?, ?, 20.00)")->execute([$id, $u_aff_id, $tenant_id, $ref_code]);
+    }
     echo "<p>✅ Affiliate Account: <b>$aff_email</b> (Pass: password123, Code: $ref_code)</p>";
 
     // 3. ADMIN ACCOUNT
-    $u_adm_id = "USR-UAT-ADM";
-    $a_id = "ADM-UAT-1";
     $adm_email = "admin.uat@edupath.id";
-    $adm_pass = password_hash("admin123", PASSWORD_BCRYPT);
-    
-    $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE password=VALUES(password), is_active=1")->execute([$u_adm_id, $adm_email, $adm_pass]);
-    
-    $pdo->prepare("INSERT INTO admins (id, tenant_id, username, password, name) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE tenant_id=VALUES(tenant_id), password=VALUES(password), name=VALUES(name)")->execute([$a_id, $tenant_id, $adm_email, $adm_pass, "UAT Admin"]);
-    
-    $pdo->prepare("INSERT IGNORE INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'superadmin', ?)")->execute(["UR-ADM", $u_adm_id, $tenant_id, $a_id]);
+    $u_adm_id = upsert_user($pdo, $adm_email, $adm_pass);
+    $a_id = upsert_admin($pdo, $adm_email, "UAT Admin", $adm_pass, $tenant_id);
+    assign_role($pdo, $u_adm_id, $tenant_id, 'superadmin', $a_id);
     
     echo "<p>✅ Admin Account: <b>$adm_email</b> (Pass: admin123)</p>";
     echo "<h3>PERFECT! Semua akun sudah diperbaiki. Silakan tes login.</h3>";
