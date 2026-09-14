@@ -3872,7 +3872,7 @@ export default {
         pendingPurchasePlanId.value = planId;
         pendingPurchaseName.value = planNameFallback;
         pendingPurchaseAmount.value = amount;
-        isLoginView.value = false;
+        isLoginMode.value = false;
         showLoginModal.value = true;
         showToast('Silakan buat akun terlebih dahulu untuk membeli paket.');
         return;
