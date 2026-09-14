@@ -13,34 +13,41 @@
     <canvas id="bg-canvas" :style="{ opacity: canvasOpacity }" class="fixed inset-0 w-full h-full z-0 pointer-events-none transition-opacity duration-700"></canvas>
 
 
-    <!-- Sidebar Navigation — permanently w-72 on desktop -->
+    <!-- Sidebar Navigation — auto-hide on desktop -->
     <aside
       v-if="isLoggedIn"
-      class="fixed left-0 top-0 h-screen z-40 flex flex-col backdrop-blur-xl border-r border-white/5 transition-transform duration-300 ease-out overflow-y-auto text-white shadow-2xl w-72 lg:translate-x-0"
+      class="fixed left-0 top-0 h-screen z-40 flex flex-col backdrop-blur-xl border-r border-white/5 transition-all duration-300 ease-out overflow-hidden text-white shadow-2xl"
       style="background: linear-gradient(160deg, #0a0f1e 0%, #0d1224 60%, #0a0f1e 100%);"
-      :class="mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+      :class="[
+        (sidebarExpanded || mobileSidebarOpen) ? 'w-72 shadow-[20px_0_60px_rgba(0,0,0,0.35)]' : 'w-[72px]',
+        mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      ]"
+      @mouseenter="sidebarExpanded = true"
+      @mouseleave="sidebarExpanded = false"
     >
       <!-- Top: Logo + Nav (scrollable) -->
-      <div class="flex flex-col flex-grow min-h-0 overflow-y-auto p-6 pb-2">
+      <div class="flex flex-col flex-grow min-h-0 overflow-y-auto" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-6 pb-2' : 'p-3 pb-2'">
         <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center gap-3 group cursor-pointer shrink-0" @click="goToHomeTop">
+          <div class="flex items-center gap-3 group cursor-pointer shrink-0" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center w-full'" @click="goToHomeTop">
             <div class="w-10 h-10 shrink-0 rounded-full bg-white flex items-center justify-center font-black text-black text-xl group-hover:bg-[#c0ff00] group-hover:rotate-12 transition-all duration-300 shadow-md">E</div>
-            <div class="min-w-0">
+            <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="min-w-0">
               <span class="font-black text-2xl tracking-tighter text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00]">.ai</span></span>
             </div>
           </div>
           <!-- Close button for mobile -->
-          <button @click="mobileSidebarOpen = false" class="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20">
+          <button v-show="(sidebarExpanded || mobileSidebarOpen)" @click="mobileSidebarOpen = false" class="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 shrink-0">
             <i class="ph-bold ph-x text-lg"></i>
           </button>
         </div>
-        <p class="text-xs text-white/40 font-semibold mb-6 uppercase tracking-wider whitespace-nowrap shrink-0">Adaptive Learning Platform</p>
+        <p v-show="(sidebarExpanded || mobileSidebarOpen)" class="text-xs text-white/40 font-semibold mb-6 uppercase tracking-wider whitespace-nowrap shrink-0">Adaptive Learning Platform</p>
+        <p v-show="!(sidebarExpanded || mobileSidebarOpen)" class="mb-4 shrink-0"></p>
         
         <nav class="flex flex-col gap-1.5">
           <template v-for="tab in tabs" :key="tab.id">
             <button 
               :title="tab.label"
-              :class="['flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left group', 
+              :class="['flex items-center rounded-xl text-xs font-bold transition-all text-left group overflow-hidden shrink-0', 
+                (sidebarExpanded || mobileSidebarOpen) ? 'gap-3 px-3.5 py-2.5' : 'justify-center px-0 py-2.5',
                 currentTab === tab.id 
                   ? 'bg-[#c0ff00]/15 border border-[#c0ff00]/40 text-[#c0ff00] shadow-[0_0_20px_rgba(192,255,0,0.15)]' 
                   : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
@@ -48,15 +55,15 @@
               @click="handleTabClick(tab.id); mobileSidebarOpen = false;"
             >
               <!-- Menampilkan huruf awal tab jika ikon gagal dimuat (fallback statis) -->
-              <div class="relative shrink-0 flex items-center justify-center w-6 h-6 bg-white/5 rounded-lg group-hover:bg-white/10">
-                <span class="absolute text-xs font-black opacity-80">{{ tab.label.charAt(0) }}</span>
-                <i :class="['ph-bold relative z-10', tab.icon, 'text-lg', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/70 group-hover:text-white']"></i>
+              <div class="relative shrink-0 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'w-6 h-6' : 'w-8 h-8'">
+                <span class="absolute text-xs font-black opacity-100 text-white">{{ tab.label.charAt(0) }}</span>
+                <i :class="['ph-bold relative z-10', tab.icon, (sidebarExpanded || mobileSidebarOpen) ? 'text-lg' : 'text-xl', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/70 group-hover:text-white']"></i>
               </div>
-              <span class="font-bold tracking-tight whitespace-nowrap" :class="currentTab === tab.id ? 'text-white' : ''">{{ tab.label }}</span>
+              <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="font-bold tracking-tight whitespace-nowrap" :class="currentTab === tab.id ? 'text-white' : ''">{{ tab.label }}</span>
             </button>
 
             <!-- Sub Menu Materi di Side Menu (Auto Hide) -->
-            <div v-if="tab.id === 'learning' && materiSubMenuOpen" class="ml-4 pl-3 border-l border-white/10 flex flex-col gap-1 my-1 animate-fade-in">
+            <div v-if="tab.id === 'learning' && (sidebarExpanded || mobileSidebarOpen) && materiSubMenuOpen" class="ml-4 pl-3 border-l border-white/10 flex flex-col gap-1 my-1 animate-fade-in shrink-0">
               <button
                 v-for="subtes in materiUtbk"
                 :key="subtes.id"
@@ -76,10 +83,10 @@
       </div>
 
       <!-- Bottom: User + Logout -->
-      <div class="shrink-0 border-t border-white/10 p-4 mx-2 mb-2">
-        <div class="flex items-center gap-3 mb-3">
+      <div class="shrink-0 border-t border-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-4 mx-2 mb-2' : 'p-2 mx-1 mb-2'">
+        <div class="flex items-center gap-3 mb-3" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center'">
           <div class="w-9 h-9 shrink-0 rounded-full bg-white/10 flex items-center justify-center font-bold text-white text-xs border border-white/20">SM</div>
-          <div class="flex-grow min-w-0">
+          <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
             <h4 class="text-xs font-black text-white whitespace-nowrap">Siswa Mandiri</h4>
             <span class="text-[10px] text-[#c0ff00] font-black uppercase tracking-wider whitespace-nowrap">Pro Member</span>
           </div>
@@ -88,16 +95,16 @@
         <button
           @click="logout"
           :title="'Keluar Akun'"
-          class="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl font-bold transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 w-full py-2.5 text-xs"
+          :class="['bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl font-bold transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 shrink-0', (sidebarExpanded || mobileSidebarOpen) ? 'w-full py-2.5 text-xs' : 'w-9 h-9 text-sm']"
         >
           <i class="ph-bold ph-sign-out shrink-0 text-base"></i>
-          <span class="whitespace-nowrap">Keluar Akun</span>
+          <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="whitespace-nowrap">Keluar Akun</span>
         </button>
       </div>
     </aside>
 
     <!-- Main Content Area -->
-    <main @scroll="handleScroll" class="relative z-10 flex-grow overflow-y-auto overflow-x-hidden max-h-screen flex flex-col w-full" :class="isLoggedIn ? 'p-6 lg:pl-6 lg:ml-72 bg-[#f8fafc]' : ''">
+    <main @scroll="handleScroll" class="relative z-10 flex-grow overflow-y-auto overflow-x-hidden max-h-screen flex flex-col w-full" :class="isLoggedIn ? 'p-6 lg:pl-6 lg:ml-[72px] bg-[#f8fafc]' : ''">
       
       <!-- Public Top Navbar (Only visible when Logged Out) -->
       <header v-if="!isLoggedIn" class="w-full flex justify-center pt-3 px-3 sm:pt-4 sm:px-4 shrink-0 z-30 fixed top-0 left-0 right-0">
@@ -1741,24 +1748,21 @@
         <!-- TAB: AFFILIATE -->
         <section v-if="currentTab === 'affiliate'" class="animate-fade-in space-y-6">
           <div v-if="isLoadingAffiliate" class="flex justify-center p-12">
-            <i class="ph-bold ph-spinner animate-spin text-4xl text-[#c0ff00]"></i>
+            <i class="ph-bold ph-spinner animate-spin text-4xl text-emerald-500"></i>
           </div>
 
           <!-- NOT JOINED STATE -->
-          <div v-else-if="affiliateData?.status === 'not_joined'" class="relative max-w-3xl mx-auto space-y-8 text-center p-12 overflow-hidden rounded-3xl bg-white/[0.02] border border-white/5 backdrop-blur-xl">
-            <!-- Decorative Glow -->
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-[#c0ff00]/10 blur-[80px] pointer-events-none"></div>
-
+          <div v-else-if="affiliateData?.status === 'not_joined'" class="relative max-w-3xl mx-auto space-y-8 text-center p-12 overflow-hidden rounded-3xl bg-white border border-slate-200 shadow-sm">
             <div class="relative z-10 space-y-6">
-              <span class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[#c0ff00] text-xs font-black uppercase tracking-widest inline-flex items-center gap-2 shadow-[0_0_15px_rgba(192,255,0,0.1)]">
+              <span class="px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-black uppercase tracking-widest inline-flex items-center gap-2 shadow-sm">
                 <i class="ph-bold ph-hand-coins text-sm"></i>
                 <span>Program Mitra Afiliasi</span>
               </span>
-              <h2 class="text-4xl md:text-5xl font-black font-heading text-white tracking-tight">Cetak Pendapatan<br>dari <span class="text-[#c0ff00]">Jejaring Anda.</span></h2>
-              <p class="text-sm text-white/60 max-w-md mx-auto font-medium leading-relaxed">
+              <h2 class="text-4xl md:text-5xl font-black font-heading text-slate-800 tracking-tight">Cetak Pendapatan<br>dari <span class="text-emerald-500">Jejaring Anda.</span></h2>
+              <p class="text-sm text-slate-500 max-w-md mx-auto font-medium leading-relaxed">
                 Dapatkan komisi pasif tanpa batas dengan mereferensikan EduPath kepada siswa lain. Gratis pendaftaran selamanya.
               </p>
-              <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-8 py-3.5 rounded-2xl bg-[#c0ff00] text-black font-black text-sm hover:bg-[#a6e600] active:scale-95 transition-all shadow-[0_0_30px_rgba(192,255,0,0.3)] hover:shadow-[0_0_40px_rgba(192,255,0,0.5)]">
+              <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-8 py-3.5 rounded-2xl bg-emerald-500 text-white font-black text-sm hover:bg-emerald-600 active:scale-95 transition-all shadow-md hover:shadow-lg">
                 <span v-if="isJoiningAffiliate" class="flex items-center gap-2 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
                 <span v-else>Aktifkan Dashboard Afiliasi</span>
               </button>
@@ -1771,83 +1775,79 @@
             <!-- Header Section -->
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
               <div class="space-y-3">
-                <span class="px-3 py-1 rounded-full bg-[#c0ff00]/10 border border-[#c0ff00]/20 text-[#c0ff00] text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1.5">
+                <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1.5 shadow-sm">
                   <i class="ph-fill ph-check-circle"></i>
                   <span>Mitra Aktif</span>
                 </span>
-                <h2 class="text-3xl font-black font-heading text-white tracking-tight">Dashboard Afiliasi</h2>
-                <p class="text-xs text-white/50 font-medium">
-                  Komisi <span class="text-white font-bold">{{ affiliateData?.commission_rate }}%</span> per pengguna aktif baru.
+                <h2 class="text-3xl font-black font-heading text-slate-800 tracking-tight">Dashboard Afiliasi</h2>
+                <p class="text-xs text-slate-500 font-medium">
+                  Komisi <span class="text-slate-800 font-bold">{{ affiliateData?.commission_rate }}%</span> per pengguna aktif baru.
                 </p>
               </div>
             </div>
 
-            <!-- Stats Grid (Left aligned, clean) -->
+            <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
               
               <!-- Stat 1 -->
-              <div class="relative overflow-hidden rounded-3xl p-6 bg-white/[0.02] border border-white/5 backdrop-blur-md group hover:bg-white/[0.04] transition-colors">
-                <div class="absolute top-0 right-0 p-6 opacity-20 group-hover:opacity-40 transition-opacity">
-                  <i class="ph-fill ph-users text-4xl text-white"></i>
+              <div class="relative overflow-hidden rounded-3xl p-6 bg-white border border-slate-200 shadow-sm group hover:border-slate-300 transition-colors">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <i class="ph-fill ph-users text-4xl text-slate-400"></i>
                 </div>
                 <div class="relative z-10 space-y-3">
-                  <span class="text-xs text-white/40 font-bold uppercase tracking-wider">Total Referral</span>
+                  <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Total Referral</span>
                   <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-white">{{ affiliateData?.stats?.total_referrals }}</span>
-                    <span class="text-xs text-white/40 font-bold">Siswa</span>
+                    <span class="text-4xl font-black text-slate-800">{{ affiliateData?.stats?.total_referrals }}</span>
+                    <span class="text-xs text-slate-400 font-bold">Siswa</span>
                   </div>
                 </div>
               </div>
 
               <!-- Stat 2 -->
-              <div class="relative overflow-hidden rounded-3xl p-6 bg-[#c0ff00]/[0.03] border border-[#c0ff00]/20 backdrop-blur-md group hover:bg-[#c0ff00]/[0.06] transition-colors">
-                <div class="absolute top-0 right-0 p-6 opacity-20 group-hover:opacity-40 transition-opacity">
-                  <i class="ph-fill ph-wallet text-4xl text-[#c0ff00]"></i>
+              <div class="relative overflow-hidden rounded-3xl p-6 bg-emerald-50 border border-emerald-100 shadow-sm group hover:border-emerald-200 transition-colors">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <i class="ph-fill ph-wallet text-4xl text-emerald-500"></i>
                 </div>
-                <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#c0ff00]/5 to-transparent pointer-events-none"></div>
                 <div class="relative z-10 space-y-3">
-                  <span class="text-xs text-[#c0ff00]/60 font-bold uppercase tracking-wider">Komisi Cair</span>
+                  <span class="text-xs text-emerald-600 font-bold uppercase tracking-wider">Komisi Cair</span>
                   <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-[#c0ff00]">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_paid || 0) }}</span>
+                    <span class="text-4xl font-black text-emerald-500">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_paid || 0) }}</span>
                   </div>
-                  <span class="text-[10px] text-[#c0ff00]/50 font-bold inline-block">Sudah ditransfer ke rekening</span>
+                  <span class="text-[10px] text-emerald-600/70 font-bold inline-block">Sudah ditransfer ke rekening</span>
                 </div>
               </div>
 
               <!-- Stat 3 -->
-              <div class="relative overflow-hidden rounded-3xl p-6 bg-amber-500/[0.03] border border-amber-500/20 backdrop-blur-md group hover:bg-amber-500/[0.06] transition-colors">
-                <div class="absolute top-0 right-0 p-6 opacity-20 group-hover:opacity-40 transition-opacity">
-                  <i class="ph-fill ph-hourglass-high text-4xl text-amber-400"></i>
+              <div class="relative overflow-hidden rounded-3xl p-6 bg-amber-50 border border-amber-100 shadow-sm group hover:border-amber-200 transition-colors">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <i class="ph-fill ph-hourglass-high text-4xl text-amber-500"></i>
                 </div>
                 <div class="relative z-10 space-y-3">
-                  <span class="text-xs text-amber-400/60 font-bold uppercase tracking-wider">Komisi Tertunda</span>
+                  <span class="text-xs text-amber-600 font-bold uppercase tracking-wider">Komisi Tertunda</span>
                   <div class="flex items-baseline gap-2">
-                    <span class="text-4xl font-black text-amber-400">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_pending || 0) }}</span>
+                    <span class="text-4xl font-black text-amber-500">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_pending || 0) }}</span>
                   </div>
-                  <span class="text-[10px] text-amber-400/50 font-bold inline-block">Menunggu jadwal pencairan</span>
+                  <span class="text-[10px] text-amber-600/70 font-bold inline-block">Menunggu jadwal pencairan</span>
                 </div>
               </div>
 
             </div>
 
-            <!-- Referral Link Box (Hero Style) -->
-            <div class="mt-8 rounded-3xl p-1 bg-gradient-to-r from-white/10 via-white/5 to-white/10">
-              <div class="rounded-[22px] p-8 md:p-10 bg-[#0a0f1e] flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
-                <!-- Background glow -->
-                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-64 h-64 bg-[#c0ff00]/10 rounded-full blur-[80px] pointer-events-none"></div>
-                
+            <!-- Referral Link Box -->
+            <div class="mt-8 rounded-3xl p-1 bg-gradient-to-r from-emerald-500 to-teal-400 shadow-md">
+              <div class="rounded-[22px] p-8 md:p-10 bg-white flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
                 <div class="flex-grow space-y-2 relative z-10 w-full md:w-auto text-center md:text-left">
-                  <h3 class="text-xl font-black font-heading text-white">Bagikan & Dapatkan Komisi</h3>
-                  <p class="text-xs text-white/50 leading-relaxed max-w-md">Sebarkan link referral unik Anda ke teman, grup WA, atau sosial media. Dapatkan komisi pasif untuk setiap siswa yang mendaftar dan berlangganan.</p>
+                  <h3 class="text-xl font-black font-heading text-slate-800">Bagikan & Dapatkan Komisi</h3>
+                  <p class="text-xs text-slate-500 leading-relaxed max-w-md mx-auto md:mx-0">Sebarkan link referral unik Anda ke teman, grup WA, atau sosial media. Dapatkan komisi pasif untuk setiap siswa yang mendaftar dan berlangganan.</p>
                 </div>
                 
                 <div class="w-full md:w-auto relative z-10 shrink-0">
-                  <div class="flex items-center bg-black/40 border border-white/10 rounded-2xl p-1.5 focus-within:border-[#c0ff00]/50 focus-within:shadow-[0_0_20px_rgba(192,255,0,0.1)] transition-all">
-                    <div class="px-4 text-white/40">
+                  <div class="flex items-center bg-slate-50 border border-slate-200 rounded-2xl p-1.5 focus-within:border-emerald-500 focus-within:shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all">
+                    <div class="px-4 text-slate-400">
                       <i class="ph-bold ph-link text-lg"></i>
                     </div>
-                    <input type="text" readonly :value="`${baseUrl}/ref/${affiliateData?.referral_code}`" class="w-full md:w-64 bg-transparent border-none text-sm text-white font-medium outline-none" id="refLinkInput" />
-                    <button @click="copyReferralLink" class="px-5 py-2.5 rounded-xl bg-white text-black font-black text-xs hover:bg-[#c0ff00] active:scale-95 transition-all shrink-0">
+                    <input type="text" readonly :value="`${baseUrl}/ref/${affiliateData?.referral_code}`" class="w-full md:w-64 bg-transparent border-none text-sm text-slate-700 font-medium outline-none" id="refLinkInput" />
+                    <button @click="copyReferralLink" class="px-5 py-2.5 rounded-xl bg-emerald-500 text-white font-black text-xs hover:bg-emerald-600 active:scale-95 transition-all shrink-0 shadow-sm">
                       Salin
                     </button>
                   </div>
@@ -1857,21 +1857,21 @@
             
             <!-- History Ledger -->
             <div v-if="affiliateData?.history?.length > 0" class="mt-8">
-              <h3 class="text-base font-black font-heading text-white mb-4 px-2">Riwayat Pencairan Terakhir</h3>
-              <div class="rounded-3xl bg-white/[0.02] border border-white/5 overflow-hidden backdrop-blur-md">
-                <div class="divide-y divide-white/5">
-                  <div v-for="(hist, idx) in affiliateData.history" :key="idx" class="flex flex-col sm:flex-row sm:items-center justify-between p-5 hover:bg-white/[0.02] transition-colors gap-4">
+              <h3 class="text-base font-black font-heading text-slate-800 mb-4 px-2">Riwayat Pencairan Terakhir</h3>
+              <div class="rounded-3xl bg-white border border-slate-200 overflow-hidden shadow-sm">
+                <div class="divide-y divide-slate-100">
+                  <div v-for="(hist, idx) in affiliateData.history" :key="idx" class="flex flex-col sm:flex-row sm:items-center justify-between p-5 hover:bg-slate-50 transition-colors gap-4">
                     <div class="flex items-center gap-4">
-                      <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" :class="hist.status === 'paid' ? 'bg-[#c0ff00]/10 text-[#c0ff00]' : 'bg-amber-500/10 text-amber-400'">
+                      <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" :class="hist.status === 'paid' ? 'bg-emerald-50 text-emerald-500' : 'bg-amber-50 text-amber-500'">
                         <i :class="['text-lg', hist.status === 'paid' ? 'ph-bold ph-check' : 'ph-bold ph-hourglass']"></i>
                       </div>
                       <div>
-                        <div class="text-sm font-bold text-white tracking-tight">Rp {{ new Intl.NumberFormat('id-ID').format(hist.amount) }}</div>
-                        <div class="text-[11px] text-white/40 mt-0.5 font-medium">{{ new Date(hist.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</div>
+                        <div class="text-sm font-bold text-slate-800 tracking-tight">Rp {{ new Intl.NumberFormat('id-ID').format(hist.amount) }}</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5 font-medium">{{ new Date(hist.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</div>
                       </div>
                     </div>
                     <div class="flex items-center gap-3">
-                      <span :class="['px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border', hist.status === 'paid' ? 'bg-[#c0ff00]/5 border-[#c0ff00]/20 text-[#c0ff00]' : 'bg-amber-500/5 border-amber-500/20 text-amber-400']">
+                      <span :class="['px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border', hist.status === 'paid' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-amber-50 border-amber-200 text-amber-600']">
                         {{ hist.status === 'paid' ? 'Selesai' : 'Tertunda' }}
                       </span>
                     </div>
