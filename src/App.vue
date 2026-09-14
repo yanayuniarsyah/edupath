@@ -3848,13 +3848,11 @@ export default {
       total: 0
     });
 
-    const purchasePlan = (planNameFallback, fallbackAmount) => {
-      if (!isLoggedIn.value) {
-        showLoginModal.value = true;
-        showToast('Silakan Masuk Akun untuk membeli paket.');
-        return;
-      }
+    const pendingPurchasePlanId = ref(null);
+    const pendingPurchaseAmount = ref(null);
+    const pendingPurchaseName = ref(null);
 
+    const purchasePlan = (planNameFallback, fallbackAmount) => {
       let amount = fallbackAmount;
       let planId = planNameFallback;
 
@@ -3868,6 +3866,16 @@ export default {
             break;
           }
         }
+      }
+
+      if (!isLoggedIn.value) {
+        pendingPurchasePlanId.value = planId;
+        pendingPurchaseName.value = planNameFallback;
+        pendingPurchaseAmount.value = amount;
+        isLoginView.value = false;
+        showLoginModal.value = true;
+        showToast('Silakan buat akun terlebih dahulu untuk membeli paket.');
+        return;
       }
 
       const tax = Math.round(amount * 0.11);
@@ -3886,7 +3894,7 @@ export default {
       const data = checkoutModalData.value;
       try {
         const response = await api.checkout(data.planId);
-        if (response.success && response.token) {
+        if (response && response.token) {
           if (window.snap) {
             window.snap.pay(response.token, {
               onSuccess: function(result) {
