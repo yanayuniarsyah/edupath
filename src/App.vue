@@ -3720,6 +3720,7 @@ export default {
       }
     };
 
+    const publicPlans = ref([]);
     const fetchPlans = async () => {
       try {
         const data = await api.getPlans();
