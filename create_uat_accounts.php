@@ -10,10 +10,13 @@ try {
     $pdo->prepare("INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES (?, 'B2C Default Tenant', 'b2c', 1)")->execute([$tenant_id]);
     
     // Clean up old UAT data just in case
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
     $pdo->exec("DELETE FROM affiliates WHERE referral_code = 'UATAFF2025'");
+    $pdo->exec("DELETE FROM user_roles WHERE reference_id IN ('STU-UAT-1', 'STU-UAT-AFF', 'ADM-UAT-1')");
     $pdo->exec("DELETE FROM admins WHERE username = 'admin.uat@edupath.id'");
     $pdo->exec("DELETE FROM students WHERE email IN ('student.uat@edupath.id', 'affiliate.uat@edupath.id')");
     $pdo->exec("DELETE FROM users WHERE identity_key IN ('student.uat@edupath.id', 'affiliate.uat@edupath.id', 'admin.uat@edupath.id')");
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
 
     // 1. STUDENT ACCOUNT
     $u_stu_id = "USR-UAT-STU";
