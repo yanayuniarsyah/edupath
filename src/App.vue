@@ -1,7 +1,6 @@
-
 <template>
   <div :class="['relative min-h-screen antialiased font-body flex overflow-hidden transition-colors duration-300', 
-    isLoggedIn ? 'bg-[#f8fafc] text-slate-900' : 'bg-[#050505] text-white',
+    (isLoggedIn && currentTab !== 'home') ? 'bg-[#f8fafc] text-slate-900' : 'bg-[#050505] text-white',
     mobileSidebarOpen ? 'mobile-sidebar-open' : ''
   ]">
     <!-- Ambient Glow (Public only) -->
@@ -104,7 +103,10 @@
     </aside>
 
     <!-- Main Content Area -->
-    <main @scroll="handleScroll" class="relative z-10 flex-grow overflow-y-auto overflow-x-hidden max-h-screen flex flex-col w-full" :class="isLoggedIn ? 'p-6 lg:pl-6 lg:ml-[72px] bg-[#f8fafc]' : ''">
+    <main @scroll="handleScroll" class="relative z-10 flex-grow overflow-y-auto overflow-x-hidden max-h-screen flex flex-col w-full" :class="[
+      isLoggedIn ? 'lg:ml-[72px]' : '',
+      (isLoggedIn && currentTab !== 'home') ? 'p-6 lg:pl-6 bg-[#f8fafc]' : ''
+    ]">
       
       <!-- Public Top Navbar (Only visible when Logged Out) -->
       <header v-if="!isLoggedIn" class="w-full flex justify-center pt-3 px-3 sm:pt-4 sm:px-4 shrink-0 z-30 fixed top-0 left-0 right-0">
