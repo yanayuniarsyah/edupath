@@ -63,8 +63,18 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
         
-        $stmt = $pdo->prepare("INSERT INTO users (id, identity_key, password) VALUES (?, ?, ?)");
-        $stmt->execute([$user_id, $email, $hashed_password]);
+        // Cek apakah identity_key (email) sudah ada di tabel users (mungkin dari registrasi affiliate)
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE identity_key = ?");
+        $stmt->execute([$email]);
+        $existing_user = $stmt->fetch();
+        
+        if ($existing_user) {
+            $user_id = $existing_user['id'];
+            // Tidak perlu insert ke users, hanya ke students dan user_roles
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO users (id, identity_key, password) VALUES (?, ?, ?)");
+            $stmt->execute([$user_id, $email, $hashed_password]);
+        }
 
         $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $tenant_id, $referred_by]);
@@ -104,7 +114,8 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (PDOException $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(["error" => "Gagal mendaftar"]);
+        // Expose error message for debugging
+        echo json_encode(["error" => "Gagal mendaftar: " . $e->getMessage()]);
     }
 } 
 elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
