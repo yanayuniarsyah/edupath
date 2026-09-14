@@ -4,7 +4,10 @@ require_once __DIR__ . '/api/config.php';
 echo "<h1>Setup UAT Accounts - EduPath B2C (Fix Final)</h1>";
 
 try {
-    $tenant_id = "default_tenant";
+    $tenant_id = "553af312-fb50-4e24-93ee-0d1abd52a62d";
+    
+    // Ensure tenant exists
+    $pdo->prepare("INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES (?, 'B2C Default Tenant', 'b2c', 1)")->execute([$tenant_id]);
     
     // Clean up old UAT data just in case
     $pdo->exec("DELETE FROM affiliates WHERE referral_code = 'UATAFF2025'");
