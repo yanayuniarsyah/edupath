@@ -3926,6 +3926,17 @@ export default {
       checkoutModalData.value.isOpen = false;
     };
 
+    watch(() => isLoggedIn.value, (newVal) => {
+      if (newVal && pendingPurchasePlanId.value) {
+        // Trigger purchase automatically
+        purchasePlan(pendingPurchaseName.value, pendingPurchaseAmount.value);
+        // Clear the pending state
+        pendingPurchasePlanId.value = null;
+        pendingPurchaseName.value = null;
+        pendingPurchaseAmount.value = null;
+      }
+    });
+
     const scrollToSection = (id) => {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
