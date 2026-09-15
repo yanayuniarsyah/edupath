@@ -1,58 +1,61 @@
 // =====================================================
-// EduPath Backend — server/middleware/auth.js
-// JWT Authentication Middleware
+// Authentication Middleware
+// Validates JWT tokens and extracts user context
 // =====================================================
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'edupath-secret-key-2024-ganti-ini-di-produksi';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 /**
- * Verifikasi token JWT untuk siswa
+ * Middleware: Validate JWT Token
+ * Extracts user from token and attaches to req.user
  */
-function authStudent(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ success: false, message: 'Token tidak ditemukan' });
-  }
-  const token = authHeader.split(' ')[1];
+const verifyToken = (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    if (decoded.role !== 'student') {
-      return res.status(403).json({ success: false, message: 'Akses ditolak' });
+    // Get token dari Authorization header atau Cookie
+    const token = req.headers.authorization?.split(' ')[1] || req.cookies?.ep_access_token;
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Token tidak ditemukan. Silakan login terlebih dahulu.'
+        }
+      });
     }
-    req.user = decoded;
+
+    // Verify JWT
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded; // Attach user context ke request
     next();
-  } catch {
-    return res.status(401).json({ success: false, message: 'Token tidak valid atau sudah kadaluarsa' });
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Token tidak valid atau sudah expired.'
+      }
+    });
   }
-}
+};
 
 /**
- * Verifikasi token JWT untuk admin
+ * Middleware: Validate Admin Token
  */
-function authAdmin(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ success: false, message: 'Token tidak ditemukan' });
-  }
-  const token = authHeader.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    if (decoded.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Akses admin diperlukan' });
+const verifyAdminToken = (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: 'Anda tidak memiliki akses ke resource ini.'
+        }
+      });
     }
-    req.admin = decoded;
     next();
-  } catch {
-    return res.status(401).json({ success: false, message: 'Token tidak valid atau sudah kadaluarsa' });
-  }
-}
+  });
+};
 
-/**
- * Generate token JWT
- */
-function generateToken(payload, expiresIn = '7d') {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn });
-}
-
-module.exports = { authStudent, authAdmin, generateToken };
+module.exports = { verifyToken, verifyAdminToken, JWT_SECRET };
