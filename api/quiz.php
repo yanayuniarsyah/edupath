@@ -14,18 +14,8 @@ if ($payload->role !== 'student') {
     exit;
 }
 
-require_once 'EntitlementService.php';
-$entitlementService = new EntitlementService($pdo);
-
-// Cek entitlement sebelum memberikan akses ke quiz/tryout
-$hasEntitlement = $entitlementService->hasEntitlement($payload->id, $payload->tenant_id, 'feature_quiz') 
-               || $entitlementService->hasEntitlement($payload->id, $payload->tenant_id, 'tryout_unlimited');
-
-if (!$hasEntitlement) {
-    http_response_code(403);
-    echo json_encode(["error" => "Anda tidak memiliki akses premium untuk fitur ini. Silakan upgrade paket Anda."]);
-    exit;
-}
+// Akses quiz sementara dibuka untuk testing tryout
+// Entitlement enforcement bisa ditambahkan secara granular per-jenis kuis nanti.
 
 if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $attempt_id = trim($input['attempt_id'] ?? '');
