@@ -15,28 +15,24 @@ try {
     try {
         $pdo->exec("ALTER TABLE questions ADD COLUMN is_qc_passed TINYINT(1) DEFAULT 0");
         echo "Berhasil menambahkan kolom is_qc_passed ke tabel questions.<br>\n";
-    } catch (PDOException $e) { }
+    } catch (PDOException $e) {
+        if (strpos($e->getMessage(), 'Duplicate column name') === false) {
+            echo "Error adding is_qc_passed: " . $e->getMessage() . "<br>\n";
+        }
+    }
 
     try {
-        $pdo->exec("ALTER TABLE questions ADD COLUMN classification ENUM('LATIHAN','TRYOUT','ASESMEN') DEFAULT 'LATIHAN'");
+        $pdo->exec("ALTER TABLE questions ADD COLUMN classification VARCHAR(50) DEFAULT 'LATIHAN'");
         echo "Berhasil menambahkan kolom classification ke tabel questions.<br>\n";
-    } catch (PDOException $e) { }
-
-    try {
-        $pdo->exec("ALTER TABLE questions ADD COLUMN source_type VARCHAR(50) DEFAULT 'author_created'");
-    } catch (PDOException $e) { }
-
-    try {
-        $pdo->exec("ALTER TABLE questions ADD COLUMN rights_status VARCHAR(50) DEFAULT 'owned'");
-    } catch (PDOException $e) { }
-
-    try {
-        $pdo->exec("ALTER TABLE questions ADD COLUMN cognitive_demand VARCHAR(50) DEFAULT 'C3'");
-    } catch (PDOException $e) { }
+    } catch (PDOException $e) {
+        if (strpos($e->getMessage(), 'Duplicate column name') === false) {
+            echo "Error adding classification: " . $e->getMessage() . "<br>\n";
+        }
+    }
 
     $count = 0;
-    // 2. Siapkan query insert
-    $stmt = $pdo->prepare("INSERT INTO questions (id, subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, is_qc_passed, source_type, rights_status, cognitive_demand, classification) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'author_created', 'owned', 'C3', 'TRYOUT')");
+    // 2. Siapkan query insert (TANPA source_type, rights_status, cognitive_demand)
+    $stmt = $pdo->prepare("INSERT INTO questions (id, subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, is_qc_passed, classification) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'TRYOUT')");
 
     $allQuestions = [];
     $keys = [];
