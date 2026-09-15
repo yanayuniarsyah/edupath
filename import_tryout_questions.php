@@ -11,7 +11,19 @@ if (!file_exists($transcriptPath)) {
 $lines = file($transcriptPath);
 
 try {
+    // 1. Pastikan kolom is_qc_passed ada di database
+    try {
+        $pdo->exec("ALTER TABLE questions ADD COLUMN is_qc_passed TINYINT(1) DEFAULT 0");
+        echo "Berhasil menambahkan kolom is_qc_passed ke tabel questions.<br>\n";
+    } catch (PDOException $e) {
+        // Abaikan error jika kolom sudah ada
+        if (strpos($e->getMessage(), 'Duplicate column name') === false) {
+            throw $e;
+        }
+    }
+
     $count = 0;
+    // 2. Siapkan query insert
     $stmt = $pdo->prepare("INSERT INTO questions (id, subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, is_qc_passed, source_type, rights_status, cognitive_demand, classification) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'author_created', 'owned', 'C3', 'TRYOUT')");
 
     $allQuestions = [];
