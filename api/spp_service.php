@@ -30,7 +30,7 @@ class SPPService {
         $this->pdo->beginTransaction();
         try {
             // Lock attempt
-            $stmt = $this->pdo->prepare("SELECT * FROM spp_attempts WHERE id = ? AND student_id = ?");
+            $stmt = $this->pdo->prepare("SELECT * FROM spp_attempts WHERE id = ? AND student_id = ? FOR UPDATE");
             $stmt->execute([$attempt_id, $student_id]);
             $attempt = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -149,11 +149,13 @@ class SPPService {
             JOIN spp_attempts att ON att.student_id = st.id
             JOIN spp_profiles p ON p.attempt_id = att.id
             JOIN spp_scores s ON s.attempt_id = att.id
+            JOIN (
+                SELECT student_id, MAX(submitted_at) AS latest_submitted_at
+                FROM spp_attempts
+                WHERE scoring_status = 'SCORED'
+                GROUP BY student_id
+            ) latest ON latest.student_id = att.student_id AND latest.latest_submitted_at = att.submitted_at
             WHERE att.scoring_status = 'SCORED'
-            AND att.submitted_at = (
-                SELECT MAX(submitted_at) FROM spp_attempts a2
-                WHERE a2.student_id = st.id AND a2.scoring_status = 'SCORED'
-            )
         ";
         
         $params = [];

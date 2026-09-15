@@ -210,7 +210,10 @@ export default {
       fontSize: 'text-base',
       answers: [],
       doubt: [],
-      timeLeft: 15 * 60, // 15 minutes in seconds
+      timeLeft: 15 * 60,
+      attemptId: null,
+      saveTimer: null,
+      submitting: false,
       timerInterval: null,
       showFinishModal: false,
       questions: [],
@@ -232,10 +235,17 @@ export default {
       return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
   },
+  watch: {
+    answers: { deep: true, handler() { this.persistAnswers(); } },
+    doubt: { deep: true, handler() { this.persistAnswers(); } }
+  },
   async mounted() {
     try {
-      // Fetch dynamic questions from the API
-      const dbQuestions = await api.getQuizQuestions(15); // Ambil 15 soal
+      const savedAttemptId = localStorage.getItem('edupath_tryout_attempt_id');
+      const attempt = await api.quizStart({ attempt_id: savedAttemptId, quiz_type: 'tryout', limit: 15, duration_sec: 15 * 60 });
+      this.attemptId = attempt.attempt_id;
+      localStorage.setItem('edupath_tryout_attempt_id', this.attemptId);
+      const dbQuestions = attempt.questions;
       this.questions = dbQuestions.map(q => ({
         id: q.id,
         subtest: q.sub_materi,
@@ -261,11 +271,19 @@ export default {
       this.isLoading = false;
       this.answers = new Array(this.questions.length).fill(null);
       this.doubt = new Array(this.questions.length).fill(false);
+      const saved = localStorage.getItem(`edupath_tryout_${this.attemptId}`);
+      if (saved) {
+        const state = JSON.parse(saved);
+        this.answers = state.answers || this.answers;
+        this.doubt = state.doubt || this.doubt;
+        if (state.expiresAt) this.timeLeft = Math.max(0, Math.floor((new Date(state.expiresAt).getTime() - Date.now()) / 1000));
+      }
       this.startTimer();
     }
   },
   beforeUnmount() {
     clearInterval(this.timerInterval);
+    clearTimeout(this.saveTimer);
   },
   methods: {
     goToQuestion(index) {
@@ -301,18 +319,46 @@ export default {
         }
       }, 1000);
     },
+    persistAnswers() {
+      if (!this.attemptId) return;
+      const state = {
+        answers: this.answers,
+        doubt: this.doubt,
+        expiresAt: new Date(Date.now() + this.timeLeft * 1000).toISOString()
+      };
+      localStorage.setItem(`edupath_tryout_${this.attemptId}`, JSON.stringify(state));
+      clearTimeout(this.saveTimer);
+      this.saveTimer = setTimeout(() => api.quizSave(this.attemptId, this.answers.map((answer, index) => ({
+        question_id: this.questions[index]?.id,
+        answer
+      })).filter(item => item.answer)), 500);
+    },
     finishExam() {
       this.showFinishModal = true;
     },
-    submitExam() {
+    async submitExam() {
+      if (this.submitting) return;
+      this.submitting = true;
       this.showFinishModal = false;
       clearInterval(this.timerInterval);
-      alert("Ujian Selesai! Terima kasih.\n(Demo UI Try Out SNPMB)");
-      this.$router.push('/');
+      try {
+        await api.submitQuiz({
+          attempt_id: this.attemptId,
+          quiz_type: 'tryout',
+          answers: this.answers.map((answer, index) => ({ question_id: this.questions[index]?.id, answer })).filter(item => item.answer),
+          duration_sec: 15 * 60 - this.timeLeft
+        });
+        localStorage.removeItem(`edupath_tryout_${this.attemptId}`);
+        localStorage.removeItem('edupath_tryout_attempt_id');
+        alert("Ujian selesai. Jawaban Anda telah disimpan.");
+        this.$router.push('/');
+      } catch (error) {
+        this.submitting = false;
+        alert(error.message || 'Jawaban belum dapat disimpan.');
+      }
     },
     autoSubmit() {
-      alert("Waktu habis! Jawaban Anda telah otomatis tersimpan.");
-      this.$router.push('/');
+      this.submitExam();
     }
   }
 }

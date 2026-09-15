@@ -75,6 +75,11 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Midtrans gross_amount must be integer IDR (no fractional cents in IDR)
     $gross_amount_int = (int) round((float) $grand_total);
+    if ($gross_amount_int <= 0 || trim((string) MIDTRANS_SERVER_KEY) === '') {
+        http_response_code(503);
+        echo json_encode(["error" => "Pembayaran belum tersedia. Konfigurasi gateway belum lengkap."]);
+        exit;
+    }
 
     $order_ref = "ORG-" . time() . "-" . rand(1000, 9999);
 
@@ -118,7 +123,10 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($transaction_payload));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
     $response = curl_exec($ch);
+    $curl_error = curl_error($ch);
     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
@@ -233,8 +241,11 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
     } else {
+        if ($curl_error !== '') {
+            error_log('EduPath Midtrans request failed: ' . $curl_error);
+        }
         http_response_code(500);
-        echo json_encode(["error" => "Gagal membuat transaksi Midtrans", "details" => $res]);
+        echo json_encode(["error" => "Gagal membuat transaksi Midtrans. Silakan coba lagi."]);
     }
 }
 
@@ -255,9 +266,15 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $payment_type       = $input['payment_type']       ?? null; // e.g. 'qris', 'bank_transfer', etc.
     $raw_payload        = json_encode($input);                  // store raw for audit
 
+    if (trim((string) MIDTRANS_SERVER_KEY) === '' || $order_id === '' || $status_code === '' || $gross_amount === '') {
+        http_response_code(503);
+        echo "Payment gateway is not configured";
+        exit;
+    }
+
     // 1. VERIFY SIGNATURE — reject if invalid
     $calculated_signature = hash('sha512', $order_id . $status_code . $gross_amount . MIDTRANS_SERVER_KEY);
-    if ($calculated_signature !== $signature_key) {
+    if (!hash_equals(strtolower($calculated_signature), strtolower((string)$signature_key))) {
         http_response_code(403);
         echo "Invalid signature";
         exit;
@@ -316,6 +333,18 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $order_tenant_id = $order['tenant_id']; // canonical for all downstream inserts
+
+        $expected_amount = number_format((float)$order['amount'], 0, '.', '');
+        $received_amount = number_format((float)$gross_amount, 0, '.', '');
+        if ($expected_amount !== $received_amount) {
+            $pdo->rollBack();
+            log_audit($pdo, null, $order_tenant_id, 'webhook_amount_mismatch', $order['id'], [
+                'expected' => $expected_amount, 'received' => $received_amount
+            ]);
+            http_response_code(422);
+            echo "Amount mismatch";
+            exit;
+        }
 
         // 4. PAYMENT STATE SAFETY — paid → failed/cancelled MUST be rejected
         $current_order_status = $order['status'];
@@ -516,17 +545,13 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         ]);
                     } else {
                         // Check if this is a first transaction or renewal
-                        $stmt_first = $pdo->prepare("SELECT id FROM orders WHERE student_id = ? AND status IN ('paid', 'settlement') AND id != ? LIMIT 1");
-                        $stmt_first->execute([$order['student_id'], $order['id']]);
+                        $stmt_first = $pdo->prepare("SELECT id FROM orders WHERE student_id = ? AND tenant_id = ? AND status = 'paid' AND id != ? LIMIT 1");
+                        $stmt_first->execute([$order['student_id'], $order['tenant_id'], $order['id']]);
                         $is_renewal = (bool) $stmt_first->fetch();
 
                         // Business rule: 20% first transaction, 10% renewal
                         $actual_rate = $is_renewal ? '10.00' : '20.00';
                         // Optionally respect affiliate's custom rate if we need to scale (e.g. if they have > 20% negotiated)
-                        if (bccomp((string)$affiliate['commission_rate'], $actual_rate, 2) === 1) {
-                             $actual_rate = (string)$affiliate['commission_rate'];
-                        }
-
                         // P1-D: bcmul — no float arithmetic for monetary commission calculation
                         $amount_str          = (string) $order['amount'];
                         $commission_amount   = bcmul($amount_str, bcdiv($actual_rate, '100', 10), 2);
@@ -604,5 +629,3 @@ else {
     echo json_encode(["error" => "Endpoint payment tidak ditemukan"]);
 }
 ?>
-
-

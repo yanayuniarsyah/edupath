@@ -98,13 +98,25 @@ export async function apiFetch(endpoint, options = {}) {
     headers['X-CSRF-Token'] = csrf;
   }
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-    credentials: 'include',   // Kirim & terima HttpOnly cookie
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), options.timeoutMs || 15000);
+  let response;
+  try {
+    response = await fetch(`${BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+      credentials: 'include',
+      signal: options.signal || controller.signal,
+    });
+  } catch (error) {
+    if (error.name === 'AbortError') throw new Error('Permintaan ke server habis waktu. Silakan coba lagi.');
+    throw new Error('Tidak dapat terhubung ke server.');
+  } finally {
+    clearTimeout(timeout);
+  }
 
-  const data = await response.json();
+  const contentType = response.headers.get('content-type') || '';
+  const data = contentType.includes('application/json') ? await response.json() : await response.text();
 
   if (!response.ok) {
     throw new Error(data.error || data.message || 'Terjadi kesalahan pada server');
@@ -198,6 +210,15 @@ export default {
     return apiFetch('/quiz.php?action=submit', {
       method: 'POST',
       body: JSON.stringify(data)
+    });
+  },
+  quizStart(data = {}) {
+    return apiFetch('/quiz.php?action=start', { method: 'POST', body: JSON.stringify(data) });
+  },
+  quizSave(attemptId, answers) {
+    return apiFetch('/quiz.php?action=save', {
+      method: 'POST',
+      body: JSON.stringify({ attempt_id: attemptId, answers })
     });
   },
   getMaterials(subtes = '') {

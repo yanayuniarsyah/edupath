@@ -4,9 +4,12 @@ require_once '../config.php';
 require_once '../jwt.php';
 require_once '../EntitlementService.php';
 
-// Enable error reporting for debug (disable in prod)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+if (defined('APP_ENV') && APP_ENV === 'development') {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+} else {
+    ini_set('display_errors', 0);
+}
 
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

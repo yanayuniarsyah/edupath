@@ -35,7 +35,7 @@ if ($action === 'data' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // 3. Fetch SPP Diagnostic Questions (EXCLUDING answer key and explanation)
         // Ensure we NEVER expose 'answer', 'hint', 'concept', or 'explanation'
-        $stmt_q = $pdo->query("SELECT id, subject, category, skill, difficulty, question, options FROM spp_diagnostic_questions ORDER BY RAND() LIMIT 20");
+        $stmt_q = $pdo->query("SELECT id, subject, category, skill, difficulty, question, options FROM spp_diagnostic_questions ORDER BY id LIMIT 20");
         if ($stmt_q) {
             $questions = $stmt_q->fetchAll();
             foreach ($questions as &$q) {
@@ -47,12 +47,8 @@ if ($action === 'data' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
         echo json_encode($data);
     } catch (PDOException $e) {
-        // If tables don't exist yet (migration pending), return empty gracefully
-        echo json_encode([
-            "universities" => [],
-            "programs" => [],
-            "diagnostic_questions" => []
-        ]);
+        http_response_code(503);
+        echo json_encode(["error" => "Data adaptive learning belum tersedia."]);
     }
 }
 else if ($action === 'create_attempt' && $_SERVER['REQUEST_METHOD'] === 'POST') {

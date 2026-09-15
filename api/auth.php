@@ -63,14 +63,16 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
         
-        // Cek apakah identity_key (email) sudah ada di tabel users (mungkin dari registrasi affiliate)
+        // Cek apakah identity_key (email) sudah ada di tabel users (mencegah hijack admin ID)
         $stmt = $pdo->prepare("SELECT id FROM users WHERE identity_key = ?");
         $stmt->execute([$email]);
         $existing_user = $stmt->fetch();
         
         if ($existing_user) {
-            $user_id = $existing_user['id'];
-            // Tidak perlu insert ke users, hanya ke students dan user_roles
+            $pdo->rollBack();
+            http_response_code(409);
+            echo json_encode(["error" => "Email sudah terdaftar di sistem utama"]);
+            exit;
         } else {
             $stmt = $pdo->prepare("INSERT INTO users (id, identity_key, password) VALUES (?, ?, ?)");
             $stmt->execute([$user_id, $email, $hashed_password]);
@@ -114,8 +116,8 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (PDOException $e) {
         $pdo->rollBack();
         http_response_code(500);
-        // Expose error message for debugging
-        echo json_encode(["error" => "Gagal mendaftar: " . $e->getMessage()]);
+        error_log('EduPath registration failed: ' . $e->getMessage());
+        echo json_encode(["error" => "Gagal mendaftar. Silakan coba lagi."]);
     }
 } 
 elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {

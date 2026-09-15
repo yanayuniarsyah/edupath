@@ -10,8 +10,10 @@ function check_rate_limit($pdo, $endpoint, $max_attempts = 5, $lock_minutes = 15
     $ip_address = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     
     try {
-        // Clean up expired locks first (optional but good for table size)
-        $pdo->exec("DELETE FROM rate_limits WHERE lock_until IS NOT NULL AND lock_until < NOW()");
+        // Cleanup is sampled to avoid an extra table-wide write on every API request.
+        if (random_int(1, 100) === 1) {
+            $pdo->exec("DELETE FROM rate_limits WHERE lock_until IS NOT NULL AND lock_until < NOW()");
+        }
 
         $stmt = $pdo->prepare("SELECT attempt_count, lock_until FROM rate_limits WHERE ip_address = ? AND endpoint = ?");
         $stmt->execute([$ip_address, $endpoint]);

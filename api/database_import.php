@@ -49,12 +49,33 @@ if ($action === 'preview' || $action === 'commit') {
     }
 
     $allowed_tables = ['students', 'plans', 'orders', 'invoices', 'payments', 'subscriptions', 'entitlements', 'question_imports_staging'];
+    $allowed_columns = [
+        'students' => ['id','user_id','tenant_id','referred_by','name','email','phone','school','plan','is_active'],
+        'plans' => ['id','tenant_id','product_id','name','price','discount','duration','features','billing_cycle'],
+        'orders' => ['id','tenant_id','plan_id','order_id','student_id','affiliate_id','plan_name','amount','status','snap_token','billing_cycle_snapshot','paid_at'],
+        'invoices' => ['id','tenant_id','student_id','order_id','subtotal','discount','tax_amount','grand_total','currency','historical_pricing_snapshot'],
+        'payments' => ['id','tenant_id','invoice_id','order_id','gateway','gateway_transaction_id','payment_method','amount','currency','status'],
+        'subscriptions' => ['id','tenant_id','student_id','plan_id','status','payment_reference','plan_name_snapshot','started_at','expires_at'],
+        'entitlements' => ['id','tenant_id','student_id','feature_key','subscription_id','expires_at','revoked_at'],
+        'question_imports_staging' => ['id','tenant_id','batch_id','row_number','payload','status','error_message']
+    ];
 
     // 1. Validate Schema
     $errors = [];
     foreach ($data as $table_name => $rows) {
         if (!in_array($table_name, $allowed_tables)) {
             $errors[] = "Tabel tidak diizinkan: $table_name";
+            continue;
+        }
+        if (!is_array($rows)) {
+            $errors[] = "Data tabel tidak valid: $table_name";
+            continue;
+        }
+        if (!empty($rows)) {
+            $invalid = array_diff(array_keys($rows[0]), $allowed_columns[$table_name]);
+            if ($invalid) {
+                $errors[] = "Kolom tidak diizinkan pada $table_name: " . implode(', ', $invalid);
+            }
         }
     }
 
@@ -96,6 +117,9 @@ if ($action === 'preview' || $action === 'commit') {
             if (empty($rows)) continue;
             
             $columns = array_keys($rows[0]);
+            if (empty($columns) || array_diff($columns, $allowed_columns[$table_name])) {
+                throw new Exception("Kolom import tidak diizinkan untuk $table_name");
+            }
             $col_str = implode(', ', $columns);
             $val_str = implode(', ', array_fill(0, count($columns), '?'));
             
