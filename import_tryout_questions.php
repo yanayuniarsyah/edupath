@@ -15,12 +15,24 @@ try {
     try {
         $pdo->exec("ALTER TABLE questions ADD COLUMN is_qc_passed TINYINT(1) DEFAULT 0");
         echo "Berhasil menambahkan kolom is_qc_passed ke tabel questions.<br>\n";
-    } catch (PDOException $e) {
-        // Abaikan error jika kolom sudah ada
-        if (strpos($e->getMessage(), 'Duplicate column name') === false) {
-            throw $e;
-        }
-    }
+    } catch (PDOException $e) { }
+
+    try {
+        $pdo->exec("ALTER TABLE questions ADD COLUMN classification ENUM('LATIHAN','TRYOUT','ASESMEN') DEFAULT 'LATIHAN'");
+        echo "Berhasil menambahkan kolom classification ke tabel questions.<br>\n";
+    } catch (PDOException $e) { }
+
+    try {
+        $pdo->exec("ALTER TABLE questions ADD COLUMN source_type VARCHAR(50) DEFAULT 'author_created'");
+    } catch (PDOException $e) { }
+
+    try {
+        $pdo->exec("ALTER TABLE questions ADD COLUMN rights_status VARCHAR(50) DEFAULT 'owned'");
+    } catch (PDOException $e) { }
+
+    try {
+        $pdo->exec("ALTER TABLE questions ADD COLUMN cognitive_demand VARCHAR(50) DEFAULT 'C3'");
+    } catch (PDOException $e) { }
 
     $count = 0;
     // 2. Siapkan query insert
