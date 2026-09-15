@@ -8,3 +8,5 @@ deployment:
     - /bin/cp -a install_db.php /home/kumonwah/edupath.co.id/ 2>/dev/null || true
     - /bin/cp -a create_uat_accounts.php /home/kumonwah/edupath.co.id/ 2>/dev/null || true
     - /bin/cp -a schema_dump.json /home/kumonwah/edupath.co.id/ 2>/dev/null || true
+    - /bin/cp -a import_tryout_questions.php /home/kumonwah/edupath.co.id/ 2>/dev/null || true
+    - /bin/cp -a update_questions_schema.php /home/kumonwah/edupath.co.id/ 2>/dev/null || true
