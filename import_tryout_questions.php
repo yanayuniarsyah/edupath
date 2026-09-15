@@ -5,7 +5,10 @@ $transcriptPath = 'C:\Users\yanay\.gemini\antigravity-ide\brain\51ed2b76-3bbc-4f
 $lines = file($transcriptPath);
 
 $count = 0;
-$stmt = $pdo->prepare("INSERT INTO questions (id, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, is_qc_passed, usage_type, source_type, rights_status, cognitive_demand) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'tryout', 'author_created', 'owned', 'C3')");
+// Note: Adjusted columns based on database schema. 
+// Added `subtes`, and mapped 'tryout' to whatever classification logic is needed (assumed `classification` or removed if not exists).
+// Since the schema dump does not show `usage_type`, we removed it. If it fails due to `classification`, we add it if the DB has it. We will use `classification` since quiz.php relies on it.
+$stmt = $pdo->prepare("INSERT INTO questions (id, subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, is_qc_passed, source_type, rights_status, cognitive_demand, classification) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'author_created', 'owned', 'C3', 'TRYOUT')");
 
 foreach ($lines as $line) {
     $data = json_decode($line, true);
@@ -96,7 +99,7 @@ foreach ($lines as $line) {
         
         try {
             $stmt->execute([
-                $id, $subMateri, $subMateri, 'medium', $q['question'], $opt_a, $opt_b, $opt_c, $opt_d, $opt_e, $correct
+                $id, $subMateri, $subMateri, $subMateri, 'medium', $q['question'], $opt_a, $opt_b, $opt_c, $opt_d, $opt_e, $correct
             ]);
             $count++;
         } catch (Exception $e) {

@@ -424,15 +424,16 @@ elseif ($action === 'questions') {
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
         
-        $stmt = $pdo->prepare("INSERT INTO questions (id, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, is_qc_passed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO questions (id, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, is_qc_passed, classification) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $sub_materi = $input['sub_materi'] ?? $input['subtes'] ?? '';
         $is_qc_passed = isset($input['is_qc_passed']) && $input['is_qc_passed'] ? 1 : 0;
+        $classification = strtoupper($input['usage_type'] ?? 'LATIHAN');
         $stmt->execute([
             $id, $sub_materi, $input['bab']??null, $input['difficulty']??'medium', 
             $input['question'], $input['option_a'], $input['option_b'], $input['option_c'], 
             $input['option_d'], $input['option_e']??null, $input['correct'], $input['explanation']??null,
             $input['cognitive_demand']??null, $input['source_type']??'author_created', $input['rights_status']??'unknown',
-            $input['source_name']??null, $input['source_year']??null, $input['source_reference']??null, $is_qc_passed
+            $input['source_name']??null, $input['source_year']??null, $input['source_reference']??null, $is_qc_passed, $classification
         ]);
         echo json_encode(["success" => true, "id" => $id]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
@@ -442,15 +443,16 @@ elseif ($action === 'questions') {
             exit;
         }
         $id = $input['id'] ?? '';
-        $stmt = $pdo->prepare("UPDATE questions SET sub_materi=?, bab=?, difficulty=?, question=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?, correct=?, explanation=?, cognitive_demand=?, source_type=?, rights_status=?, source_name=?, source_year=?, source_reference=?, is_qc_passed=? WHERE id=?");
+        $stmt = $pdo->prepare("UPDATE questions SET sub_materi=?, bab=?, difficulty=?, question=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?, correct=?, explanation=?, cognitive_demand=?, source_type=?, rights_status=?, source_name=?, source_year=?, source_reference=?, is_qc_passed=?, classification=? WHERE id=?");
         $sub_materi = $input['sub_materi'] ?? $input['subtes'] ?? '';
         $is_qc_passed = isset($input['is_qc_passed']) && $input['is_qc_passed'] ? 1 : 0;
+        $classification = strtoupper($input['usage_type'] ?? 'LATIHAN');
         $stmt->execute([
             $sub_materi, $input['bab']??null, $input['difficulty']??'medium', 
             $input['question'], $input['option_a'], $input['option_b'], $input['option_c'], 
             $input['option_d'], $input['option_e']??null, $input['correct'], $input['explanation']??null,
             $input['cognitive_demand']??null, $input['source_type']??'author_created', $input['rights_status']??'unknown',
-            $input['source_name']??null, $input['source_year']??null, $input['source_reference']??null, $is_qc_passed,
+            $input['source_name']??null, $input['source_year']??null, $input['source_reference']??null, $is_qc_passed, $classification,
             $id
         ]);
         echo json_encode(["success" => true]);
