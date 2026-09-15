@@ -1,0 +1,2561 @@
+EDUPATH — TRYOUT UTBK
+150 SOAL LATIHAN + KUNCI JAWABAN
+
+CATATAN:
+- Soal berikut adalah soal orisinal yang disusun dengan karakteristik, bentuk penalaran,
+  dan tingkat kesulitan yang dibuat menyerupai UTBK-SNBT.
+- Soal bukan salinan soal resmi UTBK/SNBT dan tidak menggunakan naskah resmi.
+- Setiap soal memiliki satu jawaban paling tepat.
+
+============================================================
+A. PENALARAN UMUM
+============================================================
+
+1. Semua peserta yang lolos tahap administrasi mengikuti simulasi. Sebagian peserta yang mengikuti simulasi memperoleh nilai di atas 80. Kesimpulan yang pasti benar adalah ...
+A. Semua peserta yang memperoleh nilai di atas 80 lolos administrasi.
+B. Sebagian peserta yang lolos administrasi memperoleh nilai di atas 80.
+C. Semua peserta yang mengikuti simulasi memperoleh nilai di atas 80.
+D. Sebagian peserta yang memperoleh nilai di atas 80 tidak mengikuti simulasi.
+E. Tidak ada peserta lolos administrasi yang memperoleh nilai di bawah 80.
+
+2. Dalam sebuah kelompok, jika Rina hadir maka Sinta hadir. Jika Sinta hadir maka Tono tidak hadir. Pada suatu pertemuan Tono hadir. Kesimpulan yang pasti benar adalah ...
+A. Rina hadir.
+B. Sinta hadir.
+C. Rina tidak hadir.
+D. Sinta tidak hadir.
+E. Rina dan Sinta hadir.
+
+3. Lima buku P, Q, R, S, dan T disusun berjajar. P harus berada di sebelah kiri Q, sedangkan S harus berada di sebelah kanan T. Susunan yang mungkin adalah ...
+A. Q-P-T-S-R
+B. P-Q-S-R-T
+C. R-P-Q-T-S
+D. T-S-Q-P-R
+E. S-T-P-Q-R
+
+4. Sebuah bilangan terdiri atas dua digit. Jumlah kedua digitnya 11. Jika digit puluhan dan satuannya ditukar, bilangan baru 27 lebih kecil daripada bilangan semula. Bilangan tersebut adalah ...
+A. 47
+B. 56
+C. 65
+D. 74
+E. 83
+
+5. Deret berikut memiliki pola tertentu: 3, 6, 12, 24, 48, ... Suku berikutnya adalah ...
+A. 72
+B. 84
+C. 90
+D. 96
+E. 108
+
+6. Deret: 2, 5, 11, 23, 47, ... Suku berikutnya adalah ...
+A. 83
+B. 91
+C. 95
+D. 97
+E. 101
+
+7. Jika x + 2y = 17 dan 2x - y = 4, nilai x + y adalah ...
+A. 7
+B. 8
+C. 9
+D. 10
+E. 11
+
+8. Sebuah pekerjaan dapat diselesaikan 12 pekerja dalam 15 hari. Dengan produktivitas sama, pekerjaan tersebut akan selesai dalam 10 hari jika jumlah pekerjanya ...
+A. 15
+B. 16
+C. 18
+D. 20
+E. 22
+
+9. Harga sebuah barang dinaikkan 20%, kemudian didiskon 20%. Dibandingkan harga awal, harga akhirnya ...
+A. sama
+B. turun 2%
+C. turun 4%
+D. naik 4%
+E. turun 8%
+
+10. Rata-rata lima bilangan adalah 18. Jika satu bilangan bernilai 10 dihapus, rata-rata empat bilangan tersisa adalah ...
+A. 19
+B. 19,5
+C. 20
+D. 20,5
+E. 21
+
+11. Sebuah kelas berisi 40 siswa. Sebanyak 24 siswa menyukai matematika, 18 menyukai fisika, dan 10 menyukai keduanya. Banyak siswa yang menyukai setidaknya salah satu dari kedua pelajaran tersebut adalah ...
+A. 28
+B. 30
+C. 32
+D. 34
+E. 36
+
+12. Semua kendaraan di parkiran yang menggunakan bahan bakar diesel memiliki kartu khusus. Mobil A tidak memiliki kartu khusus. Kesimpulan yang tepat adalah ...
+A. Mobil A pasti menggunakan bensin.
+B. Mobil A pasti kendaraan listrik.
+C. Mobil A tidak menggunakan diesel.
+D. Semua mobil tanpa kartu menggunakan bensin.
+E. Kartu khusus hanya dimiliki mobil diesel.
+
+13. Empat orang A, B, C, dan D duduk melingkar. A harus bersebelahan dengan B. C tidak boleh bersebelahan dengan D. Jika A berada di posisi tetap, susunan yang mungkin adalah ...
+A. A-B-C-D
+B. A-B-D-C
+C. A-C-B-D
+D. A-D-B-C
+E. A-C-D-B
+
+14. Jika 3a - 2b = 7 dan a + b = 5, maka a - b = ...
+A. 1
+B. 2
+C. 3
+D. 4
+E. 5
+
+15. Suatu pola bilangan memenuhi f(n)=n²+n. Nilai f(7)-f(5) adalah ...
+A. 20
+B. 22
+C. 24
+D. 26
+E. 28
+
+16. Dalam suatu survei, 60% responden memilih A, 45% memilih B, dan 25% memilih keduanya. Persentase responden yang memilih tepat salah satu adalah ...
+A. 45%
+B. 50%
+C. 55%
+D. 60%
+E. 65%
+
+17. Tiga mesin menghasilkan 900 unit dalam 5 jam dengan laju yang sama. Jika dua mesin bekerja selama 6 jam, jumlah unit yang dihasilkan adalah ...
+A. 600
+B. 660
+C. 720
+D. 750
+E. 810
+
+18. Sebuah persegi panjang memiliki keliling 50 cm. Panjangnya 5 cm lebih besar daripada lebarnya. Luasnya adalah ...
+A. 120 cm²
+B. 140 cm²
+C. 150 cm²
+D. 160 cm²
+E. 175 cm²
+
+19. Jika p > q dan q > r, pernyataan yang pasti benar adalah ...
+A. p < r
+B. p = r
+C. p > r
+D. q > p
+E. r > p
+
+20. Enam siswa P, Q, R, S, T, U mengikuti presentasi satu per satu. P harus sebelum R, Q harus setelah S, dan T harus sebelum U. Urutan yang mungkin adalah ...
+A. R-P-S-Q-T-U
+B. P-R-Q-S-T-U
+C. S-Q-P-R-T-U
+D. P-S-R-Q-U-T
+E. S-P-Q-R-U-T
+
+21. Sebuah bilangan jika dibagi 5 bersisa 2. Bilangan tersebut jika dibagi 10 dapat memiliki sisa ...
+A. hanya 2
+B. hanya 7
+C. 2 atau 7
+D. 3 atau 8
+E. 0 atau 5
+
+22. Dalam suatu kelompok, rasio laki-laki dan perempuan adalah 3:5. Setelah 4 laki-laki bergabung, rasionya menjadi 7:10. Jumlah anggota awal adalah ...
+A. 32
+B. 40
+C. 48
+D. 56
+E. 64
+
+23. Sebuah tangki terisi 3/5 bagian. Setelah ditambah 24 liter, tangki menjadi 9/10 penuh. Kapasitas tangki adalah ...
+A. 60 liter
+B. 70 liter
+C. 80 liter
+D. 90 liter
+E. 100 liter
+
+24. Jika 2^x = 32, maka nilai 3x - 1 adalah ...
+A. 11
+B. 12
+C. 13
+D. 14
+E. 15
+
+25. Dari 8 peserta dipilih seorang ketua dan seorang wakil. Banyak cara pemilihan adalah ...
+A. 16
+B. 28
+C. 32
+D. 56
+E. 64
+
+26. Sebuah dadu bersisi enam dilempar sekali. Peluang muncul angka prima adalah ...
+A. 1/6
+B. 1/3
+C. 1/2
+D. 2/3
+E. 5/6
+
+27. Jika x:y=4:7 dan y:z=14:15, maka x:z adalah ...
+A. 4:15
+B. 8:15
+C. 8:21
+D. 14:15
+E. 15:8
+
+28. Sebuah kendaraan menempuh 120 km dengan kecepatan rata-rata 60 km/jam. Waktu tempuhnya adalah ...
+A. 1 jam
+B. 1,5 jam
+C. 2 jam
+D. 2,5 jam
+E. 3 jam
+
+29. Bilangan terkecil yang harus ditambahkan pada 58 agar habis dibagi 7 adalah ...
+A. 1
+B. 2
+C. 3
+D. 4
+E. 5
+
+30. Sebuah pola terdiri atas 1, 4, 9, 16, 25, ... Jumlah dua suku berikutnya adalah ...
+A. 61
+B. 72
+C. 77
+D. 85
+E. 90
+
+============================================================
+B. PENGETAHUAN DAN PEMAHAMAN UMUM
+============================================================
+
+31. Kata "konvensional" dalam kalimat "Metode konvensional mulai ditinggalkan" paling dekat maknanya dengan ...
+A. modern
+B. tradisional
+C. eksperimental
+D. digital
+E. sementara
+
+32. Antonim kata "sporadis" adalah ...
+A. acak
+B. terputus
+C. teratur
+D. mendadak
+E. terbatas
+
+33. Kalimat yang paling efektif adalah ...
+A. Para siswa-siswa diwajibkan untuk mengumpulkan tugas.
+B. Para siswa diwajibkan mengumpulkan tugas.
+C. Para siswa diwajibkan untuk agar mengumpulkan tugas.
+D. Siswa-siswa para diwajibkan mengumpulkan tugas.
+E. Para siswa diwajibkan mengumpulkan tugas-tugasnya mereka.
+
+34. Kata "rentan" pada kalimat "Wilayah itu rentan terhadap banjir" berarti ...
+A. kebal
+B. mudah terkena
+C. bebas dari
+D. jauh dari
+E. sulit mengalami
+
+35. Makna imbuhan ke-an pada kata "kebersihan" menunjukkan ...
+A. pelaku
+B. tempat
+C. keadaan
+D. alat
+E. proses
+
+36. Kalimat berikut yang menggunakan kata "efektif" secara tepat adalah ...
+A. Obat itu efektif bekerja selama dua menit.
+B. Rapat tersebut efektif sehingga berlangsung selama lima jam.
+C. Strategi baru terbukti efektif meningkatkan kehadiran siswa.
+D. Ia efektif sekali dalam arti sangat cepat berlari.
+E. Efektif itu merupakan ukuran panjang benda.
+
+37. Hubungan kata yang paling sepadan dengan "dokter : pasien" adalah ...
+A. guru : sekolah
+B. hakim : pengadilan
+C. penjual : pembeli
+D. petani : sawah
+E. siswa : buku
+
+38. Kalimat "Kebijakan itu menuai pro dan kontra" berarti ...
+A. kebijakan itu gagal diterapkan
+B. kebijakan itu mendapat dukungan penuh
+C. kebijakan itu menimbulkan pendapat yang beragam
+D. kebijakan itu belum diketahui masyarakat
+E. kebijakan itu segera dibatalkan
+
+39. Bacalah paragraf berikut.
+"Penggunaan transportasi publik dapat mengurangi jumlah kendaraan pribadi di jalan. Jika layanan publik nyaman, aman, dan tepat waktu, masyarakat memiliki alasan lebih kuat untuk meninggalkan kendaraan pribadi. Dengan demikian, peningkatan kualitas layanan merupakan bagian penting dari pengendalian kemacetan."
+Gagasan utama paragraf tersebut adalah ...
+A. kendaraan pribadi selalu menyebabkan kecelakaan
+B. transportasi publik harus gratis
+C. kualitas transportasi publik penting untuk mengurangi kemacetan
+D. masyarakat tidak menyukai transportasi publik
+E. kemacetan hanya terjadi di kota besar
+
+40. Berdasarkan paragraf pada soal 39, asumsi yang mendasari argumen penulis adalah ...
+A. semua orang memiliki kendaraan pribadi
+B. kualitas layanan memengaruhi pilihan moda transportasi masyarakat
+C. kemacetan tidak dipengaruhi jumlah kendaraan
+D. transportasi publik selalu lebih mahal
+E. kendaraan pribadi tidak dapat digunakan lagi
+
+41. Kata yang paling tepat untuk melengkapi kalimat: "Data penelitian perlu diverifikasi agar kesimpulan yang dihasilkan tidak bersifat ____."
+A. objektif
+B. valid
+C. spekulatif
+D. sistematis
+E. terukur
+
+42. Kalimat yang memiliki hubungan sebab-akibat paling jelas adalah ...
+A. Ia belajar dan kemudian makan.
+B. Hujan turun sehingga pertandingan ditunda.
+C. Mereka berdiskusi lalu pulang.
+D. Buku itu tebal dan mahal.
+E. Ia membaca ketika menunggu.
+
+43. "Literasi digital bukan sekadar kemampuan menggunakan perangkat, tetapi juga kemampuan mengevaluasi informasi." Pernyataan tersebut menekankan bahwa ...
+A. perangkat digital tidak diperlukan
+B. literasi digital hanya berkaitan dengan teknologi
+C. penggunaan perangkat harus disertai kemampuan menilai informasi
+D. semua informasi digital salah
+E. evaluasi informasi tidak penting
+
+44. Kata "implikasi" paling dekat maknanya dengan ...
+A. akibat
+B. penyebab
+C. metode
+D. definisi
+E. pengecualian
+
+45. Kalimat yang paling logis adalah ...
+A. Karena harga naik, permintaan pasti selalu naik.
+B. Jika data tidak akurat, hasil analisis dapat menyesatkan.
+C. Semua inovasi pasti berhasil.
+D. Semakin sedikit belajar, semakin tinggi nilai.
+E. Jika hujan, semua orang pasti sakit.
+
+46. Bacalah kalimat: "Meskipun biaya awalnya tinggi, panel surya dapat mengurangi pengeluaran listrik dalam jangka panjang." Hubungan antarklausa tersebut adalah ...
+A. penambahan
+B. pertentangan
+C. sebab-akibat
+D. perbandingan
+E. syarat
+
+47. Kata "komprehensif" berarti ...
+A. sebagian
+B. menyeluruh
+C. sementara
+D. sederhana
+E. terpisah
+
+48. Dalam konteks penelitian, "bias" paling tepat berarti ...
+A. data yang lengkap
+B. kecenderungan yang dapat memengaruhi objektivitas
+C. hasil yang selalu benar
+D. metode yang sangat cepat
+E. kesimpulan yang pasti
+
+49. Paragraf yang baik harus memiliki keterkaitan antarkalimat. Istilah yang paling tepat untuk keterkaitan makna tersebut adalah ...
+A. koherensi
+B. repetisi
+C. inversi
+D. elipsis
+E. diksi
+
+50. Jika sebuah kebijakan disebut "inklusif", kebijakan tersebut cenderung ...
+A. hanya berlaku untuk kelompok tertentu
+B. mengabaikan perbedaan
+C. memberi ruang bagi berbagai kelompok untuk berpartisipasi
+D. membatasi akses masyarakat
+E. hanya menguntungkan pemerintah
+
+51. Kata "signifikan" dalam laporan penelitian paling dekat maknanya dengan ...
+A. tidak berarti
+B. bermakna atau penting
+C. sementara
+D. berulang
+E. tidak terukur
+
+52. Kalimat "Kendati hasil awal menjanjikan, penelitian lanjutan tetap diperlukan" menunjukkan bahwa ...
+A. hasil awal tidak berguna
+B. penelitian sudah selesai
+C. hasil awal belum cukup untuk menarik kesimpulan final
+D. penelitian lanjutan tidak diperlukan
+E. hasil awal pasti salah
+
+53. Pernyataan yang merupakan opini adalah ...
+A. Air membeku pada suhu 0°C pada tekanan standar.
+B. Jakarta berada di Pulau Jawa.
+C. Film itu merupakan karya terbaik tahun ini.
+D. Bumi mengelilingi Matahari.
+E. Indonesia memiliki wilayah kepulauan.
+
+54. Pernyataan yang merupakan fakta adalah ...
+A. Membaca novel adalah kegiatan paling menyenangkan.
+B. Kopi adalah minuman terbaik.
+C. Gunung Everest merupakan gunung tertinggi di atas permukaan laut.
+D. Matematika adalah pelajaran tersulit.
+E. Kota itu sangat indah.
+
+55. Kata "resiliensi" dalam konteks sosial paling dekat dengan kemampuan ...
+A. menghindari semua masalah
+B. bangkit dan beradaptasi setelah menghadapi tekanan
+C. memprediksi masa depan dengan pasti
+D. menolak perubahan
+E. mengendalikan orang lain
+
+============================================================
+C. PENGETAHUAN KUANTITATIF
+============================================================
+
+56. Jika 3x + 5 = 20, nilai x adalah ...
+A. 3
+B. 4
+C. 5
+D. 6
+E. 7
+
+57. Nilai dari (2^3)(2^4) adalah ...
+A. 64
+B. 96
+C. 128
+D. 256
+E. 512
+
+58. Jika x² - 5x + 6 = 0, jumlah akar-akarnya adalah ...
+A. 1
+B. 2
+C. 3
+D. 5
+E. 6
+
+59. Sebuah segitiga memiliki alas 12 cm dan tinggi 8 cm. Luasnya adalah ...
+A. 40 cm²
+B. 48 cm²
+C. 56 cm²
+D. 64 cm²
+E. 96 cm²
+
+60. Keliling lingkaran berjari-jari 7 cm dengan π=22/7 adalah ...
+A. 22 cm
+B. 44 cm
+C. 49 cm
+D. 88 cm
+E. 154 cm
+
+61. Nilai √144 + √81 adalah ...
+A. 15
+B. 17
+C. 19
+D. 21
+E. 23
+
+62. Jika 40% dari x adalah 72, nilai x adalah ...
+A. 160
+B. 170
+C. 180
+D. 190
+E. 200
+
+63. Median dari 4, 7, 8, 10, 13, 15, 20 adalah ...
+A. 8
+B. 9
+C. 10
+D. 11
+E. 13
+
+64. Rata-rata 6 bilangan adalah 14. Jika lima bilangan tersebut berjumlah 62, bilangan keenam adalah ...
+A. 18
+B. 20
+C. 21
+D. 22
+E. 24
+
+65. Sebuah kubus memiliki panjang rusuk 5 cm. Volumenya adalah ...
+A. 25 cm³
+B. 50 cm³
+C. 75 cm³
+D. 100 cm³
+E. 125 cm³
+
+66. Jika a=3 dan b=-2, nilai a² - 2ab + b² adalah ...
+A. 1
+B. 9
+C. 16
+D. 25
+E. 36
+
+67. Nilai x yang memenuhi |x-3|=5 adalah ...
+A. x=8 saja
+B. x=-2 saja
+C. x=2 atau 8
+D. x=-2 atau 8
+E. x=-8 atau 2
+
+68. Sebuah barisan aritmetika memiliki suku pertama 5 dan beda 3. Suku ke-10 adalah ...
+A. 29
+B. 30
+C. 31
+D. 32
+E. 35
+
+69. Jumlah 10 bilangan asli pertama adalah ...
+A. 45
+B. 50
+C. 55
+D. 60
+E. 65
+
+70. Jika x/4 = 6/8, nilai x adalah ...
+A. 2
+B. 3
+C. 4
+D. 6
+E. 8
+
+71. Sebuah persegi memiliki luas 196 cm². Panjang sisinya adalah ...
+A. 12 cm
+B. 13 cm
+C. 14 cm
+D. 15 cm
+E. 16 cm
+
+72. Nilai 0,25 × 0,4 adalah ...
+A. 0,01
+B. 0,05
+C. 0,1
+D. 0,15
+E. 0,2
+
+73. Jika 5x - 3 < 17, maka ...
+A. x < 3
+B. x < 4
+C. x > 4
+D. x ≤ 4
+E. x ≥ 4
+
+74. Peluang mengambil bola merah dari kotak berisi 5 bola merah dan 3 bola biru adalah ...
+A. 3/8
+B. 1/2
+C. 5/8
+D. 2/3
+E. 5/3
+
+75. Banyak diagonal pada sebuah segi enam adalah ...
+A. 6
+B. 8
+C. 9
+D. 12
+E. 15
+
+76. Jika 2x + 3y = 13 dan x-y=1, nilai y adalah ...
+A. 1
+B. 2
+C. 3
+D. 4
+E. 5
+
+77. Sebuah trapesium memiliki sisi sejajar 10 cm dan 16 cm serta tinggi 7 cm. Luasnya adalah ...
+A. 70 cm²
+B. 84 cm²
+C. 91 cm²
+D. 98 cm²
+E. 105 cm²
+
+78. Nilai log₂ 64 adalah ...
+A. 4
+B. 5
+C. 6
+D. 8
+E. 32
+
+79. Jika f(x)=2x²-3, maka f(2) adalah ...
+A. 3
+B. 5
+C. 7
+D. 9
+E. 11
+
+80. Sebuah barang setelah diskon 25% dijual Rp150.000. Harga sebelum diskon adalah ...
+A. Rp175.000
+B. Rp180.000
+C. Rp190.000
+D. Rp200.000
+E. Rp225.000
+
+============================================================
+D. LITERASI DALAM BAHASA INDONESIA
+============================================================
+
+81. Bacalah teks berikut.
+"Perkembangan teknologi kecerdasan buatan membuka peluang baru dalam pendidikan. Sistem adaptif dapat menyesuaikan latihan dengan kemampuan peserta didik. Namun, penggunaan teknologi tersebut tetap membutuhkan pengawasan manusia agar tujuan pembelajaran tidak bergeser menjadi sekadar mengejar skor."
+Gagasan utama teks adalah ...
+A. teknologi AI harus dilarang di sekolah
+B. AI dapat mendukung pendidikan tetapi tetap memerlukan pengawasan
+C. skor merupakan tujuan utama pembelajaran
+D. sistem adaptif tidak berguna
+E. guru tidak lagi diperlukan
+
+82. Berdasarkan teks soal 81, alasan pengawasan manusia diperlukan adalah ...
+A. teknologi tidak dapat digunakan
+B. AI selalu menghasilkan data salah
+C. tujuan pembelajaran dapat bergeser jika penggunaan teknologi tidak diarahkan
+D. semua siswa menolak teknologi
+E. guru harus mengerjakan semua tugas siswa
+
+83. Kata "adaptif" pada teks soal 81 berarti ...
+A. mampu menyesuaikan diri
+B. sulit digunakan
+C. tidak berubah
+D. bersifat manual
+E. selalu sama
+
+84. Bacalah teks berikut.
+"Urbanisasi tidak selalu menghasilkan dampak negatif. Perpindahan penduduk ke kota dapat memperluas akses terhadap pendidikan dan pekerjaan. Masalah muncul ketika pertumbuhan penduduk tidak diimbangi penyediaan perumahan, transportasi, dan layanan dasar."
+Simpulan yang tepat adalah ...
+A. urbanisasi selalu merugikan kota
+B. urbanisasi harus dihentikan
+C. dampak urbanisasi bergantung pada kesiapan kota mengelolanya
+D. kota tidak membutuhkan penduduk baru
+E. urbanisasi hanya berdampak pada pendidikan
+
+85. Berdasarkan teks soal 84, masalah urbanisasi terutama muncul ketika ...
+A. penduduk memperoleh pekerjaan
+B. akses pendidikan meningkat
+C. pertumbuhan penduduk tidak diimbangi infrastruktur dan layanan
+D. penduduk pindah ke desa
+E. kota memiliki transportasi publik
+
+86. Bacalah teks berikut.
+"Sejumlah penelitian menunjukkan bahwa tidur cukup berkaitan dengan kemampuan konsentrasi yang lebih baik. Meskipun demikian, kualitas tidur tidak hanya ditentukan oleh durasi. Konsistensi waktu tidur, lingkungan yang nyaman, dan kebiasaan sebelum tidur juga berperan."
+Pernyataan yang sesuai adalah ...
+A. durasi tidur adalah satu-satunya faktor
+B. tidur lama selalu menjamin konsentrasi
+C. kualitas tidur dipengaruhi beberapa faktor
+D. lingkungan tidak berpengaruh
+E. konsistensi waktu tidur tidak penting
+
+87. Hubungan antara kalimat pertama dan kedua pada teks soal 86 adalah ...
+A. penguatan tanpa perubahan
+B. penjelasan yang memperluas faktor
+C. pertentangan total
+D. contoh khusus
+E. kesimpulan
+
+88. Bacalah teks berikut.
+"Program penghijauan kota sering diukur dari jumlah pohon yang ditanam. Ukuran tersebut penting, tetapi belum cukup. Tingkat kelangsungan hidup pohon, lokasi penanaman, dan kemampuan pohon menyediakan manfaat ekologis juga perlu diperhatikan."
+Kritik utama penulis terhadap pengukuran program adalah ...
+A. jumlah pohon tidak pernah penting
+B. penghijauan harus dilakukan di desa
+C. keberhasilan tidak cukup dinilai dari jumlah pohon yang ditanam
+D. pohon tidak memberikan manfaat ekologis
+E. semua program penghijauan gagal
+
+89. Pernyataan yang paling mendukung teks soal 88 adalah ...
+A. banyak pohon mati beberapa bulan setelah ditanam
+B. jumlah bibit yang dibeli meningkat
+C. harga bibit turun
+D. taman kota semakin populer
+E. masyarakat menyukai ruang hijau
+
+90. Bacalah teks berikut.
+"Informasi yang beredar cepat di media sosial tidak selalu memiliki tingkat keandalan yang sama. Judul yang menarik dapat mendorong orang membagikan informasi sebelum membaca isinya. Karena itu, pemeriksaan sumber dan konteks menjadi langkah penting."
+Tindakan paling tepat berdasarkan teks adalah ...
+A. membagikan semua informasi yang menarik
+B. mempercayai informasi yang viral
+C. memeriksa sumber dan konteks sebelum membagikan
+D. menghindari semua media sosial
+E. hanya membaca judul
+
+91. Tujuan penulis teks soal 90 adalah ...
+A. mengajarkan cara membuat judul
+B. mengingatkan pentingnya memeriksa informasi
+C. melarang penggunaan media sosial
+D. menjelaskan algoritma media sosial
+E. membandingkan semua platform
+
+92. Bacalah teks berikut.
+"Pembelajaran berbasis proyek memberi kesempatan kepada siswa untuk menerapkan pengetahuan dalam situasi nyata. Keberhasilannya, bagaimanapun, sangat dipengaruhi desain proyek. Proyek yang terlalu luas dapat membebani siswa, sedangkan proyek yang terlalu sederhana tidak cukup menantang."
+Kesimpulan yang tepat adalah ...
+A. semua proyek harus sangat sulit
+B. pembelajaran proyek tidak efektif
+C. desain proyek perlu disesuaikan agar menantang tetapi tetap terkelola
+D. siswa tidak boleh bekerja dalam proyek
+E. proyek harus selalu berlangsung lama
+
+93. Makna "terkelola" dalam teks soal 92 paling dekat dengan ...
+A. dapat ditangani
+B. tidak terencana
+C. sangat mahal
+D. tidak terbatas
+E. berbahaya
+
+94. Bacalah teks berikut.
+"Efisiensi energi bukan berarti mengurangi kenyamanan secara ekstrem. Penggunaan perangkat hemat energi, pengaturan suhu yang tepat, dan pemanfaatan cahaya alami dapat menurunkan konsumsi energi tanpa menghilangkan fungsi utama ruang."
+Pernyataan yang paling tepat adalah ...
+A. efisiensi energi selalu mengurangi fungsi ruang
+B. efisiensi dapat dicapai melalui perubahan cara penggunaan energi
+C. cahaya alami tidak berguna
+D. semua perangkat harus dimatikan
+E. kenyamanan harus dihilangkan
+
+95. Hubungan sebab-akibat yang tersirat dalam teks soal 94 adalah ...
+A. perangkat hemat energi meningkatkan konsumsi
+B. pengaturan penggunaan energi dapat menurunkan konsumsi
+C. cahaya alami menyebabkan suhu meningkat
+D. kenyamanan menyebabkan pemborosan selalu
+E. semua ruang harus gelap
+
+96. Bacalah teks berikut.
+"Keberadaan perpustakaan digital memperluas akses terhadap bahan bacaan. Namun, akses yang luas tidak otomatis meningkatkan kualitas membaca. Pengguna tetap perlu memiliki kemampuan memilih sumber, memahami isi, dan mengevaluasi kredibilitas informasi."
+Ide pokok teks adalah ...
+A. perpustakaan digital tidak berguna
+B. akses digital perlu disertai kemampuan literasi
+C. semua sumber digital tidak kredibel
+D. membaca buku cetak lebih baik
+E. perpustakaan digital harus dibatasi
+
+97. Pernyataan yang dapat disimpulkan adalah ...
+A. akses informasi dan kemampuan mengevaluasi informasi merupakan dua hal yang berbeda
+B. semua pengguna perpustakaan digital memiliki literasi tinggi
+C. bahan bacaan digital selalu salah
+D. perpustakaan digital mengurangi akses
+E. evaluasi sumber tidak diperlukan
+
+98. Bacalah teks berikut.
+"Pasar kerja berubah seiring otomatisasi. Pekerjaan tertentu dapat berkurang, tetapi kebutuhan terhadap keterampilan baru juga meningkat. Oleh sebab itu, pendidikan dan pelatihan perlu memberi ruang bagi pembelajaran berkelanjutan."
+Sikap penulis terhadap otomatisasi adalah ...
+A. sepenuhnya menolak
+B. melihatnya sebagai perubahan yang membutuhkan adaptasi
+C. menganggap otomatisasi tidak berdampak
+D. menganggap pendidikan tidak diperlukan
+E. menganggap semua pekerjaan akan hilang
+
+99. Kata "berkelanjutan" pada teks soal 98 bermakna ...
+A. hanya sekali
+B. terus berlangsung
+C. sangat cepat
+D. tidak terarah
+E. berhenti sementara
+
+100. Jika penulis teks soal 98 diminta memberi rekomendasi, yang paling sesuai adalah ...
+A. menghentikan teknologi
+B. mengurangi pelatihan
+C. memperkuat kesempatan belajar sepanjang hayat
+D. menghapus pendidikan formal
+E. menghindari semua pekerjaan digital
+
+============================================================
+E. LITERASI DALAM BAHASA INGGRIS
+============================================================
+
+101. Read the passage.
+"Many cities are investing in bicycle infrastructure. Supporters argue that protected bike lanes can improve safety and encourage people to cycle. However, infrastructure alone may not be sufficient if destinations are too far apart or public transportation is poorly connected."
+What is the main idea?
+A. Bicycles should replace public transportation.
+B. Bicycle infrastructure can help, but urban mobility depends on several factors.
+C. Cities should stop building bike lanes.
+D. Public transportation is always unsafe.
+E. Cycling is only useful for short distances.
+
+102. According to the passage in question 101, bicycle infrastructure may be insufficient when ...
+A. bike lanes are protected
+B. people enjoy cycling
+C. destinations are far apart and transit connections are poor
+D. cities invest in safety
+E. cyclists use helmets
+
+103. The word "sufficient" is closest in meaning to ...
+A. necessary
+B. adequate
+C. dangerous
+D. expensive
+E. temporary
+
+104. Read the passage.
+"Researchers have found that students often perform better when they receive specific feedback rather than general praise. Feedback that identifies what was done well and what could be improved gives students clearer information about their next steps."
+The passage suggests that effective feedback should ...
+A. focus only on praise
+B. be specific and guide improvement
+C. avoid mentioning mistakes
+D. be given only at the end of a course
+E. compare students with one another
+
+105. Why is specific feedback useful?
+A. It gives students clearer information about what to do next.
+B. It guarantees perfect grades.
+C. It eliminates the need for teachers.
+D. It prevents students from making mistakes.
+E. It makes all assignments easier.
+
+106. The word "identifies" in the passage is closest in meaning to ...
+A. hides
+B. recognizes
+C. replaces
+D. predicts
+E. removes
+
+107. Read the passage.
+"Remote work can reduce commuting time and give employees greater flexibility. Nevertheless, it may also create challenges, such as weaker social interaction and difficulty separating work from personal life."
+Which statement is supported?
+A. Remote work has only advantages.
+B. Remote work eliminates all workplace problems.
+C. Remote work offers flexibility but can create new challenges.
+D. Employees always prefer remote work.
+E. Commuting becomes longer.
+
+108. The word "nevertheless" signals ...
+A. addition
+B. contrast
+C. cause
+D. example
+E. conclusion
+
+109. Read the passage.
+"Although online courses can make education more accessible, completion rates vary widely. Learners who have strong self-management skills are often better able to maintain regular study habits."
+What can be inferred?
+A. Online courses are always ineffective.
+B. Self-management may contribute to successful online learning.
+C. Accessibility has no value.
+D. All online learners have strong study habits.
+E. Completion rates are identical.
+
+110. The phrase "vary widely" means ...
+A. remain identical
+B. differ considerably
+C. increase slowly
+D. disappear completely
+E. change predictably
+
+111. Read the passage.
+"Public parks provide opportunities for recreation, but their value extends beyond leisure. Trees can reduce local heat, vegetation can absorb rainwater, and accessible green spaces can support social interaction."
+Which benefit is NOT mentioned?
+A. Reducing local heat
+B. Absorbing rainwater
+C. Supporting social interaction
+D. Providing recreation
+E. Increasing traffic congestion
+
+112. The word "extends" is closest in meaning to ...
+A. goes beyond
+B. disappears
+C. becomes smaller
+D. stops
+E. moves backward
+
+113. Read the passage.
+"Consumers sometimes choose products based on labels that suggest environmental benefits. However, such claims should be evaluated carefully because a label alone does not guarantee that a product has a low environmental impact."
+What is the author's purpose?
+A. To encourage consumers to trust every label
+B. To warn consumers to evaluate environmental claims critically
+C. To explain how products are manufactured
+D. To reject all environmentally friendly products
+E. To compare prices
+
+114. Which statement would best support the passage?
+A. Some products use attractive environmental language without providing clear evidence.
+B. All labels are regulated identically.
+C. Consumers never read labels.
+D. Environmental impact cannot be measured.
+E. Product packaging is always harmful.
+
+115. Read the passage.
+"Artificial intelligence can assist doctors by identifying patterns in medical images. Yet its usefulness depends on the quality of the data used to train the system. Biased or incomplete data can lead to unreliable results."
+The passage emphasizes that AI performance depends partly on ...
+A. the color of medical images
+B. data quality
+C. the number of doctors
+D. hospital size
+E. image printing
+
+116. The word "biased" is closest in meaning to ...
+A. perfectly neutral
+B. systematically unbalanced
+C. highly detailed
+D. recently updated
+E. completely random
+
+117. Read the passage.
+"Students who study in short, regular sessions may retain information better than those who rely on one long session immediately before an exam. Regular review gives learners repeated opportunities to retrieve and reorganize information."
+The passage supports ...
+A. last-minute studying as the best strategy
+B. regular review as a potentially effective learning strategy
+C. avoiding review
+D. studying only once
+E. memorizing without retrieval
+
+118. Why can regular review help learners?
+A. It provides repeated opportunities to retrieve information.
+B. It eliminates the need for understanding.
+C. It makes exams shorter.
+D. It guarantees identical scores.
+E. It prevents forgetting completely.
+
+119. Read the passage.
+"Some coastal communities are restoring mangrove forests. Mangroves can provide habitat for marine species and reduce the force of waves reaching shore. Restoration, however, requires long-term maintenance and community participation."
+Which statement is most accurate?
+A. Mangrove restoration has benefits but requires sustained effort.
+B. Mangroves only benefit tourism.
+C. Restoration is completed immediately after planting.
+D. Communities are irrelevant to restoration.
+E. Mangroves increase wave force.
+
+120. The word "sustained" is closest in meaning to ...
+A. temporary
+B. continued
+C. accidental
+D. sudden
+E. limited
+
+============================================================
+F. PENALARAN MATEMATIKA
+============================================================
+
+121. Sebuah fungsi linear f memenuhi f(2)=7 dan f(5)=16. Nilai f(10) adalah ...
+A. 28
+B. 31
+C. 34
+D. 37
+E. 40
+
+122. Diketahui x+y=12 dan xy=35. Nilai x²+y² adalah ...
+A. 49
+B. 64
+C. 74
+D. 84
+E. 109
+
+123. Sebuah persegi panjang memiliki luas 96 cm². Jika panjangnya 4 cm lebih besar daripada lebarnya, kelilingnya adalah ...
+A. 32 cm
+B. 36 cm
+C. 40 cm
+D. 44 cm
+E. 48 cm
+
+124. Barisan 3, 7, 11, 15, ... memiliki suku ke-n. Suku ke-25 adalah ...
+A. 95
+B. 97
+C. 99
+D. 101
+E. 103
+
+125. Jumlah 20 suku pertama barisan pada soal 124 adalah ...
+A. 800
+B. 820
+C. 840
+D. 860
+E. 880
+
+126. Sebuah bilangan positif x memenuhi x + 1/x = 5. Nilai x² + 1/x² adalah ...
+A. 21
+B. 22
+C. 23
+D. 24
+E. 25
+
+127. Sebuah segitiga siku-siku memiliki sisi siku-siku 6 cm dan 8 cm. Jari-jari lingkaran luarnya adalah ...
+A. 3 cm
+B. 4 cm
+C. 5 cm
+D. 6 cm
+E. 7 cm
+
+128. Jika log₃(x)=4, maka x adalah ...
+A. 12
+B. 27
+C. 64
+D. 81
+E. 243
+
+129. Sebuah kelas memiliki 30 siswa. Nilai rata-rata awal adalah 72. Setelah satu siswa dengan nilai 90 bergabung, rata-rata menjadi ...
+A. 72
+B. 72,5
+C. 72,58
+D. 73
+E. 73,5
+
+130. Dalam sebuah kotak terdapat 4 bola putih, 3 bola hitam, dan 2 bola merah. Dua bola diambil tanpa pengembalian. Peluang keduanya putih adalah ...
+A. 1/6
+B. 2/9
+C. 1/3
+D. 4/9
+E. 1/2
+
+131. Sebuah harga meningkat 10% lalu meningkat lagi 20%. Kenaikan total terhadap harga awal adalah ...
+A. 28%
+B. 30%
+C. 32%
+D. 34%
+E. 36%
+
+132. Jika 2x+1 dan 5x-8 memiliki nilai sama, x adalah ...
+A. 2
+B. 3
+C. 4
+D. 5
+E. 6
+
+133. Sebuah lingkaran memiliki luas 154 cm² dengan π=22/7. Diameternya adalah ...
+A. 7 cm
+B. 10 cm
+C. 12 cm
+D. 14 cm
+E. 21 cm
+
+134. Titik A(2,3) dan B(8,11). Jarak AB adalah ...
+A. 8
+B. 9
+C. 10
+D. 11
+E. 12
+
+135. Gradien garis melalui titik (1,4) dan (5,12) adalah ...
+A. 1
+B. 2
+C. 3
+D. 4
+E. 5
+
+136. Persamaan garis bergradien 3 yang melalui titik (2,1) adalah ...
+A. y=3x+5
+B. y=3x-5
+C. y=2x-3
+D. y=3x-1
+E. y=x+3
+
+137. Jika luas persegi adalah 144 cm², luas lingkaran yang diameternya sama dengan sisi persegi, dengan π=22/7, adalah ...
+A. 132 cm²
+B. 144 cm²
+C. 154 cm²
+D. 176 cm²
+E. 196 cm²
+
+138. Sebuah mobil menggunakan 8 liter bensin untuk menempuh 96 km. Dengan konsumsi sama, bensin yang diperlukan untuk 300 km adalah ...
+A. 20 liter
+B. 22 liter
+C. 24 liter
+D. 25 liter
+E. 28 liter
+
+139. Dalam suatu ujian, jawaban benar bernilai 4, salah -1, dan kosong 0. Seorang peserta menjawab 40 soal, 32 benar, dan sisanya salah. Skornya adalah ...
+A. 116
+B. 120
+C. 124
+D. 128
+E. 132
+
+140. Sebuah pola luas mengikuti A(n)=n(n+2). Selisih A(10) dan A(8) adalah ...
+A. 32
+B. 34
+C. 36
+D. 38
+E. 40
+
+141. Jika 3^(x+1)=81, nilai x² adalah ...
+A. 4
+B. 6
+C. 9
+D. 12
+E. 16
+
+142. Sebuah tangga panjangnya 10 m bersandar pada dinding. Jarak kaki tangga dari dinding 6 m. Tinggi yang dicapai tangga adalah ...
+A. 6 m
+B. 7 m
+C. 8 m
+D. 9 m
+E. 10 m
+
+143. Dua bilangan positif memiliki jumlah 18 dan selisih 4. Hasil kali kedua bilangan adalah ...
+A. 63
+B. 70
+C. 77
+D. 80
+E. 81
+
+144. Sebuah data memiliki lima nilai: 6, 8, x, 12, 14. Jika rata-ratanya 10, nilai x adalah ...
+A. 8
+B. 9
+C. 10
+D. 11
+E. 12
+
+145. Banyak cara menyusun 4 buku berbeda dari 6 buku berbeda pada sebuah rak adalah ...
+A. 120
+B. 240
+C. 300
+D. 360
+E. 720
+
+146. Sebuah koin dilempar tiga kali. Peluang muncul tepat dua gambar adalah ...
+A. 1/8
+B. 1/4
+C. 3/8
+D. 1/2
+E. 5/8
+
+147. Jika x:y=2:3 dan y:z=4:5, maka x:y:z adalah ...
+A. 2:3:5
+B. 4:6:7,5
+C. 8:12:15
+D. 8:9:15
+E. 12:8:15
+
+148. Sebuah bak berbentuk balok berukuran 80 cm × 50 cm × 40 cm terisi 75%. Volume air di dalamnya adalah ...
+A. 100 liter
+B. 110 liter
+C. 120 liter
+D. 130 liter
+E. 140 liter
+
+149. Jika suatu bilangan n memenuhi 2<n<7 dan n bilangan bulat, banyak nilai n adalah ...
+A. 3
+B. 4
+C. 5
+D. 6
+E. 7
+
+150. Sebuah proyek dapat diselesaikan A dalam 12 hari dan B dalam 18 hari. Jika bekerja bersama dengan laju konstan, proyek selesai dalam ...
+A. 6 hari
+B. 7,2 hari
+C. 8 hari
+D. 9 hari
+E. 10 hari
+
+============================================================
+KUNCI JAWABAN
+============================================================
+
+1 B
+2 D
+3 C
+4 D
+5 D
+6 C
+7 C
+8 C
+9 C
+10 C
+11 C
+12 C
+13 B
+14 C
+15 C
+16 C
+17 C
+18 C
+19 C
+20 C
+21 C
+22 B
+23 C
+24 C
+25 D
+26 C
+27 B
+28 C
+29 B
+30 C
+
+31 B
+32 C
+33 B
+34 B
+35 C
+36 C
+37 C
+38 C
+39 C
+40 B
+41 C
+42 B
+43 C
+44 A
+45 B
+46 B
+47 B
+48 B
+49 A
+50 C
+51 B
+52 C
+53 C
+54 C
+55 B
+
+56 C
+57 C
+58 D
+59 B
+60 B
+61 C
+62 C
+63 C
+64 D
+65 E
+66 D
+67 D
+68 D
+69 C
+70 D
+71 C
+72 C
+73 B
+74 C
+75 C
+76 B
+77 C
+78 C
+79 C
+80 D
+
+81 B
+82 C
+83 A
+84 C
+85 C
+86 C
+87 B
+88 C
+89 A
+90 C
+91 B
+92 C
+93 A
+94 B
+95 B
+96 B
+97 A
+98 B
+99 B
+100 C
+
+101 B
+102 C
+103 B
+104 B
+105 A
+106 B
+107 C
+108 B
+109 B
+110 B
+111 E
+112 A
+113 B
+114 A
+115 B
+116 B
+117 B
+118 A
+119 A
+120 B
+
+121 C
+122 C
+123 C
+124 C
+125 C
+126 C
+127 C
+128 D
+129 C
+130 B
+131 C
+132 C
+133 D
+134 C
+135 B
+136 B
+137 C
+138 D
+139 C
+140 C
+141 C
+142 C
+143 C
+144 C
+145 D
+146 C
+147 C
+148 C
+149 C
+150 B
+EDUPATH — TRYOUT UTBK (VERSI VARIASI)
+150 SOAL LATIHAN + KUNCI JAWABAN — DIVERIFIKASI ULANG
+
+CATATAN:
+- Soal berikut adalah soal orisinal yang disusun dengan karakteristik, bentuk penalaran,
+  dan tingkat kesulitan yang dibuat menyerupai UTBK-SNBT.
+- Soal ini BUKAN hasil pengacakan urutan dari file tryout sebelumnya — setiap nomor berisi
+  soal yang benar-benar berbeda (angka, konteks, dan/atau bentuk penalaran baru).
+- Setiap kunci jawaban telah dihitung ulang dan diverifikasi secara matematis/logis.
+- Soal bukan salinan soal resmi UTBK/SNBT dan tidak menggunakan naskah resmi.
+
+============================================================
+A. PENALARAN UMUM
+============================================================
+
+1. Semua anggota tim yang lolos seleksi wawancara mengikuti pelatihan dasar. Budi tidak mengikuti pelatihan dasar. Kesimpulan yang pasti benar adalah ...
+A. Semua yang tidak lolos wawancara tidak mengikuti pelatihan.
+B. Budi mengikuti pelatihan lanjutan.
+C. Semua peserta pelatihan dasar lolos wawancara.
+D. Budi tidak lolos seleksi wawancara.
+E. Budi lolos seleksi wawancara.
+
+2. Jika Dani berangkat pagi maka ia tidak terlambat rapat. Pada hari ini Dani terlambat rapat. Kesimpulan yang pasti benar adalah ...
+A. Dani tidak berangkat pagi.
+B. Dani selalu terlambat.
+C. Dani berangkat pagi.
+D. Rapat dimulai lebih awal.
+E. Dani tidak menghadiri rapat.
+
+3. Empat kotak K, L, M, N disusun berjajar dari kiri ke kanan. K harus tepat di sebelah kiri L. N harus berada di ujung kanan. Susunan yang mungkin adalah ...
+A. K-M-L-N
+B. M-K-L-N
+C. K-L-M-N
+D. L-K-M-N
+E. N-K-L-M
+
+4. Sebuah bilangan dua digit memiliki jumlah digit 9. Jika digit puluhan dan satuan ditukar, bilangan baru 45 lebih kecil daripada bilangan semula. Bilangan tersebut adalah ...
+A. 72
+B. 54
+C. 81
+D. 63
+E. 90
+
+5. Deret berikut: 2, 6, 18, 54, 162, ... Suku berikutnya adalah ...
+A. 396
+B. 432
+C. 486
+D. 576
+E. 540
+
+6. Deret: 3, 5, 9, 17, 33, ... Suku berikutnya adalah ...
+A. 73
+B. 61
+C. 69
+D. 57
+E. 65
+
+7. Jika 2x + 3y = 17 dan x - y = 1, nilai x + y adalah ...
+A. 7
+B. 9
+C. 8
+D. 6
+E. 5
+
+8. Sebuah pekerjaan dapat diselesaikan oleh 18 pekerja dalam 20 hari. Dengan produktivitas sama, agar selesai dalam 15 hari, jumlah pekerja yang dibutuhkan adalah ...
+A. 24
+B. 20
+C. 22
+D. 26
+E. 28
+
+9. Harga suatu barang dinaikkan 15%, kemudian didiskon 10%. Dibandingkan harga awal, harga akhirnya ...
+A. naik 3,5%
+B. turun 5%
+C. naik 5%
+D. sama
+E. turun 3,5%
+
+10. Rata-rata lima bilangan adalah 22. Jika satu bilangan bernilai 12 dihapus, rata-rata empat bilangan tersisa adalah ...
+A. 25.0
+B. 23.5
+C. 24.5
+D. 24.0
+E. 25.5
+
+11. Dalam sebuah kelas berisi 45 siswa, sebanyak 26 siswa menyukai IPA, 20 siswa menyukai IPS, dan 12 siswa menyukai keduanya. Banyak siswa yang menyukai setidaknya salah satu pelajaran tersebut adalah ...
+A. 36
+B. 32
+C. 30
+D. 38
+E. 34
+
+12. Semua peserta yang mendaftar jalur prestasi wajib melampirkan sertifikat. Rani tidak melampirkan sertifikat. Kesimpulan yang tepat adalah ...
+A. Sertifikat hanya dimiliki jalur reguler.
+B. Rani pasti diterima.
+C. Rani pasti mendaftar jalur reguler.
+D. Rani tidak mendaftar jalur prestasi.
+E. Semua yang tidak melampirkan sertifikat gagal mendaftar.
+
+13. Lima orang E, F, G, H, I duduk melingkar. E harus bersebelahan dengan F. G tidak boleh bersebelahan dengan H. Jika E berada di posisi tetap, susunan (searah jarum jam) yang mungkin adalah ...
+A. E-F-H-G-I
+B. E-F-G-H-I
+C. E-H-G-F-I
+D. E-F-G-I-H
+E. E-G-F-H-I
+
+14. Jika 2a + 3b = 16 dan a - b = 3, maka a + b = ...
+A. 7
+B. 6
+C. 8
+D. 5
+E. 9
+
+15. Suatu fungsi memenuhi f(n) = n² - n. Nilai f(8) - f(6) adalah ...
+A. 30
+B. 28
+C. 24
+D. 26
+E. 22
+
+16. Dalam sebuah survei, 55% responden menyukai produk A, 40% menyukai produk B, dan 20% menyukai keduanya. Persentase responden yang menyukai tepat salah satu produk adalah ...
+A. 45%
+B. 50%
+C. 65%
+D. 60%
+E. 55%
+
+17. Empat mesin menghasilkan 800 unit barang dalam 5 jam dengan laju sama. Jika tiga mesin bekerja selama 8 jam, jumlah unit yang dihasilkan adalah ...
+A. 930
+B. 960
+C. 900
+D. 1020
+E. 990
+
+18. Sebuah persegi panjang memiliki keliling 56 cm. Panjangnya 4 cm lebih besar daripada lebarnya. Luasnya adalah ...
+A. 182
+B. 172
+C. 192
+D. 212
+E. 202
+
+19. Jika m > n dan n > k, pernyataan yang pasti benar adalah ...
+A. m = k
+B. n > m
+C. k > m
+D. m > k
+E. m < k
+
+20. Enam peserta V, W, X, Y, Z, dan Q melakukan presentasi satu per satu. V harus sebelum X, W harus setelah Y, dan Z harus sebelum Q. Urutan yang mungkin adalah ...
+A. V-Y-X-W-Q-Z
+B. Y-W-V-X-Z-Q
+C. V-X-W-Y-Z-Q
+D. Y-V-W-X-Q-Z
+E. X-V-Y-W-Z-Q
+
+21. Sebuah bilangan jika dibagi 6 bersisa 4. Bilangan tersebut jika dibagi 12 dapat memiliki sisa ...
+A. 2 atau 8
+B. hanya 4
+C. 4 atau 10
+D. hanya 10
+E. 0 atau 6
+
+22. Dalam suatu kelompok, rasio laki-laki dan perempuan adalah 2:3. Setelah 6 laki-laki bergabung, rasionya menjadi 4:5. Jumlah anggota awal kelompok adalah ...
+A. 65
+B. 85
+C. 75
+D. 80
+E. 70
+
+23. Sebuah tangki terisi 1/2 bagian. Setelah ditambah 30 liter, tangki menjadi 4/5 penuh. Kapasitas tangki adalah ...
+A. 100
+B. 80
+C. 90
+D. 120
+E. 110
+
+24. Jika 2^x = 64, maka nilai 2x + 3 adalah ...
+A. 19
+B. 15
+C. 13
+D. 17
+E. 11
+
+25. Dari 9 peserta dipilih seorang ketua dan seorang sekretaris. Banyak cara pemilihan adalah ...
+A. 88
+B. 72
+C. 80
+D. 56
+E. 64
+
+26. Sebuah dadu bersisi enam dilempar sekali. Peluang muncul angka komposit (bukan bilangan prima dan bukan 1) adalah ...
+A. 5/6
+B. 1/2
+C. 1/3
+D. 2/3
+E. 1/6
+
+27. Jika x:y = 3:5 dan y:z = 10:13, maka x:z adalah ...
+A. 3:5
+B. 6:13
+C. 6:5
+D. 5:6
+E. 3:13
+
+28. Sebuah kendaraan menempuh 180 km dengan kecepatan rata-rata 45 km/jam. Waktu tempuhnya adalah ...
+A. 2 jam
+B. 3 jam
+C. 4 jam
+D. 5 jam
+E. 4,5 jam
+
+29. Bilangan terkecil yang harus ditambahkan pada 67 agar habis dibagi 9 adalah ...
+A. 4
+B. 3
+C. 6
+D. 5
+E. 7
+
+30. Sebuah pola bilangan terdiri atas 1, 4, 9, 16, 25, 36, 49, ... Jumlah dua suku berikutnya adalah ...
+A. 106
+B. 127
+C. 113
+D. 120
+E. 99
+
+============================================================
+B. PENGETAHUAN DAN PEMAHAMAN UMUM
+============================================================
+
+31. Kata "fluktuatif" dalam kalimat "Harga bahan pangan cenderung fluktuatif menjelang hari raya" paling dekat maknanya dengan ...
+A. menurun tajam
+B. naik turun
+C. meningkat terus
+D. stabil
+E. tidak berubah
+
+32. Antonim kata "eksplisit" adalah ...
+A. implisit
+B. gamblang
+C. jelas
+D. terbuka
+E. terang
+
+33. Kalimat yang paling efektif adalah ...
+A. Peserta-peserta semua wajib bawa kartu identitas.
+B. Bagi semua peserta wajib membawa kartu identitas.
+C. Semua peserta wajib membawa kartu identitasnya masing-masing mereka.
+D. Semua peserta diwajibkan untuk agar membawa kartu identitas.
+E. Semua peserta wajib membawa kartu identitas.
+
+34. Kata "kontroversial" pada kalimat "Keputusan itu dinilai kontroversial oleh publik" berarti ...
+A. menimbulkan pro dan kontra
+B. tidak menarik perhatian
+C. sudah lama dikenal
+D. bersifat rahasia
+E. disetujui semua pihak
+
+35. Makna imbuhan pe-an pada kata "pendidikan" menunjukkan ...
+A. proses atau hal
+B. pelaku
+C. sifat
+D. tempat
+E. alat
+
+36. Kalimat berikut yang menggunakan kata "efisien" secara tepat adalah ...
+A. Rapat itu efisien sehingga berlangsung enam jam.
+B. Efisien merupakan satuan ukuran berat.
+C. Metode baru terbukti efisien menghemat waktu produksi.
+D. Mobil itu efisien selama dua jam perjalanan.
+E. Ia efisien sekali dalam arti sangat ramah.
+
+37. Hubungan kata yang paling sepadan dengan "petani : sawah" adalah ...
+A. siswa : seragam
+B. guru : buku
+C. dokter : obat
+D. hakim : hukum
+E. nelayan : laut
+
+38. Kalimat "Rencana itu menuai kritik tajam" berarti ...
+A. rencana itu belum diumumkan
+B. rencana itu dibatalkan otomatis
+C. rencana itu mendapat banyak kecaman
+D. rencana itu tidak diketahui publik
+E. rencana itu diterima tanpa syarat
+
+39. Bacalah paragraf berikut.
+"Konsumsi air minum kemasan meningkat seiring bertambahnya aktivitas di luar rumah. Jika ketersediaan air minum yang aman dan terjangkau di tempat umum meningkat, masyarakat memiliki alasan lebih kuat untuk mengurangi pembelian kemasan sekali pakai. Dengan demikian, penyediaan fasilitas air minum publik berperan penting dalam menekan sampah plastik."
+Gagasan utama paragraf tersebut adalah ...
+A. sampah plastik hanya berasal dari air kemasan
+B. konsumsi air kemasan harus dihentikan total
+C. masyarakat tidak membutuhkan air kemasan
+D. aktivitas di luar rumah harus dikurangi
+E. fasilitas air minum publik penting untuk mengurangi sampah plastik
+
+40. Berdasarkan paragraf pada soal 39, asumsi yang mendasari argumen penulis adalah ...
+A. air minum kemasan selalu lebih murah
+B. semua orang membeli air kemasan
+C. fasilitas publik tidak berpengaruh pada perilaku masyarakat
+D. ketersediaan fasilitas publik memengaruhi kebiasaan konsumsi masyarakat
+E. sampah plastik tidak berkaitan dengan air kemasan
+
+41. Kata yang paling tepat untuk melengkapi kalimat: "Hasil survei tersebut masih perlu diuji lebih lanjut karena sampelnya terlalu ____."
+A. representatif
+B. akurat
+C. objektif
+D. terbatas
+E. sistematis
+
+42. Kalimat yang memiliki hubungan sebab-akibat paling jelas adalah ...
+A. Mereka rapat kemudian makan siang.
+B. Ia menulis lalu membaca.
+C. Buku itu tipis dan murah.
+D. Ia menonton sambil makan.
+E. Jalan licin sehingga banyak kendaraan tergelincir.
+
+43. "Kemandirian belajar bukan sekadar mampu belajar sendiri, tetapi juga mampu mengatur waktu dan mengevaluasi kemajuan diri." Pernyataan tersebut menekankan bahwa ...
+A. belajar sendiri tidak diperlukan
+B. evaluasi diri tidak penting
+C. kemandirian belajar hanya soal waktu
+D. belajar mandiri mencakup pengaturan waktu dan evaluasi diri
+E. semua siswa sudah mandiri
+
+44. Kata "kontribusi" paling dekat maknanya dengan ...
+A. hambatan
+B. batasan
+C. pengecualian
+D. penolakan
+E. sumbangan
+
+45. Kalimat yang paling logis adalah ...
+A. Jika hujan, semua acara pasti batal.
+B. Semua usaha pasti berhasil.
+C. Jika data tidak lengkap, kesimpulan dapat kurang akurat.
+D. Semakin jarang berlatih, semakin mahir seseorang.
+E. Karena rajin belajar, ia pasti selalu juara.
+
+46. Bacalah kalimat: "Walaupun modal usahanya kecil, ia berhasil mengembangkan bisnisnya hingga ke luar kota." Hubungan antarklausa tersebut adalah ...
+A. sebab-akibat
+B. pertentangan
+C. penambahan
+D. syarat
+E. perbandingan
+
+47. Kata "esensial" berarti ...
+A. terpisah
+B. berlebihan
+C. mendasar atau penting
+D. sementara
+E. tidak penting
+
+48. Dalam konteks penelitian, "validitas" paling tepat berarti ...
+A. tingkat ketepatan alat ukur dalam mengukur yang seharusnya diukur
+B. metode yang paling murah
+C. kecepatan pengumpulan data
+D. hasil yang selalu positif
+E. jumlah responden yang besar
+
+49. Istilah yang tepat untuk menyebut kesesuaian topik dalam sebuah paragraf adalah ...
+A. kesatuan (unity)
+B. inversi
+C. koherensi
+D. elipsis
+E. aliterasi
+
+50. Jika sebuah kebijakan disebut "akomodatif", kebijakan tersebut cenderung ...
+A. mengabaikan kepentingan kelompok tertentu
+B. bersifat tetap tanpa perubahan
+C. menyesuaikan diri dengan berbagai kepentingan yang ada
+D. menolak semua masukan
+E. hanya berlaku bagi kelompok mayoritas
+
+51. Kata "krusial" dalam laporan penelitian paling dekat maknanya dengan ...
+A. berulang
+B. sementara
+C. sangat menentukan
+D. tidak terukur
+E. tidak penting
+
+52. Kalimat "Walaupun hasil ujicoba positif, uji lanjutan tetap diperlukan" menunjukkan bahwa ...
+A. hasil awal belum cukup untuk kesimpulan akhir
+B. uji lanjutan tidak diperlukan
+C. hasil ujicoba pasti keliru
+D. hasil ujicoba tidak berguna
+E. penelitian sudah final
+
+53. Pernyataan yang merupakan opini adalah ...
+A. Air mendidih pada 100°C pada tekanan standar.
+B. Surabaya berada di Pulau Jawa.
+C. Bulan mengelilingi Bumi.
+D. Indonesia memiliki banyak pulau.
+E. Novel itu adalah karya paling membosankan tahun ini.
+
+54. Pernyataan yang merupakan fakta adalah ...
+A. Teh adalah minuman terenak.
+B. Fisika adalah pelajaran termudah.
+C. Sungai Nil merupakan salah satu sungai terpanjang di dunia.
+D. Pantai itu sangat memukau.
+E. Menulis adalah kegiatan paling membosankan.
+
+55. Kata "adaptabilitas" dalam konteks sosial paling dekat dengan kemampuan ...
+A. memprediksi masa depan secara pasti
+B. menolak masukan orang lain
+C. menyesuaikan diri terhadap situasi baru
+D. mengendalikan lingkungan sepenuhnya
+E. menghindari semua perubahan
+
+============================================================
+C. PENGETAHUAN KUANTITATIF
+============================================================
+
+56. Jika 4x + 7 = 27, nilai x adalah ...
+A. 5
+B. 7
+C. 6
+D. 4
+E. 3
+
+57. Nilai dari (3^2)(3^5) adalah ...
+A. 243
+B. 2187
+C. 6561
+D. 729
+E. 19683
+
+58. Jika x² - 7x + 10 = 0, jumlah akar-akarnya adalah ...
+A. 8
+B. 10
+C. 5
+D. 6
+E. 7
+
+59. Sebuah segitiga memiliki alas 14 cm dan tinggi 10 cm. Luasnya adalah ...
+A. 63
+B. 77
+C. 70
+D. 84
+E. 56
+
+60. Keliling lingkaran berjari-jari 14 cm dengan π = 22/7 adalah ...
+A. 110
+B. 88
+C. 66
+D. 132
+E. 77
+
+61. Nilai √169 + √121 adalah ...
+A. 26
+B. 20
+C. 22
+D. 24
+E. 28
+
+62. Jika 35% dari x adalah 84, nilai x adalah ...
+A. 240
+B. 280
+C. 260
+D. 220
+E. 200
+
+63. Median dari data 5, 9, 11, 14, 18, 20, 25 adalah ...
+A. 11
+B. 15
+C. 14
+D. 17
+E. 13
+
+64. Rata-rata 6 bilangan adalah 16. Jika lima bilangan berjumlah 72, bilangan keenam adalah ...
+A. 24
+B. 26
+C. 28
+D. 20
+E. 22
+
+65. Sebuah kubus memiliki panjang rusuk 6 cm. Volumenya adalah ...
+A. 198
+B. 234
+C. 252
+D. 216
+E. 180
+
+66. Jika a=4 dan b=-3, nilai a² - 2ab + b² adalah ...
+A. 41
+B. 45
+C. 49
+D. 57
+E. 53
+
+67. Nilai x yang memenuhi |x-4| = 6 adalah ...
+A. x=-2 atau 10
+B. x=-10 atau 2
+C. x=-2 saja
+D. x=2 atau 10
+E. x=10 saja
+
+68. Sebuah barisan aritmetika memiliki suku pertama 7 dan beda 4. Suku ke-12 adalah ...
+A. 50
+B. 49
+C. 48
+D. 52
+E. 51
+
+69. Jumlah 12 bilangan asli pertama adalah ...
+A. 70
+B. 82
+C. 86
+D. 74
+E. 78
+
+70. Jika x/5 = 9/15, nilai x adalah ...
+A. 5
+B. 4
+C. 2
+D. 1
+E. 3
+
+71. Sebuah persegi memiliki luas 225 cm². Panjang sisinya adalah ...
+A. 15
+B. 18
+C. 14
+D. 16
+E. 12
+
+72. Nilai 0,35 × 0,6 adalah ...
+A. 0,21
+B. 0,15
+C. 0,015
+D. 0,45
+E. 0,3
+
+73. Jika 4x - 5 < 19, maka ...
+A. x > 6
+B. x ≤ 6
+C. x < 5
+D. x < 4
+E. x < 6
+
+74. Peluang mengambil bola kuning dari kotak berisi 6 bola kuning dan 4 bola hijau adalah ...
+A. 3/5
+B. 3/10
+C. 2/5
+D. 1/2
+E. 7/10
+
+75. Banyak diagonal pada sebuah segi delapan adalah ...
+A. 17
+B. 20
+C. 26
+D. 14
+E. 23
+
+76. Jika 3x + 2y = 16 dan x - y = 2, nilai y adalah ...
+A. 4
+B. 3
+C. 0
+D. 1
+E. 2
+
+77. Sebuah trapesium memiliki sisi sejajar 12 cm dan 18 cm serta tinggi 8 cm. Luasnya adalah ...
+A. 134
+B. 120
+C. 127
+D. 113
+E. 106
+
+78. Nilai log₂ 128 adalah ...
+A. 9
+B. 7
+C. 8
+D. 6
+E. 5
+
+79. Jika f(x) = 3x² - 2, maka f(3) adalah ...
+A. 23
+B. 25
+C. 21
+D. 27
+E. 29
+
+80. Sebuah barang setelah diskon 30% dijual Rp210.000. Harga sebelum diskon adalah ...
+A. Rp270.000
+B. Rp320.000
+C. Rp250.000
+D. Rp280.000
+E. Rp300.000
+
+============================================================
+D. LITERASI DALAM BAHASA INDONESIA
+============================================================
+
+81. Bacalah teks berikut.
+"Penerapan energi surya pada rumah tangga mulai diminati karena biaya pemasangan yang menurun. Selain menekan tagihan listrik, panel surya juga mengurangi ketergantungan pada bahan bakar fosil. Meskipun demikian, efektivitasnya sangat dipengaruhi oleh intensitas cahaya matahari di wilayah pemasangan."
+Gagasan utama teks adalah ...
+A. penerapan energi surya pada rumah tangga memiliki manfaat namun bergantung pada kondisi wilayah
+B. energi surya harus digunakan di semua rumah
+C. panel surya tidak memiliki manfaat apa pun
+D. biaya pemasangan panel surya selalu mahal
+E. bahan bakar fosil lebih baik daripada energi surya
+
+82. Berdasarkan teks soal 81, faktor yang memengaruhi efektivitas panel surya adalah ...
+A. besarnya tagihan listrik
+B. jenis atap rumah
+C. intensitas cahaya matahari di wilayah pemasangan
+D. harga bahan bakar fosil
+E. jumlah rumah tangga
+
+83. Kata "ketergantungan" pada teks soal 81 berarti ...
+A. kemandirian penuh
+B. kebebasan memilih
+C. ketidakpedulian
+D. penolakan terhadap sesuatu
+E. keadaan bergantung pada sesuatu
+
+84. Bacalah teks berikut.
+"Migrasi penduduk desa ke kota tidak selalu berdampak buruk. Perpindahan tersebut dapat memperluas akses terhadap lapangan kerja dan pendidikan. Persoalan muncul ketika laju migrasi tidak diimbangi dengan penyediaan perumahan yang layak dan infrastruktur dasar di kota tujuan."
+Simpulan yang tepat adalah ...
+A. migrasi hanya memengaruhi sektor pendidikan
+B. dampak migrasi bergantung pada kesiapan kota menampungnya
+C. migrasi harus dilarang sepenuhnya
+D. kota tidak memerlukan penduduk baru
+E. migrasi selalu merugikan kota tujuan
+
+85. Berdasarkan teks soal 84, persoalan migrasi muncul terutama ketika ...
+A. akses pendidikan meningkat
+B. penduduk memperoleh lapangan kerja
+C. penduduk kembali ke desa
+D. laju migrasi tidak diimbangi penyediaan perumahan dan infrastruktur
+E. kota memiliki infrastruktur memadai
+
+86. Bacalah teks berikut.
+"Sejumlah kajian menunjukkan bahwa kebiasaan sarapan berkaitan dengan tingkat konsentrasi belajar yang lebih baik. Meskipun demikian, manfaat tersebut tidak hanya ditentukan oleh ada tidaknya sarapan, melainkan juga oleh kandungan gizi menu yang dikonsumsi."
+Pernyataan yang sesuai adalah ...
+A. sarapan adalah satu-satunya faktor konsentrasi
+B. kualitas konsentrasi dipengaruhi kandungan gizi sarapan, bukan sekadar ada tidaknya sarapan
+C. sarapan apa pun menjamin konsentrasi tinggi
+D. kandungan gizi tidak berpengaruh
+E. konsentrasi belajar tidak berkaitan dengan sarapan
+
+87. Hubungan antara kalimat pertama dan kedua pada teks soal 86 adalah ...
+A. contoh khusus semata
+B. pertentangan total
+C. kesimpulan akhir
+D. penguatan tanpa perubahan
+E. penjelasan yang memperluas faktor terkait
+
+88. Bacalah teks berikut.
+"Keberhasilan program penanaman mangrove sering diukur hanya dari jumlah bibit yang ditanam. Ukuran tersebut penting, tetapi belum memadai. Tingkat kelangsungan hidup bibit, lokasi tanam, dan kesesuaian jenis mangrove dengan kondisi pantai juga perlu diperhitungkan."
+Kritik utama penulis terhadap pengukuran program adalah ...
+A. jumlah bibit tidak pernah relevan
+B. keberhasilan tidak cukup dinilai hanya dari jumlah bibit yang ditanam
+C. penanaman mangrove harus dihentikan
+D. mangrove tidak memberi manfaat ekologis
+E. semua program mangrove pasti gagal
+
+89. Pernyataan yang paling mendukung teks soal 88 adalah ...
+A. banyak bibit mati beberapa bulan setelah ditanam karena lokasi tidak sesuai
+B. jumlah bibit yang dibeli terus meningkat
+C. masyarakat menyukai kegiatan penanaman
+D. kawasan pantai semakin populer
+E. harga bibit mangrove menurun
+
+90. Bacalah teks berikut.
+"Informasi yang beredar cepat di media sosial tidak selalu memiliki tingkat keandalan yang sama. Judul yang provokatif dapat mendorong orang membagikan informasi sebelum memverifikasi kebenarannya. Karena itu, pemeriksaan sumber dan fakta menjadi langkah penting sebelum menyebarkan informasi."
+Tindakan paling tepat berdasarkan teks adalah ...
+A. membagikan semua informasi yang menarik
+B. memeriksa sumber dan fakta sebelum membagikan informasi
+C. hanya membaca judul berita
+D. mempercayai informasi yang viral tanpa verifikasi
+E. menghindari seluruh media sosial
+
+91. Tujuan penulis teks soal 90 adalah ...
+A. menjelaskan algoritma media sosial
+B. mengingatkan pentingnya verifikasi informasi sebelum dibagikan
+C. membandingkan berbagai platform media sosial
+D. mengajarkan cara membuat judul provokatif
+E. melarang penggunaan media sosial
+
+92. Bacalah teks berikut.
+"Pembelajaran kolaboratif memberi kesempatan siswa untuk saling bertukar gagasan dalam menyelesaikan tugas. Keberhasilannya, bagaimanapun, sangat bergantung pada pembagian peran yang jelas. Kelompok tanpa pembagian peran cenderung didominasi oleh sebagian anggota saja."
+Kesimpulan yang tepat adalah ...
+A. pembagian peran yang jelas diperlukan agar pembelajaran kolaboratif berjalan efektif
+B. semua tugas kelompok pasti gagal
+C. pembelajaran kolaboratif tidak efektif
+D. siswa tidak boleh bekerja dalam kelompok
+E. kelompok besar selalu lebih baik
+
+93. Makna "didominasi" dalam teks soal 92 paling dekat dengan ...
+A. dikuasai oleh sebagian pihak
+B. dibagi secara merata
+C. diperbarui secara berkala
+D. diabaikan sepenuhnya
+E. ditinggalkan begitu saja
+
+94. Bacalah teks berikut.
+"Hemat energi tidak selalu berarti mengurangi kenyamanan secara drastis. Penggunaan lampu hemat daya, pengaturan suhu ruangan yang wajar, dan pemanfaatan ventilasi alami dapat menurunkan konsumsi energi tanpa mengorbankan kenyamanan penghuni."
+Pernyataan yang paling tepat adalah ...
+A. hemat energi selalu mengorbankan kenyamanan
+B. hemat energi dapat dicapai melalui perubahan cara penggunaan energi
+C. semua lampu harus dimatikan total
+D. ventilasi alami tidak berguna
+E. kenyamanan harus dihilangkan demi hemat energi
+
+95. Hubungan sebab-akibat yang tersirat dalam teks soal 94 adalah ...
+A. kenyamanan selalu menyebabkan pemborosan
+B. ventilasi alami menyebabkan suhu meningkat drastis
+C. lampu hemat daya meningkatkan konsumsi energi
+D. semua ruangan harus gelap total
+E. pengaturan penggunaan energi dapat menurunkan konsumsi energi
+
+96. Bacalah teks berikut.
+"Perpustakaan digital memperluas akses terhadap bahan bacaan bagi masyarakat di berbagai wilayah. Namun, akses yang luas tidak otomatis meningkatkan minat baca. Pengguna tetap perlu memiliki kebiasaan membaca dan kemampuan memilih bacaan yang relevan."
+Ide pokok teks adalah ...
+A. perpustakaan digital harus dibatasi aksesnya
+B. semua bahan bacaan digital tidak bermutu
+C. akses digital perlu disertai kebiasaan dan kemampuan memilih bacaan
+D. perpustakaan digital tidak berguna
+E. membaca buku cetak selalu lebih baik
+
+97. Pernyataan yang dapat disimpulkan dari teks soal 96 adalah ...
+A. bahan bacaan digital selalu keliru
+B. semua pengguna perpustakaan digital rajin membaca
+C. perpustakaan digital mengurangi akses masyarakat
+D. ketersediaan akses dan minat baca merupakan dua hal yang berbeda
+E. kemampuan memilih bacaan tidak diperlukan
+
+98. Bacalah teks berikut.
+"Pasar tenaga kerja terus berubah seiring perkembangan teknologi digital. Sejumlah pekerjaan rutin dapat tergantikan oleh sistem otomatis, tetapi permintaan terhadap keterampilan analitis dan kreatif justru meningkat. Oleh karena itu, pendidikan perlu mendorong pembelajaran yang berkelanjutan."
+Sikap penulis terhadap perkembangan teknologi digital adalah ...
+A. sepenuhnya menolak
+B. menganggap semua pekerjaan pasti hilang
+C. menganggap pendidikan tidak lagi diperlukan
+D. menganggap teknologi tidak berdampak pada pekerjaan
+E. melihatnya sebagai perubahan yang membutuhkan adaptasi keterampilan
+
+99. Kata "berkelanjutan" pada teks soal 98 bermakna ...
+A. berhenti sementara
+B. berlangsung sangat singkat
+C. hanya berlangsung sekali
+D. terus berlangsung dari waktu ke waktu
+E. tidak terarah
+
+100. Jika penulis teks soal 98 diminta memberi rekomendasi, yang paling sesuai adalah ...
+A. menghapus pendidikan formal
+B. menghindari semua pekerjaan berbasis digital
+C. memperkuat kesempatan belajar sepanjang hayat
+D. mengurangi pelatihan keterampilan
+E. menghentikan penggunaan teknologi
+
+============================================================
+E. LITERASI DALAM BAHASA INGGRIS
+============================================================
+
+101. Read the passage.
+"A growing number of cities are converting unused rooftops into small urban farms. Supporters say these farms can supply fresh produce locally and reduce transport emissions. Critics note that rooftop farming requires careful structural assessment, since not every building can support the added weight."
+What is the main idea?
+A. Rooftop farms are useful only in small towns.
+B. Rooftop farming should replace traditional agriculture entirely.
+C. Rooftop farming offers benefits but also faces structural limitations.
+D. Traditional farms are always unsafe.
+E. Cities should stop building on rooftops.
+
+102. According to the passage in question 101, rooftop farming may be limited by ...
+A. local food demand
+B. the price of produce
+C. the number of farmers available
+D. transport emissions
+E. a building's structural capacity to bear extra weight
+
+103. The word "assessment" is closest in meaning to ...
+A. decoration
+B. evaluation
+C. destruction
+D. postponement
+E. celebration
+
+104. Read the passage.
+"Researchers have found that students who explain concepts in their own words tend to understand material more deeply than those who simply reread their notes. This process, sometimes called the generation effect, forces learners to actively retrieve and reorganize information."
+The passage suggests that deep understanding is best supported by ...
+A. memorizing definitions only
+B. rereading notes repeatedly
+C. actively explaining concepts in one's own words
+D. listening passively to lectures
+E. avoiding practice questions
+
+105. Why does explaining a concept help learning, according to the passage?
+A. It removes the need for further study.
+B. It prevents any mistakes during exams.
+C. It guarantees perfect exam scores.
+D. It makes textbooks unnecessary.
+E. It requires learners to actively retrieve and reorganize information.
+
+106. The word "retrieve" in the passage is closest in meaning to ...
+A. delete
+B. hide
+C. recall
+D. ignore
+E. predict
+
+107. Read the passage.
+"Flexible work schedules can reduce employee stress and improve job satisfaction. Nevertheless, they may also create coordination challenges when team members work at different times."
+Which statement is supported?
+A. Flexible schedules offer benefits but can create coordination challenges.
+B. Flexible schedules have only advantages.
+C. Coordination becomes easier with flexible schedules.
+D. Employees always prefer fixed schedules.
+E. Flexible schedules eliminate all workplace problems.
+
+108. The word "nevertheless" signals ...
+A. example
+B. addition
+C. conclusion
+D. cause
+E. contrast
+
+109. Read the passage.
+"Although open-access journals can make research more widely available, publication quality still varies across platforms. Researchers with strong evaluation skills are often better able to identify credible sources."
+What can be inferred?
+A. Accessibility has no value in research.
+B. Publication quality never varies.
+C. Evaluation skills may help readers identify credible research.
+D. Open-access journals are always unreliable.
+E. All open-access journals maintain identical quality.
+
+110. The phrase "varies across" means ...
+A. changes predictably across
+B. remains identical across
+C. increases steadily across
+D. differs among
+E. disappears from
+
+111. Read the passage.
+"Urban trees provide more than shade. Their roots can help absorb excess rainwater, their leaves can filter airborne particles, and tree-lined streets can encourage walking among residents."
+Which benefit is NOT mentioned?
+A. Encouraging walking
+B. Absorbing excess rainwater
+C. Providing shade
+D. Reducing traffic accidents
+E. Filtering airborne particles
+
+112. The word "filter" is closest in meaning to ...
+A. multiply
+B. ignore
+C. purify
+D. release
+E. increase
+
+113. Read the passage.
+"Shoppers sometimes choose products because of labels claiming health benefits. However, such claims should be examined carefully, since a label alone does not guarantee that a product is actually healthier."
+What is the author's purpose?
+A. To warn consumers to examine health claims critically
+B. To explain how products are manufactured
+C. To reject all healthy products
+D. To compare product prices
+E. To encourage consumers to trust every health label
+
+114. Which statement would best support the passage?
+A. Some products use appealing health claims without solid evidence.
+B. Health benefits cannot be measured at all.
+C. All labels are regulated identically worldwide.
+D. Consumers never read product labels.
+E. Product packaging is always misleading.
+
+115. Read the passage.
+"Artificial intelligence can help translators by suggesting draft translations quickly. Yet its usefulness depends heavily on the quality and diversity of the language data used to train the system. Limited training data can lead to inaccurate translations."
+The passage emphasizes that AI translation quality depends partly on ...
+A. the quality and diversity of training data
+B. the size of the company
+C. the speed of the translator's typing
+D. the color scheme of the software
+E. the number of users online
+
+116. The word "diversity" is closest in meaning to ...
+A. shortage
+B. uniformity
+C. variety
+D. accuracy
+E. simplicity
+
+117. Read the passage.
+"Learners who space out their practice sessions over several days often remember material longer than those who cram everything into one long session. Spaced practice allows information to be revisited and reinforced over time."
+The passage supports ...
+A. memorizing without any revisiting
+B. spaced practice as a potentially effective learning strategy
+C. avoiding all review sessions
+D. cramming as the most effective strategy
+E. studying only once before a test
+
+118. Why can spaced practice help learners, according to the passage?
+A. It prevents forgetting completely.
+B. It makes exams shorter.
+C. It guarantees identical scores for everyone.
+D. It allows information to be revisited and reinforced over time.
+E. It eliminates the need for understanding.
+
+119. Read the passage.
+"Some coastal towns are restoring seagrass meadows. Seagrass can provide habitat for marine life and help stabilize the seabed. Restoration efforts, however, require long-term monitoring and local community involvement."
+Which statement is most accurate?
+A. Restoration is complete immediately after planting.
+B. Local communities are irrelevant to restoration.
+C. Seagrass meadows only benefit tourism.
+D. Seagrass destabilizes the seabed.
+E. Seagrass restoration has benefits but requires sustained effort.
+
+120. The word "stabilize" is closest in meaning to ...
+A. remove
+B. accelerate
+C. make steady
+D. weaken
+E. complicate
+
+============================================================
+F. PENALARAN MATEMATIKA
+============================================================
+
+121. Sebuah fungsi linear f memenuhi f(3) = 10 dan f(6) = 19. Nilai f(12) adalah ...
+A. 40
+B. 31
+C. 37
+D. 34
+E. 43
+
+122. Diketahui x+y=14 dan xy=40. Nilai x²+y² adalah ...
+A. 136
+B. 106
+C. 116
+D. 96
+E. 126
+
+123. Sebuah persegi panjang memiliki luas 108 cm². Jika panjangnya 3 cm lebih besar daripada lebarnya, kelilingnya adalah ...
+A. 38
+B. 34
+C. 46
+D. 50
+E. 42
+
+124. Barisan 4, 9, 14, 19, ... memiliki suku ke-n. Suku ke-22 adalah ...
+A. 115
+B. 106
+C. 112
+D. 109
+E. 103
+
+125. Jumlah 18 suku pertama barisan pada soal 124 adalah ...
+A. 845
+B. 821
+C. 853
+D. 837
+E. 829
+
+126. Sebuah bilangan positif x memenuhi x + 1/x = 6. Nilai x² + 1/x² adalah ...
+A. 32
+B. 38
+C. 36
+D. 30
+E. 34
+
+127. Sebuah segitiga siku-siku memiliki sisi siku-siku 9 cm dan 12 cm. Jari-jari lingkaran luarnya adalah ...
+A. 15/2
+B. 9/2
+C. 21/2
+D. 6.00000000000000
+E. 9.00000000000000
+
+128. Jika log₅(x) = 3, maka x adalah ...
+A. 75
+B. 625
+C. 125
+D. 25
+E. 15
+
+129. Sebuah kelas memiliki 25 siswa. Nilai rata-rata awal adalah 75. Setelah satu siswa dengan nilai 95 bergabung, rata-rata menjadi ...
+A. 75.27
+B. 76.27
+C. 75
+D. 75.77
+E. 77
+
+130. Dalam sebuah kotak terdapat 5 bola putih, 4 bola hitam, dan 3 bola merah. Dua bola diambil tanpa pengembalian. Peluang keduanya putih adalah ...
+A. 1/6
+B. 2/11
+C. 1/3
+D. 5/33
+E. 1/2
+
+131. Sebuah harga meningkat 15% lalu meningkat lagi 10%. Kenaikan total terhadap harga awal adalah ...
+A. 26,5%
+B. 25%
+C. 24%
+D. 28%
+E. 23%
+
+132. Jika 3x+2 dan 7x-14 memiliki nilai yang sama, x adalah ...
+A. 4
+B. 5
+C. 2
+D. 3
+E. 6
+
+133. Sebuah lingkaran memiliki luas 616 cm² dengan π = 22/7. Diameternya adalah ...
+A. 24 cm
+B. 14 cm
+C. 21 cm
+D. 32 cm
+E. 28 cm
+
+134. Titik A(3,2) dan B(9,10). Jarak AB adalah ...
+A. 10
+B. 12
+C. 11
+D. 9
+E. 8
+
+135. Gradien garis yang melalui titik (2,5) dan (6,17) adalah ...
+A. 2
+B. 3
+C. 1
+D. 4
+E. 5
+
+136. Persamaan garis bergradien 4 yang melalui titik (1,3) adalah ...
+A. y=4x-4
+B. y=3x-1
+C. y=4x-1
+D. y=x+4
+E. y=4x+1
+
+137. Luas persegi adalah 196 cm². Luas lingkaran yang diameternya sama dengan sisi persegi, dengan π = 22/7, adalah ...
+A. 132 cm²
+B. 176 cm²
+C. 210 cm²
+D. 154 cm²
+E. 196 cm²
+
+138. Sebuah mobil menggunakan 9 liter bensin untuk menempuh 108 km. Dengan konsumsi sama, bensin yang diperlukan untuk 260 km adalah ...
+A. 23 liter
+B. 18 liter
+C. 20 liter
+D. 26 liter
+E. 21,7 liter
+
+139. Dalam suatu ujian, jawaban benar bernilai 4, salah -1, dan kosong 0. Seorang peserta menjawab 45 soal: 35 benar, 6 salah, dan 4 kosong. Skornya adalah ...
+A. 130
+B. 134
+C. 142
+D. 138
+E. 126
+
+140. Sebuah pola luas mengikuti A(n) = n(n+3). Selisih A(12) dan A(9) adalah ...
+A. 64
+B. 76
+C. 80
+D. 68
+E. 72
+
+141. Jika 4^(x+1) = 64, nilai x² + 3 adalah ...
+A. 7
+B. 11
+C. 3
+D. 5
+E. 9
+
+142. Sebuah tangga panjangnya 13 m bersandar pada dinding. Jarak kaki tangga dari dinding 5 m. Tinggi yang dicapai tangga adalah ...
+A. 14 m
+B. 12 m
+C. 13 m
+D. 11 m
+E. 10 m
+
+143. Dua bilangan positif memiliki jumlah 20 dan selisih 6. Hasil kali kedua bilangan adalah ...
+A. 76
+B. 106
+C. 100
+D. 91
+E. 82
+
+144. Sebuah data memiliki lima nilai: 7, 9, x, 13, 16. Jika rata-ratanya 11, nilai x adalah ...
+A. 8
+B. 10
+C. 9
+D. 11
+E. 12
+
+145. Banyak cara menyusun 5 buku berbeda dari 7 buku berbeda pada sebuah rak adalah ...
+A. 2100
+B. 2940
+C. 2730
+D. 2520
+E. 2310
+
+146. Sebuah koin dilempar empat kali. Peluang muncul tepat tiga gambar adalah ...
+A. 1/8
+B. 1/16
+C. 1/4
+D. 1/2
+E. 3/8
+
+147. Jika x:y = 3:4 dan y:z = 5:6, maka x:y:z adalah ...
+A. 3:4:6
+B. 12:16:20
+C. 20:24:15
+D. 15:20:24
+E. 6:8:9
+
+148. Sebuah bak berbentuk balok berukuran 90 cm × 60 cm × 50 cm terisi 80%. Volume air di dalamnya adalah ...
+A. 198 liter
+B. 180 liter
+C. 252 liter
+D. 216 liter
+E. 234 liter
+
+149. Jika suatu bilangan n memenuhi 3 < n < 9 dan n bilangan bulat, banyak nilai n adalah ...
+A. 3
+B. 6
+C. 5
+D. 4
+E. 7
+
+150. Sebuah proyek dapat diselesaikan A dalam 15 hari dan B dalam 20 hari. Jika bekerja bersama dengan laju konstan, proyek selesai dalam ...
+A. 10 hari
+B. 6 hari
+C. 8 4/7 hari
+D. 9 hari
+E. 7,2 hari
+
+============================================================
+KUNCI JAWABAN
+============================================================
+
+1 D
+2 A
+3 B
+4 A
+5 C
+6 E
+7 A
+8 A
+9 A
+10 C
+11 E
+12 D
+13 D
+14 A
+15 D
+16 E
+17 B
+18 C
+19 D
+20 B
+21 C
+22 C
+23 A
+24 B
+25 B
+26 C
+27 B
+28 C
+29 D
+30 C
+
+31 B
+32 A
+33 E
+34 A
+35 A
+36 C
+37 E
+38 C
+39 E
+40 D
+41 D
+42 E
+43 D
+44 E
+45 C
+46 B
+47 C
+48 A
+49 A
+50 C
+51 C
+52 A
+53 E
+54 C
+55 C
+56 A
+57 B
+58 E
+59 C
+60 B
+
+61 D
+62 A
+63 C
+64 A
+65 D
+66 C
+67 A
+68 E
+69 E
+70 E
+71 A
+72 A
+73 E
+74 A
+75 B
+76 E
+77 B
+78 B
+79 B
+80 E
+81 A
+82 C
+83 E
+84 B
+85 D
+86 B
+87 E
+88 B
+89 A
+90 B
+
+91 B
+92 A
+93 A
+94 B
+95 E
+96 C
+97 D
+98 E
+99 D
+100 C
+101 C
+102 E
+103 B
+104 C
+105 E
+106 C
+107 A
+108 E
+109 C
+110 D
+111 D
+112 C
+113 A
+114 A
+115 A
+116 C
+117 B
+118 D
+119 E
+120 C
+
+121 C
+122 C
+123 E
+124 D
+125 D
+126 E
+127 A
+128 C
+129 D
+130 D
+131 A
+132 A
+133 E
+134 A
+135 B
+136 C
+137 D
+138 E
+139 B
+140 E
+141 A
+142 B
+143 D
+144 B
+145 D
+146 C
+147 D
+148 D
+149 C
+150 C
