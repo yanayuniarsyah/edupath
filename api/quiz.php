@@ -87,12 +87,33 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
         $stmt->bindValue(1, $subtes);
         $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
+        $stmt->execute();
+        $questions = $stmt->fetchAll();
     } else {
-        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
-        $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
+        if (strtolower($quiz_type) === 'tryout') {
+            $tryout_distribution = [
+                'Penalaran Umum' => 30,
+                'Pengetahuan Dan Pemahaman Umum' => 25,
+                'Pengetahuan Kuantitatif' => 25,
+                'Literasi Dalam Bahasa Indonesia' => 20,
+                'Literasi Dalam Bahasa Inggris' => 20,
+                'Penalaran Matematika' => 30
+            ];
+            $questions = [];
+            foreach ($tryout_distribution as $sub_name => $sub_limit) {
+                $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+                $stmt->bindValue(1, $sub_name);
+                $stmt->bindValue(2, $sub_limit, PDO::PARAM_INT);
+                $stmt->execute();
+                $questions = array_merge($questions, $stmt->fetchAll());
+            }
+        } else {
+            $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+            $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
+            $stmt->execute();
+            $questions = $stmt->fetchAll();
+        }
     }
-    $stmt->execute();
-    $questions = $stmt->fetchAll();
 
     echo json_encode([
         "attempt_id" => $attempt_id,
@@ -117,13 +138,35 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
         $stmt->bindValue(1, $sub_materi_input);
         $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
+        $stmt->execute();
+        $questions = $stmt->fetchAll();
     } else {
-        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
-        $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
+        if (strtolower($quiz_type) === 'tryout') {
+            $tryout_distribution = [
+                'Penalaran Umum' => 30,
+                'Pengetahuan Dan Pemahaman Umum' => 25,
+                'Pengetahuan Kuantitatif' => 25,
+                'Literasi Dalam Bahasa Indonesia' => 20,
+                'Literasi Dalam Bahasa Inggris' => 20,
+                'Penalaran Matematika' => 30
+            ];
+            $questions = [];
+            foreach ($tryout_distribution as $sub_name => $sub_limit) {
+                $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+                $stmt->bindValue(1, $sub_name);
+                $stmt->bindValue(2, $sub_limit, PDO::PARAM_INT);
+                $stmt->execute();
+                $questions = array_merge($questions, $stmt->fetchAll());
+            }
+        } else {
+            $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+            $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
+            $stmt->execute();
+            $questions = $stmt->fetchAll();
+        }
     }
-    $stmt->execute();
     
-    echo json_encode($stmt->fetchAll());
+    echo json_encode($questions);
 }
 elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!check_rate_limit($pdo, 'quiz_submit', 10, 2)) {
