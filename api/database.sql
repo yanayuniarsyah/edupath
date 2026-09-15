@@ -83,6 +83,7 @@ CREATE TABLE `questions` (
   `explanation` text DEFAULT NULL,
   `trick` text DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT '1',
+  `is_qc_passed` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

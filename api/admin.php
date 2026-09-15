@@ -424,14 +424,15 @@ elseif ($action === 'questions') {
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
         
-        $stmt = $pdo->prepare("INSERT INTO questions (id, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO questions (id, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, is_qc_passed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $sub_materi = $input['sub_materi'] ?? $input['subtes'] ?? '';
+        $is_qc_passed = isset($input['is_qc_passed']) && $input['is_qc_passed'] ? 1 : 0;
         $stmt->execute([
             $id, $sub_materi, $input['bab']??null, $input['difficulty']??'medium', 
             $input['question'], $input['option_a'], $input['option_b'], $input['option_c'], 
             $input['option_d'], $input['option_e']??null, $input['correct'], $input['explanation']??null,
             $input['cognitive_demand']??null, $input['source_type']??'author_created', $input['rights_status']??'unknown',
-            $input['source_name']??null, $input['source_year']??null, $input['source_reference']??null
+            $input['source_name']??null, $input['source_year']??null, $input['source_reference']??null, $is_qc_passed
         ]);
         echo json_encode(["success" => true, "id" => $id]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
@@ -441,14 +442,15 @@ elseif ($action === 'questions') {
             exit;
         }
         $id = $input['id'] ?? '';
-        $stmt = $pdo->prepare("UPDATE questions SET sub_materi=?, bab=?, difficulty=?, question=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?, correct=?, explanation=?, cognitive_demand=?, source_type=?, rights_status=?, source_name=?, source_year=?, source_reference=? WHERE id=?");
+        $stmt = $pdo->prepare("UPDATE questions SET sub_materi=?, bab=?, difficulty=?, question=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?, correct=?, explanation=?, cognitive_demand=?, source_type=?, rights_status=?, source_name=?, source_year=?, source_reference=?, is_qc_passed=? WHERE id=?");
         $sub_materi = $input['sub_materi'] ?? $input['subtes'] ?? '';
+        $is_qc_passed = isset($input['is_qc_passed']) && $input['is_qc_passed'] ? 1 : 0;
         $stmt->execute([
             $sub_materi, $input['bab']??null, $input['difficulty']??'medium', 
             $input['question'], $input['option_a'], $input['option_b'], $input['option_c'], 
             $input['option_d'], $input['option_e']??null, $input['correct'], $input['explanation']??null,
             $input['cognitive_demand']??null, $input['source_type']??'author_created', $input['rights_status']??'unknown',
-            $input['source_name']??null, $input['source_year']??null, $input['source_reference']??null,
+            $input['source_name']??null, $input['source_year']??null, $input['source_reference']??null, $is_qc_passed,
             $id
         ]);
         echo json_encode(["success" => true]);
@@ -531,24 +533,38 @@ elseif ($action === 'staff') {
         $name = trim($input['name'] ?? '');
         $role = $input['role'] ?? 'teacher';
         
-        $stmt = $pdo->prepare("UPDATE admins SET name = ? WHERE id = ?");
-        $stmt->execute([$name, $id]);
-        
-        $stmt = $pdo->prepare("UPDATE user_roles SET role = ? WHERE reference_id = ? AND role != 'superadmin'");
-        $stmt->execute([$role, $id]);
+        $tenant_id = $payload->role === 'superadmin' ? null : $payload->tenant_id;
+        $scope = $tenant_id ? " AND ur.tenant_id = ?" : " AND ur.tenant_id IS NULL";
+        $stmt = $pdo->prepare("UPDATE admins a JOIN user_roles ur ON ur.reference_id = a.id SET a.name = ? WHERE a.id = ? AND ur.role != 'superadmin' $scope");
+        $params = [$name, $id];
+        if ($tenant_id) $params[] = $tenant_id;
+        $stmt->execute($params);
+
+        $stmt = $pdo->prepare("UPDATE user_roles SET role = ? WHERE reference_id = ? AND role != 'superadmin' $scope");
+        $params = [$role, $id];
+        if ($tenant_id) $params[] = $tenant_id;
+        $stmt->execute($params);
         
         if (!empty($input['password'])) {
             $hashed = password_hash($input['password'], PASSWORD_BCRYPT);
-            $stmt = $pdo->prepare("UPDATE users u JOIN user_roles ur ON u.id = ur.user_id SET u.password = ? WHERE ur.reference_id = ?");
-            $stmt->execute([$hashed, $id]);
-            $stmt = $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?");
-            $stmt->execute([$hashed, $id]);
+            $stmt = $pdo->prepare("UPDATE users u JOIN user_roles ur ON u.id = ur.user_id SET u.password = ? WHERE ur.reference_id = ? AND ur.role != 'superadmin' $scope");
+            $params = [$hashed, $id];
+            if ($tenant_id) $params[] = $tenant_id;
+            $stmt->execute($params);
+            $stmt = $pdo->prepare("UPDATE admins a JOIN user_roles ur ON ur.reference_id = a.id SET a.password = ? WHERE a.id = ? AND ur.role != 'superadmin' $scope");
+            $params = [$hashed, $id];
+            if ($tenant_id) $params[] = $tenant_id;
+            $stmt->execute($params);
         }
         echo json_encode(["success" => true]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $id = $_GET['id'] ?? '';
-        $stmt = $pdo->prepare("DELETE FROM users WHERE id IN (SELECT user_id FROM user_roles WHERE reference_id = ? AND role != 'superadmin')");
-        $stmt->execute([$id]);
+        $tenant_id = $payload->role === 'superadmin' ? null : $payload->tenant_id;
+        $scope = $tenant_id ? " AND ur.tenant_id = ?" : " AND ur.tenant_id IS NULL";
+        $stmt = $pdo->prepare("DELETE u FROM users u JOIN user_roles ur ON ur.user_id = u.id WHERE ur.reference_id = ? AND ur.role != 'superadmin' $scope");
+        $params = [$id];
+        if ($tenant_id) $params[] = $tenant_id;
+        $stmt->execute($params);
         echo json_encode(["success" => true]);
     }
 }

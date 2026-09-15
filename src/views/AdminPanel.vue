@@ -353,6 +353,10 @@
                     </td>
                     <td class="px-5 py-3.5 font-bold text-slate-600">{{ q.sub_materi }}</td>
                     <td class="px-5 py-3.5">
+                      <span v-if="q.is_qc_passed == 1" class="px-2 py-1 text-[10px] font-bold bg-green-100 text-green-700 rounded-lg">Lolos QC</span>
+                      <span v-else class="px-2 py-1 text-[10px] font-bold bg-amber-100 text-amber-700 rounded-lg">Belum QC</span>
+                    </td>
+                    <td class="px-5 py-3.5">
                       <div class="flex flex-col gap-1 items-start">
                         <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 uppercase">{{ q.usage_type || 'Latihan' }}</span>
                         <span class="text-[10px] text-slate-500 font-bold">{{ q.cognitive_level || 'C3' }}</span>
@@ -855,6 +859,10 @@
               <input v-model="qForm.source_reference" type="text" placeholder="URL atau hal." class="w-full p-2 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400" />
             </div>
           </div>
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="qc_passed" v-model="qForm.is_qc_passed" :true-value="1" :false-value="0" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+            <label for="qc_passed" class="text-sm font-bold text-slate-700">Telah Melewati Proses QC (Guru)</label>
+          </div>
           <div>
             <label class="block text-xs font-bold text-slate-500 mb-1">Pertanyaan</label>
 
@@ -1167,7 +1175,7 @@ const commitImport = async () => {
 
 const isEditingQuestion = ref(false);
 const isSaving = ref(false);
-const qForm = reactive({ id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', source_name: '', source_year: null, source_reference: '' });
+const qForm = reactive({ id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', source_name: '', source_year: null, source_reference: '', is_qc_passed: 0 });
 
 const openQuestionModal = (q = null) => {
   if (q) {
@@ -1175,7 +1183,7 @@ const openQuestionModal = (q = null) => {
     Object.assign(qForm, q);
   } else {
     isEditingQuestion.value = false;
-    Object.assign(qForm, { id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', source_name: '', source_year: null, source_reference: '' });
+    Object.assign(qForm, { id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', source_name: '', source_year: null, source_reference: '', is_qc_passed: 0 });
   }
   showQuestionModal.value = true;
 };

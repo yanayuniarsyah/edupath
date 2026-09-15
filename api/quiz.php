@@ -14,6 +14,30 @@ if ($payload->role !== 'student') {
     exit;
 }
 
+if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $attempt_id = trim($input['attempt_id'] ?? '');
+    $answers = $input['answers'] ?? [];
+    if ($attempt_id === '' || !is_array($answers)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Attempt dan jawaban wajib dikirim."]);
+        exit;
+    }
+    try {
+        $stmt = $pdo->prepare("UPDATE quiz_attempts SET answers = ?, last_saved_at = NOW() WHERE id = ? AND student_id = ? AND status = 'started' AND (expires_at IS NULL OR expires_at >= NOW())");
+        $stmt->execute([json_encode($answers), $attempt_id, $payload->id]);
+        if ($stmt->rowCount() !== 1) {
+            http_response_code(409);
+            echo json_encode(["error" => "Attempt tidak aktif atau waktu telah habis."]);
+            exit;
+        }
+        echo json_encode(["success" => true, "saved_at" => date('c')]);
+    } catch (PDOException $e) {
+        http_response_code(503);
+        echo json_encode(["error" => "Autosave belum tersedia. Jalankan migrasi reliability terlebih dahulu."]);
+    }
+    exit;
+}
+
 if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!check_rate_limit($pdo, 'quiz_start', 10, 5)) {
         http_response_code(429);
@@ -22,16 +46,34 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $subtes = $input['subtes'] ?? null;
-    $limit = $input['limit'] ?? 10;
     $quiz_type = $input['quiz_type'] ?? 'latihan';
+    $limit = $quiz_type === 'tryout' ? 150 : max(1, min(50, (int)($input['limit'] ?? 10)));
 
-    $attempt_id = bin2hex(random_bytes(16));
-    $attempt_id = substr($attempt_id,0,8).'-'.substr($attempt_id,8,4).'-'.substr($attempt_id,12,4).'-'.substr($attempt_id,16,4).'-'.substr($attempt_id,20,12);
-
-    try {
-        $stmt = $pdo->prepare("INSERT INTO quiz_attempts (id, student_id, quiz_type, subtes, status) VALUES (?, ?, ?, ?, 'started')");
-        $stmt->execute([$attempt_id, $payload->id, $quiz_type, $subtes]);
-    } catch (PDOException $e) { /* Ignore if migration not run */ }
+    $duration_sec = max(60, min(7200, (int)($input['duration_sec'] ?? 900)));
+    $expires_at = date('Y-m-d H:i:s', time() + $duration_sec);
+    $attempt_id = trim($input['attempt_id'] ?? '');
+    if ($attempt_id !== '') {
+        try {
+            $resume = $pdo->prepare("SELECT id, expires_at FROM quiz_attempts WHERE id = ? AND student_id = ? AND status = 'started'");
+            $resume->execute([$attempt_id, $payload->id]);
+            $existing = $resume->fetch();
+            if ($existing) $expires_at = $existing['expires_at'];
+            else $attempt_id = '';
+        } catch (PDOException $e) {
+            $attempt_id = '';
+        }
+    }
+    if ($attempt_id === '') {
+        $attempt_id = bin2hex(random_bytes(16));
+        $attempt_id = substr($attempt_id,0,8).'-'.substr($attempt_id,8,4).'-'.substr($attempt_id,12,4).'-'.substr($attempt_id,16,4).'-'.substr($attempt_id,20,12);
+        try {
+            $stmt = $pdo->prepare("INSERT INTO quiz_attempts (id, student_id, quiz_type, subtes, status, expires_at) VALUES (?, ?, ?, ?, 'started', ?)");
+            $stmt->execute([$attempt_id, $payload->id, $quiz_type, $subtes, $expires_at]);
+        } catch (PDOException $e) {
+            $stmt = $pdo->prepare("INSERT INTO quiz_attempts (id, student_id, quiz_type, subtes, status) VALUES (?, ?, ?, ?, 'started')");
+            $stmt->execute([$attempt_id, $payload->id, $quiz_type, $subtes]);
+        }
+    }
 
     // Real Question Injection Taxonomy
     $allowed_classification = strtoupper($quiz_type);
@@ -42,11 +84,11 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($subtes) {
-        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
         $stmt->bindValue(1, $subtes);
         $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
     } else {
-        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
         $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
     }
     $stmt->execute();
@@ -54,14 +96,15 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     echo json_encode([
         "attempt_id" => $attempt_id,
+        "expires_at" => $expires_at,
         "questions" => $questions
     ]);
 }
 elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // Backward compatibility for existing Web App
     $sub_materi_input = $_GET['sub_materi'] ?? $_GET['subtes'] ?? '';
-    $limit = $_GET['limit'] ?? 10;
     $quiz_type = $_GET['quiz_type'] ?? 'latihan';
+    $limit = $quiz_type === 'tryout' ? 150 : max(1, min(50, (int)($_GET['limit'] ?? 10)));
     
     $allowed_classification = strtoupper($quiz_type);
     if ($allowed_classification === 'LATIHAN' || $allowed_classification === 'TRYOUT') {
@@ -71,11 +114,11 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     if ($sub_materi_input) {
-        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
         $stmt->bindValue(1, $sub_materi_input);
         $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
     } else {
-        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
         $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
     }
     $stmt->execute();
@@ -94,6 +137,35 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $subtes = $input['subtes'] ?? null;
     $duration_sec = $input['duration_sec'] ?? 0;
     $attempt_id = trim($input['attempt_id'] ?? '');
+
+    if ($attempt_id) {
+        try {
+            $lock = $pdo->prepare("SELECT status, expires_at FROM quiz_attempts WHERE id = ? AND student_id = ? FOR UPDATE");
+            $lock->execute([$attempt_id, $payload->id]);
+            $attempt = $lock->fetch();
+            if (!$attempt) {
+                http_response_code(404);
+                echo json_encode(["error" => "Attempt tidak ditemukan."]);
+                exit;
+            }
+            if ($attempt['status'] === 'completed') {
+                $check = $pdo->prepare("SELECT score, correct, total, id as result_id FROM quiz_results WHERE attempt_id = ? AND student_id = ?");
+                $check->execute([$attempt_id, $payload->id]);
+                $existingResult = $check->fetch();
+                if ($existingResult) {
+                    echo json_encode(["success" => true, "score" => (float)$existingResult['score'], "correct" => (int)$existingResult['correct'], "total" => (int)$existingResult['total'], "result_id" => $existingResult['result_id']]);
+                    exit;
+                }
+            }
+            if (!empty($attempt['expires_at']) && strtotime($attempt['expires_at']) < time()) {
+                http_response_code(409);
+                echo json_encode(["error" => "Waktu pengerjaan telah habis."]);
+                exit;
+            }
+        } catch (PDOException $e) {
+            // Older installations may not have the timer column; migration is additive.
+        }
+    }
 
     // Check idempotency if attempt_id is provided
     if ($attempt_id) {
