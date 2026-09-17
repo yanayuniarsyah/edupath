@@ -3311,21 +3311,40 @@
           <button @click="showAffiliateRegisterModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition-colors">✕</button>
         </div>
         <div class="p-6">
-          <form @submit.prevent="showAffiliateRegisterModal = false" class="space-y-4">
+          <form @submit.prevent="registerAffiliate" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
             <div class="space-y-1.5">
               <label class="text-xs font-bold text-white/70">Nama Lengkap</label>
-              <input type="text" placeholder="Masukkan nama" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+              <input v-model="affiliateForm.name" type="text" placeholder="Masukkan nama" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
             </div>
             <div class="space-y-1.5">
               <label class="text-xs font-bold text-white/70">Email Aktif</label>
-              <input type="email" placeholder="nama@email.com" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+              <input v-model="affiliateForm.email" type="email" placeholder="nama@email.com" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
             </div>
             <div class="space-y-1.5">
               <label class="text-xs font-bold text-white/70">Nomor WhatsApp</label>
-              <input type="tel" placeholder="08..." class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+              <input v-model="affiliateForm.whatsapp" type="tel" placeholder="08..." class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
             </div>
-            <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2 mt-2">
-              <i class="ph-bold ph-paper-plane-right"></i> Kirim Pendaftaran
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-white/70">Password</label>
+              <input v-model="affiliateForm.password" type="password" placeholder="Password" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required minlength="6">
+            </div>
+            
+            <div class="pt-4 border-t border-white/10 mt-4 space-y-4">
+              <span class="text-xs text-amber-400 uppercase font-bold tracking-wider block">Informasi Rekening Bank (Untuk Pencairan)</span>
+              <div class="space-y-1.5">
+                <input v-model="affiliateForm.bank_name" type="text" placeholder="Nama Bank (Misal: BCA, Mandiri)" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+              </div>
+              <div class="space-y-1.5">
+                <input v-model="affiliateForm.bank_account" type="text" placeholder="Nomor Rekening" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+              </div>
+              <div class="space-y-1.5">
+                <input v-model="affiliateForm.bank_owner" type="text" placeholder="Nama Pemilik Rekening" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+              </div>
+            </div>
+
+            <button type="submit" :disabled="isRegistering" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2 mt-2 disabled:opacity-50">
+              <i v-if="!isRegistering" class="ph-bold ph-paper-plane-right"></i> 
+              {{ isRegistering ? 'Memproses...' : 'Kirim Pendaftaran' }}
             </button>
           </form>
         </div>
@@ -3369,6 +3388,70 @@ export default {
     const showAffiliateRegisterModal = ref(false);
     const sidebarExpanded = ref(false);
     const toolsDropdownOpen = ref(false);
+
+    const affiliateForm = ref({
+      name: '',
+      email: '',
+      whatsapp: '',
+      password: '',
+      bank_name: '',
+      bank_account: '',
+      bank_owner: ''
+    });
+    const isRegistering = ref(false);
+
+    const registerAffiliate = async () => {
+      isRegistering.value = true;
+      try {
+        const formData = {
+          name: affiliateForm.value.name,
+          email: affiliateForm.value.email,
+          whatsapp: affiliateForm.value.whatsapp,
+          password: affiliateForm.value.password,
+          target_ptn: 'Affiliate Partner'
+        };
+
+        const regRes = await fetch('/api/auth.php?action=register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        
+        const regData = await regRes.json();
+        if (!regRes.ok) throw new Error(regData.error || 'Gagal mendaftar akun');
+
+        const token = regData.token;
+        const joinRes = await fetch('/api/affiliate.php', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            bank_name: affiliateForm.value.bank_name,
+            bank_account: affiliateForm.value.bank_account,
+            bank_owner: affiliateForm.value.bank_owner
+          })
+        });
+
+        if (!joinRes.ok) {
+          console.error("Gagal join afiliasi otomatis");
+        }
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(regData.user));
+        
+        toastMessage.value = 'Pendaftaran berhasil! Mengarahkan...';
+        setTimeout(() => {
+          window.location.href = '/affiliate_dashboard.html';
+        }, 1500);
+
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        isRegistering.value = false;
+      }
+    };
 
     const baseUrl = window.location.origin;
     const copyReferralLink = () => {
@@ -4396,6 +4479,9 @@ export default {
       answerAnalisaQuestion,
       mobileSidebarOpen,
       toggleMobileSidebar,
+      affiliateForm,
+      isRegistering,
+      registerAffiliate
     };
   }
 };
