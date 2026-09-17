@@ -1537,7 +1537,7 @@
               <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-yellow-500/15 rounded-full blur-3xl pointer-events-none"></div>
               <div class="max-w-3xl mx-auto space-y-4 relative z-10">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
-                  <i class="ph-bold ph-lightning"></i> 1 KODE REFERRAL UNTUK 8 PRODUK UNGGULAN
+                  <i class="ph-bold ph-lightning"></i> 1 KODE REFERRAL UNTUK SEMUA PRODUK UNGGULAN
                 </div>
                 <h2 class="text-3xl sm:text-5xl font-black font-heading text-white tracking-tight leading-tight">
                   Raih Komisi <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">20% Tahun Pertama</span><br class="hidden sm:inline">+ <span class="text-emerald-400">10% Recurring</span> Seumur Hidup
@@ -1556,22 +1556,10 @@
             <!-- Products Grid -->
             <section class="space-y-4">
               <div class="text-center space-y-1">
-                <span class="text-xs font-bold text-amber-400 uppercase">// 8 PRODUK SIAP DIJUAL</span>
-                <h2 class="text-2xl font-black font-heading text-white">Solusi Digital Bernilai Tinggi yang Dibutuhkan Pasar</h2>
+                <span class="text-xs font-bold text-amber-400 uppercase">// PRODUK UNGGULAN KAMI</span>
+                <h2 class="text-2xl font-black font-heading text-white">Solusi Belajar yang Banyak Diminati Siswa</h2>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-                <div class="p-5 rounded-2xl space-y-3 bg-white/5 border border-white/10">
-                  <div class="flex justify-between items-start">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                      <i class="ph-bold ph-storefront"></i>
-                    </div>
-                    <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">20% Thn-1 | 10% Rec</span>
-                  </div>
-                  <div>
-                    <h3 class="font-bold text-white text-sm">ROS Resto Platform</h3>
-                    <p class="text-[11px] text-white/50 mt-1">Platform POS, Kitchen Display System (KDS), dan manajemen inventori restoran modern.</p>
-                  </div>
-                </div>
                 <div class="p-5 rounded-2xl space-y-3 bg-white/5 border border-white/10">
                   <div class="flex justify-between items-start">
                     <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
@@ -1580,8 +1568,8 @@
                     <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">20% Thn-1 | 10% Rec</span>
                   </div>
                   <div>
-                    <h3 class="font-bold text-white text-sm">EduPath Learning Platform</h3>
-                    <p class="text-[11px] text-white/50 mt-1">Sistem pembelajaran adaptif dengan konten SNBT terukur.</p>
+                    <h3 class="font-bold text-white text-sm">EduPath Premium</h3>
+                    <p class="text-[11px] text-white/50 mt-1">Akses penuh ke sistem pembelajaran adaptif dengan ribuan konten latihan.</p>
                   </div>
                 </div>
                 <div class="p-5 rounded-2xl space-y-3 bg-white/5 border border-white/10">
@@ -1592,8 +1580,20 @@
                     <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">20% Thn-1 | 10% Rec</span>
                   </div>
                   <div>
-                    <h3 class="font-bold text-white text-sm">Elyana Exam Prep</h3>
-                    <p class="text-[11px] text-white/50 mt-1">Koleksi soal dan simulasi ujian SNBT yang terkurasi.</p>
+                    <h3 class="font-bold text-white text-sm">Paket Tryout SNBT</h3>
+                    <p class="text-[11px] text-white/50 mt-1">Simulasi ujian SNBT terlengkap yang menggunakan sistem IRT dan evaluasi AI.</p>
+                  </div>
+                </div>
+                <div class="p-5 rounded-2xl space-y-3 bg-white/5 border border-white/10">
+                  <div class="flex justify-between items-start">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <i class="ph-bold ph-robot"></i>
+                    </div>
+                    <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">20% Thn-1 | 10% Rec</span>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-white text-sm">Analisa Belajar AI</h3>
+                    <p class="text-[11px] text-white/50 mt-1">Laporan komprehensif kelemahan siswa dan rekomendasi materi secara personal.</p>
                   </div>
                 </div>
               </div>
