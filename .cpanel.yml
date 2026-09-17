@@ -11,3 +11,5 @@ deployment:
     - /bin/cp -a import_tryout_questions.php /home/kumonwah/edupath.co.id/ 2>/dev/null || true
     - /bin/cp -a update_questions_schema.php /home/kumonwah/edupath.co.id/ 2>/dev/null || true
     - /bin/cp -a tryout_data.txt /home/kumonwah/edupath.co.id/ 2>/dev/null || true
+    - /bin/cp -a backup_db.php /home/kumonwah/edupath.co.id/ 2>/dev/null || true
+    - /bin/cp -a migrate.php /home/kumonwah/edupath.co.id/ 2>/dev/null || true
