@@ -10,7 +10,11 @@ const helmet  = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-// (Deprecated) JSON DB - Akan dihapus perlahan setelah semua route migrasi ke Prisma
+// Middleware imports
+const { auditMiddleware } = require('./middleware/audit');
+const { verifyToken } = require('./middleware/auth');
+
+// JSON DB - Akan dihapus perlahan setelah semua route migrasi ke Prisma
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 require('./db/database');
@@ -19,10 +23,12 @@ const db = require('./db/database');
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
-// Keamanan: Set security HTTP headers
+// =====================================================
+// SECURITY SETUP
+// =====================================================
 app.use(helmet());
 
-// Keamanan: Rate limiting (Maks 100 request per 15 menit dari IP yang sama)
+// Rate limiting (Maks 100 request per 15 menit dari IP yang sama)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, 
   max: 100, 
@@ -41,14 +47,21 @@ app.use(cors({
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Audit logging middleware
+app.use(auditMiddleware);
+
 const distPath = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
 }
 
-app.use('/api/auth',     require('./routes/auth'));
-app.use('/api/progress', require('./routes/progress'));
-app.use('/api/admin',    require('./routes/admin'));
+// =====================================================
+// ROUTES
+// =====================================================
+app.use('/api/auth',        require('./routes/auth'));
+app.use('/api/progress',    require('./routes/progress'));
+app.use('/api/admin',       require('./routes/admin'));
+app.use('/api/assessments', require('./routes/assessments')); // New assessment routes
 
 // GET /api/plans
 app.get('/api/plans', (req, res) => {
@@ -65,18 +78,48 @@ app.get('/api/announcements', (req, res) => {
 });
 
 // GET /api/questions/random
-app.get('/api/questions/random', (req, res) => {
-  const subtes = req.query.subtes || null;
-  const n      = Math.min(parseInt(req.query.n) || 5, 20);
-  
-  let q = db.questions.where(x => x.is_active);
-  if (subtes) q = q.filter(x => x.subtes === subtes);
+// FIXED: Added authentication and entitlement check
+app.get('/api/questions/random', verifyToken, (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const subtes = req.query.subtes || null;
+    const n = Math.min(parseInt(req.query.n) || 5, 20);
+    
+    // Server-side validation: verify user subscription
+    const subscription = db.subscriptions?.find(s => 
+      s.user_id === userId && 
+      s.status === 'active' && 
+      new Date(s.expired_at) > new Date()
+    );
+    
+    if (!subscription) {
+      return res.status(403).json({
+        success: false,
+        error: {
+          code: 'NO_SUBSCRIPTION',
+          message: 'Anda perlu subscription aktif untuk mengakses soal.'
+        }
+      });
+    }
 
-  q.sort(() => 0.5 - Math.random());
-  q = q.slice(0, n);
+    let q = db.questions.where(x => x.is_active);
+    if (subtes) q = q.filter(x => x.subtes === subtes);
 
-  const sanitized = q.map(({ correct, ...rest }) => rest);
-  res.json({ success: true, questions: sanitized });
+    q.sort(() => 0.5 - Math.random());
+    q = q.slice(0, n);
+
+    const sanitized = q.map(({ correct_answer, ...rest }) => rest);
+    res.json({ success: true, questions: sanitized });
+  } catch (error) {
+    console.error('Get random questions error:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Gagal mengambil soal.'
+      }
+    });
+  }
 });
 
 app.get('/api/health', (req, res) => {
