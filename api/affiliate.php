@@ -82,9 +82,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     $commission_rate = 20.00; // Default 20%
     
+    // Bank info
+    $input = json_decode(file_get_contents('php://input'), true);
+    $bank_name = $input['bank_name'] ?? null;
+    $bank_account = $input['bank_account'] ?? null;
+    $bank_owner = $input['bank_owner'] ?? null;
+    
     try {
-        $stmt = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$id, $user_id, $tenant_id, $referral_code, $commission_rate]);
+        $stmt = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate, bank_name, bank_account, bank_owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$id, $user_id, $tenant_id, $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner]);
         
         echo json_encode(["success" => true, "referral_code" => $referral_code]);
     } catch (PDOException $e) {
