@@ -4193,11 +4193,11 @@ export default {
           diagnosticResultData.value = res;
           showToast('Diagnostic Assessment Selesai! Jalur belajar telah dikalibrasi.');
         } else {
-          showToast('Gagal menyimpan hasil diagnostic.', 'error');
+          showToast(res.error || 'Gagal menyimpan hasil diagnostic.', 'error');
         }
       } catch (e) {
         console.error('Error submitDiagnostic', e);
-        showToast('Gagal menyimpan hasil diagnostic.', 'error');
+        showToast(e.message || 'Gagal menyimpan hasil diagnostic.', 'error');
       }
     };
 
@@ -4206,6 +4206,8 @@ export default {
       diagnosticActive.value = false;
       diagnosticResultData.value = null;
     };
+
+    const diagnosticFocus = computed(() => diagnosticActive.value || diagnosticFinished.value);
 
     const materiUtbk = ref(MATERI_UTBK);
     const selectedSubtes = ref(MATERI_UTBK[0]);

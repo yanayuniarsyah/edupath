@@ -138,7 +138,7 @@ if ($action === "start") {
     } catch (PDOException $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(["error" => "Gagal menyimpan hasil diagnostik"]);
+        echo json_encode(["error" => "Gagal menyimpan hasil diagnostik: " . $e->getMessage()]);
     }
 } else {
     http_response_code(404);
