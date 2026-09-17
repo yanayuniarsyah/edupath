@@ -2121,23 +2121,19 @@
                   <h4 class="text-lg font-black text-slate-900">Diagnostic Selesai!</h4>
                 </div>
 
-                <div class="grid grid-cols-3 gap-3">
-                  <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-center">
-                    <span class="block text-xl font-black font-mono text-emerald-600">{{ Math.round(diagnosticStats.masteredPct) }}%</span>
-                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Skill Dikuasai</span>
-                  </div>
-                  <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-center">
-                    <span class="block text-xl font-black font-mono text-amber-600">{{ Math.round(diagnosticStats.unmasteredPct) }}%</span>
-                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Belum Dikuasai</span>
-                  </div>
-                  <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-center">
-                    <span class="block text-xl font-black font-mono text-rose-600">{{ Math.round(diagnosticStats.criticalPct) }}%</span>
-                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Materi Kritis</span>
-                  </div>
+                <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-950 leading-relaxed">
+                  <strong class="text-rose-900 block mb-2">Analisa Gap Kelemahan:</strong> 
+                  Anda memiliki akurasi <strong class="text-rose-600 font-bold font-mono">{{ diagnosticResultData?.gap_score || 0 }}%</strong> pada materi 
+                  <strong class="text-rose-600">{{ diagnosticResultData?.gap_sub_materi || 'Data tidak tersedia' }}</strong> ({{ diagnosticResultData?.gap_domain || 'Data tidak tersedia' }}).
                 </div>
 
                 <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-950 leading-relaxed">
-                  <strong class="text-indigo-900">Rekomendasi AI:</strong> Estimasi skor Anda diperbarui menjadi <strong class="text-indigo-600 font-bold font-mono">{{ currentAbilityScore }}</strong>. Kurikulum disesuaikan otomatis untuk mendalami <em>Penalaran Kuantitatif</em> dan <em>Aljabar</em>.
+                  <strong class="text-indigo-900 block mb-2">Learning Path (Rekomendasi Belajar):</strong>
+                  <ul class="list-disc pl-5 space-y-1">
+                    <li v-for="(act, i) in (diagnosticResultData?.learning_path?.actions || [])" :key="i">
+                      {{ act.title }}
+                    </li>
+                  </ul>
                 </div>
 
                 <div class="text-center">
@@ -4132,28 +4128,53 @@ export default {
 
     const diagnosticActive = ref(false);
     const diagnosticFinished = ref(false);
-    const diagnosticQuestions = ref(DIAGNOSTIC_QUESTIONS);
+    const diagnosticQuestions = ref([]);
     const diagnosticIdx = ref(0);
     const selectedDiagAnswer = ref(null);
     const diagnosticScore = ref(0);
+    const diagnosticAnswers = ref([]);
+    const diagnosticResultData = ref(null);
 
-    const currentDiagQuestion = computed(() => diagnosticQuestions.value[diagnosticIdx.value]);
+    const currentDiagQuestion = computed(() => diagnosticQuestions.value[diagnosticIdx.value] || {});
 
-    const startDiagnostic = () => {
-      diagnosticActive.value = true;
-      diagnosticFinished.value = false;
-      diagnosticIdx.value = 0;
-      selectedDiagAnswer.value = null;
-      diagnosticScore.value = 0;
-      showToast('Diagnostic Assessment Dimulai!');
+    const startDiagnostic = async () => {
+      try {
+        const res = await api.startDiagnostic();
+        if (res.data && res.data.length > 0) {
+          // Map backend format to frontend format
+          diagnosticQuestions.value = res.data.map(q => ({
+            id: q.id,
+            category: q.domain || 'Uncategorized',
+            skill: q.sub_materi || 'Uncategorized',
+            difficulty: q.difficulty,
+            question: q.question,
+            options: [q.option_a, q.option_b, q.option_c, q.option_d, q.option_e].filter(Boolean)
+          }));
+          diagnosticActive.value = true;
+          diagnosticFinished.value = false;
+          diagnosticIdx.value = 0;
+          selectedDiagAnswer.value = null;
+          diagnosticAnswers.value = [];
+          showToast('Diagnostic Assessment Dimulai!');
+        } else {
+          showToast('Gagal memuat soal diagnostic.', 'error');
+        }
+      } catch (e) {
+        console.error('Error startDiagnostic', e);
+        showToast('Gagal memuat soal diagnostic.', 'error');
+      }
     };
 
     const submitDiagAnswer = () => {
-      if (selectedDiagAnswer.value === currentDiagQuestion.value.answer) {
-        diagnosticScore.value += 1;
-        const skill = currentDiagQuestion.value.skill;
-        if (skillMastery.value[skill]) skillMastery.value[skill] = Math.min(skillMastery.value[skill] + 15, 100);
+      // Store the answer (convert idx to A, B, C, D, E)
+      if (selectedDiagAnswer.value !== null) {
+        const letter = String.fromCharCode(65 + selectedDiagAnswer.value);
+        diagnosticAnswers.value.push({
+          question_id: currentDiagQuestion.value.id,
+          answer: letter
+        });
       }
+      
       if (diagnosticIdx.value < diagnosticQuestions.value.length - 1) {
         diagnosticIdx.value++;
         selectedDiagAnswer.value = null;
@@ -4164,23 +4185,26 @@ export default {
 
     const finishDiagnostic = async () => {
       diagnosticActive.value = false;
-      diagnosticFinished.value = true;
-      currentAbilityScore.value = Math.min(780, 500 + diagnosticScore.value * 50);
       
-      if (isLoggedIn.value) {
-        try {
-          await api.saveQuizResult('diagnostic', null, diagnosticScore.value * 10, diagnosticScore.value, diagnosticQuestions.value.length, 60, []);
-        } catch (e) {
-          console.error('Gagal menyimpan hasil:', e);
+      try {
+        const res = await api.submitDiagnostic(diagnosticAnswers.value);
+        if (res.success) {
+          diagnosticFinished.value = true;
+          diagnosticResultData.value = res;
+          showToast('Diagnostic Assessment Selesai! Jalur belajar telah dikalibrasi.');
+        } else {
+          showToast('Gagal menyimpan hasil diagnostic.', 'error');
         }
+      } catch (e) {
+        console.error('Error submitDiagnostic', e);
+        showToast('Gagal menyimpan hasil diagnostic.', 'error');
       }
-
-      showToast('Diagnostic Assessment Selesai! Jalur belajar telah dikalibrasi.');
     };
 
     const resetDiagnostic = () => {
       diagnosticFinished.value = false;
       diagnosticActive.value = false;
+      diagnosticResultData.value = null;
     };
 
     const materiUtbk = ref(MATERI_UTBK);

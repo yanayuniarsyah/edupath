@@ -184,6 +184,17 @@ export default {
     });
   },
 
+  startDiagnostic() {
+    return apiFetch('/diagnostic.php?action=start', { method: 'GET' });
+  },
+
+  submitDiagnostic(answers) {
+    return apiFetch('/diagnostic.php?action=submit', {
+      method: 'POST',
+      body: JSON.stringify({ answers })
+    });
+  },
+
   // ── Payment ──
   checkout(plan_id) {
     return apiFetch('/payment.php?action=create', {
