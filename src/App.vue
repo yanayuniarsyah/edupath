@@ -57,6 +57,7 @@
               <div class="relative shrink-0 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'w-6 h-6' : 'w-8 h-8'">
                 <span class="absolute text-xs font-black opacity-100 text-white">{{ tab.label.charAt(0) }}</span>
                 <i :class="['ph-bold relative z-10', tab.icon, (sidebarExpanded || mobileSidebarOpen) ? 'text-lg' : 'text-xl', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/70 group-hover:text-white']"></i>
+                <i v-if="['diagnostic', 'learning', 'simulator', 'studyroom'].includes(tab.id) && isLoggedIn && !currentUser?.is_premium" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
               </div>
               <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="font-bold tracking-tight whitespace-nowrap" :class="currentTab === tab.id ? 'text-white' : ''">{{ tab.label }}</span>
             </button>
@@ -66,15 +67,18 @@
               <button
                 v-for="subtes in materiUtbk"
                 :key="subtes.id"
-                :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-2', 
+                :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
                   currentTab === 'learning' && selectedSubtes.id === subtes.id
                     ? 'bg-[#c0ff00]/15 text-[#c0ff00] font-bold border border-[#c0ff00]/30'
                     : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
                 ]"
                 @click.stop="selectSubtesFromSidebar(subtes)"
               >
-                <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]/70 shrink-0"></span>
-                <span class="truncate">{{ subtes.subtes }}</span>
+                <div class="flex items-center gap-2 overflow-hidden">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]/70 shrink-0"></span>
+                  <span class="truncate">{{ subtes.subtes }}</span>
+                </div>
+                <i v-if="isLoggedIn && !currentUser?.is_premium" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
               </button>
             </div>
           </template>
@@ -3884,6 +3888,7 @@ export default {
     };
 
     const materiSubMenuOpen = ref(false);
+    const premiumTabs = ['diagnostic', 'learning', 'simulator', 'studyroom'];
 
     const handleTabClick = (tabId) => {
       if (tabId === 'home') {
@@ -3895,6 +3900,11 @@ export default {
         showToast('Silakan Masuk Akun untuk mengakses modul ini!');
         return;
       }
+      if (premiumTabs.includes(tabId) && !currentUser.value?.is_premium) {
+        showToast('Fitur ini khusus pengguna Premium. Silakan upgrade paket Anda.', 'error');
+        purchasePlan('Pro', 149000);
+        return;
+      }
       currentTab.value = tabId;
     };
 
@@ -3902,6 +3912,11 @@ export default {
       if (!isLoggedIn.value) {
         showLoginModal.value = true;
         showToast('Silakan Masuk Akun untuk mengakses fitur ini!');
+        return;
+      }
+      if (!currentUser.value?.is_premium) {
+        showToast('Fitur ini khusus pengguna Premium. Silakan upgrade paket Anda.', 'error');
+        purchasePlan('Pro', 149000);
         return;
       }
       currentTab.value = 'learning';

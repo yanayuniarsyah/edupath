@@ -332,10 +332,18 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $stmt = $pdo->prepare("SELECT * FROM students WHERE id = ?");
     $stmt->execute([$payload->id]);
-    $user = $stmt->fetch();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
         unset($user['password']);
+
+        // Check if user has an active premium subscription
+        $subStmt = $pdo->prepare("SELECT COUNT(*) FROM subscriptions WHERE tenant_id = ? AND status = 'active' AND expires_at > NOW()");
+        $subStmt->execute([$user['tenant_id']]);
+        $hasActiveSub = $subStmt->fetchColumn() > 0;
+        
+        $user['is_premium'] = $hasActiveSub;
+
         echo json_encode(["user" => $user]); // Standardized response
     } else {
         http_response_code(404);
