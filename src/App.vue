@@ -2892,6 +2892,7 @@
           
           <div class="pt-6">
             <button 
+              id="btn-midtrans"
               class="w-full py-3.5 rounded-xl text-sm font-black transition-all hover:scale-105 active:scale-95 bg-[#c0ff00] text-black flex items-center justify-center gap-2"
               @click="confirmCheckout"
             >
@@ -3977,6 +3978,11 @@ export default {
 
     const confirmCheckout = async () => {
       const data = checkoutModalData.value;
+      
+      const btn = document.getElementById('btn-midtrans');
+      if (btn) btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Memproses...';
+      if (btn) btn.disabled = true;
+
       try {
         const response = await api.checkout(data.planId);
         if (response && response.token) {
@@ -3991,18 +3997,21 @@ export default {
                 checkoutModalData.value.isOpen = false;
               },
               onError: function(result) {
-                showToast('Pembayaran gagal, silakan coba lagi.');
+                alert('Pembayaran gagal, silakan coba lagi.');
               },
               onClose: function() {
                 showToast('Anda menutup pop-up sebelum menyelesaikan pembayaran.');
               }
             });
           } else {
-            showToast('Sistem Pembayaran (Midtrans) tidak dimuat dengan benar. Silakan coba lagi nanti.');
+            alert('Sistem Pembayaran (Midtrans) tidak dimuat dengan benar. Pastikan VITE_MIDTRANS_CLIENT_KEY dikonfigurasi di .env');
           }
         }
       } catch (err) {
-        showToast(err.message || 'Gagal menghubungi server pembayaran.');
+        alert(err.message || 'Gagal menghubungi server pembayaran.');
+      } finally {
+        if (btn) btn.innerHTML = '<i class="ph-bold ph-credit-card"></i> Lanjutkan ke Midtrans';
+        if (btn) btn.disabled = false;
       }
     };
 
