@@ -14,8 +14,13 @@ $mkuuid = function() {
 
 echo "Seeding P0 Diagnostic Data...\n";
 
-// Clear existing questions for clean slate
-$pdo->exec("TRUNCATE TABLE questions");
+try {
+    $pdo->exec("TRUNCATE TABLE questions");
+} catch (PDOException $e) {
+    echo "Warning (Truncate): " . $e->getMessage() . "\n";
+    // fallback to delete
+    $pdo->exec("DELETE FROM questions");
+}
 
 $mock_questions = [
     // Penalaran Umum (PU)
@@ -89,27 +94,33 @@ $mock_questions = [
     ]
 ];
 
-$stmt = $pdo->prepare("INSERT INTO questions (id, subtes, domain, sub_materi, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, source_name, source_year, is_qc_passed, irt_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 10)");
+try {
+    $stmt = $pdo->prepare("INSERT INTO questions (id, subtes, domain, sub_materi, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, source_name, source_year, is_qc_passed, irt_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 10)");
 
-foreach ($mock_questions as $q) {
-    $uuid = $mkuuid();
-    $stmt->execute([
-        $uuid,
-        $q["domain"], // fallback to subtes
-        $q["domain"],
-        $q["sub_materi"],
-        $q["difficulty"],
-        $q["question"],
-        $q["options"][0],
-        $q["options"][1],
-        $q["options"][2],
-        $q["options"][3],
-        $q["options"][4],
-        $q["correct"],
-        "UTBK Kemdikbud Mock",
-        2024
-    ]);
+    $count = 0;
+    foreach ($mock_questions as $q) {
+        $uuid = $mkuuid();
+        $stmt->execute([
+            $uuid,
+            $q["domain"], // fallback to subtes
+            $q["domain"],
+            $q["sub_materi"],
+            $q["difficulty"],
+            $q["question"],
+            $q["options"][0] ?? '',
+            $q["options"][1] ?? '',
+            $q["options"][2] ?? '',
+            $q["options"][3] ?? '',
+            $q["options"][4] ?? null,
+            $q["correct"],
+            "UTBK Kemdikbud Mock",
+            2024
+        ]);
+        $count++;
+    }
+
+    echo "Successfully seeded " . $count . " questions with provenance and domains.\n";
+} catch (PDOException $e) {
+    echo "Error inserting data: " . $e->getMessage() . "\n";
 }
-
-echo "Successfully seeded " . count($mock_questions) . " questions with provenance and domains.\n";
 
