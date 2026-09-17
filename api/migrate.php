@@ -1,6 +1,6 @@
 <?php
 // migrate.php - Script untuk menjalankan migrasi dari browser
-require_once 'api/config.php';
+require_once 'config.php';
 
 $secret_key = 'rahasia123';
 if (!isset($_GET['key']) || $_GET['key'] !== $secret_key) {
@@ -14,7 +14,7 @@ try {
     // Contoh untuk mengeksekusi script yang sudah ada:
     
     echo "Menjalankan update_questions_schema.php...<br>";
-    include 'update_questions_schema.php';
+    include '../update_questions_schema.php';
     echo "<br>";
     
     // Tambahkan migrasi lain di sini jika diperlukan
