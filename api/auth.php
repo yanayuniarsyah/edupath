@@ -339,10 +339,11 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // Check if user has an active premium subscription
         $subStmt = $pdo->prepare("SELECT COUNT(*) FROM subscriptions WHERE tenant_id = ? AND status = 'active' AND expires_at > NOW()");
-        $subStmt->execute([$user['tenant_id']]);
+        $subStmt->execute([$payload->tenant_id]);
         $hasActiveSub = $subStmt->fetchColumn() > 0;
         
         $user['is_premium'] = $hasActiveSub;
+        $user['tenant_id'] = $payload->tenant_id; // Add tenant_id to user object for frontend
 
         echo json_encode(["user" => $user]); // Standardized response
     } else {

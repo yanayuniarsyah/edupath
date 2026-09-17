@@ -28,18 +28,20 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Client-supplied tenant_id is NEVER read or trusted.
     // -----------------------------------------------------------------------
 
-    // 1. Fetch authenticated student including tenant_id & affiliate referral
-    $stmt = $pdo->prepare("SELECT id, name, email, phone, tenant_id, referred_by FROM students WHERE id = ?");
-    $stmt->execute([$payload->id]);
-    $student = $stmt->fetch();
-
-    if (!$student) {
-        http_response_code(403);
-        echo json_encode(["error" => "Student tidak ditemukan"]);
-        exit;
-    }
-
-    $student_tenant_id = $student['tenant_id'] ?? null;
+      // 1. Fetch authenticated student
+      $stmt = $pdo->prepare("SELECT id, name, email, phone FROM students WHERE id = ?");
+      $stmt->execute([$payload->id]);
+      $student = $stmt->fetch();
+  
+      if (!$student) {
+          http_response_code(404);
+          echo json_encode(["error" => "Student tidak ditemukan"]);
+          exit;
+      }
+      
+      // Get tenant_id from JWT token (provided by login)
+      $student_tenant_id = $payload->tenant_id ?? null;
+      $referred_by = null;
     if (empty($student_tenant_id)) {
         http_response_code(403);
         echo json_encode(["error" => "Student tidak memiliki tenant yang valid"]);
@@ -141,7 +143,7 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             return substr($b,0,8).'-'.substr($b,8,4).'-'.substr($b,12,4).'-'.substr($b,16,4).'-'.substr($b,20,12);
         };
 
-        $affiliate_id = $student['referred_by'] ?? null;
+        $affiliate_id = $referred_by;
 
         // Pricing snapshot for historical immutability
         $pricing_snapshot = json_encode([
