@@ -253,8 +253,10 @@ export default {
   updateAdminPlan(id, data)  { return apiFetch('/admin.php?action=plans', { method: 'PUT', body: JSON.stringify({ id, ...data }) }); },
   deleteAdminPlan(id)        { return apiFetch(`/admin.php?action=plans&id=${id}`, { method: 'DELETE' }); },
   getEntitlementsDictionary() { return apiFetch('/admin.php?action=entitlements_dictionary'); },
-  getAdminAffiliates()       { return apiFetch('/admin.php?action=affiliates'); },
+  getAdminAffiliates()       { return apiFetch('/admin_affiliate.php'); },
   getAdminCommissions()      { return apiFetch('/admin.php?action=commissions'); },
+  getAdminPayouts()          { return apiFetch('/admin_affiliate.php?action=payouts'); },
+  approvePayout(id)          { return apiFetch('/admin_affiliate.php', { method: 'POST', body: JSON.stringify({ action: 'approve_payout', payout_id: id }) }); },
   payoutCommission(id, ref)  { return apiFetch('/admin.php?action=payout_commission', { method: 'POST', body: JSON.stringify({ commission_id: id, payout_reference: ref }) }); },
 
   // ── Password Reset ──

@@ -142,15 +142,30 @@ async function joinAffiliate(token) {
 function updateDashboardUI(data) {
     // Update Stats
     document.getElementById('stat-total-referrals').textContent = data.stats.total_referrals;
-    // Asumsi rujukan aktif = total rujukan di API saat ini (karena blm ada kolom active di db)
-    document.getElementById('stat-active-referrals').textContent = data.stats.total_referrals;
+    document.getElementById('stat-active-referrals').textContent = data.stats.total_referrals; // Using total as active for now
     document.getElementById('stat-pending-commission').textContent = formatRupiah(data.stats.total_pending);
     document.getElementById('stat-paid-commission').textContent = formatRupiah(data.stats.total_paid);
+
+    // Show payout button if pending > 50000
+    const payoutBtn = document.getElementById('btn-request-payout');
+    if (data.stats.total_pending >= 50000) {
+        payoutBtn.classList.remove('hidden');
+        payoutBtn.textContent = `Tarik Saldo (${formatRupiah(data.stats.total_pending)})`;
+    } else {
+        payoutBtn.classList.add('hidden');
+    }
+
+    // Populate bank info
+    if (data.bank_info) {
+        document.getElementById('bank-name').value = data.bank_info.bank_name || '';
+        document.getElementById('bank-account').value = data.bank_info.bank_account || '';
+        document.getElementById('bank-owner').value = data.bank_info.bank_owner || '';
+    }
 
     // Update Links & Code
     const baseUrl = window.location.origin;
     const refCode = data.referral_code || "KODE-ERROR";
-    const refLink = `${baseUrl}/register.html?ref=${refCode}`; // Sesuaikan dengan route register yang ada
+    const refLink = `${baseUrl}/register.html?ref=${refCode}`; 
     
     document.getElementById('referral-link').value = refLink;
     document.getElementById('referral-code').textContent = refCode;
@@ -166,25 +181,122 @@ function updateDashboardUI(data) {
                 statusBadge = '<span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-md">Berhasil</span>';
             } else if (item.status === 'pending') {
                 statusBadge = '<span class="px-2 py-1 bg-amber-500/20 text-amber-400 text-xs rounded-md">Pending</span>';
+            } else if (item.status === 'requested') {
+                statusBadge = '<span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-md">Diproses</span>';
             } else {
                 statusBadge = `<span class="px-2 py-1 bg-slate-500/20 text-slate-400 text-xs rounded-md">${item.status}</span>`;
             }
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="py-3 px-4">${date}</td>
-                <td class="py-3 px-4">Komisi Referral</td>
-                <td class="py-3 px-4 text-right font-medium text-emerald-400">+${formatRupiah(item.amount)}</td>
-                <td class="py-3 px-4 text-center">${statusBadge}</td>
+                <td class="py-4 px-4 border-b border-slate-800/50">${date}</td>
+                <td class="py-4 px-4 border-b border-slate-800/50">Komisi Referral</td>
+                <td class="py-4 px-4 border-b border-slate-800/50 text-right font-medium text-emerald-400">+${formatRupiah(item.amount)}</td>
+                <td class="py-4 px-4 border-b border-slate-800/50 text-center">${statusBadge}</td>
             `;
             tbodyKomisi.appendChild(tr);
         });
     } else {
-        tbodyKomisi.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-500">Belum ada riwayat komisi.</td></tr>`;
+        tbodyKomisi.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-slate-500">Belum ada riwayat komisi.</td></tr>`;
     }
 
-    // Untuk tabel rujukan, api saat ini belum mengembalikan list user yg dirujuk, kita beri dummy jika kosong
-    renderDummyReferrals();
+    // Update Daftar Rujukan
+    const tbodyRujukan = document.getElementById('referrals-table-body');
+    if (data.referrals && data.referrals.length > 0) {
+        tbodyRujukan.innerHTML = '';
+        data.referrals.forEach(item => {
+            const date = new Date(item.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+            const statusBadge = item.plan && item.plan !== 'free' 
+                ? '<span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-md">Premium</span>'
+                : '<span class="px-2 py-1 bg-slate-500/20 text-slate-400 text-xs rounded-md">Free Trial</span>';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="py-4 px-4 border-b border-slate-800/50">${date}</td>
+                <td class="py-4 px-4 border-b border-slate-800/50 font-medium">${item.name}</td>
+                <td class="py-4 px-4 border-b border-slate-800/50 text-slate-400">${item.school || '-'}</td>
+                <td class="py-4 px-4 border-b border-slate-800/50 text-slate-400">${item.plan || 'Free'}</td>
+                <td class="py-4 px-4 border-b border-slate-800/50 text-center">${statusBadge}</td>
+            `;
+            tbodyRujukan.appendChild(tr);
+        });
+    } else {
+        tbodyRujukan.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-slate-500">Belum ada siswa yang mendaftar melalui rujukan Anda.</td></tr>`;
+    }
+}
+
+async function saveBankInfo() {
+    const btn = document.getElementById('btn-save-bank');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Menyimpan...';
+    btn.disabled = true;
+
+    try {
+        const response = await fetch('/api/affiliate.php', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'update_bank',
+                bank_name: document.getElementById('bank-name').value,
+                bank_account: document.getElementById('bank-account').value,
+                bank_owner: document.getElementById('bank-owner').value
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            showToast("Informasi rekening berhasil disimpan!");
+        } else {
+            showToast("Gagal menyimpan: " + (data.error || "Terjadi kesalahan"));
+        }
+    } catch (e) {
+        showToast("Terjadi kesalahan sistem.");
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+async function requestPayout() {
+    if (!confirm("Apakah Anda yakin ingin menarik seluruh saldo komisi pending Anda?")) return;
+    
+    const btn = document.getElementById('btn-request-payout');
+    btn.disabled = true;
+    btn.textContent = 'Memproses...';
+
+    // Get amount from text (quick hack)
+    const pendingText = document.getElementById('stat-pending-commission').textContent.replace(/[^0-9]/g, '');
+    const amount = parseInt(pendingText) || 0;
+
+    try {
+        const response = await fetch('/api/affiliate.php', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'request_payout',
+                amount: amount
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            showToast("Permintaan pencairan berhasil dikirim!");
+            // Reload data
+            fetchAffiliateData(localStorage.getItem('token'));
+        } else {
+            showToast("Gagal menarik saldo: " + (data.error || "Terjadi kesalahan"));
+            btn.disabled = false;
+        }
+    } catch (e) {
+        showToast("Terjadi kesalahan sistem saat menarik saldo.");
+        btn.disabled = false;
+    }
 }
 
 function initDashboardWithDummyData() {
@@ -197,7 +309,16 @@ function initDashboardWithDummyData() {
     document.getElementById('referral-link').value = "https://edupath.biz.id/register?ref=EP-2026-X";
     document.getElementById('referral-code').textContent = "EP-2026-X";
 
-    renderDummyReferrals();
+    const tbodyRujukan = document.getElementById('referrals-table-body');
+    tbodyRujukan.innerHTML = `
+        <tr>
+            <td class="py-4 px-4 border-b border-slate-800/50">12 Sep 2026</td>
+            <td class="py-4 px-4 border-b border-slate-800/50 font-medium">Budi Santoso</td>
+            <td class="py-4 px-4 border-b border-slate-800/50 text-slate-400">SMAN 1 Bandung</td>
+            <td class="py-4 px-4 border-b border-slate-800/50 text-slate-400">Intensif UTBK</td>
+            <td class="py-4 px-4 border-b border-slate-800/50 text-center"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-md">Premium</span></td>
+        </tr>
+    `;
 
     const tbodyKomisi = document.getElementById('commissions-table-body');
     tbodyKomisi.innerHTML = `

@@ -478,6 +478,60 @@
             <h2 class="text-xl font-black text-slate-800">Afiliasi & Komisi</h2>
           </div>
 
+          <!-- Payouts List -->
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+            <div class="p-4 border-b border-slate-100 bg-amber-50 flex justify-between items-center">
+              <h3 class="font-bold text-amber-800 text-sm">Permintaan Pencairan Dana (Payout)</h3>
+              <button @click="loadAdminPayouts" class="text-amber-600 hover:text-amber-700 text-xs font-bold flex items-center gap-1">
+                <i class="ph-bold ph-arrows-clockwise" :class="{'animate-spin': isLoadingPayouts}"></i> Refresh
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="bg-slate-50/50 text-slate-500 border-b border-slate-100">
+                    <th class="py-3 px-4 text-left font-bold">Mitra</th>
+                    <th class="py-3 px-4 text-left font-bold">Rekening Bank</th>
+                    <th class="py-3 px-4 text-left font-bold">Nominal (Rp)</th>
+                    <th class="py-3 px-4 text-left font-bold">Status</th>
+                    <th class="py-3 px-4 text-right font-bold">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="isLoadingPayouts">
+                    <td colspan="5" class="py-8 text-center text-slate-400 font-medium">Memuat data payout...</td>
+                  </tr>
+                  <tr v-else-if="payoutsList.length === 0">
+                    <td colspan="5" class="py-8 text-center text-slate-400 font-medium">Belum ada permintaan pencairan</td>
+                  </tr>
+                  <tr v-for="pay in payoutsList" :key="pay.id" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td class="py-3 px-4">
+                      <div class="font-bold text-slate-700">{{ pay.affiliate_name }}</div>
+                      <div class="font-mono text-[10px] text-indigo-600 font-bold">{{ pay.referral_code }}</div>
+                    </td>
+                    <td class="py-3 px-4">
+                      <div class="font-bold text-slate-800">{{ pay.bank_name }} - {{ pay.bank_account }}</div>
+                      <div class="text-[10px] text-slate-500">A.n {{ pay.bank_owner }}</div>
+                    </td>
+                    <td class="py-3 px-4 font-mono font-bold text-slate-800">
+                      {{ formatCurrency(pay.amount) }}
+                    </td>
+                    <td class="py-3 px-4">
+                      <span :class="['px-2 py-1 rounded-md text-[10px] font-bold uppercase', pay.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700']">
+                        {{ pay.status }}
+                      </span>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                      <button v-if="pay.status === 'pending'" @click="approvePayoutReq(pay.id)" class="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 ml-auto w-32">
+                        <i class="ph-bold ph-check-circle"></i> Tandai Ditransfer
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <!-- Affiliates List -->
           <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
             <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
@@ -1326,8 +1380,10 @@ const entitlementsDict = ref([]);
 // ── Affiliates & Commissions ──
 const affiliatesList = ref([]);
 const commissionsList = ref([]);
+const payoutsList = ref([]);
 const isLoadingAffiliates = ref(false);
 const isLoadingCommissions = ref(false);
+const isLoadingPayouts = ref(false);
 
 const loadAdminAffiliates = async () => {
   isLoadingAffiliates.value = true;
@@ -1348,6 +1404,27 @@ const loadAdminCommissions = async () => {
     alert('Gagal memuat daftar komisi');
   } finally {
     isLoadingCommissions.value = false;
+  }
+};
+
+const loadAdminPayouts = async () => {
+  isLoadingPayouts.value = true;
+  try {
+    payoutsList.value = await api.getAdminPayouts();
+  } catch (err) {
+    alert('Gagal memuat daftar payout');
+  } finally {
+    isLoadingPayouts.value = false;
+  }
+};
+
+const approvePayoutReq = async (id) => {
+  if (!confirm("Tandai payout ini sebagai 'Telah Ditransfer'?")) return;
+  try {
+    await api.approvePayout(id);
+    loadAdminPayouts();
+  } catch (err) {
+    alert(err.message || 'Gagal memproses payout');
   }
 };
 
@@ -1388,6 +1465,7 @@ watch(activeTab, (newTab) => {
   if (newTab === 'affiliates') {
     loadAdminAffiliates();
     loadAdminCommissions();
+    loadAdminPayouts();
   }
 });
 

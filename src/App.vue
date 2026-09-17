@@ -3851,7 +3851,8 @@ export default {
         if (isLoginMode.value) {
           res = await api.login(authForm.value.email, authForm.value.password);
         } else {
-          res = await api.register(authForm.value);
+          const payload = { ...authForm.value, referral_code: localStorage.getItem('affiliate_ref') || '' };
+          res = await api.register(payload);
         }
         localStorage.setItem('auth_token', res.token);
         currentUser.value = res.user;

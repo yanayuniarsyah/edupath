@@ -44,19 +44,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt->execute([$affiliate_id]);
     $history = $stmt->fetchAll();
     
+    // Get referrals list
+    $stmt = $pdo->prepare("SELECT name, school, plan, created_at FROM students WHERE referred_by = ? ORDER BY created_at DESC");
+    $stmt->execute([$affiliate_id]);
+    $referrals = $stmt->fetchAll();
+    
     echo json_encode([
         "status" => "joined",
         "referral_code" => $affiliate['referral_code'],
         "commission_rate" => $affiliate['commission_rate'],
+        "bank_info" => [
+            "bank_name" => $affiliate['bank_name'],
+            "bank_account" => $affiliate['bank_account'],
+            "bank_owner" => $affiliate['bank_owner']
+        ],
         "stats" => [
             "total_referrals" => (int)$total_referrals,
             "total_paid" => (float)$total_paid,
             "total_pending" => (float)$total_pending
         ],
-        "history" => $history
+        "history" => $history,
+        "referrals" => $referrals
     ]);
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Join affiliate program
+    $input = json_decode(file_get_contents('php://input'), true);
+    $action = $input['action'] ?? '';
+
+    if ($action === 'update_bank') {
+        $bank_name = $input['bank_name'] ?? '';
+        $bank_account = $input['bank_account'] ?? '';
+        $bank_owner = $input['bank_owner'] ?? '';
+        
+        $stmt = $pdo->prepare("UPDATE affiliates SET bank_name = ?, bank_account = ?, bank_owner = ? WHERE user_id = ? AND tenant_id = ?");
+        $stmt->execute([$bank_name, $bank_account, $bank_owner, $user_id, $tenant_id]);
+        
+        echo json_encode(["success" => true]);
+        exit;
+    }
+    
+    if ($action === 'request_payout') {
+        $amount = (float)($input['amount'] ?? 0);
+        
+        $stmt = $pdo->prepare("SELECT id, bank_name, bank_account, bank_owner FROM affiliates WHERE user_id = ? AND tenant_id = ?");
+        $stmt->execute([$user_id, $tenant_id]);
+        $aff = $stmt->fetch();
+        
+        if (!$aff) {
+            http_response_code(400); echo json_encode(["error" => "Affiliate not found"]); exit;
+        }
+        
+        // Check pending balance
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM commissions WHERE affiliate_id = ? AND status = 'pending'");
+        $stmt->execute([$aff['id']]);
+        $pending = (float)$stmt->fetchColumn();
+        
+        if ($amount < 50000 || $amount > $pending) {
+            http_response_code(400); echo json_encode(["error" => "Invalid amount or insufficient balance"]); exit;
+        }
+        
+        $payout_id = bin2hex(random_bytes(16));
+        $payout_id = substr($payout_id,0,8).'-'.substr($payout_id,8,4).'-'.substr($payout_id,12,4).'-'.substr($payout_id,16,4).'-'.substr($payout_id,20,12);
+        
+        $pdo->beginTransaction();
+        try {
+            // Create payout request
+            $stmt = $pdo->prepare("INSERT INTO payouts (id, affiliate_id, amount, status, bank_name, bank_account, bank_owner) VALUES (?, ?, ?, 'pending', ?, ?, ?)");
+            $stmt->execute([$payout_id, $aff['id'], $amount, $aff['bank_name'], $aff['bank_account'], $aff['bank_owner']]);
+            
+            // Mark commissions as requested (deduct pending)
+            // Wait, if we mark them requested, they are no longer pending.
+            $stmt = $pdo->prepare("UPDATE commissions SET status = 'requested' WHERE affiliate_id = ? AND status = 'pending'");
+            $stmt->execute([$aff['id']]);
+            
+            $pdo->commit();
+            echo json_encode(["success" => true]);
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            http_response_code(500); echo json_encode(["error" => "Failed to request payout"]);
+        }
+        exit;
+    }
+
+    // Join affiliate program (default POST action)
     $stmt = $pdo->prepare("SELECT id FROM affiliates WHERE user_id = ? AND tenant_id = ?");
     $stmt->execute([$user_id, $tenant_id]);
     if ($stmt->fetch()) {
@@ -83,7 +152,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $commission_rate = 20.00; // Default 20%
     
     // Bank info
-    $input = json_decode(file_get_contents('php://input'), true);
     $bank_name = $input['bank_name'] ?? null;
     $bank_account = $input['bank_account'] ?? null;
     $bank_owner = $input['bank_owner'] ?? null;
