@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Cek status login
-    const token = localStorage.getItem('token');
+    // Cek status login (mendukung localStorage dari affiliate.js atau sessionStorage dari main app)
+    const token = localStorage.getItem('token') || sessionStorage.getItem('ep_session_token');
     const userString = localStorage.getItem('user');
     
-    if (!token || !userString) {
+    if (!token) {
         // Jika tidak ada sesi, arahkan ke index/login (di sini disesuaikan)
         // window.location.href = 'index.html';
         console.warn("Tidak ada token ditemukan. Anda mungkin perlu login.");
@@ -126,8 +126,10 @@ async function joinAffiliate(token) {
         const response = await fetch('/api/affiliate.php', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`
-            }
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action: 'join' })
         });
         const data = await response.json();
         if (data.success) {

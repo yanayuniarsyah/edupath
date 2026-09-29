@@ -66,12 +66,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error("Gagal join afiliasi otomatis, bisa diabaikan atau ditangani di dashboard");
                 }
 
-                // Simpan token ke localStorage
+                // Simpan token ke localStorage & sessionStorage (untuk kompatibilitas)
                 localStorage.setItem('token', token);
+                sessionStorage.setItem('ep_session_token', token);
                 localStorage.setItem('user', JSON.stringify(regData.user));
 
-                alert('Pendaftaran berhasil! Anda akan diarahkan ke Dashboard Affiliate.');
-                window.location.href = 'affiliate_dashboard.html';
+                // Tampilkan pesan sukses dan delay redirect
+                const btn = document.getElementById('btn-register-submit');
+                btn.textContent = 'Berhasil! Mengalihkan...';
+                btn.classList.add('bg-green-500');
+                
+                // Coba gunakan fungsi showToast jika ada di halaman, jika tidak gunakan alert
+                if (typeof showToast === 'function') {
+                    showToast('Pendaftaran berhasil! Anda akan diarahkan ke Dashboard Affiliate.');
+                } else {
+                    alert('Pendaftaran berhasil! Anda akan diarahkan ke Dashboard Affiliate.');
+                }
+
+                setTimeout(() => {
+                    window.location.href = 'affiliate_dashboard.html';
+                }, 2000);
 
             } catch (err) {
                 alert('Pendaftaran gagal: ' + err.message);
@@ -109,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 localStorage.setItem('token', resData.token);
+                sessionStorage.setItem('ep_session_token', resData.token);
                 localStorage.setItem('user', JSON.stringify(resData.user));
 
                 window.location.href = 'affiliate_dashboard.html';

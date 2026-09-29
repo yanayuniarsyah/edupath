@@ -26,6 +26,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     $affiliate_id = $affiliate['id'];
     
+    // Auto-generate referral code if missing
+    if (empty($affiliate['referral_code'])) {
+        $stmt = $pdo->prepare("SELECT name FROM students WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$user_id, $tenant_id]);
+        $student = $stmt->fetch();
+        $name = $student ? $student['name'] : 'USER';
+        
+        $clean_name = preg_replace('/[^a-zA-Z0-9]/', '', strtoupper($name));
+        $base_code = substr($clean_name, 0, 5);
+        $random_suffix = substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 4);
+        $new_code = $base_code . $random_suffix;
+        
+        $pdo->prepare("UPDATE affiliates SET referral_code = ? WHERE id = ?")->execute([$new_code, $affiliate_id]);
+        $affiliate['referral_code'] = $new_code;
+    }
+    
     // Get Stats
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM students WHERE referred_by = ?");
     $stmt->execute([$affiliate_id]);
@@ -68,6 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     ]);
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($input)) {
+        $input = [];
+    }
     $action = $input['action'] ?? '';
 
     if ($action === 'update_bank') {
@@ -135,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     
     // Get student name to create referral code
-    $stmt = $pdo->prepare("SELECT name FROM students WHERE user_id = ? AND tenant_id = ?");
+    $stmt = $pdo->prepare("SELECT name FROM students WHERE id = ? AND tenant_id = ?");
     $stmt->execute([$user_id, $tenant_id]);
     $student = $stmt->fetch();
     $name = $student ? $student['name'] : 'USER';
@@ -156,6 +175,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $bank_account = $input['bank_account'] ?? null;
     $bank_owner = $input['bank_owner'] ?? null;
     
+    try {
+        $pdo->exec("ALTER TABLE affiliates ADD COLUMN bank_name VARCHAR(50) NULL");
+        $pdo->exec("ALTER TABLE affiliates ADD COLUMN bank_account VARCHAR(50) NULL");
+        $pdo->exec("ALTER TABLE affiliates ADD COLUMN bank_owner VARCHAR(100) NULL");
+    } catch (Exception $e) {
+        // Abaikan jika kolom sudah ada
+    }
+
     try {
         $stmt = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate, bank_name, bank_account, bank_owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$id, $user_id, $tenant_id, $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner]);
