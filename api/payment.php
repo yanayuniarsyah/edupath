@@ -472,10 +472,11 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $pdo->prepare("INSERT INTO subscriptions
                       (id, tenant_id, student_id, plan_id, status, payment_reference, expires_at, plan_name_snapshot)
-                    VALUES (?, ?, NULL, ?, 'active', ?, ?, ?)")
+                    VALUES (?, ?, ?, ?, 'active', ?, ?, ?)")
                     ->execute([
                         $subscription_id,
                         $order['tenant_id'],      // tenant from order
+                        $order['student_id'],     // student owner
                         $order['plan_id'],
                         $order['id'],          // payment_reference
                         $expires_at,
@@ -509,7 +510,7 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     $pdo->prepare("
                         INSERT INTO entitlements
                           (id, tenant_id, student_id, feature_key, subscription_id, expires_at)
-                        VALUES (?, ?, NULL, ?, ?, ?)
+                        VALUES (?, ?, ?, ?, ?, ?)
                         ON DUPLICATE KEY UPDATE
                           subscription_id = VALUES(subscription_id),
                           expires_at      = VALUES(expires_at),
@@ -517,6 +518,7 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     ")->execute([
                         $ent_id,
                         $order['tenant_id'],      // tenant from order
+                        $order['student_id'],     // student owner
                         $feature_key,
                         $subscription_id,
                         $expires_at,
@@ -547,8 +549,8 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         ]);
                     } else {
                         // Check if this is a first transaction or renewal
-                        $stmt_first = $pdo->prepare("SELECT id FROM orders WHERE student_id = ? AND tenant_id = ? AND status = 'paid' AND id != ? LIMIT 1");
-                        $stmt_first->execute([$order['student_id'], $order['tenant_id'], $order['id']]);
+                        $stmt_first = $pdo->prepare("SELECT id FROM orders WHERE student_id = ? AND status = 'paid' AND id != ? LIMIT 1");
+                        $stmt_first->execute([$order['student_id'], $order['id']]);
                         $is_renewal = (bool) $stmt_first->fetch();
 
                         // Business rule: 20% first transaction, 10% renewal

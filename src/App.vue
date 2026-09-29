@@ -258,10 +258,10 @@
       <!-- Main Panel content wrap -->
       <div class="flex-grow relative">
         <!-- TAB 0: LANDING PAGE -->
-        <section v-if="currentTab === 'home'" id="landing-top" class="animate-fade-in space-y-16 sm:space-y-24 pt-20 md:pt-24 pb-16 relative w-full">
+        <section v-if="currentTab === 'home'" id="landing-top" class="animate-fade-in pt-20 md:pt-24 pb-16 relative w-full">
           
           <!-- Hero Section -->
-          <div class="hero-bg -mt-20 md:-mt-24 min-h-[85vh] sm:min-h-[90vh] md:min-h-screen flex flex-col justify-end pt-40 sm:pt-32 pb-6 md:pb-10 relative z-0 overflow-hidden">
+          <div class="hero-bg -mt-20 md:-mt-24 min-h-[100vh] md:min-h-[115vh] flex flex-col justify-end pt-[280px] md:pt-[380px] pb-20 md:pb-32 relative z-0 overflow-hidden">
             <!-- Inner container: TERIKAT ke viewport -->
             <div class="w-full max-w-4xl mx-auto px-5 sm:px-8 text-center space-y-4" style="box-sizing: border-box;">
 
@@ -365,7 +365,7 @@
 
 
 
-          <div id="problems" class="space-y-20 scroll-mt-24">
+          <div id="problems" class="section-wrapper space-y-20 scroll-mt-24">
             <!-- Section Heading -->
             <div class="text-center max-w-3xl mx-auto space-y-4 reveal">
               <span class="text-white/40 text-sm font-bold uppercase tracking-widest block">TANTANGAN NYATA</span>
@@ -417,10 +417,12 @@
 
 
           <!-- STUDENT POTENTIAL PATH (SPP) SECTION -->
-          <StudentPotentialPath @take-readiness="handleTakeReadinessFromSpp" />
+          <div class="section-wrapper">
+            <StudentPotentialPath @take-readiness="handleTakeReadinessFromSpp" />
+          </div>
 
           <!-- 3. Dynamic Section: KALKULATOR PREDIKSI SKOR & PELUANG LOLOS PTN AI -->
-          <div id="calculator" class="space-y-12 scroll-mt-24 relative">
+          <div id="calculator" class="section-wrapper space-y-12 scroll-mt-24 relative">
             <div class="text-center max-w-3xl mx-auto space-y-3 reveal">
               <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#c0ff00]/30 bg-[#c0ff00]/10 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
                 🎯 SIMULASI INTERAKTIF AI
@@ -587,7 +589,7 @@
           </div>
 
           <!-- 4. Dynamic Section: MINI KUIS HOTS INTERAKTIF LANGSUNG DI LANDING PAGE -->
-          <div id="quiz-demo" class="space-y-12 scroll-mt-24 relative">
+          <div id="quiz-demo" class="section-wrapper space-y-12 scroll-mt-24 relative">
             <div class="text-center max-w-3xl mx-auto space-y-3 reveal">
               <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-sky-500/30 bg-sky-500/10 text-sky-400 text-xs font-black uppercase tracking-widest">
                 🧪 UJI DIAGNOSTIK INSTAN
@@ -696,7 +698,7 @@
           </div>
 
           <!-- 5. Dynamic Section: HEAD-TO-HEAD COMPARISON MATRIX -->
-          <div id="comparison" class="space-y-12 scroll-mt-24 relative">
+          <div id="comparison" class="section-wrapper space-y-12 scroll-mt-24 relative">
             <div class="text-center max-w-4xl mx-auto space-y-3 reveal">
               <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-400 text-xs font-black uppercase tracking-widest">
                 ⚖️ PERBANDINGAN STRATEGIS
@@ -846,9 +848,6 @@
                   >
                     Mulai Jalur Belajar Adaptif ⚡
                   </button>
-                  <p class="text-center text-[11px] text-white/50 font-medium">
-                    ✨ Garansi 7 hari kepuasan belajar tanpa risiko
-                  </p>
                 </div>
               </div>
 
@@ -924,7 +923,7 @@
           </div>
 
           <!-- 6. Solution & Value Proposition -->
-          <div class="relative py-12">
+          <div class="section-wrapper">
             <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl opacity-30 rounded-3xl"></div>
             <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div class="space-y-6">
@@ -982,7 +981,7 @@
           </div>
 
           <!-- 7. Core Benefits -->
-          <div id="benefits" class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center scroll-mt-24">
+          <div id="benefits" class="section-wrapper grid grid-cols-1 lg:grid-cols-5 gap-12 items-center scroll-mt-24">
             <div class="lg:col-span-3 space-y-8">
               <div class="space-y-2">
                 <span class="text-[#c0ff00] text-sm font-bold uppercase tracking-widest block">MANFAAT PLATFORM</span>
@@ -1038,7 +1037,7 @@
           </div>
 
           <!-- 8. Bento Grid Feature Showcase -->
-          <div id="features" class="space-y-12 scroll-mt-24">
+          <div id="features" class="section-wrapper space-y-12 scroll-mt-24">
             <div class="text-center max-w-xl mx-auto space-y-2 reveal">
               <span class="text-[#c0ff00] text-sm font-bold uppercase tracking-widest block">ETALASE FITUR</span>
               <h2 class="text-4xl md:text-6xl font-black font-heading text-white">Alat Tempur <span class="text-[#c0ff00]">Terlengkap</span></h2>
@@ -1129,7 +1128,7 @@
           </div>
 
           <!-- 9. Dynamic Section: FILTERABLE TESTIMONIALS -->
-          <div id="testimonials" class="space-y-12 scroll-mt-24">
+          <div id="testimonials" class="section-wrapper space-y-12 scroll-mt-24">
             <div class="text-center max-w-xl mx-auto space-y-2 reveal">
               <span class="text-[#c0ff00] text-sm font-bold uppercase tracking-widest block">FEEDBACK PENGGUNA AWAL</span>
               <h2 class="text-4xl md:text-6xl font-black font-heading text-white">Apa Kata Pengguna Beta EduPath</h2>
@@ -1206,7 +1205,7 @@
           </div>
 
           <!-- 10. Demonstration / Product Preview -->
-          <div id="preview" class="space-y-12 scroll-mt-24 relative overflow-visible">
+          <div id="preview" class="section-wrapper space-y-12 scroll-mt-24 relative overflow-visible">
             <div class="text-center max-w-xl mx-auto space-y-2 reveal">
               <span class="text-[#c0ff00] text-sm font-bold uppercase tracking-widest block">TAMPILAN INTERFACE</span>
               <h2 class="text-4xl md:text-6xl font-black font-heading text-white">Eksplorasi Dashboard</h2>
@@ -1267,7 +1266,7 @@
           </div>
 
           <!-- 11. Dynamic Section: PRICING WITH BILLING TOGGLE -->
-          <div id="pricing" class="space-y-12 scroll-mt-24"><div class="text-center max-w-4xl xl:max-w-5xl mx-auto space-y-4 reveal">
+          <div id="pricing" class="section-wrapper space-y-12 scroll-mt-24"><div class="text-center max-w-4xl xl:max-w-5xl mx-auto space-y-4 reveal">
               <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
                 💎 INVESTASI LEHER KE ATAS • BEBAS RISIKO
               </span>
@@ -1477,10 +1476,6 @@
                       <i class="ph-bold ph-star text-purple-400 mt-0.5 shrink-0"></i>
                       <span>Audit Portofolio Belajar &amp; Siasat Prodi Pilihan</span>
                     </li>
-                    <li class="flex items-start gap-2.5">
-                      <i class="ph-bold ph-shield-check text-[#c0ff00] mt-0.5 shrink-0 text-base"></i>
-                      <span><strong>Garansi 7 Hari Kepuasan Belajar &amp; Akses Penuh Mentor</strong></span>
-                    </li>
                   </ul>
                 </div>
 
@@ -1496,12 +1491,8 @@
 
             </div>
 
-            <!-- Risk Reversal & Trust Strip -->
-            <div class="max-w-4xl mx-auto pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <button @click="showDisclaimerModal = true" class="flex items-center justify-center gap-2 text-xs font-bold text-white/70 hover:text-white transition-colors cursor-pointer">
-                <i class="ph-bold ph-shield-check text-[#c0ff00] text-lg"></i>
-                <span>Garansi 7 Hari Kepuasan Belajar</span>
-              </button>
+            <!-- Trust Strip -->
+            <div class="max-w-4xl mx-auto pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
               <div class="flex items-center justify-center gap-2 text-xs font-bold text-white/70">
                 <i class="ph-bold ph-credit-card text-[#c0ff00] text-lg"></i>
                 <span>QRIS, Transfer Bank, E-Wallet Resmi</span>
@@ -1514,7 +1505,7 @@
           </div>
 
           <!-- 12. FAQ -->
-          <div id="faq" class="space-y-12 max-w-3xl mx-auto scroll-mt-24">
+          <div id="faq" class="section-wrapper space-y-12 scroll-mt-24">
             <div class="text-center max-w-xl mx-auto space-y-2">
               <span class="text-[#c0ff00] text-sm font-bold uppercase tracking-widest block">PERTANYAAN UMUM</span>
               <h2 class="text-3xl md:text-5xl font-bold font-heading text-white">Masih Ragu?</h2>
@@ -1534,7 +1525,7 @@
           </div>
 
           <!-- Affiliate Section (Merged from affiliate.html) -->
-          <div id="affiliate-section" class="scroll-mt-24 space-y-12 pb-24">
+          <div id="affiliate-section" class="section-wrapper scroll-mt-24 space-y-12 pb-24">
             <!-- Hero -->
             <section class="glass-panel rounded-3xl p-6 sm:p-12 relative overflow-hidden border border-amber-500/20 text-center space-y-6">
               <div class="absolute -right-20 -top-20 w-80 h-80 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
@@ -1625,7 +1616,8 @@
 
 
           <!-- 13. Final CTA — SAMPLE style -->
-          <div class="text-center py-20 rounded-3xl p-8 space-y-6 max-w-4xl mx-auto relative overflow-hidden" style="background: #121212; border: 1px solid rgba(255,255,255,0.08);">
+          <div class="section-wrapper">
+          <div class="text-center py-20 rounded-3xl p-8 space-y-6 relative overflow-hidden" style="background: #121212; border: 1px solid rgba(255,255,255,0.08);">
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div class="w-80 h-80 rounded-full" style="background: radial-gradient(circle, rgba(192,255,0,0.15) 0%, transparent 70%);"></div>
             </div>
@@ -1645,9 +1637,11 @@
               </button>
             </div>
           </div>
+          </div><!-- /section-wrapper CTA -->
 
           <!-- 14. Footer -->
           <footer class="border-t border-white/10 pt-12 pb-8 text-sm text-white/50 font-medium">
+            <div class="section-wrapper">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10 text-left">
               
               <!-- Col 1: Brand & Company Entity -->
@@ -1747,6 +1741,7 @@
                 <button @click="showContactModal = true" class="text-[#c0ff00] hover:underline font-bold">Detail Kontak Resmi</button>
               </div>
             </div>
+            </div><!-- /section-wrapper -->
           </footer>
 
         </section>
@@ -3121,13 +3116,6 @@
             </h4>
             <p>EduPath adalah platform teknologi pendidikan swasta independen naungan <strong>PT Kreasi Hasanah Indonesia</strong>. Platform ini tidak memiliki afiliasi dinas atau endorsement langsung dari Balai Pengelolaan Pengujian Pendidikan (BP3), Kemendikbudristek, maupun panitia SNPMB.</p>
           </div>
-
-          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
-            <h4 class="text-white font-black text-sm flex items-center gap-2">
-              <span class="text-[#c0ff00]">✦</span> Kebijakan Garansi 7 Hari Kepuasan Belajar
-            </h4>
-            <p>Kami menjamin kepuasan pengalaman belajar. Jika dalam 7 hari pertama Anda merasa platform EduPath tidak memberikan nilai tambah bagi proses belajar Anda, Anda dapat mengajukan refund 100% tanpa kesulitan.</p>
-          </div>
         </div>
 
         <div class="pt-4 border-t border-white/10 flex justify-end">
@@ -4096,7 +4084,7 @@ export default {
       },
       { 
         q: "Apakah EduPath memberikan jaminan kelulusan PTN 100%?", 
-        a: "EduPath adalah platform latihan dan akselerasi belajar adaptif. Kami tidak memberikan klaim kelulusan mutlak karena hasil seleksi nasional resmi bergantung pada performa resmi ujian siswa. Namun kami memberikan Garansi 7 Hari Kepuasan Belajar untuk memastikan Anda mendapatkan platform pembelajaran berkualitas tinggi tanpa risiko.", 
+        a: "EduPath adalah platform latihan dan akselerasi belajar adaptif. Kami tidak memberikan klaim kelulusan mutlak karena hasil seleksi nasional resmi bergantung pada performa resmi ujian siswa.", 
         open: false 
       },
       { 

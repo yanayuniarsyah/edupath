@@ -23,31 +23,22 @@ class EntitlementService {
      * @return bool True jika berhak, false jika tidak
      */
     public function hasEntitlement(string $student_id, string $tenant_id, string $feature_key): bool {
-        // Cek tabel entitlements untuk kepemilikan student ATAU tenant
+        // Cek tabel entitlements untuk kepemilikan student (Strict Ownership)
         $stmt = $this->pdo->prepare("
             SELECT id FROM entitlements 
-            WHERE (student_id = ? OR tenant_id = ?)
+            WHERE student_id = ?
               AND feature_key = ? 
               AND revoked_at IS NULL 
               AND (expires_at IS NULL OR expires_at > NOW())
             LIMIT 1
         ");
-        $stmt->execute([$student_id, $tenant_id, $feature_key]);
+        $stmt->execute([$student_id, $feature_key]);
         
         if ($stmt->fetch()) {
             return true; // Punya entitlement
         }
 
-        // LEGACY COMPATIBILITY: Fallback ke pengecekan `students.plan` jika data belum termigrasi penuh
-        $stmt_legacy = $this->pdo->prepare("SELECT plan FROM students WHERE id = ?");
-        $stmt_legacy->execute([$student_id]);
-        $student = $stmt_legacy->fetch();
-
-        if ($student) {
-            if ($feature_key === 'feature_quiz' && in_array(strtolower($student['plan']), ['pro', 'premium', 'pro annual'])) {
-                return true;
-            }
-        }
+        // LEGACY COMPATIBILITY dihapus: Otorisasi premium harus bersumber dari tabel entitlements, bukan students.plan.
 
         return false;
     }
