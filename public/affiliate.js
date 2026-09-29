@@ -1,98 +1,138 @@
-// public/affiliate.js
-// Premium UI interactions for the Affiliate Landing Page
-
-// Helper: animate numeric counter
-function animateValue(id, start, end, duration) {
-  const element = document.getElementById(id);
-  if (!element) return;
-  const range = end - start;
-  const minTimer = 50;
-  const stepTime = Math.max(Math.floor(duration / Math.abs(range)), minTimer);
-  let startTime = null;
-  function step(timestamp) {
-    if (!startTime) startTime = timestamp;
-    const progress = timestamp - startTime;
-    const value = Math.min(start + Math.floor((progress / duration) * range), end);
-    element.textContent = typeof end === 'number' && id.includes('commission')
-      ? `Rp ${value.toLocaleString('id-ID')}`
-      : value.toLocaleString('id-ID');
-    if (progress < duration) {
-      window.requestAnimationFrame(step);
-    } else {
-      // ensure final value
-      element.textContent = typeof end === 'number' && id.includes('commission')
-        ? `Rp ${end.toLocaleString('id-ID')}`
-        : end.toLocaleString('id-ID');
-    }
-  }
-  window.requestAnimationFrame(step);
-}
-
-// Mock data – in a real app this would be fetched from /api/affiliate-stats.json
-const mockStats = {
-  clicks: 1245,
-  active: 24,
-  commission: 12500000, // 12.5M IDR
-};
-
-function initStats() {
-  animateValue('stats-clicks', 0, mockStats.clicks, 1500);
-  animateValue('stats-active', 0, mockStats.active, 1500);
-  animateValue('stats-commission', 0, mockStats.commission, 2000);
-}
-
-// Smooth scroll for FAQ details expansion (optional enhancement)
-function initFAQ() {
-  const details = document.querySelectorAll('#faq details');
-  details.forEach((d) => {
-    d.addEventListener('toggle', () => {
-      if (d.open) {
-        d.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
-}
-
-// Modal open/close functions for registration form
 function openRegisterModal() {
-  const modal = document.getElementById('register-modal');
-  if (modal) modal.classList.remove('hidden');
+    document.getElementById('register-modal').classList.remove('hidden');
 }
+
 function closeRegisterModal() {
-  const modal = document.getElementById('register-modal');
-  if (modal) modal.classList.add('hidden');
+    document.getElementById('register-modal').classList.add('hidden');
 }
 
-// Registration form submission handler
-function handleRegisterForm(event) {
-  event.preventDefault();
-  const form = event.target;
-  const data = {
-    name: form.name.value,
-    email: form.email.value,
-    whatsapp: form.whatsapp.value,
-  };
-  console.log('Affiliate registration submission:', data);
-  // Placeholder for real API call
-  alert('Terima kasih! Pendaftaran Anda telah diterima.');
-  closeRegisterModal();
+function openUnifiedLoginModal() {
+    document.getElementById('login-modal').classList.remove('hidden');
 }
 
-// Attach submit listener (if element exists when script loads)
-const regForm = document.getElementById('register-form');
-if (regForm) {
-  regForm.addEventListener('submit', handleRegisterForm);
+function closeUnifiedLoginModal() {
+    document.getElementById('login-modal').classList.add('hidden');
 }
 
-
-// Initialize all interactive components once DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  initStats();
-  initFAQ();
-  // Add fade‑in animation to key sections for premium feel
-  const fadeEls = document.querySelectorAll('.animate-fade-in');
-  fadeEls.forEach((el) => {
-    el.classList.add('opacity-0'); // start hidden (Tailwind utility)
-    setTimeout(() => el.classList.remove('opacity-0'), 100); // trigger transition
-  });
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-register-submit');
+            const originalText = btn.textContent;
+            btn.textContent = 'Memproses...';
+            btn.disabled = true;
+
+            const formData = new FormData(registerForm);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                // 1. Daftar sebagai student
+                const regRes = await fetch('/api/auth.php?action=register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: data.name,
+                        email: data.email,
+                        password: data.password,
+                        whatsapp: data.whatsapp,
+                        target_ptn: 'Affiliate Partner'
+                    })
+                });
+
+                const regData = await regRes.json();
+                if (!regRes.ok) {
+                    throw new Error(regData.error || 'Gagal mendaftar');
+                }
+
+                // 2. Jika sukses, token didapat. Gabung program affiliate.
+                const token = regData.token;
+                
+                const joinRes = await fetch('/api/affiliate.php', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        bank_name: data.bank_name,
+                        bank_account: data.bank_account,
+                        bank_owner: data.bank_owner
+                    })
+                });
+
+                if (!joinRes.ok) {
+                    console.error("Gagal join afiliasi otomatis, bisa diabaikan atau ditangani di dashboard");
+                }
+
+                // Simpan token ke localStorage & sessionStorage (untuk kompatibilitas)
+                localStorage.setItem('token', token);
+                sessionStorage.setItem('ep_session_token', token);
+                localStorage.setItem('user', JSON.stringify(regData.user));
+
+                // Tampilkan pesan sukses dan delay redirect
+                const btn = document.getElementById('btn-register-submit');
+                btn.textContent = 'Berhasil! Mengalihkan...';
+                btn.classList.add('bg-green-500');
+                
+                // Coba gunakan fungsi showToast jika ada di halaman, jika tidak gunakan alert
+                if (typeof showToast === 'function') {
+                    showToast('Pendaftaran berhasil! Anda akan diarahkan ke Dashboard Affiliate.');
+                } else {
+                    alert('Pendaftaran berhasil! Anda akan diarahkan ke Dashboard Affiliate.');
+                }
+
+                setTimeout(() => {
+                    window.location.href = 'affiliate_dashboard.html';
+                }, 2000);
+
+            } catch (err) {
+                alert('Pendaftaran gagal: ' + err.message);
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+    }
+
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login-submit');
+            const originalText = btn.textContent;
+            btn.textContent = 'Memproses...';
+            btn.disabled = true;
+
+            const formData = new FormData(loginForm);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch('/api/auth.php?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: data.email,
+                        password: data.password
+                    })
+                });
+
+                const resData = await res.json();
+                if (!res.ok) {
+                    throw new Error(resData.message || resData.error || 'Gagal login');
+                }
+
+                localStorage.setItem('token', resData.token);
+                sessionStorage.setItem('ep_session_token', resData.token);
+                localStorage.setItem('user', JSON.stringify(resData.user));
+
+                window.location.href = 'affiliate_dashboard.html';
+
+            } catch (err) {
+                alert('Login gagal: ' + err.message);
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+    }
 });
