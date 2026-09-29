@@ -261,7 +261,7 @@
         <section v-if="currentTab === 'home'" id="landing-top" class="animate-fade-in pt-20 md:pt-24 pb-16 relative w-full">
           
           <!-- Hero Section -->
-          <div class="hero-bg -mt-20 md:-mt-24 min-h-[100vh] md:min-h-[115vh] flex flex-col justify-end pt-[280px] md:pt-[380px] pb-20 md:pb-32 relative z-0 overflow-hidden">
+          <div class="hero-bg -mt-[80px] md:-mt-[96px] min-h-[100svh] md:min-h-[115vh] flex flex-col justify-end pt-[150px] sm:pt-[200px] md:pt-[280px] lg:pt-[380px] pb-20 md:pb-32 relative z-0 overflow-hidden">
             <!-- Inner container: TERIKAT ke viewport -->
             <div class="w-full max-w-4xl mx-auto px-5 sm:px-8 text-center space-y-4" style="box-sizing: border-box;">
 
