@@ -1770,13 +1770,13 @@
             <div class="glass-card p-6 md:p-8 relative overflow-hidden">
               <div class="absolute top-0 right-0 w-64 h-64 rounded-full opacity-30 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #f59e0b 0%, transparent 70%); transform: translate(30%, -30%);"></div>
               
-              <div class="relative z-10 flex flex-col lg:flex-row gap-8 items-center justify-between">
+              <div class="relative z-10 flex flex-col lg:flex-row gap-4 items-center justify-between">
                 <!-- Promo Text -->
-                <div class="flex-grow space-y-3 w-full lg:w-auto text-center lg:text-left">
+                <div class="flex-grow space-y-1.5 w-full lg:w-auto text-center lg:text-left">
                   <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-black uppercase tracking-widest">
                     <i class="ph-fill ph-crown"></i> EduPath Partner
                   </div>
-                  <h3 class="text-3xl md:text-4xl font-black text-white tracking-tighter">Cetak <span class="text-emerald-400">Pendapatan</span> dari Jejaring Anda.</h3>
+                  <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter">Cetak <span class="text-emerald-400">Pendapatan</span> dari Jejaring Anda.</h3>
                   <p class="text-white/50 text-xs md:text-sm max-w-md mx-auto lg:mx-0">Komisi <span class="text-amber-400 font-bold">{{ affiliateData?.commission_rate || 20 }}%</span> per pengguna aktif baru.</p>
                 </div>
 
@@ -1802,7 +1802,7 @@
                 <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 group-hover:bg-emerald-100 transition-all">
                   <i class="ph-bold ph-users text-xl"></i>
                 </div>
-                <span class="text-2xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.total_referrals || 0 }}</span>
+                <span class="text-xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.total_referrals || 0 }}</span>
                 <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-1">Total Rujukan</span>
               </div>
               <!-- Stat 2 -->
@@ -1810,7 +1810,7 @@
                 <div class="w-10 h-10 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-400 mb-4 group-hover:scale-110 group-hover:bg-sky-100 transition-all">
                   <i class="ph-bold ph-user-check text-xl"></i>
                 </div>
-                <span class="text-2xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.active_referrals || 0 }}</span>
+                <span class="text-xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.active_referrals || 0 }}</span>
                 <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-1">Rujukan Aktif</span>
               </div>
               <!-- Stat 3 -->
@@ -1930,12 +1930,12 @@
         <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-6">
 
           <!-- ✨ Greeting Banner (Light Mode) -->
-          <div class="glass-card p-4 md:p-5 rounded-xl relative overflow-hidden">
+          <div class="glass-card px-4 py-2 md:px-5 md:py-3 rounded-xl relative overflow-hidden">
             <!-- Decorative glow -->
             <div class="absolute top-0 right-0 w-72 h-72 rounded-full opacity-30 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #0ea5e9 0%, transparent 70%); transform: translate(30%, -30%);"></div>
             <div class="absolute bottom-0 left-0 w-48 h-48 rounded-full opacity-20 blur-2xl pointer-events-none" style="background: radial-gradient(circle, #8b5cf6 0%, transparent 70%); transform: translate(-30%, 30%);"></div>
 
-            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-2">
               <!-- Left: Greeting -->
               <div class="space-y-2">
                 <div class="flex items-center gap-2">
@@ -1956,24 +1956,24 @@
               </div>
 
               <!-- Right: Quick Stats -->
-              <div class="flex gap-3 flex-wrap">
-                <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-slate-100 min-w-[80px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                  <span class="text-2xl font-black font-mono text-emerald-400">{{ currentAbilityScore }}</span>
+              <div class="flex gap-2 flex-wrap">
+                <div class="flex flex-col items-center justify-center py-1.5 px-2 rounded-xl bg-white/5 border border-slate-100 min-w-[70px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                  <span class="text-xl font-black font-mono text-emerald-400">{{ currentAbilityScore }}</span>
                   <span class="text-[9px] text-white/60 font-bold uppercase tracking-widest mt-1">Skor Saat Ini</span>
                 </div>
-                <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-slate-100 min-w-[80px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                  <span class="text-2xl font-black font-mono text-sky-400">{{ selectedUniversity.targetScore }}</span>
+                <div class="flex flex-col items-center justify-center py-1.5 px-2 rounded-xl bg-white/5 border border-slate-100 min-w-[70px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                  <span class="text-xl font-black font-mono text-sky-400">{{ selectedUniversity.targetScore }}</span>
                   <span class="text-[9px] text-white/60 font-bold uppercase tracking-widest mt-1">Skor Target</span>
                 </div>
-                <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-slate-100 min-w-[80px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                  <span class="text-2xl font-black font-mono text-amber-400">{{ coins }}</span>
+                <div class="flex flex-col items-center justify-center py-1.5 px-2 rounded-xl bg-white/5 border border-slate-100 min-w-[70px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                  <span class="text-xl font-black font-mono text-amber-400">{{ coins }}</span>
                   <span class="text-[9px] text-white/60 font-bold uppercase tracking-widest mt-1">Koin XP</span>
                 </div>
               </div>
             </div>
 
             <!-- Shortcut Buttons -->
-            <div class="relative z-10 flex flex-wrap gap-3 mt-4 pt-4 border-t border-slate-100">
+            <div class="relative z-10 flex flex-wrap gap-2 mt-2 pt-2 border-t border-slate-100">
               <button @click="handleTabClick('diagnostic')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-black uppercase tracking-wider hover:bg-indigo-100 transition-all hover:scale-105 active:scale-95">
                 <i class="ph-bold ph-exam text-lg"></i>
                 Mulai Tryout
