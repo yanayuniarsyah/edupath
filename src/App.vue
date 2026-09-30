@@ -1,14 +1,14 @@
 <template>
   <div :class="['relative min-h-screen antialiased font-body flex overflow-hidden transition-colors duration-300', 
-    'bg-[#050505] text-white mesh-gradient-bg',
+    (isLoggedIn && currentTab !== 'home') ? 'bg-[#f8fafc] text-slate-900' : 'bg-[#050505] text-white',
     mobileSidebarOpen ? 'mobile-sidebar-open' : ''
   ]">
-    <!-- Ambient Glow (Everywhere) -->
-    <div id="ambient-glow" ref="ambientGlowRef" class="opacity-80"></div>
+    <!-- Ambient Glow (Public only) -->
+    <div v-if="!isLoggedIn" id="ambient-glow" ref="ambientGlowRef" class="opacity-80"></div>
     
-    <!-- Background Blobs & Neural Canvas (Everywhere) -->
-    <div class="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/5 blur-[120px] pointer-events-none z-0 animate-pulse"></div>
-    <div class="fixed bottom-[-20%] left-1/4 w-[600px] h-[600px] rounded-full bg-primary/8 blur-[130px] pointer-events-none z-0" style="animation: float 10s ease-in-out infinite alternate"></div>
+    <!-- Background Blobs & Neural Canvas (Public only) -->
+    <div v-if="!isLoggedIn" class="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/5 blur-[120px] pointer-events-none z-0 animate-pulse"></div>
+    <div v-if="!isLoggedIn" class="fixed bottom-[-20%] left-1/4 w-[600px] h-[600px] rounded-full bg-primary/8 blur-[130px] pointer-events-none z-0" style="animation: float 10s ease-in-out infinite alternate"></div>
     <canvas id="bg-canvas" :style="{ opacity: canvasOpacity }" class="fixed inset-0 w-full h-full z-0 pointer-events-none transition-opacity duration-700"></canvas>
 
 
@@ -1750,13 +1750,13 @@
         <section v-if="currentTab === 'affiliate'" class="animate-fade-in space-y-6">
 
           <!-- Header / Status Area -->
-          <div v-if="affiliateData.status === 'not_joined'" class="bento-item bg-gradient-to-br from-[#0f172a] to-[#050505] p-10 flex flex-col items-center justify-center text-center">
-            <div class="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(16,185,129,0.2)]">
-              <i class="ph-fill ph-hand-coins text-5xl text-emerald-400"></i>
+          <div v-if="affiliateData.status === 'not_joined'" class="modern-stat-card bg-white p-10 flex flex-col items-center justify-center text-center">
+            <div class="w-24 h-24 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(16,185,129,0.2)]">
+              <i class="ph-fill ph-hand-coins text-5xl text-emerald-600"></i>
             </div>
-            <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter mb-4 text-hero-genz">Program Mitra <span class="text-emerald-400">Afiliasi</span></h2>
-            <p class="text-white/60 mb-8 max-w-lg mx-auto font-medium">Dapatkan komisi pasif tanpa batas dengan mereferensikan EduPath kepada siswa lain. Gratis pendaftaran selamanya.</p>
-            <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-8 py-4 rounded-full bg-emerald-500 text-black font-black uppercase tracking-widest text-sm hover:bg-emerald-400 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)]">
+            <h2 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tighter mb-4 text-hero-genz">Program Mitra <span class="text-emerald-600">Afiliasi</span></h2>
+            <p class="text-slate-800/60 mb-8 max-w-lg mx-auto font-medium">Dapatkan komisi pasif tanpa batas dengan mereferensikan EduPath kepada siswa lain. Gratis pendaftaran selamanya.</p>
+            <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-8 py-4 rounded-full bg-emerald-500 text-white font-black uppercase tracking-widest text-sm hover:bg-emerald-400 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)]">
               <span v-if="isJoiningAffiliate" class="flex items-center gap-2 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
               <span v-else>Aktifkan Dashboard Afiliasi</span>
             </button>
@@ -1766,7 +1766,7 @@
           <div v-else class="space-y-6">
             
             <!-- Bento Hero Affiliate -->
-            <div class="bento-item bg-gradient-to-br from-[#0a0f1e] to-[#050811] p-6 md:p-8 relative overflow-hidden">
+            <div class="modern-stat-card bg-white p-6 md:p-8 relative overflow-hidden">
               <div class="absolute top-0 right-0 w-64 h-64 rounded-full opacity-30 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #f59e0b 0%, transparent 70%); transform: translate(30%, -30%);"></div>
               
               <div class="relative z-10 flex flex-col lg:flex-row gap-8 items-center justify-between">
@@ -1775,8 +1775,8 @@
                   <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-black uppercase tracking-widest">
                     <i class="ph-fill ph-crown"></i> EduPath Partner
                   </div>
-                  <h3 class="text-3xl md:text-4xl font-black text-white tracking-tighter">Cetak <span class="text-emerald-400">Pendapatan</span> dari Jejaring Anda.</h3>
-                  <p class="text-white/50 text-xs md:text-sm max-w-md mx-auto lg:mx-0">Komisi <span class="text-amber-400 font-bold">{{ affiliateData?.commission_rate || 20 }}%</span> per pengguna aktif baru.</p>
+                  <h3 class="text-3xl md:text-4xl font-black text-slate-800 tracking-tighter">Cetak <span class="text-emerald-600">Pendapatan</span> dari Jejaring Anda.</h3>
+                  <p class="text-slate-800/50 text-xs md:text-sm max-w-md mx-auto lg:mx-0">Komisi <span class="text-amber-400 font-bold">{{ affiliateData?.commission_rate || 20 }}%</span> per pengguna aktif baru.</p>
                 </div>
 
                 <!-- Link Generator Card -->
@@ -1797,125 +1797,125 @@
             <!-- Stats Grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <!-- Stat 1 -->
-              <div class="bento-item flex flex-col p-5 group hover:border-emerald-500/50">
-                <div class="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
+              <div class="modern-stat-card flex flex-col p-5 group">
+                <div class="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500 mb-4 group-hover:scale-110 group-hover:bg-emerald-100 transition-all">
                   <i class="ph-bold ph-users text-xl"></i>
                 </div>
-                <span class="text-3xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.total_referrals || 0 }}</span>
-                <span class="text-[10px] text-white/40 font-black uppercase tracking-widest mt-1">Total Rujukan</span>
+                <span class="text-3xl font-black font-mono text-slate-800 tracking-tighter">{{ affiliateData?.stats?.total_referrals || 0 }}</span>
+                <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">Total Rujukan</span>
               </div>
               <!-- Stat 2 -->
-              <div class="bento-item flex flex-col p-5 group hover:border-[#0ea5e9]/50">
-                <div class="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-[#0ea5e9] mb-4 group-hover:scale-110 transition-transform">
+              <div class="modern-stat-card flex flex-col p-5 group">
+                <div class="w-10 h-10 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-500 mb-4 group-hover:scale-110 group-hover:bg-sky-100 transition-all">
                   <i class="ph-bold ph-user-check text-xl"></i>
                 </div>
-                <span class="text-3xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.active_referrals || 0 }}</span>
-                <span class="text-[10px] text-white/40 font-black uppercase tracking-widest mt-1">Rujukan Aktif</span>
+                <span class="text-3xl font-black font-mono text-slate-800 tracking-tighter">{{ affiliateData?.stats?.active_referrals || 0 }}</span>
+                <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">Rujukan Aktif</span>
               </div>
               <!-- Stat 3 -->
-              <div class="bento-item flex flex-col p-5 group hover:border-amber-400/50">
-                <div class="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 transition-transform">
+              <div class="modern-stat-card flex flex-col p-5 group">
+                <div class="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500 mb-4 group-hover:scale-110 group-hover:bg-amber-100 transition-all">
                   <i class="ph-bold ph-hourglass-high text-xl"></i>
                 </div>
-                <span class="text-xl md:text-2xl font-black font-mono text-white tracking-tighter">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_pending || 0) }}</span>
-                <span class="text-[10px] text-white/40 font-black uppercase tracking-widest mt-1">Komisi Pending</span>
+                <span class="text-xl md:text-2xl font-black font-mono text-slate-800 tracking-tighter">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_pending || 0) }}</span>
+                <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">Komisi Pending</span>
               </div>
               <!-- Stat 4 -->
-              <div class="bento-item flex flex-col p-5 group hover:border-[#c0ff00]/50 relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-t from-[#c0ff00]/5 to-transparent pointer-events-none"></div>
-                <div class="w-10 h-10 rounded-2xl bg-[#c0ff00]/10 flex items-center justify-center text-[#c0ff00] mb-4 group-hover:scale-110 transition-transform relative z-10">
+              <div class="modern-stat-card flex flex-col p-5 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-t from-indigo-50 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 group-hover:bg-indigo-100 transition-all relative z-10">
                   <i class="ph-bold ph-wallet text-xl"></i>
                 </div>
-                <span class="text-xl md:text-2xl font-black font-mono text-[#c0ff00] tracking-tighter relative z-10 drop-shadow-[0_0_10px_rgba(192,255,0,0.3)]">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_paid || 0) }}</span>
-                <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-1 relative z-10">Komisi Dibayar</span>
+                <span class="text-xl md:text-2xl font-black font-mono text-indigo-600 tracking-tighter relative z-10">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_paid || 0) }}</span>
+                <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1 relative z-10">Komisi Dibayar</span>
               </div>
             </div>
             
             <!-- TAB NAVIGATION -->
-            <div class="mt-8 flex border-b border-white/10 gap-2 sm:gap-6 px-4 overflow-x-auto no-scrollbar">
-              <button @click="activeAffiliateTab = 'rujukan'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'rujukan' ? 'border-emerald-400 text-emerald-400' : 'border-transparent text-white/80 hover:text-white hover:border-white/30'">
+            <div class="mt-8 flex border-b border-slate-200 gap-2 sm:gap-6 px-4 overflow-x-auto no-scrollbar">
+              <button @click="activeAffiliateTab = 'rujukan'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'rujukan' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'">
                 Daftar Rujukan
               </button>
-              <button @click="activeAffiliateTab = 'komisi'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'komisi' ? 'border-[#c0ff00] text-[#c0ff00]' : 'border-transparent text-white/80 hover:text-white hover:border-white/30'">
+              <button @click="activeAffiliateTab = 'komisi'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'komisi' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'">
                 Riwayat Komisi
               </button>
-              <button @click="activeAffiliateTab = 'profil'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'profil' ? 'border-amber-400 text-amber-400' : 'border-transparent text-white/80 hover:text-white hover:border-white/30'">
+              <button @click="activeAffiliateTab = 'profil'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'profil' ? 'border-amber-500 text-amber-600' : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'">
                 Rekening & Profil
               </button>
             </div>
 
             <!-- TAB CONTENT -->
-            <div class="mt-6 bento-item p-0 overflow-hidden">
+            <div class="mt-6 modern-stat-card bg-white p-0 overflow-hidden border border-slate-200 rounded-3xl shadow-sm">
               <!-- Daftar Rujukan -->
               <div v-show="activeAffiliateTab === 'rujukan'">
-                <div v-if="affiliateData?.referrals?.length > 0" class="divide-y divide-white/5">
-                  <div v-for="(refData, idx) in affiliateData.referrals" :key="idx" class="flex flex-col sm:flex-row sm:items-center justify-between p-6 hover:bg-white/5 transition-colors gap-4">
+                <div v-if="affiliateData?.referrals?.length > 0" class="divide-y divide-slate-100">
+                  <div v-for="(refData, idx) in affiliateData.referrals" :key="idx" class="flex flex-col sm:flex-row sm:items-center justify-between p-6 hover:bg-slate-50 transition-colors gap-4">
                     <div class="flex items-center gap-4">
-                      <div class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/40 shrink-0">
+                      <div class="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
                         <i class="ph-fill ph-user text-xl"></i>
                       </div>
                       <div>
-                        <div class="text-sm font-black text-white">{{ refData.name }}</div>
-                        <div class="text-[10px] text-white/40 font-mono mt-1">{{ refData.date }}</div>
+                        <div class="text-sm font-black text-slate-800">{{ refData.name }}</div>
+                        <div class="text-[10px] text-slate-500 font-mono mt-1">{{ refData.date }}</div>
                       </div>
                     </div>
                     <div class="text-right">
-                      <div class="text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full border inline-block" :class="refData.status === 'Aktif' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/10 text-white/40'">{{ refData.status }}</div>
+                      <div class="text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full border inline-block" :class="refData.status === 'Aktif' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-slate-100 border-slate-200 text-slate-500'">{{ refData.status }}</div>
                     </div>
                   </div>
                 </div>
-                <div v-else class="p-12 text-center text-white/40 text-sm font-bold uppercase tracking-widest">
+                <div v-else class="p-12 text-center text-slate-400 text-sm font-bold uppercase tracking-widest">
                   Belum ada rujukan.
                 </div>
               </div>
 
               <!-- Riwayat Komisi -->
               <div v-show="activeAffiliateTab === 'komisi'">
-                <div v-if="affiliateData?.history?.length > 0" class="divide-y divide-white/5">
-                  <div v-for="(hist, idx) in affiliateData.history" :key="idx" class="flex flex-col sm:flex-row sm:items-center justify-between p-6 hover:bg-white/5 transition-colors gap-4">
+                <div v-if="affiliateData?.history?.length > 0" class="divide-y divide-slate-100">
+                  <div v-for="(hist, idx) in affiliateData.history" :key="idx" class="flex flex-col sm:flex-row sm:items-center justify-between p-6 hover:bg-slate-50 transition-colors gap-4">
                     <div class="flex items-center gap-4">
-                      <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 border" :class="hist.status === 'paid' ? 'bg-[#c0ff00]/10 border-[#c0ff00]/20 text-[#c0ff00]' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'">
+                      <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 border" :class="hist.status === 'paid' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-amber-50 border-amber-200 text-amber-500'">
                         <i :class="['text-xl', hist.status === 'paid' ? 'ph-bold ph-check' : 'ph-bold ph-hourglass']"></i>
                       </div>
                       <div>
-                        <div class="text-base font-black font-mono tracking-tight" :class="hist.status === 'paid' ? 'text-[#c0ff00]' : 'text-white'">Rp {{ new Intl.NumberFormat('id-ID').format(hist.amount) }}</div>
-                        <div class="text-[10px] text-white/40 mt-1 font-mono uppercase">{{ new Date(hist.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</div>
+                        <div class="text-base font-black font-mono tracking-tight" :class="hist.status === 'paid' ? 'text-indigo-600' : 'text-slate-800'">Rp {{ new Intl.NumberFormat('id-ID').format(hist.amount) }}</div>
+                        <div class="text-[10px] text-slate-500 mt-1 font-mono uppercase">{{ new Date(hist.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</div>
                       </div>
                     </div>
                     <div class="flex items-center gap-3">
-                      <span :class="['px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border', hist.status === 'paid' ? 'bg-[#c0ff00]/10 border-[#c0ff00]/20 text-[#c0ff00]' : 'bg-amber-500/10 border-amber-500/20 text-amber-400']">
+                      <span :class="['px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border', hist.status === 'paid' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-amber-50 border-amber-200 text-amber-500']">
                         {{ hist.status === 'paid' ? 'Selesai' : 'Tertunda' }}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div v-else class="p-12 text-center text-white/40 text-sm font-bold uppercase tracking-widest">
+                <div v-else class="p-12 text-center text-slate-400 text-sm font-bold uppercase tracking-widest">
                   Belum ada riwayat komisi.
                 </div>
               </div>
 
               <!-- Rekening & Profil -->
               <div v-show="activeAffiliateTab === 'profil'">
-                <div class="p-8 flex flex-col md:flex-row gap-8">
+                <div class="p-8 flex flex-col md:flex-row gap-8 bg-slate-50/50">
                   <div class="flex-1 space-y-6">
                     <div class="text-sm">
-                      <span class="block text-[10px] uppercase font-black tracking-widest text-white/40 mb-1">Nama Lengkap</span>
-                      <span class="font-black text-white text-lg">{{ affiliateData?.profile?.name || '-' }}</span>
+                      <span class="block text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Nama Lengkap</span>
+                      <span class="font-black text-slate-800 text-lg">{{ affiliateData?.profile?.name || '-' }}</span>
                     </div>
                     <div class="text-sm">
-                      <span class="block text-[10px] uppercase font-black tracking-widest text-white/40 mb-1">Email</span>
-                      <span class="font-mono text-white/80">{{ affiliateData?.profile?.email || '-' }}</span>
+                      <span class="block text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Email</span>
+                      <span class="font-mono text-slate-600">{{ affiliateData?.profile?.email || '-' }}</span>
                     </div>
                   </div>
                   <div class="flex-1 space-y-6">
                     <div class="text-sm">
-                      <span class="block text-[10px] uppercase font-black tracking-widest text-white/40 mb-1">Bank Tujuan</span>
-                      <span class="font-black text-amber-400 text-lg">{{ affiliateData?.bank?.bank_name || '-' }}</span>
+                      <span class="block text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Bank Tujuan</span>
+                      <span class="font-black text-amber-500 text-lg">{{ affiliateData?.bank?.bank_name || '-' }}</span>
                     </div>
                     <div class="text-sm">
-                      <span class="block text-[10px] uppercase font-black tracking-widest text-white/40 mb-1">No. Rekening</span>
-                      <span class="font-mono text-white text-lg">{{ affiliateData?.bank?.bank_account || '-' }}</span>
-                      <span class="block font-bold text-white/60 text-xs mt-1">a.n {{ affiliateData?.bank?.bank_owner || '-' }}</span>
+                      <span class="block text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">No. Rekening</span>
+                      <span class="font-mono text-slate-800 text-lg">{{ affiliateData?.bank?.bank_account || '-' }}</span>
+                      <span class="block font-bold text-slate-500 text-xs mt-1">a.n {{ affiliateData?.bank?.bank_owner || '-' }}</span>
                     </div>
                   </div>
                 </div>
@@ -1928,10 +1928,10 @@
         <!-- TAB 1: DASHBOARD -->
         <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-6">
 
-          <!-- ✨ Greeting Banner (Bento Style) -->
-          <div class="bento-item bg-gradient-to-br from-[#0f172a] to-[#050505] p-6 md:p-8">
+          <!-- ✨ Greeting Banner (Light Mode) -->
+          <div class="modern-stat-card bg-white p-6 md:p-8 rounded-3xl relative overflow-hidden">
             <!-- Decorative glow -->
-            <div class="absolute top-0 right-0 w-72 h-72 rounded-full opacity-30 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #c0ff00 0%, transparent 70%); transform: translate(30%, -30%);"></div>
+            <div class="absolute top-0 right-0 w-72 h-72 rounded-full opacity-30 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #0ea5e9 0%, transparent 70%); transform: translate(30%, -30%);"></div>
             <div class="absolute bottom-0 left-0 w-48 h-48 rounded-full opacity-20 blur-2xl pointer-events-none" style="background: radial-gradient(circle, #8b5cf6 0%, transparent 70%); transform: translate(-30%, 30%);"></div>
 
             <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -1939,15 +1939,15 @@
               <div class="space-y-2">
                 <div class="flex items-center gap-2">
                   <span class="text-2xl animate-bounce">👋</span>
-                  <p class="text-white/60 font-medium text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
+                  <p class="text-slate-500 font-medium text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
                 </div>
-                <h2 class="text-hero-genz text-3xl md:text-5xl font-black text-white tracking-tighter">Halo, <span class="text-[#c0ff00]">Siswa Mandiri!</span></h2>
+                <h2 class="text-hero-genz text-3xl md:text-5xl font-black text-slate-800 tracking-tighter">Halo, <span class="text-indigo-600">Siswa Mandiri!</span></h2>
                 <div class="flex flex-wrap items-center gap-2 pt-2">
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-wider">
-                    <i class="ph-bold ph-target text-[#0ea5e9] text-sm"></i>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-50 border border-sky-100 text-sky-700 text-[10px] font-black uppercase tracking-wider">
+                    <i class="ph-bold ph-target text-sky-500 text-sm"></i>
                     Target: {{ selectedUniversity.name }}
                   </span>
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-wider text-amber-400">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-100 text-[10px] font-black uppercase tracking-wider text-amber-600">
                     <i class="ph-fill ph-fire text-sm"></i>
                     {{ streakCount }} Hari Streak
                   </span>
@@ -1956,32 +1956,32 @@
 
               <!-- Right: Quick Stats -->
               <div class="flex gap-3 flex-wrap">
-                <div class="flex flex-col items-center justify-center p-4 rounded-3xl bg-white/5 border border-white/10 min-w-[90px] backdrop-blur-md">
-                  <span class="text-3xl font-black font-mono text-[#c0ff00]">{{ currentAbilityScore }}</span>
-                  <span class="text-[9px] text-white/50 font-bold uppercase tracking-widest mt-1">Skor Saat Ini</span>
+                <div class="flex flex-col items-center justify-center p-4 rounded-3xl bg-slate-50 border border-slate-100 min-w-[90px] shadow-sm">
+                  <span class="text-3xl font-black font-mono text-emerald-500">{{ currentAbilityScore }}</span>
+                  <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">Skor Saat Ini</span>
                 </div>
-                <div class="flex flex-col items-center justify-center p-4 rounded-3xl bg-white/5 border border-white/10 min-w-[90px] backdrop-blur-md">
-                  <span class="text-3xl font-black font-mono text-[#0ea5e9]">{{ selectedUniversity.targetScore }}</span>
-                  <span class="text-[9px] text-white/50 font-bold uppercase tracking-widest mt-1">Skor Target</span>
+                <div class="flex flex-col items-center justify-center p-4 rounded-3xl bg-slate-50 border border-slate-100 min-w-[90px] shadow-sm">
+                  <span class="text-3xl font-black font-mono text-sky-500">{{ selectedUniversity.targetScore }}</span>
+                  <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">Skor Target</span>
                 </div>
-                <div class="flex flex-col items-center justify-center p-4 rounded-3xl bg-white/5 border border-white/10 min-w-[90px] backdrop-blur-md">
-                  <span class="text-3xl font-black font-mono text-amber-400">{{ coins }}</span>
-                  <span class="text-[9px] text-white/50 font-bold uppercase tracking-widest mt-1">Koin XP</span>
+                <div class="flex flex-col items-center justify-center p-4 rounded-3xl bg-slate-50 border border-slate-100 min-w-[90px] shadow-sm">
+                  <span class="text-3xl font-black font-mono text-amber-500">{{ coins }}</span>
+                  <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">Koin XP</span>
                 </div>
               </div>
             </div>
 
             <!-- Shortcut Buttons -->
-            <div class="relative z-10 flex flex-wrap gap-3 mt-8 pt-6 border-t border-white/10">
-              <button @click="handleTabClick('diagnostic')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c0ff00]/15 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-black uppercase tracking-wider hover:bg-[#c0ff00] hover:text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(192,255,0,0.15)]">
+            <div class="relative z-10 flex flex-wrap gap-3 mt-8 pt-6 border-t border-slate-100">
+              <button @click="handleTabClick('diagnostic')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-black uppercase tracking-wider hover:bg-indigo-100 transition-all hover:scale-105 active:scale-95">
                 <i class="ph-bold ph-exam text-lg"></i>
                 Mulai Tryout
               </button>
-              <button @click="handleTabClick('learning')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-white text-xs font-bold hover:bg-white/15 transition-all hover:scale-105 active:scale-95">
+              <button @click="handleTabClick('learning')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-100 transition-all hover:scale-105 active:scale-95">
                 <i class="ph-bold ph-book-open text-lg"></i>
                 Belajar Materi
               </button>
-              <button @click="handleTabClick('practice')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-white text-xs font-bold hover:bg-white/15 transition-all hover:scale-105 active:scale-95">
+              <button @click="handleTabClick('practice')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-100 transition-all hover:scale-105 active:scale-95">
                 <i class="ph-bold ph-pencil-simple text-lg"></i>
                 Latihan Soal
               </button>
@@ -1990,58 +1990,58 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Ability Meter Card -->
-            <div class="bento-item lg:col-span-2 flex flex-col justify-between group">
+            <div class="modern-stat-card bg-white lg:col-span-2 flex flex-col justify-between group">
               <div>
                 <div class="flex items-center gap-3 mb-6">
-                  <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#c0ff00]">
+                  <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-emerald-600">
                     <i class="ph-bold ph-chart-line-up text-xl"></i>
                   </div>
-                  <h3 class="text-xl font-black font-heading text-white tracking-tight">Estimasi Kemampuan</h3>
+                  <h3 class="text-xl font-black font-heading text-slate-800 tracking-tight">Estimasi Kemampuan</h3>
                 </div>
                 
-                <div class="flex items-center justify-around py-8 bg-[#0a0a0a] rounded-3xl border border-white/5 relative overflow-hidden">
+                <div class="flex items-center justify-around py-8 bg-slate-50 rounded-3xl border border-slate-200 relative overflow-hidden">
                   <!-- abstract bg -->
                   <div class="absolute inset-0 bg-grid opacity-20 pointer-events-none"></div>
                   
                   <div class="text-center relative z-10">
-                    <span class="block text-5xl font-black font-heading text-[#c0ff00] font-mono drop-shadow-[0_0_15px_rgba(192,255,0,0.4)]">{{ currentAbilityScore }}</span>
-                    <span class="text-[10px] text-white/50 font-black uppercase tracking-widest mt-2 block">Skor Saat Ini</span>
+                    <span class="block text-5xl font-black font-heading text-emerald-600 font-mono drop-shadow-[0_0_15px_rgba(192,255,0,0.4)]">{{ currentAbilityScore }}</span>
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-2 block">Skor Saat Ini</span>
                   </div>
-                  <div class="text-white/20 text-3xl font-black relative z-10 animate-pulse">➔</div>
+                  <div class="text-slate-400 text-3xl font-black relative z-10 animate-pulse">➔</div>
                   <div class="text-center relative z-10">
                     <span class="block text-5xl font-black font-heading text-[#0ea5e9] font-mono drop-shadow-[0_0_15px_rgba(14,165,233,0.4)]">{{ selectedUniversity.targetScore }}</span>
-                    <span class="text-[10px] text-white/50 font-black uppercase tracking-widest mt-2 block">Target ({{ selectedUniversity.name }})</span>
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-2 block">Target ({{ selectedUniversity.name }})</span>
                   </div>
                 </div>
               </div>
 
               <!-- Progress bar -->
               <div class="mt-8">
-                <div class="flex justify-between text-xs font-bold text-white mb-3">
+                <div class="flex justify-between text-xs font-bold text-slate-800 mb-3">
                   <span>Selisih Gap: <strong class="text-[#f43f5e] font-black font-mono text-sm">{{ gapScore }} Poin</strong></span>
                   <span class="text-[#0ea5e9] font-mono font-black">{{ progressPercentage }}% Tercapai</span>
                 </div>
-                <div class="w-full bg-white/5 rounded-full h-4 overflow-hidden border border-white/10 p-0.5">
+                <div class="w-full bg-slate-50 rounded-full h-4 overflow-hidden border border-slate-200 p-0.5">
                   <div class="bg-gradient-to-r from-[#c0ff00] via-[#0ea5e9] to-[#8b5cf6] h-full rounded-full transition-all duration-1000 ease-out relative" :style="{ width: progressPercentage + '%' }">
-                    <div class="absolute inset-0 bg-white/20 w-full h-full" style="background-image: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent); background-size: 1rem 1rem;"></div>
+                    <div class="absolute inset-0 bg-slate-200 w-full h-full" style="background-image: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent); background-size: 1rem 1rem;"></div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Daily Mission Card -->
-            <div class="bento-item flex flex-col justify-between">
+            <div class="modern-stat-card bg-white flex flex-col justify-between">
               <div>
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-xl font-black font-heading text-white tracking-tight">Misi Harian</h3>
-                  <i class="ph-fill ph-sword text-2xl text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]"></i>
+                  <h3 class="text-xl font-black font-heading text-slate-800 tracking-tight">Misi Harian</h3>
+                  <i class="ph-fill ph-sword text-2xl text-amber-500 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]"></i>
                 </div>
-                <p class="text-[11px] text-white/50 mb-6 font-medium">Selesaikan misi untuk XP.</p>
+                <p class="text-[11px] text-slate-500 mb-6 font-medium">Selesaikan misi untuk XP.</p>
                 <ul class="space-y-3">
-                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-3 p-4 rounded-2xl border transition-all duration-300', m.completed ? 'bg-[#c0ff00]/10 border-[#c0ff00]/30' : 'bg-white/5 border-white/10 hover:border-white/20']">
-                    <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-black/50 text-[#c0ff00] focus:ring-[#c0ff00] focus:ring-offset-0 w-5 h-5 cursor-pointer appearance-none checked:bg-[#c0ff00] checked:border-[#c0ff00] relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-xs checked:after:font-black checked:after:left-[4px] checked:after:top-[1px]" @change="checkMissionReward(m)">
-                    <span :class="['text-[11px] font-bold flex-grow text-white transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
-                    <span class="text-xs font-black font-mono shrink-0 text-amber-400">+{{ m.reward }}</span>
+                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-3 p-4 rounded-2xl border transition-all duration-300', m.completed ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200 hover:border-slate-300']">
+                    <input type="checkbox" v-model="m.completed" class="rounded-md border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0 w-5 h-5 cursor-pointer appearance-none checked:bg-emerald-500 checked:border-emerald-500 relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-xs checked:after:font-black checked:after:left-[4px] checked:after:top-[1px]" @change="checkMissionReward(m)">
+                    <span :class="['text-[11px] font-bold flex-grow text-slate-800 transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
+                    <span class="text-xs font-black font-mono shrink-0 text-amber-500">+{{ m.reward }}</span>
                   </li>
                 </ul>
               </div>
@@ -2050,28 +2050,28 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Priority Learning Skills map -->
-            <div class="bento-item lg:col-span-2">
+            <div class="modern-stat-card bg-white lg:col-span-2">
               <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#0ea5e9]">
+                <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-[#0ea5e9]">
                   <i class="ph-bold ph-radar text-xl"></i>
                 </div>
-                <h3 class="text-xl font-black font-heading text-white tracking-tight">Skill Map Scanner</h3>
+                <h3 class="text-xl font-black font-heading text-slate-800 tracking-tight">Skill Map Scanner</h3>
               </div>
-              <p class="text-xs text-white/50 mb-8 font-medium">Deteksi kekuatan & kelemahan materi berbasis AI.</p>
+              <p class="text-xs text-slate-500 mb-8 font-medium">Deteksi kekuatan & kelemahan materi berbasis AI.</p>
               
               <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div v-for="(skills, category) in skillMap" :key="category" class="bg-[#0a0a0a] border border-white/5 p-5 rounded-3xl">
-                  <h4 class="text-xs font-black text-white mb-5 border-b border-white/10 pb-3 flex items-center gap-2 uppercase tracking-widest">
+                <div v-for="(skills, category) in skillMap" :key="category" class="bg-slate-50 border border-slate-200 p-5 rounded-3xl">
+                  <h4 class="text-xs font-black text-slate-800 mb-5 border-b border-slate-200 pb-3 flex items-center gap-2 uppercase tracking-widest">
                     <span class="w-2 h-2 bg-[#0ea5e9] rounded-full shadow-[0_0_8px_rgba(14,165,233,0.8)]"></span>
                     {{ category }}
                   </h4>
                   <div class="space-y-4">
                     <div v-for="skill in skills" :key="skill" class="space-y-2">
                       <div class="flex justify-between text-[11px] font-bold">
-                        <span class="text-white/80">{{ skill }}</span>
+                        <span class="text-slate-600">{{ skill }}</span>
                         <span class="font-mono font-black" :style="{ color: getSkillColor(getSkillMastery(skill)) }">{{ getSkillMastery(skill) }}%</span>
                       </div>
-                      <div class="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                      <div class="w-full bg-slate-50 rounded-full h-1.5 overflow-hidden">
                         <div class="h-full rounded-full transition-all duration-1000 ease-out" :style="{ width: getSkillMastery(skill) + '%', backgroundColor: getSkillColor(getSkillMastery(skill)), boxShadow: `0 0 10px ${getSkillColor(getSkillMastery(skill))}` }"></div>
                       </div>
                     </div>
@@ -2081,18 +2081,18 @@
             </div>
 
             <!-- Recommendation path -->
-            <div class="bento-item flex flex-col justify-between">
+            <div class="modern-stat-card bg-white flex flex-col justify-between">
               <div>
                 <div class="flex items-center gap-3 mb-2">
                   <i class="ph-bold ph-lightning text-2xl text-[#8b5cf6] drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]"></i>
-                  <h3 class="text-xl font-black font-heading text-white tracking-tight">Jalur AI</h3>
+                  <h3 class="text-xl font-black font-heading text-slate-800 tracking-tight">Jalur AI</h3>
                 </div>
-                <p class="text-[11px] text-white/50 mb-8 font-medium">Auto-generated learning path.</p>
+                <p class="text-[11px] text-slate-500 mb-8 font-medium">Auto-generated learning path.</p>
                 
                 <div class="space-y-6">
                   <div v-for="(rec, i) in learningRecommendations" :key="i" class="flex gap-4 relative group">
-                    <div v-if="i < learningRecommendations.length - 1" class="absolute left-4 top-10 bottom-0 w-[2px] bg-white/10 group-hover:bg-[#8b5cf6]/50 transition-colors"></div>
-                    <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black font-mono text-xs text-[#8b5cf6] shrink-0 z-10 group-hover:scale-110 group-hover:bg-[#8b5cf6] group-hover:text-white transition-all shadow-[0_0_15px_rgba(139,92,246,0)] group-hover:shadow-[0_0_15px_rgba(139,92,246,0.4)]">
+                    <div v-if="i < learningRecommendations.length - 1" class="absolute left-4 top-10 bottom-0 w-[2px] bg-slate-100 group-hover:bg-[#8b5cf6]/50 transition-colors"></div>
+                    <div class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center font-black font-mono text-xs text-[#8b5cf6] shrink-0 z-10 group-hover:scale-110 group-hover:bg-[#8b5cf6] group-hover:text-slate-800 transition-all shadow-[0_0_15px_rgba(139,92,246,0)] group-hover:shadow-[0_0_15px_rgba(139,92,246,0.4)]">
                       {{ i + 1 }}
                     </div>
                     <div class="pt-1">
