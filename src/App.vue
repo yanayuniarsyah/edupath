@@ -532,7 +532,7 @@
                   </div>
 
                   <!-- Probability Meter -->
-                  <div class="space-y-2">
+                  <div class="space-y-1">
                     <div class="flex justify-between items-end">
                       <span class="text-xs font-bold text-white/60">Peluang Kelulusan:</span>
                       <span class="text-4xl font-black font-heading tracking-tighter" :style="{ color: simChanceStatus.color }">
@@ -1110,7 +1110,7 @@
               </div>
 
               <!-- Feature 5: Parent Portal -->
-              <div class="glass-card rounded-3xl p-8 col-span-1 md:col-span-3 lg:col-span-4 bg-gradient-to-r from-slate-950 to-slate-900 border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div class="glass-card rounded-3xl p-8 col-span-1 md:col-span-3 lg:col-span-4 bg-gradient-to-r from-slate-950 to-slate-900 border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="space-y-2">
                   <h3 class="text-2xl md:text-3xl font-black font-heading text-white flex flex-wrap items-center gap-3">
                     Auto Report WhatsApp Orang Tua
@@ -1802,7 +1802,7 @@
                 <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 group-hover:bg-emerald-100 transition-all">
                   <i class="ph-bold ph-users text-xl"></i>
                 </div>
-                <span class="text-3xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.total_referrals || 0 }}</span>
+                <span class="text-2xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.total_referrals || 0 }}</span>
                 <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-1">Total Rujukan</span>
               </div>
               <!-- Stat 2 -->
@@ -1810,7 +1810,7 @@
                 <div class="w-10 h-10 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-400 mb-4 group-hover:scale-110 group-hover:bg-sky-100 transition-all">
                   <i class="ph-bold ph-user-check text-xl"></i>
                 </div>
-                <span class="text-3xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.active_referrals || 0 }}</span>
+                <span class="text-2xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.active_referrals || 0 }}</span>
                 <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-1">Rujukan Aktif</span>
               </div>
               <!-- Stat 3 -->
@@ -1939,7 +1939,7 @@
               <!-- Left: Greeting -->
               <div class="space-y-2">
                 <div class="flex items-center gap-2">
-                  <span class="text-2xl animate-bounce">👋</span>
+                  <span class="text-xl animate-bounce">👋</span>
                   <p class="text-white/60 font-medium text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
                 </div>
                 <h2 class="text-hero-genz text-xl md:text-2xl font-black text-white tracking-tighter">Halo, <span class="text-purple-400">Siswa Mandiri!</span></h2>
@@ -1957,23 +1957,23 @@
 
               <!-- Right: Quick Stats -->
               <div class="flex gap-3 flex-wrap">
-                <div class="flex flex-col items-center justify-center p-4 rounded-3xl bg-white/5 border border-slate-100 min-w-[90px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                  <span class="text-3xl font-black font-mono text-emerald-400">{{ currentAbilityScore }}</span>
+                <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-slate-100 min-w-[80px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                  <span class="text-2xl font-black font-mono text-emerald-400">{{ currentAbilityScore }}</span>
                   <span class="text-[9px] text-white/60 font-bold uppercase tracking-widest mt-1">Skor Saat Ini</span>
                 </div>
-                <div class="flex flex-col items-center justify-center p-4 rounded-3xl bg-white/5 border border-slate-100 min-w-[90px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                  <span class="text-3xl font-black font-mono text-sky-400">{{ selectedUniversity.targetScore }}</span>
+                <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-slate-100 min-w-[80px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                  <span class="text-2xl font-black font-mono text-sky-400">{{ selectedUniversity.targetScore }}</span>
                   <span class="text-[9px] text-white/60 font-bold uppercase tracking-widest mt-1">Skor Target</span>
                 </div>
-                <div class="flex flex-col items-center justify-center p-4 rounded-3xl bg-white/5 border border-slate-100 min-w-[90px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                  <span class="text-3xl font-black font-mono text-amber-400">{{ coins }}</span>
+                <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-slate-100 min-w-[80px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                  <span class="text-2xl font-black font-mono text-amber-400">{{ coins }}</span>
                   <span class="text-[9px] text-white/60 font-bold uppercase tracking-widest mt-1">Koin XP</span>
                 </div>
               </div>
             </div>
 
             <!-- Shortcut Buttons -->
-            <div class="relative z-10 flex flex-wrap gap-3 mt-8 pt-6 border-t border-slate-100">
+            <div class="relative z-10 flex flex-wrap gap-3 mt-4 pt-4 border-t border-slate-100">
               <button @click="handleTabClick('diagnostic')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-black uppercase tracking-wider hover:bg-indigo-100 transition-all hover:scale-105 active:scale-95">
                 <i class="ph-bold ph-exam text-lg"></i>
                 Mulai Tryout
