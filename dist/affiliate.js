@@ -14,6 +14,20 @@ function closeUnifiedLoginModal() {
     document.getElementById('login-modal').classList.add('hidden');
 }
 
+function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
@@ -84,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 setTimeout(() => {
-                    window.location.href = 'affiliate_dashboard.html';
+                    window.location.href = '/#/';
                 }, 2000);
 
             } catch (err) {
@@ -126,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sessionStorage.setItem('ep_session_token', resData.token);
                 localStorage.setItem('user', JSON.stringify(resData.user));
 
-                window.location.href = 'affiliate_dashboard.html';
+                window.location.href = '/#/';
 
             } catch (err) {
                 alert('Login gagal: ' + err.message);

@@ -41,7 +41,7 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-    $tenant_id = '553af312-fb50-4e24-93ee-0d1abd52a62d'; // B2C Legacy Tenant
+    $tenant_id = 'default_tenant'; // Default tenant inserted by install_db.php
     $user_id = bin2hex(random_bytes(16)); // UUID for users
     $user_id = substr($user_id,0,8).'-'.substr($user_id,8,4).'-'.substr($user_id,12,4).'-'.substr($user_id,16,4).'-'.substr($user_id,20,12);
 

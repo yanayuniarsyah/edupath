@@ -7,6 +7,9 @@
 require_once __DIR__ . '/env.php';
 
 // --- Load .env ---
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+
 // Gunakan file .env yang ada di root direktori proyek
 load_env(dirname(__DIR__) . '/.env');
 
@@ -35,10 +38,11 @@ header('Content-Type: application/json');
 // ----------------------------------------------------------------
 // DATABASE — Dari environment variable
 // ----------------------------------------------------------------
-$host    = env('DB_HOST', 'localhost');
+$host    = env('DB_HOST', '127.0.0.1');
 $db_user = env('DB_USER');
 $db_pass = env('DB_PASSWORD');
 $db_name = env('DB_NAME');
+$port    = env('DB_PORT', '3306');
 
 // Validasi: pastikan konfigurasi database ada
 if (empty($db_user) || empty($db_name)) {
@@ -54,7 +58,7 @@ if (empty($db_user) || empty($db_name)) {
 
 try {
     $pdo = new PDO(
-        "mysql:host=$host;dbname=$db_name;charset=utf8mb4",
+        "mysql:host=$host;port=$port;dbname=$db_name;charset=utf8mb4",
         $db_user,
         $db_pass
     );
