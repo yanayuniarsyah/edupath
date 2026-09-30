@@ -1,14 +1,14 @@
 <template>
   <div :class="['relative min-h-screen antialiased font-body flex overflow-hidden transition-colors duration-300', 
-    (isLoggedIn && currentTab !== 'home') ? 'bg-[#f8fafc] text-slate-900' : 'bg-[#050505] text-white',
+    'bg-[#050505] text-white mesh-gradient-bg',
     mobileSidebarOpen ? 'mobile-sidebar-open' : ''
   ]">
-    <!-- Ambient Glow (Public only) -->
-    <div v-if="!isLoggedIn" id="ambient-glow" ref="ambientGlowRef" class="opacity-80"></div>
+    <!-- Ambient Glow (Everywhere) -->
+    <div id="ambient-glow" ref="ambientGlowRef" class="opacity-80"></div>
     
-    <!-- Background Blobs & Neural Canvas (Public only) -->
-    <div v-if="!isLoggedIn" class="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/5 blur-[120px] pointer-events-none z-0 animate-pulse"></div>
-    <div v-if="!isLoggedIn" class="fixed bottom-[-20%] left-1/4 w-[600px] h-[600px] rounded-full bg-primary/8 blur-[130px] pointer-events-none z-0" style="animation: float 10s ease-in-out infinite alternate"></div>
+    <!-- Background Blobs & Neural Canvas (Everywhere) -->
+    <div class="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-white/5 blur-[120px] pointer-events-none z-0 animate-pulse"></div>
+    <div class="fixed bottom-[-20%] left-1/4 w-[600px] h-[600px] rounded-full bg-primary/8 blur-[130px] pointer-events-none z-0" style="animation: float 10s ease-in-out infinite alternate"></div>
     <canvas id="bg-canvas" :style="{ opacity: canvasOpacity }" class="fixed inset-0 w-full h-full z-0 pointer-events-none transition-opacity duration-700"></canvas>
 
 
@@ -1832,14 +1832,14 @@
             </div>
             
             <!-- TAB NAVIGATION -->
-            <div class="mt-8 flex border-b border-slate-200 gap-2 sm:gap-6 px-4 overflow-x-auto no-scrollbar">
-              <button @click="activeAffiliateTab = 'rujukan'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'rujukan' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'">
+            <div class="mt-8 flex border-b border-white/10 gap-2 sm:gap-6 px-4 overflow-x-auto no-scrollbar">
+              <button @click="activeAffiliateTab = 'rujukan'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'rujukan' ? 'border-emerald-400 text-emerald-400' : 'border-transparent text-white/80 hover:text-white hover:border-white/30'">
                 Daftar Rujukan
               </button>
-              <button @click="activeAffiliateTab = 'komisi'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'komisi' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'">
+              <button @click="activeAffiliateTab = 'komisi'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'komisi' ? 'border-[#c0ff00] text-[#c0ff00]' : 'border-transparent text-white/80 hover:text-white hover:border-white/30'">
                 Riwayat Komisi
               </button>
-              <button @click="activeAffiliateTab = 'profil'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'profil' ? 'border-amber-500 text-amber-600' : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'">
+              <button @click="activeAffiliateTab = 'profil'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'profil' ? 'border-amber-400 text-amber-400' : 'border-transparent text-white/80 hover:text-white hover:border-white/30'">
                 Rekening & Profil
               </button>
             </div>

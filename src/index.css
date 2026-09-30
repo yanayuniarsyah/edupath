@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -96,7 +96,7 @@ p, span, li, button, label, select, input {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Glass Pill — Navbar style SAMPLE */
+/* Glass Pill â€” Navbar style SAMPLE */
 .glass-pill {
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(24px);
@@ -105,7 +105,7 @@ p, span, li, button, label, select, input {
               0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
-/* Bouncy Glass Card — gaya SAMPLE.HTML glassmorphism base */
+/* Bouncy Glass Card â€” gaya SAMPLE.HTML glassmorphism base */
 .glass-card {
   background: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -124,7 +124,7 @@ p, span, li, button, label, select, input {
   transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Bouncy Card — gaya SAMPLE.HTML dengan rotation */
+/* Bouncy Card â€” gaya SAMPLE.HTML dengan rotation */
 .bouncy-card {
   background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -133,7 +133,7 @@ p, span, li, button, label, select, input {
 
 
 
-/* Bouncy Card Lime — featured card */
+/* Bouncy Card Lime â€” featured card */
 .bouncy-card-lime {
   background: #c0ff00;
   border: none;
@@ -229,7 +229,7 @@ p, span, li, button, label, select, input {
   background: #c0ff00;
 }
 
-/* Skewed Section — seperti SAMPLE */
+/* Skewed Section â€” seperti SAMPLE */
 .section-skewed {
   transform: skewY(-2deg);
 }
