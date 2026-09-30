@@ -1832,14 +1832,14 @@
             </div>
             
             <!-- TAB NAVIGATION -->
-            <div class="mt-8 flex border-b border-white/10 gap-2 sm:gap-6 px-4 overflow-x-auto no-scrollbar">
-              <button @click="activeAffiliateTab = 'rujukan'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'rujukan' ? 'border-emerald-400 text-emerald-400' : 'border-transparent text-white/80 hover:text-white hover:border-white/30'">
+            <div class="mt-8 flex border-b border-slate-200 gap-2 sm:gap-6 px-4 overflow-x-auto no-scrollbar">
+              <button @click="activeAffiliateTab = 'rujukan'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'rujukan' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'">
                 Daftar Rujukan
               </button>
-              <button @click="activeAffiliateTab = 'komisi'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'komisi' ? 'border-[#c0ff00] text-[#c0ff00]' : 'border-transparent text-white/80 hover:text-white hover:border-white/30'">
+              <button @click="activeAffiliateTab = 'komisi'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'komisi' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'">
                 Riwayat Komisi
               </button>
-              <button @click="activeAffiliateTab = 'profil'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'profil' ? 'border-amber-400 text-amber-400' : 'border-transparent text-white/80 hover:text-white hover:border-white/30'">
+              <button @click="activeAffiliateTab = 'profil'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'profil' ? 'border-amber-500 text-amber-600' : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'">
                 Rekening & Profil
               </button>
             </div>
