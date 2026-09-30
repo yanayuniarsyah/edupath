@@ -110,7 +110,7 @@
     <!-- Main Content Area -->
     <main @scroll="handleScroll" class="relative z-10 flex-grow overflow-y-auto overflow-x-hidden max-h-screen flex flex-col w-full" :class="[
       isLoggedIn ? 'lg:ml-[72px]' : '',
-      (isLoggedIn && currentTab !== 'home') ? 'p-6 lg:pl-6 bg-[#f8fafc]' : ''
+      (isLoggedIn && currentTab !== 'home') ? 'p-6 lg:pl-6 bg-transparent' : ''
     ]">
       
       <!-- Public Top Navbar (Only visible when Logged Out) -->
@@ -225,31 +225,31 @@
         </div>
       </header>
 
-      <!-- App Header Utility (Only visible when Logged In — Crisp Light Theme) -->
-      <header v-if="isLoggedIn" class="flex justify-between items-center pb-4 border-b border-slate-200/90 mb-6 shrink-0 bg-white/90 backdrop-blur px-6 py-3.5 -mx-6 -mt-6 rounded-b-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+      <!-- App Header Utility (Only visible when Logged In — Premium Dark Theme) -->
+      <header v-if="isLoggedIn" class="flex justify-between items-center pb-4 border-b border-white/10 mb-6 shrink-0 glass-card px-6 py-3.5 -mx-6 -mt-6 rounded-b-2xl">
         <div class="flex items-center gap-3">
           <!-- Mobile Hamburger untuk Menu Siswa -->
-          <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="lg:hidden flex-shrink-0 w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 flex items-center justify-center hover:bg-slate-200 transition-all z-50">
+          <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="lg:hidden flex-shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white/70 flex items-center justify-center hover:bg-white/10 transition-all z-50">
             <i class="ph-bold ph-list text-base"></i>
           </button>
-          <label class="text-xs text-slate-500 font-bold uppercase tracking-wider hidden sm:block">Target PTN:</label>
+          <label class="text-xs text-white/60 font-bold uppercase tracking-wider hidden sm:block">Target PTN:</label>
           <div class="relative">
-            <select v-model="selectedUniversity" class="bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold py-1.5 px-3 pr-7 rounded-xl appearance-none outline-none focus:border-indigo-500 shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-colors cursor-pointer" @change="recalcTargetGap">
-              <option v-for="u in universities" :key="u.name" :value="u">
+            <select v-model="selectedUniversity" class="bg-white/5 border border-white/10 text-white text-xs font-bold py-1.5 px-3 pr-7 rounded-xl appearance-none outline-none focus:border-purple-500 shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-colors cursor-pointer" @change="recalcTargetGap">
+              <option v-for="u in universities" :key="u.name" :value="u" class="bg-slate-900 text-white">
                 {{ u.name }} (Target: {{ u.targetScore }})
               </option>
             </select>
-            <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-xs">
+            <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-white/40 text-xs">
               <i class="ph-bold ph-caret-down"></i>
             </div>
           </div>
         </div>
 
         <div class="flex items-center gap-3">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-            <span class="text-indigo-600 font-black">STREAK</span> <span>{{ streakCount }} Hari</span>
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+            <span class="text-purple-400 font-black">STREAK</span> <span>{{ streakCount }} Hari</span>
           </div>
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
             <span class="text-amber-400 font-black">COINS</span> <span>{{ coins }}</span>
           </div>
         </div>
