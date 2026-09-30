@@ -226,7 +226,7 @@
       </header>
 
       <!-- App Header Utility (Only visible when Logged In — Premium Dark Theme) -->
-      <header v-if="isLoggedIn" class="flex justify-between items-center pb-4 border-b border-white/10 mb-6 shrink-0 glass-card px-6 py-3.5 -mx-6 -mt-6 rounded-b-2xl">
+      <header v-if="isLoggedIn" class="flex justify-between items-center pb-4 border-b border-white/10 mb-6 shrink-0 glass-card px-6 py-3.5 -mx-6 -mt-6 rounded-b-2xl p-6 md:p-8">
         <div class="flex items-center gap-3">
           <!-- Mobile Hamburger untuk Menu Siswa -->
           <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="lg:hidden flex-shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white/70 flex items-center justify-center hover:bg-white/10 transition-all z-50">
@@ -1930,7 +1930,7 @@
         <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-6">
 
           <!-- ✨ Greeting Banner (Light Mode) -->
-          <div class="glass-card p-6 md:p-8 rounded-3xl relative overflow-hidden">
+          <div class="glass-card p-4 md:p-5 rounded-xl relative overflow-hidden">
             <!-- Decorative glow -->
             <div class="absolute top-0 right-0 w-72 h-72 rounded-full opacity-30 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #0ea5e9 0%, transparent 70%); transform: translate(30%, -30%);"></div>
             <div class="absolute bottom-0 left-0 w-48 h-48 rounded-full opacity-20 blur-2xl pointer-events-none" style="background: radial-gradient(circle, #8b5cf6 0%, transparent 70%); transform: translate(-30%, 30%);"></div>
@@ -1942,7 +1942,7 @@
                   <span class="text-2xl animate-bounce">👋</span>
                   <p class="text-white/60 font-medium text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
                 </div>
-                <h2 class="text-hero-genz text-3xl md:text-5xl font-black text-white tracking-tighter">Halo, <span class="text-purple-400">Siswa Mandiri!</span></h2>
+                <h2 class="text-hero-genz text-xl md:text-2xl font-black text-white tracking-tighter">Halo, <span class="text-purple-400">Siswa Mandiri!</span></h2>
                 <div class="flex flex-wrap items-center gap-2 pt-2">
                   <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[10px] font-black uppercase tracking-wider">
                     <i class="ph-bold ph-target text-sky-400 text-sm"></i>
@@ -1991,7 +1991,7 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Ability Meter Card -->
-            <div class="glass-card lg:col-span-2 flex flex-col justify-between group">
+            <div class="glass-card lg:col-span-2 flex flex-col justify-between group p-6 md:p-8">
               <div>
                 <div class="flex items-center gap-3 mb-6">
                   <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-emerald-400">
@@ -2031,7 +2031,7 @@
             </div>
 
             <!-- Daily Mission Card -->
-            <div class="glass-card flex flex-col justify-between">
+            <div class="glass-card flex flex-col justify-between p-6 md:p-8">
               <div>
                 <div class="flex items-center justify-between mb-4">
                   <h3 class="text-xl font-black font-heading text-white tracking-tight">Misi Harian</h3>
@@ -2051,7 +2051,7 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Priority Learning Skills map -->
-            <div class="glass-card lg:col-span-2">
+            <div class="glass-card lg:col-span-2 p-6 md:p-7">
               <div class="flex items-center gap-3 mb-2">
                 <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#0ea5e9]">
                   <i class="ph-bold ph-radar text-xl"></i>
@@ -2082,7 +2082,7 @@
             </div>
 
             <!-- Recommendation path -->
-            <div class="glass-card flex flex-col justify-between">
+            <div class="glass-card flex flex-col justify-between p-6 md:p-7">
               <div>
                 <div class="flex items-center gap-3 mb-2">
                   <i class="ph-bold ph-lightning text-2xl text-[#8b5cf6] drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]"></i>
