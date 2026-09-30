@@ -3047,7 +3047,12 @@
                 <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Password</label>
                 <button v-if="isLoginMode" type="button" @click="isForgotPasswordMode = true" class="text-[10px] text-[#c0ff00] hover:underline focus:outline-none">Lupa Password?</button>
               </div>
-              <input v-model="authForm.password" type="password" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
+              <div class="relative">
+                <input v-model="authForm.password" :type="showPassword ? 'text' : 'password'" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00] pr-10">
+                <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white">
+                  <i :class="showPassword ? 'ph-bold ph-eye-slash' : 'ph-bold ph-eye'" class="text-lg"></i>
+                </button>
+              </div>
             </div>
 
             <button type="submit" :disabled="authLoading" class="w-full py-3 btn-shimmer text-white rounded-xl text-xs font-bold transition-transform hover:scale-[1.02] mt-2 flex justify-center items-center">
@@ -3799,6 +3804,7 @@ export default {
       }
       initScrollReveal();
     });
+    const showPassword = ref(false);
     const authForm = ref({ name: '', email: 'demo@edupath.id', password: 'demo123' });
     const authLoading = ref(false);
     const authError = ref('');
@@ -4521,6 +4527,7 @@ export default {
       showLoginModal,
       isLoginMode,
       authForm,
+      showPassword,
       authLoading,
       authError,
       doAuth,
