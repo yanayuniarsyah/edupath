@@ -1747,13 +1747,13 @@
         <!-- TAB: AFFILIATE -->
         <section v-if="currentTab === 'affiliate'" class="animate-fade-in space-y-6">
 
-          <!-- ✨ High-Class Partner Hero Banner with Custom Image Background (PALING ATAS) -->
-          <div class="glass-card rounded-3xl relative overflow-hidden border border-amber-500/30 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
+          <!-- ✨ High-Class Partner Hero Banner with Custom Image Background (PALING ATAS - SANGAT TIPIS 60px) -->
+          <div class="glass-card rounded-2xl relative overflow-hidden border border-amber-500/30 shadow-md h-[60px] md:h-[64px] flex items-center">
             <!-- Background Image 1.jpeg with Vivid Overlay -->
             <div class="absolute inset-0 z-0">
               <img src="/1.jpeg" alt="EduPath Partner Banner" class="w-full h-full object-cover object-right md:object-center opacity-100 transition-transform duration-700 hover:scale-105" />
-              <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
             </div>
 
             <!-- Top Gold Line -->
@@ -2107,13 +2107,13 @@
         <!-- TAB 1: DASHBOARD -->
         <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-6">
 
-          <!-- ✨ High-Class Greeting Banner with Custom Image Background (PALING ATAS) -->
-          <div class="glass-card rounded-3xl relative overflow-hidden border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
+          <!-- ✨ High-Class Greeting Banner with Custom Image Background (PALING ATAS - SANGAT TIPIS 60px) -->
+          <div class="glass-card rounded-2xl relative overflow-hidden border border-white/10 shadow-md h-[60px] md:h-[64px] flex items-center">
             <!-- Background Image 2.jpeg with Vivid Overlay -->
             <div class="absolute inset-0 z-0">
               <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-full object-cover object-right md:object-center opacity-100 transition-transform duration-700 hover:scale-105" />
-              <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
             </div>
 
             <!-- Sleek Top Accent Line -->
