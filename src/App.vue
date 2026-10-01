@@ -1747,50 +1747,44 @@
         <!-- TAB: AFFILIATE -->
         <section v-if="currentTab === 'affiliate'" class="animate-fade-in space-y-6">
 
-          <!-- ✨ High-Class Partner Hero Banner with Custom Image Background (PALING ATAS - 3X LIPAT TINGGI) -->
-          <div class="glass-card rounded-3xl relative overflow-hidden border border-amber-500/30 shadow-[0_16px_50px_rgba(0,0,0,0.6)] min-h-[190px] md:min-h-[210px] flex items-center">
-            <!-- Background Image 1.jpeg with Vivid Overlay -->
-            <div class="absolute inset-0 z-0">
-              <img src="/1.jpeg" alt="EduPath Partner Banner" class="w-full h-full object-cover object-right md:object-center opacity-100 transition-transform duration-700 hover:scale-105" />
-              <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent"></div>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          <!-- ✨ Banner Gambar EduPath Partner (PALING ATAS - Gambar 1.jpeg Clean & Clear) -->
+          <div class="glass-card rounded-3xl overflow-hidden border border-amber-500/30 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
+            <img src="/1.jpeg" alt="EduPath Partner Banner" class="w-full h-48 md:h-60 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+            <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-90 z-10"></div>
+          </div>
+
+          <!-- ✨ Text & Tombol Afiliasi (DI LETAKAN DI BAWAH GAMBAR) -->
+          <div class="glass-card rounded-3xl p-6 md:p-8 border border-amber-500/30 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col lg:flex-row gap-6 items-center justify-between">
+            <!-- Left: Partner Badge & Text -->
+            <div class="flex items-start gap-4 flex-grow w-full lg:w-auto text-left">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/25 to-emerald-500/25 border border-amber-400/40 shadow-[0_0_25px_rgba(245,158,11,0.3)] flex items-center justify-center shrink-0 backdrop-blur-md">
+                <i class="ph-fill ph-crown text-3xl text-amber-400"></i>
+              </div>
+              <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                  <span>EduPath Partner Program</span>
+                </div>
+                <h3 class="text-xl md:text-2xl lg:text-3xl font-black text-white tracking-tight">Cetak <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#c0ff00] to-emerald-400">Pendapatan Pasif</span> dari Jejaring Anda</h3>
+                <p class="text-white/80 text-xs md:text-sm max-w-lg font-medium leading-relaxed">Dapatkan komisi <span class="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/40 text-amber-300 font-mono font-black">20%</span> per pengguna aktif baru selamanya.</p>
+              </div>
             </div>
 
-            <!-- Top Gold Accent Line -->
-            <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-90 z-10"></div>
-
-            <div class="relative z-10 w-full p-6 md:p-8 flex flex-col lg:flex-row gap-6 items-center justify-between">
-              <!-- Left: Partner Badge & Text -->
-              <div class="flex items-start gap-4 flex-grow w-full lg:w-auto text-left">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/25 to-emerald-500/25 border border-amber-400/40 shadow-[0_0_25px_rgba(245,158,11,0.3)] flex items-center justify-center shrink-0 backdrop-blur-md">
-                  <i class="ph-fill ph-crown text-3xl text-amber-400"></i>
-                </div>
-                <div class="space-y-2">
-                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-                    <span>EduPath Partner Program</span>
-                  </div>
-                  <h3 class="text-xl md:text-2xl lg:text-3xl font-black text-white tracking-tight">Cetak <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#c0ff00] to-emerald-400">Pendapatan Pasif</span> dari Jejaring Anda</h3>
-                  <p class="text-white/80 text-xs md:text-sm max-w-lg font-medium leading-relaxed">Dapatkan komisi <span class="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/40 text-amber-300 font-mono font-black">20%</span> per pengguna aktif baru selamanya.</p>
-                </div>
-              </div>
-
-              <!-- Right: Link Generator (if joined) OR Join Button (if not joined) -->
-              <div v-if="affiliateData.status !== 'not_joined'" class="w-full lg:w-auto shrink-0 bg-black/70 border border-white/15 p-4 rounded-2xl relative overflow-hidden backdrop-blur-xl shadow-2xl">
-                <label class="block text-xs font-black text-white/60 uppercase tracking-widest mb-2">Tautan Afiliasi Unik Anda</label>
-                <div class="flex items-center gap-2.5 bg-black/90 border border-white/15 rounded-xl p-1.5 focus-within:border-[#c0ff00]/60 transition-colors">
-                  <div class="pl-2.5 text-white/50"><i class="ph-bold ph-link text-base"></i></div>
-                  <input type="text" readonly :value="`${baseUrl}/ref/${affiliateData?.referral_code}`" class="w-full lg:w-56 bg-transparent border-none text-xs text-white font-mono outline-none" id="refLinkInput" />
-                  <button @click="copyReferralLink" class="px-4 py-2 rounded-lg bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider text-xs active:scale-95 transition-all shadow-[0_0_15px_rgba(192,255,0,0.3)] cursor-pointer whitespace-nowrap">
-                    Salin Tautan
-                  </button>
-                </div>
-              </div>
-              <div v-else class="w-full lg:w-auto shrink-0">
-                <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black uppercase tracking-wider text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(16,185,129,0.5)] cursor-pointer">
-                  <span v-if="isJoiningAffiliate" class="flex items-center gap-2 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
-                  <span v-else>Aktifkan Program Afiliasi 🚀</span>
+            <!-- Right: Link Generator (if joined) OR Join Button (if not joined) -->
+            <div v-if="affiliateData.status !== 'not_joined'" class="w-full lg:w-auto shrink-0 bg-black/70 border border-white/15 p-4 rounded-2xl relative overflow-hidden backdrop-blur-xl shadow-2xl">
+              <label class="block text-xs font-black text-white/60 uppercase tracking-widest mb-2">Tautan Afiliasi Unik Anda</label>
+              <div class="flex items-center gap-2.5 bg-black/90 border border-white/15 rounded-xl p-1.5 focus-within:border-[#c0ff00]/60 transition-colors">
+                <div class="pl-2.5 text-white/50"><i class="ph-bold ph-link text-base"></i></div>
+                <input type="text" readonly :value="`${baseUrl}/ref/${affiliateData?.referral_code}`" class="w-full lg:w-56 bg-transparent border-none text-xs text-white font-mono outline-none" id="refLinkInput" />
+                <button @click="copyReferralLink" class="px-4 py-2 rounded-lg bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider text-xs active:scale-95 transition-all shadow-[0_0_15px_rgba(192,255,0,0.3)] cursor-pointer whitespace-nowrap">
+                  Salin Tautan
                 </button>
               </div>
+            </div>
+            <div v-else class="w-full lg:w-auto shrink-0">
+              <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black uppercase tracking-wider text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(16,185,129,0.5)] cursor-pointer">
+                <span v-if="isJoiningAffiliate" class="flex items-center gap-2 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
+                <span v-else>Aktifkan Program Afiliasi 🚀</span>
+              </button>
             </div>
           </div>
 
@@ -2108,49 +2102,43 @@
         <!-- TAB 1: DASHBOARD -->
         <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-6">
 
-          <!-- ✨ High-Class Greeting Banner with Custom Image Background (PALING ATAS - 3X LIPAT TINGGI) -->
-          <div class="glass-card rounded-3xl relative overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.6)] min-h-[190px] md:min-h-[210px] flex items-center">
-            <!-- Background Image 2.jpeg with Vivid Overlay -->
-            <div class="absolute inset-0 z-0">
-              <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-full object-cover object-right md:object-center opacity-100 transition-transform duration-700 hover:scale-105" />
-              <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent"></div>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          <!-- ✨ Banner Gambar Dashboard Belajar (PALING ATAS - Gambar 2.jpeg Clean & Clear) -->
+          <div class="glass-card rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
+            <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-48 md:h-60 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+            <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-90 z-10"></div>
+          </div>
+
+          <!-- ✨ Text & Tombol Greeting (DI LETAKAN DI BAWAH GAMBAR) -->
+          <div class="glass-card rounded-3xl p-6 md:p-8 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <!-- Left: Avatar & Greeting Info -->
+            <div class="flex items-start md:items-center gap-4 flex-1 min-w-0">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#c0ff00]/25 via-emerald-500/15 to-transparent border border-[#c0ff00]/40 shadow-[0_0_25px_rgba(192,255,0,0.3)] flex items-center justify-center shrink-0 backdrop-blur-md">
+                <span class="text-2xl animate-bounce">👋</span>
+              </div>
+              <div class="space-y-1.5 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
+                  <p class="text-[#c0ff00] font-black text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || 'Siswa Mandiri' }}!</span></h2>
+                <p class="text-white/70 text-xs md:text-sm font-medium">Persiapkan SNBT 2027 dengan asesmen IRT adaptif & latihan soal terfokus.</p>
+              </div>
             </div>
 
-            <!-- Sleek Top Accent Line -->
-            <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-90 z-10"></div>
-
-            <div class="relative z-10 w-full p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <!-- Left: Avatar & Greeting Info -->
-              <div class="flex items-start md:items-center gap-4 flex-1 min-w-0">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#c0ff00]/25 via-emerald-500/15 to-transparent border border-[#c0ff00]/40 shadow-[0_0_25px_rgba(192,255,0,0.3)] flex items-center justify-center shrink-0 backdrop-blur-md">
-                  <span class="text-2xl animate-bounce">👋</span>
-                </div>
-                <div class="space-y-1.5 min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
-                    <p class="text-[#c0ff00] font-black text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
-                  </div>
-                  <h2 class="text-xl md:text-2xl lg:text-3xl font-black text-white tracking-tight">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || 'Siswa Mandiri' }}!</span></h2>
-                  <p class="text-white/70 text-xs md:text-sm font-medium">Persiapkan SNBT 2027 dengan asesmen IRT adaptif & latihan soal terfokus.</p>
-                </div>
-              </div>
-
-              <!-- Right: Shortcut Actions & Quick Info -->
-              <div class="flex flex-wrap items-center gap-3 shrink-0">
-                <button @click="handleTabClick('diagnostic')" class="flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
-                  <i class="ph-bold ph-exam text-base"></i>
-                  <span>Mulai Tryout</span>
-                </button>
-                <button @click="handleTabClick('learning')" class="flex items-center gap-2 px-4 py-3 rounded-2xl bg-black/60 hover:bg-white/10 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
-                  <i class="ph-bold ph-book-open text-base text-white/70"></i>
-                  <span>Belajar Materi</span>
-                </button>
-                <button @click="handleTabClick('practice')" class="flex items-center gap-2 px-4 py-3 rounded-2xl bg-black/60 hover:bg-white/10 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
-                  <i class="ph-bold ph-pencil-simple text-base text-white/70"></i>
-                  <span>Latihan Soal</span>
-                </button>
-              </div>
+            <!-- Right: Shortcut Actions & Quick Info -->
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+              <button @click="handleTabClick('diagnostic')" class="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
+                <i class="ph-bold ph-exam text-base"></i>
+                <span>Mulai Tryout</span>
+              </button>
+              <button @click="handleTabClick('learning')" class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
+                <i class="ph-bold ph-book-open text-base text-white/70"></i>
+                <span>Belajar Materi</span>
+              </button>
+              <button @click="handleTabClick('practice')" class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
+                <i class="ph-bold ph-pencil-simple text-base text-white/70"></i>
+                <span>Latihan Soal</span>
+              </button>
             </div>
           </div>
 
