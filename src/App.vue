@@ -232,32 +232,22 @@
         </div>
       </header>
 
-      <!-- App Header Utility (Only visible when Logged In — Premium Dark Theme) -->
-      <header v-if="isLoggedIn" class="flex justify-between items-center pb-4 border-b border-white/10 mb-6 shrink-0 glass-card px-6 py-3.5 -mx-6 -mt-6 rounded-b-2xl p-6 md:p-8">
+      <!-- App Header Utility (Only visible on Mobile when Logged In) -->
+      <header v-if="isLoggedIn" class="lg:hidden flex justify-between items-center pb-4 border-b border-white/10 mb-6 shrink-0 glass-card px-6 py-3.5 -mx-6 -mt-6 rounded-b-2xl p-6 md:p-8">
         <div class="flex items-center gap-3">
           <!-- Mobile Hamburger untuk Menu Siswa -->
-          <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="lg:hidden flex-shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white/70 flex items-center justify-center hover:bg-white/10 transition-all z-50">
+          <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="flex-shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white/70 flex items-center justify-center hover:bg-white/10 transition-all z-50">
             <i class="ph-bold ph-list text-base"></i>
           </button>
-          <label class="text-xs text-white/60 font-bold uppercase tracking-wider hidden sm:block">Target PTN:</label>
-          <div class="relative">
-            <select v-model="selectedUniversity" class="bg-white/5 border border-white/10 text-white text-xs font-bold py-1.5 px-3 pr-7 rounded-xl appearance-none outline-none focus:border-purple-500 shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-colors cursor-pointer" @change="recalcTargetGap">
-              <option v-for="u in universities" :key="u.name" :value="u" class="bg-slate-900 text-white">
-                {{ u.name }} (Target: {{ u.targetScore }})
-              </option>
-            </select>
-            <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-white/40 text-xs">
-              <i class="ph-bold ph-caret-down"></i>
-            </div>
-          </div>
+          <span class="font-black text-sm text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
         </div>
 
-        <div class="flex items-center gap-3">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-            <span class="text-purple-400 font-black">STREAK</span> <span>{{ streakCount }} Hari</span>
+        <div class="flex items-center gap-2">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+            <span class="text-purple-400 font-black">🔥 {{ streakCount }}d</span>
           </div>
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-            <span class="text-amber-400 font-black">COINS</span> <span>{{ coins }}</span>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+            <span class="text-amber-400 font-black">🪙 {{ coins }}</span>
           </div>
         </div>
       </header>
@@ -1757,62 +1747,55 @@
         <!-- TAB: AFFILIATE -->
         <section v-if="currentTab === 'affiliate'" class="animate-fade-in space-y-6">
 
-          <!-- Header / Status Area -->
-          <div v-if="affiliateData.status === 'not_joined'" class="glass-card p-10 flex flex-col items-center justify-center text-center">
-            <div class="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(16,185,129,0.2)]">
-              <i class="ph-fill ph-hand-coins text-5xl text-emerald-400"></i>
+          <!-- ✨ High-Class Partner Hero Banner with Custom Image Background (PALING ATAS) -->
+          <div class="glass-card rounded-3xl relative overflow-hidden border border-amber-500/30 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
+            <!-- Background Image 1.jpeg with Vivid Overlay -->
+            <div class="absolute inset-0 z-0">
+              <img src="/1.jpeg" alt="EduPath Partner Banner" class="w-full h-full object-cover object-right md:object-center opacity-100 transition-transform duration-700 hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
             </div>
-            <h2 class="text-3xl md:text-5xl font-black text-white tracking-tighter mb-4 text-hero-genz">Program Mitra <span class="text-emerald-400">Afiliasi</span></h2>
-            <p class="text-white/60 mb-8 max-w-lg mx-auto font-medium">Dapatkan komisi pasif tanpa batas dengan mereferensikan EduPath kepada siswa lain. Gratis pendaftaran selamanya.</p>
-            <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-8 py-4 rounded-full bg-emerald-500/100 text-white font-black uppercase tracking-widest text-sm hover:bg-emerald-400 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)]">
-              <span v-if="isJoiningAffiliate" class="flex items-center gap-2 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
-              <span v-else>Aktifkan Dashboard Afiliasi</span>
-            </button>
+
+            <!-- Top Gold Line -->
+            <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-80 z-10"></div>
+
+            <div class="relative z-10 p-5 md:p-6 flex flex-col lg:flex-row gap-5 items-center justify-between">
+              <!-- Left: Partner Badge & Text -->
+              <div class="flex items-start gap-4 flex-grow w-full lg:w-auto text-left">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-emerald-500/20 border border-amber-400/30 shadow-[0_0_20px_rgba(245,158,11,0.2)] flex items-center justify-center shrink-0 backdrop-blur-md">
+                  <i class="ph-fill ph-crown text-2xl text-amber-400"></i>
+                </div>
+                <div class="space-y-1.5">
+                  <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-widest shadow-[0_0_12px_rgba(245,158,11,0.15)] backdrop-blur-md">
+                    <span>EduPath Partner Program</span>
+                  </div>
+                  <h3 class="text-lg md:text-xl font-black text-white tracking-tight">Cetak <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#c0ff00] to-emerald-400">Pendapatan Pasif</span> dari Jejaring Anda</h3>
+                  <p class="text-white/70 text-xs max-w-md">Dapatkan komisi <span class="px-2 py-0.5 rounded-md bg-amber-400/10 border border-amber-400/30 text-amber-300 font-mono font-black text-xs">20%</span> per pengguna aktif baru selamanya.</p>
+                </div>
+              </div>
+
+              <!-- Right: Link Generator (if joined) OR Join Button (if not joined) -->
+              <div v-if="affiliateData.status !== 'not_joined'" class="w-full lg:w-auto shrink-0 bg-black/60 border border-white/10 p-3.5 rounded-2xl relative overflow-hidden backdrop-blur-xl shadow-inner">
+                <label class="block text-[10px] font-black text-white/50 uppercase tracking-widest mb-2">Tautan Afiliasi Unik Anda</label>
+                <div class="flex items-center gap-2 bg-black/80 border border-white/10 rounded-xl p-1.5 focus-within:border-[#c0ff00]/50 transition-colors">
+                  <div class="pl-2.5 text-white/40"><i class="ph-bold ph-link text-base"></i></div>
+                  <input type="text" readonly :value="`${baseUrl}/ref/${affiliateData?.referral_code}`" class="w-full lg:w-56 bg-transparent border-none text-xs text-white font-mono outline-none" id="refLinkInput" />
+                  <button @click="copyReferralLink" class="px-4 py-2 rounded-lg bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider text-xs active:scale-95 transition-all shadow-[0_0_15px_rgba(192,255,0,0.2)] cursor-pointer">
+                    Salin Tautan
+                  </button>
+                </div>
+              </div>
+              <div v-else class="w-full lg:w-auto shrink-0">
+                <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black uppercase tracking-wider text-xs hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] cursor-pointer">
+                  <span v-if="isJoiningAffiliate" class="flex items-center gap-2 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
+                  <span v-else>Aktifkan Program Afiliasi 🚀</span>
+                </button>
+              </div>
+            </div>
           </div>
 
-          <!-- JOINED STATE -->
-          <div v-else class="space-y-6">
-            
-            <!-- ✨ High-Class Partner Hero Banner with Custom Image Background -->
-            <div class="glass-card rounded-3xl relative overflow-hidden border border-amber-500/30 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
-              <!-- Background Image 1.jpeg with Vivid Overlay -->
-              <div class="absolute inset-0 z-0">
-                <img src="/1.jpeg" alt="EduPath Partner Banner" class="w-full h-full object-cover object-right md:object-center opacity-100 transition-transform duration-700 hover:scale-105" />
-                <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-              </div>
-
-              <!-- Top Gold Line -->
-              <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-80 z-10"></div>
-
-              <div class="relative z-10 p-5 md:p-6 flex flex-col lg:flex-row gap-5 items-center justify-between">
-                <!-- Left: Partner Badge & Text -->
-                <div class="flex items-start gap-4 flex-grow w-full lg:w-auto text-left">
-                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-emerald-500/20 border border-amber-400/30 shadow-[0_0_20px_rgba(245,158,11,0.2)] flex items-center justify-center shrink-0 backdrop-blur-md">
-                    <i class="ph-fill ph-crown text-2xl text-amber-400"></i>
-                  </div>
-                  <div class="space-y-1.5">
-                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-widest shadow-[0_0_12px_rgba(245,158,11,0.15)] backdrop-blur-md">
-                      <span>EduPath Partner Program</span>
-                    </div>
-                    <h3 class="text-lg md:text-xl font-black text-white tracking-tight">Cetak <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#c0ff00] to-emerald-400">Pendapatan Pasif</span> dari Jejaring Anda</h3>
-                    <p class="text-white/70 text-xs max-w-md">Dapatkan komisi <span class="px-2 py-0.5 rounded-md bg-amber-400/10 border border-amber-400/30 text-amber-300 font-mono font-black text-xs">20%</span> per pengguna aktif baru selamanya.</p>
-                  </div>
-                </div>
-
-                <!-- Right: Sleek Link Generator Card -->
-                <div class="w-full lg:w-auto shrink-0 bg-black/60 border border-white/10 p-3.5 rounded-2xl relative overflow-hidden backdrop-blur-xl shadow-inner">
-                  <label class="block text-[10px] font-black text-white/50 uppercase tracking-widest mb-2">Tautan Afiliasi Unik Anda</label>
-                  <div class="flex items-center gap-2 bg-black/80 border border-white/10 rounded-xl p-1.5 focus-within:border-[#c0ff00]/50 transition-colors">
-                    <div class="pl-2.5 text-white/40"><i class="ph-bold ph-link text-base"></i></div>
-                    <input type="text" readonly :value="`${baseUrl}/ref/${affiliateData?.referral_code}`" class="w-full lg:w-56 bg-transparent border-none text-xs text-white font-mono outline-none" id="refLinkInput" />
-                    <button @click="copyReferralLink" class="px-4 py-2 rounded-lg bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider text-xs active:scale-95 transition-all shadow-[0_0_15px_rgba(192,255,0,0.2)] cursor-pointer">
-                      Salin Tautan
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <!-- JOINED STATE DATA -->
+          <div v-if="affiliateData.status !== 'not_joined'" class="space-y-6">
 
             <!-- Dynamic Stats Grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -2125,7 +2108,7 @@
         <!-- TAB 1: DASHBOARD -->
         <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-6">
 
-          <!-- ✨ High-Class Greeting Banner with Custom Image Background -->
+          <!-- ✨ High-Class Greeting Banner with Custom Image Background (PALING ATAS) -->
           <div class="glass-card rounded-3xl relative overflow-hidden border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
             <!-- Background Image 2.jpeg with Vivid Overlay -->
             <div class="absolute inset-0 z-0">
@@ -2149,17 +2132,7 @@
                       <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
                       <p class="text-[#c0ff00] font-black text-[11px] tracking-widest uppercase">Selamat belajar hari ini</p>
                     </div>
-                    <h2 class="text-xl md:text-2xl font-black text-white tracking-tight">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">Siswa Mandiri!</span></h2>
-                    <div class="flex flex-wrap items-center gap-2 pt-1">
-                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-500/20 border border-sky-400/40 text-sky-200 text-xs font-bold shadow-[0_2px_12px_rgba(56,189,248,0.15)] backdrop-blur-md">
-                        <i class="ph-bold ph-target text-sky-400 text-sm"></i>
-                        <span>Target: <strong class="text-white">{{ selectedUniversity?.name || 'Kedokteran UI' }}</strong></span>
-                      </span>
-                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-200 text-xs font-bold shadow-[0_2px_12px_rgba(251,191,36,0.15)] backdrop-blur-md">
-                        <i class="ph-fill ph-fire text-amber-400 text-sm"></i>
-                        <span>{{ streakCount }} Hari Streak</span>
-                      </span>
-                    </div>
+                    <h2 class="text-xl md:text-2xl font-black text-white tracking-tight">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || 'Siswa Mandiri' }}!</span></h2>
                   </div>
                 </div>
 
@@ -2194,6 +2167,51 @@
                   <i class="ph-bold ph-pencil-simple text-base text-white/70"></i>
                   <span>Latihan Soal</span>
                 </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✨ Target PTN Selection & Goal Status (SECTION DIBAWAH GAMBAR HERO 2.jpeg) -->
+          <div class="glass-card p-5 md:p-6 rounded-3xl border border-sky-500/30 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-950 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
+              <!-- Left: Target Selector -->
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400 text-xl shrink-0 shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+                  🎯
+                </div>
+                <div class="space-y-1">
+                  <span class="block text-[10px] font-black uppercase tracking-widest text-sky-400">Target PTN Impian Anda</span>
+                  <div class="relative inline-block">
+                    <select
+                      v-model="selectedUniversity"
+                      @change="recalcTargetGap"
+                      class="bg-black/60 border border-white/15 text-white text-sm md:text-base font-black py-2 px-4 pr-9 rounded-xl appearance-none outline-none focus:border-sky-400 shadow-inner transition-colors cursor-pointer"
+                    >
+                      <option v-for="u in universities" :key="u.name" :value="u" class="bg-slate-900 text-white font-bold">
+                        {{ u.name }} (Target: {{ u.targetScore }})
+                      </option>
+                    </select>
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-sky-400 text-xs">
+                      <i class="ph-bold ph-caret-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Gap & Target Metrics -->
+              <div class="flex flex-wrap items-center gap-3 bg-white/5 border border-white/10 p-2.5 rounded-2xl">
+                <div class="px-3.5 py-1 border-r border-white/10 text-center">
+                  <span class="block text-[9px] font-black uppercase tracking-widest text-white/50">Skor Saat Ini</span>
+                  <span class="text-base font-black font-mono text-emerald-400">{{ currentAbilityScore }}</span>
+                </div>
+                <div class="px-3.5 py-1 border-r border-white/10 text-center">
+                  <span class="block text-[9px] font-black uppercase tracking-widest text-white/50">Target Skor</span>
+                  <span class="text-base font-black font-mono text-sky-400">{{ selectedUniversity.targetScore }}</span>
+                </div>
+                <div class="px-3.5 py-1 text-center">
+                  <span class="block text-[9px] font-black uppercase tracking-widest text-white/50">Selisih Gap</span>
+                  <span class="text-base font-black font-mono text-rose-400">{{ gapScore }} Poin</span>
+                </div>
               </div>
             </div>
           </div>
