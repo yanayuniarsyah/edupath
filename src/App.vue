@@ -1991,7 +1991,7 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Ability Meter Card -->
-            <div class="glass-card lg:col-span-2 flex flex-col justify-between group p-6 md:p-8">
+            <div class="glass-card lg:col-span-2 flex flex-col justify-between group p-4 md:p-5 rounded-2xl">
               <div>
                 <div class="flex items-center gap-3 mb-6">
                   <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-emerald-400">
@@ -2000,17 +2000,17 @@
                   <h3 class="text-xl font-black font-heading text-white tracking-tight">Estimasi Kemampuan</h3>
                 </div>
                 
-                <div class="flex items-center justify-around py-8 bg-white/5 rounded-3xl border border-white/10 relative overflow-hidden">
+                <div class="flex items-center justify-around py-3.5 bg-white/5 rounded-xl border border-white/10 relative overflow-hidden">
                   <!-- abstract bg -->
                   <div class="absolute inset-0 bg-grid opacity-20 pointer-events-none"></div>
                   
                   <div class="text-center relative z-10">
-                    <span class="block text-5xl font-black font-heading text-emerald-400 font-mono drop-shadow-[0_0_15px_rgba(192,255,0,0.4)]">{{ currentAbilityScore }}</span>
+                    <span class="block text-3xl md:text-4xl font-black font-heading text-emerald-400 font-mono drop-shadow-[0_0_15px_rgba(192,255,0,0.4)]">{{ currentAbilityScore }}</span>
                     <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-2 block">Skor Saat Ini</span>
                   </div>
                   <div class="text-white/40 text-3xl font-black relative z-10 animate-pulse">➔</div>
                   <div class="text-center relative z-10">
-                    <span class="block text-5xl font-black font-heading text-[#0ea5e9] font-mono drop-shadow-[0_0_15px_rgba(14,165,233,0.4)]">{{ selectedUniversity.targetScore }}</span>
+                    <span class="block text-3xl md:text-4xl font-black font-heading text-[#0ea5e9] font-mono drop-shadow-[0_0_15px_rgba(14,165,233,0.4)]">{{ selectedUniversity.targetScore }}</span>
                     <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-2 block">Target ({{ selectedUniversity.name }})</span>
                   </div>
                 </div>
@@ -2031,15 +2031,15 @@
             </div>
 
             <!-- Daily Mission Card -->
-            <div class="glass-card flex flex-col justify-between p-6 md:p-8">
+            <div class="glass-card flex flex-col justify-between p-4 md:p-5 rounded-2xl">
               <div>
                 <div class="flex items-center justify-between mb-4">
                   <h3 class="text-xl font-black font-heading text-white tracking-tight">Misi Harian</h3>
                   <i class="ph-fill ph-sword text-2xl text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]"></i>
                 </div>
-                <p class="text-[11px] text-white/60 mb-6 font-medium">Selesaikan misi untuk XP.</p>
+                <p class="text-[11px] text-white/60 mb-3 font-medium">Selesaikan misi untuk XP.</p>
                 <ul class="space-y-3">
-                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-3 p-4 rounded-2xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-white/5 border-white/10 hover:border-white/20']">
+                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-white/5 border-white/10 hover:border-white/20']">
                     <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-white text-emerald-400 focus:ring-emerald-500 focus:ring-offset-0 w-5 h-5 cursor-pointer appearance-none checked:bg-emerald-500/100 checked:border-emerald-500 relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-xs checked:after:font-black checked:after:left-[4px] checked:after:top-[1px]" @change="checkMissionReward(m)">
                     <span :class="['text-[11px] font-bold flex-grow text-white transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
                     <span class="text-xs font-black font-mono shrink-0 text-amber-400">+{{ m.reward }}</span>
@@ -2051,7 +2051,7 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Priority Learning Skills map -->
-            <div class="glass-card lg:col-span-2 p-6 md:p-7">
+            <div class="glass-card lg:col-span-2 p-4 md:p-5 rounded-2xl">
               <div class="flex items-center gap-3 mb-2">
                 <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#0ea5e9]">
                   <i class="ph-bold ph-radar text-xl"></i>
@@ -2082,7 +2082,7 @@
             </div>
 
             <!-- Recommendation path -->
-            <div class="glass-card flex flex-col justify-between p-6 md:p-7">
+            <div class="glass-card flex flex-col justify-between p-4 md:p-5 rounded-2xl">
               <div>
                 <div class="flex items-center gap-3 mb-2">
                   <i class="ph-bold ph-lightning text-2xl text-[#8b5cf6] drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]"></i>
