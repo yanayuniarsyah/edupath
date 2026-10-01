@@ -90,7 +90,7 @@
       <div class="shrink-0 border-t border-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-4 mx-2 mb-2' : 'p-2 mx-1 mb-2'">
         <div class="flex items-center gap-3 mb-3" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center'">
           <div class="w-9 h-9 shrink-0 rounded-full bg-[#c0ff00] text-black flex items-center justify-center font-black text-xs border border-[#c0ff00]/40 shadow-[0_0_12px_rgba(192,255,0,0.3)]">
-            {{ (currentUser?.name || 'SM').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() }}
+            <i class="ph-bold ph-user text-lg text-black"></i>
           </div>
           <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
             <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ currentUser?.name || 'Siswa Mandiri' }}</h4>
@@ -2113,7 +2113,7 @@
             <!-- Left: Avatar & Greeting Info -->
             <div class="flex items-start md:items-center gap-4 flex-1 min-w-0">
               <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#c0ff00]/25 via-emerald-500/15 to-transparent border border-[#c0ff00]/40 shadow-[0_0_25px_rgba(192,255,0,0.3)] flex items-center justify-center shrink-0 backdrop-blur-md">
-                <span class="text-2xl animate-bounce">👋</span>
+                <i class="ph-fill ph-user text-2xl text-[#c0ff00]"></i>
               </div>
               <div class="space-y-1.5 min-w-0">
                 <div class="flex items-center gap-2">
