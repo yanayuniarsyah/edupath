@@ -1759,36 +1759,35 @@
             <!-- Top Gold Line -->
             <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-80 z-10"></div>
 
-            <div class="relative z-10 py-3.5 px-5 md:px-6 md:py-4 flex flex-col lg:flex-row gap-4 items-center justify-between min-h-[110px]">
+            <div class="relative z-10 py-2.5 px-4 md:px-5 md:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-h-[65px]">
               <!-- Left: Partner Badge & Text -->
-              <div class="flex items-center gap-3.5 flex-grow w-full lg:w-auto text-left">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-emerald-500/20 border border-amber-400/30 shadow-[0_0_15px_rgba(245,158,11,0.2)] flex items-center justify-center shrink-0 backdrop-blur-md">
-                  <i class="ph-fill ph-crown text-xl text-amber-400"></i>
+              <div class="flex items-center gap-3 flex-grow w-full sm:w-auto text-left min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/20 to-emerald-500/20 border border-amber-400/30 shadow-[0_0_12px_rgba(245,158,11,0.2)] flex items-center justify-center shrink-0 backdrop-blur-md">
+                  <i class="ph-fill ph-crown text-base text-amber-400"></i>
                 </div>
-                <div class="space-y-0.5">
-                  <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[9px] font-black uppercase tracking-widest backdrop-blur-md">
-                    <span>EduPath Partner Program</span>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[8px] font-black uppercase tracking-widest backdrop-blur-md">Partner</span>
+                    <h3 class="text-xs md:text-sm font-black text-white tracking-tight truncate">Cetak <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#c0ff00] to-emerald-400">Pendapatan Pasif 20%</span></h3>
                   </div>
-                  <h3 class="text-base md:text-lg font-black text-white tracking-tight">Cetak <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#c0ff00] to-emerald-400">Pendapatan Pasif</span> dari Jejaring Anda</h3>
-                  <p class="text-white/70 text-[11px] max-w-md font-medium">Dapatkan komisi <span class="px-1.5 py-0.2 rounded bg-amber-400/10 border border-amber-400/30 text-amber-300 font-mono font-black text-[11px]">20%</span> per pengguna aktif baru selamanya.</p>
+                  <p class="text-white/70 text-[10px] truncate font-medium mt-0.5">Dapatkan komisi per pengguna aktif baru selamanya.</p>
                 </div>
               </div>
 
               <!-- Right: Link Generator (if joined) OR Join Button (if not joined) -->
-              <div v-if="affiliateData.status !== 'not_joined'" class="w-full lg:w-auto shrink-0 bg-black/60 border border-white/10 p-2.5 rounded-xl relative overflow-hidden backdrop-blur-xl shadow-inner">
-                <label class="block text-[9px] font-black text-white/50 uppercase tracking-widest mb-1">Tautan Afiliasi Unik Anda</label>
-                <div class="flex items-center gap-2 bg-black/80 border border-white/10 rounded-lg p-1 focus-within:border-[#c0ff00]/50 transition-colors">
-                  <div class="pl-2 text-white/40"><i class="ph-bold ph-link text-xs"></i></div>
-                  <input type="text" readonly :value="`${baseUrl}/ref/${affiliateData?.referral_code}`" class="w-full lg:w-48 bg-transparent border-none text-[11px] text-white font-mono outline-none" id="refLinkInput" />
-                  <button @click="copyReferralLink" class="px-3 py-1.5 rounded-md bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider text-[10px] active:scale-95 transition-all cursor-pointer">
-                    Salin Tautan
+              <div v-if="affiliateData.status !== 'not_joined'" class="w-full sm:w-auto shrink-0 bg-black/60 border border-white/10 px-2.5 py-1 rounded-xl relative overflow-hidden backdrop-blur-xl shadow-inner">
+                <div class="flex items-center gap-2">
+                  <div class="text-white/40"><i class="ph-bold ph-link text-xs"></i></div>
+                  <input type="text" readonly :value="`${baseUrl}/ref/${affiliateData?.referral_code}`" class="w-full sm:w-44 bg-transparent border-none text-[10px] text-white font-mono outline-none" id="refLinkInput" />
+                  <button @click="copyReferralLink" class="px-2.5 py-1 rounded-md bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider text-[9px] active:scale-95 transition-all cursor-pointer whitespace-nowrap">
+                    Salin Link
                   </button>
                 </div>
               </div>
-              <div v-else class="w-full lg:w-auto shrink-0">
-                <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black uppercase tracking-wider text-xs hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)] cursor-pointer">
-                  <span v-if="isJoiningAffiliate" class="flex items-center gap-2 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
-                  <span v-else>Aktifkan Program Afiliasi 🚀</span>
+              <div v-else class="w-full sm:w-auto shrink-0">
+                <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black uppercase tracking-wider text-[10px] hover:scale-105 active:scale-95 transition-all shadow-[0_0_12px_rgba(16,185,129,0.4)] cursor-pointer">
+                  <span v-if="isJoiningAffiliate" class="flex items-center gap-1.5 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
+                  <span v-else>Aktifkan Afiliasi 🚀</span>
                 </button>
               </div>
             </div>
@@ -2120,33 +2119,33 @@
             <!-- Sleek Top Accent Line -->
             <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-80 z-10"></div>
 
-            <div class="relative z-10 py-3.5 px-5 md:px-6 md:py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 min-h-[110px]">
+            <div class="relative z-10 py-2.5 px-4 md:px-5 md:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-h-[65px]">
               <!-- Left: Avatar & Greeting Info -->
-              <div class="flex items-center gap-3.5 flex-1 min-w-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c0ff00]/20 via-emerald-500/10 to-transparent border border-[#c0ff00]/30 shadow-[0_0_15px_rgba(192,255,0,0.2)] flex items-center justify-center shrink-0 backdrop-blur-md">
-                  <span class="text-xl animate-bounce">👋</span>
+              <div class="flex items-center gap-3 flex-1 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c0ff00]/20 via-emerald-500/10 to-transparent border border-[#c0ff00]/30 shadow-[0_0_12px_rgba(192,255,0,0.2)] flex items-center justify-center shrink-0 backdrop-blur-md">
+                  <span class="text-base animate-bounce">👋</span>
                 </div>
-                <div class="space-y-0.5 min-w-0">
-                  <div class="flex items-center gap-2">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00] animate-pulse"></span>
-                    <p class="text-[#c0ff00] font-black text-[10px] tracking-widest uppercase">Selamat belajar hari ini</p>
+                    <p class="text-[#c0ff00] font-black text-[9px] tracking-widest uppercase">Selamat belajar hari ini</p>
                   </div>
-                  <h2 class="text-base md:text-lg font-black text-white tracking-tight truncate">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || 'Siswa Mandiri' }}!</span></h2>
+                  <h2 class="text-xs md:text-sm font-black text-white tracking-tight truncate">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || 'Siswa Mandiri' }}!</span></h2>
                 </div>
               </div>
 
               <!-- Right: Shortcut Actions & Quick Info -->
-              <div class="flex flex-wrap items-center gap-2 shrink-0">
-                <button @click="handleTabClick('diagnostic')" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_15px_rgba(192,255,0,0.2)] cursor-pointer">
-                  <i class="ph-bold ph-exam text-sm"></i>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button @click="handleTabClick('diagnostic')" class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_12px_rgba(192,255,0,0.2)] cursor-pointer">
+                  <i class="ph-bold ph-exam text-xs"></i>
                   <span>Mulai Tryout</span>
                 </button>
-                <button @click="handleTabClick('learning')" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-black/50 hover:bg-white/10 border border-white/10 text-white text-[11px] font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
-                  <i class="ph-bold ph-book-open text-sm text-white/70"></i>
+                <button @click="handleTabClick('learning')" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-black/50 hover:bg-white/10 border border-white/10 text-white text-[10px] font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
+                  <i class="ph-bold ph-book-open text-xs text-white/70"></i>
                   <span>Materi</span>
                 </button>
-                <button @click="handleTabClick('practice')" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-black/50 hover:bg-white/10 border border-white/10 text-white text-[11px] font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
-                  <i class="ph-bold ph-pencil-simple text-sm text-white/70"></i>
+                <button @click="handleTabClick('practice')" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-black/50 hover:bg-white/10 border border-white/10 text-white text-[10px] font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
+                  <i class="ph-bold ph-pencil-simple text-xs text-white/70"></i>
                   <span>Latihan</span>
                 </button>
               </div>
