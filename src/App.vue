@@ -1767,7 +1767,7 @@
           <div v-else class="space-y-6">
             
             <!-- Bento Hero Affiliate -->
-            <div class="glass-card p-6 md:p-8 relative overflow-hidden">
+            <div class="glass-card p-4 md:p-5 rounded-2xl relative overflow-hidden">
               <div class="absolute top-0 right-0 w-64 h-64 rounded-full opacity-30 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #f59e0b 0%, transparent 70%); transform: translate(30%, -30%);"></div>
               
               <div class="relative z-10 flex flex-col lg:flex-row gap-4 items-center justify-between">
@@ -1776,7 +1776,7 @@
                   <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-black uppercase tracking-widest">
                     <i class="ph-fill ph-crown"></i> EduPath Partner
                   </div>
-                  <h3 class="text-2xl md:text-3xl font-black text-white tracking-tighter">Cetak <span class="text-emerald-400">Pendapatan</span> dari Jejaring Anda.</h3>
+                  <h3 class="text-base md:text-lg font-black text-white tracking-tight">Cetak <span class="text-emerald-400">Pendapatan</span> dari Jejaring Anda.</h3>
                   <p class="text-white/50 text-xs md:text-sm max-w-md mx-auto lg:mx-0">Komisi <span class="text-amber-400 font-bold">{{ affiliateData?.commission_rate || 20 }}%</span> per pengguna aktif baru.</p>
                 </div>
 
@@ -1942,13 +1942,13 @@
                   <span class="text-xl animate-bounce">👋</span>
                   <p class="text-white/60 font-medium text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
                 </div>
-                <h2 class="text-hero-genz text-xl md:text-2xl font-black text-white tracking-tighter">Halo, <span class="text-purple-400">Siswa Mandiri!</span></h2>
+                <h2 class="text-lg md:text-xl font-black text-white tracking-tight truncate">Halo, <span class="text-purple-400">Siswa Mandiri!</span></h2>
                 <div class="flex flex-wrap items-center gap-2 pt-2">
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[10px] font-black uppercase tracking-wider">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[11px] font-bold uppercase tracking-wider max-w-full">
                     <i class="ph-bold ph-target text-sky-400 text-sm"></i>
-                    Target: {{ selectedUniversity.name }}
+                    <span class="truncate">Target: {{ selectedUniversity?.name || 'Kedokteran UI' }}</span>
                   </span>
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-100 text-[10px] font-black uppercase tracking-wider text-amber-400">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[11px] font-bold uppercase tracking-wider shrink-0">
                     <i class="ph-fill ph-fire text-sm"></i>
                     {{ streakCount }} Hari Streak
                   </span>
@@ -1956,16 +1956,16 @@
               </div>
 
               <!-- Right: Quick Stats -->
-              <div class="flex gap-2 flex-wrap">
-                <div class="flex flex-col items-center justify-center py-1.5 px-2 rounded-xl bg-white/5 border border-slate-100 min-w-[70px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+              <div class="flex gap-2 shrink-0">
+                <div class="flex flex-col items-center justify-center p-2 rounded-xl bg-white/5 border border-white/10 min-w-[75px]">
                   <span class="text-xl font-black font-mono text-emerald-400">{{ currentAbilityScore }}</span>
                   <span class="text-[9px] text-white/60 font-bold uppercase tracking-widest mt-1">Skor Saat Ini</span>
                 </div>
-                <div class="flex flex-col items-center justify-center py-1.5 px-2 rounded-xl bg-white/5 border border-slate-100 min-w-[70px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                <div class="flex flex-col items-center justify-center p-2 rounded-xl bg-white/5 border border-white/10 min-w-[75px]">
                   <span class="text-xl font-black font-mono text-sky-400">{{ selectedUniversity.targetScore }}</span>
                   <span class="text-[9px] text-white/60 font-bold uppercase tracking-widest mt-1">Skor Target</span>
                 </div>
-                <div class="flex flex-col items-center justify-center py-1.5 px-2 rounded-xl bg-white/5 border border-slate-100 min-w-[70px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                <div class="flex flex-col items-center justify-center p-2 rounded-xl bg-white/5 border border-white/10 min-w-[75px]">
                   <span class="text-xl font-black font-mono text-amber-400">{{ coins }}</span>
                   <span class="text-[9px] text-white/60 font-bold uppercase tracking-widest mt-1">Koin XP</span>
                 </div>
@@ -1973,16 +1973,16 @@
             </div>
 
             <!-- Shortcut Buttons -->
-            <div class="relative z-10 flex flex-wrap gap-2 mt-2 pt-2 border-t border-slate-100">
-              <button @click="handleTabClick('diagnostic')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-black uppercase tracking-wider hover:bg-indigo-100 transition-all hover:scale-105 active:scale-95">
+            <div class="relative z-10 flex flex-wrap gap-2 mt-3 pt-3 border-t border-white/10">
+              <button @click="handleTabClick('diagnostic')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wider hover:bg-purple-500/30 transition-all active:scale-95">
                 <i class="ph-bold ph-exam text-lg"></i>
                 Mulai Tryout
               </button>
-              <button @click="handleTabClick('learning')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-700 text-xs font-bold hover:bg-white/10 transition-all hover:scale-105 active:scale-95">
+              <button @click="handleTabClick('learning')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/80 text-xs font-bold hover:bg-white/10 transition-all active:scale-95">
                 <i class="ph-bold ph-book-open text-lg"></i>
                 Belajar Materi
               </button>
-              <button @click="handleTabClick('practice')" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-slate-700 text-xs font-bold hover:bg-white/10 transition-all hover:scale-105 active:scale-95">
+              <button @click="handleTabClick('practice')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white/80 text-xs font-bold hover:bg-white/10 transition-all active:scale-95">
                 <i class="ph-bold ph-pencil-simple text-lg"></i>
                 Latihan Soal
               </button>
