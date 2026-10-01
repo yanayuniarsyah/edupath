@@ -89,10 +89,17 @@
       <!-- Bottom: User + Logout -->
       <div class="shrink-0 border-t border-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-4 mx-2 mb-2' : 'p-2 mx-1 mb-2'">
         <div class="flex items-center gap-3 mb-3" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center'">
-          <div class="w-9 h-9 shrink-0 rounded-full bg-white/10 flex items-center justify-center font-bold text-white text-xs border border-white/20">SM</div>
+          <div class="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-amber-400 to-emerald-400 flex items-center justify-center font-black text-slate-950 text-xs border border-white/20 shadow-sm">
+            {{ (currentUser?.name || 'SM').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() }}
+          </div>
           <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
-            <h4 class="text-xs font-black text-white whitespace-nowrap">Siswa Mandiri</h4>
-            <span class="text-[10px] text-[#c0ff00] font-black uppercase tracking-wider whitespace-nowrap">Pro Member</span>
+            <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ currentUser?.name || 'Siswa Mandiri' }}</h4>
+            <div @click="purchasePlan('Pro', 149000)" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Upgrade Paket">
+              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap" :class="currentUser?.is_premium ? 'text-[#c0ff00]' : 'text-amber-400'">
+                Status Paket: {{ currentUser?.is_premium ? 'Premium' : 'Trial' }}
+              </span>
+              <span v-if="!currentUser?.is_premium" class="text-[9px] bg-amber-400/20 text-amber-300 border border-amber-400/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Upgrade ⚡</span>
+            </div>
           </div>
         </div>
         <!-- Tombol Logout -->
@@ -1886,8 +1893,8 @@
               <button @click="activeAffiliateTab = 'komisi'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'komisi' ? 'border-indigo-500 text-purple-400' : 'border-transparent text-white/40 hover:text-white hover:border-white/20'">
                 Riwayat Komisi
               </button>
-              <button @click="activeAffiliateTab = 'profil'" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 transition-all whitespace-nowrap" :class="activeAffiliateTab === 'profil' ? 'border-amber-500 text-amber-400' : 'border-transparent text-white/40 hover:text-white hover:border-white/20'">
-                Rekening & Profil
+              <button @click="handleTabClick('settings')" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 border-transparent text-white/40 hover:text-amber-400 hover:border-amber-400 transition-all whitespace-nowrap flex items-center gap-1.5">
+                <i class="ph-bold ph-gear text-sm"></i> Pengaturan
               </button>
             </div>
 
@@ -1940,128 +1947,177 @@
                   Belum ada riwayat komisi.
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
 
-              <!-- Rekening & Profil -->
-              <div v-show="activeAffiliateTab === 'profil'" class="p-6 md:p-8">
-                <form @submit.prevent="saveProfileAndBankSettings" class="space-y-8 max-w-3xl">
-                  
-                  <!-- Section 1: Profil Akun -->
-                  <div class="space-y-5">
-                    <div class="flex items-center gap-3 pb-3 border-b border-white/10">
-                      <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm">
-                        👤
-                      </div>
-                      <div>
-                        <h4 class="text-white font-black text-base tracking-wide">Pengaturan Akun</h4>
-                        <p class="text-xs text-white/50">Ubah nama lengkap, email, dan password akun Anda</p>
-                      </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <!-- Nama Lengkap -->
-                      <div>
-                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Nama Lengkap</label>
-                        <input
-                          v-model="profileEditForm.name"
-                          type="text"
-                          required
-                          placeholder="Masukkan nama lengkap"
-                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-medium"
-                        />
-                      </div>
-
-                      <!-- Email -->
-                      <div>
-                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Email Utama</label>
-                        <input
-                          v-model="profileEditForm.email"
-                          type="email"
-                          required
-                          placeholder="contoh@email.com"
-                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-mono"
-                        />
-                      </div>
-
-                      <!-- Password Baru -->
-                      <div class="md:col-span-2">
-                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">
-                          Password Baru <span class="text-white/40 font-normal lowercase">(kosongkan jika tidak ingin diubah)</span>
-                        </label>
-                        <input
-                          v-model="profileEditForm.password"
-                          type="password"
-                          placeholder="Minimal 6 karakter..."
-                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-mono"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Section 2: Rekening Pencairan -->
-                  <div class="space-y-5 pt-4">
-                    <div class="flex items-center gap-3 pb-3 border-b border-white/10">
-                      <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-sm">
-                        🏦
-                      </div>
-                      <div>
-                        <h4 class="text-white font-black text-base tracking-wide">Rekening & E-Wallet Pencairan</h4>
-                        <p class="text-xs text-white/50">Digunakan untuk penerimaan komisi rujukan afiliasi</p>
-                      </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                      <!-- Bank / E-Wallet -->
-                      <div>
-                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Bank / E-Wallet</label>
-                        <input
-                          v-model="profileEditForm.bank_name"
-                          type="text"
-                          placeholder="Contoh: BCA, Mandiri, GoPay, OVO"
-                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition-all font-bold"
-                        />
-                      </div>
-
-                      <!-- No Rekening -->
-                      <div>
-                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">No. Rek / No. HP</label>
-                        <input
-                          v-model="profileEditForm.bank_account"
-                          type="text"
-                          placeholder="Contoh: 1234567890"
-                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition-all font-mono"
-                        />
-                      </div>
-
-                      <!-- Nama Pemilik -->
-                      <div>
-                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Atas Nama (a.n)</label>
-                        <input
-                          v-model="profileEditForm.bank_owner"
-                          type="text"
-                          placeholder="Nama Sesuai Rekening"
-                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition-all font-medium"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Save Button -->
-                  <div class="pt-4 flex items-center justify-end gap-4">
-                    <button
-                      type="submit"
-                      :disabled="isSavingProfile"
-                      class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                      <svg v-if="isSavingProfile" class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span>{{ isSavingProfile ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
-                    </button>
-                  </div>
-                </form>
+        <!-- TAB: PENGATURAN (SETTINGS) -->
+        <section v-if="currentTab === 'settings'" class="animate-fade-in space-y-6">
+          <!-- Header Banner -->
+          <div class="glass-card p-6 md:p-8 rounded-3xl border border-white/10 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-slate-950 shadow-[0_12px_40px_rgba(0,0,0,0.5)]">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                  ⚙️
+                </div>
+                <div>
+                  <h2 class="text-2xl font-black text-white tracking-tight">Pengaturan Akun & Langganan</h2>
+                  <p class="text-xs text-white/60 font-medium">Kelola informasi profil, password, status paket, dan rekening pencairan komisi.</p>
+                </div>
               </div>
             </div>
+          </div>
+
+          <!-- Card Status Paket (Clickable for Upgrade) -->
+          <div class="glass-card p-6 md:p-8 rounded-3xl border border-white/10 relative overflow-hidden bg-gradient-to-br from-white/5 to-white/0 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full" :class="currentUser?.is_premium ? 'bg-[#c0ff00] animate-pulse' : 'bg-amber-400'"></span>
+                  <span class="text-xs font-black uppercase tracking-widest text-white/60">Status Paket</span>
+                </div>
+                <div class="text-2xl md:text-3xl font-black tracking-tight" :class="currentUser?.is_premium ? 'text-[#c0ff00]' : 'text-amber-400'">
+                  {{ currentUser?.is_premium ? (currentUser?.plan_name || 'Premium UTBK (Aktif)') : 'Paket Gratis / Trial' }}
+                </div>
+                <p class="text-xs text-white/60 max-w-xl">
+                  {{ currentUser?.is_premium 
+                      ? 'Anda memiliki akses penuh ke seluruh Fitur Simulasi UTBK, Asesmen Kesiapan AI, & Modul Drill HOTS.' 
+                      : 'Akun Anda saat ini pada mode Gratis / Trial. Upgrade ke Paket Premium untuk membuka akses tanpa batas ke Simulasi SNBT & Tryout.' }}
+                </p>
+              </div>
+
+              <!-- Button Upgrade Paket -->
+              <div class="shrink-0">
+                <button
+                  @click="purchasePlan('Pro', 149000)"
+                  class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#c0ff00] via-emerald-400 to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(192,255,0,0.4)] hover:shadow-[0_0_35px_rgba(192,255,0,0.7)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <i class="ph-bold ph-lightning text-base"></i>
+                  <span>{{ currentUser?.is_premium ? 'Perpanjang / Upgrade Paket' : 'Upgrade ke Premium ⚡' }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Edit Profil & Rekening Bank -->
+          <div class="glass-card p-6 md:p-8 rounded-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+            <form @submit.prevent="saveProfileAndBankSettings" class="space-y-8 max-w-3xl">
+              
+              <!-- Section 1: Profil Akun -->
+              <div class="space-y-5">
+                <div class="flex items-center gap-3 pb-3 border-b border-white/10">
+                  <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm">
+                    👤
+                  </div>
+                  <div>
+                    <h4 class="text-white font-black text-base tracking-wide">Pengaturan Akun</h4>
+                    <p class="text-xs text-white/50">Ubah nama lengkap, email, dan password akun Anda</p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <!-- Nama Lengkap -->
+                  <div>
+                    <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Nama Lengkap</label>
+                    <input
+                      v-model="profileEditForm.name"
+                      type="text"
+                      required
+                      placeholder="Masukkan nama lengkap"
+                      class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-medium"
+                    />
+                  </div>
+
+                  <!-- Email -->
+                  <div>
+                    <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Email Utama</label>
+                    <input
+                      v-model="profileEditForm.email"
+                      type="email"
+                      required
+                      placeholder="contoh@email.com"
+                      class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-mono"
+                    />
+                  </div>
+
+                  <!-- Password Baru -->
+                  <div class="md:col-span-2">
+                    <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">
+                      Password Baru <span class="text-white/40 font-normal lowercase">(kosongkan jika tidak ingin diubah)</span>
+                    </label>
+                    <input
+                      v-model="profileEditForm.password"
+                      type="password"
+                      placeholder="Minimal 6 karakter..."
+                      class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 2: Rekening Pencairan -->
+              <div class="space-y-5 pt-4">
+                <div class="flex items-center gap-3 pb-3 border-b border-white/10">
+                  <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-sm">
+                    🏦
+                  </div>
+                  <div>
+                    <h4 class="text-white font-black text-base tracking-wide">Rekening & E-Wallet Pencairan</h4>
+                    <p class="text-xs text-white/50">Digunakan untuk penerimaan komisi rujukan afiliasi</p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <!-- Bank / E-Wallet -->
+                  <div>
+                    <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Bank / E-Wallet</label>
+                    <input
+                      v-model="profileEditForm.bank_name"
+                      type="text"
+                      placeholder="Contoh: BCA, Mandiri, GoPay, OVO"
+                      class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition-all font-bold"
+                    />
+                  </div>
+
+                  <!-- No Rekening -->
+                  <div>
+                    <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">No. Rek / No. HP</label>
+                    <input
+                      v-model="profileEditForm.bank_account"
+                      type="text"
+                      placeholder="Contoh: 1234567890"
+                      class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition-all font-mono"
+                    />
+                  </div>
+
+                  <!-- Nama Pemilik -->
+                  <div>
+                    <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Atas Nama (a.n)</label>
+                    <input
+                      v-model="profileEditForm.bank_owner"
+                      type="text"
+                      placeholder="Nama Sesuai Rekening"
+                      class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition-all font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Save Button -->
+              <div class="pt-4 flex items-center justify-end gap-4">
+                <button
+                  type="submit"
+                  :disabled="isSavingProfile"
+                  class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+                >
+                  <svg v-if="isSavingProfile" class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>{{ isSavingProfile ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </section>
 
@@ -3929,7 +3985,8 @@ export default {
       { id: 'learning', label: 'Materi & Drill', icon: 'ph-books' },
       { id: 'simulator', label: 'Ujian 2027 Simulasi', icon: 'ph-calculator' },
       { id: 'studyroom', label: 'Pomodoro Room', icon: 'ph-headphones' },
-      { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' }
+      { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' },
+      { id: 'settings', label: 'Pengaturan', icon: 'ph-gear' }
     ]);
     const isLoginMode = ref(true);
     
