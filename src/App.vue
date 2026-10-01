@@ -89,16 +89,16 @@
       <!-- Bottom: User + Logout -->
       <div class="shrink-0 border-t border-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-4 mx-2 mb-2' : 'p-2 mx-1 mb-2'">
         <div class="flex items-center gap-3 mb-3" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center'">
-          <div class="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-amber-400 to-emerald-400 flex items-center justify-center font-black text-slate-950 text-xs border border-white/20 shadow-sm">
+          <div class="w-9 h-9 shrink-0 rounded-full bg-[#c0ff00] text-black flex items-center justify-center font-black text-xs border border-[#c0ff00]/40 shadow-[0_0_12px_rgba(192,255,0,0.3)]">
             {{ (currentUser?.name || 'SM').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() }}
           </div>
           <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
             <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ currentUser?.name || 'Siswa Mandiri' }}</h4>
             <div @click="purchasePlan('Pro', 149000)" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Upgrade Paket">
-              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap" :class="currentUser?.is_premium ? 'text-[#c0ff00]' : 'text-amber-400'">
+              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-[#c0ff00]">
                 Status Paket: {{ currentUser?.is_premium ? 'Premium' : 'Trial' }}
               </span>
-              <span v-if="!currentUser?.is_premium" class="text-[9px] bg-amber-400/20 text-amber-300 border border-amber-400/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Upgrade ⚡</span>
+              <span v-if="!currentUser?.is_premium" class="text-[9px] bg-[#c0ff00]/20 text-[#c0ff00] border border-[#c0ff00]/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-[#c0ff00] group-hover:text-black transition-all">Upgrade ⚡</span>
             </div>
           </div>
         </div>
@@ -1781,7 +1781,7 @@
               </div>
             </div>
             <div v-else class="w-full lg:w-auto shrink-0">
-              <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black uppercase tracking-wider text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(16,185,129,0.5)] cursor-pointer">
+              <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="px-8 py-4 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
                 <span v-if="isJoiningAffiliate" class="flex items-center gap-2 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
                 <span v-else>Aktifkan Program Afiliasi 🚀</span>
               </button>
@@ -1967,7 +1967,7 @@
               <div class="shrink-0">
                 <button
                   @click="purchasePlan('Pro', 149000)"
-                  class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#c0ff00] via-emerald-400 to-teal-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-[0_0_25px_rgba(192,255,0,0.4)] hover:shadow-[0_0_35px_rgba(192,255,0,0.7)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  class="px-6 py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <i class="ph-bold ph-lightning text-base"></i>
                   <span>{{ currentUser?.is_premium ? 'Perpanjang / Upgrade Paket' : 'Upgrade ke Premium ⚡' }}</span>
@@ -2085,9 +2085,9 @@
                 <button
                   type="submit"
                   :disabled="isSavingProfile"
-                  class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+                  class="px-8 py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
                 >
-                  <svg v-if="isSavingProfile" class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg v-if="isSavingProfile" class="animate-spin -ml-1 mr-2 h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -3594,7 +3594,7 @@
               </div>
             </div>
 
-            <button type="submit" :disabled="isRegistering" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2 mt-2 disabled:opacity-50">
+            <button type="submit" :disabled="isRegistering" class="w-full py-4 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-sm uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 mt-2 disabled:opacity-50 cursor-pointer">
               <i v-if="!isRegistering" class="ph-bold ph-paper-plane-right"></i> 
               {{ isRegistering ? 'Memproses...' : 'Kirim Pendaftaran' }}
             </button>
