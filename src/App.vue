@@ -1701,11 +1701,10 @@
                 </h4>
                 <ul class="text-xs text-white/70 space-y-2">
                   <li>
-                    <a href="terms.html" target="_blank" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-white/70">
+                    <button @click="showTermsModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-white/70">
                       <i class="ph-bold ph-scales text-white/40"></i>
                       <span>Syarat &amp; Ketentuan</span>
-                      <i class="ph-bold ph-arrow-up-right text-[10px] text-white/40"></i>
-                    </a>
+                    </button>
                   </li>
                   <li>
                     <button @click="showPrivacyModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
@@ -3161,7 +3160,7 @@
             </button>
             <p class="mt-3 text-[11px] text-center text-white/50 leading-relaxed">
               Dengan melanjutkan pembayaran, Anda menyetujui 
-              <a href="terms.html" target="_blank" class="text-[#c0ff00] underline hover:text-white transition-colors">Syarat &amp; Ketentuan</a> 
+              <button type="button" @click="showTermsModal = true" class="text-[#c0ff00] underline hover:text-white transition-colors cursor-pointer">Syarat &amp; Ketentuan</button> 
               EduPath.
             </p>
           </div>
@@ -3280,7 +3279,7 @@
 
           <p v-if="!isLoginMode" class="text-[10px] text-slate-500 text-center font-light mt-2">
             Dengan mendaftar, Anda menyetujui 
-            <a href="terms.html" target="_blank" class="text-[#c0ff00] underline hover:text-white transition-colors">Syarat &amp; Ketentuan</a> 
+            <button type="button" @click="showTermsModal = true" class="text-[#c0ff00] underline hover:text-white transition-colors cursor-pointer">Syarat &amp; Ketentuan</button> 
             layanan EduPath.
           </p>
         </div>
@@ -3300,6 +3299,139 @@
         <p class="text-[11px] text-white/60 truncate font-medium mt-0.5">{{ liveActivityList[currentActivityIdx].desc }}</p>
       </div>
       <button @click="showLiveActivity = false" class="text-white/30 hover:text-white text-xs p-1" title="Tutup">✕</button>
+    </div>
+
+    <!-- Modal: Syarat & Ketentuan (Terms & Conditions) -->
+    <div v-if="showTermsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+      <div class="relative w-full max-w-3xl max-h-[88vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4 sticky top-0 bg-[#0c121e]/95 backdrop-blur-md z-10 -mt-2 pt-2">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center text-xl font-black">
+              <i class="ph-bold ph-scales"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-black text-white">Syarat dan Ketentuan (Terms &amp; Conditions)</h3>
+              <p class="text-xs text-white/50">EduPath Platform Pembelajaran Digital • Terakhir diperbarui: 1 Oktober 2026</p>
+            </div>
+          </div>
+          <button @click="showTermsModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition-colors">✕</button>
+        </div>
+
+        <div class="space-y-4 text-xs md:text-sm text-white/75 leading-relaxed">
+          <div class="p-4 rounded-2xl bg-white/[0.03] border-l-4 border-[#c0ff00] space-y-1">
+            <p class="text-white font-bold">Selamat datang di EduPath.</p>
+            <p>Syarat dan Ketentuan ini mengatur penggunaan situs, akun, fitur pembelajaran, paket belajar, tryout, materi digital, dan layanan lain yang disediakan oleh EduPath. Dengan membuat akun, melakukan pembelian, atau menggunakan layanan EduPath, Anda menyatakan telah membaca, memahami, dan menyetujui ketentuan ini.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">1.</span> Definisi
+            </h4>
+            <p><strong>EduPath:</strong> Platform pembelajaran digital persiapan seleksi perguruan tinggi. <strong>Pengguna:</strong> Setiap orang yang membuat akun atau mengakses EduPath. <strong>Pembayar:</strong> Pihak yang melakukan transaksi (siswa atau orang tua/wali). <strong>Konten:</strong> Seluruh soal, modul, video, analitik, dan perangkat lunak.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">2.</span> Tentang EduPath
+            </h4>
+            <p>Menyediakan latihan soal, tryout dan simulasi IRT, modul belajar adaptif, analitik belajar, rekomendasi jalur belajar, serta fitur AI pendukung persiapan UTBK/SNBT.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">3.</span> Pendaftaran dan Akun
+            </h4>
+            <p>Pengguna wajib memberikan data yang benar dan menjaga kerahasiaan kata sandi akun. Satu akun diperuntukkan untuk 1 (satu) Pengguna terdaftar dan dilarang diperjualbelikan, dipindahtangankan, atau digunakan bersama secara tidak sah (account sharing).</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">4.</span> Pengguna dan Pembayar
+            </h4>
+            <p>Pembayaran dapat dilakukan oleh orang tua atau wali murid. Hak akses diberikan kepada akun yang ditentukan saat transaksi dan tidak secara otomatis dapat dipindahkan ke akun lain.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">5.</span> Paket dan Masa Berlaku
+            </h4>
+            <p>Masa aktif akses fitur berlaku sesuai paket yang dipilih saat pembelian. Pembelian paket tidak memberikan hak kepemilikan permanen atas seluruh layanan kecuali dinyatakan khusus.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">6.</span> Harga dan Pembayaran
+            </h4>
+            <p>Harga paket adalah harga yang tercantum saat checkout. Pembayaran diproses secara aman melalui payment gateway resmi berlisensi (Midtrans). Perubahan harga berikutnya tidak berlaku surut.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">7.</span> Konfirmasi Pembayaran dan Aktivasi
+            </h4>
+            <p>Setelah status pembayaran dikonfirmasi oleh sistem EduPath dari penyedia pembayaran, hak akses paket akan langsung diaktifkan secara otomatis.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">8.</span> Penggunaan Layanan
+            </h4>
+            <p>Dilarang keras menyalin, merekam layar untuk tujuan komersial, mengunduh massal, membagikan akun, scraping data otomatis, atau menembus mekanisme keamanan sistem.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">9.</span> Hak Kekayaan Intelektual
+            </h4>
+            <p>Seluruh materi, bank soal, video pembahasan, kode sumber, dan logo merupakan hak kekayaan intelektual milik EduPath yang dilindungi oleh hukum RI.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-[#c0ff00]/5 border border-[#c0ff00]/20 space-y-1.5">
+            <h4 class="text-[#c0ff00] font-black text-sm flex items-center gap-2">
+              <span>✦ 10.</span> Batasan Fitur Analitik, Simulasi &amp; AI
+            </h4>
+            <p class="text-white/85">Kalkulator prediksi skor AI dan peluang kelulusan PTN adalah instrumen simulasi dan evaluasi belajar. <strong>Hasil tersebut bukan jaminan mutlak kelulusan ujian resmi (SNPMB/UTBK)</strong>, melainkan panduan penentuan strategi belajar.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">11.</span> Perubahan Layanan
+            </h4>
+            <p>EduPath berhak mengembangkan, memperbarui, atau menyempurnakan fitur dan materi untuk meningkatkan kualitas layanan pembelajaran.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">12.</span> Pembatalan dan Pengembalian Dana (Refund)
+            </h4>
+            <p>Mengingat layanan berbentuk produk digital dengan akses seketika, <strong>pembelian pada umumnya bersifat final (non-refundable)</strong>. Refund hanya dipertimbangkan untuk kejadian khusus seperti pembayaran ganda (double payment) atau gangguan teknis permanen pada server kami.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">13-20.</span> Keandalan Sistem, Privasi &amp; Hukum yang Berlaku
+            </h4>
+            <p>Layanan tunduk pada hukum Republik Indonesia. Kami berkomitmen menjaga keamanan data sesuai UU Perlindungan Data Pribadi dan tidak menjual data pribadi kepada pihak ketiga.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <h4 class="text-white font-black text-sm flex items-center gap-2">
+              <span class="text-[#c0ff00]">21-22.</span> Kontak Resmi &amp; Persetujuan
+            </h4>
+            <p>Email: <strong>admin@edupath.co.id</strong> • Website: <strong>https://edupath.co.id</strong></p>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <a href="terms.html" target="_blank" class="text-xs text-[#c0ff00] hover:underline flex items-center gap-1 font-bold">
+            <i class="ph-bold ph-arrow-square-out text-sm"></i>
+            <span>Buka Versi Halaman Penuh (Cetak Dokumen)</span>
+          </a>
+          <button @click="showTermsModal = false" class="px-6 py-2.5 rounded-full bg-[#c0ff00] text-black font-black text-xs hover:scale-105 active:scale-95 transition-all">
+            Saya Mengerti
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Modal: Kebijakan Privasi (Privacy Policy) -->
@@ -3651,6 +3783,7 @@ export default {
     // Basic User & Auth States
     const isLoggedIn = ref(false); 
     const showLoginModal = ref(false);
+    const showTermsModal = ref(false);
     const showPrivacyModal = ref(false);
     const showDisclaimerModal = ref(false);
     const showParentConsentModal = ref(false);
@@ -4835,6 +4968,7 @@ export default {
       newPassword,
       handleForgotPassword,
       handleResetPassword,
+      showTermsModal,
       showPrivacyModal,
       showDisclaimerModal,
       showParentConsentModal,
