@@ -1700,11 +1700,14 @@
                   <span>Legalitas &amp; Kebijakan</span>
                 </h4>
                 <ul class="text-xs text-white/70 space-y-2">
-                  <li>
+                  <li class="flex items-center gap-2">
                     <button @click="showTermsModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-white/70">
                       <i class="ph-bold ph-scales text-white/40"></i>
                       <span>Syarat &amp; Ketentuan</span>
                     </button>
+                    <a href="terms.html" target="_blank" title="Buka di tab baru" class="text-white/40 hover:text-[#c0ff00] transition-colors flex items-center">
+                      <i class="ph-bold ph-arrow-square-out text-xs"></i>
+                    </a>
                   </li>
                   <li>
                     <button @click="showPrivacyModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
