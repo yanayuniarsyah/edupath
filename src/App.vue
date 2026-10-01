@@ -1871,7 +1871,7 @@
                 Riwayat Komisi
               </button>
               <button @click="handleTabClick('settings')" class="pb-3 px-2 text-xs uppercase tracking-widest font-black border-b-2 border-transparent text-white/40 hover:text-amber-400 hover:border-amber-400 transition-all whitespace-nowrap flex items-center gap-1.5">
-                <i class="ph-bold ph-gear text-sm"></i> Pengaturan
+                <i class="ph-bold ph-user-gear text-sm"></i> Pengaturan
               </button>
             </div>
 
@@ -3975,7 +3975,7 @@ export default {
       { id: 'simulator', label: 'Ujian 2027 Simulasi', icon: 'ph-calculator' },
       { id: 'studyroom', label: 'Pomodoro Room', icon: 'ph-headphones' },
       { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' },
-      { id: 'settings', label: 'Pengaturan', icon: 'ph-gear' }
+      { id: 'settings', label: 'Pengaturan', icon: 'ph-user-gear' }
     ]);
     const isLoginMode = ref(true);
     
