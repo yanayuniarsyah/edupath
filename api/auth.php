@@ -322,6 +322,56 @@ elseif ($action === 'update_fcm' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(["error" => "Gagal menyimpan fcm_token"]);
     }
 }
+elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $payload = authenticate();
+    $name = trim($input['name'] ?? '');
+    $email = strtolower(trim($input['email'] ?? ''));
+    $password = $input['password'] ?? '';
+
+    if (!$name || !$email) {
+        http_response_code(400);
+        echo json_encode(["error" => "Nama dan email wajib diisi"]);
+        exit;
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Format email tidak valid"]);
+        exit;
+    }
+
+    // Cek email dipakai akun lain
+    $stmt = $pdo->prepare("SELECT id FROM students WHERE email = ? AND id != ?");
+    $stmt->execute([$email, $payload->id]);
+    if ($stmt->fetch()) {
+        http_response_code(409);
+        echo json_encode(["error" => "Email sudah digunakan oleh akun lain"]);
+        exit;
+    }
+
+    if (!empty($password)) {
+        if (strlen($password) < 6) {
+            http_response_code(400);
+            echo json_encode(["error" => "Password minimal 6 karakter"]);
+            exit;
+        }
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+        $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ? WHERE id = ?");
+        $stmt->execute([$name, $email, $hashed_password, $payload->id]);
+
+        $stmt = $pdo->prepare("UPDATE users SET identity_key = ?, password = ? WHERE id = ?");
+        $stmt->execute([$email, $hashed_password, $payload->user_id]);
+    } else {
+        $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ? WHERE id = ?");
+        $stmt->execute([$name, $email, $payload->id]);
+
+        $stmt = $pdo->prepare("UPDATE users SET identity_key = ? WHERE id = ?");
+        $stmt->execute([$email, $payload->user_id]);
+    }
+
+    echo json_encode(["success" => true, "message" => "Profil berhasil diperbarui"]);
+    exit;
+}
 elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $payload = authenticate();
     if ($payload->role !== 'student') {

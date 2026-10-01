@@ -1942,30 +1942,124 @@
               </div>
 
               <!-- Rekening & Profil -->
-              <div v-show="activeAffiliateTab === 'profil'">
-                <div class="p-8 flex flex-col md:flex-row gap-8 bg-white/5">
-                  <div class="flex-1 space-y-6">
-                    <div class="text-sm">
-                      <span class="block text-[10px] uppercase font-black tracking-widest text-white/40 mb-1">Nama Lengkap</span>
-                      <span class="font-black text-white text-lg">{{ affiliateData?.profile?.name || '-' }}</span>
+              <div v-show="activeAffiliateTab === 'profil'" class="p-6 md:p-8">
+                <form @submit.prevent="saveProfileAndBankSettings" class="space-y-8 max-w-3xl">
+                  
+                  <!-- Section 1: Profil Akun -->
+                  <div class="space-y-5">
+                    <div class="flex items-center gap-3 pb-3 border-b border-white/10">
+                      <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm">
+                        👤
+                      </div>
+                      <div>
+                        <h4 class="text-white font-black text-base tracking-wide">Pengaturan Akun</h4>
+                        <p class="text-xs text-white/50">Ubah nama lengkap, email, dan password akun Anda</p>
+                      </div>
                     </div>
-                    <div class="text-sm">
-                      <span class="block text-[10px] uppercase font-black tracking-widest text-white/40 mb-1">Email</span>
-                      <span class="font-mono text-white/80">{{ affiliateData?.profile?.email || '-' }}</span>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <!-- Nama Lengkap -->
+                      <div>
+                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Nama Lengkap</label>
+                        <input
+                          v-model="profileEditForm.name"
+                          type="text"
+                          required
+                          placeholder="Masukkan nama lengkap"
+                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-medium"
+                        />
+                      </div>
+
+                      <!-- Email -->
+                      <div>
+                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Email Utama</label>
+                        <input
+                          v-model="profileEditForm.email"
+                          type="email"
+                          required
+                          placeholder="contoh@email.com"
+                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-mono"
+                        />
+                      </div>
+
+                      <!-- Password Baru -->
+                      <div class="md:col-span-2">
+                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">
+                          Password Baru <span class="text-white/40 font-normal lowercase">(kosongkan jika tidak ingin diubah)</span>
+                        </label>
+                        <input
+                          v-model="profileEditForm.password"
+                          type="password"
+                          placeholder="Minimal 6 karakter..."
+                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-mono"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div class="flex-1 space-y-6">
-                    <div class="text-sm">
-                      <span class="block text-[10px] uppercase font-black tracking-widest text-white/40 mb-1">Bank Tujuan</span>
-                      <span class="font-black text-amber-400 text-lg">{{ affiliateData?.bank?.bank_name || '-' }}</span>
+
+                  <!-- Section 2: Rekening Pencairan -->
+                  <div class="space-y-5 pt-4">
+                    <div class="flex items-center gap-3 pb-3 border-b border-white/10">
+                      <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-sm">
+                        🏦
+                      </div>
+                      <div>
+                        <h4 class="text-white font-black text-base tracking-wide">Rekening & E-Wallet Pencairan</h4>
+                        <p class="text-xs text-white/50">Digunakan untuk penerimaan komisi rujukan afiliasi</p>
+                      </div>
                     </div>
-                    <div class="text-sm">
-                      <span class="block text-[10px] uppercase font-black tracking-widest text-white/40 mb-1">No. Rekening</span>
-                      <span class="font-mono text-white text-lg">{{ affiliateData?.bank?.bank_account || '-' }}</span>
-                      <span class="block font-bold text-white/60 text-xs mt-1">a.n {{ affiliateData?.bank?.bank_owner || '-' }}</span>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                      <!-- Bank / E-Wallet -->
+                      <div>
+                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Bank / E-Wallet</label>
+                        <input
+                          v-model="profileEditForm.bank_name"
+                          type="text"
+                          placeholder="Contoh: BCA, Mandiri, GoPay, OVO"
+                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition-all font-bold"
+                        />
+                      </div>
+
+                      <!-- No Rekening -->
+                      <div>
+                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">No. Rek / No. HP</label>
+                        <input
+                          v-model="profileEditForm.bank_account"
+                          type="text"
+                          placeholder="Contoh: 1234567890"
+                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition-all font-mono"
+                        />
+                      </div>
+
+                      <!-- Nama Pemilik -->
+                      <div>
+                        <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Atas Nama (a.n)</label>
+                        <input
+                          v-model="profileEditForm.bank_owner"
+                          type="text"
+                          placeholder="Nama Sesuai Rekening"
+                          class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition-all font-medium"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+
+                  <!-- Save Button -->
+                  <div class="pt-4 flex items-center justify-end gap-4">
+                    <button
+                      type="submit"
+                      :disabled="isSavingProfile"
+                      class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(245,158,11,0.4)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      <svg v-if="isSavingProfile" class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>{{ isSavingProfile ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -4522,6 +4616,78 @@ export default {
       }
     };
 
+    const isSavingProfile = ref(false);
+    const profileEditForm = ref({
+      name: '',
+      email: '',
+      password: '',
+      bank_name: '',
+      bank_account: '',
+      bank_owner: ''
+    });
+
+    const saveProfileAndBankSettings = async () => {
+      isSavingProfile.value = true;
+      try {
+        const token = localStorage.getItem('auth_token');
+        const apiUrl = import.meta.env.VITE_API_URL || '/api';
+
+        // 1. Update Profile (Name, Email, Password if provided)
+        const profileRes = await fetch(`${apiUrl}/auth.php?action=update_profile`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            name: profileEditForm.value.name,
+            email: profileEditForm.value.email,
+            password: profileEditForm.value.password || undefined
+          })
+        });
+
+        const profileData = await profileRes.json();
+        if (!profileRes.ok) {
+          throw new Error(profileData.error || 'Gagal memperbarui profil');
+        }
+
+        // 2. Update Bank Info
+        const bankRes = await fetch(`${apiUrl}/affiliate.php?action=update_bank`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            bank_name: profileEditForm.value.bank_name,
+            bank_account: profileEditForm.value.bank_account,
+            bank_owner: profileEditForm.value.bank_owner
+          })
+        });
+
+        const bankData = await bankRes.json();
+        if (!bankRes.ok) {
+          throw new Error(bankData.error || 'Gagal memperbarui rekening bank');
+        }
+
+        // Update local currentUser state if present
+        if (currentUser.value) {
+          currentUser.value.name = profileEditForm.value.name;
+          currentUser.value.email = profileEditForm.value.email;
+        }
+
+        // Reset password field after save
+        profileEditForm.value.password = '';
+
+        showToast('Profil & rekening pencairan berhasil diperbarui!');
+        await fetchAffiliateData();
+      } catch (err) {
+        alert(err.message || 'Terjadi kesalahan saat menyimpan pengaturan');
+      } finally {
+        isSavingProfile.value = false;
+      }
+    };
+
     const fetchAffiliateData = async () => {
       isLoadingAffiliate.value = true;
       try {
@@ -4538,6 +4704,15 @@ export default {
           const data = await res.json();
           // Update state
           affiliateData.value = data;
+          if (data.profile) {
+            profileEditForm.value.name = data.profile.name || '';
+            profileEditForm.value.email = data.profile.email || '';
+          }
+          if (data.bank) {
+            profileEditForm.value.bank_name = data.bank.bank_name || '';
+            profileEditForm.value.bank_account = data.bank.bank_account || '';
+            profileEditForm.value.bank_owner = data.bank.bank_owner || '';
+          }
         }
       } catch(err) {
         console.error(err);
@@ -4730,7 +4905,10 @@ export default {
       isLoadingAffiliate,
       affiliateData,
       joinAffiliateProgram,
-      activeAffiliateTab
+      activeAffiliateTab,
+      profileEditForm,
+      isSavingProfile,
+      saveProfileAndBankSettings
     };
   }
 };
