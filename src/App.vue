@@ -1807,40 +1807,74 @@
               </div>
             </div>
 
-            <!-- Stats Grid -->
+            <!-- Dynamic Stats Grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <!-- Stat 1 -->
-              <div class="modern-stat-card flex flex-col p-5 group">
-                <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 group-hover:bg-emerald-100 transition-all">
-                  <i class="ph-bold ph-users text-xl"></i>
+              <!-- Stat 1: Total Rujukan -->
+              <div class="glass-card p-5 rounded-2xl relative overflow-hidden border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(16,185,129,0.15)] group backdrop-blur-xl bg-gradient-to-br from-white/5 to-white/[0.02]">
+                <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity"></div>
+
+                <div class="flex items-center justify-between mb-3 relative z-10">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)] group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                    <i class="ph-bold ph-users text-xl"></i>
+                  </div>
+                  <span class="text-[9px] font-black tracking-widest text-emerald-400/80 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase">Total</span>
                 </div>
-                <span class="text-xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.total_referrals || 0 }}</span>
-                <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-1">Total Rujukan</span>
+                <div class="space-y-0.5 relative z-10">
+                  <div class="text-2xl md:text-3xl font-black font-mono text-white tracking-tight group-hover:text-emerald-300 transition-colors">{{ affiliateData?.stats?.total_referrals || 0 }}</div>
+                  <div class="text-[10px] text-white/50 font-black uppercase tracking-wider">Total Rujukan</div>
+                </div>
               </div>
-              <!-- Stat 2 -->
-              <div class="modern-stat-card flex flex-col p-5 group">
-                <div class="w-10 h-10 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-400 mb-4 group-hover:scale-110 group-hover:bg-sky-100 transition-all">
-                  <i class="ph-bold ph-user-check text-xl"></i>
+
+              <!-- Stat 2: Rujukan Aktif -->
+              <div class="glass-card p-5 rounded-2xl relative overflow-hidden border border-sky-500/20 hover:border-sky-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(56,189,248,0.15)] group backdrop-blur-xl bg-gradient-to-br from-white/5 to-white/[0.02]">
+                <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-sky-400 to-transparent opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-sky-500/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity"></div>
+
+                <div class="flex items-center justify-between mb-3 relative z-10">
+                  <div class="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.2)] group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                    <i class="ph-bold ph-user-check text-xl"></i>
+                  </div>
+                  <span class="text-[9px] font-black tracking-widest text-sky-400/80 bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 rounded-full uppercase">Aktif</span>
                 </div>
-                <span class="text-xl font-black font-mono text-white tracking-tighter">{{ affiliateData?.stats?.active_referrals || 0 }}</span>
-                <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-1">Rujukan Aktif</span>
+                <div class="space-y-0.5 relative z-10">
+                  <div class="text-2xl md:text-3xl font-black font-mono text-white tracking-tight group-hover:text-sky-300 transition-colors">{{ affiliateData?.stats?.active_referrals || 0 }}</div>
+                  <div class="text-[10px] text-white/50 font-black uppercase tracking-wider">Rujukan Aktif</div>
+                </div>
               </div>
-              <!-- Stat 3 -->
-              <div class="modern-stat-card flex flex-col p-5 group">
-                <div class="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 group-hover:bg-amber-100 transition-all">
-                  <i class="ph-bold ph-hourglass-high text-xl"></i>
+
+              <!-- Stat 3: Komisi Pending -->
+              <div class="glass-card p-5 rounded-2xl relative overflow-hidden border border-amber-500/20 hover:border-amber-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(245,158,11,0.15)] group backdrop-blur-xl bg-gradient-to-br from-white/5 to-white/[0.02]">
+                <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity"></div>
+
+                <div class="flex items-center justify-between mb-3 relative z-10">
+                  <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)] group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                    <i class="ph-bold ph-hourglass-high text-xl"></i>
+                  </div>
+                  <span class="text-[9px] font-black tracking-widest text-amber-400/80 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase">Pending</span>
                 </div>
-                <span class="text-xl md:text-2xl font-black font-mono text-white tracking-tighter">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_pending || 0) }}</span>
-                <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-1">Komisi Pending</span>
+                <div class="space-y-0.5 relative z-10">
+                  <div class="text-xl md:text-2xl font-black font-mono text-amber-300 tracking-tight">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_pending || 0) }}</div>
+                  <div class="text-[10px] text-white/50 font-black uppercase tracking-wider">Komisi Pending</div>
+                </div>
               </div>
-              <!-- Stat 4 -->
-              <div class="modern-stat-card flex flex-col p-5 group relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-t from-indigo-50 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div class="w-10 h-10 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-4 group-hover:scale-110 group-hover:bg-indigo-100 transition-all relative z-10">
-                  <i class="ph-bold ph-wallet text-xl"></i>
+
+              <!-- Stat 4: Komisi Dibayar -->
+              <div class="glass-card p-5 rounded-2xl relative overflow-hidden border border-[#c0ff00]/20 hover:border-[#c0ff00]/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(192,255,0,0.15)] group backdrop-blur-xl bg-gradient-to-br from-white/5 to-white/[0.02]">
+                <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-[#c0ff00]/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity"></div>
+
+                <div class="flex items-center justify-between mb-3 relative z-10">
+                  <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 border border-[#c0ff00]/30 flex items-center justify-center text-[#c0ff00] shadow-[0_0_15px_rgba(192,255,0,0.2)] group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                    <i class="ph-bold ph-wallet text-xl"></i>
+                  </div>
+                  <span class="text-[9px] font-black tracking-widest text-[#c0ff00] bg-[#c0ff00]/10 border border-[#c0ff00]/20 px-2 py-0.5 rounded-full uppercase">Lunas</span>
                 </div>
-                <span class="text-xl md:text-2xl font-black font-mono text-purple-400 tracking-tighter relative z-10">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_paid || 0) }}</span>
-                <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-1 relative z-10">Komisi Dibayar</span>
+                <div class="space-y-0.5 relative z-10">
+                  <div class="text-xl md:text-2xl font-black font-mono text-[#c0ff00] tracking-tight">Rp {{ new Intl.NumberFormat('id-ID').format(affiliateData?.stats?.total_paid || 0) }}</div>
+                  <div class="text-[10px] text-white/50 font-black uppercase tracking-wider">Komisi Dibayar</div>
+                </div>
               </div>
             </div>
             
