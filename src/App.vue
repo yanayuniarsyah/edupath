@@ -1770,9 +1770,9 @@
             <div class="glass-card rounded-3xl relative overflow-hidden border border-amber-500/30 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
               <!-- Background Image 1.jpeg with Overlay -->
               <div class="absolute inset-0 z-0">
-                <img src="/1.jpeg" alt="EduPath Partner Banner" class="w-full h-full object-cover object-right opacity-40 transition-transform duration-700 hover:scale-105" />
-                <div class="absolute inset-0 bg-gradient-to-r from-[#091512] via-[#091512]/95 to-transparent"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-[#091512] via-transparent to-[#091512]/60"></div>
+                <img src="/1.jpeg" alt="EduPath Partner Banner" class="w-full h-full object-cover object-right md:object-center opacity-85 hover:opacity-100 transition-all duration-700 hover:scale-105" />
+                <div class="absolute inset-0 bg-gradient-to-r from-[#070c16] via-[#070c16]/70 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#070c16]/80 via-transparent to-transparent"></div>
               </div>
 
               <!-- Top Gold Line -->
@@ -1945,9 +1945,9 @@
           <div class="glass-card rounded-3xl relative overflow-hidden border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
             <!-- Background Image 2.jpeg with Overlay -->
             <div class="absolute inset-0 z-0">
-              <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-full object-cover object-right md:object-center opacity-35 transition-transform duration-700 hover:scale-105" />
-              <div class="absolute inset-0 bg-gradient-to-r from-[#070c16] via-[#070c16]/90 to-transparent"></div>
-              <div class="absolute inset-0 bg-gradient-to-t from-[#070c16] via-transparent to-[#070c16]/60"></div>
+              <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-full object-cover object-right md:object-center opacity-85 hover:opacity-100 transition-all duration-700 hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-r from-[#070c16] via-[#070c16]/75 to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#070c16]/80 via-transparent to-transparent"></div>
             </div>
 
             <!-- Sleek Top Accent Line -->
