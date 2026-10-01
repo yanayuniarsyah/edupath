@@ -1701,6 +1701,13 @@
                 </h4>
                 <ul class="text-xs text-white/70 space-y-2">
                   <li>
+                    <a href="terms.html" target="_blank" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-white/70">
+                      <i class="ph-bold ph-scales text-white/40"></i>
+                      <span>Syarat &amp; Ketentuan</span>
+                      <i class="ph-bold ph-arrow-up-right text-[10px] text-white/40"></i>
+                    </a>
+                  </li>
+                  <li>
                     <button @click="showPrivacyModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
                       <i class="ph-bold ph-lock-key text-white/40"></i>
                       <span>Kebijakan Privasi Data</span>
@@ -3152,6 +3159,11 @@
               <i class="ph-bold ph-credit-card"></i>
               Lanjutkan ke Midtrans
             </button>
+            <p class="mt-3 text-[11px] text-center text-white/50 leading-relaxed">
+              Dengan melanjutkan pembayaran, Anda menyetujui 
+              <a href="terms.html" target="_blank" class="text-[#c0ff00] underline hover:text-white transition-colors">Syarat &amp; Ketentuan</a> 
+              EduPath.
+            </p>
           </div>
         </div>
       </div>
@@ -3264,6 +3276,12 @@
             <button @click="isLoginMode = !isLoginMode" class="text-[#c0ff00] font-bold hover:underline ml-1">
               {{ isLoginMode ? 'Daftar di sini' : 'Masuk di sini' }}
             </button>
+          </p>
+
+          <p v-if="!isLoginMode" class="text-[10px] text-slate-500 text-center font-light mt-2">
+            Dengan mendaftar, Anda menyetujui 
+            <a href="terms.html" target="_blank" class="text-[#c0ff00] underline hover:text-white transition-colors">Syarat &amp; Ketentuan</a> 
+            layanan EduPath.
           </p>
         </div>
       </div>

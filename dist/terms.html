@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syarat dan Ketentuan | EduPath — Platform Pembelajaran Digital</title>
+  <meta name="description" content="Syarat dan Ketentuan (Terms and Conditions) resmi platform pembelajaran digital EduPath.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    :root {
+      --bg-dark: #070b14;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #10b981;
+      --accent: #c0ff00;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    /* Ambient Background Glows */
+    .glow-1 {
+      position: fixed;
+      top: -10%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-2 {
+      position: fixed;
+      bottom: -10%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header Nav */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 48px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .logo-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #070b14;
+      font-weight: 800;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    }
+    .logo-text {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+    }
+    .logo-text span {
+      color: var(--accent);
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Document Hero */
+    .doc-hero {
+      margin-bottom: 40px;
+    }
+    .badge-pill {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+    .doc-hero h1 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .doc-meta {
+      font-size: 14px;
+      color: var(--text-dim);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    /* Card Content */
+    .doc-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .intro-box {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 4px solid var(--primary);
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      margin-bottom: 36px;
+      font-size: 15px;
+      color: #e2e8f0;
+    }
+
+    /* Clauses */
+    .clause-item {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .clause-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .clause-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .clause-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(192, 255, 0, 0.1);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .clause-body {
+      color: var(--text-muted);
+      font-size: 14.5px;
+    }
+    .clause-body p {
+      margin-bottom: 10px;
+    }
+    .clause-body p:last-child {
+      margin-bottom: 0;
+    }
+    .clause-body ul, .clause-body ol {
+      margin: 10px 0 14px 20px;
+    }
+    .clause-body li {
+      margin-bottom: 6px;
+    }
+    .clause-body strong {
+      color: #f8fafc;
+    }
+
+    /* Highlight Note */
+    .highlight-card {
+      background: rgba(192, 255, 0, 0.04);
+      border: 1px solid rgba(192, 255, 0, 0.2);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin: 14px 0;
+    }
+
+    /* Footer Info */
+    .doc-footer {
+      margin-top: 48px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    .doc-footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .doc-footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      .doc-card {
+        padding: 24px 18px;
+      }
+      .doc-hero h1 {
+        font-size: 26px;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: #fff;
+        color: #111;
+      }
+      .glow-1, .glow-2, .back-btn, .top-nav {
+        display: none;
+      }
+      .doc-card {
+        background: #fff;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        color: #111;
+      }
+      .clause-title {
+        color: #000;
+      }
+      .clause-body {
+        color: #333;
+      }
+      .clause-number {
+        background: #eee;
+        color: #000;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <div class="container">
+    <!-- Top Nav -->
+    <header class="top-nav">
+      <a href="index.html" class="logo-badge">
+        <div class="logo-icon">E</div>
+        <div class="logo-text">Edu<span>Path</span></div>
+      </a>
+      <div style="display: flex; gap: 10px;">
+        <button onclick="window.print()" class="back-btn" title="Cetak Dokumen">
+          <i class="ph-bold ph-printer"></i> Cetak
+        </button>
+        <a href="index.html" class="back-btn">
+          <i class="ph-bold ph-arrow-left"></i> Kembali ke Beranda
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero Title -->
+    <div class="doc-hero">
+      <span class="badge-pill">Legal & Compliance</span>
+      <h1>Syarat dan Ketentuan (Terms & Conditions)</h1>
+      <div class="doc-meta">
+        <span><i class="ph-bold ph-buildings"></i> EduPath Platform Pembelajaran Digital</span>
+        <span>•</span>
+        <span><i class="ph-bold ph-calendar-blank"></i> Terakhir diperbarui: 1 Oktober 2026</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="doc-card">
+      <div class="intro-box">
+        <p><strong>Selamat datang di EduPath.</strong></p>
+        <p>Syarat dan Ketentuan ini mengatur penggunaan situs, akun, fitur pembelajaran, paket belajar, tryout, materi digital, dan layanan lain yang disediakan oleh EduPath.</p>
+        <p style="margin-top: 8px;">Dengan membuat akun, melakukan pembelian, atau menggunakan layanan EduPath, Anda menyatakan telah membaca, memahami, dan menyetujui Syarat dan Ketentuan ini. Jika Anda tidak menyetujui ketentuan ini, mohon untuk tidak membuat akun atau menggunakan layanan EduPath.</p>
+      </div>
+
+      <!-- Clause 1 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">1</span> DEFINISI</h2>
+        <div class="clause-body">
+          <p>Dalam Syarat dan Ketentuan ini:</p>
+          <ul>
+            <li><strong>EduPath</strong> adalah platform pembelajaran digital yang menyediakan layanan pendampingan belajar, latihan, tryout, analitik pembelajaran, materi digital, dan fitur terkait persiapan seleksi perguruan tinggi.</li>
+            <li><strong>Pengguna</strong> adalah setiap orang yang membuat akun atau menggunakan layanan EduPath.</li>
+            <li><strong>Pembayar</strong> adalah orang yang melakukan pembayaran atas suatu paket atau layanan EduPath. Pembayar dapat merupakan Pengguna sendiri atau orang tua/wali yang membayarkan layanan untuk Pengguna.</li>
+            <li><strong>Paket</strong> adalah produk atau layanan EduPath yang dapat dibeli oleh Pengguna atau Pembayar, termasuk paket berlangganan maupun paket dengan masa akses tertentu.</li>
+            <li><strong>Konten</strong> adalah seluruh materi, soal, pembahasan, video, teks, gambar, desain, data, fitur, perangkat lunak, dan materi pembelajaran lain yang tersedia melalui EduPath.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Clause 2 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">2</span> TENTANG EDUPATH</h2>
+        <div class="clause-body">
+          <p>EduPath merupakan platform pembelajaran digital yang ditujukan untuk membantu siswa dalam proses belajar dan persiapan menghadapi seleksi perguruan tinggi.</p>
+          <p>Layanan EduPath dapat mencakup antara lain:</p>
+          <ul>
+            <li>Latihan soal;</li>
+            <li>Tryout dan simulasi;</li>
+            <li>Materi pembelajaran;</li>
+            <li>Pembahasan;</li>
+            <li>Analitik hasil belajar;</li>
+            <li>Rekomendasi atau informasi pendukung proses belajar;</li>
+            <li>Fitur berbasis teknologi dan AI;</li>
+            <li>Serta fitur lain yang dikembangkan EduPath dari waktu ke waktu.</li>
+          </ul>
+          <p>Ketersediaan fitur dapat berbeda berdasarkan paket yang dipilih dan dapat diperbarui sebagai bagian dari pengembangan layanan.</p>
+        </div>
+      </section>
+
+      <!-- Clause 3 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">3</span> PENDAFTARAN DAN AKUN</h2>
+        <div class="clause-body">
+          <ol>
+            <li>Untuk menggunakan fitur tertentu, Pengguna mungkin diwajibkan membuat akun.</li>
+            <li>Pengguna wajib memberikan informasi yang benar, akurat, dan dapat digunakan untuk keperluan layanan.</li>
+            <li>Pengguna bertanggung jawab untuk:
+              <ul>
+                <li>Menjaga kerahasiaan kata sandi dan kredensial akun;</li>
+                <li>Menjaga keamanan perangkat yang digunakan untuk mengakses akun;</li>
+                <li>Memastikan informasi akun tetap akurat;</li>
+                <li>Segera menghubungi EduPath apabila mengetahui adanya penggunaan akun yang tidak sah.</li>
+              </ul>
+            </li>
+            <li>Satu akun diperuntukkan bagi Pengguna yang terdaftar dan tidak boleh diperjualbelikan, dipindahtangankan, atau digunakan bersama secara tidak sah oleh pihak lain.</li>
+            <li>EduPath dapat melakukan pembatasan atau penangguhan akun apabila terdapat indikasi penggunaan yang melanggar Syarat dan Ketentuan ini.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Clause 4 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">4</span> PENGGUNA DAN PEMBAYAR</h2>
+        <div class="clause-body">
+          <ol>
+            <li>EduPath memungkinkan pembayaran dilakukan oleh pihak yang berbeda dari Pengguna. Contohnya, orang tua atau wali dapat melakukan pembayaran untuk akun siswa.</li>
+            <li>Dengan melakukan pembayaran untuk Pengguna lain, Pembayar menyatakan memiliki kewenangan yang diperlukan untuk melakukan pembayaran tersebut.</li>
+            <li>Hak akses terhadap paket diberikan kepada akun yang ditentukan pada saat transaksi dan tidak secara otomatis dapat dipindahkan kepada akun lain.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Clause 5 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">5</span> PAKET DAN MASA BERLAKU</h2>
+        <div class="clause-body">
+          <ol>
+            <li>Setiap paket EduPath memiliki cakupan fitur dan masa akses sebagaimana ditampilkan pada halaman produk atau saat transaksi dilakukan.</li>
+            <li>Paket dapat berupa:
+              <ul>
+                <li>Paket bulanan;</li>
+                <li>Paket tahunan;</li>
+                <li>Paket dengan masa akses tertentu;</li>
+                <li>Atau bentuk paket lainnya.</li>
+              </ul>
+            </li>
+            <li>Masa berlaku akses dimulai berdasarkan ketentuan paket dan status pembayaran yang telah berhasil dikonfirmasi oleh sistem.</li>
+            <li>Kecuali dinyatakan secara khusus pada halaman paket, pembelian paket tidak memberikan hak akses permanen terhadap seluruh layanan EduPath.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Clause 6 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">6</span> HARGA DAN PEMBAYARAN</h2>
+        <div class="clause-body">
+          <ol>
+            <li>Harga paket yang berlaku adalah harga yang ditampilkan oleh EduPath pada saat transaksi.</li>
+            <li>EduPath dapat mengubah harga atau struktur paket untuk transaksi berikutnya. Perubahan harga tidak berlaku surut terhadap transaksi yang telah berhasil dilakukan.</li>
+            <li>Pembayaran dilakukan melalui metode pembayaran yang tersedia pada EduPath dan dapat diproses melalui penyedia layanan pembayaran pihak ketiga (Payment Gateway).</li>
+            <li>Biaya atau ketentuan tambahan yang ditampilkan sebelum pembayaran menjadi bagian dari informasi transaksi.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Clause 7 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">7</span> KONFIRMASI PEMBAYARAN DAN AKTIVASI</h2>
+        <div class="clause-body">
+          <ol>
+            <li>Pembayaran dianggap berhasil setelah status transaksi dikonfirmasi oleh sistem EduPath berdasarkan informasi dari penyedia pembayaran.</li>
+            <li>Setelah pembayaran berhasil dikonfirmasi, sistem akan memberikan hak akses sesuai dengan paket yang dibeli.</li>
+            <li>EduPath tidak bertanggung jawab atas keterlambatan atau kegagalan transaksi yang disebabkan oleh penyedia pembayaran, bank, jaringan pembayaran, atau pihak ketiga lainnya di luar kendali wajar EduPath.</li>
+            <li>Apabila pembayaran telah dilakukan tetapi akses belum aktif setelah waktu pemrosesan yang wajar, Pengguna dapat menghubungi layanan bantuan EduPath dengan menyertakan informasi transaksi.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Clause 8 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">8</span> PENGGUNAAN LAYANAN</h2>
+        <div class="clause-body">
+          <p>Pengguna wajib menggunakan EduPath untuk tujuan pembelajaran dan sesuai dengan hukum yang berlaku.</p>
+          <p>Pengguna dilarang:</p>
+          <ul>
+            <li>Membagikan akun atau kredensial kepada pihak lain secara tidak sah;</li>
+            <li>Menjual kembali atau menyewakan akses EduPath;</li>
+            <li>Menyalin, merekam, mengunduh, mendistribusikan, atau menjual kembali Konten tanpa izin;</li>
+            <li>Melakukan scraping, crawling, atau pengambilan data secara otomatis tanpa izin;</li>
+            <li>Mencoba memperoleh akses ke fitur atau Konten yang tidak diperuntukkan bagi akun tersebut;</li>
+            <li>Mengubah, merusak, atau mengganggu sistem EduPath;</li>
+            <li>Mencoba melewati mekanisme keamanan atau pembatasan akses;</li>
+            <li>Menggunakan layanan untuk melakukan tindakan yang melanggar hukum atau merugikan pihak lain.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Clause 9 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">9</span> HAK KEKAYAAN INTELEKTUAL</h2>
+        <div class="clause-body">
+          <ol>
+            <li>Seluruh Konten yang dikembangkan atau digunakan secara sah oleh EduPath, termasuk materi pembelajaran, bank soal, pembahasan, desain antarmuka, logo dan merek, teks, perangkat lunak, database, serta sistem dan fitur, merupakan milik EduPath atau digunakan berdasarkan lisensi yang sah.</li>
+            <li>Pembelian paket hanya memberikan hak akses untuk menggunakan layanan sesuai dengan ketentuan paket dan tidak memindahkan kepemilikan atas Konten atau kekayaan intelektual kepada Pengguna.</li>
+            <li>Komponen pihak ketiga yang digunakan dalam layanan tetap tunduk pada hak dan ketentuan pemilik atau pemberi lisensinya masing-masing.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Clause 10 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">10</span> FITUR ANALITIK, SIMULASI, DAN AI</h2>
+        <div class="clause-body">
+          <p>Beberapa fitur EduPath dapat menggunakan analitik, algoritma, otomatisasi, atau teknologi AI untuk membantu proses pembelajaran.</p>
+          <p>Hasil analitik, estimasi skor, simulasi, rekomendasi, atau informasi lain yang dihasilkan oleh sistem merupakan alat bantu pembelajaran dan perencanaan.</p>
+          <div class="highlight-card">
+            <p><strong>Pernyataan Batasan Hasil AI & Simulasi:</strong></p>
+            <ul>
+              <li>Bukan merupakan hasil resmi penyelenggara seleksi;</li>
+              <li>Bukan merupakan jaminan nilai ujian;</li>
+              <li>Bukan merupakan jaminan penerimaan di perguruan tinggi tertentu;</li>
+              <li>Dan tidak menjamin kelulusan dalam UTBK, SNPMB, atau proses seleksi lainnya.</li>
+            </ul>
+          </div>
+          <p>Informasi yang diberikan oleh sistem harus dipahami bersama konteks data dan keterbatasan metode yang digunakan. Keputusan belajar dan keputusan terkait pilihan pendidikan tetap menjadi tanggung jawab Pengguna dan/atau orang tua atau walinya.</p>
+        </div>
+      </section>
+
+      <!-- Clause 11 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">11</span> PERUBAHAN LAYANAN</h2>
+        <div class="clause-body">
+          <ol>
+            <li>EduPath dapat mengembangkan, memperbarui, menambah, mengurangi, atau mengubah fitur dan Konten untuk meningkatkan layanan.</li>
+            <li>Perubahan harga tidak berlaku terhadap transaksi yang telah berhasil dilakukan.</li>
+            <li>Apabila terdapat perubahan material yang secara langsung memengaruhi hak akses terhadap paket yang telah dibeli, EduPath akan berupaya memberikan informasi melalui kanal komunikasi yang tersedia.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Clause 12 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">12</span> PEMBATALAN DAN PENGEMBALIAN DANA (REFUND)</h2>
+        <div class="clause-body">
+          <p>Karena sebagian layanan EduPath merupakan <strong>produk digital yang memberikan akses seketika</strong> setelah pembayaran dikonfirmasi, <strong>pembelian pada umumnya bersifat final</strong>.</p>
+          <p>Namun, pengembalian dana dapat dipertimbangkan dalam kondisi tertentu, termasuk namun tidak terbatas pada:</p>
+          <ul>
+            <li>Pembayaran ganda untuk transaksi yang sama;</li>
+            <li>Transaksi yang tidak sah atau tidak dikenali;</li>
+            <li>Kesalahan sistem yang menyebabkan paket yang telah dibayar tidak dapat digunakan;</li>
+            <li>Kendala teknis pada layanan EduPath yang menyebabkan akses terhadap paket yang telah dibeli tidak tersedia dalam jangka waktu yang wajar;</li>
+            <li>Kondisi lain yang diwajibkan berdasarkan hukum yang berlaku.</li>
+          </ul>
+          <p>Permintaan pengembalian dana harus disampaikan melalui kanal bantuan EduPath dengan informasi transaksi yang diperlukan untuk proses verifikasi. Pengajuan refund tidak otomatis disetujui; setiap permintaan akan diverifikasi terlebih dahulu.</p>
+        </div>
+      </section>
+
+      <!-- Clause 13 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">13</span> GANGGUAN LAYANAN</h2>
+        <div class="clause-body">
+          <p>EduPath berupaya menjaga layanan agar tersedia dan berfungsi sebagaimana mestinya. Namun gangguan dapat terjadi karena pemeliharaan sistem, gangguan jaringan, gangguan pusat data, gangguan penyedia pihak ketiga, kegagalan payment gateway, atau keadaan kahar (force majeure).</p>
+          <p>EduPath akan berupaya melakukan pemulihan layanan dalam waktu yang wajar setelah mengetahui adanya gangguan.</p>
+        </div>
+      </section>
+
+      <!-- Clause 14 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">14</span> PENANGGUHAN ATAU PENGHENTIAN AKUN</h2>
+        <div class="clause-body">
+          <p>EduPath dapat membatasi, menangguhkan, atau menghentikan akses akun apabila terdapat bukti atau indikasi yang wajar mengenai pelanggaran Syarat dan Ketentuan, penyalahgunaan akun, distribusi Konten secara ilegal, aktivitas pembobolan sistem, atau tindakan melanggar hukum.</p>
+        </div>
+      </section>
+
+      <!-- Clause 15 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">15</span> PRIVASI DAN DATA PRIBADI</h2>
+        <div class="clause-body">
+          <p>EduPath menghargai privasi Pengguna. Pengumpulan, penggunaan, penyimpanan, dan pemrosesan data pribadi dilakukan sesuai dengan peraturan perundang-undangan yang berlaku di Indonesia.</p>
+          <p>Data digunakan untuk pembuatan akun, penyediaan layanan belajar, pemrosesan transaksi pembayaran, dukungan teknis, dan keamanan sistem. <strong>EduPath tidak menjual data pribadi Pengguna kepada pihak manapun.</strong></p>
+        </div>
+      </section>
+
+      <!-- Clause 16 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">16</span> KOMUNIKASI ELEKTRONIK</h2>
+        <div class="clause-body">
+          <p>Dengan menggunakan layanan EduPath, Pengguna dapat menerima komunikasi terkait pendaftaran akun, transaksi/pembayaran, aktivasi paket, kendala operasional, serta informasi pembelajaran melalui email atau nomor kontak terdaftar.</p>
+        </div>
+      </section>
+
+      <!-- Clause 17 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">17</span> BATASAN TANGGUNG JAWAB</h2>
+        <div class="clause-body">
+          <p>EduPath berupaya menyediakan layanan dan Konten secara akurat. Namun, EduPath tidak menjamin layanan bebas kesalahan atau tanpa interupsi. EduPath tidak bertanggung jawab atas kegagalan jaringan internet pengguna, kerusakan perangkat pengguna, atau kendala pihak ketiga di luar kendali wajar EduPath.</p>
+        </div>
+      </section>
+
+      <!-- Clause 18 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">18</span> PELANGGARAN KETENTUAN</h2>
+        <div class="clause-body">
+          <p>Apabila Pengguna melanggar Syarat dan Ketentuan ini, EduPath dapat mengambil tindakan proporsional termasuk peringatan, pembatasan fitur, atau penghentian akun tanpa menghilangkan hak hukum yang tersedia bagi EduPath.</p>
+        </div>
+      </section>
+
+      <!-- Clause 19 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">19</span> PERUBAHAN SYARAT DAN KETENTUAN</h2>
+        <div class="clause-body">
+          <p>EduPath dapat memperbarui Syarat dan Ketentuan ini dari waktu ke waktu. Tanggal pembaruan terakhir akan dicantumkan pada bagian atas dokumen. Penggunaan layanan setelah ketentuan baru berlaku menunjukkan persetujuan Pengguna terhadap perubahan tersebut.</p>
+        </div>
+      </section>
+
+      <!-- Clause 20 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">20</span> HUKUM YANG BERLAKU</h2>
+        <div class="clause-body">
+          <p>Syarat dan Ketentuan ini diatur dan ditafsirkan berdasarkan hukum yang berlaku di <strong>Republik Indonesia</strong>. Setiap perselisihan diutamakan diselesaikan melalui jalur musyawarah untuk mufakat.</p>
+        </div>
+      </section>
+
+      <!-- Clause 21 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">21</span> KONTAK DAN BANTUAN</h2>
+        <div class="clause-body">
+          <p>Untuk pertanyaan mengenai akun, pembayaran, akses paket, layanan, atau Syarat dan Ketentuan ini, Pengguna dapat menghubungi kami:</p>
+          <ul>
+            <li><strong>Email:</strong> admin@edupath.co.id</li>
+            <li><strong>Website:</strong> <a href="https://edupath.co.id" style="color: var(--accent); text-decoration: none;">https://edupath.co.id</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Clause 22 -->
+      <section class="clause-item">
+        <h2 class="clause-title"><span class="clause-number">22</span> PERSETUJUAN</h2>
+        <div class="clause-body">
+          <p>Dengan membuat akun, melakukan pembelian, atau menggunakan layanan EduPath, Pengguna menyatakan bahwa:</p>
+          <ul>
+            <li>Telah membaca Syarat dan Ketentuan ini;</li>
+            <li>Memahami ketentuan penggunaan layanan;</li>
+            <li>Memberikan informasi yang benar; dan</li>
+            <li>Menyetujui penggunaan layanan sesuai dengan ketentuan yang berlaku.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="doc-footer">
+      <p>&copy; 2026 EduPath. Seluruh hak cipta dilindungi undang-undang.</p>
+      <p style="margin-top: 6px;">Platform Pembelajaran Digital & Persiapan Ujian Terukur.</p>
+    </footer>
+  </div>
+</body>
+</html>
