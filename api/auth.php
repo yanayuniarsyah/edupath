@@ -137,12 +137,13 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $stmt = $pdo->prepare("
-        SELECT u.id as user_id, u.password, ur.role, ur.tenant_id, ur.reference_id, s.id as student_id, t.is_active as tenant_active
+        SELECT u.id as user_id, u.password, ur.role, ur.tenant_id, ur.reference_id, COALESCE(s.id, a.id, ur.reference_id) as student_id, COALESCE(s.name, a.name, 'Admin') as name, COALESCE(s.email, a.username, u.identity_key) as email, COALESCE(s.target_ptn, 'UI') as target_ptn, COALESCE(t.is_active, 1) as tenant_active
         FROM users u 
         JOIN user_roles ur ON u.id = ur.user_id 
-        JOIN students s ON ur.reference_id = s.id
-        JOIN tenants t ON ur.tenant_id = t.id
-        WHERE u.identity_key = ? AND u.is_active = 1 AND ur.role = 'student'
+        LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
+        LEFT JOIN admins a ON (ur.reference_id = a.id OR u.identity_key = a.username)
+        LEFT JOIN tenants t ON ur.tenant_id = t.id
+        WHERE u.identity_key = ? AND u.is_active = 1
     ");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -155,10 +156,12 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         reset_rate_limit($pdo, 'login');
         
-        // Update last login
-        $pdo->prepare("UPDATE students SET last_login = NOW() WHERE id = ?")->execute([$user['reference_id']]);
+        // Update last login if student
+        if ($user['student_id']) {
+            $pdo->prepare("UPDATE students SET last_login = NOW() WHERE id = ?")->execute([$user['student_id']]);
+        }
         
-        $token = generate_jwt(['user_id' => $user['user_id'], 'id' => $user['reference_id'], 'role' => 'student', 'tenant_id' => $user['tenant_id']]);
+        $token = generate_jwt(['user_id' => $user['user_id'], 'id' => $user['reference_id'], 'role' => $user['role'], 'tenant_id' => $user['tenant_id']]);
         
         // Generate Refresh Token
         $refresh_token = bin2hex(random_bytes(32));

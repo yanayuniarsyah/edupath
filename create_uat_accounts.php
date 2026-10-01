@@ -104,6 +104,7 @@ try {
     $adm_email = "admin.uat@edupath.id";
     $u_adm_id = upsert_user($pdo, $adm_email, $adm_pass);
     $a_id = upsert_admin($pdo, $adm_email, "UAT Admin", $adm_pass, $tenant_id);
+    $s_adm_id = upsert_student($pdo, $adm_email, "UAT Admin", $adm_pass, $tenant_id);
     assign_role($pdo, $u_adm_id, $tenant_id, 'superadmin', $a_id);
     
     echo "<p>✅ Admin Account: <b>$adm_email</b> (Pass: admin123)</p>";
