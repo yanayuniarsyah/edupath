@@ -31,7 +31,7 @@ body {
 
 /* Base Hover Effects */
 @media (hover: hover) and (pointer: fine) {
-  a, button, [role="button"], .cursor-pointer, .glass-card, .bouncy-card, .bouncy-card-lime, label {
+  a, button, [role="button"], .cursor-pointer, .bouncy-card, .bouncy-card-lime, label {
     cursor: pointer !important;
   }
 }
@@ -105,18 +105,19 @@ p, span, li, button, label, select, input {
               0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
-/* Bouncy Glass Card â€” gaya SAMPLE.HTML glassmorphism base */
+/* Glass Card Base */
 .glass-card {
-  background: #1a1a1a;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .glass-card:hover {
-  transform: translateY(-5px) scale(1.01);
-  border-color: rgba(14, 165, 233, 0.5);
-  box-shadow: 0 20px 40px -10px rgba(14, 165, 233, 0.2);
+  border-color: rgba(192, 255, 0, 0.35);
+  box-shadow: 0 12px 35px -8px rgba(192, 255, 0, 0.12);
 }
 
 /* Soft Spring Animation for Cards */
@@ -461,7 +462,6 @@ input[type=range]::-moz-range-thumb:hover {
 }
 
 .glass-card:hover {
-  transform: translateY(-2px);
   border-color: rgba(192, 255, 0, 0.4);
   box-shadow: 0 10px 30px -5px rgba(192, 255, 0, 0.15);
 }

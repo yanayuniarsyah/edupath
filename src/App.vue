@@ -438,30 +438,52 @@
                 <div class="space-y-4">
                   <div class="flex items-center justify-between">
                     <label class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-2">
-                      <span>🏛️</span> Target Universitas &amp; Jurusan:
+                      <span>🏛️</span> Target Universitas &amp; Jurusan (50 PTN Favorit):
                     </label>
-                    <span class="text-xs font-bold text-[#c0ff00] bg-[#c0ff00]/10 px-2.5 py-0.5 rounded-full border border-[#c0ff00]/30">
+                    <span class="text-xs font-bold text-[#c0ff00] bg-[#c0ff00]/10 px-2.5 py-0.5 rounded-full border border-[#c0ff00]/30 font-mono">
                       Target: {{ simTargetPtn.targetScore }} Poin
                     </span>
                   </div>
                   
-                  <!-- PTN Selection Grid -->
-                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    <button
-                      v-for="ptn in targetPtnList"
-                      :key="ptn.id"
-                      :class="['p-2.5 rounded-xl text-xs font-bold text-left transition-all border flex flex-col justify-between h-20',
-                        simTargetPtn.id === ptn.id
-                          ? 'bg-[#c0ff00] text-black border-[#c0ff00] shadow-[0_0_20px_rgba(192,255,0,0.3)] scale-[1.02]'
-                          : 'bg-white/5 text-white/70 border-white/10 hover:border-white/30 hover:bg-white/10'
-                      ]"
-                      @click="simTargetPtn = ptn"
+                  <!-- Dropdown Selector for all 50 PTNs -->
+                  <div class="relative">
+                    <select
+                      v-model="simTargetPtn"
+                      class="w-full bg-slate-900/90 border border-white/20 text-white text-xs md:text-sm font-bold py-2.5 px-3.5 pr-8 rounded-xl appearance-none outline-none focus:border-[#c0ff00] transition-colors cursor-pointer shadow-inner"
                     >
-                      <span class="truncate font-black">{{ ptn.name }}</span>
-                      <span :class="simTargetPtn.id === ptn.id ? 'text-black/80 font-mono text-[10px]' : 'text-[#c0ff00] font-mono text-[10px]'">
-                        {{ ptn.targetScore }} Poin
-                      </span>
-                    </button>
+                      <option v-for="ptn in targetPtnList" :key="ptn.id" :value="ptn" class="bg-slate-900 text-white font-medium py-1">
+                        ⭐ [{{ ptn.targetScore }} Poin] {{ ptn.name }}
+                      </option>
+                    </select>
+                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#c0ff00] text-xs">
+                      <i class="ph-bold ph-caret-down"></i>
+                    </div>
+                  </div>
+
+                  <!-- Quick-Pick Tabs for Top 8 High Score PTNs (Optimized for instant, snappy click) -->
+                  <div class="space-y-1.5 pt-1">
+                    <div class="text-[10px] uppercase tracking-wider font-bold text-white/40 flex items-center justify-between">
+                      <span>Pilihan Cepat PTN Terpopuler:</span>
+                      <span class="text-[9px] text-[#c0ff00]">50 Pilihan Lengkap Ada di Dropdown ↑</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      <button
+                        v-for="ptn in targetPtnList.slice(0, 8)"
+                        :key="ptn.id"
+                        type="button"
+                        :class="['p-2 rounded-xl text-xs font-bold text-left transition-colors duration-150 border flex flex-col justify-between h-[68px] cursor-pointer',
+                          simTargetPtn.id === ptn.id
+                            ? 'bg-[#c0ff00] text-black border-[#c0ff00] shadow-[0_0_15px_rgba(192,255,0,0.3)]'
+                            : 'bg-white/5 text-white/70 border-white/10 hover:border-white/30 hover:bg-white/10'
+                        ]"
+                        @click="simTargetPtn = ptn"
+                      >
+                        <span class="truncate font-black text-[11px]">{{ ptn.name.split(' (')[0] }}</span>
+                        <span :class="simTargetPtn.id === ptn.id ? 'text-black/80 font-mono text-[10px] font-bold' : 'text-[#c0ff00] font-mono text-[10px]'">
+                          {{ ptn.targetScore }} Poin
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -1637,120 +1659,6 @@
           </div>
           </div><!-- /section-wrapper CTA -->
 
-          <!-- 14. Footer -->
-          <footer class="border-t border-white/10 pt-12 pb-8 text-sm text-white/50 font-medium">
-            <div class="section-wrapper">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10 text-left">
-              
-              <!-- Col 1: Brand & Company Entity -->
-              <div class="space-y-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-[0_0_15px_rgba(192,255,0,0.3)]">E</div>
-                  <span class="font-black text-white text-lg tracking-tight">EduPath<span style="color: #c0ff00;">.ai</span></span>
-                </div>
-                <p class="text-xs text-white/60 leading-relaxed">
-                  Platform teknologi belajar adaptif, diagnostic test IRT, dan persiapan SNBT terukur.
-                </p>
-                <div class="pt-2 border-t border-white/5">
-                  <div class="text-[11px] font-bold text-white/70 uppercase tracking-wider">Entitas Resmi:</div>
-                  <div class="text-xs font-black text-white mt-0.5">PT Kreasi Hasanah Indonesia</div>
-                </div>
-              </div>
-
-
-              <!-- Col 3: Hubungi Kami & Layanan -->
-              <div class="space-y-3">
-                <h4 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
-                  <i class="ph-bold ph-headset text-[#c0ff00]"></i>
-                  <span>Kontak &amp; Bantuan</span>
-                </h4>
-                <ul class="text-xs text-white/70 space-y-2.5">
-                  <li>
-                    <a href="https://wa.me/6281234567890?text=Halo%20Tim%20PT%20Kreasi%20Hasanah%20Indonesia%20(EduPath),%20saya%20ingin%20tanya%20seputar%20platform%20belajar%20adaptif" target="_blank" rel="noopener noreferrer" class="hover:text-[#c0ff00] transition-colors flex items-center gap-2 group">
-                      <i class="ph-bold ph-whatsapp-logo text-emerald-400 text-sm group-hover:scale-110 transition-transform"></i>
-                      <span>WhatsApp CS &amp; Konsultasi</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="mailto:kontak@elyana.biz.id" class="hover:text-[#c0ff00] transition-colors flex items-center gap-2">
-                      <i class="ph-bold ph-envelope text-sky-400 text-sm"></i>
-                      <span>kontak@elyana.biz.id</span>
-                    </a>
-                  </li>
-                  <li>
-                    <button @click="showContactModal = true" class="text-xs text-[#c0ff00] hover:underline font-bold flex items-center gap-1.5 cursor-pointer">
-                      <i class="ph-bold ph-cards text-sm"></i>
-                      <span>Lihat Info Kontak Lengkap</span>
-                    </button>
-                  </li>
-                  <li>
-                    <button @click="scrollToSection('affiliate-section'); sidebarExpanded = false" class="text-amber-400 hover:text-amber-300 transition-all font-bold flex items-center gap-1.5 cursor-pointer bg-transparent border-0 p-0 text-left">
-                      <i class="ph-bold ph-hand-coins text-sm"></i>
-                      <span>Afiliasi 20% + 10% Recurring</span>
-                      <i class="ph-bold ph-arrow-up-right text-[10px]"></i>
-                    </button>
-                  </li>
-                </ul>
-              </div>
-
-              <!-- Col 4: Informasi & Legalitas -->
-              <div class="space-y-3">
-                <h4 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
-                  <i class="ph-bold ph-shield-check text-[#c0ff00]"></i>
-                  <span>Legalitas &amp; Kebijakan</span>
-                </h4>
-                <ul class="text-xs text-white/70 space-y-2">
-                  <li class="flex items-center gap-2">
-                    <button @click="showTermsModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-white/70">
-                      <i class="ph-bold ph-scales text-white/40"></i>
-                      <span>Syarat &amp; Ketentuan</span>
-                    </button>
-                    <a href="terms.html" target="_blank" title="Buka di tab baru" class="text-white/40 hover:text-[#c0ff00] transition-colors flex items-center">
-                      <i class="ph-bold ph-arrow-square-out text-xs"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <button @click="showPrivacyModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
-                      <i class="ph-bold ph-lock-key text-white/40"></i>
-                      <span>Kebijakan Privasi Data</span>
-                    </button>
-                  </li>
-                  <li>
-                    <button @click="showDisclaimerModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
-                      <i class="ph-bold ph-file-text text-white/40"></i>
-                      <span>Disclaimer &amp; Metodologi</span>
-                    </button>
-                  </li>
-                  <li>
-                    <button @click="showParentConsentModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
-                      <i class="ph-bold ph-users-three text-white/40"></i>
-                      <span>Panduan Wali &amp; Orang Tua</span>
-                    </button>
-                  </li>
-                  <li>
-                    <button @click="showContactModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
-                      <i class="ph-bold ph-identification-card text-white/40"></i>
-                      <span>Profil &amp; Kontak Perusahaan</span>
-                    </button>
-                  </li>
-                </ul>
-              </div>
-
-            </div>
-
-            <!-- Bottom Sub-Footer Bar -->
-            <div class="border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-[#c0ff00] animate-ping"></div>
-                <span>© 2026 <strong class="text-white/80">PT Kreasi Hasanah Indonesia</strong> (EduPath). All rights reserved.</span>
-              </div>
-              <div class="flex flex-wrap items-center gap-4 text-xs">
-                <button @click="showContactModal = true" class="text-[#c0ff00] hover:underline font-bold">Detail Kontak Resmi</button>
-              </div>
-            </div>
-            </div><!-- /section-wrapper -->
-          </footer>
-
         </section>
 
         <!-- TAB: AFFILIATE -->
@@ -2434,7 +2342,27 @@
         </section>
 
         <!-- TAB 3: MATERI UTBK & MICRO-LESSONS -->
-        <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-6">
+        <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-6 pt-20 lg:pt-4 px-3 sm:px-6">
+          <!-- Top Close & Back Bar -->
+          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] border border-[#c0ff00]/30 flex items-center justify-center text-xl font-black">
+                <i class="ph-bold ph-books"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-[#c0ff00]">Modul Pembelajaran Mandiri</span>
+                <h2 class="text-base md:text-lg font-black text-white">Materi &amp; Drill Soal UTBK 2027</h2>
+              </div>
+            </div>
+            <button 
+              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+              title="Tutup Halaman & Kembali"
+            >
+              <span>Tutup</span>
+              <i class="ph-bold ph-x text-base"></i>
+            </button>
+          </div>
           <!-- Active Subtes Header Banner -->
           <div class="light-mode-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-indigo-600">
             <div class="flex items-center gap-3">
@@ -2722,7 +2650,27 @@
         </section>
 
         <!-- TAB 6: PARENT PORTAL -->
-        <section v-if="currentTab === 'parent'" class="animate-fade-in space-y-6">
+        <section v-if="currentTab === 'parent'" class="animate-fade-in space-y-6 pt-20 lg:pt-4 px-3 sm:px-6">
+          <!-- Top Close & Back Bar -->
+          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 mb-4 backdrop-blur-xl shadow-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl font-black">
+                <i class="ph-bold ph-users"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">Portal EduPath Parenting</span>
+                <h2 class="text-base md:text-lg font-black text-white">Parent Portal &amp; Monitoring Belajar</h2>
+              </div>
+            </div>
+            <button 
+              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+              title="Tutup Halaman & Kembali"
+            >
+              <span>Tutup</span>
+              <i class="ph-bold ph-x text-base"></i>
+            </button>
+          </div>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Parent insight metrics card -->
             <div class="light-mode-card rounded-2xl p-6 lg:col-span-2">
@@ -3116,6 +3064,120 @@
           </div>
         </section>
       </div>
+
+      <!-- 14. Footer (Global - tampil di semua tab) -->
+      <footer class="border-t border-white/10 pt-12 pb-8 text-sm text-white/50 font-medium">
+        <div class="section-wrapper">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10 text-left">
+
+          <!-- Col 1: Brand & Company Entity -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-[0_0_15px_rgba(192,255,0,0.3)]">E</div>
+              <span class="font-black text-white text-lg tracking-tight">EduPath<span style="color: #c0ff00;">.ai</span></span>
+            </div>
+            <p class="text-xs text-white/60 leading-relaxed">
+              Platform teknologi belajar adaptif, diagnostic test IRT, dan persiapan SNBT terukur.
+            </p>
+            <div class="pt-2 border-t border-white/5">
+              <div class="text-[11px] font-bold text-white/70 uppercase tracking-wider">Entitas Resmi:</div>
+              <div class="text-xs font-black text-white mt-0.5">PT Kreasi Hasanah Indonesia</div>
+            </div>
+          </div>
+
+          <!-- Col 3: Hubungi Kami & Layanan -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+              <i class="ph-bold ph-headset text-[#c0ff00]"></i>
+              <span>Kontak &amp; Bantuan</span>
+            </h4>
+            <ul class="text-xs text-white/70 space-y-2.5">
+              <li>
+                <a href="https://wa.me/6281234567890?text=Halo%20Tim%20PT%20Kreasi%20Hasanah%20Indonesia%20(EduPath),%20saya%20ingin%20tanya%20seputar%20platform%20belajar%20adaptif" target="_blank" rel="noopener noreferrer" class="hover:text-[#c0ff00] transition-colors flex items-center gap-2 group">
+                  <i class="ph-bold ph-whatsapp-logo text-emerald-400 text-sm group-hover:scale-110 transition-transform"></i>
+                  <span>WhatsApp CS &amp; Konsultasi</span>
+                </a>
+              </li>
+              <li>
+                <a href="mailto:kontak@elyana.biz.id" class="hover:text-[#c0ff00] transition-colors flex items-center gap-2">
+                  <i class="ph-bold ph-envelope text-sky-400 text-sm"></i>
+                  <span>kontak@elyana.biz.id</span>
+                </a>
+              </li>
+              <li>
+                <button @click="showContactModal = true" class="text-xs text-[#c0ff00] hover:underline font-bold flex items-center gap-1.5 cursor-pointer">
+                  <i class="ph-bold ph-cards text-sm"></i>
+                  <span>Lihat Info Kontak Lengkap</span>
+                </button>
+              </li>
+              <li>
+                <button @click="scrollToSection('affiliate-section'); sidebarExpanded = false" class="text-amber-400 hover:text-amber-300 transition-all font-bold flex items-center gap-1.5 cursor-pointer bg-transparent border-0 p-0 text-left">
+                  <i class="ph-bold ph-hand-coins text-sm"></i>
+                  <span>Afiliasi 20% + 10% Recurring</span>
+                  <i class="ph-bold ph-arrow-up-right text-[10px]"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Col 4: Legalitas & Kebijakan -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+              <i class="ph-bold ph-shield-check text-[#c0ff00]"></i>
+              <span>Legalitas &amp; Kebijakan</span>
+            </h4>
+            <ul class="text-xs text-white/70 space-y-2">
+              <li class="flex items-center gap-2">
+                <button @click="showTermsModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-white/70">
+                  <i class="ph-bold ph-scales text-white/40"></i>
+                  <span>Syarat &amp; Ketentuan</span>
+                </button>
+                <a href="terms.html" target="_blank" title="Buka di tab baru" class="text-white/40 hover:text-[#c0ff00] transition-colors flex items-center">
+                  <i class="ph-bold ph-arrow-square-out text-xs"></i>
+                </a>
+              </li>
+              <li>
+                <button @click="showPrivacyModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
+                  <i class="ph-bold ph-lock-key text-white/40"></i>
+                  <span>Kebijakan Privasi Data</span>
+                </button>
+              </li>
+              <li>
+                <button @click="showDisclaimerModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
+                  <i class="ph-bold ph-file-text text-white/40"></i>
+                  <span>Disclaimer &amp; Metodologi</span>
+                </button>
+              </li>
+              <li>
+                <button @click="showParentConsentModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
+                  <i class="ph-bold ph-users-three text-white/40"></i>
+                  <span>Panduan Wali &amp; Orang Tua</span>
+                </button>
+              </li>
+              <li>
+                <button @click="showContactModal = true" class="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5">
+                  <i class="ph-bold ph-identification-card text-white/40"></i>
+                  <span>Profil &amp; Kontak Perusahaan</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Bottom Sub-Footer Bar -->
+        <div class="border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-[#c0ff00] animate-ping"></div>
+            <span>© 2026 <strong class="text-white/80">PT Kreasi Hasanah Indonesia</strong> (EduPath). All rights reserved.</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-4 text-xs">
+            <button @click="showTermsModal = true" class="text-[#c0ff00] hover:underline font-bold">Syarat &amp; Ketentuan</button>
+            <button @click="showContactModal = true" class="hover:underline">Detail Kontak Resmi</button>
+          </div>
+        </div>
+        </div><!-- /section-wrapper -->
+      </footer>
 
     </main>
 
@@ -3921,17 +3983,8 @@ export default {
       countdownSeconds.value = Math.floor((diff % (1000 * 60)) / 1000);
     };
 
-    // PTN Chance Simulator
-    const targetPtnList = [
-      { id: 'fk_ui', name: 'Kedokteran UI', targetScore: 720, cluster: 'health', focus: 'Penalaran Matematika & Geometri' },
-      { id: 'if_itb', name: 'Teknik Informatika ITB', targetScore: 715, cluster: 'engineering', focus: 'Pengetahuan Kuantitatif & Logika Induktif' },
-      { id: 'akt_ugm', name: 'Aktuaria UGM', targetScore: 710, cluster: 'engineering', focus: 'Aljabar & Statistika Peluang' },
-      { id: 'bis_itb', name: 'Bisnis & Manajemen ITB', targetScore: 700, cluster: 'soshum', focus: 'Literasi Bahasa Inggris & Analitik Data' },
-      { id: 'huk_ui', name: 'Ilmu Hukum UI', targetScore: 695, cluster: 'soshum', focus: 'Literasi Bahasa Indonesia & Logika Deduktif' },
-      { id: 'stei_itb', name: 'STEI ITB', targetScore: 725, cluster: 'engineering', focus: 'Penalaran Matematika Lanjut' },
-      { id: 'far_unair', name: 'Farmasi UNAIR', targetScore: 685, cluster: 'health', focus: 'Pengetahuan Kuantitatif & Sains' },
-      { id: 'psik_unpad', name: 'Psikologi Unpad', targetScore: 675, cluster: 'soshum', focus: 'Pemahaman Bacaan & PBM' }
-    ];
+    // PTN Chance Simulator — 50 Perguruan Tinggi & Program Studi Favorit
+    const targetPtnList = TARGET_UNIVERSITIES;
 
     const simTargetPtn = ref(targetPtnList[0]);
     const simCurrentScore = ref(540);
