@@ -15,6 +15,63 @@ if (!BASE_URL) {
 }
 
 // =====================================================
+// IN-MEMORY CACHE LAYER
+// Mencegah request berulang untuk data yang jarang berubah.
+// Cache dibuang saat user logout / page refresh (in-memory, tidak persistent).
+// =====================================================
+
+const _cache = new Map(); // key → { data, expiresAt }
+const _inflight = new Map(); // key → Promise (request deduplication)
+
+/**
+ * TTL (time-to-live) dalam milidetik per endpoint.
+ * Sesuaikan jika ada endpoint yang frekuensi update-nya berbeda.
+ */
+const CACHE_TTL = {
+  // Data statis / jarang berubah → cache lebih lama
+  '/plans.php':                       5 * 60 * 1000,  // 5 menit
+  '/materials.php?action=list':       3 * 60 * 1000,  // 3 menit
+  '/spp.php?action=data':             5 * 60 * 1000,  // 5 menit
+  // Data profil user → cache pendek (30 detik) agar perubahan cepat terasa
+  '/auth.php?action=me':              30 * 1000,       // 30 detik
+};
+
+function getCacheTtl(endpoint) {
+  for (const [pattern, ttl] of Object.entries(CACHE_TTL)) {
+    if (endpoint.includes(pattern)) return ttl;
+  }
+  return 0; // default: tidak di-cache
+}
+
+function cacheGet(key) {
+  const entry = _cache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    _cache.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+
+function cacheSet(key, data, ttlMs) {
+  if (ttlMs <= 0) return;
+  _cache.set(key, { data, expiresAt: Date.now() + ttlMs });
+}
+
+/** Hapus semua cache (dipanggil saat logout) */
+export function clearApiCache() {
+  _cache.clear();
+  _inflight.clear();
+}
+
+/** Hapus cache untuk endpoint tertentu (dipanggil setelah mutasi data) */
+export function invalidateCache(endpointPattern) {
+  for (const key of _cache.keys()) {
+    if (key.includes(endpointPattern)) _cache.delete(key);
+  }
+}
+
+// =====================================================
 // TOKEN MANAGEMENT
 // Auth Strategy: HttpOnly cookie (primary) + Bearer fallback
 //
@@ -72,6 +129,9 @@ export function legacyGetToken() {
  * - Authorization Bearer header (fallback untuk mobile/API)
  * - X-CSRF-Token header (untuk cookie-based auth)
  * - credentials: 'include' (kirim HttpOnly cookie)
+ * - In-memory cache untuk GET requests
+ * - Request deduplication (mencegah double-fire untuk request yg sama)
+ * - Auto-retry untuk transient network errors
  *
  * @param {string} endpoint - Path API
  * @param {object} options  - Opsi fetch
@@ -79,6 +139,7 @@ export function legacyGetToken() {
  */
 export async function apiFetch(endpoint, options = {}) {
   const isAdminRoute = endpoint.includes('admin.php');
+  const method = (options.method || 'GET').toUpperCase();
 
   const token    = isAdminRoute ? sessionStorage.getItem(ADMIN_TOKEN_KEY) : legacyGetToken();
   const csrf     = isAdminRoute ? sessionStorage.getItem(ADMIN_CSRF_KEY)  : getCsrfToken();
@@ -98,31 +159,80 @@ export async function apiFetch(endpoint, options = {}) {
     headers['X-CSRF-Token'] = csrf;
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), options.timeoutMs || 15000);
-  let response;
-  try {
-    response = await fetch(`${BASE_URL}${endpoint}`, {
-      ...options,
-      headers,
-      credentials: 'include',
-      signal: options.signal || controller.signal,
+  const fullKey = `${method}:${BASE_URL}${endpoint}`;
+
+  // ── CACHE CHECK (hanya GET, bukan admin route) ──────────────────────────
+  if (method === 'GET' && !isAdminRoute) {
+    const cached = cacheGet(fullKey);
+    if (cached !== null) return cached;
+
+    // Request deduplication: jika request yang sama sudah in-flight, tunggu hasilnya
+    if (_inflight.has(fullKey)) {
+      return _inflight.get(fullKey);
+    }
+  }
+
+  // ── FETCH WITH RETRY ────────────────────────────────────────────────────
+  const maxRetries = options.retries ?? (method === 'GET' ? 2 : 0); // GET: 2x retry, POST/PUT/DELETE: 0
+
+  const doFetch = async (attempt = 0) => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), options.timeoutMs || 15000);
+    let response;
+    try {
+      response = await fetch(`${BASE_URL}${endpoint}`, {
+        ...options,
+        method,
+        headers,
+        credentials: 'include',
+        signal: options.signal || controller.signal,
+      });
+    } catch (error) {
+      if (error.name === 'AbortError') throw new Error('Permintaan ke server habis waktu. Silakan coba lagi.');
+      // Retry untuk network error (bukan AbortError)
+      if (attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 300; // 300ms, 600ms
+        await new Promise(r => setTimeout(r, delay));
+        return doFetch(attempt + 1);
+      }
+      throw new Error('Tidak dapat terhubung ke server.');
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    const data = contentType.includes('application/json') ? await response.json() : await response.text();
+
+    if (!response.ok) {
+      // Retry pada 503 (server overload) untuk GET requests
+      if (response.status === 503 && attempt < maxRetries && method === 'GET') {
+        const delay = Math.pow(2, attempt) * 500;
+        await new Promise(r => setTimeout(r, delay));
+        return doFetch(attempt + 1);
+      }
+      throw new Error(data.error || data.message || 'Terjadi kesalahan pada server');
+    }
+
+    return data;
+  };
+
+  // ── INFLIGHT TRACKING + CACHE WRITE ────────────────────────────────────
+  if (method === 'GET' && !isAdminRoute) {
+    const promise = doFetch().then(data => {
+      const ttl = getCacheTtl(endpoint);
+      cacheSet(fullKey, data, ttl);
+      _inflight.delete(fullKey);
+      return data;
+    }).catch(err => {
+      _inflight.delete(fullKey);
+      throw err;
     });
-  } catch (error) {
-    if (error.name === 'AbortError') throw new Error('Permintaan ke server habis waktu. Silakan coba lagi.');
-    throw new Error('Tidak dapat terhubung ke server.');
-  } finally {
-    clearTimeout(timeout);
+
+    _inflight.set(fullKey, promise);
+    return promise;
   }
 
-  const contentType = response.headers.get('content-type') || '';
-  const data = contentType.includes('application/json') ? await response.json() : await response.text();
-
-  if (!response.ok) {
-    throw new Error(data.error || data.message || 'Terjadi kesalahan pada server');
-  }
-
-  return data;
+  return doFetch();
 }
 
 export default {
@@ -155,6 +265,7 @@ export default {
       await apiFetch('/auth.php?action=logout', { method: 'POST' });
     } finally {
       clearAuthTokens();
+      clearApiCache(); // Bersihkan cache saat logout
       // Hapus legacy localStorage token jika masih ada
       localStorage.removeItem('auth_token');
     }

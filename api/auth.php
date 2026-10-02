@@ -383,22 +383,32 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM students WHERE id = ?");
+    // Optimasi: gabungkan student data + subscription check dalam SATU query
+    // menggunakan subquery EXISTS untuk menghindari round-trip kedua ke DB
+    $stmt = $pdo->prepare("
+        SELECT s.*,
+               (SELECT COUNT(*) > 0
+                FROM subscriptions sub
+                WHERE sub.student_id = s.id
+                  AND sub.status = 'active'
+                  AND sub.expires_at > NOW()
+                LIMIT 1) AS is_premium
+        FROM students s
+        WHERE s.id = ?
+    ");
     $stmt->execute([$payload->id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
         unset($user['password']);
+        $user['is_premium']  = (bool)$user['is_premium'];
+        $user['tenant_id']   = $payload->tenant_id;
 
-        // Check if user has an active premium subscription
-        $subStmt = $pdo->prepare("SELECT COUNT(*) FROM subscriptions WHERE tenant_id = ? AND status = 'active' AND expires_at > NOW()");
-        $subStmt->execute([$payload->tenant_id]);
-        $hasActiveSub = $subStmt->fetchColumn() > 0;
-        
-        $user['is_premium'] = $hasActiveSub;
-        $user['tenant_id'] = $payload->tenant_id; // Add tenant_id to user object for frontend
+        // Header cache hint untuk CDN / reverse proxy (jika ada)
+        // Browser tidak meng-cache karena credentials: include
+        header('Cache-Control: private, max-age=30');
 
-        echo json_encode(["user" => $user]); // Standardized response
+        echo json_encode(["user" => $user]);
     } else {
         http_response_code(404);
         echo json_encode(["error" => "User tidak ditemukan"]);
