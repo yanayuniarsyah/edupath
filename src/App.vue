@@ -2223,7 +2223,28 @@
         </section>
 
         <!-- TAB 2: DIAGNOSTIC & TRY OUT -->
-        <section v-if="currentTab === 'diagnostic'" class="animate-fade-in space-y-6">
+        <section v-if="currentTab === 'diagnostic'" class="animate-fade-in space-y-6 pt-20 lg:pt-4 px-3 sm:px-6">
+          <!-- Top Close & Back Bar -->
+          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xl font-black">
+                <i class="ph-bold ph-exam"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Simulasi & Assessment Adaptif</span>
+                <h2 class="text-base md:text-lg font-black text-white">Diagnostic &amp; Adaptive Simulation Test</h2>
+              </div>
+            </div>
+            <button 
+              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+              title="Tutup Halaman & Kembali"
+            >
+              <span>Tutup</span>
+              <i class="ph-bold ph-x text-base"></i>
+            </button>
+          </div>
+
           <div class="grid grid-cols-1 gap-6" :class="diagnosticFocus ? '' : 'lg:grid-cols-3'">
             <div class="light-mode-card rounded-2xl p-6 lg:p-8" :class="diagnosticFocus ? '' : 'lg:col-span-2'">
               <h3 class="text-xl font-black font-heading text-slate-900 mb-2">Diagnostic &amp; Adaptive Simulation Test</h3>

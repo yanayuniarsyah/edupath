@@ -107,17 +107,19 @@
             </div>
           </div>
 
-          <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
             <button
-              @click="sppStage = 'lead_form'"
-              class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#c0ff00] text-black font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(192,255,0,0.45)] flex items-center justify-center gap-2"
+              type="button"
+              @click.prevent="startSppForm"
+              class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#c0ff00] text-black font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(192,255,0,0.45)] flex items-center justify-center gap-2 cursor-pointer relative z-10"
             >
               <span>Mulai Asesmen SPP Sekarang (Gratis)</span>
               <i class="ph-bold ph-arrow-right text-lg"></i>
             </button>
             <button
-              @click="loadSampleResult"
-              class="w-full sm:w-auto px-5 py-3 rounded-full bg-white/5 border border-white/20 text-white/80 font-bold text-xs hover:bg-white/10 transition-all"
+              type="button"
+              @click.prevent="loadSampleResult"
+              class="w-full sm:w-auto px-5 py-3 rounded-full bg-white/5 border border-white/20 text-white/80 font-bold text-xs hover:bg-white/10 transition-all cursor-pointer relative z-10"
             >
               Lihat Contoh Profil Hasil
             </button>
@@ -974,6 +976,10 @@ export default {
       };
     };
 
+    const startSppForm = () => {
+      sppStage.value = 'lead_form';
+    };
+
     const proceedToQuestions = async () => {
       api.trackEvent('spp_start');
       isSubmitting.value = true;
@@ -1133,6 +1139,7 @@ export default {
       copySuccess,
       schoolLinkCopied,
       isSubmitting,
+      startSppForm,
       proceedToQuestions,
       loadSampleResult,
       selectOption,
