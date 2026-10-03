@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         name: data.name,
                         email: data.email,
                         password: data.password,
-                        whatsapp: data.whatsapp,
+                        telegram: data.telegram,
                         target_ptn: 'Affiliate Partner'
                     })
                 });
