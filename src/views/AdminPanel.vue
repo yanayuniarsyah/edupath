@@ -320,11 +320,32 @@
             <div class="p-2.5 border-b border-white/10 flex gap-2 bg-black/20">
               <input v-model="qSearch" type="text" placeholder="Cari soal..." class="flex-grow px-3 py-1.5 text-[11px] text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50" />
               <select v-model="qSubMateri" class="px-2.5 py-1.5 text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg outline-none cursor-pointer">
-                <option value="all" class="bg-[#0d1427]">Semua Subtes</option>
-                <option value="Penalaran Umum" class="bg-[#0d1427]">Penalaran Umum</option>
-                <option value="Penalaran Matematika" class="bg-[#0d1427]">Penalaran Matematika</option>
-                <option value="Literasi B. Indonesia" class="bg-[#0d1427]">Literasi B. Indonesia</option>
-                <option value="Literasi B. Inggris" class="bg-[#0d1427]">Literasi B. Inggris</option>
+                <option value="all" class="bg-[#0d1427]">Semua Subtes & Topik</option>
+                <optgroup label="7 Subtes UTBK SNBT" class="bg-[#0d1427] font-bold text-[#c0ff00]">
+                  <option value="Penalaran Umum" class="bg-[#0d1427]">Penalaran Umum (PU)</option>
+                  <option value="Pengetahuan Kuantitatif" class="bg-[#0d1427]">Pengetahuan Kuantitatif (PK)</option>
+                  <option value="Pemahaman Bacaan & Menulis" class="bg-[#0d1427]">Pemahaman Bacaan & Menulis (PBM)</option>
+                  <option value="Pengetahuan & Pemahaman Umum" class="bg-[#0d1427]">Pengetahuan & Pemahaman Umum (PPU)</option>
+                  <option value="Literasi Bahasa Indonesia" class="bg-[#0d1427]">Literasi Bahasa Indonesia (LBI)</option>
+                  <option value="Literasi Bahasa Inggris" class="bg-[#0d1427]">Literasi Bahasa Inggris (LBE)</option>
+                  <option value="Penalaran Matematika" class="bg-[#0d1427]">Penalaran Matematika (PM)</option>
+                </optgroup>
+                <optgroup label="Sub-Materi / Topik Khusus" class="bg-[#0d1427] font-bold text-indigo-400">
+                  <option value="Penalaran Deduktif" class="bg-[#0d1427]">Penalaran Deduktif</option>
+                  <option value="Penalaran Induktif" class="bg-[#0d1427]">Penalaran Induktif</option>
+                  <option value="Penalaran Analitik" class="bg-[#0d1427]">Penalaran Analitik</option>
+                  <option value="Pola Bilangan" class="bg-[#0d1427]">Pola Bilangan</option>
+                  <option value="Aljabar Dasar" class="bg-[#0d1427]">Aljabar Dasar</option>
+                  <option value="Statistika" class="bg-[#0d1427]">Statistika</option>
+                  <option value="Geometri" class="bg-[#0d1427]">Geometri</option>
+                  <option value="Aritmatika" class="bg-[#0d1427]">Aritmatika</option>
+                  <option value="Kalimat Efektif" class="bg-[#0d1427]">Kalimat Efektif</option>
+                  <option value="Ide Pokok" class="bg-[#0d1427]">Ide Pokok</option>
+                  <option value="PUEBI" class="bg-[#0d1427]">PUEBI / Ejaan</option>
+                  <option value="Matematika Dasar" class="bg-[#0d1427]">Matematika Dasar</option>
+                  <option value="Fisika Kuantum" class="bg-[#0d1427]">Fisika Kuantum</option>
+                  <option value="Bahasa Indonesia" class="bg-[#0d1427]">Bahasa Indonesia</option>
+                </optgroup>
               </select>
             </div>
             
@@ -838,13 +859,31 @@
         <form @submit.prevent="saveQuestion" class="p-4 space-y-3">
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Sub Materi</label>
-              <select v-model="qForm.sub_materi" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-                <option value="Penalaran Umum" class="bg-[#0d1427] text-white">Penalaran Umum</option>
-                <option value="Penalaran Matematika" class="bg-[#0d1427] text-white">Penalaran Matematika</option>
-                <option value="Literasi B. Indonesia" class="bg-[#0d1427] text-white">Literasi B. Indonesia</option>
-                <option value="Literasi B. Inggris" class="bg-[#0d1427] text-white">Literasi B. Inggris</option>
-              </select>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes / Sub Materi</label>
+              <input v-model="qForm.sub_materi" list="subMateriListOptions" placeholder="Pilih / ketik sub materi..." required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <datalist id="subMateriListOptions">
+                <option value="Penalaran Umum"></option>
+                <option value="Pengetahuan Kuantitatif"></option>
+                <option value="Pemahaman Bacaan & Menulis"></option>
+                <option value="Pengetahuan & Pemahaman Umum"></option>
+                <option value="Literasi Bahasa Indonesia"></option>
+                <option value="Literasi Bahasa Inggris"></option>
+                <option value="Penalaran Matematika"></option>
+                <option value="Penalaran Deduktif"></option>
+                <option value="Penalaran Induktif"></option>
+                <option value="Penalaran Analitik"></option>
+                <option value="Pola Bilangan"></option>
+                <option value="Aljabar Dasar"></option>
+                <option value="Statistika"></option>
+                <option value="Geometri"></option>
+                <option value="Aritmatika"></option>
+                <option value="Kalimat Efektif"></option>
+                <option value="Ide Pokok"></option>
+                <option value="PUEBI"></option>
+                <option value="Matematika Dasar"></option>
+                <option value="Fisika Kuantum"></option>
+                <option value="Bahasa Indonesia"></option>
+              </datalist>
             </div>
             <div>
               <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tingkat Kesulitan</label>
@@ -952,13 +991,24 @@
             <input v-model="mForm.title" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Sub Materi</label>
-            <select v-model="mForm.sub_materi" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-              <option value="Penalaran Umum" class="bg-[#0d1427] text-white">Penalaran Umum</option>
-              <option value="Penalaran Matematika" class="bg-[#0d1427] text-white">Penalaran Matematika</option>
-              <option value="Literasi B. Indonesia" class="bg-[#0d1427] text-white">Literasi B. Indonesia</option>
-              <option value="Literasi B. Inggris" class="bg-[#0d1427] text-white">Literasi B. Inggris</option>
-            </select>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes / Sub Materi</label>
+            <input v-model="mForm.sub_materi" list="materiSubListOptions" placeholder="Pilih / ketik sub materi..." required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <datalist id="materiSubListOptions">
+              <option value="Penalaran Umum"></option>
+              <option value="Pengetahuan Kuantitatif"></option>
+              <option value="Pemahaman Bacaan & Menulis"></option>
+              <option value="Pengetahuan & Pemahaman Umum"></option>
+              <option value="Literasi Bahasa Indonesia"></option>
+              <option value="Literasi Bahasa Inggris"></option>
+              <option value="Penalaran Matematika"></option>
+              <option value="Penalaran Deduktif"></option>
+              <option value="Penalaran Induktif"></option>
+              <option value="Aljabar Dasar"></option>
+              <option value="Statistika"></option>
+              <option value="Geometri"></option>
+              <option value="Kalimat Efektif"></option>
+              <option value="Ide Pokok"></option>
+            </datalist>
           </div>
           <div>
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Guru / Penanggung Jawab</label>
@@ -1042,9 +1092,19 @@ const doLogin = async () => {
   }
 };
 
-const doLogout = () => {
+const doLogout = async () => {
+  try {
+    await api.logout();
+  } catch (e) {
+    console.warn("Logout error:", e);
+  }
   api.clearAdminTokens();
-  sessionStorage.removeItem('admin_token');
+  api.clearAuthTokens();
+  sessionStorage.clear();
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('user_role');
+  localStorage.removeItem('user_name');
+  localStorage.removeItem('user_email');
   isAuthenticated.value = false;
   window.location.hash = '#/';
   location.reload();
@@ -1058,6 +1118,7 @@ onMounted(async () => {
     isAuthenticated.value = true;
     fetchDashboard();
     fetchStudents();
+    loadPlansAndStaff();
   } else if (mainToken) {
     try {
       const profile = await api.getProfile();
@@ -1066,6 +1127,7 @@ onMounted(async () => {
         isAuthenticated.value = true;
         fetchDashboard();
         fetchStudents();
+        loadPlansAndStaff();
       }
     } catch(e) {
       console.warn("Admin auto-auth check:", e);
@@ -1077,8 +1139,10 @@ onMounted(async () => {
 const fetchDashboard = async () => {
   try {
     const res = await api.getAdminDashboard();
-    if (res.stats) {
+    if (res?.stats) {
       Object.assign(stats, res.stats);
+    } else if (res && typeof res === 'object') {
+      Object.assign(stats, res);
     }
   } catch (err) {
     console.error("Gagal mengambil dashboard:", err);
@@ -1179,9 +1243,19 @@ const fetchQuestions = async () => {
 
 const filteredQuestions = computed(() => {
   let list = serverQuestions.value;
+  if (qSubMateri.value && qSubMateri.value !== 'all') {
+    const sM = qSubMateri.value.toLowerCase();
+    list = list.filter(q => 
+      (q.sub_materi && q.sub_materi.toLowerCase().includes(sM)) || 
+      (q.subtes && q.subtes.toLowerCase().includes(sM))
+    );
+  }
   if (qSearch.value) {
     const s = qSearch.value.toLowerCase();
-    list = list.filter(q => q.question && q.question.toLowerCase().includes(s));
+    list = list.filter(q => 
+      (q.question && q.question.toLowerCase().includes(s)) ||
+      (q.sub_materi && q.sub_materi.toLowerCase().includes(s))
+    );
   }
   return list;
 });
@@ -1486,12 +1560,25 @@ const submitPayout = async () => {
 
 // ── Watch activeTab to load data ──
 watch(activeTab, (newTab) => {
-  if (newTab === 'affiliates') {
+  sessionStorage.setItem('admin_active_tab', newTab);
+  if (newTab === 'overview') {
+    fetchDashboard();
+  } else if (newTab === 'students') {
+    fetchStudents();
+  } else if (newTab === 'questions') {
+    fetchQuestions();
+  } else if (newTab === 'materials') {
+    fetchMaterials();
+  } else if (newTab === 'transactions') {
+    fetchAdminOrders();
+  } else if (newTab === 'packages' || newTab === 'plans' || newTab === 'staff') {
+    loadPlansAndStaff();
+  } else if (newTab === 'affiliates') {
     loadAdminAffiliates();
     loadAdminCommissions();
     loadAdminPayouts();
   }
-});
+}, { immediate: true });
 
 const showStudentModal = ref(false);
 const studentForm = reactive({ name: '', email: '', password: '', plan: 'free' });

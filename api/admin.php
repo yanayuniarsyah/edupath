@@ -87,24 +87,41 @@ if (!in_array($payload->role, ['admin', 'superadmin'])) {
 }
 
 if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    if ($payload->role === 'superadmin') {
-        // Superadmin stats (Global)
-        $stmt = $pdo->query("SELECT COUNT(*) FROM tenants");
-        $totalTenants = $stmt->fetchColumn();
-        echo json_encode(["totalTenants" => (int)$totalTenants]);
+    if ($payload->role === 'superadmin' && empty($payload->tenant_id)) {
+        // Superadmin stats (Global across platform)
+        $totalStudents = $pdo->query("SELECT COUNT(*) FROM students")->fetchColumn() ?: 0;
+        $activeStudents = $pdo->query("SELECT COUNT(*) FROM students WHERE is_active = 1")->fetchColumn() ?: 0;
+        $totalQuizzes = $pdo->query("SELECT COUNT(*) FROM questions")->fetchColumn() ?: 0;
+        $totalRevenue = $pdo->query("SELECT SUM(amount) FROM orders WHERE status IN ('paid', 'settlement')")->fetchColumn() ?: 0;
+        $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE status = 'active'")->fetchColumn() ?: 0;
+        $totalAffiliates = $pdo->query("SELECT COUNT(*) FROM affiliates")->fetchColumn() ?: 0;
+        $totalCommissions = $pdo->query("SELECT SUM(amount) FROM commissions WHERE status = 'paid'")->fetchColumn() ?: 0;
+        $totalTenants = $pdo->query("SELECT COUNT(*) FROM tenants")->fetchColumn() ?: 0;
+
+        $statsData = [
+            "totalStudents" => (int)$totalStudents,
+            "activeStudents" => (int)$activeStudents,
+            "totalQuizzes" => (int)$totalQuizzes,
+            "totalRevenue" => (float)$totalRevenue,
+            "activeSubscriptions" => (int)$activeSubscriptions,
+            "totalAffiliates" => (int)$totalAffiliates,
+            "totalCommissions" => (float)$totalCommissions,
+            "totalTenants" => (int)$totalTenants
+        ];
+        echo json_encode(array_merge($statsData, ["stats" => $statsData]));
         exit;
     }
 
     $tenant_id = $payload->tenant_id;
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM students WHERE tenant_id = ?");
     $stmt->execute([$tenant_id]);
-    $totalStudents = $stmt->fetchColumn();
+    $totalStudents = $stmt->fetchColumn() ?: 0;
 
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM students WHERE is_active = 1 AND tenant_id = ?");
     $stmt->execute([$tenant_id]);
-    $activeStudents = $stmt->fetchColumn();
+    $activeStudents = $stmt->fetchColumn() ?: 0;
 
-    $totalQuizzes = $pdo->query("SELECT COUNT(*) FROM questions")->fetchColumn();
+    $totalQuizzes = $pdo->query("SELECT COUNT(*) FROM questions")->fetchColumn() ?: 0;
     
     $stmt = $pdo->prepare("SELECT SUM(amount) FROM orders o JOIN students s ON o.student_id = s.id WHERE o.status IN ('paid', 'settlement') AND s.tenant_id = ?");
     $stmt->execute([$tenant_id]);
@@ -129,7 +146,7 @@ if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt->execute([$tenant_id]);
     $totalCommissions = $stmt->fetchColumn() ?: 0;
 
-    echo json_encode([
+    $statsData = [
         "totalStudents" => (int)$totalStudents,
         "activeStudents" => (int)$activeStudents,
         "totalQuizzes" => (int)$totalQuizzes,
@@ -137,7 +154,9 @@ if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         "activeSubscriptions" => (int)$activeSubscriptions,
         "totalAffiliates" => (int)$totalAffiliates,
         "totalCommissions" => (float)$totalCommissions
-    ]);
+    ];
+    echo json_encode(array_merge($statsData, ["stats" => $statsData]));
+    exit;
 }
 elseif ($action === 'students') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -379,6 +398,19 @@ elseif ($action === 'plans') {
     $VALID_ENTITLEMENTS = ['tryout_unlimited', 'ai_adaptive_path', 'premium_materials', 'feature_quiz'];
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $plans = $pdo->query("SELECT * FROM plans ORDER BY price ASC")->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($plans)) {
+            // Auto-seed standard default 3 packages (Mandiri, Utama, VIP)
+            $defaultPlans = [
+                ['id' => 'plan-mandiri', 'name' => 'Paket Mandiri', 'price' => 150000, 'duration' => 30, 'features' => json_encode(['tryout_unlimited', 'premium_materials', 'feature_quiz'])],
+                ['id' => 'plan-utama', 'name' => 'Paket Utama', 'price' => 450000, 'duration' => 180, 'features' => json_encode(['tryout_unlimited', 'ai_adaptive_path', 'premium_materials', 'feature_quiz'])],
+                ['id' => 'plan-vip', 'name' => 'VIP Mentoring', 'price' => 850000, 'duration' => 365, 'features' => json_encode(['tryout_unlimited', 'ai_adaptive_path', 'premium_materials', 'feature_quiz'])]
+            ];
+            $stmtIns = $pdo->prepare("INSERT IGNORE INTO plans (id, name, price, duration, features) VALUES (?, ?, ?, ?, ?)");
+            foreach ($defaultPlans as $dp) {
+                $stmtIns->execute([$dp['id'], $dp['name'], $dp['price'], $dp['duration'], $dp['features']]);
+            }
+            $plans = $pdo->query("SELECT * FROM plans ORDER BY price ASC")->fetchAll(PDO::FETCH_ASSOC);
+        }
         foreach ($plans as &$plan) {
             $stmt = $pdo->prepare("SELECT feature_key FROM plan_entitlements WHERE plan_id = ?");
             $stmt->execute([$plan['id']]);
@@ -540,7 +572,14 @@ elseif ($action === 'staff') {
             http_response_code(400); echo json_encode(["error" => "Username dan password diperlukan"]); exit;
         }
 
-        $tenant_id = $payload->role === 'superadmin' ? null : $payload->tenant_id;
+        $tenant_id = $payload->tenant_id;
+        if (empty($tenant_id)) {
+            $tenant_id = $pdo->query("SELECT id FROM tenants LIMIT 1")->fetchColumn();
+            if (!$tenant_id) {
+                $tenant_id = 'default-tenant';
+                $pdo->exec("INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES ('$tenant_id', 'EduPath Indonesia', 'edupath-master', 1)");
+            }
+        }
         if (!in_array($role, ['admin', 'teacher'])) $role = 'teacher';
 
         try {
@@ -556,8 +595,8 @@ elseif ($action === 'staff') {
             $admin_id = bin2hex(random_bytes(16));
             $admin_id = substr($admin_id,0,8).'-'.substr($admin_id,8,4).'-'.substr($admin_id,12,4).'-'.substr($admin_id,16,4).'-'.substr($admin_id,20,12);
             
-            $stmt = $pdo->prepare("INSERT INTO admins (id, username, password, name) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$admin_id, $username, $hashed_password, $name]);
+            $stmt = $pdo->prepare("INSERT INTO admins (id, tenant_id, username, password, name) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$admin_id, $tenant_id, $username, $hashed_password, $name]);
             
             $ur_id = bin2hex(random_bytes(16));
             $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($ur_id,20,12);

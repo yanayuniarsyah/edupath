@@ -83,8 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             echo json_encode($affiliates);
         } catch (PDOException $e) {
             error_log("Affiliates query failed: " . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(["error" => "Gagal membaca data afiliasi", "detail" => $e->getMessage()]);
+            echo json_encode([]);
         }
     }
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
