@@ -203,11 +203,19 @@
         <!-- ===== TAB: TRANSAKSI ===== -->
         <div v-if="activeTab === 'transactions'" class="space-y-4 animate-fade-in">
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
-            <div class="px-3.5 py-2 border-b border-white/10 flex items-center justify-between bg-black/20">
-              <h3 class="font-bold text-white text-xs">Riwayat Pembayaran Midtrans</h3>
-              <button @click="fetchAdminOrders" class="text-[10px] text-[#c0ff00] font-bold hover:underline">
-                <i class="ph-bold ph-arrows-clockwise mr-1"></i> Refresh
-              </button>
+            <div class="px-3.5 py-2.5 border-b border-white/10 flex items-center justify-between bg-black/20">
+              <div class="flex items-center gap-2">
+                <h3 class="font-bold text-white text-xs">Riwayat Transaksi & Pembayaran</h3>
+                <span class="text-[9px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono font-bold">{{ adminOrders.length }} Order</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button @click="openCreateOrderModal" class="px-2.5 py-1 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[10px] font-black rounded-lg transition-colors flex items-center gap-1">
+                  <i class="ph-bold ph-plus"></i> Transaksi Manual
+                </button>
+                <button @click="fetchAdminOrders" class="text-[10px] text-[#c0ff00] font-bold hover:underline flex items-center gap-1">
+                  <i class="ph-bold ph-arrows-clockwise" :class="{'animate-spin': ordersLoading}"></i> Refresh
+                </button>
+              </div>
             </div>
             <div v-if="ordersLoading" class="p-6 text-center text-white/40">
               <i class="ph-bold ph-spinner animate-spin text-xl mb-1"></i>
@@ -227,24 +235,29 @@
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Nominal</th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status</th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Tanggal</th>
+                    <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="o in adminOrders" :key="o.order_id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 font-mono text-white/60">{{ o.order_id }}</td>
+                  <tr v-for="o in adminOrders" :key="o.order_id || o.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-2 font-mono text-white/60">{{ o.order_id || o.id }}</td>
                     <td class="px-3 py-2">
-                      <div class="font-bold text-white">{{ o.student_name }}</div>
-                      <div class="text-white/40 font-medium text-[10px]">{{ o.student_email }}</div>
+                      <div class="font-bold text-white">{{ o.student_name || '-' }}</div>
+                      <div class="text-white/40 font-medium text-[10px]">{{ o.student_email || '-' }}</div>
                     </td>
-                    <td class="px-3 py-2 font-bold text-indigo-400 capitalize">{{ o.plan_name }}</td>
-                    <td class="px-3 py-2 font-mono text-emerald-400 font-bold">Rp {{ o.amount.toLocaleString('id-ID') }}</td>
+                    <td class="px-3 py-2 font-bold text-indigo-400 capitalize">{{ o.plan_name || o.plan_id }}</td>
+                    <td class="px-3 py-2 font-mono text-emerald-400 font-bold">Rp {{ Number(o.amount || 0).toLocaleString('id-ID') }}</td>
                     <td class="px-3 py-2">
                       <span class="px-2 py-0.5 rounded-md font-bold text-[9px] uppercase border"
-                            :class="o.status === 'paid' || o.status === 'settlement' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400'">
+                            :class="o.status === 'paid' || o.status === 'settlement' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : (o.status === 'pending' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400')">
                         {{ o.status }}
                       </span>
                     </td>
-                    <td class="px-3 py-2 text-white/40">{{ new Date(o.created_at).toLocaleString('id-ID') }}</td>
+                    <td class="px-3 py-2 text-white/40">{{ o.created_at ? new Date(o.created_at).toLocaleString('id-ID') : '-' }}</td>
+                    <td class="px-3 py-2 text-right space-x-2">
+                      <button @click="openEditOrderStatusModal(o)" title="Ubah Status" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
+                      <button @click="deleteOrder(o.order_id || o.id)" title="Hapus Transaksi" class="text-rose-400 hover:text-rose-300 font-bold"><i class="ph-bold ph-trash text-sm"></i></button>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -267,7 +280,7 @@
               <option value="utama" class="bg-[#0d1427]">Utama</option>
               <option value="vip" class="bg-[#0d1427]">VIP</option>
             </select>
-            <button @click="showStudentModal = true" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5">
+            <button @click="openCreateStudentModal" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5">
               <i class="ph-bold ph-plus"></i> Tambah Siswa
             </button>
           </div>
@@ -281,6 +294,7 @@
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Siswa</th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Paket</th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status</th>
+                    <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -293,7 +307,13 @@
                       <span class="px-2 py-0.5 rounded-md font-bold text-[9px] bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 uppercase">{{ s.plan || 'free' }}</span>
                     </td>
                     <td class="px-3 py-2">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">{{ s.is_active !== false ? 'Aktif' : 'Nonaktif' }}</span>
+                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px]" :class="s.is_active != 0 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'">
+                        {{ s.is_active != 0 ? 'Aktif' : 'Nonaktif' }}
+                      </span>
+                    </td>
+                    <td class="px-3 py-2 text-right space-x-2">
+                      <button @click="openEditStudentModal(s)" title="Edit Siswa" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
+                      <button @click="deleteStudent(s.id)" title="Hapus Siswa" class="text-rose-400 hover:text-rose-300 font-bold"><i class="ph-bold ph-trash text-sm"></i></button>
                     </td>
                   </tr>
                 </tbody>
@@ -363,7 +383,7 @@
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider w-1/2">Soal</th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Sub Materi</th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Kategori & Level</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status QC</th>
                     <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
@@ -372,21 +392,16 @@
                     <td class="px-3 py-2">
                       <div class="line-clamp-2 text-white/80">{{ q.question }}</div>
                     </td>
-                    <td class="px-3 py-2 font-bold text-white">{{ q.sub_materi }}</td>
-                    <td class="px-3 py-2">
-                      <span v-if="q.is_qc_passed == 1" class="px-2 py-0.5 text-[9px] font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-md">Lolos QC</span>
-                      <span v-else class="px-2 py-0.5 text-[9px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-md">Belum QC</span>
-                    </td>
+                    <td class="px-3 py-2 font-bold text-white">{{ q.sub_materi || q.subtes }}</td>
                     <td class="px-3 py-2">
                       <div class="flex flex-col gap-0.5 items-start">
-                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 uppercase">{{ q.usage_type || 'Latihan' }}</span>
-                        <span class="text-[9px] text-white/40 font-bold">{{ q.cognitive_level || 'C3' }}</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 uppercase">{{ q.usage_type || q.classification || 'Latihan' }}</span>
+                        <span class="text-[9px] text-white/40 font-bold">{{ q.cognitive_demand || 'C3' }}</span>
                       </div>
                     </td>
                     <td class="px-3 py-2">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px]" :class="q.is_active !== false ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'">
-                        {{ q.is_active !== false ? 'Aktif' : 'Nonaktif' }}
-                      </span>
+                      <span v-if="q.is_qc_passed == 1" class="px-2 py-0.5 text-[9px] font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-md">Lolos QC</span>
+                      <span v-else class="px-2 py-0.5 text-[9px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-md">Belum QC</span>
                     </td>
                     <td class="px-3 py-2 text-right space-x-2">
                       <button @click="openQuestionModal(q)" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
@@ -402,9 +417,9 @@
         <!-- ===== TAB: MANAJEMEN MATERI ===== -->
         <div v-if="activeTab === 'materials'" class="space-y-4 animate-fade-in">
           <div class="flex items-center justify-between">
-            <h2 class="text-xs font-black text-white uppercase tracking-wider">Manajemen Materi</h2>
-            <button @click="openMaterialModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors">
-              + Tambah Materi
+            <h2 class="text-xs font-black text-white uppercase tracking-wider">Manajemen Materi Belajar</h2>
+            <button @click="openMaterialModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1">
+              <i class="ph-bold ph-plus"></i> Tambah Materi
             </button>
           </div>
 
@@ -426,7 +441,7 @@
                   <tr class="bg-black/40 border-b border-white/10 text-white/50">
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Judul Materi</th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Sub Materi</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Guru/PJ</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Guru / PJ</th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status</th>
                     <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
@@ -437,8 +452,8 @@
                     <td class="px-3 py-2 font-bold text-white/80">{{ m.sub_materi }}</td>
                     <td class="px-3 py-2 font-bold text-white/40 text-[10px]">{{ m.teacher_name || '-' }}</td>
                     <td class="px-3 py-2">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px]" :class="m.is_active !== false ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'">
-                        {{ m.is_active !== false ? 'Aktif' : 'Nonaktif' }}
+                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px]" :class="m.is_active != 0 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'">
+                        {{ m.is_active != 0 ? 'Aktif' : 'Nonaktif' }}
                       </span>
                     </td>
                     <td class="px-3 py-2 text-right space-x-2">
@@ -452,10 +467,13 @@
           </div>
         </div>
 
-        <!-- Manajemen Paket -->
+        <!-- ===== TAB: MANAJEMEN PAKET ===== -->
         <div v-if="activeTab === 'packages'" class="space-y-4 animate-fade-in">
           <div class="flex justify-between items-center">
-            <h2 class="text-xs font-black text-white uppercase tracking-wider">Manajemen Paket</h2>
+            <div>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider">Manajemen Paket & Langganan</h2>
+              <p class="text-[10px] text-white/40">Paket resmi EduPath sesuai spesifikasi landing page</p>
+            </div>
             <button @click="openPlanModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5">
               <i class="ph-bold ph-plus"></i> Tambah Paket
             </button>
@@ -466,21 +484,19 @@
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/50">
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Nama Paket</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Harga</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Durasi (Hari)</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Harga Resmi</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Durasi</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Entitlements</th>
                     <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="p in plans" :key="p.id" class="hover:bg-white/5 transition-colors">
                     <td class="px-3 py-2 font-bold text-white">{{ p.name }}</td>
-                    <td class="px-3 py-2 font-bold text-emerald-400 font-mono">Rp {{ p.price.toLocaleString('id-ID') }}</td>
+                    <td class="px-3 py-2 font-bold text-emerald-400 font-mono">Rp {{ Number(p.price || 0).toLocaleString('id-ID') }}</td>
                     <td class="px-3 py-2 font-bold text-white/80">{{ p.duration }} Hari</td>
                     <td class="px-3 py-2">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px]" :class="p.is_active !== false ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'">
-                        {{ p.is_active !== false ? 'Aktif' : 'Nonaktif' }}
-                      </span>
+                      <span class="text-[10px] text-indigo-300 font-medium">{{ Array.isArray(p.features) ? p.features.length : 0 }} fitur</span>
                     </td>
                     <td class="px-3 py-2 text-right space-x-2">
                       <button @click="openPlanModal(p)" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
@@ -493,10 +509,16 @@
           </div>
         </div>
 
-        <!-- Manajemen Afiliasi -->
+        <!-- ===== TAB: AFILIASI & KOMISI ===== -->
         <div v-if="activeTab === 'affiliates'" class="space-y-4 animate-fade-in">
           <div class="flex justify-between items-center">
-            <h2 class="text-xs font-black text-white uppercase tracking-wider">Afiliasi & Komisi</h2>
+            <div>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider">Afiliasi & Komisi</h2>
+              <p class="text-[10px] text-white/40">Kelola mitra kemitraan, kode referral, dan pencairan komisi</p>
+            </div>
+            <button @click="openCreateAffiliateModal" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5">
+              <i class="ph-bold ph-plus"></i> Tambah Mitra
+            </button>
           </div>
 
           <!-- Payouts List -->
@@ -538,14 +560,20 @@
                       {{ formatCurrency(pay.amount) }}
                     </td>
                     <td class="py-2.5 px-3">
-                      <span :class="['px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border', pay.status === 'paid' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400']">
+                      <span :class="['px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border', pay.status === 'paid' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : (pay.status === 'rejected' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400')]">
                         {{ pay.status }}
                       </span>
                     </td>
-                    <td class="py-2.5 px-3 text-right">
-                      <button v-if="pay.status === 'pending'" @click="approvePayoutReq(pay.id)" class="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 font-bold rounded-md transition-colors flex items-center justify-center gap-1 ml-auto w-28 text-[10px]">
-                        <i class="ph-bold ph-check-circle"></i> Tandai Ditransfer
-                      </button>
+                    <td class="py-2.5 px-3 text-right space-x-1.5">
+                      <template v-if="pay.status === 'pending'">
+                        <button @click="approvePayoutReq(pay.id)" class="px-2 py-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 font-bold rounded-md transition-colors text-[10px]">
+                          <i class="ph-bold ph-check"></i> Ditransfer
+                        </button>
+                        <button @click="openRejectPayoutModal(pay)" class="px-2 py-1 bg-rose-500/20 border border-rose-500/30 text-rose-400 hover:bg-rose-500/30 font-bold rounded-md transition-colors text-[10px]">
+                          <i class="ph-bold ph-x"></i> Tolak
+                        </button>
+                      </template>
+                      <span v-else class="text-[9px] text-white/40">Selesai</span>
                     </td>
                   </tr>
                 </tbody>
@@ -565,24 +593,34 @@
               <table class="w-full text-[11px]">
                 <thead>
                   <tr class="bg-black/40 text-white/50 border-b border-white/10">
-                    <th class="py-2 px-3 text-left font-bold w-1/3">Mitra (Email)</th>
+                    <th class="py-2 px-3 text-left font-bold">Mitra</th>
                     <th class="py-2 px-3 text-left font-bold">Kode Referral</th>
-                    <th class="py-2 px-3 text-left font-bold">Komisi Default</th>
-                    <th class="py-2 px-3 text-left font-bold">Terdaftar Pada</th>
+                    <th class="py-2 px-3 text-left font-bold">Komisi (%)</th>
+                    <th class="py-2 px-3 text-left font-bold">Bank Info</th>
+                    <th class="py-2 px-3 text-right font-bold">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="isLoadingAffiliates">
-                    <td colspan="4" class="py-6 text-center text-white/40 font-medium text-[10px]">Memuat data mitra...</td>
+                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-[10px]">Memuat data mitra...</td>
                   </tr>
                   <tr v-else-if="affiliatesList.length === 0">
-                    <td colspan="4" class="py-6 text-center text-white/40 font-medium text-[10px]">Belum ada mitra afiliasi</td>
+                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-[10px]">Belum ada mitra afiliasi</td>
                   </tr>
                   <tr v-for="aff in affiliatesList" :key="aff.id" class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td class="py-2.5 px-3 font-semibold text-white/90">{{ aff.identity_key }}</td>
+                    <td class="py-2.5 px-3">
+                      <div class="font-semibold text-white/90">{{ aff.affiliate_name || aff.identity_key }}</div>
+                      <div class="text-[9px] text-white/40">{{ aff.email || aff.identity_key }}</div>
+                    </td>
                     <td class="py-2.5 px-3 font-mono text-indigo-400 font-bold">{{ aff.referral_code }}</td>
                     <td class="py-2.5 px-3 text-amber-400 font-bold">{{ aff.commission_rate }}%</td>
-                    <td class="py-2.5 px-3 text-white/40">{{ new Date(aff.created_at).toLocaleDateString('id-ID') }}</td>
+                    <td class="py-2.5 px-3 text-white/60">
+                      {{ aff.bank_name ? `${aff.bank_name} (${aff.bank_account})` : '-' }}
+                    </td>
+                    <td class="py-2.5 px-3 text-right space-x-2">
+                      <button @click="openEditAffiliateModal(aff)" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
+                      <button @click="deleteAffiliate(aff.id)" class="text-rose-400 hover:text-rose-300 font-bold"><i class="ph-bold ph-trash text-sm"></i></button>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -601,11 +639,11 @@
               <table class="w-full text-[11px]">
                 <thead>
                   <tr class="bg-black/40 text-white/50 border-b border-white/10">
-                    <th class="py-2 px-3 text-left font-bold w-1/4">Siswa (Paket)</th>
-                    <th class="py-2 px-3 text-left font-bold w-1/4">Mitra (Kode)</th>
+                    <th class="py-2 px-3 text-left font-bold">Siswa</th>
+                    <th class="py-2 px-3 text-left font-bold">Mitra</th>
                     <th class="py-2 px-3 text-left font-bold">Nominal (Rp)</th>
                     <th class="py-2 px-3 text-left font-bold">Status</th>
-                    <th class="py-2 px-3 text-right font-bold w-28">Aksi</th>
+                    <th class="py-2 px-3 text-right font-bold">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -633,12 +671,11 @@
                       </span>
                     </td>
                     <td class="py-2.5 px-3 text-right">
-                      <button v-if="comm.status === 'pending'" @click="openPayoutModal(comm)" class="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 font-bold rounded-md transition-colors flex items-center justify-center gap-1 w-full text-[10px]">
+                      <button v-if="comm.status === 'pending'" @click="openPayoutModal(comm)" class="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 font-bold rounded-md transition-colors text-[10px]">
                         <i class="ph-bold ph-check-circle"></i> Bayar
                       </button>
-                      <div v-else class="text-[9px] text-white/40 text-center flex flex-col items-center">
-                        <i class="ph-bold ph-check-circle text-emerald-400 mb-0.5 text-xs"></i>
-                        Telah Dibayar
+                      <div v-else class="text-[9px] text-white/40">
+                        <i class="ph-bold ph-check-circle text-emerald-400 mr-0.5"></i> Telah Dibayar
                       </div>
                     </td>
                   </tr>
@@ -648,10 +685,13 @@
           </div>
         </div>
 
-        <!-- Manajemen Staff -->
+        <!-- ===== TAB: MANAJEMEN STAFF ===== -->
         <div v-if="activeTab === 'staff'" class="space-y-4 animate-fade-in">
           <div class="flex justify-between items-center">
-            <h2 class="text-xs font-black text-white uppercase tracking-wider">Manajemen Pengguna Internal</h2>
+            <div>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider">Manajemen Tim & Pengguna Internal</h2>
+              <p class="text-[10px] text-white/40">Kelola akses tutor, admin operasional, dan role sistem</p>
+            </div>
             <button @click="openStaffModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5">
               <i class="ph-bold ph-plus"></i> Tambah Staff
             </button>
@@ -674,8 +714,8 @@
                     <td class="px-3 py-2 font-bold text-white/80">{{ s.name || '-' }}</td>
                     <td class="px-3 py-2 font-bold text-indigo-400 uppercase">{{ s.role || 'admin' }}</td>
                     <td class="px-3 py-2">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px]" :class="s.is_active !== false ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'">
-                        {{ s.is_active !== false ? 'Aktif' : 'Nonaktif' }}
+                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                        Aktif
                       </span>
                     </td>
                     <td class="px-3 py-2 text-right space-x-2">
@@ -689,10 +729,152 @@
           </div>
         </div>
 
+        <!-- ===== TAB: LAPORAN & ANALITIK ===== -->
+        <div v-if="activeTab === 'reports'" class="space-y-4 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider">Laporan & Ekspor Data Platform</h2>
+              <p class="text-[10px] text-white/40">Audit operasional, ekspor CSV/Excel real-time, dan otomasi laporan</p>
+            </div>
+          </div>
+
+          <!-- Quick Action Exporters -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <button @click="exportStudentsCSV" class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 hover:border-[#c0ff00]/50 transition-all text-left group">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg mb-2">
+                <i class="ph-bold ph-file-csv"></i>
+              </div>
+              <h4 class="font-bold text-white text-xs">Ekspor Siswa (CSV)</h4>
+              <p class="text-[10px] text-white/40 mt-0.5">Unduh data seluruh siswa aktif & paket</p>
+            </button>
+
+            <button @click="exportTransactionsCSV" class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 hover:border-[#c0ff00]/50 transition-all text-left group">
+              <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg mb-2">
+                <i class="ph-bold ph-receipt"></i>
+              </div>
+              <h4 class="font-bold text-white text-xs">Ekspor Transaksi (CSV)</h4>
+              <p class="text-[10px] text-white/40 mt-0.5">Rekap order & omset Midtrans</p>
+            </button>
+
+            <button @click="exportQuestionsCSV" class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 hover:border-[#c0ff00]/50 transition-all text-left group">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg mb-2">
+                <i class="ph-bold ph-books"></i>
+              </div>
+              <h4 class="font-bold text-white text-xs">Ekspor Bank Soal (CSV)</h4>
+              <p class="text-[10px] text-white/40 mt-0.5">Daftar bank soal & status QC</p>
+            </button>
+
+            <button @click="blastWhatsAppParentReport" class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 hover:border-emerald-500/50 transition-all text-left group">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg mb-2">
+                <i class="ph-bold ph-whatsapp-logo"></i>
+              </div>
+              <h4 class="font-bold text-white text-xs">Blast WA Orang Tua</h4>
+              <p class="text-[10px] text-white/40 mt-0.5">Template laporan progres belajar</p>
+            </button>
+          </div>
+
+          <!-- Revenue Breakdown by Official Packages -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 p-4">
+            <h3 class="font-bold text-white text-xs mb-3">Distribusi Produk Resmi EduPath</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="p-3 rounded-lg bg-black/40 border border-white/10">
+                <div class="text-[10px] text-white/40 uppercase font-bold">Paket Mandiri</div>
+                <div class="text-sm font-mono font-black text-indigo-400 mt-1">Rp 180.000 / bln</div>
+                <div class="text-[10px] text-white/60 mt-1">500+ Micro-lessons, 50.000+ Soal IRT, 5x TO Nasional</div>
+              </div>
+              <div class="p-3 rounded-lg bg-black/40 border border-[#c0ff00]/30">
+                <div class="text-[10px] text-[#c0ff00] uppercase font-bold">Paket Utama (Terpopuler)</div>
+                <div class="text-sm font-mono font-black text-[#c0ff00] mt-1">Rp 450.000 / bln</div>
+                <div class="text-[10px] text-white/60 mt-1">AI Companion 24/7, Unlimited IRT, Rasionalisasi Prodi, WA Report</div>
+              </div>
+              <div class="p-3 rounded-lg bg-black/40 border border-amber-500/30">
+                <div class="text-[10px] text-amber-400 uppercase font-bold">Paket VIP</div>
+                <div class="text-sm font-mono font-black text-amber-400 mt-1">Rp 1.100.000 / bln</div>
+                <div class="text-[10px] text-white/60 mt-1">1-on-1 Zoom Mentoring, Grup WA VIP bareng Mentor Senior</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
 
     <!-- Modals -->
+
+    <!-- Manual Order Modal -->
+    <div v-if="showOrderModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
+          <h3 class="font-black text-sm text-white">Tambah Transaksi Manual / Offline</h3>
+          <button @click="showOrderModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+        <form @submit.prevent="saveManualOrder" class="p-4 space-y-3">
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pilih Siswa</label>
+            <select v-model="orderForm.student_id" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <option value="" disabled>-- Pilih Siswa --</option>
+              <option v-for="s in allStudents" :key="s.id" :value="s.id" class="bg-[#0d1427] text-white">{{ s.name }} ({{ s.email }})</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket Belajar</label>
+            <select v-model="orderForm.plan_id" @change="syncOrderPlanPrice" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <option value="plan-mandiri" class="bg-[#0d1427] text-white">Paket Mandiri (Rp 180.000)</option>
+              <option value="plan-utama" class="bg-[#0d1427] text-white">Paket Utama (Rp 450.000)</option>
+              <option value="plan-vip" class="bg-[#0d1427] text-white">Paket VIP (Rp 1.100.000)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nominal Pembayaran (Rp)</label>
+            <input v-model="orderForm.amount" required type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Transaksi</label>
+            <select v-model="orderForm.status" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <option value="paid" class="bg-[#0d1427] text-white">Lunas / Paid (Auto-Aktifkan Paket)</option>
+              <option value="pending" class="bg-[#0d1427] text-white">Pending</option>
+            </select>
+          </div>
+          <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
+            <button type="button" @click="showOrderModal = false" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>
+            <button type="submit" :disabled="isSaving" class="px-5 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50">
+              Simpan Transaksi
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Order Status Modal -->
+    <div v-if="showOrderStatusModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-xs shadow-2xl animate-fade-in text-white">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between">
+          <h3 class="font-black text-sm text-white">Ubah Status Transaksi</h3>
+          <button @click="showOrderStatusModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+        <div class="p-4 space-y-3">
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Order ID</label>
+            <div class="font-mono text-xs font-bold text-white">{{ selectedOrder?.order_id || selectedOrder?.id }}</div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Baru</label>
+            <select v-model="orderStatusNew" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <option value="paid" class="bg-[#0d1427] text-white">Paid / Settlement (Lunas)</option>
+              <option value="pending" class="bg-[#0d1427] text-white">Pending</option>
+              <option value="cancelled" class="bg-[#0d1427] text-white">Cancelled (Dibatalkan)</option>
+              <option value="refunded" class="bg-[#0d1427] text-white">Refunded (Dikembalikan)</option>
+            </select>
+          </div>
+        </div>
+        <div class="p-4 border-t border-white/10 flex gap-2">
+          <button @click="showOrderStatusModal = false" class="flex-1 py-2 rounded-lg font-bold text-white/60 hover:text-white bg-white/5 hover:bg-white/10 transition-colors text-xs">Batal</button>
+          <button @click="submitOrderStatusUpdate" :disabled="isSaving" class="flex-1 py-2 rounded-lg font-black text-black bg-[#c0ff00] hover:bg-[#b0ef00] transition-colors text-xs flex items-center justify-center gap-1.5">
+            Update Status
+          </button>
+        </div>
+      </div>
+    </div>
     
     <!-- Payout Modal -->
     <div v-if="showPayoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
@@ -728,11 +910,77 @@
       </div>
     </div>
 
-    <!-- Student Modal -->
+    <!-- Reject Payout Modal -->
+    <div v-if="showRejectPayoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-xs shadow-2xl animate-fade-in text-white">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between">
+          <h3 class="font-black text-sm text-white">Tolak Permintaan Payout</h3>
+          <button @click="showRejectPayoutModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+        <div class="p-4 space-y-3">
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Alasan Penolakan</label>
+            <textarea v-model="rejectReason" rows="3" placeholder="Misal: Nomor rekening tidak valid / tidak cocok dengan nama akun" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-rose-500/50 transition-all font-medium"></textarea>
+          </div>
+        </div>
+        <div class="p-4 border-t border-white/10 flex gap-2">
+          <button @click="showRejectPayoutModal = false" class="flex-1 py-2 rounded-lg font-bold text-white/60 hover:text-white bg-white/5 hover:bg-white/10 transition-colors text-xs">Batal</button>
+          <button @click="submitRejectPayout" :disabled="isSaving" class="flex-1 py-2 rounded-lg font-black text-white bg-rose-600 hover:bg-rose-500 transition-colors text-xs flex items-center justify-center gap-1.5">
+            Konfirmasi Tolak
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Affiliate Modal (Tambah / Edit) -->
+    <div v-if="showAffiliateModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
+          <h3 class="font-black text-sm text-white">{{ isEditingAffiliate ? 'Edit Mitra Afiliasi' : 'Tambah Mitra Afiliasi' }}</h3>
+          <button @click="showAffiliateModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+        <form @submit.prevent="saveAffiliate" class="p-4 space-y-3">
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Mitra</label>
+            <input v-model="affiliateForm.email" :disabled="isEditingAffiliate" required type="email" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kode Referral</label>
+            <input v-model="affiliateForm.referral_code" required type="text" placeholder="MISAL: BELAJARHEMAT" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium uppercase font-mono" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komisi (%)</label>
+            <input v-model="affiliateForm.commission_rate" required type="number" step="0.5" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Bank</label>
+              <input v-model="affiliateForm.bank_name" placeholder="BCA / BRI / Mandiri" type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor Rekening</label>
+              <input v-model="affiliateForm.bank_account" placeholder="1234567890" type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Pemilik Rekening</label>
+            <input v-model="affiliateForm.bank_owner" placeholder="Nama sesuai buku tabungan" type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+          </div>
+          <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
+            <button type="button" @click="showAffiliateModal = false" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>
+            <button type="submit" :disabled="isSaving" class="px-5 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50">
+              Simpan Mitra
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Student Modal (Tambah / Edit) -->
     <div v-if="showStudentModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
-          <h3 class="font-black text-sm text-white">Tambah Siswa Baru</h3>
+          <h3 class="font-black text-sm text-white">{{ isEditingStudent ? 'Edit Siswa' : 'Tambah Siswa Baru' }}</h3>
           <button @click="showStudentModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
         </div>
         <form @submit.prevent="saveStudent" class="p-4 space-y-3">
@@ -745,16 +993,23 @@
             <input v-model="studentForm.email" required type="email" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password</label>
-            <input v-model="studentForm.password" required type="password" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password {{ isEditingStudent ? '(Kosongkan jika tidak ubah)' : '' }}</label>
+            <input v-model="studentForm.password" :required="!isEditingStudent" type="password" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket</label>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket Belajar</label>
             <select v-model="studentForm.plan" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
               <option value="free" class="bg-[#0d1427] text-white">Free</option>
               <option value="mandiri" class="bg-[#0d1427] text-white">Mandiri</option>
               <option value="utama" class="bg-[#0d1427] text-white">Utama</option>
               <option value="vip" class="bg-[#0d1427] text-white">VIP</option>
+            </select>
+          </div>
+          <div v-if="isEditingStudent">
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Akun</label>
+            <select v-model="studentForm.is_active" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <option :value="1" class="bg-[#0d1427] text-white">Aktif</option>
+              <option :value="0" class="bg-[#0d1427] text-white">Nonaktif</option>
             </select>
           </div>
           <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
@@ -915,43 +1170,7 @@
               </select>
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Sumber Soal</label>
-              <select v-model="qForm.source_type" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-                <option value="author_created" class="bg-[#0d1427] text-white">Dibuat Sendiri (Author)</option>
-                <option value="official_source" class="bg-[#0d1427] text-white">Sumber Resmi</option>
-                <option value="licensed" class="bg-[#0d1427] text-white">Lisensi Pihak Ketiga</option>
-                <option value="adapted" class="bg-[#0d1427] text-white">Diadaptasi / Dimodifikasi</option>
-                <option value="unknown" class="bg-[#0d1427] text-white">Tidak Diketahui</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Hak Cipta</label>
-              <select v-model="qForm.rights_status" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-                <option value="unknown" class="bg-[#0d1427] text-white">Belum Di-review (Unknown)</option>
-                <option value="owned" class="bg-[#0d1427] text-white">Milik Sendiri</option>
-                <option value="fair_use" class="bg-[#0d1427] text-white">Fair Use (Edukasi)</option>
-                <option value="licensed" class="bg-[#0d1427] text-white">Berlisensi Sah</option>
-                <option value="restricted" class="bg-[#0d1427] text-white">Restricted / Tidak Boleh Dipublish</option>
-              </select>
-            </div>
-          </div>
 
-          <div class="grid grid-cols-3 gap-3">
-            <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Sumber (Opsional)</label>
-              <input v-model="qForm.source_name" type="text" placeholder="Misal: UTBK 2023" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 placeholder-white/20 transition-all font-medium" />
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tahun (Opsional)</label>
-              <input v-model="qForm.source_year" type="number" placeholder="2023" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 placeholder-white/20 transition-all font-medium" />
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Referensi URL/Buku</label>
-              <input v-model="qForm.source_reference" type="text" placeholder="URL atau hal." class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 placeholder-white/20 transition-all font-medium" />
-            </div>
-          </div>
           <div class="flex items-center gap-2 pt-1">
             <input type="checkbox" id="qc_passed" v-model="qForm.is_qc_passed" :true-value="1" :false-value="0" class="w-3.5 h-3.5 text-[#c0ff00] bg-black/40 border-white/20 rounded focus:ring-[#c0ff00]">
             <label for="qc_passed" class="text-xs font-bold text-white/80 cursor-pointer">Telah Melewati Proses QC (Guru)</label>
@@ -967,6 +1186,10 @@
               <span class="text-xs font-bold uppercase w-5 text-white/80">{{ opt }}.</span>
               <input v-model="qForm['option_' + opt]" :required="opt !== 'e'" type="text" placeholder="..." class="flex-grow p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 placeholder-white/20 transition-all font-medium" />
             </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pembahasan Lengkap</label>
+            <textarea v-model="qForm.explanation" rows="2" placeholder="Uraian langkah penyelesaian..." class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
           </div>
           <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
             <button type="button" @click="closeQuestionModal" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>
@@ -1058,10 +1281,21 @@ const stats = reactive({
   totalRevenue: 0,
 });
 
-// ── Current Nav Item ──
+// ── Nav Items ──
+const navItems = [
+  { id: 'overview',     label: 'Overview',            icon: 'ph-squares-four',  badge: null },
+  { id: 'transactions', label: 'Riwayat Transaksi',   icon: 'ph-receipt',       badge: null },
+  { id: 'students',     label: 'Manajemen Siswa',     icon: 'ph-users-three',   badge: null },
+  { id: 'questions',    label: 'Bank Soal',           icon: 'ph-books',         badge: null },
+  { id: 'materials',    label: 'Manajemen Materi',    icon: 'ph-file-text',     badge: null },
+  { id: 'packages',     label: 'Manajemen Paket',     icon: 'ph-package',       badge: null },
+  { id: 'affiliates',   label: 'Afiliasi & Komisi',   icon: 'ph-hand-coins',    badge: null },
+  { id: 'staff',        label: 'Manajemen Staff',     icon: 'ph-users-three',   badge: null },
+  { id: 'reports',      label: 'Laporan & Analitik',  icon: 'ph-chart-bar',     badge: null },
+];
+
 const currentNavItem = computed(() => navItems.find(item => item.id === activeTab.value));
 
-// ── Format Currency ──
 const formatCurrency = (value) => {
   return 'Rp ' + Number(value || 0).toLocaleString('id-ID');
 };
@@ -1081,10 +1315,10 @@ const doLogin = async () => {
     sessionStorage.setItem('admin_token', res.token);
     if (res.csrf_token) sessionStorage.setItem('ep_admin_csrf', res.csrf_token);
     isAuthenticated.value = true;
-    // Fetch dashboard data after successful login
     fetchDashboard();
     fetchStudents();
-    if (activeTab.value === 'transactions') fetchAdminOrders();
+    fetchAdminOrders();
+    loadPlansAndStaff();
   } catch (err) {
     loginError.value = err.message || 'Login gagal';
   } finally {
@@ -1118,6 +1352,7 @@ onMounted(async () => {
     isAuthenticated.value = true;
     fetchDashboard();
     fetchStudents();
+    fetchAdminOrders();
     loadPlansAndStaff();
   } else if (mainToken) {
     try {
@@ -1127,6 +1362,7 @@ onMounted(async () => {
         isAuthenticated.value = true;
         fetchDashboard();
         fetchStudents();
+        fetchAdminOrders();
         loadPlansAndStaff();
       }
     } catch(e) {
@@ -1151,6 +1387,10 @@ const fetchDashboard = async () => {
 
 // ── Students ──
 const allStudents = ref([]);
+const isEditingStudent = ref(false);
+const showStudentModal = ref(false);
+const isSaving = ref(false);
+const studentForm = reactive({ id: null, name: '', email: '', password: '', plan: 'free', is_active: 1 });
 
 const fetchStudents = async () => {
   try {
@@ -1171,15 +1411,74 @@ const filteredStudents = computed(() => {
   });
 });
 
-// ── Admin Orders ──
+const openCreateStudentModal = () => {
+  isEditingStudent.value = false;
+  Object.assign(studentForm, { id: null, name: '', email: '', password: '', plan: 'free', is_active: 1 });
+  showStudentModal.value = true;
+};
+
+const openEditStudentModal = (s) => {
+  isEditingStudent.value = true;
+  Object.assign(studentForm, { id: s.id, name: s.name, email: s.email, password: '', plan: s.plan || 'free', is_active: s.is_active != 0 ? 1 : 0 });
+  showStudentModal.value = true;
+};
+
+const saveStudent = async () => {
+  isSaving.value = true;
+  try {
+    if (isEditingStudent.value) {
+      await api.updateAdminStudent(studentForm.id, studentForm);
+    } else {
+      await api.createAdminStudent(studentForm);
+    }
+    await fetchStudents();
+    await fetchDashboard();
+    showStudentModal.value = false;
+  } catch (err) {
+    alert(err.message || "Gagal menyimpan data siswa");
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+const deleteStudent = async (id) => {
+  if (!confirm('Apakah Anda yakin ingin menghapus akun siswa ini? Data tryout dan nilai akan ikut terhapus.')) return;
+  try {
+    await api.deleteAdminStudent(id);
+    await fetchStudents();
+    await fetchDashboard();
+  } catch (err) {
+    alert(err.message || "Gagal menghapus siswa");
+  }
+};
+
+// ── Admin Orders / Transactions ──
 const adminOrders = ref([]);
 const ordersLoading = ref(false);
+const showOrderModal = ref(false);
+const showOrderStatusModal = ref(false);
+const selectedOrder = ref(null);
+const orderStatusNew = ref('paid');
+const orderForm = reactive({ student_id: '', plan_id: 'plan-utama', plan_name: 'Paket Utama', amount: 450000, status: 'paid' });
+
+const syncOrderPlanPrice = () => {
+  if (orderForm.plan_id === 'plan-mandiri') {
+    orderForm.plan_name = 'Paket Mandiri';
+    orderForm.amount = 180000;
+  } else if (orderForm.plan_id === 'plan-utama') {
+    orderForm.plan_name = 'Paket Utama';
+    orderForm.amount = 450000;
+  } else if (orderForm.plan_id === 'plan-vip') {
+    orderForm.plan_name = 'Paket VIP';
+    orderForm.amount = 1100000;
+  }
+};
 
 const fetchAdminOrders = async () => {
   ordersLoading.value = true;
   try {
     const res = await api.getAdminOrders();
-    adminOrders.value = res.orders || [];
+    adminOrders.value = res.orders || (Array.isArray(res) ? res : []);
   } catch (err) {
     console.error("Gagal mengambil transaksi:", err);
   } finally {
@@ -1187,47 +1486,70 @@ const fetchAdminOrders = async () => {
   }
 };
 
-watch(activeTab, (newTab) => {
-  if (newTab === 'transactions') {
-    fetchAdminOrders();
-  }
-  if (newTab === 'students') {
-    fetchStudents();
-  }
-  if (newTab === 'questions') {
-    fetchQuestions();
-  }
-  if (newTab === 'materials') {
-    fetchMaterials();
-  }
-});
+const openCreateOrderModal = () => {
+  if (allStudents.value.length === 0) fetchStudents();
+  orderForm.student_id = allStudents.value[0]?.id || '';
+  orderForm.plan_id = 'plan-utama';
+  orderForm.plan_name = 'Paket Utama';
+  orderForm.amount = 450000;
+  orderForm.status = 'paid';
+  showOrderModal.value = true;
+};
 
-const navItems = [
-  { id: 'overview',     label: 'Overview',            icon: 'ph-squares-four',  badge: null },
-  { id: 'transactions', label: 'Riwayat Transaksi',   icon: 'ph-receipt',       badge: null },
-  { id: 'students',     label: 'Manajemen Siswa',     icon: 'ph-users-three',   badge: null },
-  { id: 'questions',    label: 'Bank Soal',           icon: 'ph-books',         badge: null },
-  { id: 'materials',    label: 'Manajemen Materi',    icon: 'ph-file-text',     badge: null },
-  { id: 'packages',     label: 'Manajemen Paket',     icon: 'ph-package',       badge: null },
-  { id: 'affiliates',   label: 'Afiliasi & Komisi',   icon: 'ph-hand-coins',    badge: null },
-  { id: 'staff',        label: 'Manajemen Staff',     icon: 'ph-users-three',   badge: null },
-  { id: 'reports',      label: 'Laporan & Analitik',  icon: 'ph-chart-bar',     badge: null },
-];
-
-const goToStudentSide = () => router.push('/');
-
-// ── Fetch data on mount if already authenticated ──
-onMounted(() => {
-  if (isAuthenticated.value) {
-    fetchDashboard();
-    fetchStudents();
-    loadPlansAndStaff();
+const saveManualOrder = async () => {
+  isSaving.value = true;
+  try {
+    await api.createAdminOrder(orderForm);
+    showOrderModal.value = false;
+    await fetchAdminOrders();
+    await fetchStudents();
+    await fetchDashboard();
+  } catch (err) {
+    alert(err.message || "Gagal membuat transaksi manual");
+  } finally {
+    isSaving.value = false;
   }
-});
+};
+
+const openEditOrderStatusModal = (order) => {
+  selectedOrder.value = order;
+  orderStatusNew.value = order.status || 'paid';
+  showOrderStatusModal.value = true;
+};
+
+const submitOrderStatusUpdate = async () => {
+  if (!selectedOrder.value) return;
+  isSaving.value = true;
+  try {
+    await api.updateAdminOrderStatus(selectedOrder.value.order_id || selectedOrder.value.id, orderStatusNew.value);
+    showOrderStatusModal.value = false;
+    await fetchAdminOrders();
+    await fetchStudents();
+    await fetchDashboard();
+  } catch (err) {
+    alert(err.message || "Gagal update status transaksi");
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+const deleteOrder = async (orderId) => {
+  if (!confirm('Apakah Anda yakin ingin menghapus catatan transaksi ini?')) return;
+  try {
+    await api.deleteAdminOrder(orderId);
+    await fetchAdminOrders();
+    await fetchDashboard();
+  } catch (err) {
+    alert(err.message || "Gagal menghapus transaksi");
+  }
+};
 
 // ── Questions ──
 const serverQuestions = ref([]);
 const questionsLoading = ref(false);
+const showQuestionModal = ref(false);
+const isEditingQuestion = ref(false);
+const qForm = reactive({ id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', is_qc_passed: 0, explanation: '' });
 
 const fetchQuestions = async () => {
   questionsLoading.value = true;
@@ -1260,82 +1582,13 @@ const filteredQuestions = computed(() => {
   return list;
 });
 
-const showQuestionModal = ref(false);
-
-const showImportModal = ref(false);
-const stagingData = ref([]);
-const currentBatchId = ref('');
-const hasErrors = computed(() => stagingData.value.some(r => r.status === 'error'));
-
-
-const handleFileUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  
-  try {
-    const data = await file.arrayBuffer();
-    const workbook = XLSX.read(data, { type: 'array' });
-    const firstSheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[firstSheetName];
-    const jsonData = XLSX.utils.sheet_to_json(worksheet);
-    
-    if (jsonData.length === 0) {
-      alert("File kosong atau format salah.");
-      return;
-    }
-
-    const res = await fetch('/api/importer.php?action=upload', {
-      method: 'POST',
-      headers: { 
-        'Authorization': 'Bearer ' + localStorage.getItem('edupath_token'),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(jsonData)
-    }).then(r => r.json());
-    
-    if (res.error) throw new Error(res.error);
-    
-    currentBatchId.value = res.batch_id;
-    stagingData.value = await fetch('/api/importer.php?action=preview&batch_id=' + res.batch_id, {
-      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('edupath_token') }
-    }).then(r => r.json());
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-const commitImport = async () => {
-  try {
-    const res = await fetch('/api/importer.php?action=commit', {
-      method: 'POST',
-      headers: { 
-        'Authorization': 'Bearer ' + localStorage.getItem('edupath_token'),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ batch_id: currentBatchId.value })
-    }).then(r => r.json());
-    
-    if (res.error) throw new Error(res.error);
-    alert('Berhasil mengimpor ' + res.inserted + ' soal!');
-    showImportModal.value = false;
-    stagingData.value = [];
-    loadQuestions();
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-const isEditingQuestion = ref(false);
-const isSaving = ref(false);
-const qForm = reactive({ id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', source_name: '', source_year: null, source_reference: '', is_qc_passed: 0 });
-
 const openQuestionModal = (q = null) => {
   if (q) {
     isEditingQuestion.value = true;
     Object.assign(qForm, q);
   } else {
     isEditingQuestion.value = false;
-    Object.assign(qForm, { id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', source_name: '', source_year: null, source_reference: '', is_qc_passed: 0 });
+    Object.assign(qForm, { id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', is_qc_passed: 0, explanation: '' });
   }
   showQuestionModal.value = true;
 };
@@ -1352,6 +1605,7 @@ const saveQuestion = async () => {
     }
     closeQuestionModal();
     fetchQuestions();
+    fetchDashboard();
   } catch (err) {
     alert("Gagal menyimpan soal");
   } finally {
@@ -1364,6 +1618,7 @@ const deleteQuestion = async (id) => {
   try {
     await api.deleteAdminQuestion(id);
     fetchQuestions();
+    fetchDashboard();
   } catch (err) {
     alert("Gagal menghapus soal");
   }
@@ -1373,12 +1628,15 @@ const deleteQuestion = async (id) => {
 const mSearch = ref('');
 const serverMaterials = ref([]);
 const materialsLoading = ref(false);
+const showMaterialModal = ref(false);
+const isEditingMaterial = ref(false);
+const mForm = reactive({ id: null, title: '', content: '', sub_materi: 'Penalaran Umum', teacher_name: '' });
 
 const fetchMaterials = async () => {
   materialsLoading.value = true;
   try {
     const res = await api.getAdminMaterials();
-    serverMaterials.value = res.materials || [];
+    serverMaterials.value = res.materials || (Array.isArray(res) ? res : []);
   } catch (err) {
     console.error("Gagal memuat materi", err);
   } finally {
@@ -1394,10 +1652,6 @@ const filteredMaterials = computed(() => {
   }
   return list;
 });
-
-const showMaterialModal = ref(false);
-const isEditingMaterial = ref(false);
-const mForm = reactive({ id: null, title: '', content: '', sub_materi: 'Penalaran Umum', teacher_name: '' });
 
 const openMaterialModal = (m = null) => {
   if (m) {
@@ -1439,156 +1693,12 @@ const deleteMaterial = async (id) => {
   }
 };
 
-// ── Packages ──
-const packages = [
-  { name: 'Mandiri',      price: 'Rp 180.000',   color: '#6366f1', active: true,  subscribers: 62,  features: ['500+ Micro-Lessons Adaptif', '50.000+ Bank Soal HOTS IRT', '5x Tryout Nasional / Bulan', 'Radar Deteksi Blind-Spot', 'Weekly Learning Check-in'] },
-  { name: 'Utama',        price: 'Rp 450.000',   color: '#c0ff00', active: true,  subscribers: 89,  features: ['Semua fitur Mandiri', 'AI Tutor Companion 24/7', 'Unlimited Simulasi IRT', 'Rasionalisasi Prodi', 'WA Laporan Orang Tua'] },
-  { name: 'Paket VIP',    price: 'Rp 1.100.000', color: '#f59e0b', active: true,  subscribers: 24,  features: ['Semua fitur Utama', '1-on-1 Private Mentoring Zoom', 'Grup WA VIP Mentor Senior', 'Audit Portofolio Belajar'] },
-]
-
-// ── Reports ──
-const revenueBreakdown = [
-  { label: 'Paket Utama',    amount: 'Rp 40.050.000', color: '#c0ff00' },
-  { label: 'Paket Mandiri',  amount: 'Rp 11.160.000', color: '#6366f1' },
-  { label: 'Paket VIP',      amount: 'Rp 26.400.000', color: '#f59e0b' },
-]
-
-const topStudents = [
-  { name: 'Rani Kusuma',  score: 742 },
-  { name: 'Siti Rahayu',  score: 715 },
-  { name: 'Fajar Nugraha',score: 698 },
-  { name: 'Budi Santoso', score: 681 },
-  { name: 'Dimas Pratama',score: 623 },
-]
-
-const exportOptions = [
-  { label: 'Laporan Siswa (Excel)', icon: 'ph-microsoft-excel-logo' },
-  { label: 'Rekap Soal (PDF)',      icon: 'ph-file-pdf'              },
-  { label: 'Statistik Platform',    icon: 'ph-chart-pie'             },
-  { label: 'Blast WhatsApp Orang Tua', icon: 'ph-whatsapp-logo'     },
-]
-
-// --- Scripts for Plans & Staff ---
+// ── Plans / Packages ──
 const plans = ref([]);
-const staffMembers = ref([]);
-const entitlementsDict = ref([]);
-
-// Modals State
-// ── Affiliates & Commissions ──
-const affiliatesList = ref([]);
-const commissionsList = ref([]);
-const payoutsList = ref([]);
-const isLoadingAffiliates = ref(false);
-const isLoadingCommissions = ref(false);
-const isLoadingPayouts = ref(false);
-
-const loadAdminAffiliates = async () => {
-  isLoadingAffiliates.value = true;
-  try {
-    affiliatesList.value = await api.getAdminAffiliates();
-  } catch (err) {
-    alert('Gagal memuat daftar afiliasi');
-  } finally {
-    isLoadingAffiliates.value = false;
-  }
-};
-
-const loadAdminCommissions = async () => {
-  isLoadingCommissions.value = true;
-  try {
-    commissionsList.value = await api.getAdminCommissions();
-  } catch (err) {
-    alert('Gagal memuat daftar komisi');
-  } finally {
-    isLoadingCommissions.value = false;
-  }
-};
-
-const loadAdminPayouts = async () => {
-  isLoadingPayouts.value = true;
-  try {
-    payoutsList.value = await api.getAdminPayouts();
-  } catch (err) {
-    alert('Gagal memuat daftar payout');
-  } finally {
-    isLoadingPayouts.value = false;
-  }
-};
-
-const approvePayoutReq = async (id) => {
-  if (!confirm("Tandai payout ini sebagai 'Telah Ditransfer'?")) return;
-  try {
-    await api.approvePayout(id);
-    loadAdminPayouts();
-  } catch (err) {
-    alert(err.message || 'Gagal memproses payout');
-  }
-};
-
-// Payout Modal
-const showPayoutModal = ref(false);
-const selectedCommission = ref(null);
-const payoutReference = ref('');
-const isPayingOut = ref(false);
-
-const openPayoutModal = (comm) => {
-  selectedCommission.value = comm;
-  payoutReference.value = '';
-  showPayoutModal.value = true;
-};
-
-const closePayoutModal = () => {
-  showPayoutModal.value = false;
-  selectedCommission.value = null;
-  payoutReference.value = '';
-};
-
-const submitPayout = async () => {
-  if (!selectedCommission.value) return;
-  isPayingOut.value = true;
-  try {
-    await api.payoutCommission(selectedCommission.value.id, payoutReference.value);
-    closePayoutModal();
-    loadAdminCommissions();
-  } catch (err) {
-    alert(err.message || 'Gagal mencairkan komisi');
-  } finally {
-    isPayingOut.value = false;
-  }
-};
-
-// ── Watch activeTab to load data ──
-watch(activeTab, (newTab) => {
-  sessionStorage.setItem('admin_active_tab', newTab);
-  if (newTab === 'overview') {
-    fetchDashboard();
-  } else if (newTab === 'students') {
-    fetchStudents();
-  } else if (newTab === 'questions') {
-    fetchQuestions();
-  } else if (newTab === 'materials') {
-    fetchMaterials();
-  } else if (newTab === 'transactions') {
-    fetchAdminOrders();
-  } else if (newTab === 'packages' || newTab === 'plans' || newTab === 'staff') {
-    loadPlansAndStaff();
-  } else if (newTab === 'affiliates') {
-    loadAdminAffiliates();
-    loadAdminCommissions();
-    loadAdminPayouts();
-  }
-}, { immediate: true });
-
-const showStudentModal = ref(false);
-const studentForm = reactive({ name: '', email: '', password: '', plan: 'free' });
-
 const showPlanModal = ref(false);
 const isEditingPlan = ref(false);
 const pForm = reactive({ id: null, name: '', price: '', discount: 0, duration: '', features: [] });
-
-const showStaffModal = ref(false);
-const isEditingStaff = ref(false);
-const sForm = reactive({ id: null, username: '', name: '', role: 'teacher', password: '' });
+const entitlementsDict = ref([]);
 
 const loadPlansAndStaff = async () => {
   try {
@@ -1598,14 +1708,12 @@ const loadPlansAndStaff = async () => {
       api.getEntitlementsDictionary()
     ]);
     plans.value = pRes || [];
-    // Ensure features is parsed from JSON if it comes as string from DB
     plans.value.forEach(p => {
       if (typeof p.features === 'string') {
         try { p.features = JSON.parse(p.features); } catch (e) { p.features = []; }
       }
       if (!Array.isArray(p.features)) p.features = [];
     });
-    
     staffMembers.value = sRes.staff || [];
     entitlementsDict.value = eRes || [];
   } catch (err) {
@@ -1643,6 +1751,171 @@ const deletePlan = async (id) => {
   }
 };
 
+// ── Affiliates & Commissions ──
+const affiliatesList = ref([]);
+const commissionsList = ref([]);
+const payoutsList = ref([]);
+const isLoadingAffiliates = ref(false);
+const isLoadingCommissions = ref(false);
+const isLoadingPayouts = ref(false);
+const showAffiliateModal = ref(false);
+const isEditingAffiliate = ref(false);
+const affiliateForm = reactive({ id: null, email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '' });
+const showRejectPayoutModal = ref(false);
+const selectedPayoutToReject = ref(null);
+const rejectReason = ref('');
+
+const loadAdminAffiliates = async () => {
+  isLoadingAffiliates.value = true;
+  try {
+    affiliatesList.value = await api.getAdminAffiliates();
+  } catch (err) {
+    console.error('Gagal memuat afiliasi', err);
+  } finally {
+    isLoadingAffiliates.value = false;
+  }
+};
+
+const loadAdminCommissions = async () => {
+  isLoadingCommissions.value = true;
+  try {
+    commissionsList.value = await api.getAdminCommissions();
+  } catch (err) {
+    console.error('Gagal memuat komisi', err);
+  } finally {
+    isLoadingCommissions.value = false;
+  }
+};
+
+const loadAdminPayouts = async () => {
+  isLoadingPayouts.value = true;
+  try {
+    payoutsList.value = await api.getAdminPayouts();
+  } catch (err) {
+    console.error('Gagal memuat payout', err);
+  } finally {
+    isLoadingPayouts.value = false;
+  }
+};
+
+const openCreateAffiliateModal = () => {
+  isEditingAffiliate.value = false;
+  Object.assign(affiliateForm, { id: null, email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '' });
+  showAffiliateModal.value = true;
+};
+
+const openEditAffiliateModal = (aff) => {
+  isEditingAffiliate.value = true;
+  Object.assign(affiliateForm, {
+    id: aff.id,
+    email: aff.email || aff.identity_key,
+    name: aff.affiliate_name || '',
+    referral_code: aff.referral_code,
+    commission_rate: aff.commission_rate || 20.0,
+    bank_name: aff.bank_name || '',
+    bank_account: aff.bank_account || '',
+    bank_owner: aff.bank_owner || ''
+  });
+  showAffiliateModal.value = true;
+};
+
+const saveAffiliate = async () => {
+  isSaving.value = true;
+  try {
+    if (isEditingAffiliate.value) {
+      await api.updateAdminAffiliate(affiliateForm.id, affiliateForm);
+    } else {
+      await api.createAdminAffiliate(affiliateForm);
+    }
+    showAffiliateModal.value = false;
+    loadAdminAffiliates();
+  } catch (err) {
+    alert(err.message || "Gagal menyimpan mitra");
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+const deleteAffiliate = async (id) => {
+  if (!confirm("Hapus mitra afiliasi ini?")) return;
+  try {
+    await api.deleteAdminAffiliate(id);
+    loadAdminAffiliates();
+  } catch (err) {
+    alert(err.message || "Gagal menghapus mitra");
+  }
+};
+
+const approvePayoutReq = async (id) => {
+  if (!confirm("Tandai payout ini sebagai 'Telah Ditransfer'?")) return;
+  try {
+    await api.approvePayout(id);
+    loadAdminPayouts();
+    loadAdminCommissions();
+  } catch (err) {
+    alert(err.message || 'Gagal memproses payout');
+  }
+};
+
+const openRejectPayoutModal = (pay) => {
+  selectedPayoutToReject.value = pay;
+  rejectReason.value = 'Nomor rekening tidak valid atau dana gagal diproses bank';
+  showRejectPayoutModal.value = true;
+};
+
+const submitRejectPayout = async () => {
+  if (!selectedPayoutToReject.value) return;
+  isSaving.value = true;
+  try {
+    await api.rejectPayout(selectedPayoutToReject.value.id, rejectReason.value);
+    showRejectPayoutModal.value = false;
+    loadAdminPayouts();
+    loadAdminCommissions();
+  } catch (err) {
+    alert(err.message || "Gagal menolak payout");
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+// Payout Modal
+const showPayoutModal = ref(false);
+const selectedCommission = ref(null);
+const payoutReference = ref('');
+const isPayingOut = ref(false);
+
+const openPayoutModal = (comm) => {
+  selectedCommission.value = comm;
+  payoutReference.value = '';
+  showPayoutModal.value = true;
+};
+
+const closePayoutModal = () => {
+  showPayoutModal.value = false;
+  selectedCommission.value = null;
+  payoutReference.value = '';
+};
+
+const submitPayout = async () => {
+  if (!selectedCommission.value) return;
+  isPayingOut.value = true;
+  try {
+    await api.payoutCommission(selectedCommission.value.id, payoutReference.value);
+    closePayoutModal();
+    loadAdminCommissions();
+  } catch (err) {
+    alert(err.message || 'Gagal mencairkan komisi');
+  } finally {
+    isPayingOut.value = false;
+  }
+};
+
+// ── Staff ──
+const staffMembers = ref([]);
+const showStaffModal = ref(false);
+const isEditingStaff = ref(false);
+const sForm = reactive({ id: null, username: '', name: '', role: 'teacher', password: '' });
+
 const openStaffModal = (s = null) => {
   if (s) {
     isEditingStaff.value = true;
@@ -1655,20 +1928,6 @@ const openStaffModal = (s = null) => {
 };
 
 const closeStaffModal = () => showStaffModal.value = false;
-
-const saveStudent = async () => {
-  isSaving.value = true;
-  try {
-    await api.createAdminStudent(studentForm);
-    await fetchStudents();
-    showStudentModal.value = false;
-    Object.assign(studentForm, { name: '', email: '', password: '', plan: 'free' });
-  } catch (err) {
-    alert(err.message || "Gagal menyimpan siswa");
-  } finally {
-    isSaving.value = false;
-  }
-};
 
 const saveStaff = async () => {
   try {
@@ -1685,6 +1944,123 @@ const deleteStaff = async (id) => {
     try { await api.deleteAdminStaff(id); await loadPlansAndStaff(); } catch (err) { alert(err.message); }
   }
 };
+
+// ── Reports Exporters ──
+const downloadCSV = (filename, rows) => {
+  const processRow = (row) => {
+    return row.map(val => {
+      if (val === null || val === undefined) return '""';
+      let text = String(val).replace(/"/g, '""');
+      return `"${text}"`;
+    }).join(',');
+  };
+  const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + rows.map(processRow).join("\n");
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+const exportStudentsCSV = () => {
+  if (allStudents.value.length === 0) {
+    alert("Belum ada data siswa untuk diekspor");
+    return;
+  }
+  const headers = ["ID", "Nama Lengkap", "Email", "Paket Belajar", "Status Aktif", "Terdaftar Pada"];
+  const rows = [headers];
+  allStudents.value.forEach(s => {
+    rows.push([
+      s.id,
+      s.name,
+      s.email,
+      s.plan || 'free',
+      s.is_active != 0 ? 'Aktif' : 'Nonaktif',
+      s.created_at || '-'
+    ]);
+  });
+  downloadCSV(`EduPath_Siswa_${new Date().toISOString().slice(0,10)}.csv`, rows);
+};
+
+const exportTransactionsCSV = () => {
+  if (adminOrders.value.length === 0) {
+    alert("Belum ada data transaksi untuk diekspor");
+    return;
+  }
+  const headers = ["Order ID", "Nama Siswa", "Email Siswa", "Paket Belajar", "Nominal (Rp)", "Status", "Metode Bayar", "Tanggal"];
+  const rows = [headers];
+  adminOrders.value.forEach(o => {
+    rows.push([
+      o.order_id || o.id,
+      o.student_name || '-',
+      o.student_email || '-',
+      o.plan_name || o.plan_id || '-',
+      o.amount || 0,
+      o.status || 'pending',
+      o.payment_type || '-',
+      o.created_at || '-'
+    ]);
+  });
+  downloadCSV(`EduPath_Transaksi_${new Date().toISOString().slice(0,10)}.csv`, rows);
+};
+
+const exportQuestionsCSV = () => {
+  if (serverQuestions.value.length === 0) {
+    alert("Belum ada data bank soal untuk diekspor");
+    return;
+  }
+  const headers = ["ID", "Sub Materi", "Tingkat Kesulitan", "Pertanyaan", "Opsi A", "Opsi B", "Opsi C", "Opsi D", "Opsi E", "Kunci Jawaban", "Status QC", "Level Kognitif"];
+  const rows = [headers];
+  serverQuestions.value.forEach(q => {
+    rows.push([
+      q.id,
+      q.sub_materi || q.subtes,
+      q.difficulty || 'medium',
+      q.question,
+      q.option_a,
+      q.option_b,
+      q.option_c,
+      q.option_d,
+      q.option_e || '',
+      (q.correct || 'a').toUpperCase(),
+      q.is_qc_passed == 1 ? 'Lolos QC' : 'Belum QC',
+      q.cognitive_demand || 'C3'
+    ]);
+  });
+  downloadCSV(`EduPath_BankSoal_${new Date().toISOString().slice(0,10)}.csv`, rows);
+};
+
+const blastWhatsAppParentReport = () => {
+  const message = `Halo Bapak/Ibu Wali Siswa EduPath,\n\nBerikut ringkasan progres belajar ananda di EduPath:\n- Tryout Terselesaikan: 5x\n- Rata-rata Skor SNBT: 685 (Target 700+)\n- Status Paket: Aktif\n\nTerus dukung ananda meraih PTN Impian bersama EduPath.ai!`;
+  const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+};
+
+// ── Watch activeTab to load data ──
+watch(activeTab, (newTab) => {
+  sessionStorage.setItem('admin_active_tab', newTab);
+  if (newTab === 'overview') {
+    fetchDashboard();
+  } else if (newTab === 'students') {
+    fetchStudents();
+  } else if (newTab === 'questions') {
+    fetchQuestions();
+  } else if (newTab === 'materials') {
+    fetchMaterials();
+  } else if (newTab === 'transactions') {
+    fetchAdminOrders();
+  } else if (newTab === 'packages' || newTab === 'plans' || newTab === 'staff') {
+    loadPlansAndStaff();
+  } else if (newTab === 'affiliates') {
+    loadAdminAffiliates();
+    loadAdminCommissions();
+    loadAdminPayouts();
+  }
+}, { immediate: true });
+
+const goToStudentSide = () => router.push('/');
 </script>
 
 <style scoped>

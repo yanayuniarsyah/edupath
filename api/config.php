@@ -109,15 +109,44 @@ define('APP_ENV', env('APP_ENV', 'production'));
 // ----------------------------------------------------------------
 // AUDIT LOGGING HELPER
 // ----------------------------------------------------------------
-function log_audit(PDO $pdo, ?string $actor_id, ?string $tenant_id, string $action, ?string $target_id = null, array $metadata = []) {
+<?php
+function log_audit(PDO $pdo, ?string $actor_id, ?string $tenant_id, string $action, ?string $target_id = null, array $metadata = [], string $level = 'INFO') {
     try {
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
-        
-        // Cek secara aman apakah tabel audit_logs sudah ada (graceful fallback)
-        $stmt = $pdo->prepare("INSERT INTO audit_logs (id, actor_id, tenant_id, action, target_id, metadata) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$id, $actor_id, $tenant_id, $action, $target_id, json_encode($metadata)]);
+        $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? null;
+        // Optional HMAC signature for tamper‑proofing if secret is configured
+        $signature = null;
+        $secret = env('AUDIT_HMAC_SECRET', null);
+        if ($secret) {
+            $payload = json_encode([
+                'id' => $id,
+                'action' => $action,
+                'target_id' => $target_id,
+                'metadata' => $metadata,
+                'ip_address' => $ip,
+                'user_agent' => $ua,
+                'level' => $level,
+                'timestamp' => date('c')
+            ]);
+            $signature = hash_hmac('sha256', $payload, $secret);
+        }
+        $stmt = $pdo->prepare("INSERT INTO audit_logs (id, actor_id, tenant_id, action, target_id, metadata, ip_address, user_agent, level, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $id,
+            $actor_id,
+            $tenant_id,
+            $action,
+            $target_id,
+            json_encode($metadata),
+            $ip,
+            $ua,
+            $level,
+            $signature
+        ]);
     } catch (Exception $e) {
-        // Silently fail agar aplikasi tidak terganggu jika audit table belum ter-migrate
+        // Silently fail agar aplikasi tidak terganggu jika audit table belum ter‑migrate
     }
 }
+?>

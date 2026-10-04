@@ -161,9 +161,9 @@ if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 elseif ($action === 'students') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if ($payload->role === 'superadmin' && empty($payload->tenant_id)) {
-            $stmt = $pdo->query("SELECT id, name, email, plan, is_active FROM students ORDER BY created_at DESC");
+            $stmt = $pdo->query("SELECT id, name, email, plan, is_active, created_at FROM students ORDER BY created_at DESC");
         } else {
-            $stmt = $pdo->prepare("SELECT id, name, email, plan, is_active FROM students WHERE tenant_id = ? ORDER BY created_at DESC");
+            $stmt = $pdo->prepare("SELECT id, name, email, plan, is_active, created_at FROM students WHERE tenant_id = ? ORDER BY created_at DESC");
             $stmt->execute([$payload->tenant_id]);
         }
         $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -176,7 +176,7 @@ elseif ($action === 'students') {
         $plan = $input['plan'] ?? 'free';
         
         if (empty($name) || empty($email) || empty($password)) {
-            http_response_code(400); echo json_encode(["error" => "Name, email, and password required"]); exit;
+            http_response_code(400); echo json_encode(["error" => "Nama, email, dan password wajib diisi"]); exit;
         }
         
         $user_id = bin2hex(random_bytes(16));
@@ -192,11 +192,11 @@ elseif ($action === 'students') {
         }
 
         if (empty($tenant_id)) {
-            http_response_code(400); echo json_encode(["error" => "Tenant ID tidak ditemukan"]); exit;
+            $tenant_id = 'default-tenant';
+            $pdo->exec("INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES ('$tenant_id', 'EduPath Indonesia', 'edupath-master', 1)");
         }
 
         try {
-            // Cek apakah email sudah terdaftar di users
             $check = $pdo->prepare("SELECT id FROM users WHERE identity_key = ?");
             $check->execute([$email]);
             if ($check->fetch()) {
@@ -225,18 +225,233 @@ elseif ($action === 'students') {
             $pdo->rollBack();
             http_response_code(500); echo json_encode(["error" => "Gagal membuat siswa", "details" => $e->getMessage()]);
         }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $id = $input['id'] ?? '';
+        $name = trim($input['name'] ?? '');
+        $email = trim($input['email'] ?? '');
+        $plan = $input['plan'] ?? 'free';
+        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
+        $password = $input['password'] ?? '';
+
+        if (empty($id) || empty($name) || empty($email)) {
+            http_response_code(400); echo json_encode(["error" => "ID, nama, dan email wajib diisi"]); exit;
+        }
+
+        try {
+            $pdo->beginTransaction();
+            // Get old email
+            $stmtOld = $pdo->prepare("SELECT email FROM students WHERE id = ?");
+            $stmtOld->execute([$id]);
+            $oldEmail = $stmtOld->fetchColumn();
+
+            // Update students table
+            $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, plan = ?, is_active = ? WHERE id = ?");
+            $stmt->execute([$name, $email, $plan, $is_active, $id]);
+
+            // Update user table
+            if ($oldEmail) {
+                $stmtUser = $pdo->prepare("UPDATE users SET identity_key = ?, is_active = ? WHERE identity_key = ?");
+                $stmtUser->execute([$email, $is_active, $oldEmail]);
+            }
+
+            // Update password if provided
+            if (!empty($password)) {
+                $hashed = password_hash($password, PASSWORD_BCRYPT);
+                $stmtPass = $pdo->prepare("UPDATE students SET password = ? WHERE id = ?");
+                $stmtPass->execute([$hashed, $id]);
+                if ($oldEmail) {
+                    $stmtPassUser = $pdo->prepare("UPDATE users SET password = ? WHERE identity_key = ?");
+                    $stmtPassUser->execute([$hashed, $email]);
+                }
+            }
+
+            $pdo->commit();
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            http_response_code(500); echo json_encode(["error" => "Gagal mengupdate siswa", "details" => $e->getMessage()]);
+        }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $id = $_GET['id'] ?? '';
+        if (empty($id)) {
+            http_response_code(400); echo json_encode(["error" => "ID siswa wajib"]); exit;
+        }
+        try {
+            $pdo->beginTransaction();
+            $stmtS = $pdo->prepare("SELECT email FROM students WHERE id = ?");
+            $stmtS->execute([$id]);
+            $email = $stmtS->fetchColumn();
+
+            $pdo->prepare("DELETE FROM students WHERE id = ?")->execute([$id]);
+            $pdo->prepare("DELETE FROM user_roles WHERE reference_id = ?")->execute([$id]);
+            if ($email) {
+                $pdo->prepare("DELETE FROM users WHERE identity_key = ?")->execute([$email]);
+            }
+            $pdo->commit();
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            http_response_code(500); echo json_encode(["error" => "Gagal menghapus siswa"]);
+        }
     }
 }
-elseif ($action === 'orders' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    $stmt = $pdo->prepare("
-        SELECT o.*, s.name as student_name, s.email as student_email 
-        FROM orders o 
-        JOIN students s ON o.student_id = s.id 
-        WHERE s.tenant_id = ?
-        ORDER BY o.created_at DESC
+elseif ($action === 'orders') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if ($payload->role === 'superadmin' && empty($payload->tenant_id)) {
+            $stmt = $pdo->query("
+                SELECT o.*, s.name as student_name, s.email as student_email 
+                FROM orders o 
+                LEFT JOIN students s ON o.student_id = s.id 
+                ORDER BY o.created_at DESC
+            ");
+        } else {
+            $stmt = $pdo->prepare("
+                SELECT o.*, s.name as student_name, s.email as student_email 
+                FROM orders o 
+                JOIN students s ON o.student_id = s.id 
+                WHERE s.tenant_id = ?
+                ORDER BY o.created_at DESC
+            ");
+            $stmt->execute([$payload->tenant_id]);
+        }
+        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(["orders" => $orders]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Create manual/offline order
+        $input = json_decode(file_get_contents('php://input'), true);
+        $student_id = $input['student_id'] ?? '';
+        $plan_id = $input['plan_id'] ?? 'plan-utama';
+        $plan_name = $input['plan_name'] ?? 'Paket Utama';
+        $amount = (float)($input['amount'] ?? 450000);
+        $status = $input['status'] ?? 'paid';
+        $payment_type = $input['payment_type'] ?? 'manual_transfer';
+
+        if (empty($student_id)) {
+            http_response_code(400); echo json_encode(["error" => "Siswa wajib dipilih"]); exit;
+        }
+
+        $order_id = 'MANUAL-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 8)) . '-' . date('Ymd');
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare("INSERT INTO orders (id, order_id, student_id, plan_id, plan_name, amount, status, payment_type, created_at, updated_at) VALUES (UUID(), ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+            $stmt->execute([$order_id, $student_id, $plan_id, $plan_name, $amount, $status, $payment_type]);
+
+            // If status is paid, auto activate student plan
+            if (in_array($status, ['paid', 'settlement'])) {
+                $planCode = 'mandiri';
+                if (stripos($plan_id, 'vip') !== false || stripos($plan_name, 'vip') !== false) $planCode = 'vip';
+                elseif (stripos($plan_id, 'utama') !== false || stripos($plan_name, 'utama') !== false) $planCode = 'utama';
+                
+                $pdo->prepare("UPDATE students SET plan = ? WHERE id = ?")->execute([$planCode, $student_id]);
+            }
+            $pdo->commit();
+            echo json_encode(["success" => true, "order_id" => $order_id]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            http_response_code(500); echo json_encode(["error" => "Gagal membuat transaksi manual", "details" => $e->getMessage()]);
+        }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+        // Update order status
+        $input = json_decode(file_get_contents('php://input'), true);
+        $order_id = $input['order_id'] ?? $input['id'] ?? '';
+        $status = $input['status'] ?? 'paid';
+
+        if (empty($order_id)) {
+            http_response_code(400); echo json_encode(["error" => "Order ID wajib"]); exit;
+        }
+
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare("UPDATE orders SET status = ?, updated_at = NOW() WHERE order_id = ? OR id = ?");
+            $stmt->execute([$status, $order_id, $order_id]);
+
+            if (in_array($status, ['paid', 'settlement'])) {
+                // Get student_id and plan
+                $stmtOrd = $pdo->prepare("SELECT student_id, plan_id, plan_name FROM orders WHERE order_id = ? OR id = ?");
+                $stmtOrd->execute([$order_id, $order_id]);
+                $ord = $stmtOrd->fetch(PDO::FETCH_ASSOC);
+                if ($ord && !empty($ord['student_id'])) {
+                    $planCode = 'mandiri';
+                    if (stripos($ord['plan_id'], 'vip') !== false || stripos($ord['plan_name'], 'vip') !== false) $planCode = 'vip';
+                    elseif (stripos($ord['plan_id'], 'utama') !== false || stripos($ord['plan_name'], 'utama') !== false) $planCode = 'utama';
+                    $pdo->prepare("UPDATE students SET plan = ? WHERE id = ?")->execute([$planCode, $ord['student_id']]);
+                }
+            }
+            $pdo->commit();
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            http_response_code(500); echo json_encode(["error" => "Gagal update transaksi"]);
+        }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $order_id = $_GET['order_id'] ?? $_GET['id'] ?? '';
+        if (empty($order_id)) {
+            http_response_code(400); echo json_encode(["error" => "Order ID wajib"]); exit;
+        }
+        $pdo->prepare("DELETE FROM orders WHERE order_id = ? OR id = ?")->execute([$order_id, $order_id]);
+        echo json_encode(["success" => true]);
+    }
+}
+elseif ($action === 'materials') {
+    // Ensure table exists
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS materials (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            title VARCHAR(255) NOT NULL,
+            subtes VARCHAR(100) NOT NULL,
+            sub_materi VARCHAR(100) NULL,
+            teacher_name VARCHAR(150) NULL,
+            content TEXT NOT NULL,
+            is_active TINYINT(1) DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ");
-    $stmt->execute([$payload->tenant_id]);
-    echo json_encode($stmt->fetchAll());
+
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $stmt = $pdo->query("SELECT id, title, COALESCE(sub_materi, subtes) as sub_materi, subtes, teacher_name, content, is_active, created_at FROM materials ORDER BY id DESC");
+        $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(["materials" => $materials]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $title = trim($input['title'] ?? '');
+        $sub_materi = trim($input['sub_materi'] ?? $input['subtes'] ?? 'Penalaran Umum');
+        $teacher_name = trim($input['teacher_name'] ?? '');
+        $content = trim($input['content'] ?? '');
+        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
+
+        if (empty($title) || empty($content)) {
+            http_response_code(400); echo json_encode(["error" => "Judul dan konten materi wajib diisi"]); exit;
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO materials (title, subtes, sub_materi, teacher_name, content, is_active) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$title, $sub_materi, $sub_materi, $teacher_name, $content, $is_active]);
+        echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $id = $input['id'] ?? '';
+        $title = trim($input['title'] ?? '');
+        $sub_materi = trim($input['sub_materi'] ?? $input['subtes'] ?? 'Penalaran Umum');
+        $teacher_name = trim($input['teacher_name'] ?? '');
+        $content = trim($input['content'] ?? '');
+        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
+
+        if (empty($id) || empty($title) || empty($content)) {
+            http_response_code(400); echo json_encode(["error" => "ID, judul, dan konten materi wajib diisi"]); exit;
+        }
+
+        $stmt = $pdo->prepare("UPDATE materials SET title = ?, subtes = ?, sub_materi = ?, teacher_name = ?, content = ?, is_active = ? WHERE id = ?");
+        $stmt->execute([$title, $sub_materi, $sub_materi, $teacher_name, $content, $is_active, $id]);
+        echo json_encode(["success" => true]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $id = $_GET['id'] ?? '';
+        if (empty($id)) {
+            http_response_code(400); echo json_encode(["error" => "ID materi wajib"]); exit;
+        }
+        $pdo->prepare("DELETE FROM materials WHERE id = ?")->execute([$id]);
+        echo json_encode(["success" => true]);
+    }
 }
 elseif ($action === 'affiliates' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt = $pdo->prepare("

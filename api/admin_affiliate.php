@@ -123,6 +123,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             http_response_code(500);
             echo json_encode(["error" => "Database error: " . $e->getMessage()]);
         }
+    } elseif ($action === 'reject_payout') {
+        $payout_id = $input['payout_id'] ?? '';
+        $reason = $input['reason'] ?? 'Ditolak oleh admin';
+        
+        $pdo->beginTransaction();
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM payouts WHERE id = ? AND status = 'pending'");
+            $stmt->execute([$payout_id]);
+            $payout = $stmt->fetch();
+            
+            if (!$payout) {
+                http_response_code(404);
+                echo json_encode(["error" => "Payout tidak ditemukan atau sudah diproses"]);
+                $pdo->rollBack();
+                exit;
+            }
+            
+            // Mark payout as rejected
+            $stmt = $pdo->prepare("UPDATE payouts SET status = 'rejected', notes = ? WHERE id = ?");
+            $stmt->execute([$reason, $payout_id]);
+            
+            // Revert requested commissions back to pending
+            $stmt = $pdo->prepare("UPDATE commissions SET status = 'pending' WHERE affiliate_id = ? AND status = 'requested'");
+            $stmt->execute([$payout['affiliate_id']]);
+            
+            $pdo->commit();
+            echo json_encode(["success" => true]);
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(["error" => "Database error: " . $e->getMessage()]);
+        }
+    } elseif ($action === 'create_affiliate') {
+        $email = trim($input['email'] ?? '');
+        $name = trim($input['name'] ?? '');
+        $referral_code = strtoupper(trim($input['referral_code'] ?? ''));
+        $commission_rate = (float)($input['commission_rate'] ?? 20.0);
+        $bank_name = trim($input['bank_name'] ?? '');
+        $bank_account = trim($input['bank_account'] ?? '');
+        $bank_owner = trim($input['bank_owner'] ?? $name);
+
+        if (empty($email) || empty($referral_code)) {
+            http_response_code(400); echo json_encode(["error" => "Email dan kode referral wajib diisi"]); exit;
+        }
+
+        try {
+            $pdo->beginTransaction();
+            // Check if user exists or create student/user
+            $stmtU = $pdo->prepare("SELECT id FROM users WHERE identity_key = ?");
+            $stmtU->execute([$email]);
+            $user = $stmtU->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                $user_id = $user['id'];
+            } else {
+                $user_id = bin2hex(random_bytes(16));
+                $user_id = substr($user_id,0,8).'-'.substr($user_id,8,4).'-'.substr($user_id,12,4).'-'.substr($user_id,16,4).'-'.substr($user_id,20,12);
+                $defPass = password_hash('MitraEduPath2026!', PASSWORD_BCRYPT);
+                $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1)")->execute([$user_id, $email, $defPass]);
+            }
+
+            // Check if referral code taken
+            $stmtRef = $pdo->prepare("SELECT id FROM affiliates WHERE referral_code = ?");
+            $stmtRef->execute([$referral_code]);
+            if ($stmtRef->fetch()) {
+                http_response_code(409); echo json_encode(["error" => "Kode referral sudah dipakai mitra lain"]); $pdo->rollBack(); exit;
+            }
+
+            $aff_id = bin2hex(random_bytes(16));
+            $aff_id = substr($aff_id,0,8).'-'.substr($aff_id,8,4).'-'.substr($aff_id,12,4).'-'.substr($aff_id,16,4).'-'.substr($aff_id,20,12);
+
+            $stmtAff = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate, bank_name, bank_account, bank_owner, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+            $stmtAff->execute([$aff_id, $user_id, $payload->tenant_id ?: null, $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner]);
+
+            $pdo->commit();
+            echo json_encode(["success" => true, "id" => $aff_id]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            http_response_code(500); echo json_encode(["error" => "Gagal membuat mitra afiliasi", "details" => $e->getMessage()]);
+        }
+    } elseif ($action === 'update_affiliate') {
+        $id = $input['id'] ?? '';
+        $referral_code = strtoupper(trim($input['referral_code'] ?? ''));
+        $commission_rate = (float)($input['commission_rate'] ?? 20.0);
+        $bank_name = trim($input['bank_name'] ?? '');
+        $bank_account = trim($input['bank_account'] ?? '');
+        $bank_owner = trim($input['bank_owner'] ?? '');
+
+        if (empty($id) || empty($referral_code)) {
+            http_response_code(400); echo json_encode(["error" => "ID dan kode referral wajib"]); exit;
+        }
+
+        try {
+            $stmt = $pdo->prepare("UPDATE affiliates SET referral_code = ?, commission_rate = ?, bank_name = ?, bank_account = ?, bank_owner = ? WHERE id = ?");
+            $stmt->execute([$referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner, $id]);
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            http_response_code(500); echo json_encode(["error" => "Gagal update afiliasi"]);
+        }
+    } elseif ($action === 'delete_affiliate') {
+        $id = $input['id'] ?? $_GET['id'] ?? '';
+        if (empty($id)) {
+            http_response_code(400); echo json_encode(["error" => "ID afiliasi wajib"]); exit;
+        }
+        $pdo->prepare("DELETE FROM affiliates WHERE id = ?")->execute([$id]);
+        echo json_encode(["success" => true]);
     } elseif ($action === 'payout_commission') {
         $comm_id = $input['commission_id'] ?? '';
         $ref = $input['payout_reference'] ?? 'MANUAL_TRANSFER';
@@ -136,3 +242,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     }
 }
+?>

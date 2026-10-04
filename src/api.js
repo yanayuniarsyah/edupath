@@ -364,11 +364,26 @@ export default {
   getAdminOrders(page = 1, status = '') {
     return apiFetch(`/admin.php?action=orders&page=${page}&status=${status}`);
   },
+  createAdminOrder(data) {
+    return apiFetch('/admin.php?action=orders', { method: 'POST', body: JSON.stringify(data) });
+  },
+  updateAdminOrderStatus(orderId, status) {
+    return apiFetch('/admin.php?action=orders', { method: 'PUT', body: JSON.stringify({ order_id: orderId, status }) });
+  },
+  deleteAdminOrder(orderId) {
+    return apiFetch(`/admin.php?action=orders&order_id=${orderId}`, { method: 'DELETE' });
+  },
   getAdminStudents(page = 1, search = '', plan = '') {
     return apiFetch(`/admin.php?action=students&page=${page}&search=${search}&plan=${plan}`);
   },
   createAdminStudent(data) {
     return apiFetch('/admin.php?action=students', { method: 'POST', body: JSON.stringify(data) });
+  },
+  updateAdminStudent(id, data) {
+    return apiFetch('/admin.php?action=students', { method: 'PUT', body: JSON.stringify({ id, ...data }) });
+  },
+  deleteAdminStudent(id) {
+    return apiFetch(`/admin.php?action=students&id=${id}`, { method: 'DELETE' });
   },
   getAdminQuestions(page = 1, subtes = '') {
     return apiFetch(`/admin.php?action=questions&page=${page}&subtes=${subtes}`);
@@ -382,54 +397,38 @@ export default {
   deleteAdminQuestion(id) {
     return apiFetch(`/admin.php?action=questions&id=${id}`, { method: 'DELETE' });
   },
+  getAdminMaterials() {
+    return apiFetch('/admin.php?action=materials');
+  },
+  createAdminMaterial(data) {
+    return apiFetch('/admin.php?action=materials', { method: 'POST', body: JSON.stringify(data) });
+  },
+  updateAdminMaterial(id, data) {
+    return apiFetch('/admin.php?action=materials', { method: 'PUT', body: JSON.stringify({ id, ...data }) });
+  },
+  deleteAdminMaterial(id) {
+    return apiFetch(`/admin.php?action=materials&id=${id}`, { method: 'DELETE' });
+  },
   getAdminPlans()            { return apiFetch('/admin.php?action=plans'); },
   createAdminPlan(data)      { return apiFetch('/admin.php?action=plans', { method: 'POST', body: JSON.stringify(data) }); },
   updateAdminPlan(id, data)  { return apiFetch('/admin.php?action=plans', { method: 'PUT', body: JSON.stringify({ id, ...data }) }); },
   deleteAdminPlan(id)        { return apiFetch(`/admin.php?action=plans&id=${id}`, { method: 'DELETE' }); },
   getEntitlementsDictionary() { return apiFetch('/admin.php?action=entitlements_dictionary'); },
   getAdminAffiliates()       { return apiFetch('/admin_affiliate.php'); },
+  createAdminAffiliate(data) { return apiFetch('/admin_affiliate.php', { method: 'POST', body: JSON.stringify({ action: 'create_affiliate', ...data }) }); },
+  updateAdminAffiliate(id, data) { return apiFetch('/admin_affiliate.php', { method: 'POST', body: JSON.stringify({ action: 'update_affiliate', id, ...data }) }); },
+  deleteAdminAffiliate(id)   { return apiFetch('/admin_affiliate.php', { method: 'POST', body: JSON.stringify({ action: 'delete_affiliate', id }) }); },
   getAdminCommissions()      { return apiFetch('/admin.php?action=commissions'); },
   getAdminPayouts()          { return apiFetch('/admin_affiliate.php?action=payouts'); },
   approvePayout(id)          { return apiFetch('/admin_affiliate.php', { method: 'POST', body: JSON.stringify({ action: 'approve_payout', payout_id: id }) }); },
+  rejectPayout(id, reason)   { return apiFetch('/admin_affiliate.php', { method: 'POST', body: JSON.stringify({ action: 'reject_payout', payout_id: id, reason }) }); },
   payoutCommission(id, ref)  { return apiFetch('/admin.php?action=payout_commission', { method: 'POST', body: JSON.stringify({ commission_id: id, payout_reference: ref }) }); },
 
-  // ── Password Reset ──
-  forgotPassword(email) {
-    return apiFetch('/password_reset.php?action=forgot', {
-      method: 'POST',
-      body: JSON.stringify({ email })
-    });
-  },
-  async getPlans() {
-    return apiFetch('/plans.php');
-  },
-  resetPassword(email, token, newPassword) {
-    return apiFetch('/password_reset.php?action=reset', {
-      method: 'POST',
-      body: JSON.stringify({ email, token, new_password: newPassword })
-    });
-  },
-  updateStudentPassword(currentPassword, newPassword) {
-    return apiFetch('/auth.php?action=update_password', {
-      method: 'POST',
-      body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
-    });
-  },
-
-  // Affiliate Endpoints
-  getAffiliateProfile() {
-    return apiFetch('/affiliate.php');
-  },
-  joinAffiliate() {
-    return apiFetch('/affiliate.php', { method: 'POST' });
-  },
-
-  // ── Stub (belum diimplementasikan) ──
+  // ── Staff Management ──
   createAdminStaff(payload) { return apiFetch('/admin.php?action=staff', { method: 'POST', body: JSON.stringify(payload) }); },
   getAdminStaff()      { return apiFetch('/admin.php?action=staff'); },
   updateAdminStaff(id, payload) { return apiFetch('/admin.php?action=staff', { method: 'PUT', body: JSON.stringify({ id, ...payload }) }); },
   deleteAdminStaff(id) { return apiFetch(`/admin.php?action=staff&id=${id}`, { method: 'DELETE' }); },
-  getAdminMaterials()  { return Promise.resolve([]); },
 
   // ── Student Potential Path (SPP) ──
   sppCreateAttempt() {
