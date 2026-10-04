@@ -397,6 +397,11 @@ elseif ($action === 'products') {
 elseif ($action === 'plans') {
     $VALID_ENTITLEMENTS = ['tryout_unlimited', 'ai_adaptive_path', 'premium_materials', 'feature_quiz'];
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $pdo->exec("
+            UPDATE plans SET name = 'Paket Mandiri', price = 180000, duration = 30 WHERE id = 'plan-mandiri';
+            UPDATE plans SET name = 'Paket Utama', price = 450000, duration = 30 WHERE id = 'plan-utama';
+            UPDATE plans SET name = 'Paket VIP', price = 1100000, duration = 30 WHERE id = 'plan-vip';
+        ");
         $plans = $pdo->query("SELECT * FROM plans ORDER BY price ASC")->fetchAll(PDO::FETCH_ASSOC);
         if (empty($plans)) {
             // Auto-seed official 3 packages exactly matching Landing Page
