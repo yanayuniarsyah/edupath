@@ -4316,6 +4316,10 @@ export default {
           streakCount.value = res.user.streak || 0;
           coins.value = res.user.coins || 0;
           if (res.user.target_ptn) simTargetPtn.value = res.user.target_ptn;
+          if (res.user.role === 'admin' || res.user.role === 'superadmin') {
+            window.location.hash = '#/admin';
+            return;
+          }
         } catch (e) {
           console.error("Session expired", e);
           logout();
@@ -4349,11 +4353,15 @@ export default {
         currentUser.value = res.user;
         isLoggedIn.value = true;
         showLoginModal.value = false;
-        currentTab.value = 'dashboard';
-        
         currentAbilityScore.value = res.user.total_score || 0;
         streakCount.value = res.user.streak || 0;
         coins.value = res.user.coins || 0;
+
+        if (res.user.role === 'admin' || res.user.role === 'superadmin') {
+          window.location.hash = '#/admin';
+        } else {
+          currentTab.value = 'dashboard';
+        }
 
         showToast(isLoginMode.value ? 'Masuk Akun Sukses! Selamat datang kembali.' : 'Pendaftaran Berhasil! Mulai perjalananmu.');
       } catch (err) {
