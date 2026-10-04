@@ -148,7 +148,7 @@ export async function apiFetch(endpoint, options = {}) {
   const method = (options.method || 'GET').toUpperCase();
 
   const token = isAdminRoute
-    ? (sessionStorage.getItem(ADMIN_TOKEN_KEY) || sessionStorage.getItem('admin_token'))
+    ? (sessionStorage.getItem(ADMIN_TOKEN_KEY) || sessionStorage.getItem('admin_token') || legacyGetToken())
     : legacyGetToken();
 
   const csrf = (isAdminRoute ? sessionStorage.getItem(ADMIN_CSRF_KEY) : getCsrfToken())

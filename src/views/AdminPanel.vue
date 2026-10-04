@@ -992,7 +992,7 @@ const router = useRouter()
 
 // ── Data ──
 const sidebarOpen = ref(true);
-const activeTab = ref('overview');
+const activeTab = ref(sessionStorage.getItem('admin_active_tab') || 'overview');
 const studentSearch = ref('');
 const studentPlanFilter = ref('all');
 const qSearch = ref('');
@@ -1046,8 +1046,32 @@ const doLogout = () => {
   api.clearAdminTokens();
   sessionStorage.removeItem('admin_token');
   isAuthenticated.value = false;
+  window.location.hash = '#/';
   location.reload();
 }
+
+onMounted(async () => {
+  const adminToken = sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token');
+  const mainToken = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
+  
+  if (adminToken) {
+    isAuthenticated.value = true;
+    fetchDashboard();
+    fetchStudents();
+  } else if (mainToken) {
+    try {
+      const profile = await api.getProfile();
+      if (profile?.user?.role === 'admin' || profile?.user?.role === 'superadmin') {
+        sessionStorage.setItem('admin_token', mainToken);
+        isAuthenticated.value = true;
+        fetchDashboard();
+        fetchStudents();
+      }
+    } catch(e) {
+      console.warn("Admin auto-auth check:", e);
+    }
+  }
+});
 
 // ── Dashboard Stats ──
 const fetchDashboard = async () => {

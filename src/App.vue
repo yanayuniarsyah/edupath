@@ -39,8 +39,38 @@
             <i class="ph-bold ph-x text-lg"></i>
           </button>
         </div>
-        <p v-show="(sidebarExpanded || mobileSidebarOpen)" class="text-xs text-white/40 font-semibold mb-6 uppercase tracking-wider whitespace-nowrap shrink-0">Adaptive Learning Platform</p>
-        <p v-show="!(sidebarExpanded || mobileSidebarOpen)" class="mb-4 shrink-0"></p>
+        <p v-show="(sidebarExpanded || mobileSidebarOpen)" class="text-xs text-white/40 font-semibold mb-3 uppercase tracking-wider whitespace-nowrap shrink-0">Adaptive Learning Platform</p>
+        <p v-show="!(sidebarExpanded || mobileSidebarOpen)" class="mb-3 shrink-0"></p>
+
+        <!-- Admin Role Indicator Banner in Sidebar -->
+        <div v-if="(currentUser?.role === 'admin' || currentUser?.role === 'superadmin')" class="mb-4 shrink-0">
+          <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="p-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-between gap-2 shadow-lg">
+            <div class="flex items-center gap-2 min-w-0">
+              <i class="ph-fill ph-shield-check text-amber-400 text-base shrink-0"></i>
+              <div class="min-w-0">
+                <span class="text-[10px] font-black uppercase tracking-wider block truncate">
+                  {{ currentUser?.role === 'superadmin' ? 'Super Admin' : 'Admin Panel' }}
+                </span>
+                <span class="text-[9px] text-white/60 block truncate">
+                  {{ isStudentPreviewMode ? 'Pratinjau Siswa' : 'Menu Manajemen' }}
+                </span>
+              </div>
+            </div>
+            <button 
+              v-if="isStudentPreviewMode" 
+              @click="isStudentPreviewMode = false; window.location.hash = '#/admin'" 
+              class="px-2 py-1 rounded bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-[9px] shrink-0 transition-all cursor-pointer"
+              title="Kembali ke Admin Panel"
+            >
+              Ke Admin
+            </button>
+          </div>
+          <div v-show="!(sidebarExpanded || mobileSidebarOpen)" class="flex justify-center">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 cursor-pointer" title="Admin" @click="window.location.hash = '#/admin'">
+              <i class="ph-bold ph-shield-check text-base"></i>
+            </div>
+          </div>
+        </div>
         
         <nav class="flex flex-col gap-1.5">
           <template v-for="tab in filteredTabs" :key="tab.id">
@@ -4203,7 +4233,9 @@ export default {
     };
 
     const currentTab = ref('home');
-    const tabs = ref([
+    const isStudentPreviewMode = ref(false);
+
+    const studentTabs = [
       { id: 'home', label: 'Home (Landing)', icon: 'ph-house' },
       { id: 'dashboard', label: 'Dashboard Belajar', icon: 'ph-gauge' },
       { id: 'diagnostic', label: 'Asesmen Kesiapan', icon: 'ph-brain' },
@@ -4211,17 +4243,30 @@ export default {
       { id: 'simulator', label: 'Ujian 2027 Simulasi', icon: 'ph-calculator' },
       { id: 'studyroom', label: 'Pomodoro Room', icon: 'ph-headphones' },
       { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' },
-      { id: 'settings', label: 'Pengaturan', icon: 'ph-user-gear' },
-      { id: 'adminpanel', label: 'Admin Panel', icon: 'ph-shield-checkered', adminOnly: true }
-    ]);
+      { id: 'settings', label: 'Pengaturan', icon: 'ph-user-gear' }
+    ];
+
+    const adminTabs = [
+      { id: 'admin_overview', label: 'Admin Dashboard', icon: 'ph-squares-four', adminTab: 'overview' },
+      { id: 'admin_students', label: 'Manajemen Siswa', icon: 'ph-users-three', adminTab: 'students' },
+      { id: 'admin_transactions', label: 'Riwayat Transaksi', icon: 'ph-receipt', adminTab: 'transactions' },
+      { id: 'admin_questions', label: 'Bank Soal CBT', icon: 'ph-book-open', adminTab: 'questions' },
+      { id: 'admin_materials', label: 'Manajemen Materi', icon: 'ph-books', adminTab: 'materials' },
+      { id: 'admin_vouchers', label: 'Voucher Diskon', icon: 'ph-ticket', adminTab: 'vouchers' },
+      { id: 'admin_affiliates', label: 'Program Afiliasi', icon: 'ph-hand-coins', adminTab: 'affiliates' },
+      { id: 'admin_settings', label: 'Paket & Staff', icon: 'ph-gear', adminTab: 'settings' },
+      { id: 'student_preview', label: 'Tampilan Siswa', icon: 'ph-eye', isPreview: true }
+    ];
+
+    const tabs = ref(studentTabs);
 
     // Computed: filter tab berdasarkan role user
     const filteredTabs = computed(() => {
       const isAdmin = currentUser.value?.role === 'admin' || currentUser.value?.role === 'superadmin';
-      return tabs.value.filter(tab => {
-        if (tab.adminOnly) return isAdmin;
-        return true;
-      });
+      if (isAdmin && !isStudentPreviewMode.value) {
+        return adminTabs;
+      }
+      return studentTabs;
     });
     const isLoginMode = ref(true);
     
@@ -4399,6 +4444,23 @@ export default {
     const premiumTabs = ['diagnostic', 'learning', 'simulator', 'studyroom'];
 
     const handleTabClick = (tabId) => {
+      const isAdmin = currentUser.value?.role === 'admin' || currentUser.value?.role === 'superadmin';
+      
+      const adminTarget = adminTabs.find(t => t.id === tabId);
+      if (adminTarget) {
+        if (adminTarget.isPreview) {
+          isStudentPreviewMode.value = true;
+          currentTab.value = 'home';
+          showToast('Mode Pratinjau Tampilan Siswa Aktif');
+          return;
+        }
+        if (adminTarget.adminTab) {
+          sessionStorage.setItem('admin_active_tab', adminTarget.adminTab);
+        }
+        window.location.hash = '#/admin';
+        return;
+      }
+
       if (tabId === 'home') {
         goToHomeTop();
         return;
@@ -4412,7 +4474,7 @@ export default {
         showToast('Silakan Masuk Akun untuk mengakses modul ini!');
         return;
       }
-      if (premiumTabs.includes(tabId) && !currentUser.value?.is_premium && currentUser.value?.role !== 'admin' && currentUser.value?.role !== 'superadmin') {
+      if (premiumTabs.includes(tabId) && !currentUser.value?.is_premium && !isAdmin) {
         showToast('Fitur ini khusus pengguna Premium. Silakan upgrade paket Anda.', 'error');
         purchasePlan('Utama', 450000);
         return;
@@ -5106,7 +5168,9 @@ export default {
       canvasOpacity,
       handleScroll,
       tabs,
+      adminTabs,
       filteredTabs,
+      isStudentPreviewMode,
       dailyMissions,
       checkMissionReward,
       learningRecommendations,
