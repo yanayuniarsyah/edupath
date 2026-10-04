@@ -1441,17 +1441,16 @@ const deleteMaterial = async (id) => {
 
 // ── Packages ──
 const packages = [
-  { name: 'Free Trial',   price: 'Rp 0',      color: '#94a3b8', active: true,  subscribers: 16,  features: ['Tes Potensi (SPP)', 'Kalkulator Peluang', 'Akses terbatas bank soal'] },
-  { name: 'Mandiri',      price: 'Rp 100.000', color: '#6366f1', active: true,  subscribers: 62,  features: ['Semua fitur Free', 'Bank soal penuh', '2x simulasi IRT/bulan', 'Report mingguan'] },
-  { name: 'Utama',        price: 'Rp 200.000', color: '#c0ff00', active: true,  subscribers: 89,  features: ['Semua fitur Mandiri', 'Unlimited simulasi IRT', 'AI Tutor 24/7', 'WA laporan orang tua'] },
-  { name: 'VIP Mentoring',price: 'Rp 450.000', color: '#f59e0b', active: true,  subscribers: 24,  features: ['Semua fitur Utama', 'Sesi 1-on-1 live mentor', 'Jalur belajar super personal'] },
+  { name: 'Mandiri',      price: 'Rp 180.000',   color: '#6366f1', active: true,  subscribers: 62,  features: ['500+ Micro-Lessons Adaptif', '50.000+ Bank Soal HOTS IRT', '5x Tryout Nasional / Bulan', 'Radar Deteksi Blind-Spot', 'Weekly Learning Check-in'] },
+  { name: 'Utama',        price: 'Rp 450.000',   color: '#c0ff00', active: true,  subscribers: 89,  features: ['Semua fitur Mandiri', 'AI Tutor Companion 24/7', 'Unlimited Simulasi IRT', 'Rasionalisasi Prodi', 'WA Laporan Orang Tua'] },
+  { name: 'Paket VIP',    price: 'Rp 1.100.000', color: '#f59e0b', active: true,  subscribers: 24,  features: ['Semua fitur Utama', '1-on-1 Private Mentoring Zoom', 'Grup WA VIP Mentor Senior', 'Audit Portofolio Belajar'] },
 ]
 
 // ── Reports ──
 const revenueBreakdown = [
-  { label: 'Paket Utama',    amount: 'Rp 2.100.000', color: '#c0ff00' },
-  { label: 'Paket Mandiri',  amount: 'Rp 1.200.000', color: '#6366f1' },
-  { label: 'VIP Mentoring',  amount: 'Rp 900.000',   color: '#f59e0b' },
+  { label: 'Paket Utama',    amount: 'Rp 40.050.000', color: '#c0ff00' },
+  { label: 'Paket Mandiri',  amount: 'Rp 11.160.000', color: '#6366f1' },
+  { label: 'Paket VIP',      amount: 'Rp 26.400.000', color: '#f59e0b' },
 ]
 
 const topStudents = [

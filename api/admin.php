@@ -399,13 +399,48 @@ elseif ($action === 'plans') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $plans = $pdo->query("SELECT * FROM plans ORDER BY price ASC")->fetchAll(PDO::FETCH_ASSOC);
         if (empty($plans)) {
-            // Auto-seed standard default 3 packages (Mandiri, Utama, VIP)
+            // Auto-seed official 3 packages exactly matching Landing Page
             $defaultPlans = [
-                ['id' => 'plan-mandiri', 'name' => 'Paket Mandiri', 'price' => 150000, 'duration' => 30, 'features' => json_encode(['tryout_unlimited', 'premium_materials', 'feature_quiz'])],
-                ['id' => 'plan-utama', 'name' => 'Paket Utama', 'price' => 450000, 'duration' => 180, 'features' => json_encode(['tryout_unlimited', 'ai_adaptive_path', 'premium_materials', 'feature_quiz'])],
-                ['id' => 'plan-vip', 'name' => 'VIP Mentoring', 'price' => 850000, 'duration' => 365, 'features' => json_encode(['tryout_unlimited', 'ai_adaptive_path', 'premium_materials', 'feature_quiz'])]
+                [
+                    'id' => 'plan-mandiri',
+                    'name' => 'Paket Mandiri',
+                    'price' => 180000,
+                    'duration' => 30,
+                    'features' => json_encode([
+                        '500+ Micro-Lessons Adaptif (TPS & Literasi)',
+                        '50.000+ Bank Soal HOTS dengan Standar Skor IRT',
+                        '5x Tryout Nasional / Bulan + Pembahasan Lengkap',
+                        'Radar Deteksi Blind-Spot Belajar Instan',
+                        'Habit Tracker: Weekly Learning Check-in (WLC)'
+                    ])
+                ],
+                [
+                    'id' => 'plan-utama',
+                    'name' => 'Paket Utama',
+                    'price' => 450000,
+                    'duration' => 30,
+                    'features' => json_encode([
+                        'Semua Fitur di Paket Mandiri',
+                        'AI Tutor Companion 24/7 (Bimbingan logika tanpa batas)',
+                        'Unlimited Simulasi IRT Adaptif (Bebas TO tanpa kuota)',
+                        'Estimasi Kesiapan & Rasionalisasi Prodi Edukatif',
+                        'Laporan Progres Belajar Otomatis via WhatsApp Orang Tua'
+                    ])
+                ],
+                [
+                    'id' => 'plan-vip',
+                    'name' => 'Paket VIP',
+                    'price' => 1100000,
+                    'duration' => 30,
+                    'features' => json_encode([
+                        'Semua Fitur Lengkap di Paket Utama',
+                        '1-on-1 Private Mentoring Mingguan via Zoom (60 Menit)',
+                        'Grup WhatsApp VIP Langsung bareng Mentor Senior',
+                        'Audit Portofolio Belajar & Siasat Prodi Pilihan'
+                    ])
+                ]
             ];
-            $stmtIns = $pdo->prepare("INSERT IGNORE INTO plans (id, name, price, duration, features) VALUES (?, ?, ?, ?, ?)");
+            $stmtIns = $pdo->prepare("INSERT INTO plans (id, name, price, duration, features) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), price=VALUES(price), duration=VALUES(duration), features=VALUES(features)");
             foreach ($defaultPlans as $dp) {
                 $stmtIns->execute([$dp['id'], $dp['name'], $dp['price'], $dp['duration'], $dp['features']]);
             }

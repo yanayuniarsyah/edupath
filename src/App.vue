@@ -1409,7 +1409,7 @@
                 <div class="pt-8">
                   <button 
                     class="w-full py-3.5 rounded-xl bg-white/10 hover:bg-white hover:text-black text-white font-black text-xs md:text-sm border border-white/15 transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-95" 
-                    @click="purchasePlan('Mandiri', 180000)"
+                    @click="purchasePlan('Mandiri', isAnnualBilling ? 1296000 : 180000)"
                   >
                     Pilih Paket Mandiri
                   </button>
@@ -1477,7 +1477,7 @@
                 <div class="pt-8">
                   <button 
                     class="w-full py-4 rounded-xl text-sm font-black transition-all hover:scale-105 hover:shadow-[0_0_35px_rgba(192,255,0,0.6)] active:scale-95 bg-[#c0ff00] text-black flex items-center justify-center gap-2" 
-                    @click="purchasePlan('Pro', 149000)"
+                    @click="purchasePlan('Utama', isAnnualBilling ? 3240000 : 450000)"
                   >
                     <span>Mulai Paket Utama Sekarang</span>
                     <i class="ph-bold ph-arrow-right text-base"></i>
@@ -1537,7 +1537,7 @@
                 <div class="pt-8">
                   <button 
                     class="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs md:text-sm transition-all shadow-lg shadow-purple-600/30 active:scale-95" 
-                    @click="purchasePlan('Pro Annual', 990000)"
+                    @click="purchasePlan('VIP', isAnnualBilling ? 7920000 : 1100000)"
                   >
                     Daftar Kuota VIP Mentoring
                   </button>
