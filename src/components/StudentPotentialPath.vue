@@ -977,7 +977,9 @@ export default {
     };
 
     const startSppForm = () => {
+      console.log('[SPP DEBUG] startSppForm called, sppStage before:', sppStage.value);
       sppStage.value = 'lead_form';
+      console.log('[SPP DEBUG] sppStage after:', sppStage.value);
     };
 
     const proceedToQuestions = async () => {

@@ -137,12 +137,24 @@ export function legacyGetToken() {
  * @param {object} options  - Opsi fetch
  * @returns {Promise<any>}
  */
+function getCookie(name) {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 export async function apiFetch(endpoint, options = {}) {
   const isAdminRoute = endpoint.includes('admin.php');
   const method = (options.method || 'GET').toUpperCase();
 
-  const token    = isAdminRoute ? sessionStorage.getItem(ADMIN_TOKEN_KEY) : legacyGetToken();
-  const csrf     = isAdminRoute ? sessionStorage.getItem(ADMIN_CSRF_KEY)  : getCsrfToken();
+  const token = isAdminRoute
+    ? (sessionStorage.getItem(ADMIN_TOKEN_KEY) || sessionStorage.getItem('admin_token'))
+    : legacyGetToken();
+
+  const csrf = (isAdminRoute ? sessionStorage.getItem(ADMIN_CSRF_KEY) : getCsrfToken())
+    || sessionStorage.getItem(ADMIN_CSRF_KEY)
+    || getCsrfToken()
+    || getCookie('ep_csrf_token');
 
   const headers = {
     'Content-Type': 'application/json',
@@ -155,7 +167,7 @@ export async function apiFetch(endpoint, options = {}) {
   }
 
   // CSRF token — wajib untuk semua mutating requests (POST/PUT/DELETE)
-  if (csrf && options.method && options.method !== 'GET') {
+  if (csrf && method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS') {
     headers['X-CSRF-Token'] = csrf;
   }
 

@@ -1029,6 +1029,7 @@ const doLogin = async () => {
   try {
     const res = await api.adminLogin(loginForm.value.username, loginForm.value.password);
     sessionStorage.setItem('admin_token', res.token);
+    if (res.csrf_token) sessionStorage.setItem('ep_admin_csrf', res.csrf_token);
     isAuthenticated.value = true;
     // Fetch dashboard data after successful login
     fetchDashboard();
@@ -1042,6 +1043,7 @@ const doLogin = async () => {
 };
 
 const doLogout = () => {
+  api.clearAdminTokens();
   sessionStorage.removeItem('admin_token');
   isAuthenticated.value = false;
   location.reload();
@@ -1065,7 +1067,7 @@ const allStudents = ref([]);
 const fetchStudents = async () => {
   try {
     const res = await api.getAdminStudents(1, '', '');
-    allStudents.value = res.students || [];
+    allStudents.value = Array.isArray(res) ? res : (res.students || []);
   } catch (err) {
     console.error("Gagal mengambil data siswa:", err);
   }

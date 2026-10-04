@@ -81,17 +81,33 @@ function get_token(): ?string {
 // GET requests dan Bearer token tidak memerlukan CSRF check.
 // ----------------------------------------------------------------
 function verify_csrf(): bool {
-    // Tidak perlu CSRF check jika menggunakan Bearer token (bukan cookie)
-    if (empty($_COOKIE['ep_access_token'])) return true;
+    // 1. Authorization Bearer header: token eksplisit tidak rentan CSRF (tidak dikirim otomatis oleh browser)
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION']
+        ?? $_SERVER['Authorization']
+        ?? (function_exists('apache_request_headers') ? (apache_request_headers()['Authorization'] ?? null) : null)
+        ?? null;
 
-    // GET/HEAD/OPTIONS tidak memerlukan CSRF check
+    if ($authHeader && preg_match('/Bearer\s+(\S+)/i', $authHeader)) {
+        return true;
+    }
+
+    // 2. Tidak perlu CSRF check jika cookie auth tidak ada
+    if (empty($_COOKIE['ep_access_token'])) {
+        return true;
+    }
+
+    // 3. GET/HEAD/OPTIONS tidak memerlukan CSRF check (metode idempotent)
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-    if (in_array($method, ['GET', 'HEAD', 'OPTIONS'], true)) return true;
+    if (in_array($method, ['GET', 'HEAD', 'OPTIONS'], true)) {
+        return true;
+    }
 
     $headerToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
     $cookieToken = $_COOKIE['ep_csrf_token'] ?? '';
 
-    if (empty($headerToken) || empty($cookieToken)) return false;
+    if (empty($headerToken) || empty($cookieToken)) {
+        return false;
+    }
 
     return hash_equals($cookieToken, $headerToken);
 }

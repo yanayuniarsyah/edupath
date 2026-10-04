@@ -32,6 +32,7 @@ async function deploy() {
             ".htaccess", 
             "install_db.php", 
             "create_uat_accounts.php", 
+            "create_uat_v2.php",
             "schema_dump.json", 
             "import_tryout_questions.php", 
             "update_questions_schema.php", 
@@ -42,17 +43,21 @@ async function deploy() {
 
         for (const remoteDir of targetDirs) {
             console.log(`\n\x1b[36m---> Memproses domain /${remoteDir}...<---\x1b[0m`);
-            await client.ensureDir("/" + remoteDir);
-            await client.cd("/" + remoteDir);
-
+            
+            // 1. Upload Frontend (dist) ke root domain
             console.log(`  [+] Mengunggah Frontend (isi folder dist)...`);
+            await client.cd("/" + remoteDir);
             await client.uploadFromDir(path.join(__dirname, "dist"));
 
+            // 2. Upload Backend (api) ke folder /api
             console.log(`  [+] Mengunggah Backend (folder api)...`);
-            await client.ensureDir("api");
-            await client.uploadFromDir(path.join(__dirname, "api"), "api");
+            await client.ensureDir("/" + remoteDir + "/api");
+            await client.cd("/" + remoteDir + "/api");
+            await client.uploadFromDir(path.join(__dirname, "api"));
 
-            console.log(`  [+] Mengunggah file konfigurasi tambahan...`);
+            // 3. Upload file konfigurasi tambahan ke root domain
+            console.log(`  [+] Mengunggah file konfigurasi tambahan ke root...`);
+            await client.cd("/" + remoteDir);
             for (const file of filesToUpload) {
                 try {
                     await client.uploadFrom(path.join(__dirname, file), file);
@@ -61,6 +66,7 @@ async function deploy() {
                     // Abaikan jika file tidak ada
                 }
             }
+
             console.log(`  \x1b[32m[OK]\x1b[0m Domain ${remoteDir} berhasil diperbarui!`);
         }
 

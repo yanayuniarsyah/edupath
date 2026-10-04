@@ -1,5 +1,5 @@
 <?php
-require 'api/config.php';
+require 'config.php';
 
 echo "EDUPATH UAT ACCOUNT PROVISIONING\n";
 echo "=================================\n";

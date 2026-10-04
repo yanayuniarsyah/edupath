@@ -58,7 +58,7 @@
               <div class="relative shrink-0 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'w-6 h-6' : 'w-8 h-8'">
                 <span class="absolute text-xs font-black opacity-100 text-white">{{ tab.label.charAt(0) }}</span>
                 <i :class="['ph-bold relative z-10', tab.icon, (sidebarExpanded || mobileSidebarOpen) ? 'text-lg' : 'text-xl', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/70 group-hover:text-white']"></i>
-                <i v-if="['diagnostic', 'learning', 'simulator', 'studyroom'].includes(tab.id) && isLoggedIn && !currentUser?.is_premium" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
+                <i v-if="['diagnostic', 'learning', 'simulator', 'studyroom'].includes(tab.id) && isLoggedIn && !currentUser?.is_premium && currentUser?.role !== 'admin' && currentUser?.role !== 'superadmin'" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
               </div>
               <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="font-bold tracking-tight whitespace-nowrap" :class="currentTab === tab.id ? 'text-white' : ''">{{ tab.label }}</span>
             </button>
@@ -79,7 +79,7 @@
                   <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]/70 shrink-0"></span>
                   <span class="truncate">{{ subtes.subtes }}</span>
                 </div>
-                <i v-if="isLoggedIn && !currentUser?.is_premium" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                <i v-if="isLoggedIn && !currentUser?.is_premium && currentUser?.role !== 'admin' && currentUser?.role !== 'superadmin'" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
               </button>
             </div>
           </template>
@@ -94,11 +94,16 @@
           </div>
           <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
             <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ currentUser?.name || 'Siswa Mandiri' }}</h4>
-            <div @click="purchasePlan('Pro', 149000)" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Upgrade Paket">
+            <div v-if="currentUser?.role !== 'admin' && currentUser?.role !== 'superadmin'" @click="purchasePlan('Utama', 450000)" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Upgrade Paket">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-[#c0ff00]">
                 Status Paket: {{ currentUser?.is_premium ? 'Premium' : 'Trial' }}
               </span>
               <span v-if="!currentUser?.is_premium" class="text-[9px] bg-[#c0ff00]/20 text-[#c0ff00] border border-[#c0ff00]/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-[#c0ff00] group-hover:text-black transition-all">Upgrade ⚡</span>
+            </div>
+            <div v-else class="group flex items-center gap-1 mt-0.5">
+              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-indigo-400">
+                Administrator
+              </span>
             </div>
           </div>
         </div>
@@ -944,7 +949,7 @@
 
           <!-- 6. Solution & Value Proposition -->
           <div class="section-wrapper">
-            <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl opacity-30 rounded-3xl"></div>
+            <div class="absolute inset-0 pointer-events-none bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl opacity-30 rounded-3xl"></div>
             <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div class="space-y-6">
                 <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/15 border border-primary/20 text-xs font-bold text-[#c0ff00] rounded-md uppercase tracking-wider">
@@ -1561,8 +1566,11 @@
                   Dapatkan penghasilan pasif berkelanjutan dari setiap langganan software bisnis di ekosistem Elyana. Tracking otomatis, transparan, pencairan terjadwal, dan dipotong PPh resmi sesuai regulasi pajak.
                 </p>
                 <div class="flex flex-wrap justify-center gap-3 pt-2">
-                  <button @click="showAffiliateRegisterModal = true" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_35px_rgba(245,158,11,0.5)] flex items-center gap-2">
+                  <button v-if="!isLoggedIn || affiliateData?.status === 'not_joined'" @click="showAffiliateRegisterModal = true" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_35px_rgba(245,158,11,0.5)] flex items-center gap-2">
                     <i class="ph-bold ph-rocket"></i> Daftar Jadi Mitra (Gratis)
+                  </button>
+                  <button v-else @click="activeAffiliateTab = 'rujukan'; currentTab = 'affiliate'" class="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-black text-sm transition-all border border-white/20 flex items-center gap-2">
+                    <i class="ph-bold ph-chart-line-up"></i> Lihat Dashboard Afiliasi
                   </button>
                 </div>
               </div>
@@ -4382,9 +4390,9 @@ export default {
         showToast('Silakan Masuk Akun untuk mengakses modul ini!');
         return;
       }
-      if (premiumTabs.includes(tabId) && !currentUser.value?.is_premium) {
+      if (premiumTabs.includes(tabId) && !currentUser.value?.is_premium && currentUser.value?.role !== 'admin' && currentUser.value?.role !== 'superadmin') {
         showToast('Fitur ini khusus pengguna Premium. Silakan upgrade paket Anda.', 'error');
-        purchasePlan('Pro', 149000);
+        purchasePlan('Utama', 450000);
         return;
       }
       currentTab.value = tabId;
@@ -4396,9 +4404,9 @@ export default {
         showToast('Silakan Masuk Akun untuk mengakses fitur ini!');
         return;
       }
-      if (!currentUser.value?.is_premium) {
+      if (!currentUser.value?.is_premium && currentUser.value?.role !== 'admin' && currentUser.value?.role !== 'superadmin') {
         showToast('Fitur ini khusus pengguna Premium. Silakan upgrade paket Anda.', 'error');
-        purchasePlan('Pro', 149000);
+        purchasePlan('Utama', 450000);
         return;
       }
       currentTab.value = 'learning';
