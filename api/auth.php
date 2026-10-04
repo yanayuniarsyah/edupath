@@ -377,12 +377,32 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $payload = authenticate();
-    if ($payload->role !== 'student') {
-        http_response_code(403);
-        echo json_encode(["error" => "Forbidden"]);
+
+    // Admin / Superadmin: ambil data dari tabel admins
+    if ($payload->role === 'admin' || $payload->role === 'superadmin') {
+        $stmt = $pdo->prepare("SELECT id, username, name FROM admins WHERE id = ?");
+        $stmt->execute([$payload->id]);
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($admin) {
+            $user = [
+                'id'         => $admin['id'],
+                'name'       => $admin['name'] ?? $admin['username'] ?? 'Admin',
+                'email'      => $admin['username'] ?? '',
+                'role'       => $payload->role,
+                'is_premium' => true,
+                'tenant_id'  => $payload->tenant_id,
+            ];
+            header('Cache-Control: private, max-age=30');
+            echo json_encode(["user" => $user]);
+        } else {
+            http_response_code(404);
+            echo json_encode(["error" => "Admin tidak ditemukan"]);
+        }
         exit;
     }
 
+    // Student: query biasa + subscription check
     // Optimasi: gabungkan student data + subscription check dalam SATU query
     // menggunakan subquery EXISTS untuk menghindari round-trip kedua ke DB
     $stmt = $pdo->prepare("
@@ -402,6 +422,7 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($user) {
         unset($user['password']);
         $user['is_premium']  = (bool)$user['is_premium'];
+        $user['role']        = 'student';
         $user['tenant_id']   = $payload->tenant_id;
 
         // Header cache hint untuk CDN / reverse proxy (jika ada)

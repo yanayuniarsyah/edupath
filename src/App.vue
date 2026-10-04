@@ -43,7 +43,7 @@
         <p v-show="!(sidebarExpanded || mobileSidebarOpen)" class="mb-4 shrink-0"></p>
         
         <nav class="flex flex-col gap-1.5">
-          <template v-for="tab in tabs" :key="tab.id">
+          <template v-for="tab in filteredTabs" :key="tab.id">
             <button 
               :title="tab.label"
               :class="['flex items-center rounded-xl text-xs font-bold transition-all text-left group overflow-hidden shrink-0', 
@@ -4211,8 +4211,18 @@ export default {
       { id: 'simulator', label: 'Ujian 2027 Simulasi', icon: 'ph-calculator' },
       { id: 'studyroom', label: 'Pomodoro Room', icon: 'ph-headphones' },
       { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' },
-      { id: 'settings', label: 'Pengaturan', icon: 'ph-user-gear' }
+      { id: 'settings', label: 'Pengaturan', icon: 'ph-user-gear' },
+      { id: 'adminpanel', label: 'Admin Panel', icon: 'ph-shield-checkered', adminOnly: true }
     ]);
+
+    // Computed: filter tab berdasarkan role user
+    const filteredTabs = computed(() => {
+      const isAdmin = currentUser.value?.role === 'admin' || currentUser.value?.role === 'superadmin';
+      return tabs.value.filter(tab => {
+        if (tab.adminOnly) return isAdmin;
+        return true;
+      });
+    });
     const isLoginMode = ref(true);
     
     const initScrollReveal = () => {
@@ -4391,6 +4401,10 @@ export default {
     const handleTabClick = (tabId) => {
       if (tabId === 'home') {
         goToHomeTop();
+        return;
+      }
+      if (tabId === 'adminpanel') {
+        window.location.hash = '#/admin';
         return;
       }
       if (!isLoggedIn.value) {
@@ -5092,6 +5106,7 @@ export default {
       canvasOpacity,
       handleScroll,
       tabs,
+      filteredTabs,
       dailyMissions,
       checkMissionReward,
       learningRecommendations,
