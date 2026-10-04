@@ -144,7 +144,7 @@ function getCookie(name) {
 }
 
 export async function apiFetch(endpoint, options = {}) {
-  const isAdminRoute = endpoint.includes('admin.php');
+  const isAdminRoute = endpoint.includes('admin.php') || endpoint.includes('admin_affiliate.php');
   const method = (options.method || 'GET').toUpperCase();
 
   const token = isAdminRoute

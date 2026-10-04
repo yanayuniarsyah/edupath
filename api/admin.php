@@ -612,6 +612,41 @@ elseif ($action === 'staff') {
         echo json_encode(["success" => true]);
     }
 }
+elseif ($action === 'commissions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    try {
+        $stmt = $pdo->query("
+            SELECT 
+                c.id, c.affiliate_id, c.tenant_id, c.order_id, c.amount, c.commission_rate_snapshot, c.status, c.created_at,
+                COALESCE(o.plan_name, 'Paket Belajar') as plan_name,
+                COALESCE(s_order.name, 'Siswa') as student_name,
+                COALESCE(a.referral_code, '-') as referral_code,
+                COALESCE(s_aff.name, u_aff.identity_key, 'Mitra') as affiliate_name
+            FROM commissions c
+            LEFT JOIN orders o ON (c.order_id = o.id OR c.order_id = o.order_id)
+            LEFT JOIN students s_order ON o.student_id = s_order.id
+            LEFT JOIN affiliates a ON c.affiliate_id = a.id
+            LEFT JOIN users u_aff ON a.user_id = u_aff.id
+            LEFT JOIN user_roles ur_aff ON (u_aff.id = ur_aff.user_id AND ur_aff.role = 'student')
+            LEFT JOIN students s_aff ON (ur_aff.reference_id = s_aff.id OR u_aff.identity_key = s_aff.email)
+            ORDER BY c.created_at DESC
+        ");
+        $commissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode($commissions);
+    } catch (PDOException $e) {
+        echo json_encode([]);
+    }
+}
+elseif ($action === 'payout_commission' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $comm_id = $input['commission_id'] ?? '';
+    try {
+        $stmt = $pdo->prepare("UPDATE commissions SET status = 'paid' WHERE id = ?");
+        $stmt->execute([$comm_id]);
+        echo json_encode(["success" => true]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal memperbarui status komisi"]);
+    }
+}
 else {
     http_response_code(404);
     echo json_encode(["error" => "Endpoint admin tidak ditemukan"]);
