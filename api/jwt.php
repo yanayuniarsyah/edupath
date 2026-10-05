@@ -146,9 +146,18 @@ function set_auth_cookies(string $access_token, string $csrf_token): void {
 // CLEAR AUTH COOKIES (dipanggil saat logout)
 // ----------------------------------------------------------------
 function clear_auth_cookies(): void {
+    $is_production = (defined('APP_ENV') && APP_ENV === 'production')
+        || (defined('MIDTRANS_IS_PRODUCTION') && MIDTRANS_IS_PRODUCTION);
     $past = time() - 3600;
     foreach (['ep_access_token', 'ep_csrf_token'] as $name) {
-        setcookie($name, '', ['expires' => $past, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax']);
+        setcookie($name, '', [
+            'expires'  => $past,
+            'path'     => '/',
+            'domain'   => '',
+            'secure'   => $is_production,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
     }
 }
 
