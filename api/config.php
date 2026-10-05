@@ -109,7 +109,6 @@ define('APP_ENV', env('APP_ENV', 'production'));
 // ----------------------------------------------------------------
 // AUDIT LOGGING HELPER
 // ----------------------------------------------------------------
-<?php
 function log_audit(PDO $pdo, ?string $actor_id, ?string $tenant_id, string $action, ?string $target_id = null, array $metadata = [], string $level = 'INFO') {
     try {
         $id = bin2hex(random_bytes(16));
