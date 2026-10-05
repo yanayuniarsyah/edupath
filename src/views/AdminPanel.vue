@@ -1108,6 +1108,13 @@
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Username</label>
             <input v-model="sForm.username" :disabled="isEditingStaff && sForm.username === 'admin'" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
           </div>
+          <div v-if="isSuperadmin">
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pilih Bimbel / Tenant Target</label>
+            <select v-model="sForm.tenant_id" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStaff">
+              <option value="" class="bg-[#0d1427] text-white">-- Pilih Bimbel --</option>
+              <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
+            </select>
+          </div>
           <div>
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
             <input v-model="sForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
@@ -1387,6 +1394,9 @@ const isAuthenticated = ref(sessionStorage.getItem('admin_token') !== null);
 const loginForm = ref({ username: '', password: '' });
 const loginError = ref('');
 const loginLoading = ref(false);
+
+const isSuperadmin = computed(() => localStorage.getItem('user_role') === 'superadmin');
+const tenantsList = ref([]);
 const showPassword = ref(false);
 
 const doLogin = async () => {
@@ -1981,6 +1991,12 @@ const loadPlansAndStaff = async () => {
       api.getAdminStaff(),
       api.getEntitlementsDictionary()
     ]);
+    if (isSuperadmin.value) {
+      try {
+        const tRes = await api.getAdminTenants();
+        tenantsList.value = tRes || [];
+      } catch (err) { console.error('Gagal fetch tenants', err); }
+    }
     plans.value = pRes || [];
     plans.value.forEach(p => {
       if (typeof p.features === 'string') {
@@ -2188,15 +2204,15 @@ const submitPayout = async () => {
 const staffMembers = ref([]);
 const showStaffModal = ref(false);
 const isEditingStaff = ref(false);
-const sForm = reactive({ id: null, username: '', name: '', role: 'teacher', password: '' });
+const sForm = reactive({ id: null, tenant_id: '', username: '', name: '', role: 'teacher', password: '' });
 
 const openStaffModal = (s = null) => {
   if (s) {
     isEditingStaff.value = true;
-    Object.assign(sForm, { ...s, password: '' });
+    Object.assign(sForm, { ...s, password: '', tenant_id: s.tenant_id || '' });
   } else {
     isEditingStaff.value = false;
-    Object.assign(sForm, { id: null, username: '', name: '', role: 'teacher', password: '' });
+    Object.assign(sForm, { id: null, tenant_id: '', username: '', name: '', role: 'teacher', password: '' });
   }
   showStaffModal.value = true;
 };

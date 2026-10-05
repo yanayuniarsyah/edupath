@@ -990,11 +990,11 @@ elseif ($action === 'staff') {
         }
 
         $tenant_id = $payload->tenant_id;
+        // Jika superadmin (tenant_id kosong), wajib ambil dari input payload
         if (empty($tenant_id)) {
-            $tenant_id = $pdo->query("SELECT id FROM tenants LIMIT 1")->fetchColumn();
-            if (!$tenant_id) {
-                $tenant_id = 'default-tenant';
-                $pdo->exec("INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES ('$tenant_id', 'EduPath Indonesia', 'edupath-master', 1)");
+            $tenant_id = $input['tenant_id'] ?? '';
+            if (empty($tenant_id)) {
+                http_response_code(400); echo json_encode(["error" => "Superadmin wajib memilih Bimbel (Tenant) target"]); exit;
             }
         }
         if (!in_array($role, ['admin', 'teacher'])) $role = 'teacher';

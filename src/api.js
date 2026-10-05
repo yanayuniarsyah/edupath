@@ -429,6 +429,7 @@ export default {
   getAdminStaff()      { return apiFetch('/admin.php?action=staff'); },
   updateAdminStaff(id, payload) { return apiFetch('/admin.php?action=staff', { method: 'PUT', body: JSON.stringify({ id, ...payload }) }); },
   deleteAdminStaff(id) { return apiFetch(`/admin.php?action=staff&id=${id}`, { method: 'DELETE' }); },
+  getAdminTenants()    { return apiFetch('/admin.php?action=tenants'); },
 
   // ── Student Potential Path (SPP) ──
   sppCreateAttempt() {
