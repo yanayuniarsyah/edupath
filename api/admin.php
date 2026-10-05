@@ -78,6 +78,12 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+if ($action === 'logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    clear_auth_cookies();
+    echo json_encode(["success" => true]);
+    exit;
+}
+
 // Untuk rute di bawah ini, wajib login sebagai admin atau superadmin
 $payload = authenticate();
 if (!in_array($payload->role, ['admin', 'superadmin'])) {

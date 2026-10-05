@@ -1105,8 +1105,8 @@
         </div>
         <form @submit.prevent="saveStaff" class="p-4 space-y-3">
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Username</label>
-            <input v-model="sForm.username" :disabled="isEditingStaff && sForm.username === 'admin'" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email (sebagai Username)</label>
+            <input v-model="sForm.username" :disabled="isEditingStaff && sForm.username === 'admin'" required type="text" placeholder="nama@bimbel.com" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
           </div>
           <div v-if="isSuperadmin">
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pilih Bimbel / Tenant Target</label>

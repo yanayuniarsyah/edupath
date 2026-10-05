@@ -274,9 +274,14 @@ export default {
 
   async logout() {
     try {
-      await apiFetch('/auth.php?action=logout', { method: 'POST' });
+      if (sessionStorage.getItem('admin_token') || sessionStorage.getItem(ADMIN_TOKEN_KEY)) {
+        await apiFetch('/admin.php?action=logout', { method: 'POST' });
+      } else {
+        await apiFetch('/auth.php?action=logout', { method: 'POST' });
+      }
     } finally {
       clearAuthTokens();
+      clearAdminTokens();
       clearApiCache(); // Bersihkan cache saat logout
       // Hapus legacy localStorage token jika masih ada
       localStorage.removeItem('auth_token');
