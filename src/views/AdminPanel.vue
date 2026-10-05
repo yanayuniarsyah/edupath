@@ -1424,8 +1424,6 @@ const doLogout = async () => {
   } catch (e) {
     console.warn("Logout error:", e);
   }
-  api.clearAdminTokens();
-  api.clearAuthTokens();
   sessionStorage.clear();
   localStorage.removeItem('auth_token');
   localStorage.removeItem('user_role');
@@ -2350,7 +2348,7 @@ watch(activeTab, (newTab) => {
   }
 }, { immediate: true });
 
-const goToStudentSide = () => router.push('/');
+const goToStudentSide = () => { window.location.hash = '#/'; };
 </script>
 
 <style scoped>
