@@ -1,14 +1,304 @@
+// ============================================================================
+// EduPath Master Content Architecture & Question Taxonomy (SNBT Standar Resmi)
+// ============================================================================
+
+export const SNBT_TAXONOMY = {
+  exam: 'SNBT',
+  components: [
+    {
+      id: 'tps',
+      name: 'TPS',
+      fullName: 'Tes Potensi Skolastik',
+      description: 'Mengukur kemampuan kognitif yang dianggap penting untuk keberhasilan di pendidikan tinggi.',
+      subtests: [
+        {
+          id: 'pu',
+          name: 'Penalaran Umum',
+          code: 'PU',
+          description: 'Menguji kemampuan memecahkan masalah baru menggunakan logika induktif, deduktif, dan kuantitatif.',
+          topics: [
+            {
+              name: 'Induktif',
+              subtopics: [
+                { name: 'Pola Bilangan', skill: 'Identifikasi Pola', indicator: 'Menentukan pola berikutnya dari deret keteraturan' },
+                { name: 'Pola Barisan Huruf & Gambar', skill: 'Penalaran Spasial & Sekuensial', indicator: 'Menganalisis kontinuitas bentuk atau elemen' },
+                { name: 'Generalisasi Kasus Nyata', skill: 'Generalisasi Induktif', indicator: 'Menyusun prinsip umum berdasarkan fakta-fakta spesifik' }
+              ]
+            },
+            {
+              name: 'Deduktif',
+              subtopics: [
+                { name: 'Silogisme Kategorial', skill: 'Logika Silogisme', indicator: 'Menarik kesimpulan valid dari dua premis umum' },
+                { name: 'Modus Ponens & Modus Tollens', skill: 'Logika Implikasi', indicator: 'Menentukan konsekuensi logis dari pernyataan kondisional' },
+                { name: 'Penalaran Analitik & Posisi', skill: 'Analisis Hubungan Relasional', indicator: 'Menyusun urutan atau penempatan berdasarkan sejumlah syarat' }
+              ]
+            },
+            {
+              name: 'Kuantitatif',
+              subtopics: [
+                { name: 'Logika Angka & Komputasi', skill: 'Operasi Angka Bernalar', indicator: 'Memecahkan relasi numerik kontekstual' },
+                { name: 'Estimasi & Perbandingan Nilai', skill: 'Estimasi Kuantitatif', indicator: 'Menentukan kuantitas relatif tanpa perhitungan panjang' },
+                { name: 'Kecukupan Data Logis', skill: 'Analisis Kecukupan Informasi', indicator: 'Menilai apakah pernyataan (1) dan (2) cukup menjawab pertanyaan' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'ppu',
+          name: 'Pengetahuan & Pemahaman Umum',
+          code: 'PPU',
+          description: 'Menguji kedalaman penguasaan kosakata, makna kontekstual, dan keterkaitan informasi antar-wacana.',
+          topics: [
+            {
+              name: 'Kosakata',
+              subtopics: [
+                { name: 'Makna Kata Baku & Leksikal', skill: 'Penguasaan Diksi', indicator: 'Menentukan arti kata baku berdasarkan konteks KBBI' },
+                { name: 'Sinonim & Antonim Konseptual', skill: 'Relasi Semantis', indicator: 'Menentukan padanan atau lawan kata yang sepadan' },
+                { name: 'Istilah Serapan Akademik', skill: 'Standardisasi Istilah', indicator: 'Mengidentifikasi penggunaan istilah ilmiah secara tepat' }
+              ]
+            },
+            {
+              name: 'Makna Kontekstual',
+              subtopics: [
+                { name: 'Makna Kiasan & Idiomatis', skill: 'Interpretasi Figuratif', indicator: 'Menafsirkan makna konotatif dalam kalimat wacana' },
+                { name: 'Pergeseran Makna Diksi', skill: 'Semantik Kontekstual', indicator: 'Menganalisis variasi nuansa makna dalam kalimat' }
+              ]
+            },
+            {
+              name: 'Hubungan Informasi',
+              subtopics: [
+                { name: 'Keterkaitan Antarparagraf', skill: 'Kohesi & Koherensi Teks', indicator: 'Menjelaskan hubungan logis antara paragraf terdahulu dan berikutnya' },
+                { name: 'Asosiasi Kalimat & Gagasan', skill: 'Sintesis Ide Wacana', indicator: 'Menghubungkan dua premis informasi di dalam bacaan' }
+              ]
+            },
+            {
+              name: 'Penalaran Umum',
+              subtopics: [
+                { name: 'Analogi Wacana', skill: 'Penalaran Analogis Teks', indicator: 'Menentukan situasi di luar teks yang sejalan dengan situasi pada bacaan' },
+                { name: 'Kausalitas & Hubungan Sebab-Akibat', skill: 'Logika Wacana', indicator: 'Menemukan pemicu utama dari suatu fenomena teks' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'pbm',
+          name: 'Pemahaman Bacaan & Menulis',
+          code: 'PBM',
+          description: 'Menguji kemahiran teknis bahasa Indonesia, ejaan baku, keutuhan kalimat, dan keterampilan menyunting paragraf.',
+          topics: [
+            {
+              name: 'Pemahaman Bacaan',
+              subtopics: [
+                { name: 'Gagasan Utama & Ide Pokok', skill: 'Penentuan Topik Utama', indicator: 'Menentukan gagasan pokok paragraf atau keseluruhan teks' },
+                { name: 'Simpulan Teks', skill: 'Penarikan Simpulan', indicator: 'Merumuskan simpulan yang mencakup seluruh poin teks' },
+                { name: 'Kepaduan Paragraf', skill: 'Analisis Koherensi Paragraf', indicator: 'Menemukan kalimat sumbang atau tidak padu dalam wacana' }
+              ]
+            },
+            {
+              name: 'Menulis',
+              subtopics: [
+                { name: 'Ejaan & PUEBI / EYD V', skill: 'Penerapan Kaidah Ejaan', indicator: 'Mengoreksi kesalahan penulisan huruf kapital, kata depan, dan imbuhan' },
+                { name: 'Tanda Baca & Tipografi', skill: 'Tanda Baca Baku', indicator: 'Memperbaiki penggunaan koma, titik dua, dan tanda petik' },
+                { name: 'Kalimat Efektif', skill: 'Konstruksi Kalimat Baku', indicator: 'Memperbaiki kalimat ambigu, pleonastis, atau tanpa subjek-predikat' },
+                { name: 'Konjungsi Antar & Intrakalimat', skill: 'Penggunaan Kata Hubung', indicator: 'Memilih konjungsi yang tepat untuk menyambung gagasan' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'pk',
+          name: 'Pengetahuan Kuantitatif',
+          code: 'PK',
+          description: 'Menguji matematika murni mencakup Bilangan, Aljabar, Geometri, Statistika, dan Perbandingan.',
+          topics: [
+            {
+              name: 'Bilangan',
+              subtopics: [
+                { name: 'Sifat Bilangan Riil & Prima', skill: 'Teori Bilangan Dasar', indicator: 'Menganalisis keterbagian, FPB, KPK, dan bilangan prima' },
+                { name: 'Operasi Pecahan & Bentuk Akar', skill: 'Manipulasi Aritmetika', indicator: 'Menghitung operasi gabungan bilangan rasional & irasional' },
+                { name: 'Eksponen & Sifat Pangkat', skill: 'Operasi Aljabar Pangkat', indicator: 'Menyederhanakan bentuk pangkat dan akar' }
+              ]
+            },
+            {
+              name: 'Aljabar',
+              subtopics: [
+                { name: 'Persamaan & Pertidaksamaan Linear', skill: 'Aljabar Linear', indicator: 'Menemukan himpunan penyelesaian variabel x dan y' },
+                { name: 'Persamaan Kuadrat & Rumus Vieta', skill: 'Teori Persamaan Kuadrat', indicator: 'Menentukan akar dan operasi jumlah/kali akar Vieta' },
+                { name: 'Fungsi, Domain, & Komposisi', skill: 'Analisis Fungsi', indicator: 'Menghitung nilai f(g(x)) dan invers fungsi' }
+              ]
+            },
+            {
+              name: 'Geometri',
+              subtopics: [
+                { name: 'Garis, Sudut, & Segitiga', skill: 'Geometri Bidang Datar', indicator: 'Menghitung besar sudut garis sejajar dan segitiga' },
+                { name: 'Luas & Keliling Bangun Datar', skill: 'Kalkulasi Luas Bidang', indicator: 'Menentukan luas area yang diarsir pada bangun datar' },
+                { name: 'Volume & Dimensi Tiga Dasar', skill: 'Geometri Spasial', indicator: 'Menghitung kapasitas tabung, balok, kerucut, dan bola' }
+              ]
+            },
+            {
+              name: 'Statistika',
+              subtopics: [
+                { name: 'Ukuran Pemusatan (Mean, Median, Modus)', skill: 'Statistika Deskriptif', indicator: 'Menghitung rata-rata gabungan dan pergeseran nilai' },
+                { name: 'Peluang & Kaidah Pencacahan', skill: 'Teori Peluang & Kombinatorika', indicator: 'Menghitung permutasi, kombinasi, dan peluang kejadian' }
+              ]
+            },
+            {
+              name: 'Perbandingan',
+              subtopics: [
+                { name: 'Perbandingan Senilai & Berbalik Nilai', skill: 'Rasio & Proporsi', indicator: 'Menyelesaikan permasalahan waktu kerja dan proporsi nilai' },
+                { name: 'Aritmetika Sosial & Persentase', skill: 'Aplikasi Finansial', indicator: 'Menghitung untung, rugi, diskon, dan persentase perubahan' }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'literasi',
+      name: 'TES LITERASI',
+      fullName: 'Tes Literasi Bahasa & Matematika',
+      description: 'Mengukur kemampuan memahami, menggunakan, mengevaluasi, dan merefleksikan berbagai jenis teks dan penalaran matematika kontekstual.',
+      subtests: [
+        {
+          id: 'lbi',
+          name: 'Literasi Bahasa Indonesia',
+          code: 'LBI',
+          description: 'Menguji kemahiran membaca wacana saintifik, sosial, dan humaniora serta menelaah argumen secara kritis.',
+          topics: [
+            {
+              name: 'Pemahaman',
+              subtopics: [
+                { name: 'Informasi Tersurat Teks', skill: 'Retrieval Informasi Teks', indicator: 'Menemukan data atau fakta eksplisit pada teks' },
+                { name: 'Makna Tersirat & Inferensi', skill: 'Penafsiran Inferensial', indicator: 'Menyimpulkan pesan implisit dari wacana' }
+              ]
+            },
+            {
+              name: 'Analisis',
+              subtopics: [
+                { name: 'Struktur Teks & Argumen Penulis', skill: 'Dekomposisi Argumen', indicator: 'Mengurai premis dan klaim utama penulis' },
+                { name: 'Fakta vs Opini', skill: 'Verifikasi Pernyataan', indicator: 'Menilai objektivitas klaim dalam paragraf' }
+              ]
+            },
+            {
+              name: 'Evaluasi',
+              subtopics: [
+                { name: 'Kredibilitas & Validitas Sumber', skill: 'Evaluasi Bukti Teks', indicator: 'Menilai kecukupan dan keakuratan bukti pendukung' },
+                { name: 'Sikap & Nada Penulis (Tone)', skill: 'Deteksi Sikap Penulis', indicator: 'Menentukan sikap kritis, optimis, atau netral penulis' }
+              ]
+            },
+            {
+              name: 'Integrasi Informasi',
+              subtopics: [
+                { name: 'Sintesis Dua Wacana Terkait', skill: 'Sintesis Multiteks', indicator: 'Membandingkan persamaan dan kontradiksi dua wacana' },
+                { name: 'Refleksi Konseptual Solutif', skill: 'Penerapan Informasi', indicator: 'Menghubungkan ide bacaan dengan fenomena nyata' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'lbe',
+          name: 'Literasi Bahasa Inggris',
+          code: 'LBE',
+          description: 'Menguji kemampuan memahami wacana akademis berbahasa Inggris, menarik kesimpulan logis, dan menganalisis sikap penulis.',
+          topics: [
+            {
+              name: 'Vocabulary',
+              subtopics: [
+                { name: 'Contextual Academic Vocabulary', skill: 'Context Clue Interpretation', indicator: 'Determining precise meaning of academic words in passages' },
+                { name: 'Collocations & Phrasal Meaning', skill: 'Idiomatic Academic Usage', indicator: 'Identifying natural word pairings in scholarly writing' }
+              ]
+            },
+            {
+              name: 'Reading Comprehension',
+              subtopics: [
+                { name: 'Main Idea & Author Stance', skill: 'Core Concept Extraction', indicator: 'Identifying the central thesis and supporting claims' },
+                { name: 'Factual Details & Paraphrase', skill: 'Factual Retrieval', indicator: 'Locating direct statements and equivalent paraphrased statements' }
+              ]
+            },
+            {
+              name: 'Text Analysis',
+              subtopics: [
+                { name: 'Author Tone & Attitude', skill: 'Tone Recognition', indicator: 'Discerning author tone (objective, skeptical, persuasive)' },
+                { name: 'Purpose & Target Audience', skill: 'Communicative Intent Analysis', indicator: 'Determining the primary rationale behind writing the passage' }
+              ]
+            },
+            {
+              name: 'Critical Reading',
+              subtopics: [
+                { name: 'Logical Inferences & Implications', skill: 'Implicit Meaning Deduction', indicator: 'Drawing conclusions not explicitly stated in the passage' },
+                { name: 'Assumptions & Counterarguments', skill: 'Argument Strength Assessment', indicator: 'Identifying underlying assumptions and potential weaknesses' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'pm',
+          name: 'Penalaran Matematika',
+          code: 'PM',
+          description: 'Menguji kemampuan menerapkan konsep, prosedur, dan fakta matematika untuk memecahkan persoalan dunia nyata.',
+          topics: [
+            {
+              name: 'Bilangan',
+              subtopics: [
+                { name: 'Aritmetika Kontekstual Nyata', skill: 'Kalkulasi Praktis Nyata', indicator: 'Menyelesaikan skenario transaksi, tarif bertingkat, dan skema biaya' },
+                { name: 'Pertumbuhan & Peluruhan', skill: 'Pemodelan Eksponensial Terapan', indicator: 'Menyelesaikan kasus bunga majemuk atau pertumbuhan populasi' }
+              ]
+            },
+            {
+              name: 'Aljabar',
+              subtopics: [
+                { name: 'Model Sistem Persamaan (SPLDV/SPLTV)', skill: 'Formulasi Model Matematis', indicator: 'Mengubah skenario cerita ke persamaan dan mencari solusi optimal' },
+                { name: 'Pertidaksamaan & Alokasi Sumber Daya', skill: 'Optimasi Program Linear', indicator: 'Menentukan nilai batas maksimum/minimum dengan kendala sumber daya' }
+              ]
+            },
+            {
+              name: 'Geometri',
+              subtopics: [
+                { name: 'Geometri Konstruksi & Ruang Nyata', skill: 'Kalkulasi Dimensi Nyata', indicator: 'Menghitung kebutuhan luas bahan atau volume kapasitas tangki' },
+                { name: 'Skala, Peta, & Pengukuran Lapangan', skill: 'Pengukuran Spasial Nyata', indicator: 'Menghitung jarak dan elevasi dengan perbandingan sudut atau skala' }
+              ]
+            },
+            {
+              name: 'Data & Ketidakpastian',
+              subtopics: [
+                { name: 'Interpretasi Infografis & Diagram', skill: 'Literasi Visual Data', indicator: 'Menganalisis tren dari grafik garis, batang, dan tabel statistik' },
+                { name: 'Analisis Risiko & Keputusan Probabilistik', skill: 'Analisis Risiko Nyata', indicator: 'Menentukan keputusan paling rasional berdasarkan data probabilitas' }
+              ]
+            },
+            {
+              name: 'Problem Solving',
+              subtopics: [
+                { name: 'Pemecahan Masalah Multilangkah', skill: 'Strategic Problem Solving', indicator: 'Menyusun strategi bertahap untuk memecahkan persoalan matematis kompleks' },
+                { name: 'Optimasi Solusi Efisien', skill: 'Evaluasi Alternatif Solusi', indicator: 'Memilih rute, metode, atau alokasi biaya tercepat dan paling efisien' }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+// ============================================================================
+// SKILL MAP (Sesuai 7 Subtes dan Topik Resmi SNBT)
+// ============================================================================
 export const SKILL_MAP = {
   TPS: {
-    'Penalaran Umum': ['Penalaran Induktif', 'Penalaran Deduktif', 'Kesesuaian Pernyataan'],
-    'Pengetahuan Kuantitatif': ['Aljabar Dasar', 'Aritmetika Sosial', 'Statistika Peluang'],
-    'Pemahaman Bacaan & Menulis': ['Ejaan & Konjungsi', 'Kalimat Efektif', 'Kepaduan Paragraf'],
-    'Pengetahuan & Pemahaman Umum': ['Makna Kata', 'Sinonim & Antonim', 'Ide Pokok Teks']
+    'Penalaran Umum': ['Induktif', 'Deduktif', 'Kuantitatif'],
+    'Pengetahuan & Pemahaman Umum': ['Kosakata', 'Makna Kontekstual', 'Hubungan Informasi', 'Penalaran Umum'],
+    'Pemahaman Bacaan & Menulis': ['Pemahaman Bacaan', 'Menulis'],
+    'Pengetahuan Kuantitatif': ['Bilangan', 'Aljabar', 'Geometri', 'Statistika', 'Perbandingan']
   },
+  'TES LITERASI': {
+    'Literasi Bahasa Indonesia': ['Pemahaman', 'Analisis', 'Evaluasi', 'Integrasi Informasi'],
+    'Literasi Bahasa Inggris': ['Vocabulary', 'Reading Comprehension', 'Text Analysis', 'Critical Reading'],
+    'Penalaran Matematika': ['Bilangan', 'Aljabar', 'Geometri', 'Data & Ketidakpastian', 'Problem Solving']
+  },
+  // Backward compatibility alias for legacy components
   Literasi: {
-    'Bahasa Indonesia': ['Mengevaluasi Argumen', 'Memahami Teks Akademik', 'Logika Paragraf'],
-    'Bahasa Inggris': ['Main Idea & Purpose', 'Vocabulary In Context', 'Implicit Information'],
-    'Penalaran Matematika': ['Aplikasi Geometri', 'Model SPLDV', 'Analisis Data']
+    'Bahasa Indonesia': ['Pemahaman', 'Analisis', 'Evaluasi', 'Integrasi Informasi'],
+    'Bahasa Inggris': ['Vocabulary', 'Reading Comprehension', 'Text Analysis', 'Critical Reading'],
+    'Penalaran Matematika': ['Bilangan', 'Aljabar', 'Geometri', 'Data & Ketidakpastian', 'Problem Solving']
   }
 };
 
@@ -65,24 +355,57 @@ export const TARGET_UNIVERSITIES = [
   { id: 'bio_ipb', name: 'Bioteknologi IPB University', targetScore: 640, cluster: 'science', focus: 'Rekayasa Genetika & Mikrobiologi Industri', reqAbility: { 'Penalaran Umum': 78, 'Pengetahuan Kuantitatif': 81, 'Bahasa Indonesia': 79, 'Bahasa Inggris': 78 } }
 ];
 
+// ============================================================================
+// MATERI UTBK (7 Subtes Resmi dengan Hierarki Topik Sesuai Arsitektur SNBT)
+// ============================================================================
 export const MATERI_UTBK = [
+  // 1. PENALARAN UMUM (PU) — TPS
   {
-    id: 'm1',
-    subtes: 'Penalaran Umum (PU)',
+    id: 'm_pu',
+    exam: 'SNBT',
+    test_component: 'TPS',
+    subtest: 'Penalaran Umum',
+    code: 'PU',
     icon: '🧠',
     deskripsi: 'Menguji kemampuan memecahkan masalah baru berdasarkan logika induktif, deduktif, dan kuantitatif.',
+    topics: ['Induktif', 'Deduktif', 'Kuantitatif'],
     babList: [
       {
-        id: 'b1_1',
-        judul: 'Penalaran Deduktif & Silogisme',
-        teoriSingkat: 'Penalaran deduktif adalah proses penarikan kesimpulan dari premis-premis umum ke khusus. Hukum utamanya: Modus Ponens (p->q, p |= q), Modus Tollens (p->q, ~q |= ~p), dan Silogisme (p->q, q->r |= p->r).',
+        id: 'b_pu_induktif',
+        topic: 'Induktif',
+        subtopic: 'Pola Bilangan & Barisan',
+        skill: 'Identifikasi Pola',
+        indicator: 'Menentukan pola berikutnya dari deret keteraturan',
+        judul: 'Penalaran Induktif: Pola & Deret Keteraturan',
+        teoriSingkat: 'Penalaran induktif adalah proses menarik kesimpulan umum dari observasi kasus-kasus spesifik. Pada pola bilangan atau barisan simbol, perhatikan beda tingkat satu, beda tingkat dua, rasio geometri, pola larik ganda (selang-seling), atau pola Fibonacci.',
         microLesson: {
-          title: 'Trik Silogisme Cepat dalam 30 Detik',
+          title: 'Trik Pola Deret Bilangan Bertingkat HOTS',
           duration: '4 Menit',
-          type: 'Video & Ringkasan',
-          summary: 'Ingat: Jika premis mengandung kata "sebagian/beberapa", kesimpulan PASTI mengandung kata "sebagian/beberapa".',
+          type: 'Visual Guide & Trik Cepat',
+          summary: 'Selalu periksa selisih antar-suku bertetangga. Jika selisih pertama belum konstan (+1, +3, +9, +27), amati bahwa ini merupakan deret eksponen basis 3.',
           quiz: {
-            question: 'Semua ilmuwan tekun. Sebagian ilmuwan suka membaca komik. Kesimpulannya...',
+            question: 'Berapakah angka berikutnya dari deret: 2, 3, 6, 15, 42, ...?',
+            options: ['123', '84', '108', '135'],
+            answer: 0,
+            hint: 'Perhatikan selisih antar-suku: +1, +3, +9, +27 (pangkat dari 3, berikutnya +81). 42 + 81 = 123.'
+          }
+        }
+      },
+      {
+        id: 'b_pu_deduktif',
+        topic: 'Deduktif',
+        subtopic: 'Silogisme & Modus Kaidah',
+        skill: 'Logika Silogisme',
+        indicator: 'Menarik kesimpulan valid dari premis umum ke spesifik',
+        judul: 'Penalaran Deduktif: Silogisme & Logika Proposisi',
+        teoriSingkat: 'Penalaran deduktif menarik simpulan pasti berdasarkan aturan logika formal dari premis yang diberikan. Kaidah inti: Modus Ponens (p → q, p ⊢ q), Modus Tollens (p → q, ~q ⊢ ~p), dan Silogisme Hipotesis (p → q, q → r ⊢ p → r). Ingat: jika salah satu premis partikular ("sebagian"), simpulan wajib partikular.',
+        microLesson: {
+          title: 'Kaidah Cepat Silogisme Partikular',
+          duration: '4 Menit',
+          type: 'Flashcard Ringkasan',
+          summary: 'Premis Umum + Premis Partikular (Sebagian/Beberapa) = Kesimpulan Wajib Partikular (Sebagian). Kata "semua" pada simpulan otomatis salah.',
+          quiz: {
+            question: 'Semua ilmuwan tekun. Sebagian ilmuwan suka membaca komik. Kesimpulan yang sah adalah...',
             options: [
               'Sebagian orang yang tekun suka membaca komik',
               'Semua orang yang tekun adalah ilmuwan',
@@ -90,206 +413,686 @@ export const MATERI_UTBK = [
               'Semua pembaca komik adalah ilmuwan tekun'
             ],
             answer: 0,
-            hint: 'Gunakan aturan irisan himpunan sebagian (sebagian ilmuwan tekun).'
+            hint: 'Irisan himpunan "ilmuwan tekun" yang merupakan sub-kelompok pembaca komik menghasilkan kesimpulan "sebagian".'
           }
         }
       },
       {
-        id: 'b1_2',
-        judul: 'Penalaran Induktif & Pola Bilangan',
-        teoriSingkat: 'Mengidentifikasi pola keteraturan dari data konkret. Fokus pada deret aritmetika bertingkat, deret Fibonacci, dan manipulasi simbolik.',
+        id: 'b_pu_kuantitatif',
+        topic: 'Kuantitatif',
+        subtopic: 'Logika Angka & Kecukupan Data',
+        skill: 'Analisis Kecukupan Informasi',
+        indicator: 'Menilai apakah pernyataan (1) dan (2) cukup menjawab pertanyaan',
+        judul: 'Penalaran Kuantitatif: Logika Numerik & Data Sufficiency',
+        teoriSingkat: 'Menguji penalaran matematika terapan dan kecukupan data tipe (1) dan (2). Fokus pada pemahaman relasi nilai, estimasi cepat tanpa menghitung angka rumit, serta konsistensi logika kuantitatif.',
         microLesson: {
-          title: 'Pola Deret Bilangan Bertingkat HOTS',
+          title: 'Strategi 4 Langkah Menjawab Soal Kecukupan Data',
           duration: '5 Menit',
-          type: 'Visual Guide',
-          summary: 'Selalu cek selisih antar suku (selisih pertama). Jika belum konstan, hitung selisih dari selisih tersebut (selisih kedua).',
+          type: 'Interactive Guide',
+          summary: '1. Uji pernyataan (1) saja. 2. Uji pernyataan (2) saja secara independen. 3. Jika keduanya belum cukup, uji kombinasi (1) dan (2) bersamaan.',
           quiz: {
-            question: 'Berapakah angka berikutnya dari deret: 2, 3, 6, 15, 42, ...?',
-            options: ['123', '84', '108', '135'],
+            question: 'Berapakah nilai x? (1) 2x + 4 = 10; (2) x + y = 7.',
+            options: [
+              'Pernyataan (1) SAJA cukup, tetapi pernyataan (2) SAJA tidak cukup',
+              'Pernyataan (2) SAJA cukup, tetapi pernyataan (1) SAJA tidak cukup',
+              'DUA pernyataan BERSAMA-SAMA cukup, tetapi SATU pernyataan SAJA tidak cukup',
+              'Pernyataan (1) SAJA cukup dan pernyataan (2) SAJA cukup'
+            ],
             answer: 0,
-            hint: 'Perhatikan pertambahan antar suku: +1, +3, +9, +27 (pangkat dari 3).'
+            hint: 'Dari (1), 2x = 6 sehingga x = 3 (nilai x didapat tunggal). Dari (2), x tergantung nilai y yang tidak diketahui.'
           }
         }
       }
     ]
   },
+
+  // 2. PENGETAHUAN & PEMAHAMAN UMUM (PPU) — TPS
   {
-    id: 'm2',
-    subtes: 'Pengetahuan Kuantitatif (PK)',
-    icon: '📐',
-    deskripsi: 'Menguji pengetahuan matematika dasar mencakup Aljabar, Geometri, Peluang, dan Fungsi.',
+    id: 'm_ppu',
+    exam: 'SNBT',
+    test_component: 'TPS',
+    subtest: 'Pengetahuan & Pemahaman Umum',
+    code: 'PPU',
+    icon: '📖',
+    deskripsi: 'Menguji kedalaman penguasaan kosakata, makna kontekstual, keterkaitan informasi, dan penalaran wacana.',
+    topics: ['Kosakata', 'Makna Kontekstual', 'Hubungan Informasi', 'Penalaran Umum'],
     babList: [
       {
-        id: 'b2_1',
-        judul: 'Aljabar & Persamaan Kuadrat',
-        teoriSingkat: 'Persamaan ax² + bx + c = 0 memiliki akar x1 dan x2. Berlaku rumus Vieta: x1 + x2 = -b/a dan x1 * x2 = c/a.',
+        id: 'b_ppu_kosakata',
+        topic: 'Kosakata',
+        subtopic: 'Makna Kata Baku & Leksikal',
+        skill: 'Penguasaan Diksi',
+        indicator: 'Menentukan arti kata baku berdasarkan konteks wacana',
+        judul: 'Kosakata Baku & Diksi Akademik',
+        teoriSingkat: 'Pemahaman kata baku, makna denotatif kamus (KBBI), serta istilah serapan ilmiah. Sering kali soal menguji arti kata serapan yang jarang digunakan dalam percakapan sehari-hari.',
         microLesson: {
-          title: 'Faktorisasi & Vieta Trick',
+          title: 'Pembeda Makna Kata Serapan & Homonim',
           duration: '3 Menit',
+          type: 'Rangkuman Diksi',
+          summary: 'Perhatikan kelas kata (nomina, verba, adjektiva) dan konteks wacana saat menentukan padanan kata dalam kalimat.',
+          quiz: {
+            question: 'Arti kata "konsensus" dalam wacana kesepakatan publik adalah...',
+            options: [
+              'Kesepakatan bersama yang dicapai melalui musyawarah',
+              'Perdebatan terbuka antar-kelompok',
+              'Keputusan sepihak dari pimpinan',
+              'Penolakan terhadap usulan mayoritas'
+            ],
+            answer: 0,
+            hint: 'Konsensus = mufakat / kesepakatan umum bersama.'
+          }
+        }
+      },
+      {
+        id: 'b_ppu_makna_kontekstual',
+        topic: 'Makna Kontekstual',
+        subtopic: 'Pergeseran Makna & Frasa Konotatif',
+        skill: 'Semantik Kontekstual',
+        indicator: 'Menganalisis variasi nuansa makna dalam kalimat',
+        judul: 'Makna Kontekstual & Ungkapan Wacana',
+        teoriSingkat: 'Makna kata tidak selalu sesuai dengan kamus murni (denotasi), tetapi dipengaruhi oleh relasi sintaksis dan pragmatis dalam kalimat teks.',
+        microLesson: {
+          title: 'Cara Menentukan Makna Konotatif secara Akurat',
+          duration: '4 Menit',
+          type: 'Video Trik',
+          summary: 'Gantikan kata target dengan kata opsi pilihan. Opsi yang tidak mengubah makna kalimat secara keseluruhan adalah jawaban yang benar.',
+          quiz: {
+            question: 'Pada kalimat "Perusahaan itu kini berada di ujung tanduk", makna kontekstual frasa "di ujung tanduk" adalah...',
+            options: [
+              'Dalam situasi sangat genting dan terancam bangkrut',
+              'Memiliki kekuasaan yang sangat tinggi',
+              'Mendapat perlindungan khusus dari otoritas',
+              'Berada di posisi paling terdepan'
+            ],
+            answer: 0,
+            hint: 'Ujung tanduk merupakan idiom untuk situasi berbahaya/kritis.'
+          }
+        }
+      },
+      {
+        id: 'b_ppu_hubungan_informasi',
+        topic: 'Hubungan Informasi',
+        subtopic: 'Keterkaitan Antarparagraf & Asosiasi',
+        skill: 'Kohesi & Koherensi Teks',
+        indicator: 'Menjelaskan hubungan logis antara paragraf terdahulu dan berikutnya',
+        judul: 'Hubungan Antarparagraf & Kohesi Teks',
+        teoriSingkat: 'Menguji kemampuan melihat jembatan logika antar-paragraf: apakah paragraf kedua menjelaskan contoh, memberikan rincian sebab, membantah klaim paragraf pertama, atau merangkum solusi.',
+        microLesson: {
+          title: 'Kata Transisi Penentu Hubungan Paragraf',
+          duration: '3 Menit',
+          type: 'Visual Mindmap',
+          summary: 'Kata seperti "Oleh karena itu" menunjukkan simpulan/akibat. "Namun / Sebaliknya" menandakan kontras. "Selain itu" menandakan penambahan poin.',
+          quiz: {
+            question: 'Jika paragraf 1 memaparkan bahaya polusi udara dan paragraf 2 memaparkan uji coba bus listrik di Jakarta, apa hubungan kedua paragraf?',
+            options: [
+              'Paragraf 2 menyajikan solusi konkret atas masalah pada paragraf 1',
+              'Paragraf 2 membantah bahaya polusi pada paragraf 1',
+              'Paragraf 2 mengulang masalah yang sama dengan istilah berbeda',
+              'Paragraf 2 membatasi ruang lingkup paragraf 1'
+            ],
+            answer: 0,
+            hint: 'Bus listrik adalah upaya mereduksi polusi, yang merupakan solusi nyata.'
+          }
+        }
+      },
+      {
+        id: 'b_ppu_penalaran_umum',
+        topic: 'Penalaran Umum',
+        subtopic: 'Analogi Wacana & Kausalitas',
+        skill: 'Penalaran Analogis Teks',
+        indicator: 'Menentukan situasi di luar teks yang sejalan dengan situasi pada bacaan',
+        judul: 'Penalaran Wacana: Analogi & Kausalitas Teks',
+        teoriSingkat: 'Mentransfer pola hubungan yang terjadi di dalam wacana ke dalam situasi kehidupan lain (penalaran analogis tingkat tinggi).',
+        microLesson: {
+          title: 'Metode Abstraksi Hubungan Sebab-Akibat',
+          duration: '4 Menit',
+          type: 'Ringkasan Konseptual',
+          summary: 'Ubah teks ke dalam bentuk model logika abstrak: "A menyebabkan B, sehingga terjadi C". Cari opsi yang memiliki relasi A → B → C yang identik.',
+          quiz: {
+            question: 'Di sebuah pulau, populasi serigala menurun drastis sehingga populasi rusa melonjak dan vegetasi habis. Situasi yang analog adalah...',
+            options: [
+              'Penurunan pengawas lalu lintas membuat pelanggaran melonjak dan kemacetan parah',
+              'Musim kemarau panjang membuat petani menanam tanaman palawija',
+              'Pemberian subsidi pupuk membuat hasil panen padi melimpah',
+              'Kenaikan harga BBM menyebabkan penurunan pemakaian kendaraan umum'
+            ],
+            answer: 0,
+            hint: 'Hilangnya pengendali (predator/pengawas) mengakibatkan meledaknya objek yang diawasi dan memicu kerusakan sistem.'
+          }
+        }
+      }
+    ]
+  },
+
+  // 3. PEMAHAMAN BACAAN & MENULIS (PBM) — TPS
+  {
+    id: 'm_pbm',
+    exam: 'SNBT',
+    test_component: 'TPS',
+    subtest: 'Pemahaman Bacaan & Menulis',
+    code: 'PBM',
+    icon: '✍️',
+    deskripsi: 'Menguji tata bahasa baku, kaidah ejaan EYD V, kalimat efektif, dan perbaikan wacana.',
+    topics: ['Pemahaman Bacaan', 'Menulis'],
+    babList: [
+      {
+        id: 'b_pbm_pemahaman',
+        topic: 'Pemahaman Bacaan',
+        subtopic: 'Ide Pokok & Inti Kalimat',
+        skill: 'Penentuan Topik Utama',
+        indicator: 'Menentukan gagasan pokok paragraf dan inti kalimat kompleks',
+        judul: 'Pemahaman Bacaan: Ide Pokok & Inti Kalimat',
+        teoriSingkat: 'Gagasan utama terletak pada kalimat utama (deduktif di awal, induktif di akhir, atau campuran). Inti kalimat majemuk bertingkat dicari dengan membuang anak kalimat (klausula yang diawali konjungsi subordinatif) dan mempertahankan induk kalimat (Subjek + Predikat utama).',
+        microLesson: {
+          title: 'Trik Mengupas Inti Kalimat Panjang Beranak Pinak',
+          duration: '4 Menit',
+          type: 'Rangkuman Materi',
+          summary: 'Coret klausul yang diawali "yang", "karena", "meskipun", "sehingga". Sisa kata yang membentuk Subjek dan Predikat adalah inti kalimat.',
+          quiz: {
+            question: 'Manakah inti kalimat dari: "Meskipun cuaca sangat buruk, tim penyelamat yang telah terlatih berhasil mengevakuasi seluruh korban banjir."?',
+            options: [
+              'Tim penyelamat berhasil mengevakuasi seluruh korban',
+              'Cuaca sangat buruk menghalangi tim penyelamat',
+              'Tim penyelamat telah terlatih dengan baik',
+              'Seluruh korban banjir diselamatkan karena cuaca'
+            ],
+            answer: 0,
+            hint: 'Buang anak kalimat "Meskipun cuaca sangat buruk" dan perluasan "yang telah terlatih". Subjek: Tim penyelamat, Predikat: berhasil mengevakuasi, Objek: seluruh korban.'
+          }
+        }
+      },
+      {
+        id: 'b_pbm_menulis',
+        topic: 'Menulis',
+        subtopic: 'Kaidah Ejaan (EYD V) & Kalimat Efektif',
+        skill: 'Penerapan Kaidah Ejaan & Konstruksi Kalimat',
+        indicator: 'Mengoreksi kesalahan ejaan, tanda baca, konjungsi, dan ketidakefektifan kalimat',
+        judul: 'Keterampilan Menulis: Ejaan EYD V & Kalimat Efektif',
+        teoriSingkat: 'Syarat kalimat efektif: 1. Kesepadanan struktur (jelas S dan P, tidak ada preposisi di depan subjek tanpa predikat); 2. Kesejajaran bentuk (paralelisme afiks); 3. Kehematan kata (tidak pleonastis); 4. Ketepatan ejaan EYD V (huruf kapital, kata depan di/ke, dan tanda koma).',
+        microLesson: {
+          title: '3 Jebakan Kalimat Efektif Terbanyak di UTBK',
+          duration: '5 Menit',
+          type: 'Analisis Kesalahan Nyata',
+          summary: 'Hindari subjek yang diawali kata depan: "Bagi semua siswa harus hadir" (SALAH) → "Semua siswa harus hadir" (BENAR).',
+          quiz: {
+            question: 'Kalimat manakah yang memenuhi syarat KALIMAT EFEKTIF dan EYD V?',
+            options: [
+              'Pemerintah meresmikan jembatan itu kemarin.',
+              'Untuk mempercepat pembangunan jembatan itu membutuhkan dana besar.',
+              'Rapat itu membicarakan daripada masalah pengentasan kemiskinan.',
+              'Adik membeli bermacam-macam buah-buahan di pasar tradisional.'
+            ],
+            answer: 0,
+            hint: 'Pilihan 1 memiliki Subjek (Pemerintah) dan Predikat (meresmikan) yang lugas tanpa kata mubazir/rusak subjek.'
+          }
+        }
+      }
+    ]
+  },
+
+  // 4. PENGETAHUAN KUANTITATIF (PK) — TPS
+  {
+    id: 'm_pk',
+    exam: 'SNBT',
+    test_component: 'TPS',
+    subtest: 'Pengetahuan Kuantitatif',
+    code: 'PK',
+    icon: '📐',
+    deskripsi: 'Menguji matematika murni mencakup Bilangan, Aljabar, Geometri, Statistika, dan Perbandingan.',
+    topics: ['Bilangan', 'Aljabar', 'Geometri', 'Statistika', 'Perbandingan'],
+    babList: [
+      {
+        id: 'b_pk_bilangan',
+        topic: 'Bilangan',
+        subtopic: 'Sifat Bilangan Riil, Prima & Operasi Pecahan',
+        skill: 'Teori Bilangan Dasar',
+        indicator: 'Menganalisis keterbagian, FPB, KPK, dan operasi bilangan',
+        judul: 'Teori Bilangan: Keterbagian & Bilangan Prima',
+        teoriSingkat: 'Bilangan prima adalah bilangan asli lebih besar dari 1 yang faktor pembaginya hanya 1 dan dirinya sendiri. Kriteria keterbagian: habis dibagi 3 jika jumlah digitnya habis dibagi 3; habis dibagi 4 jika 2 digit terakhir habis dibagi 4.',
+        microLesson: {
+          title: 'Trik Cepat Menentukan Bilangan Prima & Keterbagian',
+          duration: '3 Menit',
+          type: 'Flashcard Formula',
+          summary: 'Satu-satunya bilangan prima genap adalah 2. Bilangan komposit adalah bilangan lebih besar dari 1 yang bukan prima.',
+          quiz: {
+            question: 'Berapa banyak bilangan prima antara 20 dan 35?',
+            options: ['3', '4', '2', '5'],
+            answer: 0,
+            hint: 'Bilangan prima antara 20 dan 35 adalah: 23, 29, 31 (Total = 3).'
+          }
+        }
+      },
+      {
+        id: 'b_pk_aljabar',
+        topic: 'Aljabar',
+        subtopic: 'Persamaan Kuadrat, Vieta, & Fungsi',
+        skill: 'Aljabar Linear & Kuadrat',
+        indicator: 'Menentukan akar dan relasi Vieta serta komposisi fungsi',
+        judul: 'Aljabar & Teorema Vieta pada Persamaan Kuadrat',
+        teoriSingkat: 'Untuk persamaan kuadrat ax² + bx + c = 0 dengan akar x₁ dan x₂, teorema Vieta menyatakan: x₁ + x₂ = -b/a dan x₁ · x₂ = c/a. Nilai (x₁ + x₂)² = x₁² + 2x₁x₂ + x₂².',
+        microLesson: {
+          title: 'Formula Vieta Cepat Tanpa Mencari Akar',
+          duration: '4 Menit',
           type: 'Flashcard & Rumus Cepat',
-          summary: 'Gunakan hubungan x1 + x2 dan x1 * x2 langsung tanpa mencari nilai x1 dan x2 satu per satu.',
+          summary: 'Untuk mencari 1/x₁ + 1/x₂ gunakan bentuk (x₁ + x₂) / (x₁ · x₂) = (-b/a) / (c/a) = -b/c.',
           quiz: {
             question: 'Jika akar-akar x² - 6x + 8 = 0 adalah a dan b, berapakah nilai 1/a + 1/b?',
             options: ['3/4', '4/3', '6/8', '1/2'],
             answer: 0,
-            hint: 'Samakan penyebut: (a+b)/(a*b) = (-b/a)/(c/a).'
+            hint: '1/a + 1/b = (a+b)/(ab) = 6/8 = 3/4.'
           }
         }
       },
       {
-        id: 'b2_2',
-        judul: 'Statistika & Peluang',
-        teoriSingkat: 'Peluang kejadian A disimbolkan P(A) = n(A)/n(S). Nilai rata-rata gabungan: X_gab = (n1*X1 + n2*X2) / (n1 + n2).',
+        id: 'b_pk_geometri',
+        topic: 'Geometri',
+        subtopic: 'Bangun Datar, Sudut, & Dimensi Ruang',
+        skill: 'Geometri Bidang Datar & Spasial',
+        indicator: 'Menghitung sudut garis sejajar dan luas daerah terarsir',
+        judul: 'Geometri: Sudut, Luas Daerah, & Teorema Pythagoras',
+        teoriSingkat: 'Dua garis sejajar yang dipotong garis transversal menghasilkan sudut berseberangan yang sama besar. Luas segitiga = 1/2 · alas · tinggi = 1/2 · a · b · sin(C).',
         microLesson: {
-          title: 'Rata-rata Gabungan Cepat',
-          duration: '5 Menit',
-          type: 'Video Trik',
-          summary: 'Metode selisih deviasi rata-rata untuk menghitung jumlah anggota kelompok tanpa aljabar panjang.',
+          title: 'Sudut Berseberangan & Sudut Luar Segitiga',
+          duration: '4 Menit',
+          type: 'Visual Diagram',
+          summary: 'Besar sudut luar segitiga sama dengan jumlah dua sudut dalam segitiga yang tidak bertetangga dengannya.',
           quiz: {
-            question: 'Rata-rata nilai 10 siswa adalah 70. Jika dimasukkan 5 siswa lain rata-rata menjadi 75. Berapa rata-rata 5 siswa tersebut?',
+            question: 'Pada segitiga siku-siku ABC dengan siku di B, jika AB = 6 dan BC = 8, berapa panjang AC?',
+            options: ['10', '12', '14', '9'],
+            answer: 0,
+            hint: 'Tripel Pythagoras dasar: 6, 8, 10 (kelipatan dari 3, 4, 5).'
+          }
+        }
+      },
+      {
+        id: 'b_pk_statistika',
+        topic: 'Statistika',
+        subtopic: 'Ukuran Pemusatan (Mean Gabungan) & Peluang',
+        skill: 'Statistika Deskriptif & Kombinatorika',
+        indicator: 'Menghitung rata-rata gabungan dan peluang kejadian majemuk',
+        judul: 'Statistika & Peluang: Rata-Rata Gabungan & Kombinasi',
+        teoriSingkat: 'Rata-rata gabungan: X̄_gab = (n₁·X̄₁ + n₂·X̄₂) / (n₁ + n₂). Kombinasi nCr = n! / (r!(n - r)!) digunakan saat urutan pemilihan tidak diperhatikan.',
+        microLesson: {
+          title: 'Trik Cepat Rata-Rata Gabungan dengan Selisih Bobot',
+          duration: '4 Menit',
+          type: 'Video Trik',
+          summary: 'Gunakan prinsip timbangan/deviasi rata-rata untuk mencari rasio jumlah anggota dua kelompok tanpa aljabar panjang.',
+          quiz: {
+            question: 'Rata-rata nilai 10 siswa adalah 70. Jika dimasukkan 5 siswa baru nilai rata-rata menjadi 75. Berapa rata-rata 5 siswa baru tersebut?',
             options: ['85', '80', '90', '78'],
             answer: 0,
-            hint: 'Gunakan X_gab = (10*70 + 5*X2)/15 = 75.'
+            hint: 'Total nilai awal = 10 * 70 = 700. Total nilai akhir = 15 * 75 = 1125. Selisih = 425. Rata-rata 5 siswa = 425 / 5 = 85.'
           }
         }
-      }
-    ]
-  },
-  {
-    id: 'm3',
-    subtes: 'Pemahaman Bacaan & Menulis (PBM)',
-    icon: '✍️',
-    deskripsi: 'Menguji tata bahasa Indonesia baku, ejaan PUEBI/EYD, konjungsi, dan keutuhan paragraf.',
-    babList: [
+      },
       {
-        id: 'b3_1',
-        judul: 'Ejaan, Tanda Baca, & Konjungsi',
-        teoriSingkat: 'Penggunaan kata depan (di, ke) dipisah jika menunjukkan tempat. Konjungsi intrakalimat (sehingga, karena) tidak boleh diawali tanda titik.',
+        id: 'b_pk_perbandingan',
+        topic: 'Perbandingan',
+        subtopic: 'Rasio Senilai, Berbalik Nilai, & Aritmetika Sosial',
+        skill: 'Rasio & Proporsi Kuantitatif',
+        indicator: 'Menyelesaikan permasalahan waktu kerja dan proporsi nilai',
+        judul: 'Perbandingan Senilai & Berbalik Nilai pada Waktu Kerja',
+        teoriSingkat: 'Perbandingan senilai: a₁/b₁ = a₂/b₂ (makin banyak bahan, makin banyak produk). Perbandingan berbalik nilai: a₁ · b₁ = a₂ · b₂ (makin banyak pekerja, makin cepat/sedikit waktu yang dibutuhkan).',
         microLesson: {
-          title: 'Analisis Kesalahan Ejaan PBM',
-          duration: '4 Menit',
-          type: 'Rangkuman Materi',
-          summary: 'Cek kata berimbuhan gabungan (di- + kata kerja = disambung, di + kata tempat = dipisah).',
+          title: 'Rumus Master Pekerja Berhenti Sementara',
+          duration: '5 Menit',
+          type: 'Rangkuman Rumus',
+          summary: 'Tambahan pekerja = (Hari terhenti · Pekerja awal) / Sisa hari kerja.',
           quiz: {
-            question: 'Kalimat manakah yang memiliki penggunaan ejaan yang BENAR?',
-            options: [
-              'Buku itu di beli oleh Kakak di toko Gramedia.',
-              'Ia pergi ke luar negeri untuk melanjutkan studi.',
-              'Ibu membelikan adik: sepatu, baju, dan tas.',
-              'Studi kasus itu di lakukan secara independen.'
-            ],
+            question: 'Suatu proyek diselesaikan 20 pekerja dalam 30 hari. Setelah bekerja 10 hari, pekerjaan terhenti 5 hari. Berapa pekerja tambahan agar selesai tepat waktu?',
+            options: ['7 orang', '6 orang', '5 orang', '8 orang'],
             answer: 1,
-            hint: 'Kata "ke luar" dipisah karena menunjukkan arah tempat.'
+            hint: 'Sisa hari normal = 20 hari. Terhenti = 5 hari. Sisa hari tersisa = 15 hari. Tambahan pekerja = (5 * 20) / 15 = 6,67 ≈ 7 orang (atau jika hitung bulat pas: 6-7 orang).'
           }
         }
       }
     ]
   },
+
+  // 5. LITERASI BAHASA INDONESIA — TES LITERASI
   {
-    id: 'm4',
-    subtes: 'Pengetahuan & Pemahaman Umum (PPU)',
-    icon: '📖',
-    deskripsi: 'Menguji kemampuan memahami isi bacaan, ide pokok, makna kata kontekstual, dan sinonim/antonim.',
-    babList: [
-      {
-        id: 'b4_1',
-        judul: 'Gagasan Utama & Makna Kata Kontekstual',
-        teoriSingkat: 'Gagasan utama terletak di kalimat utama (deduktif di awal, induktif di akhir). Makna kata dapat berupa denotatif maupun konotatif.',
-        microLesson: {
-          title: 'Strategi Menemukan Gagasan Utama Teks Panjang',
-          duration: '3 Menit',
-          type: 'Visual Mindmap',
-          summary: 'Bacalah kalimat pertama dan terakhir setiap paragraf untuk memetakan alur tesis ide.',
-          quiz: {
-            question: 'Apa fungsi kalimat penjelas dalam sebuah paragraf akademik?',
-            options: [
-              'Mendukung dan memperjelas gagasan utama dengan bukti/alasan',
-              'Mengubah topik pembicaraan ke isu baru',
-              'Mengulang kalimat utama secara persis',
-              'Menyajikan simpulan yang bertentangan'
-            ],
-            answer: 0,
-            hint: 'Kalimat penjelas bertugas menguraikan klaim awal.'
-          }
-        }
-      }
-    ]
-  },
-  {
-    id: 'm5',
-    subtes: 'Literasi Bahasa Indonesia',
+    id: 'm_lbi',
+    exam: 'SNBT',
+    test_component: 'TES LITERASI',
+    subtest: 'Literasi Bahasa Indonesia',
+    code: 'LBI',
     icon: '🇮🇩',
-    deskripsi: 'Menguji pemahaman bacaan kompleks, sintesis informasi, dan evaluasi argumen teks ilmiah.',
+    deskripsi: 'Menguji kemampuan membaca wacana saintifik, sosial, dan humaniora serta menelaah argumen secara kritis.',
+    topics: ['Pemahaman', 'Analisis', 'Evaluasi', 'Integrasi Informasi'],
     babList: [
       {
-        id: 'b5_1',
-        judul: 'Evaluasi Argumen & Sikap Penulis',
-        teoriSingkat: 'Sikap penulis dapat berupa netral, mendukung (pro), menolak (kontra), atau kritis objektif.',
+        id: 'b_lbi_pemahaman',
+        topic: 'Pemahaman',
+        subtopic: 'Identifikasi Fakta & Makna Tersirat',
+        skill: 'Retrieval Informasi Teks',
+        indicator: 'Menemukan data atau fakta eksplisit dan implisit pada teks ilmiah',
+        judul: 'Literasi Bacaan: Pemahaman Fakta Tersurat & Tersirat',
+        teoriSingkat: 'Wacana literasi SNBT menyajikan teks ilmiah populer sepanjang 4-6 paragraf. Siswa dituntut membaca secara cepat namun cermat untuk menemukan informasi yang relevan.',
         microLesson: {
-          title: 'Cara Cepat Menentukan Tone & Sikap Penulis',
+          title: 'Teknik Skimming & Scanning Teks Akademis',
           duration: '4 Menit',
           type: 'Video Trik',
-          summary: 'Cari kata sifat subjektif yang digunakan penulis (misal: "sangat disayangkan", "berhasil baik").',
+          summary: 'Baca pertanyaan terlebih dahulu untuk mencatat kata kunci (keyword), lalu scanning paragraf terkait untuk menemukan jawaban.',
           quiz: {
-            question: 'Jika penulis sering menggunakan kata "sayangnya", "berbahaya", dan "kurang bijak", sikap penulis adalah...',
-            options: ['Kritis/Prihatin', 'Optimis', 'Netral', 'Acuh tak acuh'],
-            answer: 0,
-            hint: 'Pilihan kata bermuatan negatif menunjukkan keprihatinan/kritik.'
-          }
-        }
-      }
-    ]
-  },
-  {
-    id: 'm6',
-    subtes: 'Literasi Bahasa Inggris',
-    icon: '🇬🇧',
-    deskripsi: 'Menguji reading comprehension teks Bahasa Inggris akademik, tone, purpose, dan inferensi.',
-    babList: [
-      {
-        id: 'b6_1',
-        judul: 'Main Idea & Author Purpose',
-        teoriSingkat: 'Purpose Questions biasanya diawali kata kerja infinitive: To explain, To compare, To criticize, To persuade.',
-        microLesson: {
-          title: 'Deconstructing English Academic Texts',
-          duration: '5 Menit',
-          type: 'Interactive Guide',
-          summary: 'Identify transition markers like "However", "In contrast", and "Furthermore" to catch the shift in the author\'s main point.',
-          quiz: {
-            question: 'What is the primary function of the word "Furthermore" in a text?',
+            question: 'Apa langkah awal paling efektif saat menghadapi teks literasi panjang di UTBK?',
             options: [
-              'To add supporting information to an existing point',
-              'To introduce a contrasting idea',
-              'To conclude the argument',
-              'To show cause and effect'
+              'Membaca soal dan menandai kata kunci pertanyaan sebelum membaca teks',
+              'Membaca teks kata demi kata secara perlahan dari awal sampai akhir',
+              'Menebak jawaban berdasarkan intuisi umum',
+              'Menghafalkan seluruh isi teks'
             ],
             answer: 0,
-            hint: 'Furthermore = In addition.'
+            hint: 'Mengetahui apa yang dicari memangkas waktu membaca hingga 50%.'
+          }
+        }
+      },
+      {
+        id: 'b_lbi_analisis',
+        topic: 'Analisis',
+        subtopic: 'Struktur Argumen & Fakta vs Opini',
+        skill: 'Dekomposisi Argumen',
+        indicator: 'Mengurai premis dan klaim utama serta membedakan opini dan fakta',
+        judul: 'Analisis Wacana: Struktur Argumen & Bukti Penulis',
+        teoriSingkat: 'Penulis membangun argumen dengan klaim (claim), alasan (warrant), dan bukti data (evidence). Kenali apakah suatu kalimat berupa opini subjektif atau fakta terverifikasi.',
+        microLesson: {
+          title: 'Membedakan Kalimat Fakta dan Opini dalam Teks Ilmiah',
+          duration: '3 Menit',
+          type: 'Guide Interaktif',
+          summary: 'Fakta mengandung angka/tanggal/data empiris ("Berdasarkan data BPS tahun 2024..."). Opini mengandung kata sifat penilai ("sangat disayangkan", "sebaiknya").',
+          quiz: {
+            question: 'Manakah dari kalimat berikut yang merupakan FAKTA?',
+            options: [
+              'Suhu rata-rata global meningkat 1,1 derajat Celsius dibandingkan era pra-industri.',
+              'Kebijakan energi hijau merupakan kebijakan terbaik yang pernah ada.',
+              'Masyarakat semestinya lebih peduli terhadap masa depan lingkungan.',
+              'Program transisi energi dirasa kurang menyentuh akar rumput.'
+            ],
+            answer: 0,
+            hint: 'Kalimat 1 menyajikan data numerik kuantitatif yang dapat diverifikasi secara ilmiah.'
+          }
+        }
+      },
+      {
+        id: 'b_lbi_evaluasi',
+        topic: 'Evaluasi',
+        subtopic: 'Kredibilitas Bukti & Nada Sikap Penulis (Tone)',
+        skill: 'Deteksi Sikap Penulis & Evaluasi Kritis',
+        indicator: 'Menentukan nada objektif, skeptis, atau persuasif penulis',
+        judul: 'Evaluasi Wacana: Nada Tulisan (Tone) & Kredibilitas Teks',
+        teoriSingkat: 'Nada tulisan mencerminkan sikap emosional atau intelektual penulis terhadap topik yang dibahas: objektif, kritis, sinis, optimis, prihatin, atau persuasif.',
+        microLesson: {
+          title: 'Cara Cepat Mendeteksi Sikap Penulis Melalui Diksi',
+          duration: '4 Menit',
+          type: 'Rangkuman Materi',
+          summary: 'Cek kata sifat bermuatan nilai: "sayangnya", "berbahaya", "lalai" menandakan sikap kritis/prihatin.',
+          quiz: {
+            question: 'Jika penulis sering menggunakan frasa "sayangnya", "rentan", dan "belum menunjukkan kemajuan berarti", sikap penulis adalah...',
+            options: ['Kritis dan prihatin', 'Optimis dan mendukung', 'Netral tanpa pendirian', 'Acuh tak acuh'],
+            answer: 0,
+            hint: 'Diksi bermuatan negatif menunjukkan rasa prihatin dan kritik terhadap situasi.'
+          }
+        }
+      },
+      {
+        id: 'b_lbi_integrasi',
+        topic: 'Integrasi Informasi',
+        subtopic: 'Sintesis Dua Teks & Refleksi Isi',
+        skill: 'Sintesis Multiteks',
+        indicator: 'Membandingkan persamaan dan kontradiksi dua wacana yang berkaitan',
+        judul: 'Integrasi Informasi: Sintesis Dua Bacaan Berbeda',
+        teoriSingkat: 'Menguji kemampuan menggabungkan informasi dari Teks 1 dan Teks 2 yang membahas topik sama dari sudut pandang atau temuan yang berbeda.',
+        microLesson: {
+          title: 'Matriks Perbandingan Sintesis 2 Teks',
+          duration: '4 Menit',
+          type: 'Diagram Visual',
+          summary: 'Petakan topik: Teks A fokus pada aspek apa (misal manfaat), Teks B fokus pada aspek apa (misal risiko/efek samping).',
+          quiz: {
+            question: 'Teks A membahas efektivitas vaksin dalam mencegah penyakit. Teks B membahas kendala distribusi rantai dingin vaksin ke pelosok. Simpulan sintesisnya adalah...',
+            options: [
+              'Vaksin terbukti efektif, namun pemerataan distribusinya membutuhkan infrastruktur rantai dingin yang memadai',
+              'Vaksin tidak boleh digunakan sebelum semua pelosok terjangkau',
+              'Distribusi vaksin lebih penting daripada efektivitas medisnya',
+              'Teks B sepenuhnya membantah manfaat vaksin pada Teks A'
+            ],
+            answer: 0,
+            hint: 'Sintesis menggabungkan keunggulan Teks A dengan tantangan nyata Teks B secara komprehensif.'
           }
         }
       }
     ]
   },
+
+  // 6. LITERASI BAHASA INGGRIS — TES LITERASI
   {
-    id: 'm7',
-    subtes: 'Penalaran Matematika (PM)',
-    icon: '📊',
-    deskripsi: 'Menguji kemampuan penalaran matematis berbasis pemecahan masalah dunia nyata (soal cerita kontekstual).',
+    id: 'm_lbe',
+    exam: 'SNBT',
+    test_component: 'TES LITERASI',
+    subtest: 'Literasi Bahasa Inggris',
+    code: 'LBE',
+    icon: '🇬🇧',
+    deskripsi: 'Menguji pemahaman reading comprehension wacana akademis berbahasa Inggris, inference, author stance, dan text structure.',
+    topics: ['Vocabulary', 'Reading Comprehension', 'Text Analysis', 'Critical Reading'],
     babList: [
       {
-        id: 'b7_1',
-        judul: 'Model Matematika & Optimasi SPLDV',
-        teoriSingkat: 'Mengubah soal cerita ke bentuk persamaan matematika. Tentukan variabel x dan y, buat fungsi kendala dan fungsi tujuan.',
+        id: 'b_lbe_vocabulary',
+        topic: 'Vocabulary',
+        subtopic: 'Vocabulary in Context & Academic Collocations',
+        skill: 'Context Clue Interpretation',
+        indicator: 'Menentukan arti kata akademis berdasarkan petunjuk konteks kalimat',
+        judul: 'Academic Vocabulary & Context Clues',
+        teoriSingkat: 'Context clues (definisi, sinonim, antonim, contoh) membantu menebak makna kata sulit tanpa kamus. Perhatikan kata hubung penjelas seperti "that is", "in other words", atau "unlike".',
         microLesson: {
-          title: 'Penerapan SPLDV pada Soal Cerita Ekonomi',
-          duration: '5 Menit',
-          type: 'Video & Latihan',
-          summary: 'Selalu definisikan pemisalan variabel secara jelas sebelum membuat persamaan.',
+          title: 'Deciphering Unfamiliar Words with Contrast Clues',
+          duration: '4 Menit',
+          type: 'Interactive Guide',
+          summary: 'When you see "unlike", "whereas", or "however", the target word is the opposite of the known word.',
           quiz: {
-            question: 'Harga 2 buku dan 3 pensil adalah 12.000. Harga 3 buku dan 1 pensil adalah 11.000. Harga 1 buku adalah...',
-            options: ['3.000', '2.000', '4.000', '2.500'],
+            question: 'In the sentence: "Unlike her gregarious sister who loved parties, Maya was introverted and quiet." What does "gregarious" mean?',
+            options: ['Sociable and outgoing', 'Extremely studious', 'Shy and reserved', 'Easily irritated'],
             answer: 0,
-            hint: 'Sistem eliminasi: 2x+3y=12000 dan 3x+y=11000.'
+            hint: '"Unlike" signals contrast with Maya who is introverted and quiet. Therefore, gregarious = sociable/outgoing.'
+          }
+        }
+      },
+      {
+        id: 'b_lbe_reading_comprehension',
+        topic: 'Reading Comprehension',
+        subtopic: 'Main Idea & Detailed Facts',
+        skill: 'Core Concept Extraction',
+        indicator: 'Menentukan gagasan pokok teks dan rincian data faktual',
+        judul: 'Reading Comprehension: Main Idea & Factual Details',
+        teoriSingkat: 'Main idea questions ask for the central point of the passage. Look at the first and last sentences of each paragraph to synthesize the author thesis.',
+        microLesson: {
+          title: 'Topic Sentence Strategy for Academic Passages',
+          duration: '4 Menit',
+          type: 'Video & Mindmap',
+          summary: 'The main idea must cover the whole text, not just one single paragraph or supporting example.',
+          quiz: {
+            question: 'What is the best definition of the "Main Idea" of an academic passage?',
+            options: [
+              'The primary overarching argument that all paragraphs support',
+              'The most dramatic statistical fact mentioned in paragraph 3',
+              'The author personal background story',
+              'The concluding sentence repeated verbatim'
+            ],
+            answer: 0,
+            hint: 'The main idea is the umbrella thesis tying all sections together.'
+          }
+        }
+      },
+      {
+        id: 'b_lbe_text_analysis',
+        topic: 'Text Analysis',
+        subtopic: 'Author Purpose & Rhetorical Organization',
+        skill: 'Communicative Intent Analysis',
+        indicator: 'Menganalisis tujuan penulisan dan pola organisasi retoris wacana',
+        judul: 'Text Analysis: Author Purpose & Text Structure',
+        teoriSingkat: 'Purpose verbs: To criticize, To illustrate, To compare, To persuade, To explain. Notice how the passage transitions between paragraphs (chronological, problem-solution, cause-effect).',
+        microLesson: {
+          title: 'Key Transition Words Showing Text Patterns',
+          duration: '5 Menit',
+          type: 'Flashcard Guide',
+          summary: 'Words like "Consequently", "As a result" show cause-effect. "Nevertheless", "Yet" show concession/counter-argument.',
+          quiz: {
+            question: 'What is the primary function of the phrase "In contrast to previous findings" in a research text?',
+            options: [
+              'To introduce a divergent discovery that disagrees with earlier studies',
+              'To repeat earlier data word for word',
+              'To conclude the entire experiment',
+              'To show agreement with traditional beliefs'
+            ],
+            answer: 0,
+            hint: '"In contrast" marks disagreement or divergence from earlier literature.'
+          }
+        }
+      },
+      {
+        id: 'b_lbe_critical_reading',
+        topic: 'Critical Reading',
+        subtopic: 'Inferences & Underlying Assumptions',
+        skill: 'Implicit Meaning Deduction',
+        indicator: 'Menarik kesimpulan implisit dan mengevaluasi asumsi penulis',
+        judul: 'Critical Reading: Inferences & Author Assumptions',
+        teoriSingkat: 'An inference is a logical conclusion derived from stated facts. The correct answer must be true based on the passage, but not stated word-for-word.',
+        microLesson: {
+          title: 'Avoiding the "Too Broad" Trap in Inference Questions',
+          duration: '4 Menit',
+          type: 'Video Trik',
+          summary: 'Be cautious of extreme words like "always", "never", "entirely". Passages in SNBT usually support nuanced claims.',
+          quiz: {
+            question: 'If a passage states: "Clinical trials showed 85% efficacy with mild side effects in 5% of patients", what can be safely inferred?',
+            options: [
+              'The majority of participants experienced a successful treatment outcome',
+              'All patients became completely immune to the disease',
+              'The vaccine is completely dangerous for everyone',
+              'No further medical supervision is required'
+            ],
+            answer: 0,
+            hint: '85% represents the vast majority with successful outcome.'
+          }
+        }
+      }
+    ]
+  },
+
+  // 7. PENALARAN MATEMATIKA (PM) — TES LITERASI
+  {
+    id: 'm_pm',
+    exam: 'SNBT',
+    test_component: 'TES LITERASI',
+    subtest: 'Penalaran Matematika',
+    code: 'PM',
+    icon: '📊',
+    deskripsi: 'Menguji penalaran matematis berbasis pemecahan masalah dunia nyata, model matematika terapan, dan interpretasi data.',
+    topics: ['Bilangan', 'Aljabar', 'Geometri', 'Data & Ketidakpastian', 'Problem Solving'],
+    babList: [
+      {
+        id: 'b_pm_bilangan',
+        topic: 'Bilangan',
+        subtopic: 'Aritmetika Kontekstual & Skema Keuangan',
+        skill: 'Kalkulasi Praktis Nyata',
+        indicator: 'Menghitung transaksi harian, tarif bertingkat, dan skema biaya',
+        judul: 'Aritmetika Kontekstual: Tarif Bertingkat & Pajak',
+        teoriSingkat: 'Penerapan matematika pada skema tarif bertingkat (tagihan listrik PLN, tarif PDAM, PPh pasal 21 progresif). Setiap rentang pemakaian memiliki tarif per unit yang berbeda.',
+        microLesson: {
+          title: 'Cara Menghitung Tarif Progresif Bertingkat Cepat',
+          duration: '4 Menit',
+          type: 'Flashcard Formula',
+          summary: 'Pecah kuantitas pemakaian ke dalam blok-blok tarif, hitung biaya tiap blok, lalu jumlahkan totalnya.',
+          quiz: {
+            question: 'Tarif air PDAM: 10 m³ pertama Rp2.000/m³, 10 m³ kedua Rp3.000/m³, selebihnya Rp5.000/m³. Berapa biaya pemakaian 25 m³?',
+            options: ['Rp75.000', 'Rp65.000', 'Rp85.000', 'Rp70.000'],
+            answer: 0,
+            hint: 'Blok 1 (10 m³) = 20.000; Blok 2 (10 m³) = 30.000; Blok 3 (5 m³) = 25.000. Total = 20.000 + 30.000 + 25.000 = Rp75.000.'
+          }
+        }
+      },
+      {
+        id: 'b_pm_aljabar',
+        topic: 'Aljabar',
+        subtopic: 'Model Sistem Persamaan (SPLDV) Nyata',
+        skill: 'Formulasi Model Matematis',
+        indicator: 'Mengubah skenario cerita ke persamaan dan mencari solusi optimal',
+        judul: 'Pemodelan Matematika: SPLDV & Optimasi Biaya',
+        teoriSingkat: 'Langkah memecahkan soal cerita matematika: 1. Tetapkan pemisalan variabel (misal x = harga tiket dewasa, y = tiket anak); 2. Susun sistem persamaan; 3. Selesaikan dengan eliminasi-substitusi.',
+        microLesson: {
+          title: 'Menyelesaikan Soal Cerita Ekonomi dalam 60 Detik',
+          duration: '5 Menit',
+          type: 'Video Trik',
+          summary: 'Definisikan variabel dengan jelas. Kurangkan dua persamaan langsung jika koefisien salah satu variabel mudah disamakan.',
+          quiz: {
+            question: 'Harga 2 buku dan 3 pensil adalah Rp12.000. Harga 3 buku dan 1 pensil adalah Rp11.000. Berapakah harga 1 buku?',
+            options: ['Rp3.000', 'Rp2.000', 'Rp4.000', 'Rp2.500'],
+            answer: 0,
+            hint: '2x + 3y = 12000. 3x + y = 11000 (kalikan 3: 9x + 3y = 33000). Kurangkan: 7x = 21000 => x = Rp3.000.'
+          }
+        }
+      },
+      {
+        id: 'b_pm_geometri',
+        topic: 'Geometri',
+        subtopic: 'Aplikasi Geometri Ruang & Konstruksi Fisik',
+        skill: 'Kalkulasi Dimensi Nyata',
+        indicator: 'Menghitung kebutuhan luas bahan atau volume kapasitas tangki',
+        judul: 'Aplikasi Geometri: Volume Wadah & Estimasi Bahan',
+        teoriSingkat: 'Penerapan geometri pada dunia teknik dan konstruksi: menghitung daya tampung kolam renang, luas dinding yang akan dicat, atau kapasitas tangki bahan bakar.',
+        microLesson: {
+          title: 'Konversi Satuan Volume dan Liter Tanpa Bingung',
+          duration: '4 Menit',
+          type: 'Visual Diagram',
+          summary: '1 Liter = 1 dm³ = 1.000 cm³. Ubah semua ukuran panjang ke desimeter (dm) terlebih dahulu agar hasil langsung dalam Liter.',
+          quiz: {
+            question: 'Sebuah tangki air berbentuk silinder memiliki jari-jari alas 7 dm dan tinggi 20 dm. Berapa liter volume air jika terisi 80%? (π = 22/7)',
+            options: ['2.464 Liter', '3.080 Liter', '1.971,2 Liter', '2.150 Liter'],
+            answer: 0,
+            hint: 'Volume total = 22/7 * 7 * 7 * 20 = 3.080 Liter. Terisi 80% = 0.8 * 3080 = 2.464 Liter.'
+          }
+        }
+      },
+      {
+        id: 'b_pm_data',
+        topic: 'Data & Ketidakpastian',
+        subtopic: 'Interpretasi Infografis, Grafik & Tabel Data',
+        skill: 'Literasi Visual Data',
+        indicator: 'Menganalisis tren dari grafik garis, diagram batang, dan tabel statistik',
+        judul: 'Literasi Data: Interpretasi Grafik, Tren, & Peluang Resiko',
+        teoriSingkat: 'Soal menyajikan tabel data sensus atau diagram batang/garis. Pertanyaan menguji persentase kenaikan/penurunan terbesar, laju perubahan rata-rata, atau proyeksi nilai berikutnya.',
+        microLesson: {
+          title: 'Membaca Infografis & Persentase Perubahan Cepat',
+          duration: '4 Menit',
+          type: 'Visual Guide',
+          summary: 'Persentase perubahan = (Nilai Akhir - Nilai Awal) / Nilai Awal × 100%. Jangan terbalik membagi dengan nilai akhir.',
+          quiz: {
+            question: 'Penjualan toko meningkat dari 200 unit pada Januari menjadi 250 unit pada Februari. Berapa persentase peningkatannya?',
+            options: ['25%', '20%', '50%', '30%'],
+            answer: 0,
+            hint: 'Kenaikan = 250 - 200 = 50. Persentase = 50 / 200 * 100% = 25%.'
+          }
+        }
+      },
+      {
+        id: 'b_pm_problem_solving',
+        topic: 'Problem Solving',
+        subtopic: 'Pemecahan Masalah Multilangkah & Optimasi',
+        skill: 'Strategic Problem Solving',
+        indicator: 'Menyusun strategi bertahap untuk memecahkan dilema logis kompleks',
+        judul: 'Problem Solving: Optimasi Sumber Daya & Skenario Alternatif',
+        teoriSingkat: 'Menguji penalaran memilih alternatif solusi terbaik (paling hemat biaya, paling hemat waktu, atau kapasitas tertinggi) dari sejumlah opsi yang dibatasi kendala.',
+        microLesson: {
+          title: 'Strategi Eliminasi Skenario Tak Optimal',
+          duration: '5 Menit',
+          type: 'Case Study Step-by-Step',
+          summary: 'Hitung nilai ekstrem pada masing-masing skenario untuk langsung membuang opsi yang melanggar batas kendala.',
+          quiz: {
+            question: 'Truk A mengangkut 4 ton dengan sewa Rp500.000. Truk B mengangkut 6 ton dengan sewa Rp700.000. Untuk mengangkut 24 ton, kombinasi paling hemat biaya adalah...',
+            options: [
+              '4 Truk B (Biaya Rp2.800.000, angkut 24 ton)',
+              '6 Truk A (Biaya Rp3.000.000, angkut 24 ton)',
+              '3 Truk A dan 2 Truk B (Biaya Rp2.900.000)',
+              'Semua kombinasi biayanya sama'
+            ],
+            answer: 0,
+            hint: 'Biaya per ton Truk B = 700.000/6 ≈ 116.666/ton. Truk A = 500.000/4 = 125.000/ton. Menggunakan 4 Truk B = 4 * 700.000 = Rp2.800.000 (termurah).'
           }
         }
       }
@@ -297,11 +1100,16 @@ export const MATERI_UTBK = [
   }
 ];
 
+// ============================================================================
+// MICRO LESSONS (Flat list for direct access/widgets)
+// ============================================================================
 export const MICRO_LESSONS = MATERI_UTBK.flatMap(m => 
   m.babList.map(b => ({
     id: b.id,
-    subject: m.subtes.includes('TPS') || m.subtes.includes('PU') || m.subtes.includes('PK') || m.subtes.includes('PBM') || m.subtes.includes('PPU') ? 'TPS' : 'Literasi',
-    topic: m.subtes,
+    subject: m.test_component || (m.subtes.includes('TPS') || m.subtes.includes('PU') || m.subtes.includes('PK') || m.subtes.includes('PBM') || m.subtes.includes('PPU') ? 'TPS' : 'Literasi'),
+    topic: b.topic,
+    subtopic: b.subtopic,
+    subtes: m.subtest,
     title: b.microLesson.title,
     duration: b.microLesson.duration,
     type: b.microLesson.type,
@@ -311,6 +1119,9 @@ export const MICRO_LESSONS = MATERI_UTBK.flatMap(m =>
   }))
 );
 
+// ============================================================================
+// DIAGNOSTIC QUESTIONS
+// ============================================================================
 export const DIAGNOSTIC_QUESTIONS = [
   {
     id: 'q1',
@@ -438,16 +1249,18 @@ export const DIAGNOSTIC_QUESTIONS = [
   }
 ];
 
-// GENERATE 155 FULL DOCK QUESTIONS ACCORDING TO OFFICIAL UTBK SNBT SUBTESTS
+// ============================================================================
+// SIMULATOR QUESTIONS GENERATOR
+// ============================================================================
 export const generateFull155Questions = () => {
   const categories = {
     PU: { subject: 'TPS', name: 'Penalaran Umum', total: 30, baseQuestion: 'Jika pemerintah menaikkan subsidi energi, maka harga barang pokok stabil. Jika harga barang pokok stabil, daya beli masyarakat meningkat.' },
     PK: { subject: 'TPS', name: 'Pengetahuan Kuantitatif', total: 15, baseQuestion: 'Berapakah nilai dari x jika diketahui 3x + 2y = 24 dan y adalah bilangan prima genap?' },
     PBM: { subject: 'TPS', name: 'Pemahaman Bacaan & Menulis', total: 20, baseQuestion: 'Manakah penulisan kalimat di bawah ini yang menggunakan konjungsi antarkalimat secara tepat?' },
     PPU: { subject: 'TPS', name: 'Pengetahuan & Pemahaman Umum', total: 20, baseQuestion: 'Makna kata "konsensus" pada paragraf kedua wacana di atas adalah...' },
-    LIndo: { subject: 'Literasi', name: 'Literasi Bahasa Indonesia', total: 30, baseQuestion: 'Berdasarkan wacana tentang transisi energi hijau, apakah argumen utama yang disampaikan oleh peneliti?' },
-    LEng: { subject: 'Literasi', name: 'Literasi Bahasa Inggris', total: 20, baseQuestion: 'According to paragraph 2, what factor contributes most significantly to urban heat islands?' },
-    PM: { subject: 'Literasi', name: 'Penalaran Matematika', total: 20, baseQuestion: 'Sebuah perusahaan logistik memiliki dua armada truk A dan B. Truk A mampu mengangkut 4 ton barang...' }
+    LIndo: { subject: 'TES LITERASI', name: 'Literasi Bahasa Indonesia', total: 30, baseQuestion: 'Berdasarkan wacana tentang transisi energi hijau, apakah argumen utama yang disampaikan oleh peneliti?' },
+    LEng: { subject: 'TES LITERASI', name: 'Literasi Bahasa Inggris', total: 20, baseQuestion: 'According to paragraph 2, what factor contributes most significantly to urban heat islands?' },
+    PM: { subject: 'TES LITERASI', name: 'Penalaran Matematika', total: 20, baseQuestion: 'Sebuah perusahaan logistik memiliki dua armada truk A dan B. Truk A mampu mengangkut 4 ton barang...' }
   };
 
   const list = {};

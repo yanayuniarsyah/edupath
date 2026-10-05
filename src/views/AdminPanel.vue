@@ -340,31 +340,42 @@
             <div class="p-2.5 border-b border-white/10 flex gap-2 bg-black/20">
               <input v-model="qSearch" type="text" placeholder="Cari soal..." class="flex-grow px-3 py-1.5 text-[11px] text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50" />
               <select v-model="qSubMateri" class="px-2.5 py-1.5 text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg outline-none cursor-pointer">
-                <option value="all" class="bg-[#0d1427]">Semua Subtes & Topik</option>
-                <optgroup label="7 Subtes UTBK SNBT" class="bg-[#0d1427] font-bold text-[#c0ff00]">
+                <option value="all" class="bg-[#0d1427]">Semua Komponen & Subtes</option>
+                <optgroup label="Komponen: TPS" class="bg-[#0d1427] font-bold text-[#c0ff00]">
                   <option value="Penalaran Umum" class="bg-[#0d1427]">Penalaran Umum (PU)</option>
-                  <option value="Pengetahuan Kuantitatif" class="bg-[#0d1427]">Pengetahuan Kuantitatif (PK)</option>
-                  <option value="Pemahaman Bacaan & Menulis" class="bg-[#0d1427]">Pemahaman Bacaan & Menulis (PBM)</option>
                   <option value="Pengetahuan & Pemahaman Umum" class="bg-[#0d1427]">Pengetahuan & Pemahaman Umum (PPU)</option>
+                  <option value="Pemahaman Bacaan & Menulis" class="bg-[#0d1427]">Pemahaman Bacaan & Menulis (PBM)</option>
+                  <option value="Pengetahuan Kuantitatif" class="bg-[#0d1427]">Pengetahuan Kuantitatif (PK)</option>
+                </optgroup>
+                <optgroup label="Komponen: TES LITERASI" class="bg-[#0d1427] font-bold text-sky-400">
                   <option value="Literasi Bahasa Indonesia" class="bg-[#0d1427]">Literasi Bahasa Indonesia (LBI)</option>
                   <option value="Literasi Bahasa Inggris" class="bg-[#0d1427]">Literasi Bahasa Inggris (LBE)</option>
                   <option value="Penalaran Matematika" class="bg-[#0d1427]">Penalaran Matematika (PM)</option>
                 </optgroup>
-                <optgroup label="Sub-Materi / Topik Khusus" class="bg-[#0d1427] font-bold text-indigo-400">
-                  <option value="Penalaran Deduktif" class="bg-[#0d1427]">Penalaran Deduktif</option>
-                  <option value="Penalaran Induktif" class="bg-[#0d1427]">Penalaran Induktif</option>
-                  <option value="Penalaran Analitik" class="bg-[#0d1427]">Penalaran Analitik</option>
-                  <option value="Pola Bilangan" class="bg-[#0d1427]">Pola Bilangan</option>
-                  <option value="Aljabar Dasar" class="bg-[#0d1427]">Aljabar Dasar</option>
-                  <option value="Statistika" class="bg-[#0d1427]">Statistika</option>
-                  <option value="Geometri" class="bg-[#0d1427]">Geometri</option>
-                  <option value="Aritmatika" class="bg-[#0d1427]">Aritmatika</option>
-                  <option value="Kalimat Efektif" class="bg-[#0d1427]">Kalimat Efektif</option>
-                  <option value="Ide Pokok" class="bg-[#0d1427]">Ide Pokok</option>
-                  <option value="PUEBI" class="bg-[#0d1427]">PUEBI / Ejaan</option>
-                  <option value="Matematika Dasar" class="bg-[#0d1427]">Matematika Dasar</option>
-                  <option value="Fisika Kuantum" class="bg-[#0d1427]">Fisika Kuantum</option>
-                  <option value="Bahasa Indonesia" class="bg-[#0d1427]">Bahasa Indonesia</option>
+                <optgroup label="Topik Resmi SNBT" class="bg-[#0d1427] font-bold text-indigo-400">
+                  <option value="Induktif" class="bg-[#0d1427]">Topik: Induktif</option>
+                  <option value="Deduktif" class="bg-[#0d1427]">Topik: Deduktif</option>
+                  <option value="Kuantitatif" class="bg-[#0d1427]">Topik: Kuantitatif</option>
+                  <option value="Kosakata" class="bg-[#0d1427]">Topik: Kosakata</option>
+                  <option value="Makna Kontekstual" class="bg-[#0d1427]">Topik: Makna Kontekstual</option>
+                  <option value="Hubungan Informasi" class="bg-[#0d1427]">Topik: Hubungan Informasi</option>
+                  <option value="Pemahaman Bacaan" class="bg-[#0d1427]">Topik: Pemahaman Bacaan</option>
+                  <option value="Menulis" class="bg-[#0d1427]">Topik: Menulis</option>
+                  <option value="Bilangan" class="bg-[#0d1427]">Topik: Bilangan</option>
+                  <option value="Aljabar" class="bg-[#0d1427]">Topik: Aljabar</option>
+                  <option value="Geometri" class="bg-[#0d1427]">Topik: Geometri</option>
+                  <option value="Statistika" class="bg-[#0d1427]">Topik: Statistika</option>
+                  <option value="Perbandingan" class="bg-[#0d1427]">Topik: Perbandingan</option>
+                  <option value="Pemahaman" class="bg-[#0d1427]">Topik: Pemahaman (LBI)</option>
+                  <option value="Analisis" class="bg-[#0d1427]">Topik: Analisis (LBI)</option>
+                  <option value="Evaluasi" class="bg-[#0d1427]">Topik: Evaluasi (LBI)</option>
+                  <option value="Integrasi Informasi" class="bg-[#0d1427]">Topik: Integrasi Informasi</option>
+                  <option value="Vocabulary" class="bg-[#0d1427]">Topik: Vocabulary (LBE)</option>
+                  <option value="Reading Comprehension" class="bg-[#0d1427]">Topik: Reading Comprehension</option>
+                  <option value="Text Analysis" class="bg-[#0d1427]">Topik: Text Analysis</option>
+                  <option value="Critical Reading" class="bg-[#0d1427]">Topik: Critical Reading</option>
+                  <option value="Data & Ketidakpastian" class="bg-[#0d1427]">Topik: Data & Ketidakpastian</option>
+                  <option value="Problem Solving" class="bg-[#0d1427]">Topik: Problem Solving</option>
                 </optgroup>
               </select>
             </div>
@@ -380,9 +391,11 @@
               <table class="w-full text-[11px]">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider w-1/2">Soal</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Sub Materi</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Kategori & Level</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider w-4/12">Pertanyaan</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Komponen & Subtes</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Topik & Subtopik</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Skill / Kompetensi</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Tipe & Level</th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status QC</th>
                     <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
@@ -390,13 +403,29 @@
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="q in filteredQuestions" :key="q.id" class="hover:bg-white/5 transition-colors">
                     <td class="px-3 py-2">
-                      <div class="line-clamp-2 text-white/80">{{ q.question }}</div>
+                      <div class="line-clamp-2 text-white/80 font-medium">{{ q.question }}</div>
                     </td>
-                    <td class="px-3 py-2 font-bold text-white">{{ q.sub_materi || q.subtes }}</td>
+                    <td class="px-3 py-2">
+                      <div class="flex flex-col gap-0.5">
+                        <span class="text-[9px] font-black uppercase tracking-wider text-[#c0ff00]">{{ q.test_component || 'TPS' }}</span>
+                        <span class="font-bold text-white text-[11px]">{{ q.subtest || q.sub_materi || q.subtes }}</span>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2">
+                      <div class="flex flex-col gap-0.5">
+                        <span v-if="q.topic" class="text-[10px] font-bold text-indigo-300">{{ q.topic }}</span>
+                        <span v-if="q.subtopic" class="text-[9px] text-white/50">{{ q.subtopic }}</span>
+                        <span v-if="!q.topic && !q.subtopic" class="text-[9px] text-white/30 italic">-</span>
+                      </div>
+                    </td>
+                    <td class="px-3 py-2">
+                      <span v-if="q.skill" class="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">{{ q.skill }}</span>
+                      <span v-else class="text-[9px] text-white/30 italic">-</span>
+                    </td>
                     <td class="px-3 py-2">
                       <div class="flex flex-col gap-0.5 items-start">
                         <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 uppercase">{{ q.usage_type || q.classification || 'Latihan' }}</span>
-                        <span class="text-[9px] text-white/40 font-bold">{{ q.cognitive_demand || 'C3' }}</span>
+                        <span class="text-[9px] text-white/40 font-bold uppercase">{{ q.difficulty || 'medium' }} • {{ q.cognitive_demand || 'C3' }}</span>
                       </div>
                     </td>
                     <td class="px-3 py-2">
@@ -404,8 +433,8 @@
                       <span v-else class="px-2 py-0.5 text-[9px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-md">Belum QC</span>
                     </td>
                     <td class="px-3 py-2 text-right space-x-2">
-                      <button @click="openQuestionModal(q)" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
-                      <button @click="deleteQuestion(q.id)" class="text-rose-400 hover:text-rose-300 font-bold"><i class="ph-bold ph-trash text-sm"></i></button>
+                      <button @click="openQuestionModal(q)" class="text-indigo-400 hover:text-indigo-300 font-bold" title="Edit Soal"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
+                      <button @click="deleteQuestion(q.id)" class="text-rose-400 hover:text-rose-300 font-bold" title="Hapus Soal"><i class="ph-bold ph-trash text-sm"></i></button>
                     </td>
                   </tr>
                 </tbody>
@@ -1112,34 +1141,76 @@
           <button @click="closeQuestionModal" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
         </div>
         <form @submit.prevent="saveQuestion" class="p-4 space-y-3">
+          <!-- Row 1: Ujian & Komponen -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes / Sub Materi</label>
-              <input v-model="qForm.sub_materi" list="subMateriListOptions" placeholder="Pilih / ketik sub materi..." required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
-              <datalist id="subMateriListOptions">
-                <option value="Penalaran Umum"></option>
-                <option value="Pengetahuan Kuantitatif"></option>
-                <option value="Pemahaman Bacaan & Menulis"></option>
-                <option value="Pengetahuan & Pemahaman Umum"></option>
-                <option value="Literasi Bahasa Indonesia"></option>
-                <option value="Literasi Bahasa Inggris"></option>
-                <option value="Penalaran Matematika"></option>
-                <option value="Penalaran Deduktif"></option>
-                <option value="Penalaran Induktif"></option>
-                <option value="Penalaran Analitik"></option>
-                <option value="Pola Bilangan"></option>
-                <option value="Aljabar Dasar"></option>
-                <option value="Statistika"></option>
-                <option value="Geometri"></option>
-                <option value="Aritmatika"></option>
-                <option value="Kalimat Efektif"></option>
-                <option value="Ide Pokok"></option>
-                <option value="PUEBI"></option>
-                <option value="Matematika Dasar"></option>
-                <option value="Fisika Kuantum"></option>
-                <option value="Bahasa Indonesia"></option>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Ujian</label>
+              <input v-model="qForm.exam" readonly class="w-full p-2 text-xs text-white/70 bg-black/40 border border-white/10 rounded-lg outline-none cursor-not-allowed font-medium" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komponen Ujian</label>
+              <select v-model="qForm.test_component" @change="onQComponentChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option v-for="c in qAvailableComponents" :key="c.name" :value="c.name" class="bg-[#0d1427] text-white">{{ c.label || c.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 2: Subtes & Topik -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes</label>
+              <select v-model="qForm.subtest" @change="onQSubtestChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option v-for="s in qAvailableSubtests" :key="s.name" :value="s.name" class="bg-[#0d1427] text-white">{{ s.name }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Topik</label>
+              <select v-model="qForm.topic" @change="onQTopicChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option v-for="t in qAvailableTopics" :key="t.name" :value="t.name" class="bg-[#0d1427] text-white">{{ t.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 3: Subtopik & Skill -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtopik</label>
+              <input v-model="qForm.subtopic" list="qSubtopicDatalist" placeholder="e.g. Pola Bilangan..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <datalist id="qSubtopicDatalist">
+                <option v-for="st in (qCurrentTopicObj?.subtopics || [])" :key="st" :value="st"></option>
               </datalist>
             </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Skill / Kompetensi</label>
+              <input v-model="qForm.skill" list="qSkillDatalist" placeholder="e.g. Identifikasi Pola..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <datalist id="qSkillDatalist">
+                <option v-for="sk in (qCurrentTopicObj?.skills || [])" :key="sk" :value="sk"></option>
+              </datalist>
+            </div>
+          </div>
+
+          <!-- Row 4: Indikator & Tipe Soal -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Indikator Soal</label>
+              <input v-model="qForm.indicator" list="qIndicatorDatalist" placeholder="e.g. Menentukan pola berikutnya..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <datalist id="qIndicatorDatalist">
+                <option v-for="ind in (qCurrentTopicObj?.indicators || [])" :key="ind" :value="ind"></option>
+              </datalist>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tipe Soal</label>
+              <select v-model="qForm.question_type" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option value="multiple_choice" class="bg-[#0d1427] text-white">Pilihan Ganda (A-E)</option>
+                <option value="complex_mcq" class="bg-[#0d1427] text-white">Pilihan Ganda Kompleks</option>
+                <option value="short_answer" class="bg-[#0d1427] text-white">Isian Singkat</option>
+                <option value="true_false" class="bg-[#0d1427] text-white">Pernyataan Benar / Salah</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 5: Kesulitan, Penggunaan, Kognitif & QC -->
+          <div class="grid grid-cols-3 gap-3">
             <div>
               <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tingkat Kesulitan</label>
               <select v-model="qForm.difficulty" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
@@ -1148,14 +1219,12 @@
                 <option value="hard" class="bg-[#0d1427] text-white">Sulit</option>
               </select>
             </div>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kategori Penggunaan</label>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Penggunaan</label>
               <select v-model="qForm.usage_type" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option value="latihan" class="bg-[#0d1427] text-white">Latihan Harian</option>
                 <option value="tryout" class="bg-[#0d1427] text-white">Tryout Resmi</option>
-                <option value="diagnostik" class="bg-[#0d1427] text-white">Asesmen Diagnostik</option>
+                <option value="diagnostik" class="bg-[#0d1427] text-white">Diagnostik</option>
               </select>
             </div>
             <div>
@@ -1173,7 +1242,7 @@
 
           <div class="flex items-center gap-2 pt-1">
             <input type="checkbox" id="qc_passed" v-model="qForm.is_qc_passed" :true-value="1" :false-value="0" class="w-3.5 h-3.5 text-[#c0ff00] bg-black/40 border-white/20 rounded focus:ring-[#c0ff00]">
-            <label for="qc_passed" class="text-xs font-bold text-white/80 cursor-pointer">Telah Melewati Proses QC (Guru)</label>
+            <label for="qc_passed" class="text-xs font-bold text-white/80 cursor-pointer">Telah Melewati Proses QC (Guru / Superadmin)</label>
           </div>
           <div>
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pertanyaan</label>
@@ -1213,25 +1282,37 @@
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Judul Materi</label>
             <input v-model="mForm.title" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
-          <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes / Sub Materi</label>
-            <input v-model="mForm.sub_materi" list="materiSubListOptions" placeholder="Pilih / ketik sub materi..." required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
-            <datalist id="materiSubListOptions">
-              <option value="Penalaran Umum"></option>
-              <option value="Pengetahuan Kuantitatif"></option>
-              <option value="Pemahaman Bacaan & Menulis"></option>
-              <option value="Pengetahuan & Pemahaman Umum"></option>
-              <option value="Literasi Bahasa Indonesia"></option>
-              <option value="Literasi Bahasa Inggris"></option>
-              <option value="Penalaran Matematika"></option>
-              <option value="Penalaran Deduktif"></option>
-              <option value="Penalaran Induktif"></option>
-              <option value="Aljabar Dasar"></option>
-              <option value="Statistika"></option>
-              <option value="Geometri"></option>
-              <option value="Kalimat Efektif"></option>
-              <option value="Ide Pokok"></option>
-            </datalist>
+          <!-- Komponen & Subtes -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komponen Ujian</label>
+              <select v-model="mForm.test_component" @change="onMComponentChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option v-for="c in mAvailableComponents" :key="c.name" :value="c.name" class="bg-[#0d1427] text-white">{{ c.label || c.name }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes</label>
+              <select v-model="mForm.subtest" @change="onMSubtestChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option v-for="s in mAvailableSubtests" :key="s.name" :value="s.name" class="bg-[#0d1427] text-white">{{ s.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Topik & Subtopik -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Topik</label>
+              <select v-model="mForm.topic" @change="onMTopicChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option v-for="t in mAvailableTopics" :key="t.name" :value="t.name" class="bg-[#0d1427] text-white">{{ t.name }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtopik</label>
+              <input v-model="mForm.subtopic" list="mSubtopicDatalist" placeholder="e.g. Pola Bilangan..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <datalist id="mSubtopicDatalist">
+                <option v-for="st in (mCurrentTopicObj?.subtopics || [])" :key="st" :value="st"></option>
+              </datalist>
+            </div>
           </div>
           <div>
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Guru / Penanggung Jawab</label>
@@ -1260,6 +1341,7 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api';
+import { SNBT_TAXONOMY } from '../EduData.js';
 
 const router = useRouter()
 
@@ -1549,7 +1631,70 @@ const serverQuestions = ref([]);
 const questionsLoading = ref(false);
 const showQuestionModal = ref(false);
 const isEditingQuestion = ref(false);
-const qForm = reactive({ id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', is_qc_passed: 0, explanation: '' });
+
+const qForm = reactive({
+  id: null,
+  exam: 'SNBT',
+  test_component: 'TPS',
+  subtest: 'Penalaran Umum',
+  sub_materi: 'Penalaran Umum',
+  topic: 'Induktif',
+  subtopic: 'Pola Bilangan',
+  skill: 'Identifikasi Pola',
+  indicator: 'Menentukan pola berikutnya',
+  question_type: 'multiple_choice',
+  difficulty: 'medium',
+  question: '',
+  option_a: '',
+  option_b: '',
+  option_c: '',
+  option_d: '',
+  option_e: '',
+  correct: 'a',
+  usage_type: 'latihan',
+  cognitive_demand: 'C3',
+  source_type: 'author_created',
+  rights_status: 'verified',
+  is_qc_passed: 1,
+  explanation: ''
+});
+
+// Cascading helpers for Question Form
+const qAvailableComponents = computed(() => SNBT_TAXONOMY?.components || []);
+
+const qAvailableSubtests = computed(() => {
+  const comp = qAvailableComponents.value.find(c => c.name === qForm.test_component);
+  return comp ? comp.subtests : [];
+});
+
+const qAvailableTopics = computed(() => {
+  const sub = qAvailableSubtests.value.find(s => s.name === qForm.subtest);
+  return sub ? sub.topics : [];
+});
+
+const qCurrentTopicObj = computed(() => {
+  return qAvailableTopics.value.find(t => t.name === qForm.topic) || null;
+});
+
+const onQComponentChange = () => {
+  const firstSub = qAvailableSubtests.value[0]?.name || '';
+  qForm.subtest = firstSub;
+  onQSubtestChange();
+};
+
+const onQSubtestChange = () => {
+  qForm.sub_materi = qForm.subtest;
+  const firstTopic = qAvailableTopics.value[0]?.name || '';
+  qForm.topic = firstTopic;
+  onQTopicChange();
+};
+
+const onQTopicChange = () => {
+  const topObj = qCurrentTopicObj.value;
+  qForm.subtopic = topObj?.subtopics?.[0] || '';
+  qForm.skill = topObj?.skills?.[0] || '';
+  qForm.indicator = topObj?.indicators?.[0] || '';
+};
 
 const fetchQuestions = async () => {
   questionsLoading.value = true;
@@ -1569,14 +1714,18 @@ const filteredQuestions = computed(() => {
     const sM = qSubMateri.value.toLowerCase();
     list = list.filter(q => 
       (q.sub_materi && q.sub_materi.toLowerCase().includes(sM)) || 
-      (q.subtes && q.subtes.toLowerCase().includes(sM))
+      (q.subtest && q.subtest.toLowerCase().includes(sM)) ||
+      (q.topic && q.topic.toLowerCase().includes(sM))
     );
   }
   if (qSearch.value) {
     const s = qSearch.value.toLowerCase();
     list = list.filter(q => 
       (q.question && q.question.toLowerCase().includes(s)) ||
-      (q.sub_materi && q.sub_materi.toLowerCase().includes(s))
+      (q.sub_materi && q.sub_materi.toLowerCase().includes(s)) ||
+      (q.subtest && q.subtest.toLowerCase().includes(s)) ||
+      (q.topic && q.topic.toLowerCase().includes(s)) ||
+      (q.skill && q.skill.toLowerCase().includes(s))
     );
   }
   return list;
@@ -1585,10 +1734,55 @@ const filteredQuestions = computed(() => {
 const openQuestionModal = (q = null) => {
   if (q) {
     isEditingQuestion.value = true;
-    Object.assign(qForm, q);
+    let comp = q.test_component || '';
+    const sub = q.subtest || q.sub_materi || 'Penalaran Umum';
+    if (!comp) {
+      const isLiterasi = ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(sub);
+      comp = isLiterasi ? 'TES LITERASI' : 'TPS';
+    }
+    Object.assign(qForm, {
+      ...q,
+      exam: q.exam || 'SNBT',
+      test_component: comp,
+      subtest: sub,
+      sub_materi: sub,
+      topic: q.topic || q.bab || 'Induktif',
+      subtopic: q.subtopic || '',
+      skill: q.skill || '',
+      indicator: q.indicator || '',
+      question_type: q.question_type || 'multiple_choice',
+      usage_type: q.usage_type || 'latihan',
+      cognitive_demand: q.cognitive_demand || 'C3',
+      is_qc_passed: q.is_qc_passed ? 1 : 0
+    });
   } else {
     isEditingQuestion.value = false;
-    Object.assign(qForm, { id: null, sub_materi: 'Penalaran Umum', difficulty: 'medium', question: '', option_a: '', option_b: '', option_c: '', option_d: '', option_e: '', correct: 'a', usage_type: 'latihan', cognitive_demand: 'C3', source_type: 'author_created', rights_status: 'unknown', is_qc_passed: 0, explanation: '' });
+    Object.assign(qForm, {
+      id: null,
+      exam: 'SNBT',
+      test_component: 'TPS',
+      subtest: 'Penalaran Umum',
+      sub_materi: 'Penalaran Umum',
+      topic: 'Induktif',
+      subtopic: 'Pola Bilangan',
+      skill: 'Identifikasi Pola',
+      indicator: 'Menentukan pola berikutnya',
+      question_type: 'multiple_choice',
+      difficulty: 'medium',
+      question: '',
+      option_a: '',
+      option_b: '',
+      option_c: '',
+      option_d: '',
+      option_e: '',
+      correct: 'a',
+      usage_type: 'latihan',
+      cognitive_demand: 'C3',
+      source_type: 'author_created',
+      rights_status: 'verified',
+      is_qc_passed: 1,
+      explanation: ''
+    });
   }
   showQuestionModal.value = true;
 };
@@ -1630,7 +1824,54 @@ const serverMaterials = ref([]);
 const materialsLoading = ref(false);
 const showMaterialModal = ref(false);
 const isEditingMaterial = ref(false);
-const mForm = reactive({ id: null, title: '', content: '', sub_materi: 'Penalaran Umum', teacher_name: '' });
+
+const mForm = reactive({
+  id: null,
+  title: '',
+  content: '',
+  exam: 'SNBT',
+  test_component: 'TPS',
+  subtest: 'Penalaran Umum',
+  sub_materi: 'Penalaran Umum',
+  topic: 'Induktif',
+  subtopic: '',
+  teacher_name: ''
+});
+
+// Cascading helpers for Material Form
+const mAvailableComponents = computed(() => SNBT_TAXONOMY?.components || []);
+
+const mAvailableSubtests = computed(() => {
+  const comp = mAvailableComponents.value.find(c => c.name === mForm.test_component);
+  return comp ? comp.subtests : [];
+});
+
+const mAvailableTopics = computed(() => {
+  const sub = mAvailableSubtests.value.find(s => s.name === mForm.subtest);
+  return sub ? sub.topics : [];
+});
+
+const mCurrentTopicObj = computed(() => {
+  return mAvailableTopics.value.find(t => t.name === mForm.topic) || null;
+});
+
+const onMComponentChange = () => {
+  const firstSub = mAvailableSubtests.value[0]?.name || '';
+  mForm.subtest = firstSub;
+  onMSubtestChange();
+};
+
+const onMSubtestChange = () => {
+  mForm.sub_materi = mForm.subtest;
+  const firstTopic = mAvailableTopics.value[0]?.name || '';
+  mForm.topic = firstTopic;
+  onMTopicChange();
+};
+
+const onMTopicChange = () => {
+  const topObj = mCurrentTopicObj.value;
+  mForm.subtopic = topObj?.subtopics?.[0] || '';
+};
 
 const fetchMaterials = async () => {
   materialsLoading.value = true;
@@ -1648,7 +1889,12 @@ const filteredMaterials = computed(() => {
   let list = serverMaterials.value;
   if (mSearch.value) {
     const s = mSearch.value.toLowerCase();
-    list = list.filter(m => (m.title && m.title.toLowerCase().includes(s)) || (m.sub_materi && m.sub_materi.toLowerCase().includes(s)));
+    list = list.filter(m => 
+      (m.title && m.title.toLowerCase().includes(s)) || 
+      (m.sub_materi && m.sub_materi.toLowerCase().includes(s)) ||
+      (m.subtest && m.subtest.toLowerCase().includes(s)) ||
+      (m.topic && m.topic.toLowerCase().includes(s))
+    );
   }
   return list;
 });
@@ -1656,10 +1902,38 @@ const filteredMaterials = computed(() => {
 const openMaterialModal = (m = null) => {
   if (m) {
     isEditingMaterial.value = true;
-    Object.assign(mForm, m);
+    let comp = m.test_component || '';
+    const sub = m.subtest || m.sub_materi || 'Penalaran Umum';
+    if (!comp) {
+      const isLiterasi = ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(sub);
+      comp = isLiterasi ? 'TES LITERASI' : 'TPS';
+    }
+    Object.assign(mForm, {
+      ...m,
+      exam: m.exam || 'SNBT',
+      test_component: comp,
+      subtest: sub,
+      sub_materi: sub,
+      topic: m.topic || 'Induktif',
+      subtopic: m.subtopic || '',
+      teacher_name: m.teacher_name || '',
+      title: m.title || '',
+      content: m.content || ''
+    });
   } else {
     isEditingMaterial.value = false;
-    Object.assign(mForm, { id: null, title: '', content: '', sub_materi: 'Penalaran Umum', teacher_name: '' });
+    Object.assign(mForm, {
+      id: null,
+      exam: 'SNBT',
+      test_component: 'TPS',
+      subtest: 'Penalaran Umum',
+      sub_materi: 'Penalaran Umum',
+      topic: 'Induktif',
+      subtopic: '',
+      teacher_name: '',
+      title: '',
+      content: ''
+    });
   }
   showMaterialModal.value = true;
 };

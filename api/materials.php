@@ -33,17 +33,33 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     
     // 4. FETCH RESOURCE
+    $test_component = $_GET['test_component'] ?? '';
+    $topic = $_GET['topic'] ?? '';
+
+    $sql = "SELECT id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, teacher_name, created_at FROM materials WHERE 1=1";
+    $params = [];
     if ($subtes) {
-        $stmt = $pdo->prepare("SELECT id, subtes, title, content FROM materials WHERE subtes = ?");
-        $stmt->execute([$subtes]);
-    } else {
-        $stmt = $pdo->query("SELECT id, subtes, title, content FROM materials");
+        $sql .= " AND (subtest = ? OR subtest LIKE ?)";
+        $params[] = $subtes;
+        $params[] = "%$subtes%";
     }
+    if ($test_component && $test_component !== 'all') {
+        $sql .= " AND test_component = ?";
+        $params[] = $test_component;
+    }
+    if ($topic && $topic !== 'all') {
+        $sql .= " AND topic = ?";
+        $params[] = $topic;
+    }
+    $sql .= " ORDER BY created_at DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     
     // 5. STANDARD RESPONSE
     echo json_encode([
         "success" => true,
-        "data" => $stmt->fetchAll()
+        "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)
     ]);
 } else {
     http_response_code(404);

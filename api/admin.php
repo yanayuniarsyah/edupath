@@ -743,56 +743,218 @@ elseif ($action === 'plans') {
 }
 elseif ($action === 'questions') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        echo json_encode($pdo->query("SELECT * FROM questions ORDER BY created_at DESC")->fetchAll());
+        $subtest = $_GET['subtest'] ?? $_GET['sub_materi'] ?? '';
+        $test_component = $_GET['test_component'] ?? '';
+        $topic = $_GET['topic'] ?? '';
+
+        $sql = "SELECT * FROM questions WHERE 1=1";
+        $params = [];
+        if ($subtest && $subtest !== 'all') {
+            $sql .= " AND (subtest = ? OR sub_materi = ?)";
+            $params[] = $subtest;
+            $params[] = $subtest;
+        }
+        if ($test_component && $test_component !== 'all') {
+            $sql .= " AND test_component = ?";
+            $params[] = $test_component;
+        }
+        if ($topic && $topic !== 'all') {
+            $sql .= " AND topic = ?";
+            $params[] = $topic;
+        }
+        $sql .= " ORDER BY created_at DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if ($payload->role !== 'superadmin') {
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
             http_response_code(403);
-            echo json_encode(["error" => "System admin only"]);
+            echo json_encode(["error" => "Admin only"]);
             exit;
         }
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
         
-        $stmt = $pdo->prepare("INSERT INTO questions (id, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, is_qc_passed, classification) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $sub_materi = $input['sub_materi'] ?? $input['subtes'] ?? '';
+        $exam = $input['exam'] ?? 'SNBT';
+        $subtest = $input['subtest'] ?? $input['sub_materi'] ?? $input['subtes'] ?? 'Penalaran Umum';
+        $test_component = $input['test_component'] ?? (
+            (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+        );
+        $topic = $input['topic'] ?? null;
+        $subtopic = $input['subtopic'] ?? null;
+        $skill = $input['skill'] ?? null;
+        $indicator = $input['indicator'] ?? null;
+        $question_type = $input['question_type'] ?? 'multiple_choice';
+
         $is_qc_passed = isset($input['is_qc_passed']) && $input['is_qc_passed'] ? 1 : 0;
         $classification = strtoupper($input['usage_type'] ?? 'LATIHAN');
+
+        $stmt = $pdo->prepare("
+            INSERT INTO questions (
+                id, exam, test_component, subtest, topic, subtopic, skill, indicator, question_type,
+                sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e,
+                correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference,
+                is_qc_passed, classification
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?
+            )
+        ");
         $stmt->execute([
-            $id, $sub_materi, $input['bab']??null, $input['difficulty']??'medium', 
-            $input['question'], $input['option_a'], $input['option_b'], $input['option_c'], 
-            $input['option_d'], $input['option_e']??null, $input['correct'], $input['explanation']??null,
-            $input['cognitive_demand']??null, $input['source_type']??'author_created', $input['rights_status']??'unknown',
-            $input['source_name']??null, $input['source_year']??null, $input['source_reference']??null, $is_qc_passed, $classification
+            $id, $exam, $test_component, $subtest, $topic, $subtopic, $skill, $indicator, $question_type,
+            $subtest, $subtopic ?? $input['bab'] ?? null, $input['difficulty'] ?? 'medium',
+            $input['question'], $input['option_a'], $input['option_b'], $input['option_c'],
+            $input['option_d'], $input['option_e'] ?? null, $input['correct'], $input['explanation'] ?? null,
+            $input['cognitive_demand'] ?? null, $input['source_type'] ?? 'author_created', $input['rights_status'] ?? 'unknown',
+            $input['source_name'] ?? null, $input['source_year'] ?? null, $input['source_reference'] ?? null,
+            $is_qc_passed, $classification
         ]);
         echo json_encode(["success" => true, "id" => $id]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        if ($payload->role !== 'superadmin') {
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
             http_response_code(403);
-            echo json_encode(["error" => "System admin only"]);
+            echo json_encode(["error" => "Admin only"]);
             exit;
         }
         $id = $input['id'] ?? '';
-        $stmt = $pdo->prepare("UPDATE questions SET sub_materi=?, bab=?, difficulty=?, question=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?, correct=?, explanation=?, cognitive_demand=?, source_type=?, rights_status=?, source_name=?, source_year=?, source_reference=?, is_qc_passed=?, classification=? WHERE id=?");
-        $sub_materi = $input['sub_materi'] ?? $input['subtes'] ?? '';
+        $exam = $input['exam'] ?? 'SNBT';
+        $subtest = $input['subtest'] ?? $input['sub_materi'] ?? $input['subtes'] ?? 'Penalaran Umum';
+        $test_component = $input['test_component'] ?? (
+            (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+        );
+        $topic = $input['topic'] ?? null;
+        $subtopic = $input['subtopic'] ?? null;
+        $skill = $input['skill'] ?? null;
+        $indicator = $input['indicator'] ?? null;
+        $question_type = $input['question_type'] ?? 'multiple_choice';
+
         $is_qc_passed = isset($input['is_qc_passed']) && $input['is_qc_passed'] ? 1 : 0;
         $classification = strtoupper($input['usage_type'] ?? 'LATIHAN');
+
+        $stmt = $pdo->prepare("
+            UPDATE questions SET
+                exam=?, test_component=?, subtest=?, topic=?, subtopic=?, skill=?, indicator=?, question_type=?,
+                sub_materi=?, bab=?, difficulty=?, question=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?,
+                correct=?, explanation=?, cognitive_demand=?, source_type=?, rights_status=?, source_name=?, source_year=?, source_reference=?,
+                is_qc_passed=?, classification=?
+            WHERE id=?
+        ");
         $stmt->execute([
-            $sub_materi, $input['bab']??null, $input['difficulty']??'medium', 
-            $input['question'], $input['option_a'], $input['option_b'], $input['option_c'], 
-            $input['option_d'], $input['option_e']??null, $input['correct'], $input['explanation']??null,
-            $input['cognitive_demand']??null, $input['source_type']??'author_created', $input['rights_status']??'unknown',
-            $input['source_name']??null, $input['source_year']??null, $input['source_reference']??null, $is_qc_passed, $classification,
+            $exam, $test_component, $subtest, $topic, $subtopic, $skill, $indicator, $question_type,
+            $subtest, $subtopic ?? $input['bab'] ?? null, $input['difficulty'] ?? 'medium',
+            $input['question'], $input['option_a'], $input['option_b'], $input['option_c'],
+            $input['option_d'], $input['option_e'] ?? null, $input['correct'], $input['explanation'] ?? null,
+            $input['cognitive_demand'] ?? null, $input['source_type'] ?? 'author_created', $input['rights_status'] ?? 'unknown',
+            $input['source_name'] ?? null, $input['source_year'] ?? null, $input['source_reference'] ?? null,
+            $is_qc_passed, $classification,
             $id
         ]);
         echo json_encode(["success" => true]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        if ($payload->role !== 'superadmin') {
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
             http_response_code(403);
-            echo json_encode(["error" => "System admin only"]);
+            echo json_encode(["error" => "Admin only"]);
             exit;
         }
         $id = $_GET['id'] ?? '';
         $pdo->prepare("DELETE FROM questions WHERE id = ?")->execute([$id]);
+        echo json_encode(["success" => true]);
+    }
+}
+elseif ($action === 'materials') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $subtest = $_GET['subtest'] ?? $_GET['sub_materi'] ?? '';
+        $test_component = $_GET['test_component'] ?? '';
+        $topic = $_GET['topic'] ?? '';
+
+        $sql = "SELECT * FROM materials WHERE 1=1";
+        $params = [];
+        if ($subtest && $subtest !== 'all') {
+            $sql .= " AND (subtest = ? OR subtest LIKE ?)";
+            $params[] = $subtest;
+            $params[] = "%$subtest%";
+        }
+        if ($test_component && $test_component !== 'all') {
+            $sql .= " AND test_component = ?";
+            $params[] = $test_component;
+        }
+        if ($topic && $topic !== 'all') {
+            $sql .= " AND topic = ?";
+            $params[] = $topic;
+        }
+        $sql .= " ORDER BY created_at DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+            http_response_code(403);
+            echo json_encode(["error" => "Staff only"]);
+            exit;
+        }
+        $id = bin2hex(random_bytes(16));
+        $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
+
+        $exam = $input['exam'] ?? 'SNBT';
+        $subtest = $input['subtest'] ?? $input['sub_materi'] ?? 'Penalaran Umum';
+        $test_component = $input['test_component'] ?? (
+            (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+        );
+        $topic = $input['topic'] ?? null;
+        $subtopic = $input['subtopic'] ?? null;
+        $skill = $input['skill'] ?? null;
+        $indicator = $input['indicator'] ?? null;
+        $title = trim($input['title'] ?? 'Materi Belajar');
+        $content = $input['content'] ?? '';
+        $teacher_name = $input['teacher_name'] ?? null;
+
+        $stmt = $pdo->prepare("
+            INSERT INTO materials (id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, teacher_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $id, $exam, $test_component, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name
+        ]);
+        echo json_encode(["success" => true, "id" => $id]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+            http_response_code(403);
+            echo json_encode(["error" => "Staff only"]);
+            exit;
+        }
+        $id = $input['id'] ?? '';
+        $exam = $input['exam'] ?? 'SNBT';
+        $subtest = $input['subtest'] ?? $input['sub_materi'] ?? 'Penalaran Umum';
+        $test_component = $input['test_component'] ?? (
+            (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+        );
+        $topic = $input['topic'] ?? null;
+        $subtopic = $input['subtopic'] ?? null;
+        $skill = $input['skill'] ?? null;
+        $indicator = $input['indicator'] ?? null;
+        $title = trim($input['title'] ?? 'Materi Belajar');
+        $content = $input['content'] ?? '';
+        $teacher_name = $input['teacher_name'] ?? null;
+
+        $stmt = $pdo->prepare("
+            UPDATE materials SET
+                exam=?, test_component=?, subtest=?, topic=?, subtopic=?, skill=?, indicator=?, title=?, content=?, teacher_name=?
+            WHERE id=?
+        ");
+        $stmt->execute([
+            $exam, $test_component, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $id
+        ]);
+        echo json_encode(["success" => true]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
+            http_response_code(403);
+            echo json_encode(["error" => "Admin only"]);
+            exit;
+        }
+        $id = $_GET['id'] ?? '';
+        $pdo->prepare("DELETE FROM materials WHERE id = ?")->execute([$id]);
         echo json_encode(["success" => true]);
     }
 }

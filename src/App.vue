@@ -95,8 +95,10 @@
 
             <!-- Sub Menu Materi di Side Menu (Auto Hide) -->
             <div v-if="tab.id === 'learning' && (sidebarExpanded || mobileSidebarOpen) && materiSubMenuOpen" class="ml-4 pl-3 border-l border-white/10 flex flex-col gap-1 my-1 animate-fade-in shrink-0">
+              <!-- Group TPS -->
+              <div class="px-2 pt-1 pb-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/80">TPS (Skolastik)</div>
               <button
-                v-for="subtes in materiUtbk"
+                v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TPS' || !['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtes)))"
                 :key="subtes.id"
                 :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
                   currentTab === 'learning' && selectedSubtes.id === subtes.id
@@ -107,6 +109,25 @@
               >
                 <div class="flex items-center gap-2 overflow-hidden">
                   <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]/70 shrink-0"></span>
+                  <span class="truncate">{{ subtes.subtes }}</span>
+                </div>
+                <i v-if="isLoggedIn && !currentUser?.is_premium && currentUser?.role !== 'admin' && currentUser?.role !== 'superadmin'" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+              </button>
+
+              <!-- Group TES LITERASI -->
+              <div class="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase tracking-wider text-sky-400/80">TES LITERASI</div>
+              <button
+                v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtes)))"
+                :key="subtes.id"
+                :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
+                  currentTab === 'learning' && selectedSubtes.id === subtes.id
+                    ? 'bg-sky-400/15 text-sky-400 font-bold border border-sky-400/30'
+                    : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
+                ]"
+                @click.stop="selectSubtesFromSidebar(subtes)"
+              >
+                <div class="flex items-center gap-2 overflow-hidden">
+                  <span class="w-1.5 h-1.5 rounded-full bg-sky-400/70 shrink-0"></span>
                   <span class="truncate">{{ subtes.subtes }}</span>
                 </div>
                 <i v-if="isLoggedIn && !currentUser?.is_premium && currentUser?.role !== 'admin' && currentUser?.role !== 'superadmin'" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
@@ -2425,9 +2446,13 @@
           <!-- Active Subtes Header Banner -->
           <div class="light-mode-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-indigo-600">
             <div class="flex items-center gap-3">
-              <span class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-600 text-lg font-mono">UTBK</span>
+              <span class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-600 text-xs font-mono">{{ selectedSubtes.test_component || (['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(selectedSubtes.subtes) ? 'LITERASI' : 'TPS') }}</span>
               <div>
-                <span class="text-[10px] text-indigo-600 font-black uppercase tracking-widest block">SUBTES TERPILIH</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] text-indigo-600 font-black uppercase tracking-widest">SNBT 2026</span>
+                  <span class="text-slate-300">•</span>
+                  <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{{ selectedSubtes.test_component || (['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(selectedSubtes.subtes) ? 'TES LITERASI' : 'TPS') }}</span>
+                </div>
                 <h3 class="text-lg font-black font-heading text-slate-900">{{ selectedSubtes.subtes }}</h3>
               </div>
             </div>
@@ -2461,8 +2486,19 @@
               <div v-if="selectedBab" class="light-mode-card rounded-2xl p-6 lg:p-8 space-y-6">
                 <!-- 1. HEADER & TEORI SINGKAT MATERI UTBK -->
                 <div class="space-y-4 border-b border-slate-200 pb-6">
-                  <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-md text-xs font-black text-indigo-600 uppercase tracking-wider">
-                    TEORI KONSEPTUAL UTBK
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-md text-xs font-black text-indigo-600 uppercase tracking-wider">
+                      <i class="ph-bold ph-tree-structure"></i> SNBT &bull; {{ selectedSubtes.subtes }}
+                    </span>
+                    <span v-if="selectedBab.topic" class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-xs font-bold text-blue-700">
+                      Topik: {{ selectedBab.topic }}
+                    </span>
+                    <span v-if="selectedBab.subtopic" class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 border border-emerald-200 rounded-md text-xs font-bold text-emerald-700">
+                      Subtopik: {{ selectedBab.subtopic }}
+                    </span>
+                    <span v-if="selectedBab.skill" class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-md text-xs font-bold text-amber-800">
+                      Skill: {{ selectedBab.skill }}
+                    </span>
                   </div>
                   <h3 class="text-2xl font-black font-heading text-slate-900">{{ selectedBab.judul }}</h3>
                   
