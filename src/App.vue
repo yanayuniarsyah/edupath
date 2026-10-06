@@ -1422,198 +1422,98 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
-              
-              <!-- Plan 1: Mandiri -->
-              <div class="glass-card rounded-3xl p-8 flex flex-col justify-between border border-white/10 hover:border-white/20 bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-300">
-                <div class="space-y-5">
-                  <div class="flex justify-between items-center">
-                    <span class="text-slate-400 text-xs font-bold uppercase tracking-wider block">STARTER PASS</span>
-                    <span class="text-[10px] px-2.5 py-1 rounded-full bg-white/10 text-white/80 font-bold">Mandiri &amp; Disiplin</span>
-                  </div>
-                  
-                  <div>
-                    <h3 class="text-2xl font-black text-white font-heading">Paket Mandiri</h3>
-                    <p class="text-xs text-white/50 mt-1">Akses kurasi materi &amp; bank soal IRT untuk pejuang yang disiplin belajar sendiri.</p>
-                  </div>
+              <!-- Dynamic Plans -->
+              <div 
+                v-for="(product, idx) in displayProducts" 
+                :key="product.id"
+                :class="[
+                  'glass-card rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative z-10',
+                  idx % 3 === 0 ? 'border border-white/10 hover:border-white/20 bg-white/[0.02] hover:bg-white/[0.04]' : '',
+                  idx % 3 === 1 ? 'border-2 border-[#c0ff00] scale-105 shadow-2xl hover:shadow-[0_0_50px_rgba(192,255,0,0.25)]' : '',
+                  idx % 3 === 2 ? 'border border-purple-500/30 bg-purple-950/[0.08] hover:border-purple-500/50' : ''
+                ]"
+                :style="idx % 3 === 1 ? 'background: linear-gradient(180deg, #0d1626 0%, #080d16 100%);' : ''"
+              >
+                 <!-- Ribbon for Middle item -->
+                 <div v-if="idx % 3 === 1" class="absolute top-0 right-0 bg-[#c0ff00] text-black text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider shadow-md">
+                   👑 PILIHAN UTAMA PEJUANG PTN
+                 </div>
 
-                  <!-- Price Framing -->
-                  <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1">
-                    <div v-if="isAnnualBilling" class="flex items-center gap-2">
-                      <span class="text-xs text-white/40 line-through">Rp 180.000</span>
-                      <span class="text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Hemat 40%</span>
-                    </div>
-                    <div class="flex items-baseline gap-1">
-                      <span class="text-4xl sm:text-5xl font-black text-white font-heading">{{ isAnnualBilling ? '108rb' : '180rb' }}</span>
-                      <span class="text-white/50 font-bold text-xs">/bulan</span>
-                    </div>
-                    <div class="text-[11px] text-[#c0ff00] font-semibold">
-                      {{ isAnnualBilling ? 'Hanya ~Rp 3.600/hari • Ditagih Rp 1.296.000/thn' : 'Fleksibel, batalkan kapan saja' }}
-                    </div>
-                  </div>
+                 <!-- Title and Desc -->
+                 <div class="space-y-5">
+                   <div class="flex justify-between items-center">
+                     <span :class="[
+                       'text-xs font-bold uppercase tracking-wider block',
+                       idx % 3 === 0 ? 'text-slate-400' : '',
+                       idx % 3 === 1 ? 'text-[#c0ff00]' : '',
+                       idx % 3 === 2 ? 'text-purple-300' : ''
+                     ]">{{ product.code || 'PAKET' }} PASS</span>
+                     <span v-if="idx % 3 === 2" class="text-[10px] px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">Premium</span>
+                     <span v-else-if="idx % 3 === 0" class="text-[10px] px-2.5 py-1 rounded-full bg-white/10 text-white/80 font-bold">Dasar</span>
+                   </div>
+                   
+                   <div>
+                     <h3 class="text-2xl font-black text-white font-heading">{{ product.name }}</h3>
+                     <p :class="[
+                       'text-xs mt-1',
+                       idx % 3 === 1 ? 'text-white/60' : 'text-white/50'
+                     ]">{{ product.description }}</p>
+                   </div>
 
-                  <!-- Value Stack -->
-                  <ul class="space-y-3 text-xs md:text-sm text-white/80 font-medium pt-2">
-                    <li class="flex items-start gap-2.5">
-                      <i class="ph-bold ph-check text-[#c0ff00] mt-0.5 shrink-0"></i>
-                      <span><strong>500+ Micro-Lessons Adaptif</strong> (TPS &amp; Literasi)</span>
-                    </li>
-                    <li class="flex items-start gap-2.5">
-                      <i class="ph-bold ph-check text-[#c0ff00] mt-0.5 shrink-0"></i>
-                      <span><strong>50.000+ Bank Soal HOTS</strong> dengan Standar Skor IRT</span>
-                    </li>
-                    <li class="flex items-start gap-2.5">
-                      <i class="ph-bold ph-check text-[#c0ff00] mt-0.5 shrink-0"></i>
-                      <span><strong>5x Tryout Nasional / Bulan</strong> + Pembahasan Lengkap</span>
-                    </li>
-                    <li class="flex items-start gap-2.5">
-                      <i class="ph-bold ph-check text-[#c0ff00] mt-0.5 shrink-0"></i>
-                      <span>Radar Deteksi Blind-Spot Belajar Instan</span>
-                    </li>
-                    <li class="flex items-start gap-2.5">
-                      <i class="ph-bold ph-check text-[#c0ff00] mt-0.5 shrink-0"></i>
-                      <span>Habit Tracker: Weekly Learning Check-in (WLC)</span>
-                    </li>
-                  </ul>
-                </div>
+                   <!-- Price Framing -->
+                   <div v-if="product.activePlan" :class="[
+                     'p-4 rounded-2xl space-y-1',
+                     idx % 3 === 0 ? 'bg-white/[0.03] border border-white/10' : '',
+                     idx % 3 === 1 ? 'bg-[#c0ff00]/10 border border-[#c0ff00]/30' : '',
+                     idx % 3 === 2 ? 'bg-purple-900/20 border border-purple-500/30' : ''
+                   ]">
+                     <div v-if="product.activePlan.discount > 0" class="flex items-center gap-2">
+                       <span class="text-xs text-white/40 line-through">Rp {{ Math.round(product.activePlan.price / (1 - (product.activePlan.discount/100))).toLocaleString('id-ID') }}</span>
+                       <span :class="[
+                         'text-[10px] font-black px-2 py-0.5 rounded-full uppercase',
+                         idx % 3 === 1 ? 'bg-[#c0ff00] text-black' : 'text-emerald-400 bg-emerald-500/10'
+                       ]">Hemat {{ product.activePlan.discount }}%</span>
+                     </div>
+                     <div class="flex items-baseline gap-1">
+                       <span :class="[
+                         'text-4xl sm:text-5xl font-black font-heading',
+                         idx % 3 === 1 ? 'text-[#c0ff00]' : 'text-white'
+                       ]">Rp {{ (product.activePlan.price / 1000).toLocaleString('id-ID') }}k</span>
+                       <span :class="[
+                         'font-bold text-xs',
+                         idx % 3 === 1 ? 'text-white/60' : 'text-white/50'
+                       ]">/{{ product.activePlan.billing_cycle === 'yearly' ? 'tahun' : 'bulan' }}</span>
+                     </div>
+                   </div>
 
-                <div class="pt-8">
-                  <button 
-                    class="w-full py-3.5 rounded-xl bg-white/10 hover:bg-white hover:text-black text-white font-black text-xs md:text-sm border border-white/15 transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-95" 
-                    @click="purchasePlan('Mandiri', isAnnualBilling ? 1296000 : 180000)"
-                  >
-                    Pilih Paket Mandiri
-                  </button>
-                </div>
+                   <!-- Value Stack -->
+                   <ul :class="[
+                     'space-y-3.5 text-xs md:text-sm font-medium pt-2',
+                     idx % 3 === 1 ? 'text-white' : 'text-white/80'
+                   ]">
+                     <li v-for="(feat, fIdx) in product.featuresList" :key="fIdx" class="flex items-start gap-2.5">
+                       <i v-if="idx % 3 === 0" class="ph-bold ph-check text-[#c0ff00] mt-0.5 shrink-0"></i>
+                       <span v-else-if="idx % 3 === 1" class="text-[#c0ff00] text-base shrink-0 font-black">⚡</span>
+                       <i v-else-if="idx % 3 === 2" class="ph-bold ph-star text-purple-400 mt-0.5 shrink-0"></i>
+                       <span>{{ feat }}</span>
+                     </li>
+                   </ul>
+                 </div>
+
+                 <!-- Action Button -->
+                 <div class="pt-8" v-if="product.activePlan">
+                   <button 
+                     :class="[
+                       'w-full py-3.5 rounded-xl text-xs md:text-sm font-black transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-95 flex items-center justify-center gap-2',
+                       idx % 3 === 1 ? 'bg-[#c0ff00] text-black hover:scale-105 hover:shadow-[0_0_35px_rgba(192,255,0,0.6)] py-4' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/15'
+                     ]"
+                     @click="purchasePlan(product.name, product.activePlan.price)"
+                   >
+                     <span>Pilih {{ product.name }}</span>
+                     <i v-if="idx % 3 === 1" class="ph-bold ph-arrow-right text-base"></i>
+                   </button>
+                 </div>
               </div>
-
-              <!-- Plan 2: Utama (Featured & High-Converting) -->
-              <div class="rounded-3xl p-8 flex flex-col justify-between relative scale-105 z-10 overflow-hidden shadow-2xl transition-all duration-300" style="background: linear-gradient(180deg, #0d1626 0%, #080d16 100%); border: 2px solid #c0ff00; box-shadow: 0 0 50px rgba(192, 255, 0, 0.25);">
-                <!-- Most Popular Ribbon -->
-                <div class="absolute top-0 right-0 bg-[#c0ff00] text-black text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider shadow-md">
-                  👑 PILIHAN UTAMA PEJUANG PTN
-                </div>
-
-                <div class="space-y-5">
-                  <div class="flex justify-between items-center">
-                    <span class="text-[#c0ff00] text-xs font-black uppercase tracking-wider block">THE ACCELERATOR</span>
-                  </div>
-
-                  <div>
-                    <h3 class="text-2xl sm:text-3xl font-black text-white font-heading">Paket Utama</h3>
-                    <p class="text-xs text-white/60 mt-1">Paket all-in-one paling direkomendasikan untuk akselerasi belajar adaptif dan kesiapan SNBT terukur.</p>
-                  </div>
-
-                  <!-- Price Framing -->
-                  <div class="p-4 rounded-2xl bg-[#c0ff00]/10 border border-[#c0ff00]/30 space-y-1">
-                    <div v-if="isAnnualBilling" class="flex items-center gap-2">
-                      <span class="text-xs text-white/40 line-through">Rp 450.000</span>
-                      <span class="text-[10px] font-black text-black bg-[#c0ff00] px-2 py-0.5 rounded-full uppercase">Hemat 40%</span>
-                    </div>
-                    <div class="flex items-baseline gap-1">
-                      <span class="text-5xl sm:text-6xl font-black font-heading text-[#c0ff00]">{{ isAnnualBilling ? '270rb' : '450rb' }}</span>
-                      <span class="text-white/60 font-bold text-xs">/bulan</span>
-                    </div>
-                    <div class="text-[11px] text-white font-bold">
-                      {{ isAnnualBilling ? 'Hanya ~Rp 9.000/hari (Kurang dari harga kopi!) • Ditagih Rp 3.240.000/thn' : 'Investasi bulanan fleksibel tanpa komitmen' }}
-                    </div>
-                  </div>
-
-                  <!-- Value Stack -->
-                  <ul class="space-y-3.5 text-xs md:text-sm text-white font-medium pt-2">
-                    <li class="flex items-start gap-2.5">
-                      <span class="text-[#c0ff00] text-base shrink-0 font-black">⚡</span>
-                      <span><strong>Semua Fitur di Paket Mandiri</strong></span>
-                    </li>
-                    <li class="flex items-start gap-2.5">
-                      <span class="text-[#c0ff00] text-base shrink-0 font-black">⚡</span>
-                      <span><strong>AI Tutor Companion 24/7</strong> (Bimbingan logika tanpa batas)</span>
-                    </li>
-                    <li class="flex items-start gap-2.5">
-                      <span class="text-[#c0ff00] text-base shrink-0 font-black">⚡</span>
-                      <span><strong>Unlimited Simulasi IRT Adaptif</strong> (Bebas TO tanpa kuota)</span>
-                    </li>
-
-                    <li class="flex items-start gap-2.5">
-                      <span class="text-[#c0ff00] text-base shrink-0 font-black">⚡</span>
-                      <span><strong>Estimasi Kesiapan &amp; Rasionalisasi Prodi Edukatif</strong></span>
-                    </li>
-                    <li class="flex items-start gap-2.5">
-                      <span class="text-[#c0ff00] text-base shrink-0 font-black">⚡</span>
-                      <span>Laporan Progres Belajar Otomatis via Telegram Orang Tua</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="pt-8">
-                  <button 
-                    class="w-full py-4 rounded-xl text-sm font-black transition-all hover:scale-105 hover:shadow-[0_0_35px_rgba(192,255,0,0.6)] active:scale-95 bg-[#c0ff00] text-black flex items-center justify-center gap-2" 
-                    @click="purchasePlan('Utama', isAnnualBilling ? 3240000 : 450000)"
-                  >
-                    <span>Mulai Paket Utama Sekarang</span>
-                    <i class="ph-bold ph-arrow-right text-base"></i>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Plan 3: VIP Mentoring -->
-              <div class="glass-card rounded-3xl p-8 flex flex-col justify-between border border-purple-500/30 bg-purple-950/[0.08] hover:border-purple-500/50 transition-all duration-300">
-                <div class="space-y-5">
-                  <div class="flex justify-between items-center">
-                    <span class="text-purple-300 text-xs font-bold uppercase tracking-wider block">PRESIDENTIAL PASS</span>
-                    <span class="text-[10px] px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">Kuota: 50 Siswa</span>
-                  </div>
-
-                  <div>
-                    <h3 class="text-2xl font-black text-white font-heading">Paket VIP</h3>
-                    <p class="text-xs text-white/50 mt-1">Pendampingan privat 1-on-1 intensif dengan Master Tutor top PTN untuk pemantapan strategi belajar maksimal.</p>
-                  </div>
-
-                  <!-- Price Framing -->
-                  <div class="p-4 rounded-2xl bg-purple-900/20 border border-purple-500/30 space-y-1">
-                    <div v-if="isAnnualBilling" class="flex items-center gap-2">
-                      <span class="text-xs text-white/40 line-through">Rp 1.100.000</span>
-                      <span class="text-[10px] font-black text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full">Hemat 40%</span>
-                    </div>
-                    <div class="flex items-baseline gap-1">
-                      <span class="text-4xl sm:text-5xl font-black text-white font-heading">{{ isAnnualBilling ? '660rb' : '1,1jt' }}</span>
-                      <span class="text-white/50 font-bold text-xs">/bulan</span>
-                    </div>
-                    <div class="text-[11px] text-purple-300 font-semibold">
-                      {{ isAnnualBilling ? 'Hanya ~Rp 22.000/hari • Ditagih Rp 7.920.000/thn' : 'Pendampingan privat eksklusif bulanan' }}
-                    </div>
-                  </div>
-
-                  <!-- Value Stack -->
-                  <ul class="space-y-3 text-xs md:text-sm text-white/80 font-medium pt-2">
-                    <li class="flex items-start gap-2.5">
-                      <i class="ph-bold ph-star text-purple-400 mt-0.5 shrink-0"></i>
-                      <span><strong>Semua Fitur Lengkap di Paket Utama</strong></span>
-                    </li>
-                    <li class="flex items-start gap-2.5">
-                      <i class="ph-bold ph-star text-purple-400 mt-0.5 shrink-0"></i>
-                      <span><strong>1-on-1 Private Mentoring Mingguan</strong> via Zoom (60 Menit)</span>
-                    </li>
-                    <li class="flex items-start gap-2.5">
-                      <i class="ph-bold ph-star text-purple-400 mt-0.5 shrink-0"></i>
-                      <span><strong>Grup Telegram VIP Langsung bareng Mentor Senior</strong></span>
-                    </li>
-                    <li class="flex items-start gap-2.5">
-                      <i class="ph-bold ph-star text-purple-400 mt-0.5 shrink-0"></i>
-                      <span>Audit Portofolio Belajar &amp; Siasat Prodi Pilihan</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="pt-8">
-                  <button 
-                    class="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs md:text-sm transition-all shadow-lg shadow-purple-600/30 active:scale-95" 
-                    @click="purchasePlan('VIP', isAnnualBilling ? 7920000 : 1100000)"
-                  >
-                    Daftar Kuota VIP Mentoring
-                  </button>
-                </div>
-              </div>
-
             </div>
 
             <!-- Trust Strip -->
@@ -4419,6 +4319,37 @@ export default {
       }
     };
 
+    const publicPlans = ref([]);
+    
+    const displayProducts = computed(() => {
+      return publicPlans.value.map(prod => {
+        let activePlan = null;
+        if (prod.plans && prod.plans.length > 0) {
+          const cycle = isAnnualBilling.value ? 'yearly' : 'monthly';
+          activePlan = prod.plans.find(p => p.billing_cycle === cycle || p.billing_cycle === 'annual');
+          if (!activePlan) activePlan = prod.plans[0]; // fallback
+        }
+        
+        let featuresList = [];
+        if (activePlan && activePlan.features) {
+           try { 
+             featuresList = JSON.parse(activePlan.features); 
+             if (!Array.isArray(featuresList)) featuresList = [activePlan.features];
+           } catch(e) { 
+             featuresList = activePlan.features.split('\n').filter(Boolean); 
+           }
+        } else if (prod.description) {
+           featuresList = [prod.description];
+        }
+
+        return {
+          ...prod,
+          activePlan,
+          featuresList
+        };
+      });
+    });
+
     const handleResetPassword = async () => {
       authError.value = '';
       if (!resetToken.value || !newPassword.value) {
@@ -4439,8 +4370,6 @@ export default {
         authLoading.value = false;
       }
     };
-
-    const publicPlans = ref([]);
     const fetchPlans = async () => {
       try {
         const data = await api.getPlans();
@@ -4449,6 +4378,8 @@ export default {
         console.error('Failed to fetch plans', e);
       }
     };
+
+
 
     const checkAuth = async () => {
       const token = localStorage.getItem('auth_token');
