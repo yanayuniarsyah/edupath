@@ -1223,7 +1223,7 @@
               </div>
 
               <!-- Feature 4: Virtual Study Room -->
-              <div class="glass-card rounded-3xl p-6 col-span-1 flex flex-col justify-between group">
+              <div class="glass-card rounded-2xl p-4 md:col-span-2 lg:col-span-4 flex flex-col justify-start group">
                 <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-[#c0ff00] text-lg">
                   ⏳
                 </div>
@@ -1234,7 +1234,7 @@
               </div>
 
               <!-- Feature 5: Parent Portal -->
-              <div class="glass-card rounded-3xl p-8 col-span-1 md:col-span-3 lg:col-span-4 bg-gradient-to-r from-slate-950 to-slate-900 border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div class="glass-card rounded-3xl p-6 md:col-span-2 lg:col-span-8 bg-gradient-to-r from-slate-950 to-slate-900 border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="space-y-2">
                   <h3 class="text-2xl md:text-3xl font-black font-heading text-white flex flex-wrap items-center gap-3">
                     Auto Report Telegram Orang Tua
@@ -3381,7 +3381,7 @@
     <div v-if="showLoginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-fade-in">
       <div class="glass-card max-w-sm w-full p-8 rounded-3xl space-y-6 relative border-primary/30">
         <!-- Close button -->
-        <button @click="showLoginModal = false" class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-transparent hover:border-rose-500/30 text-sm">
+        <button @click="showLoginModal = false" class="!absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-transparent hover:border-rose-500/30 text-sm">
           <i class="ph-bold ph-x"></i>
         </button>
         <div v-if="isForgotPasswordMode">
