@@ -1119,34 +1119,34 @@
               <h2 class="text-4xl md:text-6xl font-black font-heading text-white">Alat Tempur <span class="text-[#c0ff00]">Terlengkap</span></h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 max-w-5xl mx-auto items-start">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 max-w-5xl mx-auto items-stretch">
               
               <!-- Feature 1: Adaptive Learning -->
               <div class="glass-card rounded-2xl p-4 lg:col-span-5 flex flex-col justify-start relative overflow-hidden group">
                 <div class="!absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-[60px] rounded-full group-hover:bg-primary/20 transition-all duration-700 pointer-events-none"></div>
                 
-                <div class="space-y-1.5 z-10">
-                  <div class="flex items-center justify-between mb-1">
-                    <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-[#c0ff00] border border-primary/20">
-                      <i class="ph-bold ph-cpu text-lg"></i>
+                <div class="space-y-2 z-10">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-[#c0ff00] border border-primary/20">
+                      <i class="ph-bold ph-cpu text-xl"></i>
                     </div>
-                    <span class="text-[9px] bg-primary/20 text-[#c0ff00] font-mono px-2 py-0.5 rounded-full border border-primary/30 font-bold uppercase tracking-wider">
+                    <span class="text-[10px] bg-primary/20 text-[#c0ff00] font-mono px-2.5 py-1 rounded-full border border-primary/30 font-bold uppercase tracking-wider">
                       🎯 IRT Adaptive
                     </span>
                   </div>
                   <div>
-                    <h3 class="text-base font-black text-white font-heading">AI Adaptive Assessment™</h3>
-                    <p class="text-[10px] text-slate-300 leading-relaxed font-medium mt-1">
+                    <h3 class="text-xl md:text-2xl font-black text-white font-heading">AI Adaptive Assessment™</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed font-medium mt-2">
                       Sistem mendeteksi materi kelemahan, lalu reaktif mengubah urutan soal agar pas dengan porsi pemahaman Anda.
                     </p>
                   </div>
                 </div>
 
-                <div class="bg-slate-950/80 border border-slate-900 rounded-xl p-2.5 mt-3 z-10 relative overflow-hidden">
-                  <div class="flex items-center justify-between text-[9px] font-mono mb-2">
+                <div class="bg-slate-950/80 border border-slate-900 rounded-xl p-3 mt-4 z-10 relative overflow-hidden">
+                  <div class="flex items-center justify-between text-xs font-mono mb-3">
                     <span class="text-white/60">Live Mastery</span>
                     <span class="text-[#c0ff00] font-bold flex items-center gap-1.5">
-                      <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00] animate-pulse"></span> Beradaptasi
+                      <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span> Beradaptasi
                     </span>
                   </div>
                   <div class="flex items-end gap-1.5 h-12">
@@ -1162,30 +1162,30 @@
               <div class="glass-card rounded-2xl p-4 lg:col-span-4 flex flex-col justify-start relative overflow-hidden group">
                 <div class="!absolute -top-8 -right-8 w-24 h-24 bg-secondary/15 blur-xl rounded-full pointer-events-none"></div>
                 
-                <div class="space-y-1.5 z-10">
-                  <div class="flex items-center justify-between mb-1">
-                    <div class="w-8 h-8 rounded-lg bg-secondary/15 flex items-center justify-center text-[#c0ff00] border border-secondary/30">
-                      <i class="ph-bold ph-video-camera text-lg"></i>
+                <div class="space-y-2 z-10">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-secondary/15 flex items-center justify-center text-[#c0ff00] border border-secondary/30">
+                      <i class="ph-bold ph-video-camera text-xl"></i>
                     </div>
-                    <span class="text-[9px] bg-secondary/25 text-[#c0ff00] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-secondary/30">
+                    <span class="text-[10px] bg-secondary/25 text-[#c0ff00] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border border-secondary/30">
                       📚 Modul Kilat
                     </span>
                   </div>
                   <div>
-                    <h3 class="text-base font-black font-heading text-white">Micro-Lessons Library</h3>
-                    <p class="text-[10px] text-slate-300 leading-relaxed font-medium mt-1">
+                    <h3 class="text-xl md:text-2xl font-black font-heading text-white">Micro-Lessons Library</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed font-medium mt-2">
                       Koleksi video ringkas 3-7 menit yang langsung mengupas trik penyelesaian dan eliminasi opsi jawaban.
                     </p>
                   </div>
                 </div>
 
-                <div class="bg-black/40 border border-white/10 rounded-xl p-2 mt-3 space-y-1 z-10">
-                  <div class="flex items-center justify-between px-2 py-1.5 rounded-lg bg-white/5 text-[9px] text-white/80 font-medium">
-                    <span class="flex items-center gap-1.5"><i class="ph-fill ph-play-circle text-[#c0ff00]"></i> Trik Eliminasi Aljabar</span>
+                <div class="bg-black/40 border border-white/10 rounded-xl p-3 mt-4 space-y-2 z-10 flex-1 flex flex-col justify-end">
+                  <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 text-xs text-white/80 font-medium">
+                    <span class="flex items-center gap-2"><i class="ph-fill ph-play-circle text-[#c0ff00] text-sm"></i> Trik Eliminasi Aljabar</span>
                     <span class="text-white/40 font-mono">04:15</span>
                   </div>
-                  <div class="flex items-center justify-between px-2 py-1.5 rounded-lg bg-white/5 text-[9px] text-white/80 font-medium">
-                    <span class="flex items-center gap-1.5"><i class="ph-fill ph-play-circle text-[#c0ff00]"></i> Taktik Analisis Wacana</span>
+                  <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 text-xs text-white/80 font-medium">
+                    <span class="flex items-center gap-2"><i class="ph-fill ph-play-circle text-[#c0ff00] text-sm"></i> Taktik Analisis Wacana</span>
                     <span class="text-white/40 font-mono">05:10</span>
                   </div>
                 </div>
@@ -1193,43 +1193,43 @@
 
               <!-- Feature 3: AI Tutor -->
               <div class="glass-card rounded-2xl p-4 lg:col-span-3 flex flex-col justify-start group">
-                <div class="space-y-1.5">
-                  <div class="flex items-center justify-between mb-1">
-                    <div class="w-8 h-8 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center text-[#c0ff00] text-lg">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center text-[#c0ff00] text-xl">
                       🤖
                     </div>
-                    <span class="text-[9px] bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded-full font-mono font-bold border border-emerald-500/30 flex items-center gap-1">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 24/7
+                    <span class="text-[10px] bg-emerald-500/15 text-emerald-400 px-2.5 py-1 rounded-full font-mono font-bold border border-emerald-500/30 flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 24/7
                     </span>
                   </div>
                   <div>
-                    <h3 class="text-base font-black text-white font-heading">AI Companion 24/7</h3>
-                    <p class="text-[10px] text-slate-300 font-medium leading-relaxed mt-1">
+                    <h3 class="text-xl md:text-2xl font-black text-white font-heading">AI Companion 24/7</h3>
+                    <p class="text-sm text-slate-300 font-medium leading-relaxed mt-2">
                       Asisten interaktif cerdas membongkar kerumitan soal UTBK kapan pun kamu buntu.
                     </p>
                   </div>
                 </div>
 
-                <div class="bg-black/50 border border-white/10 rounded-xl p-2.5 mt-3 space-y-1.5">
-                  <div class="flex items-start gap-1.5 max-w-[90%]">
-                    <div class="w-4 h-4 rounded-full bg-slate-700 flex items-center justify-center text-[8px] shrink-0">👤</div>
-                    <div class="bg-slate-800 text-slate-200 text-[9px] p-1.5 rounded-lg rounded-tl-none font-medium">Kak, trik cepat eliminasi silogisme ini gimana?</div>
+                <div class="bg-black/50 border border-white/10 rounded-xl p-3 mt-4 space-y-2 flex-1 flex flex-col justify-end">
+                  <div class="flex items-start gap-2 max-w-[90%]">
+                    <div class="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-[10px] shrink-0 mt-0.5">👤</div>
+                    <div class="bg-slate-800 text-slate-200 text-xs p-2.5 rounded-xl rounded-tl-none font-medium leading-relaxed">Kak, trik cepat eliminasi silogisme ini gimana?</div>
                   </div>
-                  <div class="flex items-start gap-1.5 max-w-[95%] ml-auto flex-row-reverse">
-                    <div class="w-4 h-4 rounded-full bg-[#c0ff00] text-black font-black flex items-center justify-center text-[7px] shrink-0">AI</div>
-                    <div class="bg-[#c0ff00]/15 border border-[#c0ff00]/30 text-white text-[9px] p-1.5 rounded-lg rounded-tr-none font-medium">Coret term penengahnya, jawabannya opsi B! 💡</div>
+                  <div class="flex items-start gap-2 max-w-[95%] ml-auto flex-row-reverse">
+                    <div class="w-5 h-5 rounded-full bg-[#c0ff00] text-black font-black flex items-center justify-center text-[9px] shrink-0 mt-0.5">AI</div>
+                    <div class="bg-[#c0ff00]/15 border border-[#c0ff00]/30 text-white text-xs p-2.5 rounded-xl rounded-tr-none font-medium leading-relaxed">Coret term penengahnya, jawabannya opsi B! 💡</div>
                   </div>
                 </div>
               </div>
 
               <!-- Feature 4: Virtual Study Room -->
-              <div class="glass-card rounded-2xl p-4 md:col-span-2 lg:col-span-4 flex flex-col justify-start group">
-                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-[#c0ff00] text-lg">
+              <div class="glass-card rounded-2xl p-6 md:col-span-2 lg:col-span-4 flex flex-col justify-center text-center items-center gap-4 group">
+                <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-[#c0ff00] text-3xl">
                   ⏳
                 </div>
                 <div>
-                  <h3 class="text-lg md:text-xl font-black text-white font-heading mb-1">Pomodoro Lofi Room</h3>
-                  <p class="text-sm text-slate-300 font-medium leading-relaxed">Ruang belajar fokus bersama iringan musik lofi ambient.</p>
+                  <h3 class="text-xl font-black text-white font-heading mb-2">Pomodoro Lofi Room</h3>
+                  <p class="text-sm text-slate-300 font-medium leading-relaxed max-w-xs mx-auto">Ruang belajar fokus bersama iringan musik lofi ambient.</p>
                 </div>
               </div>
 
