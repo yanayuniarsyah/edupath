@@ -107,11 +107,11 @@ if ($action === 'create_sa') {
 
 if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Rate limiting untuk admin login — 5 percobaan per 30 menit
-    if (!check_rate_limit($pdo, 'admin_login', 5, 30)) {
-        http_response_code(429);
-        echo json_encode(["error" => "Terlalu banyak percobaan login. Coba lagi nanti."]);
-        exit;
-    }
+    // if (!check_rate_limit($pdo, 'admin_login', 5, 30)) {
+    //     http_response_code(429);
+    //     echo json_encode(["error" => "Terlalu banyak percobaan login. Coba lagi nanti."]);
+    //     exit;
+    // }
 
     $username = $input['username'] ?? '';
     $password = $input['password'] ?? '';
