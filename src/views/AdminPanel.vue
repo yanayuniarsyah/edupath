@@ -291,14 +291,16 @@
               <table class="w-full text-[11px]">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Siswa</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Paket</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status</th>
+                    <th class="text-center px-3 py-2 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Siswa <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('plan')">Paket <i v-if="sortKey === 'plan'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="s in filteredStudents" :key="s.id" class="hover:bg-white/5 transition-colors">
+                  <tr v-for="(s, index) in filteredStudents" :key="s.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ index + 1 }}</td>
                     <td class="px-3 py-2">
                       <div class="font-bold text-white">{{ s.name }}</div>
                       <div class="text-white/40 font-medium text-[10px]">{{ s.email }}</div>
@@ -391,17 +393,19 @@
               <table class="w-full text-[11px]">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider w-4/12">Pertanyaan</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Komponen & Subtes</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Topik & Subtopik</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Skill / Kompetensi</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Tipe & Level</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status QC</th>
+                    <th class="text-center px-3 py-2 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider w-4/12 cursor-pointer hover:text-white" @click="setSort('question')">Pertanyaan <i v-if="sortKey === 'question'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('test_component')">Komponen & Subtes <i v-if="sortKey === 'test_component'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('topic')">Topik & Subtopik <i v-if="sortKey === 'topic'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('skill')">Skill / Kompetensi <i v-if="sortKey === 'skill'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('question_type')">Tipe & Level <i v-if="sortKey === 'question_type'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_qc_passed')">Status QC <i v-if="sortKey === 'is_qc_passed'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="q in filteredQuestions" :key="q.id" class="hover:bg-white/5 transition-colors">
+                  <tr v-for="(q, index) in filteredQuestions" :key="q.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ index + 1 }}</td>
                     <td class="px-3 py-2">
                       <div class="line-clamp-2 text-white/80 font-medium">{{ q.question }}</div>
                     </td>
@@ -468,15 +472,17 @@
               <table class="w-full text-[11px]">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Judul Materi</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Sub Materi</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Guru / PJ</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status</th>
+                    <th class="text-center px-3 py-2 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('title')">Judul Materi <i v-if="sortKey === 'title'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('sub_materi')">Sub Materi <i v-if="sortKey === 'sub_materi'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('teacher_name')">Guru / PJ <i v-if="sortKey === 'teacher_name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="m in filteredMaterials" :key="m.id" class="hover:bg-white/5 transition-colors">
+                  <tr v-for="(m, index) in filteredMaterials" :key="m.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ index + 1 }}</td>
                     <td class="px-3 py-2 font-bold text-white">{{ m.title }}</td>
                     <td class="px-3 py-2 font-bold text-white/80">{{ m.sub_materi }}</td>
                     <td class="px-3 py-2 font-bold text-white/40 text-[10px]">{{ m.teacher_name || '-' }}</td>
@@ -730,15 +736,17 @@
               <table class="w-full text-[11px]">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Username</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Nama</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Peran (Role)</th>
+                    <th class="text-center px-3 py-2 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('username')">Username <i v-if="sortKey === 'username'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('role')">Peran (Role) <i v-if="sortKey === 'role'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status</th>
                     <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="s in staffMembers" :key="s.id" class="hover:bg-white/5 transition-colors">
+                  <tr v-for="(s, index) in sortedStaffMembers" :key="s.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ index + 1 }}</td>
                     <td class="px-3 py-2 font-bold text-white">{{ s.username }}</td>
                     <td class="px-3 py-2 font-bold text-white/80">{{ s.name || '-' }}</td>
                     <td class="px-3 py-2 font-bold text-indigo-400 uppercase">{{ s.role || 'admin' }}</td>
@@ -1362,6 +1370,32 @@ const router = useRouter()
 // ── Data ──
 const sidebarOpen = ref(true);
 const activeTab = ref(sessionStorage.getItem('admin_active_tab') || 'overview');
+
+// Sorting state
+const sortKey = ref('');
+const sortOrder = ref('asc');
+
+const setSort = (key) => {
+  if (sortKey.value === key) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortOrder.value = 'asc';
+  }
+};
+
+const doSort = (list) => {
+  if (!sortKey.value || !Array.isArray(list)) return list;
+  return [...list].sort((a, b) => {
+    let valA = a[sortKey.value] !== undefined && a[sortKey.value] !== null ? a[sortKey.value] : '';
+    let valB = b[sortKey.value] !== undefined && b[sortKey.value] !== null ? b[sortKey.value] : '';
+    if (typeof valA === 'string') valA = valA.toLowerCase();
+    if (typeof valB === 'string') valB = valB.toLowerCase();
+    if (valA < valB) return sortOrder.value === 'asc' ? -1 : 1;
+    if (valA > valB) return sortOrder.value === 'asc' ? 1 : -1;
+    return 0;
+  });
+};
 const studentSearch = ref('');
 const studentPlanFilter = ref('all');
 const qSearch = ref('');
@@ -1499,13 +1533,14 @@ const fetchStudents = async () => {
 };
 
 const filteredStudents = computed(() => {
-  return allStudents.value.filter(s => {
+  const filtered = allStudents.value.filter(s => {
     const matchSearch = !studentSearch.value ||
       (s.name || '').toLowerCase().includes(studentSearch.value.toLowerCase()) ||
       (s.email || '').toLowerCase().includes(studentSearch.value.toLowerCase());
     const matchPlan = studentPlanFilter.value === 'all' || s.plan === studentPlanFilter.value;
     return matchSearch && matchPlan;
   });
+  return doSort(filtered);
 });
 
 const openCreateStudentModal = () => {
@@ -1743,7 +1778,7 @@ const filteredQuestions = computed(() => {
       (q.skill && q.skill.toLowerCase().includes(s))
     );
   }
-  return list;
+  return doSort(list);
 });
 
 const openQuestionModal = (q = null) => {
@@ -1911,7 +1946,7 @@ const filteredMaterials = computed(() => {
       (m.topic && m.topic.toLowerCase().includes(s))
     );
   }
-  return list;
+  return doSort(list);
 });
 
 const openMaterialModal = (m = null) => {
@@ -2207,6 +2242,7 @@ const submitPayout = async () => {
 
 // ── Staff ──
 const staffMembers = ref([]);
+const sortedStaffMembers = computed(() => doSort(staffMembers.value));
 const showStaffModal = ref(false);
 const isEditingStaff = ref(false);
 const sForm = reactive({ id: null, tenant_id: '', username: '', name: '', role: 'teacher', password: '' });
