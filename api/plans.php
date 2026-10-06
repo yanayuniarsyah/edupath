@@ -11,13 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    // Sync canonical landing page plans to exact official pricing
-    $pdo->exec("
-        UPDATE plans SET name = 'Paket Mandiri', price = 180000, duration = 30 WHERE id = 'plan-mandiri';
-        UPDATE plans SET name = 'Paket Utama', price = 450000, duration = 30 WHERE id = 'plan-utama';
-        UPDATE plans SET name = 'Paket VIP', price = 1100000, duration = 30 WHERE id = 'plan-vip';
-    ");
-
     // We only expose active products and active plans
     // We fetch products first, then their plans
     $stmt = $pdo->prepare("
