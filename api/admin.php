@@ -167,7 +167,7 @@ if (!in_array($payload->role, ['admin', 'superadmin'])) {
 }
 
 if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    if ($payload->role === 'superadmin' && empty($payload->tenant_id)) {
+    if ($payload->role === 'superadmin') {
         // Superadmin stats (Global across platform)
         $totalStudents = $pdo->query("SELECT COUNT(*) FROM students")->fetchColumn() ?: 0;
         $activeStudents = $pdo->query("SELECT COUNT(*) FROM students WHERE is_active = 1")->fetchColumn() ?: 0;
@@ -240,7 +240,7 @@ if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 elseif ($action === 'students') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if ($payload->role === 'superadmin' && empty($payload->tenant_id)) {
+        if ($payload->role === 'superadmin') {
             $stmt = $pdo->query("SELECT id, name, email, plan, is_active, created_at FROM students ORDER BY created_at DESC");
         } else {
             $stmt = $pdo->prepare("SELECT id, name, email, plan, is_active, created_at FROM students WHERE tenant_id = ? ORDER BY created_at DESC");
