@@ -4,6 +4,80 @@ require_once 'config.php';
 require_once 'jwt.php';
 require_once 'rate_limit.php';
 
+function ensure_admin_schema($pdo) {
+    static $done = false;
+    if ($done) return;
+    $done = true;
+
+    // 1. Table materials
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS materials (
+                id VARCHAR(36) PRIMARY KEY,
+                exam VARCHAR(50) DEFAULT 'SNBT',
+                test_component VARCHAR(100) DEFAULT 'TPS',
+                subtest VARCHAR(100) NOT NULL,
+                sub_materi VARCHAR(100) NULL,
+                topic VARCHAR(100) NULL,
+                subtopic VARCHAR(100) NULL,
+                skill VARCHAR(100) NULL,
+                indicator VARCHAR(100) NULL,
+                title VARCHAR(255) NOT NULL,
+                content LONGTEXT NOT NULL,
+                teacher_name VARCHAR(150) NULL,
+                is_active TINYINT(1) DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
+
+    $materialCols = [
+        "ALTER TABLE materials ADD COLUMN exam VARCHAR(50) DEFAULT 'SNBT'",
+        "ALTER TABLE materials ADD COLUMN test_component VARCHAR(100) DEFAULT 'TPS'",
+        "ALTER TABLE materials ADD COLUMN subtest VARCHAR(100) NULL",
+        "ALTER TABLE materials ADD COLUMN sub_materi VARCHAR(100) NULL",
+        "ALTER TABLE materials ADD COLUMN topic VARCHAR(100) NULL",
+        "ALTER TABLE materials ADD COLUMN subtopic VARCHAR(100) NULL",
+        "ALTER TABLE materials ADD COLUMN skill VARCHAR(100) NULL",
+        "ALTER TABLE materials ADD COLUMN indicator VARCHAR(100) NULL",
+        "ALTER TABLE materials ADD COLUMN teacher_name VARCHAR(150) NULL",
+        "ALTER TABLE materials ADD COLUMN is_active TINYINT(1) DEFAULT 1"
+    ];
+    foreach ($materialCols as $sql) {
+        try { $pdo->exec($sql); } catch (\Throwable $e) {}
+    }
+
+    // 2. Table questions
+    $questionCols = [
+        "ALTER TABLE questions ADD COLUMN exam VARCHAR(50) DEFAULT 'SNBT'",
+        "ALTER TABLE questions ADD COLUMN test_component VARCHAR(100) DEFAULT 'TPS'",
+        "ALTER TABLE questions ADD COLUMN subtest VARCHAR(100) NULL",
+        "ALTER TABLE questions ADD COLUMN topic VARCHAR(100) NULL",
+        "ALTER TABLE questions ADD COLUMN subtopic VARCHAR(100) NULL",
+        "ALTER TABLE questions ADD COLUMN skill VARCHAR(100) NULL",
+        "ALTER TABLE questions ADD COLUMN indicator VARCHAR(100) NULL",
+        "ALTER TABLE questions ADD COLUMN question_type VARCHAR(50) DEFAULT 'multiple_choice'",
+        "ALTER TABLE questions ADD COLUMN is_qc_passed TINYINT(1) DEFAULT 1",
+        "ALTER TABLE questions ADD COLUMN classification VARCHAR(50) DEFAULT 'LATIHAN'"
+    ];
+    foreach ($questionCols as $sql) {
+        try { $pdo->exec($sql); } catch (\Throwable $e) {}
+    }
+
+    // 3. Table plans
+    $planCols = [
+        "ALTER TABLE plans ADD COLUMN tenant_id VARCHAR(36) NULL",
+        "ALTER TABLE plans ADD COLUMN discount DECIMAL(10,2) DEFAULT 0.00",
+        "ALTER TABLE plans ADD COLUMN product_id VARCHAR(100) NULL",
+        "ALTER TABLE plans ADD COLUMN billing_cycle VARCHAR(50) DEFAULT 'monthly'"
+    ];
+    foreach ($planCols as $sql) {
+        try { $pdo->exec($sql); } catch (\Throwable $e) {}
+    }
+}
+ensure_admin_schema($pdo);
+
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true);
 
@@ -396,66 +470,6 @@ elseif ($action === 'orders') {
         echo json_encode(["success" => true]);
     }
 }
-elseif ($action === 'materials') {
-    // Ensure table exists
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS materials (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
-            subtes VARCHAR(100) NOT NULL,
-            sub_materi VARCHAR(100) NULL,
-            teacher_name VARCHAR(150) NULL,
-            content TEXT NOT NULL,
-            is_active TINYINT(1) DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-    ");
-
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $stmt = $pdo->query("SELECT id, title, COALESCE(sub_materi, subtes) as sub_materi, subtes, teacher_name, content, is_active, created_at FROM materials ORDER BY id DESC");
-        $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(["materials" => $materials]);
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $input = json_decode(file_get_contents('php://input'), true);
-        $title = trim($input['title'] ?? '');
-        $sub_materi = trim($input['sub_materi'] ?? $input['subtes'] ?? 'Penalaran Umum');
-        $teacher_name = trim($input['teacher_name'] ?? '');
-        $content = trim($input['content'] ?? '');
-        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
-
-        if (empty($title) || empty($content)) {
-            http_response_code(400); echo json_encode(["error" => "Judul dan konten materi wajib diisi"]); exit;
-        }
-
-        $stmt = $pdo->prepare("INSERT INTO materials (title, subtes, sub_materi, teacher_name, content, is_active) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$title, $sub_materi, $sub_materi, $teacher_name, $content, $is_active]);
-        echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        $input = json_decode(file_get_contents('php://input'), true);
-        $id = $input['id'] ?? '';
-        $title = trim($input['title'] ?? '');
-        $sub_materi = trim($input['sub_materi'] ?? $input['subtes'] ?? 'Penalaran Umum');
-        $teacher_name = trim($input['teacher_name'] ?? '');
-        $content = trim($input['content'] ?? '');
-        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
-
-        if (empty($id) || empty($title) || empty($content)) {
-            http_response_code(400); echo json_encode(["error" => "ID, judul, dan konten materi wajib diisi"]); exit;
-        }
-
-        $stmt = $pdo->prepare("UPDATE materials SET title = ?, subtes = ?, sub_materi = ?, teacher_name = ?, content = ?, is_active = ? WHERE id = ?");
-        $stmt->execute([$title, $sub_materi, $sub_materi, $teacher_name, $content, $is_active, $id]);
-        echo json_encode(["success" => true]);
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        $id = $_GET['id'] ?? '';
-        if (empty($id)) {
-            http_response_code(400); echo json_encode(["error" => "ID materi wajib"]); exit;
-        }
-        $pdo->prepare("DELETE FROM materials WHERE id = ?")->execute([$id]);
-        echo json_encode(["success" => true]);
-    }
-}
 elseif ($action === 'affiliates' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt = $pdo->prepare("
         SELECT a.*, u.identity_key 
@@ -770,9 +784,9 @@ elseif ($action === 'questions') {
         $stmt->execute($params);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (!in_array($payload->role, ['superadmin', 'admin'])) {
+        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
             http_response_code(403);
-            echo json_encode(["error" => "Admin only"]);
+            echo json_encode(["error" => "Akses ditolak"]);
             exit;
         }
         $id = bin2hex(random_bytes(16));
@@ -783,42 +797,46 @@ elseif ($action === 'questions') {
         $test_component = $input['test_component'] ?? (
             (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
         );
-        $topic = $input['topic'] ?? null;
+        $topic = $input['topic'] ?? $input['bab'] ?? null;
         $subtopic = $input['subtopic'] ?? null;
         $skill = $input['skill'] ?? null;
         $indicator = $input['indicator'] ?? null;
         $question_type = $input['question_type'] ?? 'multiple_choice';
 
         $is_qc_passed = isset($input['is_qc_passed']) && $input['is_qc_passed'] ? 1 : 0;
-        $classification = strtoupper($input['usage_type'] ?? 'LATIHAN');
+        $classification = strtoupper($input['usage_type'] ?? $input['classification'] ?? 'LATIHAN');
 
-        $stmt = $pdo->prepare("
-            INSERT INTO questions (
-                id, exam, test_component, subtest, topic, subtopic, skill, indicator, question_type,
-                sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e,
-                correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference,
-                is_qc_passed, classification
-            ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?
-            )
-        ");
-        $stmt->execute([
-            $id, $exam, $test_component, $subtest, $topic, $subtopic, $skill, $indicator, $question_type,
-            $subtest, $subtopic ?? $input['bab'] ?? null, $input['difficulty'] ?? 'medium',
-            $input['question'], $input['option_a'], $input['option_b'], $input['option_c'],
-            $input['option_d'], $input['option_e'] ?? null, $input['correct'], $input['explanation'] ?? null,
-            $input['cognitive_demand'] ?? null, $input['source_type'] ?? 'author_created', $input['rights_status'] ?? 'unknown',
-            $input['source_name'] ?? null, $input['source_year'] ?? null, $input['source_reference'] ?? null,
-            $is_qc_passed, $classification
-        ]);
-        echo json_encode(["success" => true, "id" => $id]);
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO questions (
+                    id, exam, test_component, subtest, topic, subtopic, skill, indicator, question_type,
+                    subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e,
+                    correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference,
+                    is_qc_passed, classification
+                ) VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?
+                )
+            ");
+            $stmt->execute([
+                $id, $exam, $test_component, $subtest, $topic, $subtopic, $skill, $indicator, $question_type,
+                $subtest, $subtest, $subtopic ?? $topic ?? 'Umum', $input['difficulty'] ?? 'medium',
+                $input['question'], $input['option_a'], $input['option_b'], $input['option_c'],
+                $input['option_d'], $input['option_e'] ?? null, $input['correct'], $input['explanation'] ?? null,
+                $input['cognitive_demand'] ?? null, $input['source_type'] ?? 'author_created', $input['rights_status'] ?? 'unknown',
+                $input['source_name'] ?? null, $input['source_year'] ?? null, $input['source_reference'] ?? null,
+                $is_qc_passed, $classification
+            ]);
+            echo json_encode(["success" => true, "id" => $id]);
+        } catch (PDOException $e) {
+            http_response_code(500); echo json_encode(["error" => "Gagal menyimpan soal", "details" => $e->getMessage()]);
+        }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        if (!in_array($payload->role, ['superadmin', 'admin'])) {
+        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
             http_response_code(403);
-            echo json_encode(["error" => "Admin only"]);
+            echo json_encode(["error" => "Akses ditolak"]);
             exit;
         }
         $id = $input['id'] ?? '';
@@ -827,34 +845,38 @@ elseif ($action === 'questions') {
         $test_component = $input['test_component'] ?? (
             (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
         );
-        $topic = $input['topic'] ?? null;
+        $topic = $input['topic'] ?? $input['bab'] ?? null;
         $subtopic = $input['subtopic'] ?? null;
         $skill = $input['skill'] ?? null;
         $indicator = $input['indicator'] ?? null;
         $question_type = $input['question_type'] ?? 'multiple_choice';
 
         $is_qc_passed = isset($input['is_qc_passed']) && $input['is_qc_passed'] ? 1 : 0;
-        $classification = strtoupper($input['usage_type'] ?? 'LATIHAN');
+        $classification = strtoupper($input['usage_type'] ?? $input['classification'] ?? 'LATIHAN');
 
-        $stmt = $pdo->prepare("
-            UPDATE questions SET
-                exam=?, test_component=?, subtest=?, topic=?, subtopic=?, skill=?, indicator=?, question_type=?,
-                sub_materi=?, bab=?, difficulty=?, question=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?,
-                correct=?, explanation=?, cognitive_demand=?, source_type=?, rights_status=?, source_name=?, source_year=?, source_reference=?,
-                is_qc_passed=?, classification=?
-            WHERE id=?
-        ");
-        $stmt->execute([
-            $exam, $test_component, $subtest, $topic, $subtopic, $skill, $indicator, $question_type,
-            $subtest, $subtopic ?? $input['bab'] ?? null, $input['difficulty'] ?? 'medium',
-            $input['question'], $input['option_a'], $input['option_b'], $input['option_c'],
-            $input['option_d'], $input['option_e'] ?? null, $input['correct'], $input['explanation'] ?? null,
-            $input['cognitive_demand'] ?? null, $input['source_type'] ?? 'author_created', $input['rights_status'] ?? 'unknown',
-            $input['source_name'] ?? null, $input['source_year'] ?? null, $input['source_reference'] ?? null,
-            $is_qc_passed, $classification,
-            $id
-        ]);
-        echo json_encode(["success" => true]);
+        try {
+            $stmt = $pdo->prepare("
+                UPDATE questions SET
+                    exam=?, test_component=?, subtest=?, topic=?, subtopic=?, skill=?, indicator=?, question_type=?,
+                    subtes=?, sub_materi=?, bab=?, difficulty=?, question=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?,
+                    correct=?, explanation=?, cognitive_demand=?, source_type=?, rights_status=?, source_name=?, source_year=?, source_reference=?,
+                    is_qc_passed=?, classification=?
+                WHERE id=?
+            ");
+            $stmt->execute([
+                $exam, $test_component, $subtest, $topic, $subtopic, $skill, $indicator, $question_type,
+                $subtest, $subtest, $subtopic ?? $topic ?? 'Umum', $input['difficulty'] ?? 'medium',
+                $input['question'], $input['option_a'], $input['option_b'], $input['option_c'],
+                $input['option_d'], $input['option_e'] ?? null, $input['correct'], $input['explanation'] ?? null,
+                $input['cognitive_demand'] ?? null, $input['source_type'] ?? 'author_created', $input['rights_status'] ?? 'unknown',
+                $input['source_name'] ?? null, $input['source_year'] ?? null, $input['source_reference'] ?? null,
+                $is_qc_passed, $classification,
+                $id
+            ]);
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            http_response_code(500); echo json_encode(["error" => "Gagal update soal", "details" => $e->getMessage()]);
+        }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         if (!in_array($payload->role, ['superadmin', 'admin'])) {
             http_response_code(403);
@@ -862,8 +884,12 @@ elseif ($action === 'questions') {
             exit;
         }
         $id = $_GET['id'] ?? '';
-        $pdo->prepare("DELETE FROM questions WHERE id = ?")->execute([$id]);
-        echo json_encode(["success" => true]);
+        try {
+            $pdo->prepare("DELETE FROM questions WHERE id = ?")->execute([$id]);
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            http_response_code(500); echo json_encode(["error" => "Gagal menghapus soal", "details" => $e->getMessage()]);
+        }
     }
 }
 elseif ($action === 'materials') {
@@ -875,9 +901,10 @@ elseif ($action === 'materials') {
         $sql = "SELECT * FROM materials WHERE 1=1";
         $params = [];
         if ($subtest && $subtest !== 'all') {
-            $sql .= " AND (subtest = ? OR subtest LIKE ?)";
+            $sql .= " AND (subtest = ? OR subtest LIKE ? OR sub_materi = ?)";
             $params[] = $subtest;
             $params[] = "%$subtest%";
+            $params[] = $subtest;
         }
         if ($test_component && $test_component !== 'all') {
             $sql .= " AND test_component = ?";
@@ -890,7 +917,8 @@ elseif ($action === 'materials') {
         $sql .= " ORDER BY created_at DESC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
-        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(["materials" => $materials]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
             http_response_code(403);
@@ -912,15 +940,20 @@ elseif ($action === 'materials') {
         $title = trim($input['title'] ?? 'Materi Belajar');
         $content = $input['content'] ?? '';
         $teacher_name = $input['teacher_name'] ?? null;
+        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
 
-        $stmt = $pdo->prepare("
-            INSERT INTO materials (id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, teacher_name)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([
-            $id, $exam, $test_component, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name
-        ]);
-        echo json_encode(["success" => true, "id" => $id]);
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, title, content, teacher_name, is_active)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([
+                $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $is_active
+            ]);
+            echo json_encode(["success" => true, "id" => $id]);
+        } catch (PDOException $e) {
+            http_response_code(500); echo json_encode(["error" => "Gagal menyimpan materi", "details" => $e->getMessage()]);
+        }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
             http_response_code(403);
@@ -940,16 +973,21 @@ elseif ($action === 'materials') {
         $title = trim($input['title'] ?? 'Materi Belajar');
         $content = $input['content'] ?? '';
         $teacher_name = $input['teacher_name'] ?? null;
+        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
 
-        $stmt = $pdo->prepare("
-            UPDATE materials SET
-                exam=?, test_component=?, subtest=?, topic=?, subtopic=?, skill=?, indicator=?, title=?, content=?, teacher_name=?
-            WHERE id=?
-        ");
-        $stmt->execute([
-            $exam, $test_component, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $id
-        ]);
-        echo json_encode(["success" => true]);
+        try {
+            $stmt = $pdo->prepare("
+                UPDATE materials SET
+                    exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, title=?, content=?, teacher_name=?, is_active=?
+                WHERE id=?
+            ");
+            $stmt->execute([
+                $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $is_active, $id
+            ]);
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            http_response_code(500); echo json_encode(["error" => "Gagal update materi", "details" => $e->getMessage()]);
+        }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         if (!in_array($payload->role, ['superadmin', 'admin'])) {
             http_response_code(403);
@@ -957,27 +995,33 @@ elseif ($action === 'materials') {
             exit;
         }
         $id = $_GET['id'] ?? '';
-        $pdo->prepare("DELETE FROM materials WHERE id = ?")->execute([$id]);
-        echo json_encode(["success" => true]);
+        try {
+            $pdo->prepare("DELETE FROM materials WHERE id = ?")->execute([$id]);
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            http_response_code(500); echo json_encode(["error" => "Gagal menghapus materi", "details" => $e->getMessage()]);
+        }
     }
 }
 elseif ($action === 'staff') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $tenant_id = $payload->role === 'superadmin' ? null : $payload->tenant_id;
-        
         $sql = "
-            SELECT u.identity_key as username, a.name, a.id, ur.role
+            SELECT u.identity_key as username, a.name, a.id, ur.role, ur.tenant_id, t.name as tenant_name
             FROM users u
             JOIN user_roles ur ON u.id = ur.user_id
             JOIN admins a ON ur.reference_id = a.id
+            LEFT JOIN tenants t ON ur.tenant_id = t.id
             WHERE ur.role != 'superadmin'
         ";
         $params = [];
-        if ($tenant_id) {
-            $sql .= " AND ur.tenant_id = ?";
-            $params[] = $tenant_id;
+        if ($payload->role === 'superadmin') {
+            if (!empty($_GET['tenant_id'])) {
+                $sql .= " AND ur.tenant_id = ?";
+                $params[] = $_GET['tenant_id'];
+            }
         } else {
-            $sql .= " AND ur.tenant_id IS NULL";
+            $sql .= " AND ur.tenant_id = ?";
+            $params[] = $payload->tenant_id;
         }
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
@@ -993,11 +1037,12 @@ elseif ($action === 'staff') {
         }
 
         $tenant_id = $payload->tenant_id;
-        // Jika superadmin (tenant_id kosong), wajib ambil dari input payload
         if (empty($tenant_id)) {
             $tenant_id = $input['tenant_id'] ?? '';
             if (empty($tenant_id)) {
-                http_response_code(400); echo json_encode(["error" => "Superadmin wajib memilih Bimbel (Tenant) target"]); exit;
+                // Jika superadmin tidak memilih tenant, pilih tenant pertama yang aktif
+                $tFirst = $pdo->query("SELECT id FROM tenants WHERE is_active = 1 LIMIT 1")->fetchColumn();
+                $tenant_id = $tFirst ?: null;
             }
         }
         if (!in_array($role, ['admin', 'teacher'])) $role = 'teacher';
@@ -1019,7 +1064,7 @@ elseif ($action === 'staff') {
             $stmt->execute([$admin_id, $tenant_id, $username, $hashed_password, $name]);
             
             $ur_id = bin2hex(random_bytes(16));
-            $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($ur_id,20,12);
+            $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($user_id,20,12);
             
             $stmt = $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([$ur_id, $user_id, $tenant_id, $role, $admin_id]);
@@ -1041,40 +1086,64 @@ elseif ($action === 'staff') {
         if ($payload->role !== 'superadmin') {
             $scope = $tenant_id ? " AND ur.tenant_id = ?" : " AND ur.tenant_id IS NULL";
         }
-        $stmt = $pdo->prepare("UPDATE admins a JOIN user_roles ur ON ur.reference_id = a.id SET a.name = ? WHERE a.id = ? AND ur.role != 'superadmin' $scope");
-        $params = [$name, $id];
-        if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
-        $stmt->execute($params);
+        try {
+            $stmt = $pdo->prepare("UPDATE admins a JOIN user_roles ur ON ur.reference_id = a.id SET a.name = ? WHERE a.id = ? AND ur.role != 'superadmin' $scope");
+            $params = [$name, $id];
+            if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
+            $stmt->execute($params);
 
-        $stmt = $pdo->prepare("UPDATE user_roles SET role = ? WHERE reference_id = ? AND role != 'superadmin' $scope");
-        $params = [$role, $id];
-        if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
-        $stmt->execute($params);
-        
-        if (!empty($input['password'])) {
-            $hashed = password_hash($input['password'], PASSWORD_BCRYPT);
-            $stmt = $pdo->prepare("UPDATE users u JOIN user_roles ur ON u.id = ur.user_id SET u.password = ? WHERE ur.reference_id = ? AND ur.role != 'superadmin' $scope");
-            $params = [$hashed, $id];
+            $stmt = $pdo->prepare("UPDATE user_roles SET role = ? WHERE reference_id = ? AND role != 'superadmin' $scope");
+            $params = [$role, $id];
             if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
             $stmt->execute($params);
-            $stmt = $pdo->prepare("UPDATE admins a JOIN user_roles ur ON ur.reference_id = a.id SET a.password = ? WHERE a.id = ? AND ur.role != 'superadmin' $scope");
-            $params = [$hashed, $id];
-            if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
-            $stmt->execute($params);
+            
+            if (!empty($input['password'])) {
+                $hashed = password_hash($input['password'], PASSWORD_BCRYPT);
+                $stmt = $pdo->prepare("UPDATE users u JOIN user_roles ur ON u.id = ur.user_id SET u.password = ? WHERE ur.reference_id = ? AND ur.role != 'superadmin' $scope");
+                $params = [$hashed, $id];
+                if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
+                $stmt->execute($params);
+                $stmt = $pdo->prepare("UPDATE admins a JOIN user_roles ur ON ur.reference_id = a.id SET a.password = ? WHERE a.id = ? AND ur.role != 'superadmin' $scope");
+                $params = [$hashed, $id];
+                if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
+                $stmt->execute($params);
+            }
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            http_response_code(500); echo json_encode(["error" => "Gagal mengupdate staff", "details" => $e->getMessage()]);
         }
-        echo json_encode(["success" => true]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $id = $_GET['id'] ?? '';
-        $tenant_id = $payload->role === 'superadmin' ? null : $payload->tenant_id;
-        $scope = '';
-        if ($payload->role !== 'superadmin') {
-            $scope = $tenant_id ? " AND ur.tenant_id = ?" : " AND ur.tenant_id IS NULL";
+        if (empty($id)) {
+            http_response_code(400); echo json_encode(["error" => "ID staff diperlukan"]); exit;
         }
-        $stmt = $pdo->prepare("DELETE u FROM users u JOIN user_roles ur ON ur.user_id = u.id WHERE ur.reference_id = ? AND ur.role != 'superadmin' $scope");
-        $params = [$id];
-        if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
-        $stmt->execute($params);
-        echo json_encode(["success" => true]);
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare("SELECT ur.user_id, ur.tenant_id, ur.role FROM user_roles ur WHERE ur.reference_id = ?");
+            $stmt->execute([$id]);
+            $staffInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$staffInfo || $staffInfo['role'] === 'superadmin') {
+                $pdo->rollBack();
+                http_response_code(403); echo json_encode(["error" => "Tidak dapat menghapus superadmin"]); exit;
+            }
+
+            if ($payload->role !== 'superadmin' && $staffInfo['tenant_id'] !== $payload->tenant_id) {
+                $pdo->rollBack();
+                http_response_code(403); echo json_encode(["error" => "Akses ditolak"]); exit;
+            }
+
+            $pdo->prepare("DELETE FROM admins WHERE id = ?")->execute([$id]);
+            $pdo->prepare("DELETE FROM user_roles WHERE reference_id = ?")->execute([$id]);
+            if (!empty($staffInfo['user_id'])) {
+                $pdo->prepare("DELETE FROM users WHERE id = ?")->execute([$staffInfo['user_id']]);
+            }
+            $pdo->commit();
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            http_response_code(500); echo json_encode(["error" => "Gagal menghapus staff", "details" => $e->getMessage()]);
+        }
     }
 }
 elseif ($action === 'commissions' && $_SERVER['REQUEST_METHOD'] === 'GET') {

@@ -518,15 +518,17 @@
               <table class="w-full text-[11px]">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Nama Paket</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Harga Resmi</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Durasi</th>
+                    <th class="text-center px-3 py-2 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama Paket <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('price')">Harga Resmi <i v-if="sortKey === 'price'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('duration')">Durasi <i v-if="sortKey === 'duration'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Entitlements</th>
                     <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="p in plans" :key="p.id" class="hover:bg-white/5 transition-colors">
+                  <tr v-for="(p, index) in sortedPlans" :key="p.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ index + 1 }}</td>
                     <td class="px-3 py-2 font-bold text-white">{{ p.name }}</td>
                     <td class="px-3 py-2 font-bold text-emerald-400 font-mono">Rp {{ Number(p.price || 0).toLocaleString('id-ID') }}</td>
                     <td class="px-3 py-2 font-bold text-white/80">{{ p.duration }} Hari</td>
@@ -1436,7 +1438,33 @@ const loginForm = ref({ username: '', password: '' });
 const loginError = ref('');
 const loginLoading = ref(false);
 
-const isSuperadmin = computed(() => localStorage.getItem('user_role') === 'superadmin');
+function extractRoleFromToken(token) {
+  try {
+    if (!token) return '';
+    const parts = token.split('.');
+    if (parts.length < 2) return '';
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(jsonPayload).role || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+const currentRole = ref(
+  extractRoleFromToken(sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token') || localStorage.getItem('auth_token')) ||
+  localStorage.getItem('user_role') ||
+  sessionStorage.getItem('admin_role') ||
+  ''
+);
+
+const isSuperadmin = computed(() => {
+  return currentRole.value === 'superadmin' ||
+         localStorage.getItem('user_role') === 'superadmin' ||
+         sessionStorage.getItem('admin_role') === 'superadmin';
+});
+
 const tenantsList = ref([]);
 const showPassword = ref(false);
 
@@ -1447,6 +1475,12 @@ const doLogin = async () => {
     const res = await api.adminLogin(loginForm.value.username, loginForm.value.password);
     sessionStorage.setItem('admin_token', res.token);
     if (res.csrf_token) sessionStorage.setItem('ep_admin_csrf', res.csrf_token);
+    const roleFound = res.user?.role || extractRoleFromToken(res.token) || '';
+    if (roleFound) {
+      currentRole.value = roleFound;
+      localStorage.setItem('user_role', roleFound);
+      sessionStorage.setItem('admin_role', roleFound);
+    }
     isAuthenticated.value = true;
     fetchDashboard();
     fetchStudents();
@@ -1470,6 +1504,7 @@ const doLogout = async () => {
   localStorage.removeItem('user_role');
   localStorage.removeItem('user_name');
   localStorage.removeItem('user_email');
+  currentRole.value = '';
   isAuthenticated.value = false;
   window.location.hash = '#/';
   location.reload();
@@ -1479,6 +1514,16 @@ onMounted(async () => {
   const adminToken = sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token');
   const mainToken = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
   
+  const tokenToInspect = adminToken || mainToken;
+  if (tokenToInspect) {
+    const roleFromTok = extractRoleFromToken(tokenToInspect);
+    if (roleFromTok) {
+      currentRole.value = roleFromTok;
+      localStorage.setItem('user_role', roleFromTok);
+      sessionStorage.setItem('admin_role', roleFromTok);
+    }
+  }
+
   if (adminToken) {
     isAuthenticated.value = true;
     fetchDashboard();
@@ -1488,8 +1533,11 @@ onMounted(async () => {
   } else if (mainToken) {
     try {
       const profile = await api.getProfile();
-      if (profile?.user?.role === 'admin' || profile?.user?.role === 'superadmin') {
+      if (profile?.user?.role === 'admin' || profile?.user?.role === 'superadmin' || profile?.user?.role === 'teacher') {
         sessionStorage.setItem('admin_token', mainToken);
+        currentRole.value = profile.user.role;
+        localStorage.setItem('user_role', profile.user.role);
+        sessionStorage.setItem('admin_role', profile.user.role);
         isAuthenticated.value = true;
         fetchDashboard();
         fetchStudents();
@@ -1545,13 +1593,14 @@ const filteredStudents = computed(() => {
 
 const openCreateStudentModal = () => {
   isEditingStudent.value = false;
-  Object.assign(studentForm, { id: null, tenant_id: '', name: '', email: '', password: '', plan: 'free', is_active: 1 });
+  const defTenant = tenantsList.value?.[0]?.id || '';
+  Object.assign(studentForm, { id: null, tenant_id: defTenant, name: '', email: '', password: '', plan: 'free', is_active: 1 });
   showStudentModal.value = true;
 };
 
 const openEditStudentModal = (s) => {
   isEditingStudent.value = true;
-  Object.assign(studentForm, { id: s.id, tenant_id: s.tenant_id || '', name: s.name, email: s.email, password: '', plan: s.plan || 'free', is_active: s.is_active != 0 ? 1 : 0 });
+  Object.assign(studentForm, { id: s.id, tenant_id: s.tenant_id || tenantsList.value?.[0]?.id || '', name: s.name, email: s.email, password: '', plan: s.plan || 'free', is_active: s.is_active != 0 ? 1 : 0 });
   showStudentModal.value = true;
 };
 
@@ -2019,6 +2068,7 @@ const deleteMaterial = async (id) => {
 
 // ── Plans / Packages ──
 const plans = ref([]);
+const sortedPlans = computed(() => doSort(plans.value));
 const showPlanModal = ref(false);
 const isEditingPlan = ref(false);
 const pForm = reactive({ id: null, name: '', price: '', discount: 0, duration: '', features: [] });
@@ -2031,12 +2081,10 @@ const loadPlansAndStaff = async () => {
       api.getAdminStaff(),
       api.getEntitlementsDictionary()
     ]);
-    if (isSuperadmin.value) {
-      try {
-        const tRes = await api.getAdminTenants();
-        tenantsList.value = tRes || [];
-      } catch (err) { console.error('Gagal fetch tenants', err); }
-    }
+    try {
+      const tRes = await api.getAdminTenants();
+      tenantsList.value = tRes || [];
+    } catch (err) { console.error('Gagal fetch tenants', err); }
     plans.value = pRes || [];
     plans.value.forEach(p => {
       if (typeof p.features === 'string') {
@@ -2248,12 +2296,13 @@ const isEditingStaff = ref(false);
 const sForm = reactive({ id: null, tenant_id: '', username: '', name: '', role: 'teacher', password: '' });
 
 const openStaffModal = (s = null) => {
+  const defTenant = tenantsList.value?.[0]?.id || '';
   if (s) {
     isEditingStaff.value = true;
-    Object.assign(sForm, { ...s, password: '', tenant_id: s.tenant_id || '' });
+    Object.assign(sForm, { ...s, password: '', tenant_id: s.tenant_id || defTenant });
   } else {
     isEditingStaff.value = false;
-    Object.assign(sForm, { id: null, tenant_id: '', username: '', name: '', role: 'teacher', password: '' });
+    Object.assign(sForm, { id: null, tenant_id: defTenant, username: '', name: '', role: 'teacher', password: '' });
   }
   showStaffModal.value = true;
 };
