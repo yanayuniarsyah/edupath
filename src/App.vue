@@ -4468,21 +4468,28 @@ export default {
     };
 
     const logout = async () => {
+      // Optimistically update UI to prevent clicking around while waiting
+      currentUser.value = null;
+      isLoggedIn.value = false;
+      currentTab.value = 'home';
+      sidebarExpanded.value = false;
+      document.body.style.pointerEvents = 'none';
+      showToast('Sedang keluar dari akun...');
+
       try {
         await api.logout();
       } catch (e) {
         console.error('Logout API error', e);
       }
+      
       // Clear all auth related storage keys
       const keys = ['auth_token', 'ep_session_token', 'ep_csrf', 'ep_admin_token', 'ep_admin_csrf'];
       keys.forEach(k => {
         sessionStorage.removeItem(k);
         localStorage.removeItem(k);
       });
-      currentUser.value = null;
-      isLoggedIn.value = false;
-      currentTab.value = 'home';
-      sidebarExpanded.value = false;
+      
+      document.body.style.pointerEvents = '';
       showToast('Anda telah keluar dari akun.');
     };
 

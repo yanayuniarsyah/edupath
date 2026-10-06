@@ -1494,18 +1494,24 @@ const doLogin = async () => {
 };
 
 const doLogout = async () => {
+  // Update UI optimistically to give instant feedback
+  isAuthenticated.value = false;
+  document.body.style.pointerEvents = 'none'; // Prevent further clicks
+  
   try {
     await api.logout();
   } catch (e) {
     console.warn("Logout error:", e);
   }
+  
   sessionStorage.clear();
   localStorage.removeItem('auth_token');
   localStorage.removeItem('user_role');
   localStorage.removeItem('user_name');
   localStorage.removeItem('user_email');
   currentRole.value = '';
-  isAuthenticated.value = false;
+  
+  document.body.style.pointerEvents = '';
   window.location.hash = '#/';
   location.reload();
 }
