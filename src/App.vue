@@ -4467,8 +4467,18 @@ export default {
       isLoginMode.value = true;
     };
 
-    const logout = () => {
-      localStorage.removeItem('auth_token');
+    const logout = async () => {
+      try {
+        await api.logout();
+      } catch (e) {
+        console.error('Logout API error', e);
+      }
+      // Clear all auth related storage keys
+      const keys = ['auth_token', 'ep_session_token', 'ep_csrf', 'ep_admin_token', 'ep_admin_csrf'];
+      keys.forEach(k => {
+        sessionStorage.removeItem(k);
+        localStorage.removeItem(k);
+      });
       currentUser.value = null;
       isLoggedIn.value = false;
       currentTab.value = 'home';

@@ -248,6 +248,14 @@ export async function apiFetch(endpoint, options = {}) {
 }
 
 export default {
+  // ── Plans ──
+  /**
+   * Retrieve list of available subscription plans.
+   * Uses the cached endpoint '/plans.php' with TTL defined in CACHE_TTL.
+   */
+  getPlans() {
+    return apiFetch('/plans.php');
+  },
   // ── Auth Siswa ──
   async login(email, password) {
     const res = await apiFetch('/auth.php?action=login', {
