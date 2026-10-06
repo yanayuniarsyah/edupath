@@ -1123,7 +1123,7 @@
               
               <!-- Feature 1: Adaptive Learning -->
               <div class="glass-card rounded-3xl p-8 col-span-1 md:col-span-2 lg:col-span-2 row-span-2 flex flex-col justify-between relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full group-hover:bg-primary/20 transition-all duration-700"></div>
+                <div class="!absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full group-hover:bg-primary/20 transition-all duration-700"></div>
                 
                 <div class="space-y-4 z-10">
                   <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-[#c0ff00] border border-primary/20">
@@ -1145,7 +1145,7 @@
 
               <!-- Feature 2: Micro Lessons -->
               <div class="glass-card rounded-3xl p-6 col-span-1 lg:col-span-2 flex flex-col justify-between relative overflow-hidden group">
-                <div class="absolute -top-12 -right-12 w-32 h-32 bg-secondary/15 blur-2xl rounded-full"></div>
+                <div class="!absolute -top-12 -right-12 w-32 h-32 bg-secondary/15 blur-2xl rounded-full"></div>
                 <div>
                   <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl md:text-2xl font-black font-heading text-white">Micro-Lessons Library</h3>
@@ -1188,15 +1188,15 @@
               <div class="glass-card rounded-3xl p-8 col-span-1 md:col-span-3 lg:col-span-4 bg-gradient-to-r from-slate-950 to-slate-900 border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="space-y-2">
                   <h3 class="text-2xl md:text-3xl font-black font-heading text-white flex flex-wrap items-center gap-3">
-                    Auto Report WhatsApp Orang Tua
-                    <span class="bg-emerald-500/15 text-[#c0ff00] px-2.5 py-1 rounded text-[10px] font-bold border border-emerald-500/20 uppercase tracking-widest">WhatsApp</span>
+                    Auto Report Telegram Orang Tua
+                    <span class="bg-emerald-500/15 text-[#c0ff00] px-2.5 py-1 rounded text-[10px] font-bold border border-emerald-500/20 uppercase tracking-widest">Telegram</span>
                   </h3>
                   <p class="text-sm md:text-base text-slate-300 max-w-2xl font-medium leading-relaxed">
-                    Hilangkan kekhawatiran orang tua secara transparan. Sistem otomatis meringkas total waktu belajar, perolehan skor target PTN, dan mengirimkannya langsung ke WhatsApp orang tua.
+                    Hilangkan kekhawatiran orang tua secara transparan. Sistem otomatis meringkas total waktu belajar, perolehan skor target PTN, dan mengirimkannya langsung ke Telegram orang tua.
                   </p>
                 </div>
                 <button class="shrink-0 bg-white text-slate-950 hover:bg-slate-200 px-6 py-3.5 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center gap-2" @click="currentTab = 'parent'">
-                  Uji Coba Portal <i class="ph-bold ph-whatsapp-logo text-base"></i>
+                  Uji Coba Portal <i class="ph-bold ph-telegram-logo text-base"></i>
                 </button>
               </div>
 
@@ -1490,7 +1490,7 @@
                     </li>
                     <li class="flex items-start gap-2.5">
                       <span class="text-[#c0ff00] text-base shrink-0 font-black">⚡</span>
-                      <span>Laporan Progres Belajar Otomatis via WhatsApp Orang Tua</span>
+                      <span>Laporan Progres Belajar Otomatis via Telegram Orang Tua</span>
                     </li>
                   </ul>
                 </div>
@@ -1546,7 +1546,7 @@
                     </li>
                     <li class="flex items-start gap-2.5">
                       <i class="ph-bold ph-star text-purple-400 mt-0.5 shrink-0"></i>
-                      <span><strong>Grup WhatsApp VIP Langsung bareng Mentor Senior</strong></span>
+                      <span><strong>Grup Telegram VIP Langsung bareng Mentor Senior</strong></span>
                     </li>
                     <li class="flex items-start gap-2.5">
                       <i class="ph-bold ph-star text-purple-400 mt-0.5 shrink-0"></i>
@@ -1587,9 +1587,9 @@
               <h2 class="text-3xl md:text-5xl font-bold font-heading text-white">Masih Ragu?</h2>
             </div>
 
-            <div class="space-y-2">
-              <div v-for="(faq, idx) in faqs" :key="idx" class="border-b border-slate-900 py-5 transition-all">
-                <button class="w-full text-left flex justify-between items-center font-bold text-sm md:text-base text-white focus:outline-none py-2" @click="toggleFaq(idx)">
+            <div class="space-y-1">
+              <div v-for="(faq, idx) in faqs" :key="idx" class="border-b border-slate-900 py-2 transition-all">
+                <button class="w-full text-left flex justify-between items-center font-bold text-sm md:text-base text-white focus:outline-none" @click="toggleFaq(idx)">
                   <span>{{ faq.q }}</span>
                   <span class="text-slate-500 text-lg transition-transform" :class="{ 'rotate-45': faq.open }">+</span>
                 </button>
@@ -2745,7 +2745,7 @@
         </section>
 
         <!-- TAB 6: PARENT PORTAL -->
-        <section v-if="currentTab === 'parent'" class="animate-fade-in space-y-6 pt-20 lg:pt-4 px-3 sm:px-6">
+        <section v-if="currentTab === 'parent'" class="animate-fade-in space-y-6 pt-24 lg:pt-28 px-3 sm:px-6">
           <!-- Top Close & Back Bar -->
           <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 mb-4 backdrop-blur-xl shadow-xl">
             <div class="flex items-center gap-3">
@@ -2758,7 +2758,7 @@
               </div>
             </div>
             <button 
-              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+              @click="currentTab = 'home'" 
               class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
               title="Tutup Halaman & Kembali"
             >
@@ -2797,18 +2797,18 @@
               </div>
             </div>
 
-            <!-- WhatsApp Report Simulator -->
+            <!-- Telegram Report Simulator -->
             <div class="light-mode-card rounded-2xl p-6 flex flex-col justify-between">
               <div>
-                <h3 class="text-lg font-black font-heading text-slate-900 mb-2">Notifikasi Laporan WA</h3>
-                <p class="text-xs text-slate-500 mb-4 font-medium">Laporan ringkas mingguan dikirimkan otomatis ke WhatsApp orang tua.</p>
+                <h3 class="text-lg font-black font-heading text-slate-900 mb-2">Notifikasi Laporan Telegram</h3>
+                <p class="text-xs text-slate-500 mb-4 font-medium">Laporan ringkas mingguan dikirimkan otomatis ke Telegram orang tua.</p>
 
-                <div class="border border-emerald-600 rounded-2xl overflow-hidden bg-[#075e54]">
-                  <div class="bg-[#075e54] px-4 py-2 flex items-center gap-2 border-b border-black/10">
-                    <span class="w-2.5 h-2.5 bg-emerald-400 rounded-full"></span>
+                <div class="border border-sky-600 rounded-2xl overflow-hidden bg-[#0088cc]">
+                  <div class="bg-[#0088cc] px-4 py-2 flex items-center gap-2 border-b border-black/10">
+                    <span class="w-2.5 h-2.5 bg-sky-300 rounded-full"></span>
                     <span class="text-xs font-bold text-white">EduPath Parenting Bot</span>
                   </div>
-                  <div class="bg-[#ece5dd] p-3 h-44 overflow-y-auto">
+                  <div class="bg-[#e4ebf5] p-3 h-44 overflow-y-auto">
                     <div class="bg-white text-slate-900 p-3 rounded-xl text-[10px] leading-relaxed shadow-[0_8px_32px_rgba(0,0,0,0.3)] max-w-[85%] border border-black/5">
                       <p class="font-bold text-slate-900 border-b border-slate-200 pb-1 mb-1">Laporan Belajar Mingguan EduPath</p>
                       <p>Ananda belajar selama 4 jam 35 menit.</p>
@@ -2816,14 +2816,14 @@
                       <p>Literasi: +4%</p>
                       <p>Penalaran: Butuh latihan lanjutan</p>
                       <p>Target PTN UI: 720</p>
-                      <p class="font-bold text-emerald-700 mt-1">Estimasi Kemampuan: {{ currentAbilityScore }}</p>
+                      <p class="font-bold text-sky-700 mt-1">Estimasi Kemampuan: {{ currentAbilityScore }}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <button class="w-full mt-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.3)]" @click="simulateWASent">
-                Kirim Laporan WA
+              <button class="w-full mt-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.3)]" @click="simulateTelegramSent">
+                Kirim Laporan Telegram
               </button>
             </div>
           </div>
@@ -3189,8 +3189,8 @@
             <ul class="text-xs text-white/70 space-y-2.5">
               <li>
                 <a href="https://wa.me/6281234567890?text=Halo%20Tim%20PT%20Kreasi%20Hasanah%20Indonesia%20(EduPath),%20saya%20ingin%20tanya%20seputar%20platform%20belajar%20adaptif" target="_blank" rel="noopener noreferrer" class="hover:text-[#c0ff00] transition-colors flex items-center gap-2 group">
-                  <i class="ph-bold ph-whatsapp-logo text-emerald-400 text-sm group-hover:scale-110 transition-transform"></i>
-                  <span>WhatsApp CS &amp; Konsultasi</span>
+                  <i class="ph-bold ph-telegram-logo text-emerald-400 text-sm group-hover:scale-110 transition-transform"></i>
+                  <span>Telegram CS &amp; Konsultasi</span>
                 </a>
               </li>
               <li>
@@ -3621,7 +3621,7 @@
             <h4 class="text-white font-black text-sm flex items-center gap-2">
               <span class="text-[#c0ff00]">1.</span> Data yang Kami Kumpulkan
             </h4>
-            <p>Kami hanya mengumpulkan data yang diperlukan untuk personalisasi pembelajaran dan laporan berkala, meliputi: nama/inisial siswa, tingkat sekolah, target jurusan/PTN impian, riwayat pengerjaan latihan asesmen, serta nomor kontak WhatsApp wali murid yang diberikan secara sukarela.</p>
+            <p>Kami hanya mengumpulkan data yang diperlukan untuk personalisasi pembelajaran dan laporan berkala, meliputi: nama/inisial siswa, tingkat sekolah, target jurusan/PTN impian, riwayat pengerjaan latihan asesmen, serta nomor kontak Telegram wali murid yang diberikan secara sukarela.</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
@@ -3635,7 +3635,7 @@
             <h4 class="text-white font-black text-sm flex items-center gap-2">
               <span class="text-[#c0ff00]">3.</span> Izin Wali (Parental Consent) &amp; Sekolah (DPA)
             </h4>
-            <p>Bagi siswa di bawah umur, pendaftaran dan pengiriman nomor WhatsApp wali dianggap telah melalui persetujuan orang tua/wali resmi. Untuk integrasi B2B sekolah/bimbel, seluruh data agregat dilindungi oleh perjanjian pemrosesan data (DPA) yang terisolasi.</p>
+            <p>Bagi siswa di bawah umur, pendaftaran dan pengiriman nomor Telegram wali dianggap telah melalui persetujuan orang tua/wali resmi. Untuk integrasi B2B sekolah/bimbel, seluruh data agregat dilindungi oleh perjanjian pemrosesan data (DPA) yang terisolasi.</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
@@ -3724,10 +3724,10 @@
         <div class="space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
           <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
             <h4 class="text-white font-black text-sm flex items-center gap-2 text-indigo-300">
-              <i class="ph-bold ph-whatsapp-logo text-emerald-400 text-base"></i>
-              Laporan Mingguan via WhatsApp
+              <i class="ph-bold ph-telegram-logo text-emerald-400 text-base"></i>
+              Laporan Mingguan via Telegram
             </h4>
-            <p>Orang tua tidak perlu repot menginstal aplikasi tambahan. Ringkasan topik yang sudah dipelajari anak, skor tryout berkala, dan rekomendasi fokus minggu depan akan dikirimkan otomatis ke nomor WhatsApp orang tua.</p>
+            <p>Orang tua tidak perlu repot menginstal aplikasi tambahan. Ringkasan topik yang sudah dipelajari anak, skor tryout berkala, dan rekomendasi fokus minggu depan akan dikirimkan otomatis ke nomor Telegram orang tua.</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
@@ -3743,7 +3743,7 @@
               <i class="ph-bold ph-hand-heart text-[#c0ff00] text-base"></i>
               Persetujuan Wali &amp; Pengelolaan Data
             </h4>
-            <p>Penggunaan kontak WhatsApp orang tua semata-mata ditujukan untuk pelaporan progres edukatif di bawah naungan <strong>PT Kreasi Hasanah Indonesia</strong>. Orang tua berhak menghentikan pengiriman laporan kapan pun.</p>
+            <p>Penggunaan kontak Telegram orang tua semata-mata ditujukan untuk pelaporan progres edukatif di bawah naungan <strong>PT Kreasi Hasanah Indonesia</strong>. Orang tua berhak menghentikan pengiriman laporan kapan pun.</p>
           </div>
         </div>
 
@@ -3817,12 +3817,12 @@
             >
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                  <i class="ph-bold ph-whatsapp-logo text-base"></i> WhatsApp CS
+                  <i class="ph-bold ph-telegram-logo text-base"></i> Telegram CS
                 </span>
                 <i class="ph-bold ph-arrow-up-right text-emerald-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform text-xs"></i>
               </div>
               <p class="font-black text-white text-sm">+62 812-3456-7890</p>
-              <p class="text-[11px] text-white/50">Respon cepat via pesan WhatsApp</p>
+              <p class="text-[11px] text-white/50">Respon cepat via pesan Telegram</p>
             </a>
 
             <a 
@@ -3889,7 +3889,7 @@
               <input v-model="affiliateForm.email" type="email" placeholder="nama@email.com" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
             </div>
             <div class="space-y-1.5">
-              <label class="text-xs font-bold text-white/70">Nomor WhatsApp</label>
+              <label class="text-xs font-bold text-white/70">Nomor Telegram</label>
               <input v-model="affiliateForm.whatsapp" type="tel" placeholder="08..." class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
             </div>
             <div class="space-y-1.5">
@@ -4211,7 +4211,7 @@ export default {
         cluster: 'soshum',
         target: 'Soshum / Ekonomi',
         badge: 'Pengguna Beta',
-        text: 'Fitur laporan mingguan ke WhatsApp orang tua keren banget. Orang tua jadi bisa pantau perkembangan belajarku tanpa harus nanya-nanya terus. Akhirnya belajar tenang!'
+        text: 'Fitur laporan mingguan ke Telegram orang tua keren banget. Orang tua jadi bisa pantau perkembangan belajarku tanpa harus nanya-nanya terus. Akhirnya belajar tenang!'
       }
     ];
 
@@ -4734,13 +4734,33 @@ export default {
       },
       { 
         q: "Bagaimana orang tua memantau perkembangan belajar anak?", 
-        a: "Laporan ringkas mengenai topik yang dikuasai, skor latihan berkala, dan rekomendasi fokus mingguan dikirimkan otomatis ke WhatsApp orang tua tanpa perlu menginstal aplikasi tambahan.", 
+        a: "Laporan ringkas mengenai topik yang dikuasai, skor latihan berkala, dan rekomendasi fokus mingguan dikirimkan otomatis ke Telegram orang tua tanpa perlu menginstal aplikasi tambahan.", 
         open: false 
       },
       { 
         q: "Bagaimana EduPath menjaga privasi data siswa & sekolah?", 
         a: "Data identitas, asal sekolah, dan riwayat asesmen dilindungi dengan enkripsi standar industri dan TIDAK PERNAH diperjualbelikan kepada pihak ketiga. Untuk kerja sama sekolah, kami menyediakan Data Processing Agreement (DPA) khusus.", 
         open: false 
+      },
+      {
+        q: "Apakah ada versi gratis atau harus langsung bayar?",
+        a: "EduPath menyediakan versi uji coba gratis (Free Tier) agar Anda bisa merasakan langsung asesmen diagnostik dan beberapa micro-lessons. Untuk akses penuh ke seluruh perpustakaan materi, AI Companion, dan TryOut Nasional, Anda dapat berlangganan paket Premium.",
+        open: false
+      },
+      {
+        q: "Bagaimana cara kerja komisi Program Afiliasi EduPath?",
+        a: "Anda akan mendapatkan komisi sebesar 20% pada tahun pertama untuk setiap transaksi langganan dari pengguna yang mendaftar menggunakan kode referral Anda, ditambah komisi berulang (recurring) 10% seumur hidup selama pengguna tersebut memperpanjang langganannya.",
+        open: false
+      },
+      {
+        q: "Apakah EduPath bisa diakses lewat HP/Tablet?",
+        a: "Ya! EduPath dirancang 100% responsif. Anda bisa belajar, menonton micro-lessons, hingga melakukan TryOut dengan nyaman melalui smartphone, tablet, maupun laptop/PC tanpa perlu menginstal aplikasi tambahan.",
+        open: false
+      },
+      {
+        q: "Apakah jadwal TryOut Nasional selalu serentak?",
+        a: "Ya, TryOut Nasional diselenggarakan secara serentak sesuai jadwal yang telah ditentukan untuk mensimulasikan tekanan dan kondisi UTBK aslinya. Namun, untuk latihan reguler dan asesmen mandiri, Anda bisa mengerjakannya kapan saja 24/7.",
+        open: false
       }
     ]);
 
@@ -4975,7 +4995,7 @@ export default {
       showToast(`Memutar track: ${trackId}`);
     };
 
-    const simulateWASent = () => showToast(' Laporan mingguan sukses dikirimkan ke WhatsApp Orang Tua.');
+    const simulateTelegramSent = () => showToast(' Laporan mingguan sukses dikirimkan ke Telegram Orang Tua.');
 
     const liveActivityList = [
       { icon: '🔥', title: 'EduPath Beta Aktif', desc: 'Platform sedang dalam tahap pengembangan & pengujian', time: 'Live' },
@@ -5314,7 +5334,7 @@ export default {
       toggleTimer,
       resetTimer,
       playTrack,
-      simulateWASent,
+      simulateTelegramSent,
       ansProj1,
       ansProj2,
       ansProj3,

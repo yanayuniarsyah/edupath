@@ -889,9 +889,9 @@
               <p class="text-[10px] text-white/40 mt-0.5">Daftar bank soal & status QC</p>
             </button>
 
-            <button @click="blastWhatsAppParentReport" class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 hover:border-emerald-500/50 transition-all text-left group">
+            <button @click="blastTelegramParentReport" class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 hover:border-emerald-500/50 transition-all text-left group">
               <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg mb-2">
-                <i class="ph-bold ph-whatsapp-logo"></i>
+                <i class="ph-bold ph-telegram-logo"></i>
               </div>
               <h4 class="font-bold text-white text-xs">Blast WA Orang Tua</h4>
               <p class="text-[10px] text-white/40 mt-0.5">Template laporan progres belajar</p>
@@ -2542,7 +2542,7 @@ const exportQuestionsCSV = () => {
   downloadCSV(`EduPath_BankSoal_${new Date().toISOString().slice(0,10)}.csv`, rows);
 };
 
-const blastWhatsAppParentReport = () => {
+const blastTelegramParentReport = () => {
   const message = `Halo Bapak/Ibu Wali Siswa EduPath,\n\nBerikut ringkasan progres belajar ananda di EduPath:\n- Tryout Terselesaikan: 5x\n- Rata-rata Skor SNBT: 685 (Target 700+)\n- Status Paket: Aktif\n\nTerus dukung ananda meraih PTN Impian bersama EduPath.ai!`;
   const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');

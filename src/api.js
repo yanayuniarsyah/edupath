@@ -374,8 +374,8 @@ export default {
 
   // ── Admin Endpoints ──
   getAdminDashboard()                  { return apiFetch('/admin.php?action=stats'); },
-  getAdminOrders(page = 1, status = '') {
-    return apiFetch(`/admin.php?action=orders&page=${page}&status=${status}`);
+  getAdminOrders(page = 1, status = '', student_id = '', search = '') {
+    return apiFetch(`/admin.php?action=orders&page=${page}&status=${status}&student_id=${encodeURIComponent(student_id)}&search=${encodeURIComponent(search)}`);
   },
   createAdminOrder(data) {
     return apiFetch('/admin.php?action=orders', { method: 'POST', body: JSON.stringify(data) });

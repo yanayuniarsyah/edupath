@@ -145,7 +145,7 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         JOIN user_roles ur ON u.id = ur.user_id 
         LEFT JOIN admins a ON ur.reference_id = a.id
         LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE (u.identity_key = ? OR a.username = ?) AND u.is_active = 1 AND ur.role IN ('admin', 'superadmin')
+        WHERE (u.identity_key = ? OR a.username = ?) AND u.is_active = 1 AND ur.role IN ('admin', 'superadmin', 'teacher')
         LIMIT 1
     ");
     $stmt->execute([$username, $username]);
@@ -163,7 +163,7 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($isValid) {
-        if ($admin['role'] === 'admin' && isset($admin['tenant_active']) && (int)$admin['tenant_active'] === 0) {
+        if (in_array($admin['role'], ['admin', 'teacher']) && isset($admin['tenant_active']) && (int)$admin['tenant_active'] === 0) {
             http_response_code(403);
             echo json_encode(["error" => "Tenant anda telah dinonaktifkan."]);
             exit;
@@ -203,15 +203,49 @@ if ($action === 'logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Untuk rute di bawah ini, wajib login sebagai admin atau superadmin
+// Untuk rute di bawah ini, wajib login sebagai superadmin, admin, atau teacher
 $payload = authenticate();
-if (!in_array($payload->role, ['admin', 'superadmin'])) {
+if (!in_array($payload->role, ['admin', 'superadmin', 'teacher'])) {
     http_response_code(403);
     echo json_encode(["error" => "Forbidden"]);
     exit;
 }
 
 if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    if ($payload->role === 'teacher') {
+        $tenant_id = $payload->tenant_id;
+        $totalStudents = 0;
+        $activeStudents = 0;
+        if ($tenant_id) {
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM students WHERE tenant_id = ?");
+            $stmt->execute([$tenant_id]);
+            $totalStudents = $stmt->fetchColumn() ?: 0;
+
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM students WHERE is_active = 1 AND tenant_id = ?");
+            $stmt->execute([$tenant_id]);
+            $activeStudents = $stmt->fetchColumn() ?: 0;
+        } else {
+            $totalStudents = $pdo->query("SELECT COUNT(*) FROM students")->fetchColumn() ?: 0;
+            $activeStudents = $pdo->query("SELECT COUNT(*) FROM students WHERE is_active = 1")->fetchColumn() ?: 0;
+        }
+        $totalQuizzes = $pdo->query("SELECT COUNT(*) FROM questions")->fetchColumn() ?: 0;
+        $totalMaterials = $pdo->query("SELECT COUNT(*) FROM materials")->fetchColumn() ?: 0;
+
+        $statsData = [
+            "totalStudents" => (int)$totalStudents,
+            "activeStudents" => (int)$activeStudents,
+            "totalQuizzes" => (int)$totalQuizzes,
+            "totalMaterials" => (int)$totalMaterials,
+            "totalRevenue" => 0,
+            "activeSubscriptions" => 0,
+            "totalAffiliates" => 0,
+            "totalCommissions" => 0,
+            "totalTenants" => 0
+        ];
+        echo json_encode(array_merge($statsData, ["stats" => $statsData]));
+        exit;
+    }
+
     if ($payload->role === 'superadmin') {
         // Superadmin stats (Global across platform)
         $totalStudents = $pdo->query("SELECT COUNT(*) FROM students")->fetchColumn() ?: 0;
@@ -400,6 +434,9 @@ elseif ($action === 'students') {
             http_response_code(500); echo json_encode(["error" => "Gagal mengupdate siswa", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
+            http_response_code(403); echo json_encode(["error" => "Akses ditolak"]); exit;
+        }
         $id = $_GET['id'] ?? '';
         if (empty($id)) {
             http_response_code(400); echo json_encode(["error" => "ID siswa wajib"]); exit;
@@ -410,6 +447,24 @@ elseif ($action === 'students') {
             $stmtS->execute([$id]);
             $email = $stmtS->fetchColumn();
 
+            // 1. Delete dependent financial data
+            $pdo->prepare("DELETE FROM commissions WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id]);
+            $pdo->prepare("DELETE FROM payments WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id]);
+            $pdo->prepare("DELETE FROM invoices WHERE student_id = ? OR order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id, $id]);
+            $pdo->prepare("DELETE FROM orders WHERE student_id = ?")->execute([$id]);
+            $pdo->prepare("DELETE FROM subscriptions WHERE student_id = ?")->execute([$id]);
+
+            // 2. Delete quiz and learning data
+            $pdo->prepare("DELETE FROM quiz_results WHERE student_id = ?")->execute([$id]);
+            $pdo->prepare("DELETE FROM quiz_attempts WHERE student_id = ?")->execute([$id]);
+            $pdo->prepare("DELETE FROM progress WHERE student_id = ?")->execute([$id]);
+            $pdo->prepare("DELETE FROM entitlements WHERE student_id = ?")->execute([$id]);
+
+            // 3. Delete session & device tokens
+            $pdo->prepare("DELETE FROM refresh_tokens WHERE student_id = ?")->execute([$id]);
+            $pdo->prepare("DELETE FROM device_tokens WHERE student_id = ?")->execute([$id]);
+
+            // 4. Delete student record & user account
             $pdo->prepare("DELETE FROM students WHERE id = ?")->execute([$id]);
             $pdo->prepare("DELETE FROM user_roles WHERE reference_id = ?")->execute([$id]);
             if ($email) {
@@ -419,29 +474,45 @@ elseif ($action === 'students') {
             echo json_encode(["success" => true]);
         } catch (PDOException $e) {
             $pdo->rollBack();
-            http_response_code(500); echo json_encode(["error" => "Gagal menghapus siswa"]);
+            http_response_code(500); echo json_encode(["error" => "Gagal menghapus siswa: " . $e->getMessage()]);
         }
     }
 }
 elseif ($action === 'orders') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if ($payload->role === 'superadmin' || empty($payload->tenant_id)) {
-            $stmt = $pdo->query("
-                SELECT o.*, s.name as student_name, s.email as student_email 
-                FROM orders o 
-                LEFT JOIN students s ON o.student_id = s.id 
-                ORDER BY o.created_at DESC
-            ");
-        } else {
-            $stmt = $pdo->prepare("
-                SELECT o.*, s.name as student_name, s.email as student_email 
-                FROM orders o 
-                LEFT JOIN students s ON o.student_id = s.id 
-                WHERE (s.tenant_id = ? OR s.tenant_id IS NULL OR s.tenant_id = '')
-                ORDER BY o.created_at DESC
-            ");
-            $stmt->execute([$payload->tenant_id]);
+        $student_id = trim($_GET['student_id'] ?? '');
+        $search = trim($_GET['search'] ?? '');
+
+        $sql = "
+            SELECT o.*, s.name as student_name, s.email as student_email 
+            FROM orders o 
+            LEFT JOIN students s ON o.student_id = s.id 
+            WHERE 1=1
+        ";
+        $params = [];
+
+        if ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+            $sql .= " AND (s.tenant_id = ? OR s.tenant_id IS NULL OR s.tenant_id = '')";
+            $params[] = $payload->tenant_id;
         }
+
+        if (!empty($student_id) && $student_id !== 'all') {
+            $sql .= " AND (o.student_id = ? OR s.email = ?)";
+            $params[] = $student_id;
+            $params[] = $student_id;
+        }
+
+        if (!empty($search)) {
+            $sql .= " AND (s.name LIKE ? OR s.email LIKE ? OR o.order_id LIKE ? OR o.plan_name LIKE ?)";
+            $params[] = "%$search%";
+            $params[] = "%$search%";
+            $params[] = "%$search%";
+            $params[] = "%$search%";
+        }
+
+        $sql .= " ORDER BY o.created_at DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo safe_json_encode(["orders" => $orders]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -461,14 +532,34 @@ elseif ($action === 'orders') {
         $order_id = 'MANUAL-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 8)) . '-' . date('Ymd');
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare("INSERT INTO orders (id, order_id, student_id, plan_id, plan_name, amount, status, payment_type, created_at, updated_at) VALUES (UUID(), ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
-            $stmt->execute([$order_id, $student_id, $plan_id, $plan_name, $amount, $status, $payment_type]);
+
+            $stmtTenant = $pdo->prepare("SELECT tenant_id FROM students WHERE id = ?");
+            $stmtTenant->execute([$student_id]);
+            $studentTenant = $stmtTenant->fetchColumn();
+            if (!$studentTenant) {
+                $studentTenant = $payload->tenant_id ?? $pdo->query("SELECT id FROM tenants LIMIT 1")->fetchColumn();
+            }
+
+            $actual_plan_id = null;
+            if (!empty($plan_id)) {
+                $pStmt = $pdo->prepare("SELECT id, name FROM plans WHERE id = ? OR name = ? LIMIT 1");
+                $pStmt->execute([$plan_id, $plan_name]);
+                $pRow = $pStmt->fetch(PDO::FETCH_ASSOC);
+                if ($pRow) {
+                    $actual_plan_id = $pRow['id'];
+                    $plan_name = $pRow['name'];
+                }
+            }
+
+            $paid_at = in_array($status, ['paid', 'settlement']) ? date('Y-m-d H:i:s') : null;
+            $stmt = $pdo->prepare("INSERT INTO orders (id, tenant_id, plan_id, order_id, student_id, plan_name, amount, status, paid_at, created_at, updated_at) VALUES (UUID(), ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+            $stmt->execute([$studentTenant, $actual_plan_id, $order_id, $student_id, $plan_name, $amount, $status, $paid_at]);
 
             // If status is paid, auto activate student plan
             if (in_array($status, ['paid', 'settlement'])) {
                 $planCode = 'mandiri';
-                if (stripos($plan_id, 'vip') !== false || stripos($plan_name, 'vip') !== false) $planCode = 'vip';
-                elseif (stripos($plan_id, 'utama') !== false || stripos($plan_name, 'utama') !== false) $planCode = 'utama';
+                if (stripos((string)$plan_name, 'vip') !== false || stripos((string)$plan_id, 'vip') !== false) $planCode = 'vip';
+                elseif (stripos((string)$plan_name, 'utama') !== false || stripos((string)$plan_id, 'utama') !== false) $planCode = 'utama';
                 
                 $pdo->prepare("UPDATE students SET plan = ? WHERE id = ?")->execute([$planCode, $student_id]);
             }
@@ -500,8 +591,8 @@ elseif ($action === 'orders') {
                 $ord = $stmtOrd->fetch(PDO::FETCH_ASSOC);
                 if ($ord && !empty($ord['student_id'])) {
                     $planCode = 'mandiri';
-                    if (stripos($ord['plan_id'], 'vip') !== false || stripos($ord['plan_name'], 'vip') !== false) $planCode = 'vip';
-                    elseif (stripos($ord['plan_id'], 'utama') !== false || stripos($ord['plan_name'], 'utama') !== false) $planCode = 'utama';
+                    if (stripos($ord['plan_id'] ?? '', 'vip') !== false || stripos($ord['plan_name'] ?? '', 'vip') !== false) $planCode = 'vip';
+                    elseif (stripos($ord['plan_id'] ?? '', 'utama') !== false || stripos($ord['plan_name'] ?? '', 'utama') !== false) $planCode = 'utama';
                     $pdo->prepare("UPDATE students SET plan = ? WHERE id = ?")->execute([$planCode, $ord['student_id']]);
                 }
             }
@@ -679,7 +770,7 @@ elseif ($action === 'products') {
 elseif ($action === 'plans') {
     $VALID_ENTITLEMENTS = ['tryout_unlimited', 'ai_adaptive_path', 'premium_materials', 'feature_quiz'];
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $plans = $pdo->query("SELECT * FROM plans ORDER BY price ASC")->fetchAll(PDO::FETCH_ASSOC);
+        $plans = $pdo->query("SELECT * FROM plans WHERE (is_archived IS NULL OR is_archived = 0) ORDER BY price ASC")->fetchAll(PDO::FETCH_ASSOC);
         if (empty($plans)) {
             // Auto-seed official 3 packages exactly matching Landing Page
             $defaultPlans = [
@@ -726,7 +817,7 @@ elseif ($action === 'plans') {
             foreach ($defaultPlans as $dp) {
                 $stmtIns->execute([$dp['id'], $dp['name'], $dp['price'], $dp['duration'], $dp['features']]);
             }
-            $plans = $pdo->query("SELECT * FROM plans ORDER BY price ASC")->fetchAll(PDO::FETCH_ASSOC);
+            $plans = $pdo->query("SELECT * FROM plans WHERE (is_archived IS NULL OR is_archived = 0) ORDER BY price ASC")->fetchAll(PDO::FETCH_ASSOC);
         }
         foreach ($plans as &$plan) {
             $stmt = $pdo->prepare("SELECT feature_key FROM plan_entitlements WHERE plan_id = ?");
@@ -799,8 +890,36 @@ elseif ($action === 'plans') {
             http_response_code(403); echo json_encode(["error" => "Admin only"]); exit;
         }
         $id = $_GET['id'] ?? '';
-        $pdo->prepare("DELETE FROM plans WHERE id = ?")->execute([$id]);
-        echo json_encode(["success" => true]);
+        if (empty($id)) {
+            http_response_code(400); echo json_encode(["error" => "ID paket diperlukan"]); exit;
+        }
+        try {
+            $pdo->beginTransaction();
+            // Delete plan entitlements first
+            $pdo->prepare("DELETE FROM plan_entitlements WHERE plan_id = ?")->execute([$id]);
+
+            // Check if there are orders or subscriptions
+            $chkOrders = $pdo->prepare("SELECT COUNT(*) FROM orders WHERE plan_id = ?");
+            $chkOrders->execute([$id]);
+            $hasOrders = $chkOrders->fetchColumn() > 0;
+
+            $chkSubs = $pdo->prepare("SELECT COUNT(*) FROM subscriptions WHERE plan_id = ?");
+            $chkSubs->execute([$id]);
+            $hasSubs = $chkSubs->fetchColumn() > 0;
+
+            if ($hasOrders || $hasSubs) {
+                // Soft archive to protect financial records
+                $pdo->prepare("UPDATE plans SET is_active = 0, is_archived = 1 WHERE id = ?")->execute([$id]);
+            } else {
+                // Safe hard delete
+                $pdo->prepare("DELETE FROM plans WHERE id = ?")->execute([$id]);
+            }
+            $pdo->commit();
+            echo json_encode(["success" => true]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            http_response_code(500); echo json_encode(["error" => "Gagal menghapus paket", "details" => $e->getMessage()]);
+        }
     }
 }
 elseif ($action === 'questions') {
@@ -860,7 +979,7 @@ elseif ($action === 'questions') {
                     is_qc_passed, classification
                 ) VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?
                 )
@@ -1072,6 +1191,11 @@ elseif ($action === 'staff') {
         $stmt->execute($params);
         echo safe_json_encode(["staff" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($payload->role !== 'superadmin') {
+            http_response_code(403);
+            echo json_encode(["error" => "Hanya Superadmin yang memiliki izin untuk menambah, mengedit, atau menghapus staf"]);
+            exit;
+        }
         $username = trim($input['username'] ?? '');
         $name = trim($input['name'] ?? '');
         $role = $input['role'] ?? 'teacher';
@@ -1122,6 +1246,11 @@ elseif ($action === 'staff') {
             http_response_code(500); echo json_encode(["error" => "Gagal membuat staff", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+        if ($payload->role !== 'superadmin') {
+            http_response_code(403);
+            echo json_encode(["error" => "Hanya Superadmin yang memiliki izin untuk menambah, mengedit, atau menghapus staf"]);
+            exit;
+        }
         $id = $input['id'] ?? '';
         $name = trim($input['name'] ?? '');
         $role = $input['role'] ?? 'teacher';
@@ -1158,6 +1287,11 @@ elseif ($action === 'staff') {
             http_response_code(500); echo json_encode(["error" => "Gagal mengupdate staff", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        if ($payload->role !== 'superadmin') {
+            http_response_code(403);
+            echo json_encode(["error" => "Hanya Superadmin yang memiliki izin untuk menambah, mengedit, atau menghapus staf"]);
+            exit;
+        }
         $id = $_GET['id'] ?? '';
         if (empty($id)) {
             http_response_code(400); echo json_encode(["error" => "ID staff diperlukan"]); exit;

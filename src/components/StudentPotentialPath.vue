@@ -198,7 +198,7 @@
 
             <div>
               <label class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
-                Nomor WhatsApp <span class="text-white/40 font-normal">(Opsional — untuk kirim backup hasil &amp; laporan orang tua)</span>
+                Nomor Telegram <span class="text-white/40 font-normal">(Opsional — untuk kirim backup hasil &amp; laporan orang tua)</span>
               </label>
               <input
                 v-model="studentData.whatsapp"
@@ -491,7 +491,7 @@
                     class="px-5 py-2.5 rounded-full bg-white text-black font-black text-xs hover:bg-[#c0ff00] active:scale-95 transition-all flex items-center gap-2 shadow-lg"
                   >
                     <i class="ph-bold ph-share-network text-base"></i>
-                    <span>{{ copySuccess ? 'Link Berhasil Disalin!' : 'Bagikan ke WhatsApp / IG' }}</span>
+                    <span>{{ copySuccess ? 'Link Berhasil Disalin!' : 'Bagikan ke Telegram / IG' }}</span>
                   </button>
                   <button
                     @click="retakeAssessment"
@@ -669,11 +669,11 @@
 
             <div class="flex flex-wrap items-center gap-3 pt-2">
               <a
-                :href="partnerWhatsAppUrl"
+                :href="partnerTelegramUrl"
                 target="_blank"
                 class="px-6 py-3 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs md:text-sm hover:scale-105 active:scale-95 transition-all inline-flex items-center gap-2 shadow-lg shadow-emerald-500/20"
               >
-                <i class="ph-bold ph-whatsapp-logo text-base"></i>
+                <i class="ph-bold ph-telegram-logo text-base"></i>
                 <span>Klaim Banner Cetak & Fasilitasi BK via WA</span>
               </a>
             </div>
@@ -838,7 +838,7 @@ export default {
       return `https://edupath.biz.id/spp?school=${slug}`;
     });
 
-    const partnerWhatsAppUrl = computed(() => {
+    const partnerTelegramUrl = computed(() => {
       const text = `Halo Tim Kemitraan EduPath, saya ${partnerBkName.value} dari ${partnerSchoolName.value} (${partnerStudentCount.value}) ingin mengklaim banner QR Code resmi & fasilitasi asesmen SPP untuk sekolah kami.`;
       return `https://wa.me/6281234567890?text=${encodeURIComponent(text)}`;
     });
@@ -1135,7 +1135,7 @@ export default {
       partnerBkName,
       partnerStudentCount,
       generatedSchoolLink,
-      partnerWhatsAppUrl,
+      partnerTelegramUrl,
       profile,
       schoolStats,
       copySuccess,

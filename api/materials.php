@@ -56,11 +56,9 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     
-    // 5. STANDARD RESPONSE
-    echo json_encode([
-        "success" => true,
-        "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)
-    ]);
+    // 5. STANDARD RESPONSE (Direct array for backward compatibility and test suite)
+    $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode($materials);
 } else {
     http_response_code(404);
     echo json_encode([

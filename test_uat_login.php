@@ -2,8 +2,12 @@
 require 'api/config.php';
 
 function api_request($endpoint, $method = 'GET', $token = null, $data = null) {
+    $clean = ltrim($endpoint, '/');
+    if (!str_starts_with($clean, 'api/')) {
+        $clean = 'api/' . $clean;
+    }
+    $url = "http://localhost:8000/" . $clean;
     $ch = curl_init();
-    $url = "http://localhost:8000/" . ltrim($endpoint, '/');
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     

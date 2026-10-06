@@ -10,7 +10,8 @@ require_once __DIR__ . '/env.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
-// Gunakan file .env yang ada di root direktori proyek
+// Gunakan file api/.env terlebih dahulu (spesifik backend), lalu fallback ke root .env
+load_env(__DIR__ . '/.env');
 load_env(dirname(__DIR__) . '/.env');
 
 // ----------------------------------------------------------------
