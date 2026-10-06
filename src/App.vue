@@ -1119,57 +1119,106 @@
               <h2 class="text-4xl md:text-6xl font-black font-heading text-white">Alat Tempur <span class="text-[#c0ff00]">Terlengkap</span></h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[270px] max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 max-w-5xl mx-auto items-start">
               
               <!-- Feature 1: Adaptive Learning -->
-              <div class="glass-card rounded-3xl p-8 col-span-1 md:col-span-2 lg:col-span-2 row-span-2 flex flex-col justify-between relative overflow-hidden group">
-                <div class="!absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full group-hover:bg-primary/20 transition-all duration-700"></div>
+              <div class="glass-card rounded-2xl p-4 lg:col-span-5 flex flex-col justify-start relative overflow-hidden group">
+                <div class="!absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-[60px] rounded-full group-hover:bg-primary/20 transition-all duration-700 pointer-events-none"></div>
                 
-                <div class="space-y-4 z-10">
-                  <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-[#c0ff00] border border-primary/20">
-                    <i class="ph-bold ph-cpu text-2xl"></i>
+                <div class="space-y-1.5 z-10">
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-[#c0ff00] border border-primary/20">
+                      <i class="ph-bold ph-cpu text-lg"></i>
+                    </div>
+                    <span class="text-[9px] bg-primary/20 text-[#c0ff00] font-mono px-2 py-0.5 rounded-full border border-primary/30 font-bold uppercase tracking-wider">
+                      🎯 IRT Adaptive
+                    </span>
                   </div>
-                  <h3 class="text-2xl md:text-3xl font-black text-white font-heading">AI Adaptive Assessment™</h3>
-                  <p class="text-base text-slate-300 leading-relaxed font-medium">
-                    Sistem mendeteksi secara instan di materi mana pemahaman konsep Anda melambat, lalu secara reaktif merubah susunan subtes berikutnya agar pas dengan porsi pemahaman Anda.
-                  </p>
+                  <div>
+                    <h3 class="text-base font-black text-white font-heading">AI Adaptive Assessment™</h3>
+                    <p class="text-[10px] text-slate-300 leading-relaxed font-medium mt-1">
+                      Sistem mendeteksi materi kelemahan, lalu reaktif mengubah urutan soal agar pas dengan porsi pemahaman Anda.
+                    </p>
+                  </div>
                 </div>
 
-                <div class="bg-slate-955 border border-slate-900 rounded-xl p-4 mt-6 z-10 relative overflow-hidden h-28 flex items-end gap-2">
-                  <div class="w-1/4 bg-slate-800 rounded-t h-[40%] group-hover:h-[60%] transition-all duration-500"></div>
-                  <div class="w-1/4 bg-slate-800 rounded-t h-[60%] group-hover:h-[80%] transition-all duration-500 delay-75"></div>
-                  <div class="w-1/4 bg-primary/60 rounded-t h-[75%] group-hover:h-[95%] transition-all duration-500 delay-100"></div>
-                  <div class="w-1/4 bg-secondary/60 rounded-t h-[90%] group-hover:h-[110%] transition-all duration-500 delay-150"></div>
+                <div class="bg-slate-950/80 border border-slate-900 rounded-xl p-2.5 mt-3 z-10 relative overflow-hidden">
+                  <div class="flex items-center justify-between text-[9px] font-mono mb-2">
+                    <span class="text-white/60">Live Mastery</span>
+                    <span class="text-[#c0ff00] font-bold flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00] animate-pulse"></span> Beradaptasi
+                    </span>
+                  </div>
+                  <div class="flex items-end gap-1.5 h-12">
+                    <div class="w-1/4 bg-slate-800 rounded-t h-[40%] group-hover:h-[60%] transition-all duration-500"></div>
+                    <div class="w-1/4 bg-slate-800 rounded-t h-[60%] group-hover:h-[80%] transition-all duration-500 delay-75"></div>
+                    <div class="w-1/4 bg-primary/60 rounded-t h-[75%] group-hover:h-[95%] transition-all duration-500 delay-100"></div>
+                    <div class="w-1/4 bg-secondary/60 rounded-t h-[90%] group-hover:h-[110%] transition-all duration-500 delay-150"></div>
+                  </div>
                 </div>
               </div>
 
               <!-- Feature 2: Micro Lessons -->
-              <div class="glass-card rounded-3xl p-6 col-span-1 lg:col-span-2 flex flex-col justify-between relative overflow-hidden group">
-                <div class="!absolute -top-12 -right-12 w-32 h-32 bg-secondary/15 blur-2xl rounded-full"></div>
-                <div>
-                  <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl md:text-2xl font-black font-heading text-white">Micro-Lessons Library</h3>
-                    <span class="text-xs bg-secondary/25 text-[#c0ff00] px-2.5 py-1 rounded font-bold uppercase tracking-wider">📚 5 Menit</span>
+              <div class="glass-card rounded-2xl p-4 lg:col-span-4 flex flex-col justify-start relative overflow-hidden group">
+                <div class="!absolute -top-8 -right-8 w-24 h-24 bg-secondary/15 blur-xl rounded-full pointer-events-none"></div>
+                
+                <div class="space-y-1.5 z-10">
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="w-8 h-8 rounded-lg bg-secondary/15 flex items-center justify-center text-[#c0ff00] border border-secondary/30">
+                      <i class="ph-bold ph-video-camera text-lg"></i>
+                    </div>
+                    <span class="text-[9px] bg-secondary/25 text-[#c0ff00] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-secondary/30">
+                      📚 Modul Kilat
+                    </span>
                   </div>
-                  <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">
-                    Koleksi modul video ringkas terfokus durasi 3-7 menit yang langsung mengupas trik penyelesaian rumus cepat dan eliminasi pilihan jawaban.
-                  </p>
+                  <div>
+                    <h3 class="text-base font-black font-heading text-white">Micro-Lessons Library</h3>
+                    <p class="text-[10px] text-slate-300 leading-relaxed font-medium mt-1">
+                      Koleksi video ringkas 3-7 menit yang langsung mengupas trik penyelesaian dan eliminasi opsi jawaban.
+                    </p>
+                  </div>
                 </div>
-                <div class="flex -space-x-3 mt-4">
-                  <span class="w-8 h-8 rounded-full bg-slate-800 border-2 border-slate-950 flex items-center justify-center text-xs text-slate-300 font-bold">PU</span>
-                  <span class="w-8 h-8 rounded-full bg-slate-800 border-2 border-slate-950 flex items-center justify-center text-xs text-slate-300 font-bold">PK</span>
-                  <span class="w-8 h-8 rounded-full bg-slate-800 border-2 border-slate-950 flex items-center justify-center text-xs text-slate-300 font-bold">PM</span>
+
+                <div class="bg-black/40 border border-white/10 rounded-xl p-2 mt-3 space-y-1 z-10">
+                  <div class="flex items-center justify-between px-2 py-1.5 rounded-lg bg-white/5 text-[9px] text-white/80 font-medium">
+                    <span class="flex items-center gap-1.5"><i class="ph-fill ph-play-circle text-[#c0ff00]"></i> Trik Eliminasi Aljabar</span>
+                    <span class="text-white/40 font-mono">04:15</span>
+                  </div>
+                  <div class="flex items-center justify-between px-2 py-1.5 rounded-lg bg-white/5 text-[9px] text-white/80 font-medium">
+                    <span class="flex items-center gap-1.5"><i class="ph-fill ph-play-circle text-[#c0ff00]"></i> Taktik Analisis Wacana</span>
+                    <span class="text-white/40 font-mono">05:10</span>
+                  </div>
                 </div>
               </div>
 
               <!-- Feature 3: AI Tutor -->
-              <div class="glass-card rounded-3xl p-6 col-span-1 flex flex-col justify-between group">
-                <div class="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-[#c0ff00] text-lg">
-                  🤖
+              <div class="glass-card rounded-2xl p-4 lg:col-span-3 flex flex-col justify-start group">
+                <div class="space-y-1.5">
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="w-8 h-8 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center text-[#c0ff00] text-lg">
+                      🤖
+                    </div>
+                    <span class="text-[9px] bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded-full font-mono font-bold border border-emerald-500/30 flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 24/7
+                    </span>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-black text-white font-heading">AI Companion 24/7</h3>
+                    <p class="text-[10px] text-slate-300 font-medium leading-relaxed mt-1">
+                      Asisten interaktif cerdas membongkar kerumitan soal UTBK kapan pun kamu buntu.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="text-lg md:text-xl font-black text-white font-heading mb-1">AI Companion 24/7</h3>
-                  <p class="text-sm text-slate-300 font-medium leading-relaxed">Asisten interaktif bongkar kerumitan soal jam berapa pun.</p>
+
+                <div class="bg-black/50 border border-white/10 rounded-xl p-2.5 mt-3 space-y-1.5">
+                  <div class="flex items-start gap-1.5 max-w-[90%]">
+                    <div class="w-4 h-4 rounded-full bg-slate-700 flex items-center justify-center text-[8px] shrink-0">👤</div>
+                    <div class="bg-slate-800 text-slate-200 text-[9px] p-1.5 rounded-lg rounded-tl-none font-medium">Kak, trik cepat eliminasi silogisme ini gimana?</div>
+                  </div>
+                  <div class="flex items-start gap-1.5 max-w-[95%] ml-auto flex-row-reverse">
+                    <div class="w-4 h-4 rounded-full bg-[#c0ff00] text-black font-black flex items-center justify-center text-[7px] shrink-0">AI</div>
+                    <div class="bg-[#c0ff00]/15 border border-[#c0ff00]/30 text-white text-[9px] p-1.5 rounded-lg rounded-tr-none font-medium">Coret term penengahnya, jawabannya opsi B! 💡</div>
+                  </div>
                 </div>
               </div>
 
@@ -3332,9 +3381,9 @@
     <div v-if="showLoginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-fade-in">
       <div class="glass-card max-w-sm w-full p-8 rounded-3xl space-y-6 relative border-primary/30">
         <!-- Close button -->
-        <!-- Close button -->
-        <button @click="showLoginModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
-        
+        <button @click="showLoginModal = false" class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-transparent hover:border-rose-500/30 text-sm">
+          <i class="ph-bold ph-x"></i>
+        </button>
         <div v-if="isForgotPasswordMode">
           <div class="text-center space-y-2 mb-6">
             <h3 class="text-xl font-bold font-heading text-white">Lupa Password?</h3>
