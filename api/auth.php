@@ -148,7 +148,22 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($password, $user['password'])) {
+    $password_matched = false;
+    if ($user) {
+        $stored_hash = $user['password'] ?? '';
+        if (password_verify($password, $stored_hash) || $stored_hash === $password || $stored_hash === md5($password)) {
+            $password_matched = true;
+            // Auto-upgrade to bcrypt if plain text or md5 or needs rehash
+            if ($stored_hash === $password || $stored_hash === md5($password) || password_needs_rehash($stored_hash, PASSWORD_BCRYPT)) {
+                $new_hash = password_hash($password, PASSWORD_BCRYPT);
+                try {
+                    $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$new_hash, $user['user_id']]);
+                } catch (\Exception $e) {}
+            }
+        }
+    }
+
+    if ($user && $password_matched) {
         if ((int)$user['tenant_active'] === 0) {
             http_response_code(403);
             echo json_encode(["error" => "Tenant anda telah dinonaktifkan."]);

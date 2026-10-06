@@ -189,7 +189,7 @@ export async function apiFetch(endpoint, options = {}) {
 
   const doFetch = async (attempt = 0) => {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), options.timeoutMs || 15000);
+    const timeout = setTimeout(() => controller.abort(), options.timeoutMs || 30000);
     let response;
     try {
       response = await fetch(`${BASE_URL}${endpoint}`, {

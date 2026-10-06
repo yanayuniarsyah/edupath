@@ -78,7 +78,13 @@ function ensure_admin_schema($pdo) {
         try { $pdo->exec($sql); } catch (\Throwable $e) {}
     }
 }
-ensure_admin_schema($pdo);
+if (isset($_GET['migrate']) || ($action === 'migrate')) {
+    ensure_admin_schema($pdo);
+    if ($action === 'migrate') {
+        echo json_encode(["success" => true, "message" => "Admin schema migrated successfully"]);
+        exit;
+    }
+}
 
 // Helper: safe json_encode yang menangani karakter non-UTF8
 // json_encode PHP akan return false jika data mengandung karakter non-UTF8,
@@ -133,31 +139,55 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Join with tenants to check if tenant is active (only for non-superadmin)
     $stmt = $pdo->prepare("
-        SELECT u.id as user_id, u.password, ur.role, ur.tenant_id, ur.reference_id, a.id as admin_id, t.is_active as tenant_active
+        SELECT u.id as user_id, u.password as user_password, a.password as admin_password,
+               ur.role, ur.tenant_id, ur.reference_id, a.id as admin_id, t.is_active as tenant_active
         FROM users u 
         JOIN user_roles ur ON u.id = ur.user_id 
         LEFT JOIN admins a ON ur.reference_id = a.id
         LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE u.identity_key = ? AND u.is_active = 1 AND ur.role IN ('admin', 'superadmin')
+        WHERE (u.identity_key = ? OR a.username = ?) AND u.is_active = 1 AND ur.role IN ('admin', 'superadmin')
+        LIMIT 1
     ");
-    $stmt->execute([$username]);
+    $stmt->execute([$username, $username]);
     $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($admin && password_verify($password, $admin['password'])) {
-        if ($admin['role'] === 'admin' && (int)$admin['tenant_active'] === 0) {
+    $isValid = false;
+    if ($admin) {
+        $candidates = array_filter([$admin['user_password'] ?? '', $admin['admin_password'] ?? '']);
+        foreach ($candidates as $stored) {
+            if (password_verify($password, $stored) || $password === $stored || md5($password) === $stored) {
+                $isValid = true;
+                break;
+            }
+        }
+    }
+
+    if ($isValid) {
+        if ($admin['role'] === 'admin' && isset($admin['tenant_active']) && (int)$admin['tenant_active'] === 0) {
             http_response_code(403);
             echo json_encode(["error" => "Tenant anda telah dinonaktifkan."]);
             exit;
-        }        reset_rate_limit($pdo, 'admin_login');
+        }
+
+        // Auto-upgrade / sync to standard bcrypt hash if plain text or md5 was injected
+        $newHash = password_hash($password, PASSWORD_BCRYPT);
+        if (!empty($admin['user_id'])) {
+            try { $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$newHash, $admin['user_id']]); } catch (\Throwable $e) {}
+        }
+        if (!empty($admin['admin_id'])) {
+            try { $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?")->execute([$newHash, $admin['admin_id']]); } catch (\Throwable $e) {}
+        }
+
+        reset_rate_limit($pdo, 'admin_login');
         $token = generate_jwt([
             'user_id' => $admin['user_id'], 
-            'id' => $admin['reference_id'], 
+            'id' => $admin['reference_id'] ?? $admin['user_id'], 
             'role' => $admin['role'], 
             'tenant_id' => $admin['tenant_id'] // superadmin will naturally have NULL here
         ]);
         $csrf_token = generate_csrf_token();
         set_auth_cookies($token, $csrf_token);
-        unset($admin['password']);
+        unset($admin['user_password'], $admin['admin_password']);
         echo json_encode(["token" => $token, "csrf_token" => $csrf_token, "user" => $admin]);
     } else {
         log_audit($pdo, null, null, 'admin_login_failed', null, ['username' => $username, 'ip' => $_SERVER['REMOTE_ADDR'] ?? '']);
