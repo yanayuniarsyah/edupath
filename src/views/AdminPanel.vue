@@ -53,8 +53,14 @@
                 style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);"
                 :style="loginError ? 'border-color: rgba(239,68,68,0.5);' : ''"
               />
-              <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
-                <i :class="['ph-bold text-sm', showPassword ? 'ph-eye-slash' : 'ph-eye']"></i>
+              <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors cursor-pointer select-none p-1" :title="showPassword ? 'Sembunyikan password' : 'Lihat password'">
+                <svg v-if="!showPassword" class="w-5 h-5 text-white/60 hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg v-else class="w-5 h-5 text-[#c0ff00] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                </svg>
               </button>
             </div>
           </div>
@@ -239,7 +245,7 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="o in adminOrders" :key="o.order_id || o.id" class="hover:bg-white/5 transition-colors">
+                  <tr v-for="o in pagedOrders" :key="o.order_id || o.id" class="hover:bg-white/5 transition-colors">
                     <td class="px-3 py-2 font-mono text-white/60">{{ o.order_id || o.id }}</td>
                     <td class="px-3 py-2">
                       <div class="font-bold text-white">{{ o.student_name || '-' }}</div>
@@ -261,6 +267,22 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <!-- Pagination Orders -->
+            <div v-if="adminOrders.length > PAGE_SIZE" class="px-3.5 py-2.5 border-t border-white/10 flex items-center justify-between text-[11px] bg-black/20">
+              <span class="text-white/40 font-medium">
+                Menampilkan {{ (orderPage - 1) * PAGE_SIZE + 1 }}-{{ Math.min(orderPage * PAGE_SIZE, adminOrders.length) }} dari {{ adminOrders.length }} transaksi
+              </span>
+              <div class="flex items-center gap-1.5">
+                <button :disabled="orderPage <= 1" @click="orderPage--" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                  &laquo; Prev
+                </button>
+                <span class="px-2 font-mono font-bold text-[#c0ff00]">{{ orderPage }} / {{ orderTotalPages }}</span>
+                <button :disabled="orderPage >= orderTotalPages" @click="orderPage++" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                  Next &raquo;
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -299,8 +321,8 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="(s, index) in filteredStudents" :key="s.id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ index + 1 }}</td>
+                  <tr v-for="(s, index) in pagedStudents" :key="s.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ (studentPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-3 py-2">
                       <div class="font-bold text-white">{{ s.name }}</div>
                       <div class="text-white/40 font-medium text-[10px]">{{ s.email }}</div>
@@ -320,6 +342,22 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <!-- Pagination Students -->
+            <div v-if="filteredStudents.length > PAGE_SIZE" class="px-3.5 py-2.5 border-t border-white/10 flex items-center justify-between text-[11px] bg-black/20">
+              <span class="text-white/40 font-medium">
+                Menampilkan {{ (studentPage - 1) * PAGE_SIZE + 1 }}-{{ Math.min(studentPage * PAGE_SIZE, filteredStudents.length) }} dari {{ filteredStudents.length }} siswa
+              </span>
+              <div class="flex items-center gap-1.5">
+                <button :disabled="studentPage <= 1" @click="studentPage--" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                  &laquo; Prev
+                </button>
+                <span class="px-2 font-mono font-bold text-[#c0ff00]">{{ studentPage }} / {{ studentTotalPages }}</span>
+                <button :disabled="studentPage >= studentTotalPages" @click="studentPage++" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                  Next &raquo;
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -404,8 +442,8 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="(q, index) in filteredQuestions" :key="q.id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ index + 1 }}</td>
+                  <tr v-for="(q, index) in pagedQuestions" :key="q.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ (questionPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-3 py-2">
                       <div class="line-clamp-2 text-white/80 font-medium">{{ q.question }}</div>
                     </td>
@@ -444,6 +482,22 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Pagination Questions -->
+            <div v-if="filteredQuestions.length > PAGE_SIZE" class="px-3.5 py-2.5 border-t border-white/10 flex items-center justify-between text-[11px] bg-black/20">
+              <span class="text-white/40 font-medium">
+                Menampilkan {{ (questionPage - 1) * PAGE_SIZE + 1 }}-{{ Math.min(questionPage * PAGE_SIZE, filteredQuestions.length) }} dari {{ filteredQuestions.length }} soal
+              </span>
+              <div class="flex items-center gap-1.5">
+                <button :disabled="questionPage <= 1" @click="questionPage--" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                  &laquo; Prev
+                </button>
+                <span class="px-2 font-mono font-bold text-[#c0ff00]">{{ questionPage }} / {{ questionTotalPages }}</span>
+                <button :disabled="questionPage >= questionTotalPages" @click="questionPage++" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                  Next &raquo;
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -481,8 +535,8 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="(m, index) in filteredMaterials" :key="m.id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ index + 1 }}</td>
+                  <tr v-for="(m, index) in pagedMaterials" :key="m.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ (materialPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-3 py-2 font-bold text-white">{{ m.title }}</td>
                     <td class="px-3 py-2 font-bold text-white/80">{{ m.sub_materi }}</td>
                     <td class="px-3 py-2 font-bold text-white/40 text-[10px]">{{ m.teacher_name || '-' }}</td>
@@ -498,6 +552,22 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <!-- Pagination Materials -->
+            <div v-if="filteredMaterials.length > PAGE_SIZE" class="px-3.5 py-2.5 border-t border-white/10 flex items-center justify-between text-[11px] bg-black/20">
+              <span class="text-white/40 font-medium">
+                Menampilkan {{ (materialPage - 1) * PAGE_SIZE + 1 }}-{{ Math.min(materialPage * PAGE_SIZE, filteredMaterials.length) }} dari {{ filteredMaterials.length }} materi
+              </span>
+              <div class="flex items-center gap-1.5">
+                <button :disabled="materialPage <= 1" @click="materialPage--" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                  &laquo; Prev
+                </button>
+                <span class="px-2 font-mono font-bold text-[#c0ff00]">{{ materialPage }} / {{ materialTotalPages }}</span>
+                <button :disabled="materialPage >= materialTotalPages" @click="materialPage++" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                  Next &raquo;
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -527,8 +597,8 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="(p, index) in sortedPlans" :key="p.id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ index + 1 }}</td>
+                  <tr v-for="(p, index) in pagedPlans" :key="p.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ (planPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-3 py-2 font-bold text-white">{{ p.name }}</td>
                     <td class="px-3 py-2 font-bold text-emerald-400 font-mono">Rp {{ Number(p.price || 0).toLocaleString('id-ID') }}</td>
                     <td class="px-3 py-2 font-bold text-white/80">{{ p.duration }} Hari</td>
@@ -542,6 +612,22 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <!-- Pagination Plans -->
+            <div v-if="sortedPlans.length > PAGE_SIZE" class="px-3.5 py-2.5 border-t border-white/10 flex items-center justify-between text-[11px] bg-black/20">
+              <span class="text-white/40 font-medium">
+                Menampilkan {{ (planPage - 1) * PAGE_SIZE + 1 }}-{{ Math.min(planPage * PAGE_SIZE, sortedPlans.length) }} dari {{ sortedPlans.length }} paket
+              </span>
+              <div class="flex items-center gap-1.5">
+                <button :disabled="planPage <= 1" @click="planPage--" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                  &laquo; Prev
+                </button>
+                <span class="px-2 font-mono font-bold text-[#c0ff00]">{{ planPage }} / {{ planTotalPages }}</span>
+                <button :disabled="planPage >= planTotalPages" @click="planPage++" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                  Next &raquo;
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1027,10 +1113,10 @@
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
             <input v-model="studentForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
-          <div v-if="isSuperadmin">
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Bimbel / Tenant</label>
-            <select v-model="studentForm.tenant_id" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStudent">
-              <option value="" class="bg-[#0d1427] text-white">-- Pilih Bimbel --</option>
+          <div v-if="isSuperadmin && tenantsList.length > 1">
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang / Lembaga Bimbel (Opsional)</label>
+            <select v-model="studentForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStudent">
+              <option value="" class="bg-[#0d1427] text-white">-- Bimbel Utama (Default) --</option>
               <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
             </select>
           </div>
@@ -1125,10 +1211,10 @@
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email (sebagai Username)</label>
             <input v-model="sForm.username" :disabled="isEditingStaff && sForm.username === 'admin'" required type="text" placeholder="nama@bimbel.com" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
           </div>
-          <div v-if="isSuperadmin">
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pilih Bimbel / Tenant Target</label>
-            <select v-model="sForm.tenant_id" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStaff">
-              <option value="" class="bg-[#0d1427] text-white">-- Pilih Bimbel --</option>
+          <div v-if="isSuperadmin && tenantsList.length > 1">
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang / Lembaga Bimbel (Opsional)</label>
+            <select v-model="sForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStaff">
+              <option value="" class="bg-[#0d1427] text-white">-- Bimbel Utama (Default) --</option>
               <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
             </select>
           </div>
@@ -1486,6 +1572,8 @@ const doLogin = async () => {
     fetchStudents();
     fetchAdminOrders();
     loadPlansAndStaff();
+    fetchQuestions();
+    fetchMaterials();
   } catch (err) {
     loginError.value = err.message || 'Login gagal';
   } finally {
@@ -1536,6 +1624,8 @@ onMounted(async () => {
     fetchStudents();
     fetchAdminOrders();
     loadPlansAndStaff();
+    fetchQuestions();
+    fetchMaterials();
   } else if (mainToken) {
     try {
       const profile = await api.getProfile();
@@ -1549,6 +1639,8 @@ onMounted(async () => {
         fetchStudents();
         fetchAdminOrders();
         loadPlansAndStaff();
+        fetchQuestions();
+        fetchMaterials();
       }
     } catch(e) {
       console.warn("Admin auto-auth check:", e);
@@ -1577,10 +1669,25 @@ const showStudentModal = ref(false);
 const isSaving = ref(false);
 const studentForm = reactive({ id: null, tenant_id: '', name: '', email: '', password: '', plan: 'free', is_active: 1 });
 
+// ── Pagination helpers ──
+const PAGE_SIZE = 10;
+const studentPage = ref(1);
+const questionPage = ref(1);
+const materialPage = ref(1);
+const planPage = ref(1);
+const orderPage = ref(1);
+
+const paginate = (list, page) => {
+  const start = (page - 1) * PAGE_SIZE;
+  return list.slice(start, start + PAGE_SIZE);
+};
+const totalPages = (list) => Math.max(1, Math.ceil((list?.length || 0) / PAGE_SIZE));
+
 const fetchStudents = async () => {
   try {
     const res = await api.getAdminStudents(1, '', '');
     allStudents.value = Array.isArray(res) ? res : (res.students || []);
+    studentPage.value = 1;
   } catch (err) {
     console.error("Gagal mengambil data siswa:", err);
   }
@@ -1596,6 +1703,8 @@ const filteredStudents = computed(() => {
   });
   return doSort(filtered);
 });
+const pagedStudents = computed(() => paginate(filteredStudents.value, studentPage.value));
+const studentTotalPages = computed(() => totalPages(filteredStudents.value));
 
 const openCreateStudentModal = () => {
   isEditingStudent.value = false;
@@ -1672,6 +1781,9 @@ const fetchAdminOrders = async () => {
     ordersLoading.value = false;
   }
 };
+
+const pagedOrders = computed(() => paginate(adminOrders.value, orderPage.value));
+const orderTotalPages = computed(() => totalPages(adminOrders.value));
 
 const openCreateOrderModal = () => {
   if (allStudents.value.length === 0) fetchStudents();
@@ -1835,6 +1947,8 @@ const filteredQuestions = computed(() => {
   }
   return doSort(list);
 });
+const pagedQuestions = computed(() => paginate(filteredQuestions.value, questionPage.value));
+const questionTotalPages = computed(() => totalPages(filteredQuestions.value));
 
 const openQuestionModal = (q = null) => {
   if (q) {
@@ -2003,6 +2117,8 @@ const filteredMaterials = computed(() => {
   }
   return doSort(list);
 });
+const pagedMaterials = computed(() => paginate(filteredMaterials.value, materialPage.value));
+const materialTotalPages = computed(() => totalPages(filteredMaterials.value));
 
 const openMaterialModal = (m = null) => {
   if (m) {
@@ -2075,6 +2191,8 @@ const deleteMaterial = async (id) => {
 // ── Plans / Packages ──
 const plans = ref([]);
 const sortedPlans = computed(() => doSort(plans.value));
+const pagedPlans = computed(() => paginate(sortedPlans.value, planPage.value));
+const planTotalPages = computed(() => totalPages(sortedPlans.value));
 const showPlanModal = ref(false);
 const isEditingPlan = ref(false);
 const pForm = reactive({ id: null, name: '', price: '', discount: 0, duration: '', features: [] });
@@ -2082,27 +2200,33 @@ const entitlementsDict = ref([]);
 
 const loadPlansAndStaff = async () => {
   try {
-    const [pRes, sRes, eRes] = await Promise.all([
-      api.getAdminPlans(),
-      api.getAdminStaff(),
-      api.getEntitlementsDictionary()
-    ]);
-    try {
-      const tRes = await api.getAdminTenants();
-      tenantsList.value = tRes || [];
-    } catch (err) { console.error('Gagal fetch tenants', err); }
-    plans.value = pRes || [];
+    const pRes = await api.getAdminPlans().catch(err => { console.error('Gagal fetch plans', err); return []; });
+    const rawPlans = Array.isArray(pRes) ? pRes : (pRes?.plans || []);
+    plans.value = rawPlans;
     plans.value.forEach(p => {
       if (typeof p.features === 'string') {
         try { p.features = JSON.parse(p.features); } catch (e) { p.features = []; }
       }
       if (!Array.isArray(p.features)) p.features = [];
     });
-    staffMembers.value = sRes.staff || [];
-    entitlementsDict.value = eRes || [];
   } catch (err) {
-    console.error(err);
+    console.error('Error load plans:', err);
   }
+
+  try {
+    const sRes = await api.getAdminStaff().catch(() => ({ staff: [] }));
+    staffMembers.value = sRes?.staff || (Array.isArray(sRes) ? sRes : []);
+  } catch (err) { console.error('Error load staff:', err); }
+
+  try {
+    const eRes = await api.getEntitlementsDictionary().catch(() => []);
+    entitlementsDict.value = Array.isArray(eRes) ? eRes : [];
+  } catch (err) { console.error('Error load entitlements:', err); }
+
+  try {
+    const tRes = await api.getAdminTenants().catch(() => []);
+    tenantsList.value = Array.isArray(tRes) ? tRes : [];
+  } catch (err) { console.error('Gagal fetch tenants', err); }
 };
 
 const openPlanModal = (p = null) => {
@@ -2453,4 +2577,8 @@ const goToStudentSide = () => { window.location.hash = '#/'; };
 .animate-fade-in { animation: fadeIn 0.35s ease both; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* Fallback: tampilkan emoji hanya jika Phosphor Icons gagal dimuat */
+.ph-bold:not(:empty) + .ph-fallback { display: none; }
+.ph-bold[class*="ph-eye"]::before { content: ""; }
+.ph-fallback { font-size: 16px; line-height: 1; }
 </style>

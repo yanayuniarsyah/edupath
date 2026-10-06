@@ -70,7 +70,9 @@ function ensure_admin_schema($pdo) {
         "ALTER TABLE plans ADD COLUMN tenant_id VARCHAR(36) NULL",
         "ALTER TABLE plans ADD COLUMN discount DECIMAL(10,2) DEFAULT 0.00",
         "ALTER TABLE plans ADD COLUMN product_id VARCHAR(100) NULL",
-        "ALTER TABLE plans ADD COLUMN billing_cycle VARCHAR(50) DEFAULT 'monthly'"
+        "ALTER TABLE plans ADD COLUMN billing_cycle VARCHAR(50) DEFAULT 'monthly'",
+        "ALTER TABLE plans ADD COLUMN is_active TINYINT(1) DEFAULT 1",
+        "ALTER TABLE plans ADD COLUMN is_archived TINYINT(1) DEFAULT 0"
     ];
     foreach ($planCols as $sql) {
         try { $pdo->exec($sql); } catch (\Throwable $e) {}
@@ -78,8 +80,21 @@ function ensure_admin_schema($pdo) {
 }
 ensure_admin_schema($pdo);
 
+// Helper: safe json_encode yang menangani karakter non-UTF8
+// json_encode PHP akan return false jika data mengandung karakter non-UTF8,
+// menyebabkan response kosong dan frontend menampilkan tabel kosong.
+function safe_json_encode($data) {
+    $result = json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_UNICODE);
+    if ($result === false) {
+        // Fallback: bersihkan data secara rekursif
+        $cleaned = json_decode(json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE), true);
+        $result = json_encode($cleaned);
+    }
+    return $result ?: '[]';
+}
+
 $action = $_GET['action'] ?? '';
-$input = json_decode(file_get_contents('php://input'), true);
+$input = json_decode(file_get_contents('php://input'), true) ?: [];
 
 if ($action === 'create_sa') {
     $sa_id = 'uat-u-superadmin';
@@ -240,14 +255,14 @@ if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 elseif ($action === 'students') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if ($payload->role === 'superadmin') {
-            $stmt = $pdo->query("SELECT id, name, email, plan, is_active, created_at FROM students ORDER BY created_at DESC");
+        if ($payload->role === 'superadmin' || empty($payload->tenant_id)) {
+            $stmt = $pdo->query("SELECT id, name, email, plan, is_active, created_at, tenant_id FROM students ORDER BY created_at DESC");
         } else {
-            $stmt = $pdo->prepare("SELECT id, name, email, plan, is_active, created_at FROM students WHERE tenant_id = ? ORDER BY created_at DESC");
+            $stmt = $pdo->prepare("SELECT id, name, email, plan, is_active, created_at, tenant_id FROM students WHERE (tenant_id = ? OR tenant_id IS NULL OR tenant_id = '') ORDER BY created_at DESC");
             $stmt->execute([$payload->tenant_id]);
         }
         $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(["students" => $students]);
+        echo safe_json_encode(["students" => $students]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
         $name = trim($input['name'] ?? '');
@@ -266,11 +281,16 @@ elseif ($action === 'students') {
         $student_id = substr($student_id,0,8).'-'.substr($student_id,8,4).'-'.substr($student_id,12,4).'-'.substr($student_id,16,4).'-'.substr($student_id,20,12);
         
         $tenant_id = $payload->tenant_id;
-        if ($payload->role === 'superadmin' && empty($tenant_id)) {
+        if (empty($tenant_id)) {
             $tenant_id = $input['tenant_id'] ?? '';
-            if (empty($tenant_id)) {
-                http_response_code(400); echo json_encode(["error" => "Superadmin wajib memilih Bimbel (Tenant) target untuk siswa"]); exit;
+        }
+        if (empty($tenant_id)) {
+            $tFirst = $pdo->query("SELECT id FROM tenants WHERE is_active = 1 LIMIT 1")->fetchColumn();
+            if (!$tFirst) {
+                $tFirst = 'default-tenant';
+                try { $pdo->exec("INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES ('default-tenant', 'EduPath Bimbel Pusat', 'edupath-pusat', 1)"); } catch (\Throwable $e) {}
             }
+            $tenant_id = $tFirst;
         }
 
         try {
@@ -375,7 +395,7 @@ elseif ($action === 'students') {
 }
 elseif ($action === 'orders') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if ($payload->role === 'superadmin' && empty($payload->tenant_id)) {
+        if ($payload->role === 'superadmin' || empty($payload->tenant_id)) {
             $stmt = $pdo->query("
                 SELECT o.*, s.name as student_name, s.email as student_email 
                 FROM orders o 
@@ -386,14 +406,14 @@ elseif ($action === 'orders') {
             $stmt = $pdo->prepare("
                 SELECT o.*, s.name as student_name, s.email as student_email 
                 FROM orders o 
-                JOIN students s ON o.student_id = s.id 
-                WHERE s.tenant_id = ?
+                LEFT JOIN students s ON o.student_id = s.id 
+                WHERE (s.tenant_id = ? OR s.tenant_id IS NULL OR s.tenant_id = '')
                 ORDER BY o.created_at DESC
             ");
             $stmt->execute([$payload->tenant_id]);
         }
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(["orders" => $orders]);
+        echo safe_json_encode(["orders" => $orders]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Create manual/offline order
         $input = json_decode(file_get_contents('php://input'), true);
@@ -479,7 +499,7 @@ elseif ($action === 'affiliates' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         ORDER BY a.created_at DESC
     ");
     $stmt->execute([$payload->tenant_id]);
-    echo json_encode($stmt->fetchAll());
+    echo safe_json_encode($stmt->fetchAll());
 }
 elseif ($action === 'commissions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt = $pdo->prepare("
@@ -494,7 +514,7 @@ elseif ($action === 'commissions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         ORDER BY c.created_at DESC
     ");
     $stmt->execute([$payload->tenant_id]);
-    echo json_encode($stmt->fetchAll());
+    echo safe_json_encode($stmt->fetchAll());
 }
 elseif ($action === 'payout_commission' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
@@ -549,7 +569,7 @@ elseif ($action === 'tenants') {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        echo json_encode($pdo->query("SELECT * FROM tenants ORDER BY created_at DESC")->fetchAll());
+        echo safe_json_encode($pdo->query("SELECT * FROM tenants ORDER BY created_at DESC")->fetchAll());
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
@@ -623,7 +643,7 @@ elseif ($action === 'entitlements_dictionary') {
 }
 elseif ($action === 'products') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        echo json_encode($pdo->query("SELECT * FROM products ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC));
+        echo safe_json_encode($pdo->query("SELECT * FROM products ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC));
     }
 }
 elseif ($action === 'plans') {
@@ -686,10 +706,10 @@ elseif ($action === 'plans') {
                 $plan['features'] = json_encode($features);
             }
         }
-        echo json_encode($plans);
+        echo safe_json_encode($plans);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if ($payload->role !== 'superadmin') {
-            http_response_code(403); echo json_encode(["error" => "System admin only"]); exit;
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
+            http_response_code(403); echo json_encode(["error" => "Admin only"]); exit;
         }
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
@@ -716,8 +736,8 @@ elseif ($action === 'plans') {
             http_response_code(500); echo json_encode(["error" => "Gagal membuat plan", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        if ($payload->role !== 'superadmin') {
-            http_response_code(403); echo json_encode(["error" => "System admin only"]); exit;
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
+            http_response_code(403); echo json_encode(["error" => "Admin only"]); exit;
         }
         $id = $input['id'] ?? '';
         $features = is_array($input['features']) ? $input['features'] : [];
@@ -745,8 +765,8 @@ elseif ($action === 'plans') {
             http_response_code(500); echo json_encode(["error" => "Gagal update plan", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        if ($payload->role !== 'superadmin') {
-            http_response_code(403); echo json_encode(["error" => "System admin only"]); exit;
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
+            http_response_code(403); echo json_encode(["error" => "Admin only"]); exit;
         }
         $id = $_GET['id'] ?? '';
         $pdo->prepare("DELETE FROM plans WHERE id = ?")->execute([$id]);
@@ -777,7 +797,7 @@ elseif ($action === 'questions') {
         $sql .= " ORDER BY created_at DESC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
-        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        echo safe_json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
             http_response_code(403);
@@ -913,7 +933,7 @@ elseif ($action === 'materials') {
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(["materials" => $materials]);
+        echo safe_json_encode(["materials" => $materials]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
             http_response_code(403);
@@ -1020,7 +1040,7 @@ elseif ($action === 'staff') {
         }
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
-        echo json_encode(["staff" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+        echo safe_json_encode(["staff" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = trim($input['username'] ?? '');
         $name = trim($input['name'] ?? '');
@@ -1160,7 +1180,7 @@ elseif ($action === 'commissions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             ORDER BY c.created_at DESC
         ");
         $commissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($commissions);
+        echo safe_json_encode($commissions);
     } catch (PDOException $e) {
         echo json_encode([]);
     }
