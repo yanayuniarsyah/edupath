@@ -1017,6 +1017,13 @@
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
             <input v-model="studentForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
+          <div v-if="isSuperadmin">
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Bimbel / Tenant</label>
+            <select v-model="studentForm.tenant_id" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStudent">
+              <option value="" class="bg-[#0d1427] text-white">-- Pilih Bimbel --</option>
+              <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
+            </select>
+          </div>
           <div>
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email</label>
             <input v-model="studentForm.email" required type="email" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
@@ -1480,7 +1487,7 @@ const allStudents = ref([]);
 const isEditingStudent = ref(false);
 const showStudentModal = ref(false);
 const isSaving = ref(false);
-const studentForm = reactive({ id: null, name: '', email: '', password: '', plan: 'free', is_active: 1 });
+const studentForm = reactive({ id: null, tenant_id: '', name: '', email: '', password: '', plan: 'free', is_active: 1 });
 
 const fetchStudents = async () => {
   try {
@@ -1503,13 +1510,13 @@ const filteredStudents = computed(() => {
 
 const openCreateStudentModal = () => {
   isEditingStudent.value = false;
-  Object.assign(studentForm, { id: null, name: '', email: '', password: '', plan: 'free', is_active: 1 });
+  Object.assign(studentForm, { id: null, tenant_id: '', name: '', email: '', password: '', plan: 'free', is_active: 1 });
   showStudentModal.value = true;
 };
 
 const openEditStudentModal = (s) => {
   isEditingStudent.value = true;
-  Object.assign(studentForm, { id: s.id, name: s.name, email: s.email, password: '', plan: s.plan || 'free', is_active: s.is_active != 0 ? 1 : 0 });
+  Object.assign(studentForm, { id: s.id, tenant_id: s.tenant_id || '', name: s.name, email: s.email, password: '', plan: s.plan || 'free', is_active: s.is_active != 0 ? 1 : 0 });
   showStudentModal.value = true;
 };
 

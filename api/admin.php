@@ -192,14 +192,11 @@ elseif ($action === 'students') {
         $student_id = substr($student_id,0,8).'-'.substr($student_id,8,4).'-'.substr($student_id,12,4).'-'.substr($student_id,16,4).'-'.substr($student_id,20,12);
         
         $tenant_id = $payload->tenant_id;
-        if ($payload->role === 'superadmin' && !$tenant_id) {
-            $tenant = $pdo->query("SELECT id FROM tenants WHERE is_active = 1 LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-            $tenant_id = $tenant ? $tenant['id'] : null;
-        }
-
-        if (empty($tenant_id)) {
-            $tenant_id = 'default-tenant';
-            $pdo->exec("INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES ('$tenant_id', 'EduPath Indonesia', 'edupath-master', 1)");
+        if ($payload->role === 'superadmin' && empty($tenant_id)) {
+            $tenant_id = $input['tenant_id'] ?? '';
+            if (empty($tenant_id)) {
+                http_response_code(400); echo json_encode(["error" => "Superadmin wajib memilih Bimbel (Tenant) target untuk siswa"]); exit;
+            }
         }
 
         try {
@@ -1040,36 +1037,42 @@ elseif ($action === 'staff') {
         $role = $input['role'] ?? 'teacher';
         
         $tenant_id = $payload->role === 'superadmin' ? null : $payload->tenant_id;
-        $scope = $tenant_id ? " AND ur.tenant_id = ?" : " AND ur.tenant_id IS NULL";
+        $scope = '';
+        if ($payload->role !== 'superadmin') {
+            $scope = $tenant_id ? " AND ur.tenant_id = ?" : " AND ur.tenant_id IS NULL";
+        }
         $stmt = $pdo->prepare("UPDATE admins a JOIN user_roles ur ON ur.reference_id = a.id SET a.name = ? WHERE a.id = ? AND ur.role != 'superadmin' $scope");
         $params = [$name, $id];
-        if ($tenant_id) $params[] = $tenant_id;
+        if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
         $stmt->execute($params);
 
         $stmt = $pdo->prepare("UPDATE user_roles SET role = ? WHERE reference_id = ? AND role != 'superadmin' $scope");
         $params = [$role, $id];
-        if ($tenant_id) $params[] = $tenant_id;
+        if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
         $stmt->execute($params);
         
         if (!empty($input['password'])) {
             $hashed = password_hash($input['password'], PASSWORD_BCRYPT);
             $stmt = $pdo->prepare("UPDATE users u JOIN user_roles ur ON u.id = ur.user_id SET u.password = ? WHERE ur.reference_id = ? AND ur.role != 'superadmin' $scope");
             $params = [$hashed, $id];
-            if ($tenant_id) $params[] = $tenant_id;
+            if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
             $stmt->execute($params);
             $stmt = $pdo->prepare("UPDATE admins a JOIN user_roles ur ON ur.reference_id = a.id SET a.password = ? WHERE a.id = ? AND ur.role != 'superadmin' $scope");
             $params = [$hashed, $id];
-            if ($tenant_id) $params[] = $tenant_id;
+            if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
             $stmt->execute($params);
         }
         echo json_encode(["success" => true]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $id = $_GET['id'] ?? '';
         $tenant_id = $payload->role === 'superadmin' ? null : $payload->tenant_id;
-        $scope = $tenant_id ? " AND ur.tenant_id = ?" : " AND ur.tenant_id IS NULL";
+        $scope = '';
+        if ($payload->role !== 'superadmin') {
+            $scope = $tenant_id ? " AND ur.tenant_id = ?" : " AND ur.tenant_id IS NULL";
+        }
         $stmt = $pdo->prepare("DELETE u FROM users u JOIN user_roles ur ON ur.user_id = u.id WHERE ur.reference_id = ? AND ur.role != 'superadmin' $scope");
         $params = [$id];
-        if ($tenant_id) $params[] = $tenant_id;
+        if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
         $stmt->execute($params);
         echo json_encode(["success" => true]);
     }
