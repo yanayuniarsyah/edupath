@@ -51,16 +51,33 @@ function verify_jwt(string $jwt): object|false {
     return $payload;
 }
 
+function get_auth_header(): ?string {
+    $header = $_SERVER['HTTP_AUTHORIZATION']
+        ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+        ?? $_SERVER['Authorization']
+        ?? $_SERVER['REDIRECT_Authorization']
+        ?? null;
+
+    if (!$header && function_exists('apache_request_headers')) {
+        $headers = apache_request_headers();
+        $header = $headers['Authorization'] ?? $headers['authorization'] ?? null;
+    }
+
+    if (!$header && function_exists('getallheaders')) {
+        $headers = getallheaders();
+        $header = $headers['Authorization'] ?? $headers['authorization'] ?? null;
+    }
+
+    return $header;
+}
+
 // ----------------------------------------------------------------
 // TOKEN EXTRACTION — Cookie-first, Bearer fallback
 // Strategy: HttpOnly cookie for browser clients, Bearer for mobile/API
 // ----------------------------------------------------------------
 function get_token(): ?string {
     // 1. Prioritas utama: Bearer token di Authorization header (dikirim eksplisit oleh admin/mobile)
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION']
-        ?? $_SERVER['Authorization']
-        ?? (function_exists('apache_request_headers') ? (apache_request_headers()['Authorization'] ?? null) : null)
-        ?? null;
+    $authHeader = get_auth_header();
 
     if ($authHeader && preg_match('/Bearer\s+(\S+)/i', $authHeader, $m)) {
         return $m[1];
@@ -82,10 +99,7 @@ function get_token(): ?string {
 // ----------------------------------------------------------------
 function verify_csrf(): bool {
     // 1. Authorization Bearer header: token eksplisit tidak rentan CSRF (tidak dikirim otomatis oleh browser)
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION']
-        ?? $_SERVER['Authorization']
-        ?? (function_exists('apache_request_headers') ? (apache_request_headers()['Authorization'] ?? null) : null)
-        ?? null;
+    $authHeader = get_auth_header();
 
     if ($authHeader && preg_match('/Bearer\s+(\S+)/i', $authHeader)) {
         return true;
@@ -102,7 +116,9 @@ function verify_csrf(): bool {
         return true;
     }
 
-    $headerToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    $headerToken = $_SERVER['HTTP_X_CSRF_TOKEN']
+        ?? $_SERVER['REDIRECT_HTTP_X_CSRF_TOKEN']
+        ?? (function_exists('getallheaders') ? (getallheaders()['X-CSRF-Token'] ?? getallheaders()['x-csrf-token'] ?? '') : '');
     $cookieToken = $_COOKIE['ep_csrf_token'] ?? '';
 
     if (empty($headerToken) || empty($cookieToken)) {

@@ -1,6 +1,10 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # Pass Authorization Header in Apache / cPanel
+  RewriteCond %{HTTP:Authorization} .
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
   # HTTPS Enforcement (Production)
   RewriteCond %{HTTPS} off
   RewriteCond %{HTTP_HOST} !^localhost

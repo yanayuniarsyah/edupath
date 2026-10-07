@@ -16,12 +16,18 @@ load_env(dirname(__DIR__) . '/.env');
 
 // ----------------------------------------------------------------
 $allowed_origins_raw = env('ALLOWED_ORIGINS', 'http://localhost:5173');
-$allowed_origins = array_map('trim', explode(',', $allowed_origins_raw));
 $request_origin  = trim($_SERVER['HTTP_ORIGIN'] ?? '');
 
-if ($request_origin !== '' && in_array($request_origin, $allowed_origins, true)) {
-    header("Access-Control-Allow-Origin: $request_origin");
-    header('Vary: Origin');
+if ($request_origin !== '') {
+    $origin_host = parse_url($request_origin, PHP_URL_HOST) ?? '';
+    if (in_array($request_origin, $allowed_origins, true) || 
+        str_ends_with($origin_host, 'edupath.co.id') ||
+        str_ends_with($origin_host, 'elyana.biz.id') ||
+        str_contains($origin_host, 'localhost') ||
+        str_contains($origin_host, '127.0.0.1')) {
+        header("Access-Control-Allow-Origin: $request_origin");
+        header('Vary: Origin');
+    }
 }
 
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");

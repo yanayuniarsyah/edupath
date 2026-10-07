@@ -1,5 +1,9 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
+
+  # Pass Authorization Header in Apache / cPanel / LiteSpeed
+  RewriteCond %{HTTP:Authorization} .
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
   
   # Route requests like /api/auth/login to /api/auth.php?action=login
   RewriteRule ^auth/(.*)$ auth.php?action=$1 [QSA,L]
