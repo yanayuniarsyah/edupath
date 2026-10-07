@@ -103,13 +103,20 @@ $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true) ?: [];
 
 if ($action === 'create_sa') {
+    try {
+        $pdo->exec("ALTER TABLE students ADD COLUMN tenant_id VARCHAR(36) NULL");
+    } catch (\Throwable $e) {}
+    try {
+        $pdo->exec("ALTER TABLE admins ADD COLUMN tenant_id VARCHAR(36) NULL");
+    } catch (\Throwable $e) {}
+
     $sa_id = 'uat-u-superadmin';
     $sa_ref = 'uat-r-superadmin';
     $sa_email = 'superadmin@uat.edupath.local';
     $sa_pass = 'EduPathSuperAdmin01!2026';
     $sa_hash = password_hash($sa_pass, PASSWORD_BCRYPT);
-    $pdo->exec("INSERT IGNORE INTO users (id, identity_key, password, is_active) VALUES ('$sa_id', '$sa_email', '$sa_hash', 1)");
-    $pdo->exec("INSERT IGNORE INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('uat-ur-sa', '$sa_id', NULL, 'superadmin', '$sa_id')");
+    $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$sa_id', '$sa_email', '$sa_hash', 1) ON DUPLICATE KEY UPDATE password='$sa_hash', is_active=1");
+    $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('uat-ur-sa', '$sa_id', NULL, 'superadmin', '$sa_id') ON DUPLICATE KEY UPDATE role='superadmin'");
     
     $adm_id = 'uat-u-admin';
     $adm_ref = 'uat-r-admin';
@@ -117,27 +124,22 @@ if ($action === 'create_sa') {
     $adm_pass = 'EduPathAdmin01!2026';
     $adm_hash = password_hash($adm_pass, PASSWORD_BCRYPT);
     $uat_tenant_id = 'uat-tenant-01';
-    $pdo->exec("INSERT IGNORE INTO tenants (id, name, slug, is_active) VALUES ('$uat_tenant_id', 'UAT EduPath Tenant', 'uat-edupath', 1)");
-    $pdo->exec("INSERT IGNORE INTO users (id, identity_key, password, is_active) VALUES ('$adm_id', '$adm_email', '$adm_hash', 1)");
-    $pdo->exec("INSERT IGNORE INTO admins (id, tenant_id, username, password, name) VALUES ('$adm_ref', '$uat_tenant_id', '$adm_email', '$adm_hash', 'UAT Tenant Admin')");
-    $pdo->exec("INSERT IGNORE INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('uat-ur-adm', '$adm_id', '$uat_tenant_id', 'admin', '$adm_ref')");
+    $pdo->exec("INSERT INTO tenants (id, name, slug, is_active) VALUES ('$uat_tenant_id', 'UAT EduPath Tenant', 'uat-edupath', 1) ON DUPLICATE KEY UPDATE is_active=1");
+    $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$adm_id', '$adm_email', '$adm_hash', 1) ON DUPLICATE KEY UPDATE password='$adm_hash', is_active=1");
+    $pdo->exec("INSERT INTO admins (id, tenant_id, username, password, name) VALUES ('$adm_ref', '$uat_tenant_id', '$adm_email', '$adm_hash', 'UAT Tenant Admin') ON DUPLICATE KEY UPDATE password='$adm_hash'");
+    $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('uat-ur-adm', '$adm_id', '$uat_tenant_id', 'admin', '$adm_ref') ON DUPLICATE KEY UPDATE role='admin'");
     
     echo "SA CREATED";
     exit;
 }
 
 if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Rate limiting untuk admin login — 5 percobaan per 30 menit
-    // if (!check_rate_limit($pdo, 'admin_login', 5, 30)) {
-    //     http_response_code(429);
-    //     echo json_encode(["error" => "Terlalu banyak percobaan login. Coba lagi nanti."]);
-    //     exit;
-    // }
-
     $username = trim($input['username'] ?? '');
     $password = trim($input['password'] ?? '');
 
     // Join with tenants to check if tenant is active (only for non-superadmin)
+    // Support exact match as well as prefix match (e.g. typing 'superadmin' matches 'superadmin@...')
+    $usernamePrefix = $username . '@%';
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.password as user_password, a.password as admin_password,
                ur.role, ur.tenant_id, ur.reference_id, a.id as admin_id, t.is_active as tenant_active
@@ -145,10 +147,12 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         JOIN user_roles ur ON u.id = ur.user_id 
         LEFT JOIN admins a ON ur.reference_id = a.id
         LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE (u.identity_key = ? OR a.username = ?) AND u.is_active = 1 AND ur.role IN ('admin', 'superadmin', 'teacher')
+        WHERE (u.identity_key = ? OR a.username = ? OR u.identity_key LIKE ? OR a.username LIKE ?) 
+          AND u.is_active = 1 
+          AND ur.role IN ('admin', 'superadmin', 'teacher')
         LIMIT 1
     ");
-    $stmt->execute([$username, $username]);
+    $stmt->execute([$username, $username, $usernamePrefix, $usernamePrefix]);
     $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $isValid = false;

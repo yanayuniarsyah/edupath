@@ -1583,6 +1583,10 @@ const doLogin = async () => {
   }
 };
 
+const goToStudentSide = () => {
+  window.location.hash = '#/';
+};
+
 const doLogout = async () => {
   // Update UI optimistically to give instant feedback
   isAuthenticated.value = false;
@@ -2571,8 +2575,6 @@ watch(activeTab, (newTab) => {
     loadAdminPayouts();
   }
 }, { immediate: true });
-
-const goToStudentSide = () => { window.location.hash = '#/'; };
 </script>
 
 <style scoped>
