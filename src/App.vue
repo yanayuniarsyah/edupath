@@ -3285,11 +3285,22 @@
         <button @click="showLoginModal = false" class="!absolute top-5 right-5 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-transparent hover:border-rose-500/30 text-sm">
           <i class="ph-bold ph-x"></i>
         </button>
-        <div v-if="isForgotPasswordMode">
-          <div class="text-center space-y-2 mb-6">
-            <h3 class="text-xl font-bold font-heading text-white">Lupa Password?</h3>
-            <p class="text-xs text-slate-400 font-light">Masukkan email Anda untuk menerima token pemulihan.</p>
+
+        <!-- Logo & Header (Consistent with Admin Portal) -->
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center gap-2.5 group select-none mb-2">
+            <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
+            <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
+          <h3 class="text-lg font-bold font-heading text-white">
+            {{ isForgotPasswordMode ? 'Lupa Password?' : (isResetPasswordMode ? 'Reset Password' : (isLoginMode ? 'Masuk ke Akun Siswa' : 'Daftar Akun EduPath')) }}
+          </h3>
+          <p class="text-xs text-slate-400 font-light mt-1">
+            {{ isForgotPasswordMode ? 'Masukkan email Anda untuk menerima token pemulihan.' : (isResetPasswordMode ? 'Masukkan token dan password baru Anda.' : (isLoginMode ? 'Selamat datang kembali pejuang PTN!' : 'Mulai perjalanan belajarmu hari ini.')) }}
+          </p>
+        </div>
+
+        <div v-if="isForgotPasswordMode">
           <form @submit.prevent="handleForgotPassword" class="space-y-4">
             <div v-if="authError" class="px-3 py-2 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-[11px] font-bold text-center">
               {{ authError }}
@@ -3310,10 +3321,6 @@
         </div>
 
         <div v-else-if="isResetPasswordMode">
-          <div class="text-center space-y-2 mb-6">
-            <h3 class="text-xl font-bold font-heading text-white">Reset Password</h3>
-            <p class="text-xs text-slate-400 font-light">Masukkan token yang kami kirimkan ke email Anda dan password baru.</p>
-          </div>
           <form @submit.prevent="handleResetPassword" class="space-y-4">
             <div v-if="authError" class="px-3 py-2 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-[11px] font-bold text-center">
               {{ authError }}
@@ -3338,16 +3345,7 @@
         </div>
 
         <div v-else>
-          <div class="text-center space-y-2 mb-6">
-            <div class="inline-flex items-center gap-2.5 group select-none">
-              <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
-              <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
-            </div>
-            <h3 class="text-lg font-bold font-heading text-white mt-1">{{ isLoginMode ? 'Masuk ke Akun Siswa' : 'Daftar Akun EduPath' }}</h3>
-            <p class="text-xs text-slate-400 font-light">{{ isLoginMode ? 'Selamat datang kembali pejuang PTN!' : 'Mulai perjalanan belajarmu hari ini.' }}</p>
-          </div>
-
-          <form @submit.prevent="doAuth" class="space-y-4 mt-6">
+          <form @submit.prevent="doAuth" class="space-y-4">
             <div v-if="authError" class="px-3 py-2 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-[11px] font-bold text-center">
               {{ authError }}
             </div>

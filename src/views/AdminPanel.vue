@@ -6,18 +6,17 @@
     <div class="absolute bottom-0 right-1/4 w-80 h-80 rounded-full opacity-15 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #6366f1 0%, transparent 70%);"></div>
 
     <div class="relative z-10 w-full max-w-sm mx-4">
-      <!-- Logo -->
-      <div class="text-center mb-6">
-        <div class="inline-flex items-center gap-2.5 group select-none mb-2">
-          <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
-          <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
-        </div>
-        <p class="text-white/40 text-xs font-semibold uppercase tracking-widest">Admin Panel Portal</p>
-      </div>
-
       <!-- Login Card -->
-      <div class="rounded-3xl p-8 border" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); backdrop-filter: blur(20px);">
-        <h2 class="text-white font-black text-lg mb-6">Masuk sebagai Admin</h2>
+      <div class="rounded-3xl p-8 border relative" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); backdrop-filter: blur(20px);">
+        <!-- Logo & Header -->
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center gap-2.5 group select-none mb-2">
+            <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
+            <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+          </div>
+          <h2 class="text-white font-black text-lg">Masuk sebagai Admin</h2>
+          <p class="text-white/40 text-xs font-semibold uppercase tracking-widest mt-1">Admin Panel Portal</p>
+        </div>
 
         <!-- Error Message -->
         <div v-if="loginError" class="mb-4 px-4 py-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-bold flex items-center gap-2">
