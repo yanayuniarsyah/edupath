@@ -3218,6 +3218,7 @@
           <div class="flex flex-wrap items-center gap-4 text-xs">
             <button @click="showTermsModal = true" class="text-[#c0ff00] hover:underline font-bold">Syarat &amp; Ketentuan</button>
             <button @click="showContactModal = true" class="hover:underline">Detail Kontak Resmi</button>
+            <a href="#/admin" class="text-amber-400/80 hover:text-amber-300 font-bold hover:underline">Portal Administrator &rarr;</a>
           </div>
         </div>
         </div><!-- /section-wrapper -->
@@ -3391,6 +3392,13 @@
               {{ isLoginMode ? 'Daftar di sini' : 'Masuk di sini' }}
             </button>
           </p>
+
+          <div class="mt-4 pt-3 border-t border-white/10 text-center">
+            <a href="#/admin" @click="showLoginModal = false" class="text-[11px] font-bold text-amber-400 hover:text-amber-300 transition-colors inline-flex items-center gap-1.5">
+              <i class="ph-bold ph-shield-check"></i>
+              <span>Masuk sebagai Administrator / Admin Bimbel &rarr;</span>
+            </a>
+          </div>
 
           <p v-if="!isLoginMode" class="text-[10px] text-slate-500 text-center font-light mt-2">
             Dengan mendaftar, Anda menyetujui 
