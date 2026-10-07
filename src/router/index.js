@@ -1,9 +1,18 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
-// LAZY IMPORTS: setiap route di-download hanya saat dibutuhkan
-// - Siswa biasa tidak perlu download AdminPanel.vue (89KB + xlsx library)
-// - TryOutCBT hanya didownload saat masuk halaman tryout
-// Ini memotong initial bundle secara signifikan
+// Handle direct pathname URL like https://edupath.co.id/admin when using hash history
+try {
+  const currentPath = window.location.pathname.replace(/^\/+/, '').replace(/\/+$/, '');
+  if (currentPath && !window.location.hash) {
+    if (currentPath === 'admin' || currentPath === 'admin/login') {
+      window.location.replace('/#/admin');
+    } else if (currentPath === 'tryout') {
+      window.location.replace('/#/tryout');
+    } else if (currentPath === 'terms') {
+      window.location.replace('/#/terms');
+    }
+  }
+} catch (e) {}
 
 const routes = [
   {
