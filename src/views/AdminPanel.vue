@@ -29,22 +29,21 @@
 
         <form @submit.prevent="doLogin" class="space-y-4">
           <div>
-            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Username</label>
+            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Email</label>
             <div class="relative">
-              <i class="ph-bold ph-user absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
+              <i class="ph-bold ph-envelope absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
               <input
-                v-model="loginForm.username"
-                type="text"
-                placeholder="admin"
-                autocomplete="username"
+                v-model="loginForm.email"
+                type="email"
+                placeholder="admin@edupath.ai"
+                autocomplete="email"
                 class="w-full pl-9 pr-4 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all"
                 style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);"
                 :style="loginError ? 'border-color: rgba(239,68,68,0.5);' : ''"
               />
             </div>
           </div>
-
-          <div>
+          <div class="mt-4">
             <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Password</label>
             <div class="relative">
               <i class="ph-bold ph-lock absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
@@ -68,6 +67,22 @@
               </button>
             </div>
           </div>
+          <div class="mt-4">
+            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Kode OTP</label>
+            <div class="relative">
+              <i class="ph-bold ph-key absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
+              <input
+                v-model="loginForm.otp"
+                type="text"
+                placeholder="123456"
+                class="w-full pl-9 pr-4 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all"
+                style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);"
+              />
+            </div>
+            <button @click="sendOtp" class="mt-2 w-full py-2 rounded-xl font-black text-sm text-black bg-[#c0ff00] transition-all hover:opacity-90">
+              Kirim OTP
+            </button>
+          </div>          </div>
 
           <button
             type="submit"
@@ -78,6 +93,7 @@
             <span v-if="!loginLoading">Masuk ke Admin Panel</span>
             <span v-else class="flex items-center justify-center gap-2"><i class="ph-bold ph-spinner animate-spin"></i> Memverifikasi...</span>
           </button>
+
         </form>
 
         <div class="mt-5 pt-4 border-t border-white/8 text-center">
