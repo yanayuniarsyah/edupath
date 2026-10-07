@@ -27,6 +27,7 @@
     >
       <!-- Top: Logo + Nav (scrollable) -->
       <div class="flex flex-col flex-grow min-h-0 overflow-y-auto" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-6 pb-2' : 'p-3 pb-2'">
+        <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-2.5 group cursor-pointer shrink-0" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center w-full'" @click="goToHomeTop">
             <div class="w-8 h-8 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base group-hover:rotate-12 transition-all duration-300 shadow-md shadow-[#c0ff00]/20">E</div>
             <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="min-w-0">
