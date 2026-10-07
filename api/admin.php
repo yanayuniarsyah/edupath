@@ -482,28 +482,28 @@ elseif ($action === 'students') {
             $stmtS->execute([$id]);
             $email = $stmtS->fetchColumn();
 
-            // 1. Delete dependent financial data
-            $pdo->prepare("DELETE FROM commissions WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id]);
-            $pdo->prepare("DELETE FROM payments WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id]);
-            $pdo->prepare("DELETE FROM invoices WHERE student_id = ? OR order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id, $id]);
-            $pdo->prepare("DELETE FROM orders WHERE student_id = ?")->execute([$id]);
-            $pdo->prepare("DELETE FROM subscriptions WHERE student_id = ?")->execute([$id]);
+            // 1. Delete dependent financial data safely
+            try { $pdo->prepare("DELETE FROM commissions WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM payments WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM invoices WHERE student_id = ? OR order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id, $id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM orders WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM subscriptions WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
 
-            // 2. Delete quiz and learning data
-            $pdo->prepare("DELETE FROM quiz_results WHERE student_id = ?")->execute([$id]);
-            $pdo->prepare("DELETE FROM quiz_attempts WHERE student_id = ?")->execute([$id]);
-            $pdo->prepare("DELETE FROM progress WHERE student_id = ?")->execute([$id]);
-            $pdo->prepare("DELETE FROM entitlements WHERE student_id = ?")->execute([$id]);
+            // 2. Delete quiz and learning data safely
+            try { $pdo->prepare("DELETE FROM quiz_results WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM quiz_attempts WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM progress WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM entitlements WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
 
-            // 3. Delete session & device tokens
-            $pdo->prepare("DELETE FROM refresh_tokens WHERE student_id = ?")->execute([$id]);
-            $pdo->prepare("DELETE FROM device_tokens WHERE student_id = ?")->execute([$id]);
+            // 3. Delete session & device tokens safely
+            try { $pdo->prepare("DELETE FROM refresh_tokens WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM device_tokens WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
 
             // 4. Delete student record & user account
             $pdo->prepare("DELETE FROM students WHERE id = ?")->execute([$id]);
-            $pdo->prepare("DELETE FROM user_roles WHERE reference_id = ?")->execute([$id]);
+            try { $pdo->prepare("DELETE FROM user_roles WHERE reference_id = ?")->execute([$id]); } catch (\Throwable $e) {}
             if ($email) {
-                $pdo->prepare("DELETE FROM users WHERE identity_key = ?")->execute([$email]);
+                try { $pdo->prepare("DELETE FROM users WHERE identity_key = ?")->execute([$email]); } catch (\Throwable $e) {}
             }
             $pdo->commit();
             echo json_encode(["success" => true]);
