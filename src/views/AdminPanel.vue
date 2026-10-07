@@ -8,15 +8,17 @@
     <div class="relative z-10 w-full max-w-sm mx-4">
       <!-- Login Card -->
       <div class="rounded-3xl p-8 border relative" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); backdrop-filter: blur(20px);">
+        <!-- Close button -->
+        <button @click="$router.push('/')" class="!absolute top-5 right-5 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-transparent hover:border-rose-500/30 text-sm">
+          <i class="ph-bold ph-x"></i>
+        </button>
+
         <!-- Logo & Header -->
         <div class="text-center mb-6">
           <div class="inline-flex items-center gap-2.5 group select-none mb-2">
             <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
             <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
-          <button @click="$router.push('/')" class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-transparent hover:border-rose-500/30 text-sm">
-            <i class="ph-bold ph-x text-base"></i>
-          </button>
           <h2 class="text-white font-black text-lg">Masuk sebagai Admin</h2>
           <p class="text-white/40 text-xs font-semibold uppercase tracking-widest mt-1">Admin Panel Portal</p>
         </div>
@@ -67,22 +69,7 @@
               </button>
             </div>
           </div>
-          <div class="mt-4">
-            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Kode OTP</label>
-            <div class="relative">
-              <i class="ph-bold ph-key absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
-              <input
-                v-model="loginForm.otp"
-                type="text"
-                placeholder="123456"
-                class="w-full pl-9 pr-4 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all"
-                style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);"
-              />
-            </div>
-            <button @click="sendOtp" class="mt-2 w-full py-2 rounded-xl font-black text-sm text-black bg-[#c0ff00] transition-all hover:opacity-90">
-              Kirim OTP
-            </button>
-          </div>          </div>
+
 
           <button
             type="submit"
@@ -2584,6 +2571,7 @@ Terus dukung ananda meraih PTN Impian bersama EduPath.ai!`;
     showToast('Gagal mengirim laporan ke Telegram.');
   }
 };
+const blastWAParentReport = () => {
   const message = `Halo Bapak/Ibu Wali Siswa EduPath,\n\nBerikut ringkasan progres belajar ananda di EduPath:\n- Tryout Terselesaikan: 5x\n- Rata-rata Skor SNBT: 685 (Target 700+)\n- Status Paket: Aktif\n\nTerus dukung ananda meraih PTN Impian bersama EduPath.ai!`;
   const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
