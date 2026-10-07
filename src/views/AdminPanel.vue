@@ -130,16 +130,6 @@
           </div>
         </div>
         <button
-          @click="goToStudentSide"
-          :title="'Lihat Tampilan Siswa'"
-          :class="['bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white rounded-lg font-bold transition-all flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-95 text-[11px]',
-            sidebarOpen ? 'w-full py-1.5' : 'w-8 h-8 text-xs'
-          ]"
-        >
-          <i class="ph-bold ph-arrow-square-out shrink-0"></i>
-          <span v-show="sidebarOpen" class="whitespace-nowrap">Tampilan Siswa</span>
-        </button>
-        <button
           @click="doLogout"
           :title="'Keluar'"
           :class="['bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-95 text-[11px]',
@@ -1581,10 +1571,6 @@ const doLogin = async () => {
   } finally {
     loginLoading.value = false;
   }
-};
-
-const goToStudentSide = () => {
-  window.location.hash = '#/';
 };
 
 const doLogout = async () => {

@@ -13,15 +13,6 @@
 
 
 
-    <!-- Floating Admin Preview Return Bar -->
-    <div v-if="hasAdminSession" class="fixed top-4 right-4 z-50 flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-amber-500/95 text-black font-black text-xs shadow-2xl backdrop-blur-md border border-amber-300 animate-fade-in">
-      <i class="ph-bold ph-shield-check text-base"></i>
-      <span>Mode Pratinjau Siswa</span>
-      <button @click="returnToAdminPanel" class="ml-1 px-3 py-1 rounded-xl bg-slate-950 text-amber-300 hover:bg-black transition-all text-xs font-bold flex items-center gap-1 cursor-pointer">
-        <span>Kembali ke Admin</span> &rarr;
-      </button>
-    </div>
-
     <!-- Sidebar Navigation — auto-hide on desktop -->
     <aside
       v-if="isLoggedIn"
@@ -3905,8 +3896,6 @@ export default {
     const toggleMobileSidebar = () => { mobileSidebarOpen.value = !mobileSidebarOpen.value; };
 
     // Basic User & Auth States
-    const hasAdminSession = ref(Boolean(sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token')));
-    const returnToAdminPanel = () => { window.location.hash = '#/admin'; };
     const isLoggedIn = ref(false); 
     const showLoginModal = ref(false);
     const showTermsModal = ref(false);
@@ -5206,8 +5195,6 @@ export default {
       resetToken,
       newPassword,
       handleForgotPassword,
-      hasAdminSession,
-      returnToAdminPanel,
       showTermsModal,
       showPrivacyModal,
       showDisclaimerModal,
