@@ -7,10 +7,12 @@
 
     <div class="relative z-10 w-full max-w-sm mx-4">
       <!-- Logo -->
-      <div class="text-center mb-8">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-black text-2xl mx-auto mb-4 shadow-lg" style="background: #c0ff00;">E</div>
-        <h1 class="text-2xl font-black text-white tracking-tight">EduPath<span style="color:#c0ff00;">.ai</span></h1>
-        <p class="text-white/40 text-xs font-semibold mt-1 uppercase tracking-widest">Admin Panel</p>
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2.5 group select-none mb-2">
+          <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
+          <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+        </div>
+        <p class="text-white/40 text-xs font-semibold uppercase tracking-widest">Admin Panel Portal</p>
       </div>
 
       <!-- Login Card -->
@@ -93,11 +95,11 @@
       style="background: linear-gradient(160deg, #050a18 0%, #0d1224 60%, #050a18 100%);"
     >
       <!-- Logo -->
-      <div class="flex items-center gap-2.5 px-3 py-3 border-b border-white/10 shrink-0 cursor-pointer select-none" @click="sidebarOpen = !sidebarOpen">
-        <div class="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center font-black text-black text-base transition-all duration-300" style="background: #c0ff00;">E</div>
+      <div class="flex items-center gap-2.5 px-3.5 py-3.5 border-b border-white/10 shrink-0 cursor-pointer select-none" @click="sidebarOpen = !sidebarOpen">
+        <div class="w-8 h-8 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base shadow-md shadow-[#c0ff00]/20">E</div>
         <div v-show="sidebarOpen" class="min-w-0">
-          <span class="font-black text-sm tracking-tight text-white whitespace-nowrap">EduPath<span style="color:#c0ff00;">.ai</span></span>
-          <p class="text-[9px] text-white/40 font-semibold uppercase tracking-widest whitespace-nowrap">Admin Panel</p>
+          <span class="font-black text-base tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+          <p class="text-[9px] text-white/40 font-semibold uppercase tracking-widest whitespace-nowrap">Admin Portal</p>
         </div>
       </div>
 
