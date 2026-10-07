@@ -9,6 +9,8 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
     if (!fs.existsSync(dirPath)) return arrayOfFiles;
     const files = fs.readdirSync(dirPath);
     files.forEach((file) => {
+        // Jangan upload file .env lokal ke server production agar tidak menimpa settingan hosting
+        if (file.startsWith(".env")) return;
         const fullPath = path.join(dirPath, file);
         if (fs.statSync(fullPath).isDirectory()) {
             arrayOfFiles = getAllFiles(fullPath, arrayOfFiles);

@@ -1558,7 +1558,9 @@ const doLogin = async () => {
   loginError.value = '';
   loginLoading.value = true;
   try {
-    const res = await api.adminLogin(loginForm.value.username, loginForm.value.password);
+    const u = loginForm.value.username?.trim() || '';
+    const p = loginForm.value.password?.trim() || '';
+    const res = await api.adminLogin(u, p);
     sessionStorage.setItem('admin_token', res.token);
     if (res.csrf_token) sessionStorage.setItem('ep_admin_csrf', res.csrf_token);
     const roleFound = res.user?.role || extractRoleFromToken(res.token) || '';

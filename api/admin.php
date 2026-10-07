@@ -134,8 +134,8 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     //     exit;
     // }
 
-    $username = $input['username'] ?? '';
-    $password = $input['password'] ?? '';
+    $username = trim($input['username'] ?? '');
+    $password = trim($input['password'] ?? '');
 
     // Join with tenants to check if tenant is active (only for non-superadmin)
     $stmt = $pdo->prepare("

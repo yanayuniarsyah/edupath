@@ -46,6 +46,13 @@ function api_request($endpoint, $method = 'GET', $token = null, $data = null) {
 }
 
 try {
+    $pdo->exec("ALTER TABLE students ADD COLUMN tenant_id VARCHAR(36) NULL");
+} catch (\Throwable $e) {}
+try {
+    $pdo->exec("ALTER TABLE admins ADD COLUMN tenant_id VARCHAR(36) NULL");
+} catch (\Throwable $e) {}
+
+try {
     $pdo->beginTransaction();
 
     // Create UAT Tenant
