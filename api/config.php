@@ -16,7 +16,8 @@ load_env(dirname(__DIR__) . '/.env');
 
 // ----------------------------------------------------------------
 $allowed_origins_raw = env('ALLOWED_ORIGINS', 'http://localhost:5173');
-$request_origin  = trim($_SERVER['HTTP_ORIGIN'] ?? '');
+$allowed_origins     = array_map('trim', explode(',', $allowed_origins_raw));
+$request_origin      = trim($_SERVER['HTTP_ORIGIN'] ?? '');
 
 if ($request_origin !== '') {
     $origin_host = parse_url($request_origin, PHP_URL_HOST) ?? '';
