@@ -14,6 +14,9 @@
             <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
             <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
+          <button @click="$router.push('/')" class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-transparent hover:border-rose-500/30 text-sm">
+            <i class="ph-bold ph-x text-base"></i>
+          </button>
           <h2 class="text-white font-black text-lg">Masuk sebagai Admin</h2>
           <p class="text-white/40 text-xs font-semibold uppercase tracking-widest mt-1">Admin Panel Portal</p>
         </div>
@@ -2535,7 +2538,36 @@ const exportQuestionsCSV = () => {
   downloadCSV(`EduPath_BankSoal_${new Date().toISOString().slice(0,10)}.csv`, rows);
 };
 
-const blastTelegramParentReport = () => {
+const blastTelegramParentReport = async () => {
+  const message = `Halo Bapak/Ibu Wali Siswa EduPath,
+
+Berikut ringkasan progres belajar ananda di EduPath:
+- Tryout Terselesaikan: 5x
+- Rata-rata Skor SNBT: 685 (Target 700+)
+- Status Paket: Aktif
+
+Terus dukung ananda meraih PTN Impian bersama EduPath.ai!`;
+
+  const botToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || 'YOUR_TELEGRAM_BOT_TOKEN';
+  const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || 'TARGET_CHAT_ID';
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: message })
+    });
+    if (response.ok) {
+      showToast('Laporan berhasil dikirim ke Telegram orang tua.');
+    } else {
+      const err = await response.text();
+      console.error('Telegram API error:', err);
+      showToast('Gagal mengirim laporan ke Telegram.');
+    }
+  } catch (e) {
+    console.error('Telegram request failed:', e);
+    showToast('Gagal mengirim laporan ke Telegram.');
+  }
+};
   const message = `Halo Bapak/Ibu Wali Siswa EduPath,\n\nBerikut ringkasan progres belajar ananda di EduPath:\n- Tryout Terselesaikan: 5x\n- Rata-rata Skor SNBT: 685 (Target 700+)\n- Status Paket: Aktif\n\nTerus dukung ananda meraih PTN Impian bersama EduPath.ai!`;
   const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
