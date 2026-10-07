@@ -250,9 +250,9 @@
                       </span>
                     </td>
                     <td class="px-3 py-2 text-white/40">{{ o.created_at ? new Date(o.created_at).toLocaleString('id-ID') : '-' }}</td>
-                    <td class="px-3 py-2 text-right space-x-2">
-                      <button @click="openEditOrderStatusModal(o)" title="Ubah Status" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
-                      <button @click="deleteOrder(o.order_id || o.id)" title="Hapus Transaksi" class="text-rose-400 hover:text-rose-300 font-bold"><i class="ph-bold ph-trash text-sm"></i></button>
+                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
+                      <button @click="openEditOrderStatusModal(o)" title="Ubah Status" class="px-2 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all"><i class="ph-bold ph-pencil-simple"></i> Status</button>
+                      <button @click="deleteOrder(o.order_id || o.id)" title="Hapus Transaksi" class="px-2 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -325,9 +325,9 @@
                         {{ s.is_active != 0 ? 'Aktif' : 'Nonaktif' }}
                       </span>
                     </td>
-                    <td class="px-3 py-2 text-right space-x-2">
-                      <button @click="openEditStudentModal(s)" title="Edit Siswa" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
-                      <button @click="deleteStudent(s.id)" title="Hapus Siswa" class="text-rose-400 hover:text-rose-300 font-bold"><i class="ph-bold ph-trash text-sm"></i></button>
+                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
+                      <button @click="openEditStudentModal(s)" title="Edit Siswa" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deleteStudent(s.id)" title="Hapus Siswa" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -464,9 +464,9 @@
                       <span v-if="q.is_qc_passed == 1" class="px-2 py-0.5 text-[9px] font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-md">Lolos QC</span>
                       <span v-else class="px-2 py-0.5 text-[9px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-md">Belum QC</span>
                     </td>
-                    <td class="px-3 py-2 text-right space-x-2">
-                      <button @click="openQuestionModal(q)" class="text-indigo-400 hover:text-indigo-300 font-bold" title="Edit Soal"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
-                      <button @click="deleteQuestion(q.id)" class="text-rose-400 hover:text-rose-300 font-bold" title="Hapus Soal"><i class="ph-bold ph-trash text-sm"></i></button>
+                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
+                      <button @click="openQuestionModal(q)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Soal"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deleteQuestion(q.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Soal"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -535,9 +535,9 @@
                         {{ m.is_active != 0 ? 'Aktif' : 'Nonaktif' }}
                       </span>
                     </td>
-                    <td class="px-3 py-2 text-right space-x-2">
-                      <button @click="openMaterialModal(m)" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
-                      <button @click="deleteMaterial(m.id)" class="text-rose-400 hover:text-rose-300 font-bold"><i class="ph-bold ph-trash text-sm"></i></button>
+                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
+                      <button @click="openMaterialModal(m)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Materi"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deleteMaterial(m.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Materi"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -595,9 +595,9 @@
                     <td class="px-3 py-2">
                       <span class="text-[10px] text-indigo-300 font-medium">{{ Array.isArray(p.features) ? p.features.length : 0 }} fitur</span>
                     </td>
-                    <td class="px-3 py-2 text-right space-x-2">
-                      <button @click="openPlanModal(p)" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
-                      <button @click="deletePlan(p.id)" class="text-rose-400 hover:text-rose-300 font-bold"><i class="ph-bold ph-trash text-sm"></i></button>
+                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
+                      <button @click="openPlanModal(p)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Paket"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deletePlan(p.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Paket"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -730,9 +730,9 @@
                     <td class="py-2.5 px-3 text-white/60">
                       {{ aff.bank_name ? `${aff.bank_name} (${aff.bank_account})` : '-' }}
                     </td>
-                    <td class="py-2.5 px-3 text-right space-x-2">
-                      <button @click="openEditAffiliateModal(aff)" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
-                      <button @click="deleteAffiliate(aff.id)" class="text-rose-400 hover:text-rose-300 font-bold"><i class="ph-bold ph-trash text-sm"></i></button>
+                    <td class="py-2.5 px-3 text-right space-x-1.5 whitespace-nowrap">
+                      <button @click="openEditAffiliateModal(aff)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Mitra"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deleteAffiliate(aff.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Mitra"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -833,9 +833,9 @@
                         Aktif
                       </span>
                     </td>
-                    <td class="px-3 py-2 text-right space-x-2">
-                      <button @click="openStaffModal(s)" class="text-indigo-400 hover:text-indigo-300 font-bold"><i class="ph-bold ph-pencil-simple text-sm"></i></button>
-                      <button v-if="s.username !== 'admin'" @click="deleteStaff(s.id)" class="text-rose-400 hover:text-rose-300 font-bold"><i class="ph-bold ph-trash text-sm"></i></button>
+                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
+                      <button @click="openStaffModal(s)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Staff"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button v-if="s.username !== 'admin'" @click="deleteStaff(s.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Staff"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
