@@ -15,7 +15,20 @@ $expected_key = env('PHASE4E_VERIFY_KEY');
 if (empty($expected_key)) {
     $expected_key = getenv('PHASE4E_VERIFY_KEY'); // fallback
 }
+
 $provided_key = $_SERVER['HTTP_X_VERIFY_KEY'] ?? '';
+if (empty($provided_key) && function_exists('apache_request_headers')) {
+    $headers = apache_request_headers();
+    foreach ($headers as $k => $v) {
+        if (strtolower($k) === 'x-verify-key') {
+            $provided_key = $v;
+            break;
+        }
+    }
+}
+
+$expected_key = trim((string)$expected_key);
+$provided_key = trim((string)$provided_key);
 
 if (empty($expected_key) || empty($provided_key) || !hash_equals($expected_key, $provided_key)) {
     http_response_code(401);
