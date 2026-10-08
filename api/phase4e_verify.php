@@ -10,11 +10,14 @@ header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-// 1. Authenticate using a derivative of an existing environment secret (so no new secret is committed)
-$expected_key = substr(hash_hmac('sha256', 'phase4e', JWT_SECRET), 0, 16);
+// 1. Authenticate using a dedicated temporary verification key
+$expected_key = env('PHASE4E_VERIFY_KEY');
+if (empty($expected_key)) {
+    $expected_key = getenv('PHASE4E_VERIFY_KEY'); // fallback
+}
 $provided_key = $_SERVER['HTTP_X_VERIFY_KEY'] ?? '';
 
-if (empty($provided_key) || !hash_equals($expected_key, $provided_key)) {
+if (empty($expected_key) || empty($provided_key) || !hash_equals($expected_key, $provided_key)) {
     http_response_code(401);
     echo json_encode(["error" => "Unauthorized access to verification bridge."]);
     exit;
