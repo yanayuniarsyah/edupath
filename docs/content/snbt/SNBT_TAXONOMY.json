@@ -1,0 +1,265 @@
+{
+  "program": {
+    "id": "PRG-SNBT",
+    "name": "SNBT",
+    "version": "1.0",
+    "assessments": [
+      {
+        "id": "ASM-TPS",
+        "name": "TPS",
+        "subtests": [
+          {
+            "id": "SUB-PU",
+            "name": "Penalaran Umum",
+            "domains": [
+              {
+                "id": "DOM-PU-IN",
+                "name": "Penalaran Induktif",
+                "topics": [
+                  {
+                    "id": "TOP-PU-IN-CAUS",
+                    "name": "Hubungan Sebab-Akibat",
+                    "subtopics": [],
+                    "competencies": [
+                      {
+                        "id": "COM-PU-IN-CAUS-1",
+                        "name": "Menentukan pernyataan sebab-akibat yang paling mungkin terjadi berdasarkan teks bacaan."
+                      }
+                    ],
+                    "indicators": [
+                      {
+                        "id": "IND-PU-IN-CAUS-1A",
+                        "competency_id": "COM-PU-IN-CAUS-1",
+                        "name": "Peserta dapat mengidentifikasi fenomena akibat langsung dari dua premis fakta kausal yang disajikan."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "DOM-PU-DE",
+                "name": "Penalaran Deduktif",
+                "topics": [
+                  {
+                    "id": "TOP-PU-DE-SYL",
+                    "name": "Silogisme",
+                    "subtopics": [
+                      {
+                        "id": "SUBTOP-PU-DE-SYL-CAT",
+                        "name": "Silogisme Kategorial"
+                      }
+                    ],
+                    "competencies": [
+                      {
+                        "id": "COM-PU-DE-SYL-1",
+                        "name": "Menarik kesimpulan valid dari dua premis."
+                      }
+                    ],
+                    "indicators": [
+                      {
+                        "id": "IND-PU-DE-SYL-1A",
+                        "competency_id": "COM-PU-DE-SYL-1",
+                        "name": "Peserta dapat menentukan konklusi yang sah dari premis universal dan premis partikular."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "SUB-PPU",
+            "name": "Pengetahuan dan Pemahaman Umum",
+            "domains": [
+              {
+                "id": "DOM-PPU-SEM",
+                "name": "Pemahaman Semantik",
+                "topics": [
+                  {
+                    "id": "TOP-PPU-SEM-SYN",
+                    "name": "Sinonim dan Makna Kontekstual",
+                    "subtopics": [],
+                    "competencies": [
+                      {
+                        "id": "COM-PPU-SEM-1",
+                        "name": "Menentukan makna istilah spesifik sesuai dengan konteks kalimat."
+                      }
+                    ],
+                    "indicators": [
+                      {
+                        "id": "IND-PPU-SEM-1A",
+                        "competency_id": "COM-PPU-SEM-1",
+                        "name": "Peserta dapat mengidentifikasi padanan kata yang tepat untuk menggantikan frasa bercetak miring dalam sebuah paragraf."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "SUB-PBM",
+            "name": "Pemahaman Bacaan dan Menulis",
+            "domains": [
+              {
+                "id": "DOM-PBM-MECH",
+                "name": "Mekanika Penulisan",
+                "topics": [
+                  {
+                    "id": "TOP-PBM-MECH-EBI",
+                    "name": "Ejaan Bahasa Indonesia",
+                    "subtopics": [],
+                    "competencies": [
+                      {
+                        "id": "COM-PBM-MECH-1",
+                        "name": "Mengevaluasi ketepatan penggunaan tanda baca dan huruf kapital."
+                      }
+                    ],
+                    "indicators": [
+                      {
+                        "id": "IND-PBM-MECH-1A",
+                        "competency_id": "COM-PBM-MECH-1",
+                        "name": "Peserta dapat menemukan kesalahan penggunaan tanda koma pada kalimat majemuk."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "SUB-PK",
+            "name": "Pengetahuan Kuantitatif",
+            "domains": [
+              {
+                "id": "DOM-PK-ALG",
+                "name": "Aljabar",
+                "topics": [
+                  {
+                    "id": "TOP-PK-ALG-EQ",
+                    "name": "Persamaan dan Pertidaksamaan",
+                    "subtopics": [
+                      {
+                        "id": "SUBTOP-PK-ALG-EQ-LIN",
+                        "name": "Sistem Persamaan Linear Dua Variabel"
+                      }
+                    ],
+                    "competencies": [
+                      {
+                        "id": "COM-PK-ALG-1",
+                        "name": "Menyelesaikan model matematika dari sistem persamaan linear."
+                      }
+                    ],
+                    "indicators": [
+                      {
+                        "id": "IND-PK-ALG-1A",
+                        "competency_id": "COM-PK-ALG-1",
+                        "name": "Peserta dapat menghitung nilai variabel dari dua buah persamaan linear yang disajikan tanpa narasi cerita."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ASM-LIT",
+        "name": "Tes Literasi",
+        "subtests": [
+          {
+            "id": "SUB-LIT-ID",
+            "name": "Literasi Bahasa Indonesia",
+            "domains": [
+              {
+                "id": "DOM-LIT-ID-INFO",
+                "name": "Mengevaluasi dan Merefleksi Teks",
+                "topics": [
+                  {
+                    "id": "TOP-LIT-ID-BIAS",
+                    "name": "Analisis Argumen dan Bias",
+                    "subtopics": [],
+                    "competencies": [
+                      {
+                        "id": "COM-LIT-ID-BIAS-1",
+                        "name": "Menilai kredibilitas dan opini penulis dalam teks eksposisi."
+                      }
+                    ],
+                    "indicators": [
+                      {
+                        "id": "IND-LIT-ID-BIAS-1A",
+                        "competency_id": "COM-LIT-ID-BIAS-1",
+                        "name": "Peserta dapat membedakan antara fakta objektif dan asumsi subjektif yang diajukan oleh penulis teks."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "SUB-LIT-EN",
+            "name": "Literasi Bahasa Inggris",
+            "domains": [
+              {
+                "id": "DOM-LIT-EN-COMP",
+                "name": "Reading Comprehension",
+                "topics": [
+                  {
+                    "id": "TOP-LIT-EN-MAIN",
+                    "name": "Main Idea and Detail Information",
+                    "subtopics": [],
+                    "competencies": [
+                      {
+                        "id": "COM-LIT-EN-MAIN-1",
+                        "name": "Menentukan gagasan utama dari sebuah teks berbahasa Inggris."
+                      }
+                    ],
+                    "indicators": [
+                      {
+                        "id": "IND-LIT-EN-MAIN-1A",
+                        "competency_id": "COM-LIT-EN-MAIN-1",
+                        "name": "Peserta dapat mengidentifikasi topik utama yang dibahas pada keseluruhan teks ilmiah."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "SUB-LIT-MATH",
+            "name": "Penalaran Matematika",
+            "domains": [
+              {
+                "id": "DOM-LIT-MATH-DATA",
+                "name": "Data dan Ketidakpastian",
+                "topics": [
+                  {
+                    "id": "TOP-LIT-MATH-STAT",
+                    "name": "Statistika Deskriptif",
+                    "subtopics": [],
+                    "competencies": [
+                      {
+                        "id": "COM-LIT-MATH-STAT-1",
+                        "name": "Menginterpretasikan data dari grafik atau tabel kontekstual."
+                      }
+                    ],
+                    "indicators": [
+                      {
+                        "id": "IND-LIT-MATH-STAT-1A",
+                        "competency_id": "COM-LIT-MATH-STAT-1",
+                        "name": "Peserta dapat mengambil keputusan berdasarkan perbandingan rata-rata atau tren grafik dari dua dataset."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

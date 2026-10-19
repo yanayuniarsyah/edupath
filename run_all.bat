@@ -6,32 +6,36 @@ cd /d "%~dp0"
 
 echo.
 echo  ============================================
-echo   EduPath - Menjalankan Semua Service
+echo   EduPath - Menjalankan Semua Service Lokal
 echo  ============================================
 echo.
 
-:: ── Install frontend dependencies jika belum ──
-if not exist node_modules (
-  echo [1/3] Install frontend dependencies...
-  call npm install
+:: 1. Cek / Jalankan MySQL (XAMPP)
+netstat -ano | findstr :3306 > nul
+if %errorlevel% neq 0 (
+  echo [1/3] Menjalankan MySQL database (XAMPP)...
+  if exist "C:\xampp\mysql_start.bat" (
+    start "EduPath MySQL" cmd /c "C:\xampp\mysql_start.bat"
+  ) else (
+    echo [PERINGATAN] XAMPP MySQL tidak ditemukan di C:\xampp. Pastikan MySQL sudah running.
+  )
+  ping -n 3 127.0.0.1 > nul
+) else (
+  echo [1/3] MySQL port 3306 sudah aktif.
 )
 
-:: ── Install backend dependencies jika belum ──
-if not exist server\node_modules (
-  echo [2/3] Install backend dependencies...
-  cd server
-  call npm install
-  cd ..
+:: 2. Jalankan PHP Backend Server (Port 8000)
+netstat -ano | findstr :8000 > nul
+if %errorlevel% neq 0 (
+  echo [2/3] Menjalankan PHP Backend Server (port 8000)...
+  start "EduPath Backend (PHP 8000)" cmd /k "cd /d "%~dp0" && php -S localhost:8000"
+  ping -n 2 127.0.0.1 > nul
+) else (
+  echo [2/3] PHP Backend di port 8000 sudah aktif.
 )
 
-echo.
-echo [OK] Menjalankan server backend di port 3001...
-start "EduPath Backend (port 3001)" cmd /k "cd /d "%~dp0server" && node server.js"
-
-:: Jeda agar backend sempat start
-ping -n 3 127.0.0.1 > nul
-
-echo [OK] Menjalankan Vite dev server...
+:: 3. Jalankan Vite Frontend Dev Server (Port 5173)
+echo [3/3] Menjalankan Frontend Vite...
 start "EduPath Frontend (Vite)" cmd /k "cd /d "%~dp0" && npm run dev"
 
 echo.
@@ -39,9 +43,11 @@ echo  ============================================
 echo   Semua service berjalan!
 echo.
 echo   Frontend : http://localhost:5173
-echo   Backend  : http://localhost:3001
-echo   API Test : http://localhost:3001/api/health
+echo   Backend  : http://localhost:8000
+echo   Database : localhost:3306 (MySQL)
 echo  ============================================
 echo.
-echo  Tutup jendela ini jika mau. Service tetap jalan.
-pause
+echo  Browser akan terbuka otomatis dalam 3 detik...
+ping -n 4 127.0.0.1 > nul
+start http://localhost:5173
+exit

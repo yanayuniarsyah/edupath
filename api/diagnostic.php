@@ -12,25 +12,76 @@ $mkuuid = function() {
     );
 };
 
+function ensure_diagnostic_schema($pdo) {
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS diagnostic_results (
+                id VARCHAR(36) PRIMARY KEY,
+                student_id VARCHAR(36) NOT NULL,
+                total_score INT DEFAULT 0,
+                gap_domain VARCHAR(100),
+                gap_sub_materi VARCHAR(100),
+                gap_score DECIMAL(5,2) DEFAULT 0,
+                details TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS learning_paths (
+                id VARCHAR(36) PRIMARY KEY,
+                student_id VARCHAR(36) NOT NULL,
+                diagnostic_result_id VARCHAR(36),
+                gap_focus VARCHAR(100),
+                recommended_materials TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        ");
+    } catch (\Throwable $e) {}
+}
+ensure_diagnostic_schema($pdo);
+
 $action = $_GET["action"] ?? "";
 
 if ($action === "start") {
     try {
-        // Fetch diagnostic blueprint (2 questions per domain for quick test)
-        $domains = ["Penalaran Umum", "Pengetahuan Kuantitatif", "Pemahaman Bacaan & Menulis", "Penalaran Matematika"];
+        // Fetch diagnostic questions covering key domains
+        $domains = ["Penalaran Umum", "Pengetahuan Kuantitatif", "Pemahaman Bacaan & Menulis", "Penalaran Matematika", "Literasi Bahasa Indonesia", "Literasi Bahasa Inggris"];
         $diagnostic_questions = [];
 
         foreach ($domains as $domain) {
-            $stmt = $pdo->prepare("SELECT id, domain, sub_materi, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE domain = ? AND is_active = 1 ORDER BY RAND() LIMIT 2");
-            $stmt->execute([$domain]);
+            $stmt = $pdo->prepare("
+                SELECT id, COALESCE(subtes, ?) as domain, COALESCE(sub_materi, subtes, 'Umum') as sub_materi, 
+                       difficulty, question, option_a, option_b, option_c, option_d, option_e 
+                FROM questions 
+                WHERE (subtes = ? OR sub_materi = ? OR test_component = ?) AND (is_active = 1 OR is_active IS NULL) 
+                ORDER BY RAND() LIMIT 2
+            ");
+            $stmt->execute([$domain, $domain, $domain, $domain]);
             $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $diagnostic_questions = array_merge($diagnostic_questions, $questions);
+        }
+
+        // Fallback / fill up from general pool if needed
+        if (count($diagnostic_questions) < 4) {
+            $existingIds = array_column($diagnostic_questions, 'id');
+            $placeholders = !empty($existingIds) ? implode(',', array_fill(0, count($existingIds), '?')) : '0';
+            $limit = 8 - count($diagnostic_questions);
+            $fallbackStmt = $pdo->prepare("
+                SELECT id, COALESCE(subtes, 'Penalaran Umum') as domain, COALESCE(sub_materi, subtes, 'Umum') as sub_materi, 
+                       difficulty, question, option_a, option_b, option_c, option_d, option_e 
+                FROM questions 
+                WHERE id NOT IN ($placeholders) AND (is_active = 1 OR is_active IS NULL) 
+                ORDER BY RAND() LIMIT $limit
+            ");
+            $fallbackStmt->execute($existingIds);
+            $extra = $fallbackStmt->fetchAll(PDO::FETCH_ASSOC);
+            $diagnostic_questions = array_merge($diagnostic_questions, $extra);
         }
 
         echo json_encode(["success" => true, "data" => $diagnostic_questions]);
     } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode(["error" => "Failed to load diagnostic test"]);
+        echo json_encode(["error" => "Failed to load diagnostic test: " . $e->getMessage()]);
     }
 } elseif ($action === "submit" && $_SERVER["REQUEST_METHOD"] === "POST") {
     $payload = authenticate();
@@ -50,7 +101,7 @@ if ($action === "start") {
     }
 
     $inQuery = implode(",", array_fill(0, count($qIds), "?"));
-    $stmt = $pdo->prepare("SELECT id, correct, domain, sub_materi FROM questions WHERE id IN ($inQuery)");
+    $stmt = $pdo->prepare("SELECT id, correct, COALESCE(subtes, 'Penalaran Umum') as domain, COALESCE(sub_materi, subtes, 'Umum') as sub_materi FROM questions WHERE id IN ($inQuery)");
     $stmt->execute($qIds);
     $questionsDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

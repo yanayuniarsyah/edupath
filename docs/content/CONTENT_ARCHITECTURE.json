@@ -1,0 +1,57 @@
+{
+  "taxonomy_levels": [
+    "program",
+    "assessment",
+    "subtest",
+    "domain",
+    "topic",
+    "subtopic",
+    "competency",
+    "indicator"
+  ],
+  "pilot_structure": {
+    "program": "SNBT",
+    "assessments": [
+      {
+        "name": "TPS",
+        "subtests": [
+          { "name": "Penalaran Umum" },
+          { "name": "Pengetahuan dan Pemahaman Umum" },
+          { "name": "Pemahaman Bacaan dan Menulis" },
+          { "name": "Pengetahuan Kuantitatif" }
+        ]
+      },
+      {
+        "name": "Tes Literasi",
+        "subtests": [
+          { "name": "Literasi Bahasa Indonesia" },
+          { "name": "Literasi Bahasa Inggris" },
+          { "name": "Penalaran Matematika" }
+        ]
+      }
+    ]
+  },
+  "content_relationships": {
+    "material": {
+      "binds_to": ["indicator", "competency", "topic"],
+      "metadata": [
+        "content_id", "program_id", "topic_id", "competency_id", "title", "learning_objective", "prerequisite", "content", "worked_example", "practice", "summary"
+      ]
+    },
+    "question": {
+      "binds_to": ["indicator", "competency", "topic"],
+      "metadata": [
+        "question_id", "program", "assessment", "subtest", "domain", "topic", "subtopic", "competency", "indicator", "question_type", "difficulty", "cognitive_demand", "stimulus_type", "source", "source_year", "source_reference", "status", "version"
+      ]
+    }
+  },
+  "spp_model": {
+    "isolated_from_taxonomy": true,
+    "dimensions": [
+      "Potential",
+      "Interest",
+      "Learning",
+      "Growth"
+    ]
+  }
+}

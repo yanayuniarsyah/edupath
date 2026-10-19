@@ -30,7 +30,7 @@
       <!-- Sub-header: Mata Ujian & Timer -->
       <div class="bg-[#013b6b] px-4 py-2 flex items-center justify-between text-sm shadow-inner">
         <div class="font-semibold uppercase tracking-wider flex items-center gap-2">
-          Subtes: <span class="bg-[#facc15] text-black px-2 py-0.5 rounded font-bold">{{ currentQuestion.sub_materit }}</span>
+          Subtes: <span class="bg-[#facc15] text-black px-2 py-0.5 rounded font-bold">{{ currentQuestion.subtest || currentQuestion.sub_materi || 'Tes Potensi Skolastik' }}</span>
         </div>
         <div class="flex items-center gap-4">
           <button @click="showQuestionList = true" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded font-bold text-xs uppercase flex items-center gap-2 transition-colors border border-blue-400 shadow">
@@ -61,13 +61,18 @@
         <!-- Question Area -->
         <div v-else class="flex-grow bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col relative overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-          <div class="font-bold text-lg">SOAL NO. <span class="text-2xl ml-1">{{ activeIndex + 1 }}</span></div>
-          <div class="text-sm text-gray-500 font-medium">Ukuran Font: <span class="cursor-pointer border px-1 ml-1 hover:bg-gray-200" @click="fontSize = 'text-sm'">A-</span><span class="cursor-pointer border px-1 ml-1 font-bold hover:bg-gray-200" @click="fontSize = 'text-base'">A</span><span class="cursor-pointer border px-1 ml-1 text-lg hover:bg-gray-200" @click="fontSize = 'text-lg'">A+</span></div>
+          <div class="font-bold text-lg md:text-xl text-slate-800">SOAL NO. <span class="text-2xl ml-1 font-black text-[#024a86]">{{ activeIndex + 1 }}</span></div>
+          <div class="text-sm text-gray-600 font-bold flex items-center">
+            Ukuran Teks: 
+            <button type="button" class="cursor-pointer border border-gray-300 rounded px-2 py-0.5 ml-1.5 hover:bg-gray-200 text-sm font-semibold transition-colors" :class="fontSize === 'text-base' ? 'bg-[#024a86] text-white border-[#024a86]' : 'bg-white text-gray-700'" @click="fontSize = 'text-base'">A-</button>
+            <button type="button" class="cursor-pointer border border-gray-300 rounded px-2.5 py-0.5 ml-1 hover:bg-gray-200 text-base font-bold transition-colors" :class="fontSize === 'text-lg' ? 'bg-[#024a86] text-white border-[#024a86]' : 'bg-white text-gray-700'" @click="fontSize = 'text-lg'">A</button>
+            <button type="button" class="cursor-pointer border border-gray-300 rounded px-3 py-0.5 ml-1 hover:bg-gray-200 text-lg font-black transition-colors" :class="fontSize === 'text-xl' ? 'bg-[#024a86] text-white border-[#024a86]' : 'bg-white text-gray-700'" @click="fontSize = 'text-xl'">A+</button>
+          </div>
         </div>
 
         <!-- Scrollable Question Area -->
-        <div class="flex-grow overflow-y-auto p-5 md:p-8" :class="fontSize">
-          <div class="mb-8 leading-relaxed text-justify" v-html="currentQuestion.text"></div>
+        <div class="flex-grow overflow-y-auto p-6 md:p-10 font-sans" :class="fontSize">
+          <div class="mb-8 leading-relaxed text-justify text-slate-900 font-medium question-body" v-html="currentQuestion.text"></div>
 
           <!-- Options -->
           <div class="space-y-4">
@@ -200,6 +205,7 @@
 
 <script>
 import api from '../api';
+import { HOTS_DIAGNOSTIC_BANK } from '../EduData';
 
 export default {
   name: 'TryOutCBT',
@@ -207,7 +213,7 @@ export default {
     return {
       showQuestionList: false,
       activeIndex: 0,
-      fontSize: 'text-base',
+      fontSize: 'text-lg',
       answers: [],
       doubt: [],
       timeLeft: 15 * 60,
@@ -245,28 +251,35 @@ export default {
       const attempt = await api.quizStart({ attempt_id: savedAttemptId, quiz_type: 'tryout', limit: 15, duration_sec: 15 * 60 });
       this.attemptId = attempt.attempt_id;
       localStorage.setItem('edupath_tryout_attempt_id', this.attemptId);
-      const dbQuestions = attempt.questions;
-      this.questions = dbQuestions.map(q => ({
-        id: q.id,
-        subtest: q.sub_materi,
-        text: q.question,
-        options: [
-          { id: 'A', text: q.option_a },
-          { id: 'B', text: q.option_b },
-          { id: 'C', text: q.option_c },
-          { id: 'D', text: q.option_d },
-          { id: 'E', text: q.option_e }
-        ]
-      }));
+      const dbQuestions = attempt.questions || [];
+      if (dbQuestions.length > 0) {
+        this.questions = dbQuestions.map(q => ({
+          id: q.id,
+          subtest: q.sub_materi || q.subtes || 'Tes Skolastik',
+          text: q.question,
+          options: [
+            { id: 'A', text: q.option_a },
+            { id: 'B', text: q.option_b },
+            { id: 'C', text: q.option_c },
+            { id: 'D', text: q.option_d },
+            { id: 'E', text: q.option_e }
+          ]
+        }));
+      } else {
+        throw new Error('No questions returned from API');
+      }
     } catch (e) {
-      console.error('Failed to load questions', e);
-      // Fallback jika API gagal (biar ga nge-blank)
-      this.questions = [
-        {
-          id: 1, subtest: 'Error', text: '<p>Gagal memuat soal dari database. Pastikan backend berjalan dan database telah di-seed.</p>',
-          options: [{id: 'A', text: 'Kembali'}, {id: 'B', text: 'Coba Lagi'}]
-        }
-      ];
+      console.warn('Tryout API fallback to HOTS_DIAGNOSTIC_BANK', e);
+      this.attemptId = 'local-to-' + Date.now();
+      this.questions = HOTS_DIAGNOSTIC_BANK.map((q, idx) => ({
+        id: q.id || (idx + 1),
+        subtest: q.category || q.subject || 'Penalaran Umum',
+        text: q.question,
+        options: (q.options || []).map((opt, oIdx) => ({
+          id: String.fromCharCode(65 + oIdx),
+          text: opt
+        }))
+      }));
     } finally {
       this.isLoading = false;
       this.answers = new Array(this.questions.length).fill(null);

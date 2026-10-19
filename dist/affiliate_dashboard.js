@@ -308,7 +308,7 @@ function initDashboardWithDummyData() {
     document.getElementById('stat-pending-commission').textContent = "Rp 150.000";
     document.getElementById('stat-paid-commission').textContent = "Rp 600.000";
     
-    document.getElementById('referral-link').value = "https://edupath.biz.id/register?ref=EP-2026-X";
+    document.getElementById('referral-link').value = "https://edupath.co.id/register?ref=EP-2026-X";
     document.getElementById('referral-code').textContent = "EP-2026-X";
 
     const tbodyRujukan = document.getElementById('referrals-table-body');

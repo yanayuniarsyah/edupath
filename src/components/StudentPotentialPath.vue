@@ -241,19 +241,19 @@
           </form>
         </div>
 
-        <!-- STEP B: INTERACTIVE QUESTION FLOW -->
-        <div v-else-if="sppStage === 'questions'" class="max-w-2xl mx-auto space-y-8 animate-fade-in">
+        <!-- STEP B: INTERACTIVE QUESTION FLOW (Single-Screen Compact Layout) -->
+        <div v-else-if="sppStage === 'questions'" class="max-w-2xl mx-auto space-y-4 animate-fade-in" @keydown="handleKeyDown" tabindex="0" ref="sppQuestionsContainer">
           
           <!-- Progress Bar & Dimension Badge -->
-          <div class="space-y-3">
+          <div class="space-y-2">
             <div class="flex items-center justify-between text-xs font-bold text-white/60">
               <span class="flex items-center gap-1.5 text-[#c0ff00]">
                 <i class="ph-bold ph-sparkle"></i>
                 Dimensi: {{ currentQuestion.dimension }}
               </span>
-              <span>Pertanyaan {{ currentQuestionIdx + 1 }} dari {{ questions.length }}</span>
+              <span class="text-[11px] text-white/70">Soal {{ currentQuestionIdx + 1 }} dari {{ questions.length }}</span>
             </div>
-            <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+            <div class="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
               <div
                 class="h-full bg-gradient-to-r from-[#c0ff00] to-emerald-400 transition-all duration-300 rounded-full"
                 :style="{ width: `${((currentQuestionIdx + 1) / questions.length) * 100}%` }"
@@ -261,34 +261,38 @@
             </div>
           </div>
 
-          <!-- Scenario Card -->
-          <div class="p-6 md:p-8 rounded-2xl bg-white/[0.05] border border-white/10 space-y-4">
-            <span class="inline-block text-[11px] font-mono uppercase tracking-widest text-white/40">Skenario Interaktif</span>
-            <h3 class="text-xl md:text-2xl font-black text-white leading-snug">
+          <!-- Scenario Card (Compact) -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-white/[0.05] border border-white/10 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="inline-block text-[10px] font-mono uppercase tracking-widest text-[#c0ff00]">Skenario Interaktif</span>
+              <span class="text-[10px] text-white/40 font-mono">Pilih opsi 1–5 lalu tekan Enter ↵</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-white leading-snug">
               {{ currentQuestion.question }}
             </h3>
-            <p v-if="currentQuestion.context" class="text-xs md:text-sm text-white/60 leading-relaxed">
+            <p v-if="currentQuestion.context" class="text-xs text-white/60 leading-relaxed">
               {{ currentQuestion.context }}
             </p>
           </div>
 
-          <!-- 1-5 Likert Scale Options -->
-          <div class="space-y-3">
+          <!-- 1-5 Likert Scale Options (Compact single-screen) -->
+          <div class="space-y-1.5 sm:space-y-2">
             <button
               v-for="value in [1, 2, 3, 4, 5]"
               :key="value"
-              @click="selectOption(value)"
+              type="button"
+              @click="selectOptionAndAdvance(value)"
               :class="[
-                'w-full text-left p-4 md:p-5 rounded-2xl border transition-all flex items-center justify-between group',
+                'w-full text-left px-3.5 py-2.5 sm:py-3 rounded-xl border transition-all flex items-center justify-between group cursor-pointer',
                 selectedAnswers[currentQuestionIdx] === value
-                  ? 'bg-[#c0ff00]/15 border-[#c0ff00] shadow-[0_0_20px_rgba(192,255,0,0.15)] text-white'
+                  ? 'bg-[#c0ff00]/20 border-[#c0ff00] shadow-[0_0_15px_rgba(192,255,0,0.2)] text-white ring-1 ring-[#c0ff00]/50'
                   : 'bg-white/[0.02] border-white/10 hover:border-white/30 hover:bg-white/[0.05] text-white/80'
               ]"
             >
-              <div class="flex items-center gap-4">
+              <div class="flex items-center gap-3">
                 <div
                   :class="[
-                    'w-8 h-8 shrink-0 rounded-full border flex items-center justify-center font-black text-sm transition-colors',
+                    'w-6 h-6 shrink-0 rounded-full border flex items-center justify-center font-black text-xs transition-colors',
                     selectedAnswers[currentQuestionIdx] === value
                       ? 'bg-[#c0ff00] text-black border-[#c0ff00]'
                       : 'border-white/30 text-white/60 group-hover:border-white group-hover:text-white'
@@ -296,7 +300,7 @@
                 >
                   {{ value }}
                 </div>
-                <div class="font-bold text-sm md:text-base text-white group-hover:text-[#c0ff00] transition-colors">
+                <div class="font-semibold text-xs sm:text-sm text-white group-hover:text-[#c0ff00] transition-colors">
                   {{ 
                     value === 1 ? (currentQuestion.dimension === 'Interest' ? 'Sangat Tidak Suka' : 'Sangat Tidak Setuju') :
                     value === 2 ? (currentQuestion.dimension === 'Interest' ? 'Tidak Suka' : 'Tidak Setuju') :
@@ -306,27 +310,31 @@
                   }}
                 </div>
               </div>
+              <span class="text-[10px] text-white/40 hidden sm:inline font-mono">[{{ value }}]</span>
             </button>
           </div>
 
-          <!-- Navigation buttons -->
-          <div class="flex items-center justify-between pt-4">
+          <!-- Navigation buttons (Always visible without scrolling) -->
+          <div class="flex items-center justify-between pt-2">
             <button
               v-if="currentQuestionIdx > 0"
+              type="button"
               @click="currentQuestionIdx--"
-              class="px-5 py-2 rounded-xl text-xs font-bold text-white/60 hover:text-white flex items-center gap-1.5 transition-colors"
+              class="px-4 py-2 rounded-xl text-xs font-bold text-white/60 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <i class="ph-bold ph-arrow-left"></i> Sebelumnya
             </button>
             <div v-else></div>
 
             <button
-              :disabled="!selectedAnswers[currentQuestionIdx] || isSubmitting"
+              type="button"
+              :disabled="isSubmitting"
               @click="nextQuestion"
-              class="px-6 py-2.5 rounded-full bg-[#c0ff00] disabled:bg-white/10 text-black disabled:text-white/30 font-black text-xs md:text-sm hover:scale-105 active:scale-95 disabled:hover:scale-100 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(192,255,0,0.3)] disabled:shadow-none"
+              class="px-6 py-2.5 rounded-full bg-[#c0ff00] text-black font-black text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(192,255,0,0.4)] cursor-pointer"
             >
-              <span>{{ isSubmitting ? 'Memproses...' : (currentQuestionIdx === questions.length - 1 ? 'Lihat Potential Profile' : 'Lanjut') }}</span>
-              <i class="ph-bold ph-arrow-right"></i>
+              <i v-if="isSubmitting" class="ph-bold ph-spinner animate-spin"></i>
+              <span>{{ isSubmitting ? 'Memproses...' : (currentQuestionIdx === questions.length - 1 ? 'Lihat Potential Profile ↵' : 'Lanjut (Enter ↵)') }}</span>
+              <i v-if="!isSubmitting" class="ph-bold ph-arrow-right"></i>
             </button>
           </div>
         </div>
@@ -668,14 +676,14 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-3 pt-2">
-              <a
-                :href="partnerTelegramUrl"
-                target="_blank"
-                class="px-6 py-3 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs md:text-sm hover:scale-105 active:scale-95 transition-all inline-flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+              <button
+                type="button"
+                @click="downloadBannerKit"
+                class="px-6 py-3 rounded-full bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs md:text-sm hover:scale-105 active:scale-95 transition-all inline-flex items-center gap-2 shadow-lg shadow-[#c0ff00]/25 cursor-pointer"
               >
-                <i class="ph-bold ph-telegram-logo text-base"></i>
-                <span>Klaim Banner Cetak & Fasilitasi BK via WA</span>
-              </a>
+                <i class="ph-bold ph-download-simple text-base"></i>
+                <span>Download Kit &amp; Template Banner Cetak (.PDF)</span>
+              </button>
             </div>
           </div>
 
@@ -803,7 +811,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 import api from '../api';
 
 export default {
@@ -835,7 +843,7 @@ export default {
 
     const generatedSchoolLink = computed(() => {
       const slug = encodeURIComponent(partnerSchoolName.value || 'sekolah');
-      return `https://edupath.biz.id/spp?school=${slug}`;
+      return `https://edupath.co.id/?school=${slug}#spp`;
     });
 
     const partnerTelegramUrl = computed(() => {
@@ -1029,7 +1037,19 @@ export default {
       selectedAnswers.value[currentQuestionIdx.value] = value;
     };
 
+    const selectOptionAndAdvance = (value) => {
+      selectedAnswers.value[currentQuestionIdx.value] = value;
+      setTimeout(() => {
+        nextQuestion();
+      }, 160);
+    };
+
     const nextQuestion = async () => {
+      // Default to 3 (Netral) if no option selected yet, so user is never stuck
+      if (!selectedAnswers.value[currentQuestionIdx.value]) {
+        selectedAnswers.value[currentQuestionIdx.value] = 3;
+      }
+
       if (currentQuestionIdx.value < questions.length - 1) {
         currentQuestionIdx.value++;
       } else {
@@ -1073,6 +1093,109 @@ export default {
         } finally {
           isSubmitting.value = false;
         }
+      }
+    };
+
+    const handleKeyDown = (e) => {
+      if (sppStage.value !== 'questions') return;
+
+      // Handle number keys 1-5
+      if (['1', '2', '3', '4', '5'].includes(e.key)) {
+        e.preventDefault();
+        selectOptionAndAdvance(Number(e.key));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        nextQuestion();
+      } else if (e.key === 'ArrowLeft' && currentQuestionIdx.value > 0) {
+        e.preventDefault();
+        currentQuestionIdx.value--;
+      }
+    };
+
+    onMounted(() => {
+      window.addEventListener('keydown', handleKeyDown);
+
+      // Tangkap parameter school dari URL (mendukung URL search maupun hash search)
+      try {
+        let schoolParam = '';
+        if (window.location.search) {
+          const urlParams = new URLSearchParams(window.location.search);
+          schoolParam = urlParams.get('school');
+        }
+        if (!schoolParam && window.location.hash.includes('?')) {
+          const hashQuery = window.location.hash.split('?')[1];
+          const urlParams = new URLSearchParams(hashQuery);
+          schoolParam = urlParams.get('school');
+        }
+
+        if (schoolParam) {
+          studentData.school = decodeURIComponent(schoolParam);
+          // Langsung arahkan siswa ke form identitas asesmen
+          sppStage.value = 'lead_form';
+          setTimeout(() => {
+            const el = document.getElementById('spp');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }, 350);
+        }
+      } catch (err) {
+        console.warn('SPP school parameter parse error:', err);
+      }
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener('keydown', handleKeyDown);
+    });
+
+    const downloadBannerKit = () => {
+      const schoolName = partnerSchoolName.value || 'Sekolah Mitra';
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(generatedSchoolLink.value)}`;
+      
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Banner Cetak Asesmen SPP - ${schoolName}</title>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 40px; background: #f8fafc; color: #0f172a; margin: 0; }
+    .banner-card { max-width: 580px; margin: 0 auto; background: white; border: 3px solid #4f46e5; border-radius: 24px; padding: 36px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+    .badge { display: inline-block; background: #e0e7ff; color: #4338ca; font-weight: 800; font-size: 13px; padding: 6px 16px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 1.5px; }
+    h1 { font-size: 26px; margin: 18px 0 6px; color: #1e1b4b; }
+    h2 { font-size: 15px; color: #64748b; font-weight: 600; margin-bottom: 24px; }
+    .qr-box { background: #f8fafc; padding: 18px; border: 2px dashed #cbd5e1; border-radius: 16px; display: inline-block; margin-bottom: 20px; }
+    .instructions { font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 24px; text-align: left; background: #f1f5f9; padding: 16px; border-radius: 12px; }
+    .footer { font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+    .btn-print { margin-top: 20px; padding: 12px 28px; background: #4f46e5; color: white; border: none; border-radius: 9999px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+    @media print {
+      body { padding: 0; background: white; }
+      .banner-card { border: 2px solid #000; box-shadow: none; max-width: 100%; border-radius: 0; padding: 24px; }
+      .btn-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="banner-card">
+    <div class="badge">Portal Resmi Asesmen Minat & Bakat</div>
+    <h1>${schoolName}</h1>
+    <h2>Student Potential Path (SPP) • EduPath Indonesia</h2>
+    <div class="qr-box">
+      <img src="${qrUrl}" width="240" height="240" alt="QR Code Asesmen" />
+    </div>
+    <div class="instructions">
+      <strong>Langkah Siswa:</strong><br>
+      1. Buka kamera HP atau Google Lens.<br>
+      2. Scan QR Code di atas untuk akses asesmen SPP secara gratis.<br>
+      3. Dapatkan peta gaya belajar dan rekomendasi prodi PTN impian Anda!
+    </div>
+    <div class="footer">
+      Diterbitkan resmi oleh EduPath • UU Perlindungan Data Pribadi (UU PDP) Certified
+    </div>
+    <button class="btn-print" onclick="window.print()">Cetak Banner / Simpan Sebagai PDF</button>
+  </div>
+</body>
+</html>`);
+        printWindow.document.close();
       }
     };
 
@@ -1145,6 +1268,9 @@ export default {
       proceedToQuestions,
       loadSampleResult,
       selectOption,
+      selectOptionAndAdvance,
+      handleKeyDown,
+      downloadBannerKit,
       nextQuestion,
       retakeAssessment,
       shareCard,

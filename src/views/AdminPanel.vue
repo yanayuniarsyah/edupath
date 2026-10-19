@@ -31,14 +31,14 @@
 
         <form @submit.prevent="doLogin" class="space-y-4">
           <div>
-            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Email</label>
+            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Email atau Username</label>
             <div class="relative">
-              <i class="ph-bold ph-envelope absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
+              <i class="ph-bold ph-user absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
               <input
-                v-model="loginForm.email"
-                type="email"
-                placeholder="admin@edupath.ai"
-                autocomplete="email"
+                v-model="loginForm.username"
+                type="text"
+                placeholder="superadmin@uat.edupath.local / username"
+                autocomplete="username"
                 class="w-full pl-9 pr-4 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all"
                 style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);"
                 :style="loginError ? 'border-color: rgba(239,68,68,0.5);' : ''"
@@ -70,6 +70,36 @@
             </div>
           </div>
 
+          <!-- Quick Fill Demo Accounts -->
+          <div class="pt-1">
+            <span class="block text-[10px] uppercase font-black text-white/40 tracking-wider mb-1.5">Pilih Akun Demo UAT:</span>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button
+                type="button"
+                @click="fillCredentials('superadmin@uat.edupath.local', 'EduPathSuperAdmin01!2026')"
+                class="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c0ff00]/40 text-[10px] font-bold text-white/80 hover:text-[#c0ff00] transition-all text-center truncate"
+                title="Super Admin: superadmin@uat.edupath.local"
+              >
+                👑 Superadmin
+              </button>
+              <button
+                type="button"
+                @click="fillCredentials('admin@uat.edupath.local', 'EduPathAdmin01!2026')"
+                class="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-sky-400/40 text-[10px] font-bold text-white/80 hover:text-sky-300 transition-all text-center truncate"
+                title="Admin Tenant: admin@uat.edupath.local"
+              >
+                🏢 Admin
+              </button>
+              <button
+                type="button"
+                @click="fillCredentials('tutor@uat.edupath.local', 'EduPathTutor01!2026')"
+                class="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/40 text-[10px] font-bold text-white/80 hover:text-emerald-300 transition-all text-center truncate"
+                title="Guru / Tutor: tutor@uat.edupath.local"
+              >
+                👨‍🏫 Guru
+              </button>
+            </div>
+          </div>
 
           <button
             type="submit"
@@ -84,7 +114,7 @@
         </form>
 
         <div class="mt-5 pt-4 border-t border-white/8 text-center">
-          <p class="text-white/30 text-[11px] font-medium">Akses terbatas. Hanya untuk administrator.</p>
+          <p class="text-white/30 text-[11px] font-medium">Akses terbatas untuk administrator & guru pengajar.</p>
         </div>
       </div>
     </div>
@@ -96,54 +126,56 @@
     <!-- ===== SIDEBAR ===== -->
     <aside
       class="flex flex-col h-full shrink-0 transition-all duration-300 ease-out overflow-hidden border-r border-white/10 shadow-2xl"
-      :class="sidebarOpen ? 'w-52' : 'w-[56px]'"
+      :class="sidebarOpen ? 'w-60' : 'w-[64px]'"
       style="background: linear-gradient(160deg, #050a18 0%, #0d1224 60%, #050a18 100%);"
     >
       <!-- Logo -->
-      <div class="flex items-center gap-2.5 px-3.5 py-3.5 border-b border-white/10 shrink-0 cursor-pointer select-none" @click="sidebarOpen = !sidebarOpen">
-        <div class="w-8 h-8 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base shadow-md shadow-[#c0ff00]/20">E</div>
+      <div class="flex items-center gap-3 px-4 py-4 border-b border-white/10 shrink-0 cursor-pointer select-none" @click="sidebarOpen = !sidebarOpen">
+        <div class="w-9 h-9 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
         <div v-show="sidebarOpen" class="min-w-0">
-          <span class="font-black text-base tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00]">.ai</span></span>
-          <p class="text-[9px] text-white/40 font-semibold uppercase tracking-widest whitespace-nowrap">Admin Portal</p>
+          <span class="font-black text-lg tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+          <p class="text-[11px] text-white/50 font-bold uppercase tracking-widest whitespace-nowrap">{{ isAffiliate ? 'Portal Afiliasi' : (isTeacher ? 'Portal Pendidik' : 'Admin Portal') }}</p>
         </div>
       </div>
 
       <!-- Nav -->
-      <nav class="flex flex-col gap-0.5 p-2 flex-grow overflow-y-auto">
+      <nav class="flex flex-col gap-1 p-2.5 flex-grow overflow-y-auto">
         <button
           v-for="item in navItems" :key="item.id"
           @click="activeTab = item.id"
           :title="item.label"
-          :class="['flex items-center rounded-lg text-[11px] font-bold transition-all text-left group relative',
-            sidebarOpen ? 'gap-2.5 px-2.5 py-2' : 'justify-center px-0 py-2',
+          :class="['flex items-center rounded-xl text-xs font-bold transition-all text-left group relative',
+            sidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center px-0 py-2.5',
             activeTab === item.id
               ? 'bg-[#c0ff00]/15 border border-[#c0ff00]/40 text-[#c0ff00]'
-              : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
+              : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
           ]"
         >
-          <i :class="['ph-bold shrink-0 text-base', item.icon]"></i>
+          <i :class="['ph-bold shrink-0 text-lg', item.icon]"></i>
           <span v-show="sidebarOpen" class="whitespace-nowrap">{{ item.label }}</span>
-          <span v-if="item.badge && sidebarOpen" class="ml-auto bg-rose-500 text-white text-[8px] font-black px-1 py-0.5 rounded-full">{{ item.badge }}</span>
+          <span v-if="item.badge && sidebarOpen" class="ml-auto bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">{{ item.badge }}</span>
         </button>
       </nav>
 
       <!-- Footer -->
-      <div class="shrink-0 border-t border-white/10 p-2 space-y-1.5">
-        <div class="flex items-center gap-2" :class="sidebarOpen ? '' : 'justify-center'">
-          <div class="w-7 h-7 shrink-0 rounded-md bg-[#c0ff00]/20 flex items-center justify-center font-bold text-[#c0ff00] text-[10px] border border-[#c0ff00]/30">AD</div>
+      <div class="shrink-0 border-t border-white/10 p-3 space-y-2">
+        <div class="flex items-center gap-2.5" :class="sidebarOpen ? '' : 'justify-center'">
+          <div class="w-8 h-8 shrink-0 rounded-lg bg-[#c0ff00]/20 flex items-center justify-center font-black text-[#c0ff00] text-xs border border-[#c0ff00]/30">
+            {{ currentRole === 'teacher' ? 'TC' : (currentRole === 'superadmin' ? 'SA' : 'AD') }}
+          </div>
           <div v-show="sidebarOpen" class="flex-grow min-w-0">
-            <h4 class="text-[11px] font-black text-white whitespace-nowrap">Admin</h4>
-            <span class="text-[9px] text-[#c0ff00] font-bold uppercase tracking-wider">Super Admin</span>
+            <h4 class="text-xs font-black text-white truncate">{{ currentAdminUser?.name || (currentRole === 'teacher' ? 'Guru / Tutor' : (currentRole === 'superadmin' ? 'Superadmin' : 'Admin Bimbel')) }}</h4>
+            <span class="text-[10px] text-[#c0ff00] font-bold uppercase tracking-wider">{{ currentRole === 'teacher' ? 'Pendidik / Tutor' : (currentRole === 'superadmin' ? 'Super Admin' : 'Tenant Admin') }}</span>
           </div>
         </div>
         <button
           @click="doLogout"
           :title="'Keluar'"
-          :class="['bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-95 text-[11px]',
-            sidebarOpen ? 'w-full py-1.5' : 'w-8 h-8 text-xs'
+          :class="['bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl font-bold transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 text-xs',
+            sidebarOpen ? 'w-full py-2' : 'w-9 h-9 text-sm'
           ]"
         >
-          <i class="ph-bold ph-sign-out shrink-0"></i>
+          <i class="ph-bold ph-sign-out shrink-0 text-base"></i>
           <span v-show="sidebarOpen" class="whitespace-nowrap">Keluar</span>
         </button>
       </div>
@@ -153,19 +185,19 @@
     <div class="flex flex-col flex-grow min-w-0 overflow-hidden">
 
       <!-- Top Bar -->
-      <header class="flex items-center justify-between px-4 py-2 bg-[#0b1329]/90 backdrop-blur-md border-b border-white/10 shrink-0">
-        <div class="flex items-center gap-2">
-          <button @click="sidebarOpen = !sidebarOpen" class="w-7 h-7 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors text-white/70">
-            <i class="ph-bold ph-list text-sm"></i>
+      <header class="flex items-center justify-between px-6 py-3 bg-[#0b1329]/95 backdrop-blur-md border-b border-white/10 shrink-0">
+        <div class="flex items-center gap-3">
+          <button @click="sidebarOpen = !sidebarOpen" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors text-white/80">
+            <i class="ph-bold ph-list text-base"></i>
           </button>
-          <h1 class="text-xs font-black text-white">{{ currentNavItem?.label }}</h1>
+          <h1 class="text-sm font-black text-white tracking-wide uppercase">{{ currentNavItem?.label }}</h1>
         </div>
-        <div class="flex items-center gap-2">
-          <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div class="flex items-center gap-3">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             Aktif
           </div>
-          <div class="text-[10px] text-white/40 font-semibold">{{ new Date().toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }) }}</div>
+          <div class="text-xs text-white/50 font-medium">{{ new Date().toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }) }}</div>
         </div>
       </header>
 
@@ -199,6 +231,105 @@
                 <span class="text-[10px] font-bold text-white/50 uppercase tracking-wider">Pendapatan</span>
               </div>
               <div class="text-xl font-black font-mono text-[#c0ff00]">{{ formatCurrency(stats.totalRevenue) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: TEACHER HUB (Khusus Guru) ===== -->
+        <div v-if="activeTab === 'teacher_hub'" class="space-y-4 animate-fade-in">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl">
+              <i class="ph-bold ph-chalkboard-teacher"></i>
+            </div>
+            <div>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider">Panel Guru — Siswa & Jadwal Saya</h2>
+              <p class="text-[10px] text-white/40">Kelola informasi mengajar, siswa bimbingan, dan jadwal kelas Anda.</p>
+            </div>
+          </div>
+
+          <!-- Stats Guru -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10 hover:border-emerald-400/40 transition-all">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Siswa Saya</div>
+              <div class="text-xl font-black font-mono text-emerald-400">{{ teacherStudents.length }}</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10 hover:border-sky-400/40 transition-all">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Mata Pelajaran</div>
+              <div class="text-xl font-black font-mono text-sky-400">{{ teacherSubjects.length }}</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10 hover:border-amber-400/40 transition-all">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Jam Mengajar/Minggu</div>
+              <div class="text-xl font-black font-mono text-amber-400">{{ teacherSchedule.length * 2 }}j</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10 hover:border-purple-400/40 transition-all">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Soal Dibuat</div>
+              <div class="text-xl font-black font-mono text-[#8b5cf6]">{{ serverQuestions.filter(q => q.teacher_name === (currentAdminUser?.name || '')).length }}</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Daftar Siswa yang Diajar -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
+              <div class="px-3.5 py-2.5 border-b border-white/10 bg-black/20 flex items-center gap-2">
+                <i class="ph-bold ph-users text-emerald-400"></i>
+                <h3 class="font-bold text-white text-xs">Daftar Siswa yang Saya Ajar</h3>
+              </div>
+              <div v-if="teacherStudents.length === 0" class="p-6 text-center text-white/40">
+                <i class="ph-bold ph-users text-2xl mb-2 block"></i>
+                <p class="text-[10px]">Belum ada siswa yang ditugaskan ke Anda.</p>
+                <p class="text-[10px] text-white/30 mt-1">Hubungi Admin Bimbel untuk penugasan siswa.</p>
+              </div>
+              <div v-else class="divide-y divide-white/5">
+                <div v-for="s in teacherStudents" :key="s.id" class="px-3.5 py-2.5 flex items-center gap-3 hover:bg-white/5 transition-colors">
+                  <div class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-black shrink-0">
+                    {{ (s.name || s.username || 'S').charAt(0).toUpperCase() }}
+                  </div>
+                  <div class="min-w-0 flex-grow">
+                    <div class="text-xs font-bold text-white truncate">{{ s.name || s.username }}</div>
+                    <div class="text-[10px] text-white/40 truncate">{{ s.email }}</div>
+                  </div>
+                  <span :class="['text-[9px] px-2 py-0.5 rounded-full font-black uppercase', s.is_active != 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400']">
+                    {{ s.is_active != 0 ? 'Aktif' : 'Nonaktif' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Jadwal Mengajar & Mata Pelajaran -->
+            <div class="space-y-4">
+              <!-- Mata Pelajaran -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
+                <div class="px-3.5 py-2.5 border-b border-white/10 bg-black/20 flex items-center gap-2">
+                  <i class="ph-bold ph-books text-sky-400"></i>
+                  <h3 class="font-bold text-white text-xs">Mata Pelajaran yang Saya Ampu</h3>
+                </div>
+                <div v-if="teacherSubjects.length === 0" class="p-4 text-center text-white/40 text-[10px]">Belum ada mata pelajaran.</div>
+                <div v-else class="p-3 flex flex-wrap gap-2">
+                  <span v-for="(subj, idx) in teacherSubjects" :key="idx" class="px-2.5 py-1 rounded-lg bg-sky-500/15 border border-sky-500/30 text-sky-300 text-[10px] font-bold">
+                    {{ subj }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Jadwal Mengajar -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
+                <div class="px-3.5 py-2.5 border-b border-white/10 bg-black/20 flex items-center gap-2">
+                  <i class="ph-bold ph-calendar text-amber-400"></i>
+                  <h3 class="font-bold text-white text-xs">Jadwal Mengajar Saya</h3>
+                </div>
+                <div v-if="teacherSchedule.length === 0" class="p-4 text-center text-white/40 text-[10px]">
+                  Jadwal belum diatur oleh Admin Bimbel.
+                </div>
+                <div v-else class="divide-y divide-white/5">
+                  <div v-for="(sched, idx) in teacherSchedule" :key="idx" class="px-3.5 py-2.5 flex items-center gap-3">
+                    <div class="w-14 text-center py-1 rounded-lg bg-amber-500/15 border border-amber-500/20 text-amber-300 text-[10px] font-black shrink-0">{{ sched.day }}</div>
+                    <div class="min-w-0">
+                      <div class="text-xs font-bold text-white">{{ sched.subject }}</div>
+                      <div class="text-[10px] text-white/40">{{ sched.time }} • {{ sched.room || 'Online' }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -361,22 +492,45 @@
 
         <!-- ===== TAB: BANK SOAL ===== -->
         <div v-if="activeTab === 'questions'" class="space-y-4 animate-fade-in">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xs font-black text-white uppercase tracking-wider">Manajemen Bank Soal</h2>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base font-black text-white uppercase tracking-wider">Manajemen Bank Soal</h2>
+              <p class="text-xs text-white/50 mt-0.5">Kelola soal latihan, tryout, dan pembahasan resmi SNBT / TPS</p>
+            </div>
             <div class="flex items-center gap-2">
-              <button @click="showImportModal = true" class="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold rounded-lg hover:bg-emerald-500/20 text-[11px] transition-colors">
-                <i class="ph-bold ph-file-csv mr-1"></i> Import CSV
+              <button @click="showImportModal = true" class="px-3.5 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold rounded-xl hover:bg-emerald-500/20 text-xs transition-colors flex items-center gap-1.5">
+                <i class="ph-bold ph-file-csv text-base"></i> Import CSV
               </button>
-              <button @click="openQuestionModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors">
-                + Tambah Soal
+              <button @click="openQuestionModal()" class="px-4 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-xl transition-all shadow-md shadow-[#c0ff00]/20 flex items-center gap-1.5">
+                <i class="ph-bold ph-plus text-base"></i> Tambah Soal
               </button>
             </div>
           </div>
 
-          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
-            <div class="p-2.5 border-b border-white/10 flex gap-2 bg-black/20">
-              <input v-model="qSearch" type="text" placeholder="Cari soal..." class="flex-grow px-3 py-1.5 text-[11px] text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50" />
-              <select v-model="qSubMateri" class="px-2.5 py-1.5 text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg outline-none cursor-pointer">
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+            <div class="p-3 border-b border-white/10 flex flex-wrap items-center gap-2.5 bg-black/20">
+              <div class="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/10 shrink-0">
+                <button
+                  type="button"
+                  @click="questionFilterTeacher = 'all'"
+                  :class="questionFilterTeacher === 'all' ? 'bg-[#c0ff00] text-black font-black' : 'text-white/60 hover:text-white font-bold'"
+                  class="px-3 py-1.5 rounded-lg text-xs transition-colors"
+                >
+                  Semua Soal
+                </button>
+                <button
+                  type="button"
+                  @click="questionFilterTeacher = 'mine'"
+                  :class="questionFilterTeacher === 'mine' ? 'bg-[#c0ff00] text-black font-black' : 'text-white/60 hover:text-white font-bold'"
+                  class="px-3 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1"
+                >
+                  <span>👨‍🏫 Soal Saya</span>
+                </button>
+              </div>
+
+              <input v-model="qSearch" type="text" placeholder="Cari soal / materi / topik..." class="flex-grow min-w-[180px] px-3.5 py-2 text-xs text-white placeholder-white/40 bg-black/40 border border-white/10 rounded-xl outline-none focus:border-[#c0ff00]/50 transition-colors" />
+
+              <select v-model="qSubMateri" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
                 <option value="all" class="bg-[#0d1427]">Semua Komponen & Subtes</option>
                 <optgroup label="Komponen: TPS" class="bg-[#0d1427] font-bold text-[#c0ff00]">
                   <option value="Penalaran Umum" class="bg-[#0d1427]">Penalaran Umum (PU)</option>
@@ -417,63 +571,78 @@
               </select>
             </div>
             
-            <div v-if="questionsLoading" class="p-6 text-center text-white/40">
-              <i class="ph-bold ph-spinner animate-spin text-xl mb-1"></i>
-              <p class="text-[10px]">Memuat bank soal...</p>
+            <div v-if="questionsLoading" class="p-8 text-center text-white/40">
+              <i class="ph-bold ph-spinner animate-spin text-2xl mb-2 text-[#c0ff00]"></i>
+              <p class="text-xs font-semibold">Memuat bank soal...</p>
             </div>
-            <div v-else-if="filteredQuestions.length === 0" class="p-6 text-center text-white/40">
-              <p class="text-[10px]">Tidak ada soal yang ditemukan.</p>
+            <div v-else-if="filteredQuestions.length === 0" class="p-8 text-center text-white/40">
+              <i class="ph-bold ph-books text-3xl mb-2 text-white/20"></i>
+              <p class="text-xs font-bold text-white/60">Tidak ada soal yang ditemukan.</p>
+              <p class="text-[11px] text-white/40 mt-1">Coba sesuaikan kata kunci pencarian atau filter guru/subtes.</p>
             </div>
             <div v-else class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-center px-3 py-2 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider w-4/12 cursor-pointer hover:text-white" @click="setSort('question')">Pertanyaan <i v-if="sortKey === 'question'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('test_component')">Komponen & Subtes <i v-if="sortKey === 'test_component'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('topic')">Topik & Subtopik <i v-if="sortKey === 'topic'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('skill')">Skill / Kompetensi <i v-if="sortKey === 'skill'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('question_type')">Tipe & Level <i v-if="sortKey === 'question_type'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_qc_passed')">Status QC <i v-if="sortKey === 'is_qc_passed'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
+                  <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="text-center px-3 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider w-5/12 cursor-pointer hover:text-white" @click="setSort('question')">Pertanyaan <i v-if="sortKey === 'question'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('test_component')">Komponen & Subtes <i v-if="sortKey === 'test_component'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('topic')">Topik & Subtopik <i v-if="sortKey === 'topic'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('skill')">Skill / Kompetensi <i v-if="sortKey === 'skill'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('question_type')">Tipe & Level <i v-if="sortKey === 'question_type'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_qc_passed')">Status QC <i v-if="sortKey === 'is_qc_passed'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="(q, index) in pagedQuestions" :key="q.id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ (questionPage - 1) * PAGE_SIZE + index + 1 }}</td>
-                    <td class="px-3 py-2">
-                      <div class="line-clamp-2 text-white/80 font-medium">{{ q.question }}</div>
+                    <td class="px-3 py-3 text-center text-white/50 font-bold">{{ (questionPage - 1) * PAGE_SIZE + index + 1 }}</td>
+                    <td class="px-4 py-3">
+                      <div class="line-clamp-2 text-sm text-white/90 font-medium leading-relaxed" :title="stripHtml(q.question)">
+                        {{ stripHtml(q.question) }}
+                      </div>
+                      <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <button type="button" @click="openQuestionPreview(q)" class="text-xs text-sky-400 hover:text-sky-300 font-bold inline-flex items-center gap-1 transition-colors">
+                          <i class="ph-bold ph-eye"></i> Format Penuh
+                        </button>
+                        <span v-if="q.teacher_name" class="text-[11px] text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20 font-bold">
+                          👨‍🏫 {{ q.teacher_name }}
+                        </span>
+                      </div>
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-3 py-3">
+                      <div class="flex flex-col gap-1">
+                        <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00]">{{ q.test_component || 'TPS' }}</span>
+                        <span class="font-bold text-white text-xs">{{ q.subtest || q.sub_materi || q.subtes }}</span>
+                      </div>
+                    </td>
+                    <td class="px-3 py-3">
                       <div class="flex flex-col gap-0.5">
-                        <span class="text-[9px] font-black uppercase tracking-wider text-[#c0ff00]">{{ q.test_component || 'TPS' }}</span>
-                        <span class="font-bold text-white text-[11px]">{{ q.subtest || q.sub_materi || q.subtes }}</span>
+                        <span v-if="q.topic" class="text-xs font-bold text-indigo-300">{{ q.topic }}</span>
+                        <span v-if="q.subtopic" class="text-[11px] text-white/50">{{ q.subtopic }}</span>
+                        <span v-if="!q.topic && !q.subtopic" class="text-xs text-white/30 italic">-</span>
                       </div>
                     </td>
-                    <td class="px-3 py-2">
-                      <div class="flex flex-col gap-0.5">
-                        <span v-if="q.topic" class="text-[10px] font-bold text-indigo-300">{{ q.topic }}</span>
-                        <span v-if="q.subtopic" class="text-[9px] text-white/50">{{ q.subtopic }}</span>
-                        <span v-if="!q.topic && !q.subtopic" class="text-[9px] text-white/30 italic">-</span>
+                    <td class="px-3 py-3">
+                      <span v-if="q.skill" class="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">{{ q.skill }}</span>
+                      <span v-else class="text-xs text-white/30 italic">-</span>
+                    </td>
+                    <td class="px-3 py-3">
+                      <div class="flex flex-col gap-1 items-start">
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 uppercase">{{ q.usage_type || q.classification || 'Latihan' }}</span>
+                        <span class="text-[11px] text-white/50 font-bold uppercase">{{ q.difficulty || 'medium' }} • {{ q.cognitive_demand || 'C3' }}</span>
                       </div>
                     </td>
-                    <td class="px-3 py-2">
-                      <span v-if="q.skill" class="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">{{ q.skill }}</span>
-                      <span v-else class="text-[9px] text-white/30 italic">-</span>
+                    <td class="px-3 py-3">
+                      <span v-if="q.is_qc_passed == 1" class="px-2.5 py-0.5 text-[11px] font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-md">Lolos QC</span>
+                      <span v-else class="px-2.5 py-0.5 text-[11px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-md">Belum QC</span>
                     </td>
-                    <td class="px-3 py-2">
-                      <div class="flex flex-col gap-0.5 items-start">
-                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 uppercase">{{ q.usage_type || q.classification || 'Latihan' }}</span>
-                        <span class="text-[9px] text-white/40 font-bold uppercase">{{ q.difficulty || 'medium' }} • {{ q.cognitive_demand || 'C3' }}</span>
-                      </div>
-                    </td>
-                    <td class="px-3 py-2">
-                      <span v-if="q.is_qc_passed == 1" class="px-2 py-0.5 text-[9px] font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-md">Lolos QC</span>
-                      <span v-else class="px-2 py-0.5 text-[9px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-md">Belum QC</span>
-                    </td>
-                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
-                      <button @click="openQuestionModal(q)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Soal"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
-                      <button @click="deleteQuestion(q.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Soal"><i class="ph-bold ph-trash"></i> Hapus</button>
+                    <td class="px-4 py-3 text-right space-x-1.5 whitespace-nowrap">
+                      <template v-if="canManageQuestion(q)">
+                        <button @click="openQuestionModal(q)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-all shadow-sm" title="Edit Soal"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                        <button @click="deleteQuestion(q.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-all shadow-sm" title="Hapus Soal"><i class="ph-bold ph-trash"></i> Hapus</button>
+                      </template>
+                      <span v-else class="text-xs text-white/40 italic px-2.5 py-1 bg-white/5 rounded-lg border border-white/10">Hanya Pemilik</span>
                     </td>
                   </tr>
                 </tbody>
@@ -481,16 +650,16 @@
             </div>
 
             <!-- Pagination Questions -->
-            <div v-if="filteredQuestions.length > PAGE_SIZE" class="px-3.5 py-2.5 border-t border-white/10 flex items-center justify-between text-[11px] bg-black/20">
-              <span class="text-white/40 font-medium">
+            <div v-if="filteredQuestions.length > PAGE_SIZE" class="px-4 py-3 border-t border-white/10 flex items-center justify-between text-xs bg-black/20">
+              <span class="text-white/50 font-medium">
                 Menampilkan {{ (questionPage - 1) * PAGE_SIZE + 1 }}-{{ Math.min(questionPage * PAGE_SIZE, filteredQuestions.length) }} dari {{ filteredQuestions.length }} soal
               </span>
-              <div class="flex items-center gap-1.5">
-                <button :disabled="questionPage <= 1" @click="questionPage--" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+              <div class="flex items-center gap-2">
+                <button :disabled="questionPage <= 1" @click="questionPage--" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
                   &laquo; Prev
                 </button>
-                <span class="px-2 font-mono font-bold text-[#c0ff00]">{{ questionPage }} / {{ questionTotalPages }}</span>
-                <button :disabled="questionPage >= questionTotalPages" @click="questionPage++" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
+                <span class="px-2.5 font-mono font-bold text-[#c0ff00]">{{ questionPage }} / {{ questionTotalPages }}</span>
+                <button :disabled="questionPage >= questionTotalPages" @click="questionPage++" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white font-bold transition-all">
                   Next &raquo;
                 </button>
               </div>
@@ -501,8 +670,8 @@
         <!-- ===== TAB: MANAJEMEN MATERI ===== -->
         <div v-if="activeTab === 'materials'" class="space-y-4 animate-fade-in">
           <div class="flex items-center justify-between">
-            <h2 class="text-xs font-black text-white uppercase tracking-wider">Manajemen Materi Belajar</h2>
-            <button @click="openMaterialModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1">
+            <h2 class="text-xs font-black text-white uppercase tracking-wider">{{ isTeacher ? 'Materi yang Saya Ajar' : 'Manajemen Materi Belajar' }}</h2>
+            <button v-if="!isTeacher" @click="openMaterialModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1">
               <i class="ph-bold ph-plus"></i> Tambah Materi
             </button>
           </div>
@@ -543,8 +712,12 @@
                       </span>
                     </td>
                     <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
-                      <button @click="openMaterialModal(m)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Materi"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
-                      <button @click="deleteMaterial(m.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Materi"><i class="ph-bold ph-trash"></i> Hapus</button>
+                      <a v-if="m.file_url" :href="m.file_url" target="_blank" class="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Buka File Materi"><i class="ph-bold ph-file-arrow-down"></i> File</a>
+                      <template v-if="canManageMaterial(m)">
+                        <button @click="openMaterialModal(m)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Materi"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                        <button @click="deleteMaterial(m.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Materi"><i class="ph-bold ph-trash"></i> Hapus</button>
+                      </template>
+                      <span v-else class="text-xs text-white/40 italic px-2 py-1 bg-white/5 rounded-lg border border-white/10">Hanya Pemilik</span>
                     </td>
                   </tr>
                 </tbody>
@@ -805,6 +978,96 @@
           </div>
         </div>
 
+        <!-- ===== TAB: PENGATURAN (AFILIATOR & PROFIL) ===== -->
+        <div v-if="activeTab === 'settings'" class="space-y-6 animate-fade-in max-w-4xl">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider">Pengaturan Akun & Rekening Pencairan</h2>
+              <p class="text-[10px] text-white/40">Kelola informasi profil, rekening penarikan komisi, dan keamanan akun</p>
+            </div>
+            <button @click="saveAffiliateSettings" :disabled="isSavingSettings" class="px-4 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-xl transition-all shadow-lg shadow-[#c0ff00]/20 flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
+              <i class="ph-bold ph-floppy-disk"></i>
+              <span>{{ isSavingSettings ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Card 1: Data Mitra & Profil -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Informasi Profil Mitra</h3>
+              </div>
+              <div class="space-y-3 text-xs">
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
+                  <input v-model="affiliateSettingsForm.name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Nama Lengkap Mitra" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Akun (Identity)</label>
+                  <input v-model="affiliateSettingsForm.email" type="email" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="email@edupath.id" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peran Akun</label>
+                  <div class="p-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-300 font-bold flex items-center gap-2">
+                    <i class="ph-bold ph-shield-check"></i>
+                    <span>Mitra Afiliasi Resmi EduPath</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Rekening Bank & E-Wallet Penarikan -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                <i class="ph-bold ph-bank text-emerald-400 text-lg"></i>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Rekening Pencairan Komisi</h3>
+              </div>
+              <div class="space-y-3 text-xs">
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Bank / E-Wallet</label>
+                  <select v-model="affiliateSettingsForm.bank_name" class="w-full p-2.5 bg-[#0d1427] border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                    <option value="BCA">Bank Central Asia (BCA)</option>
+                    <option value="MANDIRI">Bank Mandiri</option>
+                    <option value="BRI">Bank Rakyat Indonesia (BRI)</option>
+                    <option value="BNI">Bank Negara Indonesia (BNI)</option>
+                    <option value="BSI">Bank Syariah Indonesia (BSI)</option>
+                    <option value="GOPAY">GoPay</option>
+                    <option value="OVO">OVO</option>
+                    <option value="DANA">DANA</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor Rekening / No. HP E-Wallet</label>
+                  <input v-model="affiliateSettingsForm.bank_account" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: 8830192831" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Pemilik Rekening</label>
+                  <input v-model="affiliateSettingsForm.bank_owner" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Budi Santoso" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Keamanan / Ganti Password -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4 md:col-span-2">
+              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan Akun</h3>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password Baru (Kosongkan jika tidak diubah)</label>
+                  <input v-model="affiliateSettingsForm.new_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Minimal 6 karakter" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Konfirmasi Password Baru</label>
+                  <input v-model="affiliateSettingsForm.confirm_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Ulangi password baru" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- ===== TAB: MANAJEMEN STAFF ===== -->
         <div v-if="activeTab === 'staff'" class="space-y-4 animate-fade-in">
           <div class="flex justify-between items-center">
@@ -886,12 +1149,12 @@
               <p class="text-[10px] text-white/40 mt-0.5">Daftar bank soal & status QC</p>
             </button>
 
-            <button @click="blastTelegramParentReport" class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 hover:border-emerald-500/50 transition-all text-left group">
-              <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg mb-2">
+            <button @click="blastTelegramParentReport" class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 hover:border-sky-400/50 transition-all text-left group">
+              <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg mb-2">
                 <i class="ph-bold ph-telegram-logo"></i>
               </div>
-              <h4 class="font-bold text-white text-xs">Blast WA Orang Tua</h4>
-              <p class="text-[10px] text-white/40 mt-0.5">Template laporan progres belajar</p>
+              <h4 class="font-bold text-white text-xs">Blast Telegram Orang Tua</h4>
+              <p class="text-[10px] text-white/40 mt-0.5">Kirim laporan progres belajar via Telegram</p>
             </button>
           </div>
 
@@ -902,17 +1165,20 @@
               <div class="p-3 rounded-lg bg-black/40 border border-white/10">
                 <div class="text-[10px] text-white/40 uppercase font-bold">Paket Mandiri</div>
                 <div class="text-sm font-mono font-black text-indigo-400 mt-1">Rp 180.000 / bln</div>
+                <div class="text-[10px] text-indigo-300 font-bold mt-0.5">Rp 1.296.000 / tahun (hemat 40%)</div>
                 <div class="text-[10px] text-white/60 mt-1">500+ Micro-lessons, 50.000+ Soal IRT, 5x TO Nasional</div>
               </div>
               <div class="p-3 rounded-lg bg-black/40 border border-[#c0ff00]/30">
-                <div class="text-[10px] text-[#c0ff00] uppercase font-bold">Paket Utama (Terpopuler)</div>
-                <div class="text-sm font-mono font-black text-[#c0ff00] mt-1">Rp 450.000 / bln</div>
-                <div class="text-[10px] text-white/60 mt-1">AI Companion 24/7, Unlimited IRT, Rasionalisasi Prodi, WA Report</div>
+                <div class="text-[10px] text-[#c0ff00] uppercase font-bold">Paket Pejuang PTN (Terpopuler)</div>
+                <div class="text-sm font-mono font-black text-[#c0ff00] mt-1">Rp 480.000 / bln</div>
+                <div class="text-[10px] text-[#c0ff00]/70 font-bold mt-0.5">Rp 2.304.000 / tahun (hemat 60%)</div>
+                <div class="text-[10px] text-white/60 mt-1">AI Companion 24/7, Unlimited IRT, Rasionalisasi Prodi, Telegram Report</div>
               </div>
               <div class="p-3 rounded-lg bg-black/40 border border-amber-500/30">
-                <div class="text-[10px] text-amber-400 uppercase font-bold">Paket VIP</div>
-                <div class="text-sm font-mono font-black text-amber-400 mt-1">Rp 1.100.000 / bln</div>
-                <div class="text-[10px] text-white/60 mt-1">1-on-1 Zoom Mentoring, Grup WA VIP bareng Mentor Senior</div>
+                <div class="text-[10px] text-amber-400 uppercase font-bold">Paket Elite Mentoring</div>
+                <div class="text-sm font-mono font-black text-amber-400 mt-1">Rp 980.000 / bln</div>
+                <div class="text-[10px] text-amber-300/70 font-bold mt-0.5">Rp 8.232.000 / tahun (hemat 30%)</div>
+                <div class="text-[10px] text-white/60 mt-1">1-on-1 Zoom Mentoring Private, SOS Live Tutor Senior Mentor UI/ITB</div>
               </div>
             </div>
           </div>
@@ -922,6 +1188,43 @@
     </div>
 
     <!-- Modals -->
+
+    <!-- Telegram Blast Delivery Status Modal -->
+    <div v-if="showTelegramBlastModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
+          <div class="flex items-center gap-2">
+            <i class="ph-bold ph-telegram-logo text-sky-400"></i>
+            <h3 class="font-black text-sm text-white">Monitor Pengiriman Telegram</h3>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-[10px] text-white/40">
+              ✅ {{ telegramBlastStatuses.filter(s => s.status === 'sent').length }} / {{ telegramBlastStatuses.length }} terkirim
+            </span>
+            <button @click="showTelegramBlastModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+          </div>
+        </div>
+        <div class="p-3 space-y-2">
+          <div v-for="item in telegramBlastStatuses" :key="item.chat_id" class="flex items-center gap-3 p-2.5 rounded-lg bg-black/30 border border-white/5">
+            <div :class="['w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0', item.status === 'sent' ? 'bg-emerald-500/20 text-emerald-400' : item.status === 'failed' ? 'bg-red-500/20 text-red-400' : item.status === 'sending' ? 'bg-sky-500/20 text-sky-400' : 'bg-white/10 text-white/40']">
+              <i :class="item.status === 'sent' ? 'ph-bold ph-check' : item.status === 'failed' ? 'ph-bold ph-x' : item.status === 'sending' ? 'ph-bold ph-spinner animate-spin' : 'ph-bold ph-clock'"></i>
+            </div>
+            <div class="min-w-0 flex-grow">
+              <div class="text-xs font-bold text-white truncate">{{ item.name }}</div>
+              <div class="text-[10px] text-white/40 truncate">{{ item.chat_id }}</div>
+              <div v-if="item.error" class="text-[10px] text-red-400 truncate">⚠ {{ item.error }}</div>
+            </div>
+            <span :class="['text-[9px] px-2 py-0.5 rounded-full font-black uppercase shrink-0', item.status === 'sent' ? 'bg-emerald-500/20 text-emerald-400' : item.status === 'failed' ? 'bg-red-500/20 text-red-400' : item.status === 'sending' ? 'bg-sky-500/20 text-sky-400' : 'bg-white/10 text-white/40']">
+              {{ item.status === 'sent' ? 'Terkirim' : item.status === 'failed' ? 'Gagal' : item.status === 'sending' ? 'Mengirim...' : 'Antrian' }}
+            </span>
+          </div>
+        </div>
+        <div v-if="telegramBlastStatuses.every(s => s.status !== 'sending' && s.status !== 'pending')" class="p-4 border-t border-white/10 text-center">
+          <p class="text-xs text-white/60 mb-3">Proses selesai: {{ telegramBlastStatuses.filter(s => s.status === 'sent').length }} terkirim, {{ telegramBlastStatuses.filter(s => s.status === 'failed').length }} gagal.</p>
+          <button @click="showTelegramBlastModal = false" class="px-5 py-2 bg-[#c0ff00] text-black text-xs font-black rounded-xl hover:bg-[#b0ef00] transition-colors">Tutup</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Manual Order Modal -->
     <div v-if="showOrderModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
@@ -941,9 +1244,9 @@
           <div>
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket Belajar</label>
             <select v-model="orderForm.plan_id" @change="syncOrderPlanPrice" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-              <option value="plan-mandiri" class="bg-[#0d1427] text-white">Paket Mandiri (Rp 180.000)</option>
-              <option value="plan-utama" class="bg-[#0d1427] text-white">Paket Utama (Rp 450.000)</option>
-              <option value="plan-vip" class="bg-[#0d1427] text-white">Paket VIP (Rp 1.100.000)</option>
+              <option value="plan-mandiri" class="bg-[#0d1427] text-white">Paket Mandiri (Rp 100.000)</option>
+              <option value="plan-utama" class="bg-[#0d1427] text-white">Paket Utama (Rp 200.000)</option>
+              <option value="plan-vip" class="bg-[#0d1427] text-white">Paket VIP (Rp 450.000)</option>
             </select>
           </div>
           <div>
@@ -1128,10 +1431,10 @@
           <div>
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket Belajar</label>
             <select v-model="studentForm.plan" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-              <option value="free" class="bg-[#0d1427] text-white">Free</option>
-              <option value="mandiri" class="bg-[#0d1427] text-white">Mandiri</option>
-              <option value="utama" class="bg-[#0d1427] text-white">Utama</option>
-              <option value="vip" class="bg-[#0d1427] text-white">VIP</option>
+              <option value="free" class="bg-[#0d1427] text-white">Free / Trial</option>
+              <option value="mandiri" class="bg-[#0d1427] text-white">Paket Mandiri</option>
+              <option value="utama" class="bg-[#0d1427] text-white">Paket Utama (Pejuang PTN)</option>
+              <option value="vip" class="bg-[#0d1427] text-white">Paket VIP (Elite Mentoring)</option>
             </select>
           </div>
           <div v-if="isEditingStudent">
@@ -1142,9 +1445,10 @@
             </select>
           </div>
           <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
-            <button type="button" @click="showStudentModal = false" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>
-            <button type="submit" :disabled="isSaving" class="px-5 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50">
-              Simpan
+            <button type="button" @click="showStudentModal = false" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors cursor-pointer">Batal</button>
+            <button type="button" @click="saveStudent" :disabled="isSaving" class="px-5 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer">
+              <i v-if="isSaving" class="ph-bold ph-spinner animate-spin"></i>
+              <span>{{ isSaving ? 'Menyimpan...' : 'Simpan' }}</span>
             </button>
           </div>
         </form>
@@ -1429,6 +1733,14 @@
             </select>
           </div>
           <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Lampiran Dokumen / File Materi (PDF, DOCX, PPT)</label>
+            <div class="flex items-center gap-2">
+              <input type="file" ref="materialFileInput" @change="handleMaterialFileUpload" class="text-xs text-white/70 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#c0ff00] file:text-black hover:file:bg-[#b0ef00] cursor-pointer" />
+              <span v-if="isUploadingFile" class="text-xs text-[#c0ff00] animate-pulse">Mengunggah...</span>
+            </div>
+            <input v-model="mForm.file_url" type="text" placeholder="URL File / Lampiran (otomatis terisi setelah unggah)" class="mt-1.5 w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none font-mono" />
+          </div>
+          <div>
             <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Isi / Konten Materi</label>
             <textarea v-model="mForm.content" required rows="5" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
           </div>
@@ -1439,6 +1751,53 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Question Full Preview Modal -->
+    <div v-if="showQuestionPreviewModal && selectedQuestionForPreview" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="px-2 py-0.5 rounded bg-[#c0ff00]/15 text-[#c0ff00] font-black text-xs uppercase">{{ selectedQuestionForPreview.test_component || 'TPS' }}</span>
+            <span class="text-xs font-bold text-white/70">{{ selectedQuestionForPreview.subtest || selectedQuestionForPreview.sub_materi }}</span>
+            <span v-if="selectedQuestionForPreview.teacher_name" class="text-xs text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 font-bold">
+              👨‍🏫 {{ selectedQuestionForPreview.teacher_name }}
+            </span>
+          </div>
+          <button @click="closeQuestionPreview" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-wider text-sky-400">Pertanyaan Soal:</span>
+            <div class="p-4 rounded-xl bg-white/5 border border-white/10 text-base leading-relaxed text-white font-medium" v-html="selectedQuestionForPreview.question"></div>
+          </div>
+          <div class="space-y-2">
+            <span class="text-xs font-black uppercase tracking-wider text-white/50">Pilihan Jawaban:</span>
+            <div class="space-y-2">
+              <div
+                v-for="opt in ['a','b','c','d','e']" :key="opt"
+                v-show="selectedQuestionForPreview['option_' + opt]"
+                class="p-3 rounded-xl border flex items-start gap-3 text-sm transition-all"
+                :class="(selectedQuestionForPreview.correct || '').toLowerCase() === opt ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-200' : 'bg-white/5 border-white/10 text-white/80'"
+              >
+                <span class="w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs shrink-0 uppercase"
+                      :class="(selectedQuestionForPreview.correct || '').toLowerCase() === opt ? 'bg-emerald-400 text-black' : 'bg-white/10 text-white/70'">
+                  {{ opt }}
+                </span>
+                <div class="pt-0.5 flex-grow" v-html="selectedQuestionForPreview['option_' + opt]"></div>
+                <span v-if="(selectedQuestionForPreview.correct || '').toLowerCase() === opt" class="text-xs font-black text-emerald-400 shrink-0">✓ Kunci Jawaban</span>
+              </div>
+            </div>
+          </div>
+          <div v-if="selectedQuestionForPreview.explanation" class="space-y-2 pt-2 border-t border-white/10">
+            <span class="text-xs font-black uppercase tracking-wider text-amber-400">📖 Pembahasan Lengkap:</span>
+            <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm text-amber-100 leading-relaxed font-medium" v-html="selectedQuestionForPreview.explanation"></div>
+          </div>
+        </div>
+        <div class="p-4 border-t border-white/10 flex justify-end">
+          <button @click="closeQuestionPreview" class="px-5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-all">Tutup</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1453,8 +1812,17 @@ import { SNBT_TAXONOMY } from '../EduData.js';
 const router = useRouter()
 
 // ── Data ──
+const isAuthenticated = ref(false);
 const sidebarOpen = ref(true);
-const activeTab = ref(sessionStorage.getItem('admin_active_tab') || 'overview');
+const initialTab = () => {
+  const stored = sessionStorage.getItem('admin_active_tab');
+  const role = sessionStorage.getItem('admin_role') || localStorage.getItem('user_role') || '';
+  if (['affiliate', 'afiliator'].includes(role)) {
+    return (stored === 'settings') ? 'settings' : 'affiliates';
+  }
+  return stored || 'overview';
+};
+const activeTab = ref(initialTab());
 
 // Sorting state
 const sortKey = ref('');
@@ -1496,30 +1864,20 @@ const stats = reactive({
   totalRevenue: 0,
 });
 
-// ── Nav Items ──
-const navItems = [
-  { id: 'overview',     label: 'Overview',            icon: 'ph-squares-four',  badge: null },
-  { id: 'transactions', label: 'Riwayat Transaksi',   icon: 'ph-receipt',       badge: null },
-  { id: 'students',     label: 'Manajemen Siswa',     icon: 'ph-users-three',   badge: null },
-  { id: 'questions',    label: 'Bank Soal',           icon: 'ph-books',         badge: null },
-  { id: 'materials',    label: 'Manajemen Materi',    icon: 'ph-file-text',     badge: null },
-  { id: 'packages',     label: 'Manajemen Paket',     icon: 'ph-package',       badge: null },
-  { id: 'affiliates',   label: 'Afiliasi & Komisi',   icon: 'ph-hand-coins',    badge: null },
-  { id: 'staff',        label: 'Manajemen Staff',     icon: 'ph-users-three',   badge: null },
-  { id: 'reports',      label: 'Laporan & Analitik',  icon: 'ph-chart-bar',     badge: null },
-];
-
-const currentNavItem = computed(() => navItems.find(item => item.id === activeTab.value));
-
-const formatCurrency = (value) => {
-  return 'Rp ' + Number(value || 0).toLocaleString('id-ID');
-};
-
-// ── Auth ──
-const isAuthenticated = ref(sessionStorage.getItem('admin_token') !== null);
-const loginForm = ref({ username: '', password: '' });
-const loginError = ref('');
-const loginLoading = ref(false);
+function extractUserIdFromToken(token) {
+  try {
+    if (!token) return '';
+    const parts = token.split('.');
+    if (parts.length < 2) return '';
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    const p = JSON.parse(jsonPayload);
+    return p.user_id || p.id || '';
+  } catch (e) {
+    return '';
+  }
+}
 
 function extractRoleFromToken(token) {
   try {
@@ -1536,11 +1894,14 @@ function extractRoleFromToken(token) {
 }
 
 const currentRole = ref(
-  extractRoleFromToken(sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token') || localStorage.getItem('auth_token')) ||
-  localStorage.getItem('user_role') ||
   sessionStorage.getItem('admin_role') ||
+  extractRoleFromToken(sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token')) ||
+  localStorage.getItem('user_role') ||
   ''
 );
+
+const currentUserId = ref(extractUserIdFromToken(sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token') || localStorage.getItem('auth_token')) || '');
+const currentAdminUser = ref(JSON.parse(sessionStorage.getItem('ep_user') || 'null'));
 
 const isSuperadmin = computed(() => {
   return currentRole.value === 'superadmin' ||
@@ -1548,15 +1909,149 @@ const isSuperadmin = computed(() => {
          sessionStorage.getItem('admin_role') === 'superadmin';
 });
 
+const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes(currentRole.value));
+const isAffiliate = computed(() => ['affiliate', 'afiliator'].includes(currentRole.value));
+
+// ── Nav Items (Role-filtered) ──
+const navItems = computed(() => {
+  if (isAffiliate.value) {
+    return [
+      { id: 'affiliates', label: 'Afiliasi & Komisi', icon: 'ph-hand-coins', roles: ['affiliate'] },
+      { id: 'settings',   label: 'Pengaturan',        icon: 'ph-gear',       roles: ['affiliate'] }
+    ];
+  }
+
+  const isT = isTeacher.value;
+  const isSuper = isSuperadmin.value || currentRole.value === 'superadmin';
+  const role = currentRole.value || 'admin';
+
+  const items = [
+    { id: 'overview',     label: 'Overview',              icon: 'ph-squares-four',  roles: ['superadmin', 'admin', 'teacher'] },
+    ...(isT ? [{ id: 'teacher_hub', label: 'Siswa & Jadwal Saya', icon: 'ph-chalkboard-teacher', roles: ['teacher'] }] : []),
+    { id: 'questions',   label: isT ? 'Bank Soal Saya' : 'Bank Soal CBT', icon: 'ph-books', roles: ['superadmin', 'admin', 'teacher'] },
+    { id: 'materials',   label: isT ? 'Materi Saya' : 'Manajemen Materi', icon: 'ph-file-text', roles: ['superadmin', 'admin', 'teacher'] },
+    { id: 'students',    label: 'Manajemen Siswa',       icon: 'ph-users-three',   roles: ['superadmin', 'admin'] },
+    { id: 'transactions',label: 'Riwayat Transaksi',     icon: 'ph-receipt',       roles: ['superadmin', 'admin'] },
+    { id: 'packages',    label: 'Manajemen Paket',       icon: 'ph-package',       roles: ['superadmin', 'admin'] },
+    { id: 'affiliates',  label: 'Afiliasi & Komisi',     icon: 'ph-hand-coins',    roles: ['superadmin', 'admin'] },
+    { id: 'staff',       label: 'Manajemen Staff',       icon: 'ph-users-three',   roles: ['superadmin'] },
+    { id: 'reports',     label: 'Laporan & Analitik',    icon: 'ph-chart-bar',     roles: ['superadmin', 'admin'] },
+  ];
+
+  if (isSuper) return items;
+  return items.filter(item => !item.roles || item.roles.includes(role));
+});
+
+const currentNavItem = computed(() => navItems.value.find(item => item.id === activeTab.value));
+
+const formatCurrency = (value) => {
+  return 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+};
+
+// ── Question Preview & Teacher Ownership State ──
+const showQuestionPreviewModal = ref(false);
+const selectedQuestionForPreview = ref(null);
+const teacherQuestionFilter = ref('all');
+const questionFilterTeacher = teacherQuestionFilter;
+const teacherMaterialFilter = ref('all');
+
+const openQuestionPreview = (q) => {
+  selectedQuestionForPreview.value = q;
+  showQuestionPreviewModal.value = true;
+};
+
+const closeQuestionPreview = () => {
+  showQuestionPreviewModal.value = false;
+  selectedQuestionForPreview.value = null;
+};
+
+const canManageQuestion = (q) => {
+  if (isSuperadmin.value || currentRole.value === 'admin') return true;
+  if (isTeacher.value) {
+    if (!q.teacher_id && !q.teacher_name) return true;
+    return q.teacher_id === currentUserId.value || (currentAdminUser.value?.name && q.teacher_name === currentAdminUser.value.name);
+  }
+  return false;
+};
+
+const canManageMaterial = (m) => {
+  if (isSuperadmin.value || currentRole.value === 'admin') return true;
+  if (isTeacher.value) {
+    if (!m.teacher_id && !m.teacher_name) return true;
+    return m.teacher_id === currentUserId.value || (currentAdminUser.value?.name && m.teacher_name === currentAdminUser.value.name);
+  }
+  return false;
+};
+
+const isUploadingFile = ref(false);
+const handleMaterialFileUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  isUploadingFile.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = sessionStorage.getItem('admin_token') || localStorage.getItem('auth_token');
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    const res = await fetch(`${apiUrl}/admin.php?action=upload_material_file`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Gagal mengunggah file');
+    mForm.file_url = data.file_url;
+  } catch (err) {
+    alert(err.message || 'Gagal mengunggah file');
+  } finally {
+    isUploadingFile.value = false;
+  }
+};
+
 const tenantsList = ref([]);
 const showPassword = ref(false);
+const loginForm = ref({ username: '', password: '' });
+const loginError = ref('');
+const loginLoading = ref(false);
+
+const fillCredentials = (user, pass) => {
+  loginForm.value.username = user;
+  loginForm.value.password = pass;
+  loginError.value = '';
+};
+
+const loadRoleData = () => {
+  if (isAffiliate.value) {
+    if (!['affiliates', 'settings'].includes(activeTab.value)) {
+      activeTab.value = 'affiliates';
+    }
+    loadAdminAffiliates();
+    loadAdminCommissions();
+    loadAdminPayouts();
+  } else if (isTeacher.value) {
+    if (!['questions', 'materials', 'teacher_hub'].includes(activeTab.value)) {
+      activeTab.value = 'questions';
+    }
+    fetchQuestions();
+    fetchMaterials();
+  } else {
+    fetchDashboard();
+    fetchStudents();
+    fetchAdminOrders();
+    loadPlansAndStaff();
+    fetchQuestions();
+    fetchMaterials();
+  }
+};
 
 const doLogin = async () => {
   loginError.value = '';
   loginLoading.value = true;
   try {
-    const u = loginForm.value.username?.trim() || '';
-    const p = loginForm.value.password?.trim() || '';
+    const u = (loginForm.value.username || loginForm.value.email || '').trim();
+    const p = (loginForm.value.password || '').trim();
     const res = await api.adminLogin(u, p);
     sessionStorage.setItem('admin_token', res.token);
     if (res.csrf_token) sessionStorage.setItem('ep_admin_csrf', res.csrf_token);
@@ -1567,12 +2062,7 @@ const doLogin = async () => {
       sessionStorage.setItem('admin_role', roleFound);
     }
     isAuthenticated.value = true;
-    fetchDashboard();
-    fetchStudents();
-    fetchAdminOrders();
-    loadPlansAndStaff();
-    fetchQuestions();
-    fetchMaterials();
+    loadRoleData();
   } catch (err) {
     loginError.value = err.message || 'Login gagal';
   } finally {
@@ -1619,27 +2109,17 @@ onMounted(async () => {
 
   if (adminToken) {
     isAuthenticated.value = true;
-    fetchDashboard();
-    fetchStudents();
-    fetchAdminOrders();
-    loadPlansAndStaff();
-    fetchQuestions();
-    fetchMaterials();
+    loadRoleData();
   } else if (mainToken) {
     try {
       const profile = await api.getProfile();
-      if (profile?.user?.role === 'admin' || profile?.user?.role === 'superadmin' || profile?.user?.role === 'teacher') {
+      if (['admin', 'superadmin', 'teacher', 'affiliate'].includes(profile?.user?.role)) {
         sessionStorage.setItem('admin_token', mainToken);
         currentRole.value = profile.user.role;
         localStorage.setItem('user_role', profile.user.role);
         sessionStorage.setItem('admin_role', profile.user.role);
         isAuthenticated.value = true;
-        fetchDashboard();
-        fetchStudents();
-        fetchAdminOrders();
-        loadPlansAndStaff();
-        fetchQuestions();
-        fetchMaterials();
+        loadRoleData();
       }
     } catch(e) {
       console.warn("Admin auto-auth check:", e);
@@ -1706,6 +2186,7 @@ const pagedStudents = computed(() => paginate(filteredStudents.value, studentPag
 const studentTotalPages = computed(() => totalPages(filteredStudents.value));
 
 const openCreateStudentModal = () => {
+  isSaving.value = false;
   isEditingStudent.value = false;
   const defTenant = tenantsList.value?.[0]?.id || '';
   Object.assign(studentForm, { id: null, tenant_id: defTenant, name: '', email: '', password: '', plan: 'free', is_active: 1 });
@@ -1713,12 +2194,21 @@ const openCreateStudentModal = () => {
 };
 
 const openEditStudentModal = (s) => {
+  isSaving.value = false;
   isEditingStudent.value = true;
   Object.assign(studentForm, { id: s.id, tenant_id: s.tenant_id || tenantsList.value?.[0]?.id || '', name: s.name, email: s.email, password: '', plan: s.plan || 'free', is_active: s.is_active != 0 ? 1 : 0 });
   showStudentModal.value = true;
 };
 
 const saveStudent = async () => {
+  if (!studentForm.name || !studentForm.name.trim()) {
+    alert("Nama lengkap siswa wajib diisi!");
+    return;
+  }
+  if (!studentForm.email || !studentForm.email.trim()) {
+    alert("Email siswa wajib diisi!");
+    return;
+  }
   isSaving.value = true;
   try {
     if (isEditingStudent.value) {
@@ -1729,6 +2219,7 @@ const saveStudent = async () => {
     await fetchStudents();
     await fetchDashboard();
     showStudentModal.value = false;
+    alert("Data siswa berhasil disimpan!");
   } catch (err) {
     alert(err.message || "Gagal menyimpan data siswa");
   } finally {
@@ -1759,13 +2250,13 @@ const orderForm = reactive({ student_id: '', plan_id: 'plan-utama', plan_name: '
 const syncOrderPlanPrice = () => {
   if (orderForm.plan_id === 'plan-mandiri') {
     orderForm.plan_name = 'Paket Mandiri';
-    orderForm.amount = 180000;
+    orderForm.amount = 100000;
   } else if (orderForm.plan_id === 'plan-utama') {
     orderForm.plan_name = 'Paket Utama';
-    orderForm.amount = 450000;
+    orderForm.amount = 200000;
   } else if (orderForm.plan_id === 'plan-vip') {
     orderForm.plan_name = 'Paket VIP';
-    orderForm.amount = 1100000;
+    orderForm.amount = 450000;
   }
 };
 
@@ -1926,6 +2417,9 @@ const fetchQuestions = async () => {
 
 const filteredQuestions = computed(() => {
   let list = serverQuestions.value;
+  if (teacherQuestionFilter.value === 'mine') {
+    list = list.filter(q => canManageQuestion(q));
+  }
   if (qSubMateri.value && qSubMateri.value !== 'all') {
     const sM = qSubMateri.value.toLowerCase();
     list = list.filter(q => 
@@ -2105,6 +2599,9 @@ const fetchMaterials = async () => {
 
 const filteredMaterials = computed(() => {
   let list = serverMaterials.value;
+  if (teacherMaterialFilter.value === 'mine') {
+    list = list.filter(m => canManageMaterial(m));
+  }
   if (mSearch.value) {
     const s = mSearch.value.toLowerCase();
     list = list.filter(m => 
@@ -2417,6 +2914,66 @@ const submitPayout = async () => {
   }
 };
 
+// ── Affiliate Portal Settings ──
+const isSavingSettings = ref(false);
+const affiliateSettingsForm = reactive({
+  name: '',
+  email: '',
+  bank_name: '',
+  bank_account: '',
+  bank_owner: '',
+  new_password: '',
+  confirm_password: ''
+});
+
+const loadAffiliateSettings = async () => {
+  try {
+    const res = await api.getAffiliateSettings();
+    if (res && res.settings) {
+      affiliateSettingsForm.name = res.settings.name || '';
+      affiliateSettingsForm.email = res.settings.email || '';
+      affiliateSettingsForm.bank_name = res.settings.bank_name || '';
+      affiliateSettingsForm.bank_account = res.settings.bank_account || '';
+      affiliateSettingsForm.bank_owner = res.settings.bank_owner || '';
+    }
+  } catch (err) {
+    console.error('Gagal memuat pengaturan afiliasi:', err);
+  }
+};
+
+const saveAffiliateSettings = async () => {
+  if (affiliateSettingsForm.new_password) {
+    if (affiliateSettingsForm.new_password.length < 6) {
+      alert('Password minimal 6 karakter.');
+      return;
+    }
+    if (affiliateSettingsForm.new_password !== affiliateSettingsForm.confirm_password) {
+      alert('Konfirmasi password tidak cocok.');
+      return;
+    }
+  }
+
+  isSavingSettings.value = true;
+  try {
+    await api.saveAffiliateSettings({
+      name: affiliateSettingsForm.name,
+      email: affiliateSettingsForm.email,
+      bank_name: affiliateSettingsForm.bank_name,
+      bank_account: affiliateSettingsForm.bank_account,
+      bank_owner: affiliateSettingsForm.bank_owner,
+      new_password: affiliateSettingsForm.new_password
+    });
+    alert('Pengaturan berhasil disimpan!');
+    affiliateSettingsForm.new_password = '';
+    affiliateSettingsForm.confirm_password = '';
+    loadAffiliateSettings();
+  } catch (err) {
+    alert(err.message || 'Gagal menyimpan pengaturan.');
+  } finally {
+    isSavingSettings.value = false;
+  }
+};
+
 // ── Staff ──
 const staffMembers = ref([]);
 const sortedStaffMembers = computed(() => doSort(staffMembers.value));
@@ -2541,61 +3098,117 @@ const exportQuestionsCSV = () => {
   downloadCSV(`EduPath_BankSoal_${new Date().toISOString().slice(0,10)}.csv`, rows);
 };
 
+// ── Telegram Blast with Delivery Status Monitor ──
+const telegramBlastStatuses = ref([]); // [{name, chat_id, status: 'sending'|'sent'|'failed', error}]
+const showTelegramBlastModal = ref(false);
+
 const blastTelegramParentReport = async () => {
-  const message = `Halo Bapak/Ibu Wali Siswa EduPath,
+  const botToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || '';
+  if (!botToken || botToken === 'YOUR_TELEGRAM_BOT_TOKEN') {
+    showToast('⚠️ Telegram Bot Token belum dikonfigurasi di .env (VITE_TELEGRAM_BOT_TOKEN).');
+    return;
+  }
 
-Berikut ringkasan progres belajar ananda di EduPath:
-- Tryout Terselesaikan: 5x
-- Rata-rata Skor SNBT: 685 (Target 700+)
-- Status Paket: Aktif
+  // Kumpulkan siswa dengan telegram_chat_id
+  const targets = allStudents.value.filter(s => s.telegram_chat_id || s.parent_telegram_id);
+  if (targets.length === 0) {
+    showToast('Tidak ada nomor Telegram orang tua yang terdaftar.');
+    return;
+  }
 
-Terus dukung ananda meraih PTN Impian bersama EduPath.ai!`;
+  telegramBlastStatuses.value = targets.map(s => ({ name: s.name || s.username, chat_id: s.telegram_chat_id || s.parent_telegram_id, status: 'pending', error: null }));
+  showTelegramBlastModal.value = true;
 
-  const botToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || 'YOUR_TELEGRAM_BOT_TOKEN';
-  const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || 'TARGET_CHAT_ID';
-  try {
-    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: message })
-    });
-    if (response.ok) {
-      showToast('Laporan berhasil dikirim ke Telegram orang tua.');
-    } else {
-      const err = await response.text();
-      console.error('Telegram API error:', err);
-      showToast('Gagal mengirim laporan ke Telegram.');
+  for (let i = 0; i < telegramBlastStatuses.value.length; i++) {
+    const item = telegramBlastStatuses.value[i];
+    item.status = 'sending';
+    const message = `📚 *Laporan Belajar EduPath*\n\nHalo Bapak/Ibu Wali dari *${item.name}*,\n\nBerikut ringkasan progres belajar ananda:\n✅ Tryout Terselesaikan: 5x\n📊 Rata-rata Skor SNBT: 685 (Target 700+)\n💎 Status Paket: Aktif\n\nTerus dukung ananda meraih PTN Impian bersama *EduPath.ai*!`;
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: item.chat_id, text: message, parse_mode: 'Markdown' })
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        item.status = 'sent';
+        item.message_id = data.result?.message_id;
+      } else {
+        item.status = 'failed';
+        item.error = data.description || 'Gagal kirim';
+      }
+    } catch (e) {
+      item.status = 'failed';
+      item.error = e.message || 'Network error';
     }
-  } catch (e) {
-    console.error('Telegram request failed:', e);
-    showToast('Gagal mengirim laporan ke Telegram.');
+    await new Promise(r => setTimeout(r, 300)); // rate limit delay
   }
 };
-const blastWAParentReport = () => {
-  const message = `Halo Bapak/Ibu Wali Siswa EduPath,\n\nBerikut ringkasan progres belajar ananda di EduPath:\n- Tryout Terselesaikan: 5x\n- Rata-rata Skor SNBT: 685 (Target 700+)\n- Status Paket: Aktif\n\nTerus dukung ananda meraih PTN Impian bersama EduPath.ai!`;
-  const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
-};
+
+// Removed: blastWAParentReport (replaced by Telegram)
+
+// ── Teacher Hub reactive data ──
+const teacherStudents = computed(() => {
+  if (!isTeacher.value) return [];
+  const myName = currentAdminUser.value?.name || '';
+  // Siswa yang punya teacher_name = nama guru ini
+  const fromQuestions = allStudents.value.filter(s => s.teacher_name === myName || s.assigned_teacher === myName);
+  if (fromQuestions.length > 0) return fromQuestions;
+  // Fallback: tampilkan semua siswa aktif jika belum ada assignment
+  return allStudents.value.slice(0, 20);
+});
+
+const teacherSubjects = computed(() => {
+  if (!isTeacher.value) return [];
+  const myName = currentAdminUser.value?.name || '';
+  const subjects = new Set();
+  serverQuestions.value.filter(q => q.teacher_name === myName || !q.teacher_name).forEach(q => {
+    if (q.sub_materi) subjects.add(q.sub_materi);
+    if (q.subtes) subjects.add(q.subtes);
+  });
+  serverMaterials.value.filter(m => m.teacher_name === myName || !m.teacher_name).forEach(m => {
+    if (m.subtest) subjects.add(m.subtest);
+    if (m.sub_materi) subjects.add(m.sub_materi);
+  });
+  return [...subjects].filter(Boolean);
+});
+
+const teacherSchedule = ref([
+  // Data dummy jadwal — idealnya dari API admin/teacher-schedule endpoint
+  { day: 'Senin', subject: 'Penalaran Matematika', time: '14.00–16.00', room: 'Kelas A' },
+  { day: 'Rabu', subject: 'Literasi Bahasa Indonesia', time: '13.00–15.00', room: 'Kelas B' },
+  { day: 'Jumat', subject: 'Tes Potensi Skolastik', time: '09.00–11.00', room: 'Online' },
+]);
 
 // ── Watch activeTab to load data ──
 watch(activeTab, (newTab) => {
+  if (isAffiliate.value && !['affiliates', 'settings'].includes(newTab)) {
+    activeTab.value = 'affiliates';
+    return;
+  }
+  if (isTeacher.value && ['packages', 'plans', 'transactions', 'affiliates', 'staff', 'students', 'settings'].includes(newTab)) {
+    activeTab.value = 'questions';
+    return;
+  }
   sessionStorage.setItem('admin_active_tab', newTab);
-  if (newTab === 'overview') {
+  if (newTab === 'overview' && !isAffiliate.value && !isTeacher.value) {
     fetchDashboard();
-  } else if (newTab === 'students') {
+  } else if (newTab === 'students' && !isTeacher.value && !isAffiliate.value) {
     fetchStudents();
-  } else if (newTab === 'questions') {
+  } else if (newTab === 'questions' && !isAffiliate.value) {
     fetchQuestions();
-  } else if (newTab === 'materials') {
+  } else if (newTab === 'materials' && !isAffiliate.value) {
     fetchMaterials();
-  } else if (newTab === 'transactions') {
+  } else if (newTab === 'transactions' && !isTeacher.value && !isAffiliate.value) {
     fetchAdminOrders();
-  } else if (newTab === 'packages' || newTab === 'plans' || newTab === 'staff') {
+  } else if ((newTab === 'packages' || newTab === 'plans' || newTab === 'staff') && !isTeacher.value && !isAffiliate.value) {
     loadPlansAndStaff();
   } else if (newTab === 'affiliates') {
     loadAdminAffiliates();
     loadAdminCommissions();
     loadAdminPayouts();
+  } else if (newTab === 'settings' && isAffiliate.value) {
+    loadAffiliateSettings();
   }
 }, { immediate: true });
 </script>

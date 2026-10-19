@@ -8,9 +8,9 @@ $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true);
 
 $payload = authenticate();
-if ($payload->role !== 'student') {
+if (!in_array($payload->role, ['student', 'admin', 'superadmin', 'teacher'])) {
     http_response_code(403);
-    echo json_encode(["error" => "Hanya siswa yang dapat mengakses kuis"]);
+    echo json_encode(["error" => "Akses tidak diizinkan"]);
     exit;
 }
 
@@ -87,11 +87,12 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($subtes) {
-        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+        $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi = ? OR subtes = ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
         $stmt->bindValue(1, $subtes);
-        $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(2, $subtes);
+        $stmt->bindValue(3, (int)$limit, PDO::PARAM_INT);
         $stmt->execute();
-        $questions = $stmt->fetchAll();
+        $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } else {
         if (strtolower($quiz_type) === 'tryout') {
             $tryout_distribution = [
@@ -104,21 +105,30 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             $questions = [];
             foreach ($tryout_distribution as $sub_name => $sub_limit) {
-                $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi LIKE ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+                $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi LIKE ? OR subtes LIKE ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
                 $stmt->bindValue(1, "%" . $sub_name . "%");
-                $stmt->bindValue(2, $sub_limit, PDO::PARAM_INT);
+                $stmt->bindValue(2, "%" . $sub_name . "%");
+                $stmt->bindValue(3, $sub_limit, PDO::PARAM_INT);
                 $stmt->execute();
-                $fetched = $stmt->fetchAll();
+                $fetched = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($fetched) {
                     $questions = array_merge($questions, $fetched);
                 }
             }
         } else {
-            $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
+            $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
             $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
             $stmt->execute();
-            $questions = $stmt->fetchAll();
+            $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
+    }
+
+    // Resilient fallback: If no questions found matching exact filters, get any active questions
+    if (empty($questions)) {
+        $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 ORDER BY RAND() LIMIT ?");
+        $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
+        $stmt->execute();
+        $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     echo json_encode([

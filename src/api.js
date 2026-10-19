@@ -422,6 +422,22 @@ export default {
   deleteAdminMaterial(id) {
     return apiFetch(`/admin.php?action=materials&id=${id}`, { method: 'DELETE' });
   },
+  uploadAdminMaterialFile(formData) {
+    const token = sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token') || localStorage.getItem('auth_token') || '';
+    const csrfToken = sessionStorage.getItem('ep_admin_csrf') || '';
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+    return fetch('/api/admin.php?action=upload_material_file', {
+      method: 'POST',
+      headers,
+      body: formData
+    }).then(async res => {
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Gagal upload file');
+      return data;
+    });
+  },
   getAdminPlans()            { return apiFetch('/admin.php?action=plans'); },
   createAdminPlan(data)      { return apiFetch('/admin.php?action=plans', { method: 'POST', body: JSON.stringify(data) }); },
   updateAdminPlan(id, data)  { return apiFetch('/admin.php?action=plans', { method: 'PUT', body: JSON.stringify({ id, ...data }) }); },
@@ -436,6 +452,8 @@ export default {
   approvePayout(id)          { return apiFetch('/admin_affiliate.php', { method: 'POST', body: JSON.stringify({ action: 'approve_payout', payout_id: id }) }); },
   rejectPayout(id, reason)   { return apiFetch('/admin_affiliate.php', { method: 'POST', body: JSON.stringify({ action: 'reject_payout', payout_id: id, reason }) }); },
   payoutCommission(id, ref)  { return apiFetch('/admin.php?action=payout_commission', { method: 'POST', body: JSON.stringify({ commission_id: id, payout_reference: ref }) }); },
+  getAffiliateSettings()     { return apiFetch('/admin.php?action=affiliate_settings'); },
+  saveAffiliateSettings(data){ return apiFetch('/admin.php?action=affiliate_settings', { method: 'POST', body: JSON.stringify(data) }); },
 
   // ── Staff Management ──
   createAdminStaff(payload) { return apiFetch('/admin.php?action=staff', { method: 'POST', body: JSON.stringify(payload) }); },

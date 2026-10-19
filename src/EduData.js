@@ -1296,3 +1296,5 @@ export const generateFull155Questions = () => {
 };
 
 export const SIMULATOR_DATABASE = generateFull155Questions();
+
+export const HOTS_DIAGNOSTIC_BANK = Object.values(SIMULATOR_DATABASE).flat().slice(0, 30);

@@ -42,32 +42,31 @@
         <p v-show="(sidebarExpanded || mobileSidebarOpen)" class="text-xs text-white/40 font-semibold mb-3 uppercase tracking-wider whitespace-nowrap shrink-0">Adaptive Learning Platform</p>
         <p v-show="!(sidebarExpanded || mobileSidebarOpen)" class="mb-3 shrink-0"></p>
 
-        <!-- Admin Role Indicator Banner in Sidebar -->
-        <div v-if="(currentUser?.role === 'admin' || currentUser?.role === 'superadmin')" class="mb-4 shrink-0">
-          <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="p-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-between gap-2 shadow-lg">
+        <!-- Mode Pratinjau Siswa Banner (Hanya jika Staff sedang Pratinjau Tampilan Siswa) -->
+        <div v-if="isStaff && isStudentPreviewMode" class="mb-4 shrink-0">
+          <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
-              <i class="ph-fill ph-shield-check text-amber-400 text-base shrink-0"></i>
+              <i class="ph-fill ph-eye text-amber-400 text-base shrink-0"></i>
               <div class="min-w-0">
                 <span class="text-[10px] font-black uppercase tracking-wider block truncate">
-                  {{ currentUser?.role === 'superadmin' ? 'Super Admin' : 'Admin Panel' }}
+                  Pratinjau Siswa
                 </span>
                 <span class="text-[9px] text-white/60 block truncate">
-                  {{ isStudentPreviewMode ? 'Pratinjau Siswa' : 'Menu Manajemen' }}
+                  Tampilan simulasi siswa
                 </span>
               </div>
             </div>
             <button 
-              v-if="isStudentPreviewMode" 
-              @click="isStudentPreviewMode = false; window.location.hash = '#/admin'" 
+              @click="window.location.hash = '#/admin'" 
               class="px-2 py-1 rounded bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-[9px] shrink-0 transition-all cursor-pointer"
-              title="Kembali ke Admin Panel"
+              title="Kembali ke Portal Admin/Guru"
             >
-              Ke Admin
+              Kembali
             </button>
           </div>
           <div v-show="!(sidebarExpanded || mobileSidebarOpen)" class="flex justify-center">
-            <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 cursor-pointer" title="Admin" @click="window.location.hash = '#/admin'">
-              <i class="ph-bold ph-shield-check text-base"></i>
+            <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 cursor-pointer" title="Kembali ke Admin" @click="window.location.hash = '#/admin'">
+              <i class="ph-bold ph-arrow-left text-base"></i>
             </div>
           </div>
         </div>
@@ -88,7 +87,7 @@
               <div class="relative shrink-0 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'w-6 h-6' : 'w-8 h-8'">
                 <span class="absolute text-xs font-black opacity-100 text-white">{{ tab.label.charAt(0) }}</span>
                 <i :class="['ph-bold relative z-10', tab.icon, (sidebarExpanded || mobileSidebarOpen) ? 'text-lg' : 'text-xl', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/70 group-hover:text-white']"></i>
-                <i v-if="['diagnostic', 'learning', 'simulator', 'studyroom'].includes(tab.id) && isLoggedIn && !currentUser?.is_premium && currentUser?.role !== 'admin' && currentUser?.role !== 'superadmin'" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
+                <i v-if="['diagnostic', 'learning', 'simulator', 'studyroom'].includes(tab.id) && isLoggedIn && !currentUser?.is_premium && !isStaff" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
               </div>
               <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="font-bold tracking-tight whitespace-nowrap" :class="currentTab === tab.id ? 'text-white' : ''">{{ tab.label }}</span>
             </button>
@@ -111,7 +110,7 @@
                   <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]/70 shrink-0"></span>
                   <span class="truncate">{{ subtes.subtes }}</span>
                 </div>
-                <i v-if="isLoggedIn && !currentUser?.is_premium && currentUser?.role !== 'admin' && currentUser?.role !== 'superadmin'" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                <i v-if="isLoggedIn && !currentUser?.is_premium && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
               </button>
 
               <!-- Group TES LITERASI -->
@@ -130,7 +129,7 @@
                   <span class="w-1.5 h-1.5 rounded-full bg-sky-400/70 shrink-0"></span>
                   <span class="truncate">{{ subtes.subtes }}</span>
                 </div>
-                <i v-if="isLoggedIn && !currentUser?.is_premium && currentUser?.role !== 'admin' && currentUser?.role !== 'superadmin'" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                <i v-if="isLoggedIn && !currentUser?.is_premium && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
               </button>
             </div>
           </template>
@@ -145,16 +144,23 @@
           </div>
           <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
             <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ currentUser?.name || 'Siswa Mandiri' }}</h4>
-            <div v-if="currentUser?.role !== 'admin' && currentUser?.role !== 'superadmin'" @click="purchasePlan('Utama', 450000)" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Upgrade Paket">
+            <div v-if="isTeacher" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Guru & Bank Soal">
+              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-emerald-400">
+                Pendidik / Tutor
+              </span>
+              <span class="text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-emerald-400 group-hover:text-black transition-all">Portal Guru ➔</span>
+            </div>
+            <div v-else-if="isAdmin" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Admin Panel">
+              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-indigo-400">
+                {{ currentUser?.role === 'superadmin' ? 'Super Admin' : 'Administrator' }}
+              </span>
+              <span class="text-[9px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-indigo-400 group-hover:text-black transition-all">Panel ➔</span>
+            </div>
+            <div v-else @click="openPlanSelector" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Lihat Pilihan Paket">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-[#c0ff00]">
                 Status Paket: {{ currentUser?.is_premium ? 'Premium' : 'Trial' }}
               </span>
-              <span v-if="!currentUser?.is_premium" class="text-[9px] bg-[#c0ff00]/20 text-[#c0ff00] border border-[#c0ff00]/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-[#c0ff00] group-hover:text-black transition-all">Upgrade ⚡</span>
-            </div>
-            <div v-else class="group flex items-center gap-1 mt-0.5">
-              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-indigo-400">
-                Administrator
-              </span>
+              <span v-if="!currentUser?.is_premium" class="text-[9px] bg-[#c0ff00]/20 text-[#c0ff00] border border-[#c0ff00]/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-[#c0ff00] group-hover:text-black transition-all">Pilih Paket ⚡</span>
             </div>
           </div>
         </div>
@@ -1415,7 +1421,7 @@
                     @click="isAnnualBilling = true"
                   >
                     <span>Bayar Tahunan</span>
-                    <span class="bg-black text-[#c0ff00] text-[10px] px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">HEMAT 40% OFF 🔥</span>
+                    <span class="bg-black text-[#c0ff00] text-[10px] px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">HEMAT HINGGA 60% OFF 🔥</span>
                   </button>
                 </div>
               </div>
@@ -1467,8 +1473,8 @@
                      idx % 3 === 1 ? 'bg-[#c0ff00]/10 border border-[#c0ff00]/30' : '',
                      idx % 3 === 2 ? 'bg-purple-900/20 border border-purple-500/30' : ''
                    ]">
-                     <div v-if="product.activePlan.discount > 0" class="flex items-center gap-2">
-                       <span class="text-xs text-white/40 line-through">Rp {{ Math.round(product.activePlan.price / (1 - (product.activePlan.discount/100))).toLocaleString('id-ID') }}</span>
+                     <div v-if="isAnnualBilling && product.activePlan.discount > 0" class="flex items-center gap-2">
+                       <span class="text-xs text-white/40 line-through">Rp {{ Number(idx === 0 ? 180000 : idx === 1 ? 480000 : 980000).toLocaleString('id-ID') }}</span>
                        <span :class="[
                          'text-[10px] font-black px-2 py-0.5 rounded-full uppercase',
                          idx % 3 === 1 ? 'bg-[#c0ff00] text-black' : 'text-emerald-400 bg-emerald-500/10'
@@ -1478,11 +1484,17 @@
                        <span :class="[
                          'text-4xl sm:text-5xl font-black font-heading',
                          idx % 3 === 1 ? 'text-[#c0ff00]' : 'text-white'
-                       ]">Rp {{ (product.activePlan.price / 1000).toLocaleString('id-ID') }}k</span>
+                       ]">Rp {{ isAnnualBilling ? Math.round(product.activePlan.price / 12 / 1000).toLocaleString('id-ID') : Math.round(product.activePlan.price / 1000).toLocaleString('id-ID') }}k</span>
                        <span :class="[
                          'font-bold text-xs',
                          idx % 3 === 1 ? 'text-white/60' : 'text-white/50'
-                       ]">/{{ product.activePlan.billing_cycle === 'yearly' ? 'tahun' : 'bulan' }}</span>
+                       ]">/bulan</span>
+                     </div>
+                     <div v-if="isAnnualBilling" class="text-[10px] text-white/50 pt-1 font-medium">
+                       Ditagih tahunan Rp {{ Number(product.activePlan.price).toLocaleString('id-ID') }} /tahun
+                     </div>
+                     <div v-else class="text-[10px] text-white/40 pt-1 font-medium">
+                       Ditagih bulanan, fleksibel tanpa komitmen
                      </div>
                    </div>
 
@@ -1557,13 +1569,13 @@
               <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-yellow-500/15 rounded-full blur-3xl pointer-events-none"></div>
               <div class="max-w-3xl mx-auto space-y-4 relative z-10">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
-                  <i class="ph-bold ph-lightning"></i> 1 KODE REFERRAL UNTUK SEMUA PRODUK UNGGULAN
+                  <i class="ph-bold ph-hand-coins"></i> PROGRAM KEMITRAAN &amp; AFILIASI EDUPATH
                 </div>
                 <h2 class="text-3xl sm:text-5xl font-black font-heading text-white tracking-tight leading-tight">
-                  Raih Komisi <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">20% Tahun Pertama</span><br class="hidden sm:inline">+ <span class="text-emerald-400">10% Recurring</span> Seumur Hidup
+                  Raih Komisi <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">20% Pembelian Paket</span><br class="hidden sm:inline">+ <span class="text-emerald-400">10% Recurring</span> Tiap Perpanjangan
                 </h2>
                 <p class="text-white/70 text-sm sm:text-base leading-relaxed">
-                  Dapatkan penghasilan pasif berkelanjutan dari setiap langganan software bisnis di ekosistem Elyana. Tracking otomatis, transparan, pencairan terjadwal, dan dipotong PPh resmi sesuai regulasi pajak.
+                  Dapatkan penghasilan berkelanjutan dengan merekomendasikan platform belajar adaptif &amp; simulasi UTBK EduPath kepada rekan pejuang PTN dan komunitas belajar. Tracking komisi transparan secara real-time, pencairan terjadwal langsung ke rekening Anda.
                 </p>
                 <div class="flex flex-wrap justify-center gap-3 pt-2">
                   <button v-if="!isLoggedIn || affiliateData?.status === 'not_joined'" @click="showAffiliateRegisterModal = true" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_35px_rgba(245,158,11,0.5)] flex items-center gap-2">
@@ -1870,51 +1882,155 @@
             </div>
           </div>
 
-          <!-- Card Status Paket (Clickable for Upgrade) -->
+          <!-- Card Status Paket (Role-aware & Upgrade Flow) -->
           <div class="glass-card p-6 md:p-8 rounded-3xl border border-white/10 relative overflow-hidden bg-gradient-to-br from-white/5 to-white/0 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div class="space-y-2">
                 <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full" :class="currentUser?.is_premium ? 'bg-[#c0ff00] animate-pulse' : 'bg-amber-400'"></span>
-                  <span class="text-xs font-black uppercase tracking-widest text-white/60">Status Paket</span>
+                  <span class="w-2.5 h-2.5 rounded-full" :class="(currentUser?.is_premium || isStaff) ? 'bg-[#c0ff00] animate-pulse' : 'bg-amber-400'"></span>
+                  <span class="text-xs font-black uppercase tracking-widest text-white/60">Status Akun &amp; Paket</span>
                 </div>
-                <div class="text-2xl md:text-3xl font-black tracking-tight" :class="currentUser?.is_premium ? 'text-[#c0ff00]' : 'text-amber-400'">
-                  {{ currentUser?.is_premium ? (currentUser?.plan_name || 'Premium UTBK (Aktif)') : 'Paket Gratis / Trial' }}
+                <div class="text-2xl md:text-3xl font-black tracking-tight" :class="(currentUser?.is_premium || isStaff) ? 'text-[#c0ff00]' : 'text-amber-400'">
+                  {{ isTeacher ? 'Akun Pendidik / Guru (Akses Penuh)' : (isAdmin ? (currentUser?.role === 'superadmin' ? 'Super Administrator' : 'Administrator Tenant') : (currentUser?.is_premium ? (currentUser?.plan_name || 'Premium UTBK (Aktif)') : 'Paket Gratis / Trial')) }}
                 </div>
                 <p class="text-xs text-white/60 max-w-xl">
-                  {{ currentUser?.is_premium 
-                      ? 'Anda memiliki akses penuh ke seluruh Fitur Simulasi UTBK, Asesmen Kesiapan AI, & Modul Drill HOTS.' 
-                      : 'Akun Anda saat ini pada mode Gratis / Trial. Upgrade ke Paket Premium untuk membuka akses tanpa batas ke Simulasi SNBT & Tryout.' }}
+                  {{ isTeacher 
+                      ? 'Anda memiliki hak akses pengajar penuh untuk mengelola modul materi, kurikulum, bank soal, dan analitik siswa.' 
+                      : (isAdmin 
+                          ? 'Akses administrator sistem penuh untuk manajemen data, pesanan, analitik, dan pengguna platform.' 
+                          : (currentUser?.is_premium 
+                              ? 'Anda memiliki akses penuh ke seluruh Fitur Simulasi UTBK, Asesmen Kesiapan AI, & Modul Drill HOTS.' 
+                              : 'Akun Anda saat ini pada mode Gratis / Trial. Upgrade ke Paket Premium untuk membuka akses tanpa batas ke Simulasi SNBT & Tryout.')) }}
                 </p>
               </div>
 
-              <!-- Button Upgrade Paket -->
+              <!-- Button Upgrade / Portal Guru -->
               <div class="shrink-0">
                 <button
-                  @click="purchasePlan('Pro', 149000)"
+                  v-if="isStaff"
+                  @click="window.location.hash = '#/admin'"
+                  class="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <i class="ph-bold ph-chalkboard-teacher text-base" v-if="isTeacher"></i>
+                  <i class="ph-bold ph-shield-check text-base" v-else></i>
+                  <span>{{ isTeacher ? 'Buka Portal Guru / Bank Soal ➔' : 'Buka Admin Panel ➔' }}</span>
+                </button>
+                <button
+                  v-else
+                  @click="openPlanSelector"
                   class="px-6 py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <i class="ph-bold ph-lightning text-base"></i>
-                  <span>{{ currentUser?.is_premium ? 'Perpanjang / Upgrade Paket' : 'Upgrade ke Premium ⚡' }}</span>
+                  <span>{{ currentUser?.is_premium ? 'Perpanjang / Ganti Paket' : 'Pilih Paket Belajar ⚡' }}</span>
                 </button>
               </div>
             </div>
           </div>
 
-          <!-- Form Edit Profil & Rekening Bank -->
+          <!-- Informasi Atribut Data Akun (VIEW MODE & EDIT MODE) -->
           <div class="glass-card p-6 md:p-8 rounded-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-            <form @submit.prevent="saveProfileAndBankSettings" class="space-y-8 max-w-3xl">
-              
-              <!-- Section 1: Profil Akun -->
-              <div class="space-y-5">
-                <div class="flex items-center gap-3 pb-3 border-b border-white/10">
-                  <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm">
+            
+            <!-- View Mode -->
+            <div v-if="!isEditingProfile" class="space-y-8">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/10 gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg">
                     👤
                   </div>
                   <div>
-                    <h4 class="text-white font-black text-base tracking-wide">Pengaturan Akun</h4>
-                    <p class="text-xs text-white/50">Ubah nama lengkap, email, dan password akun Anda</p>
+                    <h4 class="text-white font-black text-lg tracking-wide">Pengaturan Akun &amp; Rekening</h4>
+                    <p class="text-xs text-white/50">Data atribut akun dan rekening pencairan komisi afiliasi Anda</p>
                   </div>
+                </div>
+
+                <button
+                  type="button"
+                  @click="startEditingProfile"
+                  class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-[#c0ff00] hover:text-black text-white font-black text-xs uppercase tracking-wider border border-white/20 transition-all flex items-center gap-2 cursor-pointer shadow-md shrink-0 self-start sm:self-auto"
+                >
+                  <i class="ph-bold ph-pencil-simple text-base"></i>
+                  <span>Edit Data Pengaturan</span>
+                </button>
+              </div>
+
+              <!-- Grid Informasi Atribut Profil -->
+              <div class="space-y-4 max-w-4xl">
+                <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-400">
+                  <span>👤 Data Profil Akun</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Nama Lengkap</span>
+                    <div class="text-sm font-bold text-white">{{ currentUser?.name || profileEditForm.name || '-' }}</div>
+                  </div>
+                  <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Email Utama</span>
+                    <div class="text-sm font-mono font-medium text-white">{{ currentUser?.email || profileEditForm.email || '-' }}</div>
+                  </div>
+                  <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Peran / Status Pengguna</span>
+                    <div class="text-sm font-bold text-[#c0ff00]">
+                      {{ isTeacher ? 'Guru / Tutor (Pendidik)' : (isAdmin ? (currentUser?.role === 'superadmin' ? 'Super Administrator' : 'Administrator Tenant') : (currentUser?.is_premium ? 'Siswa Premium' : 'Siswa Mandiri (Trial)')) }}
+                    </div>
+                  </div>
+                  <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Password</span>
+                    <div class="text-sm font-mono text-white/70">•••••••• <span class="text-[10px] text-emerald-400 ml-1.5 font-bold font-sans">(Tersimpan aman)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Grid Informasi Atribut Rekening -->
+              <div class="space-y-4 max-w-4xl pt-2">
+                <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-emerald-400">
+                  <span>🏦 Rekening &amp; E-Wallet Pencairan Komisi Afiliasi</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Bank / E-Wallet</span>
+                    <div class="text-sm font-bold text-white">{{ profileEditForm.bank_name || '-' }}</div>
+                  </div>
+                  <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">No. Rek / No. HP</span>
+                    <div class="text-sm font-mono font-medium text-white">{{ profileEditForm.bank_account || '-' }}</div>
+                  </div>
+                  <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Atas Nama (a.n)</span>
+                    <div class="text-sm font-bold text-white">{{ profileEditForm.bank_owner || '-' }}</div>
+                  </div>
+                </div>
+                <p v-if="!profileEditForm.bank_name && !profileEditForm.bank_account" class="text-xs text-white/40 italic">
+                  * Data rekening belum diisi. Klik tombol "Edit Data Pengaturan" untuk melengkapi rekening penerimaan komisi afiliasi Anda.
+                </p>
+              </div>
+            </div>
+
+            <!-- Edit Mode (Form Input) -->
+            <form v-else @submit.prevent="saveProfileAndBankSettings" class="space-y-8 max-w-3xl animate-fade-in">
+              <div class="flex items-center justify-between pb-6 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-lg">
+                    ✏️
+                  </div>
+                  <div>
+                    <h4 class="text-white font-black text-lg tracking-wide">Edit Data Akun &amp; Rekening</h4>
+                    <p class="text-xs text-white/50">Perbarui informasi nama, email, password, dan rekening pencairan</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  @click="cancelEditingProfile"
+                  class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all cursor-pointer"
+                >
+                  Batal
+                </button>
+              </div>
+
+              <!-- Section 1: Profil Akun -->
+              <div class="space-y-5">
+                <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-400">
+                  <span>👤 Data Profil</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -1958,15 +2074,9 @@
               </div>
 
               <!-- Section 2: Rekening Pencairan -->
-              <div class="space-y-5 pt-4">
-                <div class="flex items-center gap-3 pb-3 border-b border-white/10">
-                  <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-sm">
-                    🏦
-                  </div>
-                  <div>
-                    <h4 class="text-white font-black text-base tracking-wide">Rekening & E-Wallet Pencairan</h4>
-                    <p class="text-xs text-white/50">Digunakan untuk penerimaan komisi rujukan afiliasi</p>
-                  </div>
+              <div class="space-y-5 pt-4 border-t border-white/10">
+                <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-emerald-400">
+                  <span>🏦 Rekening &amp; E-Wallet Pencairan</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -2005,8 +2115,15 @@
                 </div>
               </div>
 
-              <!-- Save Button -->
-              <div class="pt-4 flex items-center justify-end gap-4">
+              <!-- Save / Cancel Buttons -->
+              <div class="pt-6 border-t border-white/10 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  @click="cancelEditingProfile"
+                  class="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+                >
+                  Batal
+                </button>
                 <button
                   type="submit"
                   :disabled="isSavingProfile"
@@ -2243,20 +2360,31 @@
                 <h2 class="text-base md:text-lg font-black text-white">Diagnostic &amp; Adaptive Simulation Test</h2>
               </div>
             </div>
-            <button 
-              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
-              title="Tutup Halaman & Kembali"
-            >
-              <span>Tutup</span>
-              <i class="ph-bold ph-x text-base"></i>
-            </button>
+            <div class="flex items-center gap-2">
+              <button 
+                type="button"
+                @click="showIrtInfo = !showIrtInfo" 
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+                title="Sembunyikan / Tampilkan Kotak IRT"
+              >
+                <span>{{ showIrtInfo ? 'Sembunyikan Panel IRT (Layar Penuh)' : 'Tampilkan Panel IRT' }}</span>
+                <i :class="showIrtInfo ? 'ph-bold ph-eye-slash' : 'ph-bold ph-eye'"></i>
+              </button>
+              <button 
+                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+                class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+                title="Tutup Halaman & Kembali"
+              >
+                <span>Tutup</span>
+                <i class="ph-bold ph-x text-base"></i>
+              </button>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-6" :class="diagnosticFocus ? '' : 'lg:grid-cols-3'">
-            <div class="light-mode-card rounded-2xl p-6 lg:p-8" :class="diagnosticFocus ? '' : 'lg:col-span-2'">
+          <div class="grid grid-cols-1 gap-6" :class="showIrtInfo ? 'lg:grid-cols-3' : ''">
+            <div class="light-mode-card rounded-2xl p-6 lg:p-8" :class="showIrtInfo ? 'lg:col-span-2' : 'w-full'">
               <h3 class="text-xl font-black font-heading text-slate-900 mb-2">Diagnostic &amp; Adaptive Simulation Test</h3>
-              <p v-if="!diagnosticFocus" class="text-xs text-white/60 mb-6 font-medium">
+              <p v-if="!diagnosticFocus" class="text-xs text-slate-600 mb-6 font-medium">
                 Sistem simulasi ujian dengan Item Response Theory (IRT). Kesulitan soal dinamis sesuai respons kemampuan Anda.
               </p>
 
@@ -2265,7 +2393,7 @@
                   IRT
                 </div>
                 <h4 class="text-lg font-black font-heading text-slate-900 mb-2">Mulai Diagnostic Assessment</h4>
-                <p class="text-xs text-white/60 max-w-sm mx-auto mb-6 leading-relaxed font-medium">
+                <p class="text-xs text-slate-600 max-w-sm mx-auto mb-6 leading-relaxed font-medium">
                   Ukur kemampuan Aljabar, Geometri, dan Penalaran Logis awal Anda secara presisi dalam 4 soal terpilih.
                 </p>
                 <button class="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all" @click="startDiagnostic">
@@ -2287,23 +2415,23 @@
                 </div>
 
                 <div class="space-y-3">
-                  <strong class="text-xs text-purple-400 uppercase font-black tracking-widest">Pertanyaan {{ diagnosticIdx + 1 }} dari {{ diagnosticQuestions.length }}:</strong>
-                  <p class="text-lg md:text-xl text-slate-900 font-bold leading-relaxed">{{ currentDiagQuestion.question }}</p>
+                  <strong class="text-xs text-purple-600 uppercase font-black tracking-widest">Pertanyaan {{ diagnosticIdx + 1 }} dari {{ diagnosticQuestions.length }}:</strong>
+                  <div class="text-lg md:text-xl text-slate-900 font-bold leading-relaxed" v-html="currentDiagQuestion.question"></div>
                 </div>
 
                 <div class="grid grid-cols-1 gap-2.5">
                   <button 
                     v-for="(option, idx) in currentDiagQuestion.options" 
                     :key="idx"
-                    :class="['w-full text-left px-4 py-3 rounded-xl border text-sm font-semibold transition-all outline-none', 
+                    :class="['w-full text-left px-4 py-3 rounded-xl border text-sm font-semibold transition-all outline-none flex items-center', 
                       selectedDiagAnswer === idx 
                         ? 'bg-indigo-50 border-indigo-500 text-indigo-900 shadow-[0_8px_32px_rgba(0,0,0,0.3)]' 
                         : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-100'
                     ]" 
                     @click="selectedDiagAnswer = idx"
                   >
-                    <span class="inline-block w-6 h-6 rounded-lg bg-white border border-slate-300 text-center leading-6 text-xs text-slate-700 font-black mr-2.5">{{ String.fromCharCode(65 + idx) }}</span>
-                    {{ option }}
+                    <span class="inline-block w-6 h-6 rounded-lg bg-white border border-slate-300 text-center leading-6 text-xs text-slate-700 font-black mr-2.5 shrink-0">{{ String.fromCharCode(65 + idx) }}</span>
+                    <span class="text-sm md:text-base font-medium" v-html="option"></span>
                   </button>
                 </div>
 
@@ -2347,10 +2475,21 @@
               </div>
             </div>
 
-            <!-- IRT Details Card -->
-            <div v-if="!diagnosticFocus" class="light-mode-card rounded-2xl p-6 flex flex-col justify-between">
+            <!-- IRT Details Card (Hidden completely when showIrtInfo is false for 100% full monitor width) -->
+            <div v-if="!diagnosticFocus && showIrtInfo" class="light-mode-card rounded-2xl p-6 flex flex-col justify-between">
               <div>
-                <h3 class="text-lg font-black font-heading text-slate-900 mb-4">Kenapa Memilih IRT Model?</h3>
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-lg font-black font-heading text-slate-900">Kenapa Memilih IRT Model?</h3>
+                  <button 
+                    type="button"
+                    @click="showIrtInfo = false" 
+                    class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-colors flex items-center gap-1 cursor-pointer"
+                    title="Tutup Kotak IRT"
+                  >
+                    <span>Tutup</span>
+                    <i class="ph-bold ph-x"></i>
+                  </button>
+                </div>
                 <div class="space-y-3">
                   <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
                     <strong class="text-xs text-slate-900 block mb-1">1. Estimasi Skor Presisi</strong>
@@ -2383,14 +2522,25 @@
                 <h2 class="text-base md:text-lg font-black text-white">Materi &amp; Drill Soal UTBK 2027</h2>
               </div>
             </div>
-            <button 
-              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
-              title="Tutup Halaman & Kembali"
-            >
-              <span>Tutup</span>
-              <i class="ph-bold ph-x text-base"></i>
-            </button>
+            <div class="flex items-center gap-2">
+              <button 
+                type="button"
+                @click="hideBabSidebar = !hideBabSidebar" 
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#c0ff00] border border-[#c0ff00]/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+                :title="hideBabSidebar ? 'Tampilkan Daftar Bab' : 'Sembunyikan Bab (Area Materi Luas)'"
+              >
+                <span>{{ hideBabSidebar ? 'Buka Daftar Bab' : 'Sembunyikan Bab (Area Luas)' }}</span>
+                <i :class="hideBabSidebar ? 'ph-bold ph-sidebar-simple' : 'ph-bold ph-arrows-out-line-horizontal'"></i>
+              </button>
+              <button 
+                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+                class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+                title="Tutup Halaman & Kembali"
+              >
+                <span>Tutup</span>
+                <i class="ph-bold ph-x text-base"></i>
+              </button>
+            </div>
           </div>
           <!-- Active Subtes Header Banner -->
           <div class="light-mode-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-indigo-600">
@@ -2410,10 +2560,21 @@
 
           <!-- Description & Bab List -->
           <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-            <!-- Sidebar Bab list -->
-            <div class="lg:col-span-1 light-mode-card rounded-2xl p-4 space-y-3">
-              <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider px-2">Daftar Bab &amp; Topik:</h4>
-              <div class="space-y-2">
+            <!-- Sidebar Bab list (Collapsible / Auto-Hide for wide reading area) -->
+            <div v-show="!hideBabSidebar" class="lg:col-span-1 light-mode-card rounded-2xl p-4 space-y-3 animate-fade-in">
+              <div class="flex items-center justify-between px-2">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Daftar Bab:</h4>
+                <button 
+                  type="button" 
+                  @click="hideBabSidebar = true" 
+                  class="text-[11px] text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-0.5 cursor-pointer"
+                  title="Sembunyikan sidebar agar area materi luas"
+                >
+                  <span>Sembunyikan</span>
+                  <i class="ph-bold ph-caret-left"></i>
+                </button>
+              </div>
+              <div class="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
                 <button 
                   v-for="bab in selectedSubtes.babList" 
                   :key="bab.id"
@@ -2431,7 +2592,7 @@
             </div>
 
             <!-- Content Area: Teori Singkat -> Micro Lesson -> Quick Quiz -->
-            <div class="lg:col-span-3 space-y-6">
+            <div :class="hideBabSidebar ? 'lg:col-span-4' : 'lg:col-span-3'" class="space-y-6 transition-all duration-300">
               <div v-if="selectedBab" class="light-mode-card rounded-2xl p-6 lg:p-8 space-y-6">
                 <!-- 1. HEADER & TEORI SINGKAT MATERI UTBK -->
                 <div class="space-y-4 border-b border-slate-200 pb-6">
@@ -2516,8 +2677,27 @@
           </div>
         </section>
 
-        <!-- TAB 4: PRACTICE & AI TUTOR -->
         <section v-if="currentTab === 'practice'" class="animate-fade-in space-y-6">
+          <!-- Top Close Bar -->
+          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl font-black">
+                <i class="ph-bold ph-brain"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">Latihan Soal Adaptif</span>
+                <h2 class="text-base md:text-lg font-black text-white">Practice Engine &amp; AI Tutor</h2>
+              </div>
+            </div>
+            <button 
+              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+              title="Tutup Practice Engine"
+            >
+              <span>Tutup</span>
+              <i class="ph-bold ph-x text-base"></i>
+            </button>
+          </div>
           <div class="grid grid-cols-1 gap-6" :class="showAICompanion ? 'lg:grid-cols-3' : ''">
             <!-- Main Interactive Problem Screen -->
             <div class="light-mode-card rounded-2xl p-6 lg:p-8 flex flex-col justify-between" :class="showAICompanion ? 'lg:col-span-2' : ''">
@@ -2529,23 +2709,21 @@
 
                 <div class="space-y-4">
                   <span class="text-xs text-indigo-600 font-black uppercase tracking-widest block">SOAL LATIHAN</span>
-                  <p class="text-lg md:text-xl font-bold text-slate-900 leading-relaxed">
-                    {{ activePracticeQuestion.question }}
-                  </p>
+                  <div class="text-lg md:text-xl font-bold text-slate-900 leading-relaxed" v-html="activePracticeQuestion.question"></div>
 
                   <div class="grid grid-cols-1 gap-2.5 pt-3">
                     <button 
                       v-for="(opt, idx) in activePracticeQuestion.options" 
                       :key="idx"
-                      :class="['w-full text-left px-4 py-3.5 rounded-xl border text-sm font-semibold transition-all outline-none', 
+                      :class="['w-full text-left px-4 py-3.5 rounded-xl border text-sm font-semibold transition-all outline-none flex items-center', 
                         practiceUserAnswer === idx
                           ? (practiceEvaluated && idx === activePracticeQuestion.answer ? 'bg-emerald-50 border-emerald-500 text-emerald-900' : 'bg-rose-50 border-rose-500 text-rose-900')
                           : (practiceEvaluated && idx === activePracticeQuestion.answer ? 'bg-emerald-50 border-emerald-500 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-300 hover:bg-slate-100')
                       ]"
                       @click="practiceUserAnswer = idx"
                     >
-                      <span class="inline-block w-6 h-6 rounded-lg bg-white border border-slate-300 text-center leading-6 text-xs font-black text-slate-700 mr-2.5">{{ String.fromCharCode(65 + idx) }}</span>
-                      {{ opt }}
+                      <span class="inline-block w-6 h-6 rounded-lg bg-white border border-slate-300 text-center leading-6 text-xs font-black text-slate-700 mr-2.5 shrink-0">{{ String.fromCharCode(65 + idx) }}</span>
+                      <span class="text-sm md:text-base font-medium" v-html="opt"></span>
                     </button>
                   </div>
                 </div>
@@ -2771,15 +2949,36 @@
                 </div>
               </div>
 
-              <button class="w-full mt-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.3)]" @click="simulateTelegramSent">
-                Kirim Laporan Telegram
-              </button>
+              <div class="mt-4 p-3 rounded-xl bg-sky-50 border border-sky-200 text-sky-800 text-[11px] flex items-center gap-2.5">
+                <i class="ph-bold ph-paper-plane-tilt text-sky-600 text-base shrink-0"></i>
+                <span>Laporan dikirim otomatis oleh sistem bimbel setiap hari Minggu pukul 18.00 WIB langsung ke kontak orang tua.</span>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- TAB 7: 2027 AI INTELLIGENCE & PERFORMANCE COCKPIT -->
-        <section v-if="currentTab === 'projection2027'" class="animate-fade-in space-y-6">
+        <!-- TAB 7: 2027 AI INTELLIGENCE & PERFORMANCE COCKPIT (Ujian 2027 Simulasi) -->
+        <section v-if="currentTab === 'simulator' || currentTab === 'projection2027'" class="animate-fade-in space-y-6 pt-20 lg:pt-4 px-3 sm:px-6">
+          <!-- Top Header Bar -->
+          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xl font-black">
+                <i class="ph-bold ph-chart-polar"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Simulasi &amp; Intelligence Cockpit</span>
+                <h2 class="text-base md:text-lg font-black text-white">Simulasi UTBK 2027 &amp; Proyeksi IRT Adaptif</h2>
+              </div>
+            </div>
+            <button 
+              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+              title="Tutup Halaman & Kembali"
+            >
+              <span>Tutup</span>
+              <i class="ph-bold ph-x text-base"></i>
+            </button>
+          </div>
           
           <!-- Top KPI Strip -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
@@ -2920,9 +3119,7 @@
                   </div>
 
                   <!-- Question Text -->
-                  <p class="text-base md:text-lg font-bold text-slate-900 leading-relaxed">
-                    {{ q.question }}
-                  </p>
+                  <div class="text-base md:text-lg font-bold text-slate-900 leading-relaxed" v-html="q.question"></div>
 
                   <!-- Option Buttons -->
                   <div class="grid grid-cols-1 gap-2.5 pt-1">
@@ -2939,14 +3136,14 @@
                       @click="answerAnalisaQuestion(q.id, idx)"
                     >
                       <div class="flex items-center gap-3">
-                        <span :class="['w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black font-mono',
+                        <span :class="['w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black font-mono shrink-0',
                           userAnswersMap[q.id] === idx ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-700'
                         ]">
                           {{ String.fromCharCode(65 + idx) }}
                         </span>
-                        <span>{{ opt }}</span>
+                        <span class="text-sm md:text-base font-medium" v-html="opt"></span>
                       </div>
-                      <span v-if="userAnswersMap[q.id] === idx" class="text-xs font-mono font-black">
+                      <span v-if="userAnswersMap[q.id] === idx" class="text-xs font-mono font-black shrink-0">
                         {{ idx === q.answer ? '✓ BENAR' : '✕ SALAH' }}
                       </span>
                     </button>
@@ -3226,6 +3423,111 @@
 
     </main>
 
+    <!-- Modal: Pilihan Paket Belajar EduPath (Upgrade & Plan Selector Flow) -->
+    <div v-if="showPlanSelectorModal" class="fixed inset-0 z-[95] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-md" @click="showPlanSelectorModal = false"></div>
+      <div class="relative bg-[#090f1e] border border-white/15 rounded-3xl w-full max-w-4xl p-6 sm:p-8 shadow-2xl animate-fade-in text-white max-h-[90vh] overflow-y-auto">
+        <!-- Close button -->
+        <button @click="showPlanSelectorModal = false" class="!absolute top-5 right-5 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-white/10 text-base cursor-pointer">
+          ✕
+        </button>
+
+        <!-- Header -->
+        <div class="text-center max-w-xl mx-auto mb-8 space-y-2">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
+            ⚡ INVESTASI MASA DEPAN
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black font-heading text-white">Pilih Paket Persiapan UTBK SNBT</h2>
+          <p class="text-xs sm:text-sm text-white/60">Tingkatkan kesiapan ujian dengan ribuan bank soal HOTS terstandar IRT, tryout adaptif, dan analisis AI cerdas.</p>
+
+          <!-- Billing Cycle Switch -->
+          <div class="pt-3 flex items-center justify-center gap-3">
+            <span class="text-xs font-bold" :class="!isAnnualBilling ? 'text-[#c0ff00]' : 'text-white/50'">Bulanan</span>
+            <button 
+              type="button"
+              @click="isAnnualBilling = !isAnnualBilling"
+              class="w-12 h-6 rounded-full bg-white/10 border border-white/20 p-1 transition-colors relative cursor-pointer"
+            >
+              <div 
+                class="w-4 h-4 rounded-full bg-[#c0ff00] transition-transform duration-200"
+                :class="isAnnualBilling ? 'translate-x-6' : 'translate-x-0'"
+              ></div>
+            </button>
+            <span class="text-xs font-bold flex items-center gap-1.5" :class="isAnnualBilling ? 'text-[#c0ff00]' : 'text-white/50'">
+              <span>Tahunan</span>
+              <span class="text-[10px] bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 px-1.5 py-0.5 rounded-full font-black uppercase">Hemat 30%</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Plan Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+          <div 
+            v-for="(product, idx) in displayProducts" 
+            :key="product.id"
+            :class="[
+              'rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 relative border',
+              idx % 3 === 1 ? 'border-2 border-[#c0ff00] bg-gradient-to-b from-[#0e192f] to-[#090f1e] shadow-[0_0_40px_rgba(192,255,0,0.2)] md:-translate-y-2' : 'border-white/10 bg-white/[0.03] hover:border-white/20'
+            ]"
+          >
+            <!-- Badge for Middle Plan -->
+            <div v-if="idx % 3 === 1" class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#c0ff00] text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
+              👑 PALING POPULER
+            </div>
+
+            <div>
+              <!-- Plan Header -->
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00]">{{ product.code || 'PAKET' }}</span>
+                <span v-if="product.activePlan?.discount > 0" class="text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                  Diskon {{ product.activePlan.discount }}%
+                </span>
+              </div>
+              <h3 class="text-xl font-black text-white">{{ product.name }}</h3>
+              <p class="text-xs text-white/50 mt-1 min-h-[32px]">{{ product.description }}</p>
+
+              <!-- Price -->
+              <div class="my-5 pb-4 border-b border-white/10" v-if="product.activePlan">
+                <div class="flex items-baseline gap-1">
+                  <span class="text-3xl font-black font-heading text-white">
+                    Rp {{ (product.activePlan.price / 1000).toLocaleString('id-ID') }}k
+                  </span>
+                  <span class="text-xs text-white/50 font-bold">/{{ product.activePlan.billing_cycle === 'yearly' ? 'thn' : 'bln' }}</span>
+                </div>
+              </div>
+
+              <!-- Features -->
+              <ul class="space-y-2.5 text-xs text-white/80 font-medium">
+                <li v-for="(feat, fIdx) in product.featuresList" :key="fIdx" class="flex items-start gap-2">
+                  <i class="ph-bold ph-check text-[#c0ff00] mt-0.5 shrink-0"></i>
+                  <span>{{ feat }}</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Action Button -->
+            <div class="pt-6 mt-4 border-t border-white/10" v-if="product.activePlan">
+              <button
+                @click="showPlanSelectorModal = false; purchasePlan(product.name, product.activePlan.price)"
+                :class="[
+                  'w-full py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg active:scale-95',
+                  idx % 3 === 1 ? 'bg-[#c0ff00] hover:bg-[#b0ef00] text-black shadow-[0_0_20px_rgba(192,255,0,0.3)]' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/20'
+                ]"
+              >
+                <span>Pilih {{ product.name }}</span>
+                <i class="ph-bold ph-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trust Note -->
+        <div class="mt-6 pt-4 border-t border-white/10 text-center text-xs text-white/40">
+          Metode pembayaran resmi: QRIS (GoPay, OVO, Dana), Virtual Account BCA, Mandiri, BNI, BRI via Midtrans Payment Gateway.
+        </div>
+      </div>
+    </div>
+
     <!-- Checkout Modal -->
     <div v-if="checkoutModalData.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeCheckoutModal"></div>
@@ -3259,20 +3561,37 @@
             </div>
           </div>
           
-          <div class="pt-6">
+          <!-- Mandatory Terms Checkbox -->
+          <div class="pt-4 border-t border-white/10">
+            <label class="flex items-start gap-2.5 text-xs text-white/80 cursor-pointer select-none">
+              <input 
+                type="checkbox" 
+                v-model="checkoutTermsAgreed" 
+                class="rounded border-white/20 bg-white/10 text-[#c0ff00] focus:ring-[#c0ff00] w-4 h-4 mt-0.5 cursor-pointer shrink-0"
+              />
+              <span>
+                Saya telah membaca dan menyetujui 
+                <button type="button" @click.stop="showTermsModal = true" class="text-[#c0ff00] font-bold underline hover:text-white">Syarat &amp; Ketentuan</button> 
+                serta Kebijakan Privasi EduPath.
+              </span>
+            </label>
+          </div>
+
+          <div class="pt-3">
             <button 
               id="btn-midtrans"
-              class="w-full py-3.5 rounded-xl text-sm font-black transition-all hover:scale-105 active:scale-95 bg-[#c0ff00] text-black flex items-center justify-center gap-2"
+              :disabled="!checkoutTermsAgreed"
+              :class="[
+                'w-full py-3.5 rounded-xl text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer',
+                checkoutTermsAgreed
+                  ? 'bg-[#c0ff00] text-black hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.35)]'
+                  : 'bg-white/10 text-white/40 cursor-not-allowed opacity-60'
+              ]"
               @click="confirmCheckout"
             >
               <i class="ph-bold ph-credit-card"></i>
               Lanjutkan ke Midtrans
             </button>
-            <p class="mt-3 text-[11px] text-center text-white/50 leading-relaxed">
-              Dengan melanjutkan pembayaran, Anda menyetujui 
-              <button type="button" @click="showTermsModal = true" class="text-[#c0ff00] underline hover:text-white transition-colors cursor-pointer">Syarat &amp; Ketentuan</button> 
-              EduPath.
-            </p>
           </div>
         </div>
       </div>
@@ -3391,13 +3710,6 @@
               {{ isLoginMode ? 'Daftar di sini' : 'Masuk di sini' }}
             </button>
           </p>
-
-          <div class="mt-4 pt-3 border-t border-white/10 text-center">
-            <a href="#/admin" @click="showLoginModal = false" class="text-[11px] font-bold text-amber-400 hover:text-amber-300 transition-colors inline-flex items-center gap-1.5">
-              <i class="ph-bold ph-shield-check"></i>
-              <span>Masuk sebagai Administrator / Admin Bimbel &rarr;</span>
-            </a>
-          </div>
 
           <p v-if="!isLoginMode" class="text-[10px] text-slate-500 text-center font-light mt-2">
             Dengan mendaftar, Anda menyetujui 
@@ -3965,12 +4277,15 @@ export default {
         }
 
         localStorage.setItem('auth_token', token);
-        localStorage.setItem('user', JSON.stringify(regData.user));
+        localStorage.setItem('user', JSON.stringify({ ...regData.user, role: 'affiliate' }));
+        sessionStorage.setItem('admin_token', token);
+        sessionStorage.setItem('admin_role', 'affiliate');
         
-        toastMessage.value = 'Pendaftaran berhasil! Mengarahkan...';
+        toastMessage.value = 'Pendaftaran Mitra Afiliasi Berhasil! Mengarahkan ke Dashboard Afiliasi...';
+        showToast('Pendaftaran Mitra Afiliasi Berhasil! Mengarahkan ke Dashboard Afiliasi...');
         setTimeout(() => {
-          window.location.href = '/affiliate_dashboard.html';
-        }, 1500);
+          window.location.hash = '#/admin';
+        }, 1200);
 
       } catch (error) {
         alert(error.message);
@@ -4259,9 +4574,17 @@ export default {
     const tabs = ref(studentTabs);
 
     // Computed: filter tab berdasarkan role user
+    const isAdmin = computed(() => currentUser.value?.role === 'admin' || currentUser.value?.role === 'superadmin');
+    const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes(currentUser.value?.role));
+    const isStaff = computed(() => isAdmin.value || isTeacher.value);
+
+    const showPlanSelectorModal = ref(false);
+    const openPlanSelector = () => {
+      showPlanSelectorModal.value = true;
+    };
+
     const filteredTabs = computed(() => {
-      const isAdmin = currentUser.value?.role === 'admin' || currentUser.value?.role === 'superadmin';
-      if (isAdmin && !isStudentPreviewMode.value) {
+      if (isAdmin.value && !isStudentPreviewMode.value) {
         return adminTabs;
       }
       return studentTabs;
@@ -4329,12 +4652,42 @@ export default {
     const publicPlans = ref([]);
     
     const displayProducts = computed(() => {
-      return publicPlans.value.map(prod => {
+      const orderMap = { 'MANDIRI': 1, 'STARTER': 1, 'UTBK': 2, 'UTAMA': 2, 'VIP': 3, 'ELITE': 3 };
+      const sorted = [...publicPlans.value].sort((a, b) => {
+        const ordA = orderMap[a.code] || 99;
+        const ordB = orderMap[b.code] || 99;
+        return ordA - ordB;
+      });
+
+      return sorted.map((prod, idx) => {
         let activePlan = null;
+        const cycle = isAnnualBilling.value ? 'yearly' : 'monthly';
+        
         if (prod.plans && prod.plans.length > 0) {
-          const cycle = isAnnualBilling.value ? 'yearly' : 'monthly';
-          activePlan = prod.plans.find(p => p.billing_cycle === cycle || p.billing_cycle === 'annual');
-          if (!activePlan) activePlan = prod.plans[0]; // fallback
+          activePlan = prod.plans.find(p => p.billing_cycle === cycle || (cycle === 'yearly' && p.billing_cycle === 'annual'));
+        }
+
+        // If no matching plan found for the current billing cycle, dynamically derive it
+        if (!activePlan && prod.plans && prod.plans.length > 0) {
+          const base = prod.plans[0];
+          const discountPct = (idx === 0 || prod.code === 'MANDIRI') ? 40 : ((idx === 1 || prod.code === 'UTBK') ? 60 : 30);
+          const monthlyPrice = (idx === 0 || prod.code === 'MANDIRI') ? 180000 : ((idx === 1 || prod.code === 'UTBK') ? 480000 : 980000);
+          
+          if (isAnnualBilling.value) {
+            activePlan = {
+              ...base,
+              billing_cycle: 'yearly',
+              price: Math.round(monthlyPrice * 12 * (1 - discountPct / 100)),
+              discount: discountPct
+            };
+          } else {
+            activePlan = {
+              ...base,
+              billing_cycle: 'monthly',
+              price: monthlyPrice,
+              discount: 0
+            };
+          }
         }
         
         let featuresList = [];
@@ -4378,11 +4731,43 @@ export default {
       }
     };
     const fetchPlans = async () => {
+      // Fallback pricing lokal (harga resmi)
+      const FALLBACK_PRODUCTS = [
+        {
+          id: 1, code: 'STARTER', name: 'Paket Mandiri',
+          description: 'Mulai belajar adaptif dengan IRT assessment & 50.000+ soal bank soal.',
+          plans: [
+            { billing_cycle: 'monthly', price: 180000, discount: 0, features: JSON.stringify(['500+ Micro-lessons & Video Ringkas','50.000+ Soal Bank Soal IRT','5x Tryout Nasional Simulasi SNBT','Diagnostic Assessment Awal','Dashboard Progres Belajar']) },
+            { billing_cycle: 'yearly',  price: Math.round(180000 * 12 * 0.60), discount: 40, features: JSON.stringify(['500+ Micro-lessons & Video Ringkas','50.000+ Soal Bank Soal IRT','5x Tryout Nasional Simulasi SNBT','Diagnostic Assessment Awal','Dashboard Progres Belajar']) }
+          ]
+        },
+        {
+          id: 2, code: 'UTBK', name: 'Paket Pejuang PTN',
+          description: 'AI Tutor 24/7, Adaptive IRT tanpa batas, & Rasionalisasi Prodi real-time.',
+          plans: [
+            { billing_cycle: 'monthly', price: 480000, discount: 0, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas PTN']) },
+            { billing_cycle: 'yearly',  price: Math.round(480000 * 12 * 0.40), discount: 60, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas PTN']) }
+          ]
+        },
+        {
+          id: 3, code: 'ELITE', name: 'Paket Elite Mentoring',
+          description: '1-on-1 Zoom Mentoring dengan Senior Mentor alumni UI/ITB + akses semua fitur.',
+          plans: [
+            { billing_cycle: 'monthly', price: 980000, discount: 0, features: JSON.stringify(['Semua fitur Paket Pejuang PTN','1-on-1 Zoom Mentoring Private (4x/bulan)','SOS Live Tutor Senior Mentor UI/ITB','Analisis Soal UTBK Spesifik per Individu','Garansi Score Improvement atau Refund','Akses Eksklusif Beta Fitur Terbaru']) },
+            { billing_cycle: 'yearly',  price: Math.round(980000 * 12 * 0.70), discount: 30, features: JSON.stringify(['Semua fitur Paket Pejuang PTN','1-on-1 Zoom Mentoring Private (4x/bulan)','SOS Live Tutor Senior Mentor UI/ITB','Analisis Soal UTBK Spesifik per Individu','Garansi Score Improvement atau Refund','Akses Eksklusif Beta Fitur Terbaru']) }
+          ]
+        }
+      ];
       try {
         const data = await api.getPlans();
-        if (data.products) publicPlans.value = data.products;
+        if (data.products && data.products.length > 0) {
+          publicPlans.value = data.products;
+        } else {
+          publicPlans.value = FALLBACK_PRODUCTS;
+        }
       } catch (e) {
-        console.error('Failed to fetch plans', e);
+        console.warn('Gagal fetch plans dari API, pakai fallback lokal:', e);
+        publicPlans.value = FALLBACK_PRODUCTS;
       }
     };
 
@@ -4400,7 +4785,9 @@ export default {
           streakCount.value = res.user.streak || 0;
           coins.value = res.user.coins || 0;
           if (res.user.target_ptn) simTargetPtn.value = res.user.target_ptn;
-          if (res.user.role === 'admin' || res.user.role === 'superadmin') {
+          if (['admin', 'superadmin', 'teacher', 'guru', 'tutor', 'affiliate'].includes(res.user.role) && !isStudentPreviewMode.value) {
+            sessionStorage.setItem('admin_token', token);
+            sessionStorage.setItem('admin_role', res.user.role);
             window.location.hash = '#/admin';
             return;
           }
@@ -4441,11 +4828,24 @@ export default {
         streakCount.value = res.user.streak || 0;
         coins.value = res.user.coins || 0;
 
-        if (res.user.role === 'admin' || res.user.role === 'superadmin') {
+        // Route affiliates directly to affiliate portal
+        if (res.user?.role === 'affiliate') {
+          sessionStorage.setItem('admin_token', res.token);
+          sessionStorage.setItem('admin_role', 'affiliate');
           window.location.hash = '#/admin';
-        } else {
-          currentTab.value = 'dashboard';
+          showToast('Selamat datang di Portal Afiliasi!');
+          return;
         }
+
+        // Strict role validation: only students are allowed on student portal
+        if (res.user?.role && res.user.role !== 'student') {
+          sessionStorage.clear();
+          localStorage.removeItem('auth_token');
+          authError.value = 'Akun Staf/Guru/Tutor/Admin tidak diizinkan masuk melalui portal siswa. Silakan masuk melalui portal pengajar di /#/admin.';
+          return;
+        }
+
+        currentTab.value = 'dashboard';
 
         showToast(isLoginMode.value ? 'Masuk Akun Sukses! Selamat datang kembali.' : 'Pendaftaran Berhasil! Mulai perjalananmu.');
       } catch (err) {
@@ -4490,8 +4890,6 @@ export default {
     const premiumTabs = ['diagnostic', 'learning', 'simulator', 'studyroom'];
 
     const handleTabClick = (tabId) => {
-      const isAdmin = currentUser.value?.role === 'admin' || currentUser.value?.role === 'superadmin';
-      
       const adminTarget = adminTabs.find(t => t.id === tabId);
       if (adminTarget) {
         if (adminTarget.isPreview) {
@@ -4520,12 +4918,15 @@ export default {
         showToast('Silakan Masuk Akun untuk mengakses modul ini!');
         return;
       }
-      if (premiumTabs.includes(tabId) && !currentUser.value?.is_premium && !isAdmin) {
-        showToast('Fitur ini khusus pengguna Premium. Silakan upgrade paket Anda.', 'error');
-        purchasePlan('Utama', 450000);
+      if (premiumTabs.includes(tabId) && !currentUser.value?.is_premium && !isStaff.value) {
+        showToast('Fitur ini khusus pengguna Premium. Silakan pilih paket belajar Anda.');
+        openPlanSelector();
         return;
       }
       currentTab.value = tabId;
+      if (tabId === 'affiliate' || tabId === 'settings') {
+        fetchAffiliateData();
+      }
     };
 
     const selectSubtesFromSidebar = (subtes) => {
@@ -4534,9 +4935,9 @@ export default {
         showToast('Silakan Masuk Akun untuk mengakses fitur ini!');
         return;
       }
-      if (!currentUser.value?.is_premium && currentUser.value?.role !== 'admin' && currentUser.value?.role !== 'superadmin') {
-        showToast('Fitur ini khusus pengguna Premium. Silakan upgrade paket Anda.', 'error');
-        purchasePlan('Utama', 450000);
+      if (!currentUser.value?.is_premium && !isStaff.value) {
+        showToast('Fitur ini khusus pengguna Premium. Silakan pilih paket belajar Anda.');
+        openPlanSelector();
         return;
       }
       currentTab.value = 'learning';
@@ -4557,6 +4958,10 @@ export default {
       }
     };
 
+    const showIrtInfo = ref(false);
+    const hideBabSidebar = ref(false);
+    const checkoutTermsAgreed = ref(false);
+
     const checkoutModalData = ref({
       isOpen: false,
       planName: '',
@@ -4570,6 +4975,7 @@ export default {
     const pendingPurchaseName = ref(null);
 
     const purchasePlan = (planNameFallback, fallbackAmount) => {
+      checkoutTermsAgreed.value = false;
       let amount = fallbackAmount;
       let planId = planNameFallback;
 
@@ -4608,6 +5014,10 @@ export default {
     };
 
     const confirmCheckout = async () => {
+      if (!checkoutTermsAgreed.value) {
+        showToast('Harap setujui Syarat & Ketentuan terlebih dahulu.');
+        return;
+      }
       const data = checkoutModalData.value;
       
       const btn = document.getElementById('btn-midtrans');
@@ -4622,10 +5032,12 @@ export default {
               onSuccess: function(result) {
                 showToast(`Pembayaran berhasil! Paket ${data.planName} diaktifkan.`);
                 checkoutModalData.value.isOpen = false;
+                checkoutTermsAgreed.value = false;
               },
               onPending: function(result) {
                 showToast('Menunggu pembayaran Anda diselesaikan.');
                 checkoutModalData.value.isOpen = false;
+                checkoutTermsAgreed.value = false;
               },
               onError: function(result) {
                 alert('Pembayaran gagal, silakan coba lagi.');
@@ -4648,6 +5060,7 @@ export default {
 
     const closeCheckoutModal = () => {
       checkoutModalData.value.isOpen = false;
+      checkoutTermsAgreed.value = false;
     };
 
     watch(() => isLoggedIn.value, (newVal) => {
@@ -4795,27 +5208,33 @@ export default {
     const startDiagnostic = async () => {
       try {
         const res = await api.startDiagnostic();
-        if (res.data && res.data.length > 0) {
+        if (res?.data && res.data.length > 0) {
           // Map backend format to frontend format
           diagnosticQuestions.value = res.data.map(q => ({
             id: q.id,
-            category: q.domain || 'Uncategorized',
-            skill: q.sub_materi || 'Uncategorized',
-            difficulty: q.difficulty,
+            category: q.domain || q.subtes || 'Umum',
+            skill: q.sub_materi || 'Analisis Logika',
+            difficulty: q.difficulty || 'SEDANG',
             question: q.question,
             options: [q.option_a, q.option_b, q.option_c, q.option_d, q.option_e].filter(Boolean)
           }));
-          diagnosticActive.value = true;
-          diagnosticFinished.value = false;
-          diagnosticIdx.value = 0;
-          selectedDiagAnswer.value = null;
-          diagnosticAnswers.value = [];
-          showToast('Diagnostic Assessment Dimulai!');
         } else {
-          showToast('Gagal memuat soal diagnostic.', 'error');
+          console.warn('API diagnostic kosong, gunakan bank soal lokal');
+          diagnosticQuestions.value = DIAGNOSTIC_QUESTIONS;
         }
       } catch (e) {
-        console.error('Error startDiagnostic', e);
+        console.warn('Error startDiagnostic dari API, gunakan fallback lokal', e);
+        diagnosticQuestions.value = DIAGNOSTIC_QUESTIONS;
+      }
+
+      if (diagnosticQuestions.value && diagnosticQuestions.value.length > 0) {
+        diagnosticActive.value = true;
+        diagnosticFinished.value = false;
+        diagnosticIdx.value = 0;
+        selectedDiagAnswer.value = null;
+        diagnosticAnswers.value = [];
+        showToast('Diagnostic Assessment Dimulai!');
+      } else {
         showToast('Gagal memuat soal diagnostic.', 'error');
       }
     };
@@ -4996,33 +5415,41 @@ export default {
 
     const isJoiningAffiliate = ref(false);
     const isLoadingAffiliate = ref(false);
+    const isEditingProfile = ref(false);
+
+    const startEditingProfile = () => {
+      if (currentUser.value) {
+        if (!profileEditForm.value.name) profileEditForm.value.name = currentUser.value.name || '';
+        if (!profileEditForm.value.email) profileEditForm.value.email = currentUser.value.email || '';
+      }
+      isEditingProfile.value = true;
+    };
+
+    const cancelEditingProfile = () => {
+      isEditingProfile.value = false;
+      profileEditForm.value.password = '';
+    };
+
     const affiliateData = ref({
-      status: 'joined',
+      status: 'loading',
       commission_rate: 20,
-      referral_code: 'REF-EDUPATH-2027',
+      referral_code: '',
       stats: {
-        total_referrals: 12,
-        active_referrals: 8,
-        total_paid: 1500000,
-        total_pending: 450000
+        total_referrals: 0,
+        active_referrals: 0,
+        total_paid: 0,
+        total_pending: 0
       },
-      referrals: [
-        { name: 'Budi Santoso', date: '12 Sep 2026', status: 'Aktif' },
-        { name: 'Siti Aminah', date: '10 Sep 2026', status: 'Pending' }
-      ],
-      history: [
-        { amount: 500000, date: '01 Sep 2026', status: 'paid', created_at: '2026-09-01T10:00:00' },
-        { amount: 450000, date: '15 Sep 2026', status: 'pending', created_at: '2026-09-15T14:30:00' }
-      ],
-      profile: { name: 'Siswa Mandiri', email: 'siswa@mandiri.com' },
-      bank: { bank_name: 'BCA', bank_account: '1234567890', bank_owner: 'Siswa Mandiri' }
+      referrals: [],
+      history: [],
+      bank_info: { bank_name: '', bank_account: '', bank_owner: '' }
     });
     const activeAffiliateTab = ref('rujukan');
 
     const joinAffiliateProgram = async () => {
       isJoiningAffiliate.value = true;
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
         const apiUrl = import.meta.env.VITE_API_URL || '/api';
         const res = await fetch(`${apiUrl}/affiliate.php?action=join`, {
           method: 'POST',
@@ -5061,7 +5488,7 @@ export default {
     const saveProfileAndBankSettings = async () => {
       isSavingProfile.value = true;
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
         const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
         // 1. Update Profile (Name, Email, Password if provided)
@@ -5091,6 +5518,7 @@ export default {
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
+            action: 'update_bank',
             bank_name: profileEditForm.value.bank_name,
             bank_account: profileEditForm.value.bank_account,
             bank_owner: profileEditForm.value.bank_owner
@@ -5108,8 +5536,9 @@ export default {
           currentUser.value.email = profileEditForm.value.email;
         }
 
-        // Reset password field after save
+        // Reset password field after save & exit edit mode
         profileEditForm.value.password = '';
+        isEditingProfile.value = false;
 
         showToast('Profil & rekening pencairan berhasil diperbarui!');
         await fetchAffiliateData();
@@ -5123,8 +5552,11 @@ export default {
     const fetchAffiliateData = async () => {
       isLoadingAffiliate.value = true;
       try {
-        const token = localStorage.getItem('auth_token');
-        if (!token) return;
+        const token = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
+        if (!token) {
+          affiliateData.value.status = 'not_joined';
+          return;
+        }
         const apiUrl = import.meta.env.VITE_API_URL || '/api';
         const res = await fetch(`${apiUrl}/affiliate.php?action=get_data`, {
           headers: {
@@ -5134,20 +5566,45 @@ export default {
         
         if (res.ok) {
           const data = await res.json();
-          // Update state
-          affiliateData.value = data;
-          if (data.profile) {
-            profileEditForm.value.name = data.profile.name || '';
-            profileEditForm.value.email = data.profile.email || '';
+          if (data.status === 'not_joined') {
+            affiliateData.value.status = 'not_joined';
+          } else {
+            affiliateData.value = {
+              status: data.status || 'joined',
+              referral_code: data.referral_code || '',
+              commission_rate: data.commission_rate || 20,
+              stats: {
+                total_referrals: Number(data.stats?.total_referrals || 0),
+                active_referrals: Number(data.stats?.active_referrals || (data.referrals ? data.referrals.filter(r => r.plan).length : 0)),
+                total_paid: Number(data.stats?.total_paid || 0),
+                total_pending: Number(data.stats?.total_pending || 0)
+              },
+              bank_info: data.bank_info || {},
+              referrals: (data.referrals || []).map(r => ({
+                name: r.name || 'Siswa',
+                school: r.school || '-',
+                date: r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : (r.date || '-'),
+                status: r.plan ? 'Aktif' : (r.status || 'Terdaftar')
+              })),
+              history: data.history || []
+            };
+
+            const b = data.bank_info || data.bank;
+            if (b) {
+              if (b.bank_name) profileEditForm.value.bank_name = b.bank_name;
+              if (b.bank_account) profileEditForm.value.bank_account = b.bank_account;
+              if (b.bank_owner) profileEditForm.value.bank_owner = b.bank_owner;
+            }
           }
-          if (data.bank) {
-            profileEditForm.value.bank_name = data.bank.bank_name || '';
-            profileEditForm.value.bank_account = data.bank.bank_account || '';
-            profileEditForm.value.bank_owner = data.bank.bank_owner || '';
+          if (currentUser.value) {
+            if (!profileEditForm.value.name) profileEditForm.value.name = currentUser.value.name || '';
+            if (!profileEditForm.value.email) profileEditForm.value.email = currentUser.value.email || '';
           }
+        } else if (res.status === 403) {
+          affiliateData.value.status = 'staff_mode';
         }
       } catch(err) {
-        console.error(err);
+        console.error("fetchAffiliateData error:", err);
       } finally {
         isLoadingAffiliate.value = false;
       }
@@ -5174,7 +5631,9 @@ export default {
       initScrollReveal();
       initNeuralCanvas();
       
-      
+      if (isLoggedIn.value) {
+        fetchAffiliateData();
+      }
     });
 
     onUnmounted(() => {
@@ -5184,6 +5643,9 @@ export default {
     });
 
     return {
+      showIrtInfo,
+      hideBabSidebar,
+      checkoutTermsAgreed,
       checkoutModalData,
       confirmCheckout,
       closeCheckoutModal,
@@ -5343,7 +5805,17 @@ export default {
       activeAffiliateTab,
       profileEditForm,
       isSavingProfile,
-      saveProfileAndBankSettings
+      saveProfileAndBankSettings,
+      isAdmin,
+      isTeacher,
+      isStaff,
+      showPlanSelectorModal,
+      openPlanSelector,
+      isEditingProfile,
+      startEditingProfile,
+      cancelEditingProfile,
+      displayProducts,
+      publicPlans
     };
   }
 };

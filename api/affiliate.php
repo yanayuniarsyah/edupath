@@ -15,8 +15,13 @@ $tenant_id = $payload->tenant_id;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Get Affiliate profile
-    $stmt = $pdo->prepare("SELECT * FROM affiliates WHERE user_id = ? AND tenant_id = ?");
-    $stmt->execute([$user_id, $tenant_id]);
+    if (!empty($tenant_id)) {
+        $stmt = $pdo->prepare("SELECT * FROM affiliates WHERE user_id = ? AND (tenant_id = ? OR tenant_id IS NULL)");
+        $stmt->execute([$user_id, $tenant_id]);
+    } else {
+        $stmt = $pdo->prepare("SELECT * FROM affiliates WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+    }
     $affiliate = $stmt->fetch();
     
     if (!$affiliate) {
@@ -28,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     // Auto-generate referral code if missing
     if (empty($affiliate['referral_code'])) {
-        $stmt = $pdo->prepare("SELECT name FROM students WHERE id = ? AND tenant_id = ?");
-        $stmt->execute([$user_id, $tenant_id]);
+        $stmt = $pdo->prepare("SELECT name FROM students WHERE id = ?");
+        $stmt->execute([$user_id]);
         $student = $stmt->fetch();
         $name = $student ? $student['name'] : 'USER';
         
@@ -94,8 +99,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $bank_account = $input['bank_account'] ?? '';
         $bank_owner = $input['bank_owner'] ?? '';
         
-        $stmt = $pdo->prepare("UPDATE affiliates SET bank_name = ?, bank_account = ?, bank_owner = ? WHERE user_id = ? AND tenant_id = ?");
-        $stmt->execute([$bank_name, $bank_account, $bank_owner, $user_id, $tenant_id]);
+        if (!empty($tenant_id)) {
+            $stmt = $pdo->prepare("UPDATE affiliates SET bank_name = ?, bank_account = ?, bank_owner = ? WHERE user_id = ? AND (tenant_id = ? OR tenant_id IS NULL)");
+            $stmt->execute([$bank_name, $bank_account, $bank_owner, $user_id, $tenant_id]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE affiliates SET bank_name = ?, bank_account = ?, bank_owner = ? WHERE user_id = ?");
+            $stmt->execute([$bank_name, $bank_account, $bank_owner, $user_id]);
+        }
         
         echo json_encode(["success" => true]);
         exit;
@@ -104,8 +114,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($action === 'request_payout') {
         $amount = (float)($input['amount'] ?? 0);
         
-        $stmt = $pdo->prepare("SELECT id, bank_name, bank_account, bank_owner FROM affiliates WHERE user_id = ? AND tenant_id = ?");
-        $stmt->execute([$user_id, $tenant_id]);
+        if (!empty($tenant_id)) {
+            $stmt = $pdo->prepare("SELECT id, bank_name, bank_account, bank_owner FROM affiliates WHERE user_id = ? AND (tenant_id = ? OR tenant_id IS NULL)");
+            $stmt->execute([$user_id, $tenant_id]);
+        } else {
+            $stmt = $pdo->prepare("SELECT id, bank_name, bank_account, bank_owner FROM affiliates WHERE user_id = ?");
+            $stmt->execute([$user_id]);
+        }
         $aff = $stmt->fetch();
         
         if (!$aff) {
@@ -187,6 +202,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate, bank_name, bank_account, bank_owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$id, $user_id, $tenant_id, $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner]);
         
+        // Update user_roles so role is affiliate (not student)
+        $pdo->prepare("UPDATE user_roles SET role = 'affiliate', reference_id = ? WHERE user_id = ?")->execute([$id, $user_id]);
+        
+        // Remove dummy student record so they do not show in students list
+        $pdo->prepare("DELETE FROM students WHERE id = ? OR id = ? OR email = (SELECT identity_key FROM users WHERE id = ?)")->execute([$user_id, $payload->id, $user_id]);
+
         echo json_encode(["success" => true, "referral_code" => $referral_code]);
     } catch (PDOException $e) {
         http_response_code(500);

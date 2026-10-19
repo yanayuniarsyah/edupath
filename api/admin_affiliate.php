@@ -5,9 +5,9 @@ require_once 'jwt.php';
 
 $payload = authenticate();
 
-if (!in_array($payload->role, ['admin', 'superadmin'])) {
+if (!in_array($payload->role, ['admin', 'superadmin', 'affiliate'])) {
     http_response_code(403);
-    echo json_encode(["error" => "Only admins can access this"]);
+    echo json_encode(["error" => "Forbidden"]);
     exit;
 }
 
@@ -16,20 +16,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     if ($action === 'payouts') {
         try {
-            $stmt = $pdo->query("
-                SELECT p.*, 
-                    COALESCE(a.referral_code, '-') as referral_code,
-                    COALESCE(a.bank_name, '-') as bank_name,
-                    COALESCE(a.bank_account, '-') as bank_account,
-                    COALESCE(a.bank_owner, '-') as bank_owner,
-                    COALESCE(s.name, u.identity_key, 'Mitra Afiliasi') as affiliate_name 
-                FROM payouts p 
-                LEFT JOIN affiliates a ON p.affiliate_id = a.id
-                LEFT JOIN users u ON a.user_id = u.id
-                LEFT JOIN user_roles ur ON (u.id = ur.user_id AND ur.role = 'student')
-                LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
-                ORDER BY p.created_at DESC
-            ");
+            if ($payload->role === 'affiliate') {
+                $stmt = $pdo->prepare("
+                    SELECT p.*, 
+                        COALESCE(a.referral_code, '-') as referral_code,
+                        COALESCE(a.bank_name, '-') as bank_name,
+                        COALESCE(a.bank_account, '-') as bank_account,
+                        COALESCE(a.bank_owner, '-') as bank_owner,
+                        COALESCE(s.name, u.identity_key, 'Mitra Afiliasi') as affiliate_name 
+                    FROM payouts p 
+                    LEFT JOIN affiliates a ON p.affiliate_id = a.id
+                    LEFT JOIN users u ON a.user_id = u.id
+                    LEFT JOIN user_roles ur ON (u.id = ur.user_id AND ur.role = 'student')
+                    LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
+                    WHERE a.user_id = ? OR a.id = ?
+                    ORDER BY p.created_at DESC
+                ");
+                $stmt->execute([$payload->user_id, $payload->id]);
+            } else {
+                $stmt = $pdo->query("
+                    SELECT p.*, 
+                        COALESCE(a.referral_code, '-') as referral_code,
+                        COALESCE(a.bank_name, '-') as bank_name,
+                        COALESCE(a.bank_account, '-') as bank_account,
+                        COALESCE(a.bank_owner, '-') as bank_owner,
+                        COALESCE(s.name, u.identity_key, 'Mitra Afiliasi') as affiliate_name 
+                    FROM payouts p 
+                    LEFT JOIN affiliates a ON p.affiliate_id = a.id
+                    LEFT JOIN users u ON a.user_id = u.id
+                    LEFT JOIN user_roles ur ON (u.id = ur.user_id AND ur.role = 'student')
+                    LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
+                    ORDER BY p.created_at DESC
+                ");
+            }
             $payouts = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($payouts);
         } catch (PDOException $e) {
@@ -37,22 +56,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     } elseif ($action === 'commissions') {
         try {
-            $stmt = $pdo->query("
-                SELECT 
-                    c.id, c.affiliate_id, c.tenant_id, c.order_id, c.amount, c.commission_rate_snapshot, c.status, c.created_at,
-                    COALESCE(o.plan_name, 'Paket Belajar') as plan_name,
-                    COALESCE(s_order.name, 'Siswa') as student_name,
-                    COALESCE(a.referral_code, '-') as referral_code,
-                    COALESCE(s_aff.name, u_aff.identity_key, 'Mitra') as affiliate_name
-                FROM commissions c
-                LEFT JOIN orders o ON (c.order_id = o.id OR c.order_id = o.order_id)
-                LEFT JOIN students s_order ON o.student_id = s_order.id
-                LEFT JOIN affiliates a ON c.affiliate_id = a.id
-                LEFT JOIN users u_aff ON a.user_id = u_aff.id
-                LEFT JOIN user_roles ur_aff ON (u_aff.id = ur_aff.user_id AND ur_aff.role = 'student')
-                LEFT JOIN students s_aff ON (ur_aff.reference_id = s_aff.id OR u_aff.identity_key = s_aff.email)
-                ORDER BY c.created_at DESC
-            ");
+            if ($payload->role === 'affiliate') {
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        c.id, c.affiliate_id, c.tenant_id, c.order_id, c.amount, c.commission_rate_snapshot, c.status, c.created_at,
+                        COALESCE(o.plan_name, 'Paket Belajar') as plan_name,
+                        COALESCE(s_order.name, 'Siswa') as student_name,
+                        COALESCE(a.referral_code, '-') as referral_code,
+                        COALESCE(s_aff.name, u_aff.identity_key, 'Mitra') as affiliate_name
+                    FROM commissions c
+                    LEFT JOIN orders o ON (c.order_id = o.id OR c.order_id = o.order_id)
+                    LEFT JOIN students s_order ON o.student_id = s_order.id
+                    LEFT JOIN affiliates a ON c.affiliate_id = a.id
+                    LEFT JOIN users u_aff ON a.user_id = u_aff.id
+                    LEFT JOIN user_roles ur_aff ON (u_aff.id = ur_aff.user_id AND ur_aff.role = 'student')
+                    LEFT JOIN students s_aff ON (ur_aff.reference_id = s_aff.id OR u_aff.identity_key = s_aff.email)
+                    WHERE a.user_id = ? OR a.id = ?
+                    ORDER BY c.created_at DESC
+                ");
+                $stmt->execute([$payload->user_id, $payload->id]);
+            } else {
+                $stmt = $pdo->query("
+                    SELECT 
+                        c.id, c.affiliate_id, c.tenant_id, c.order_id, c.amount, c.commission_rate_snapshot, c.status, c.created_at,
+                        COALESCE(o.plan_name, 'Paket Belajar') as plan_name,
+                        COALESCE(s_order.name, 'Siswa') as student_name,
+                        COALESCE(a.referral_code, '-') as referral_code,
+                        COALESCE(s_aff.name, u_aff.identity_key, 'Mitra') as affiliate_name
+                    FROM commissions c
+                    LEFT JOIN orders o ON (c.order_id = o.id OR c.order_id = o.order_id)
+                    LEFT JOIN students s_order ON o.student_id = s_order.id
+                    LEFT JOIN affiliates a ON c.affiliate_id = a.id
+                    LEFT JOIN users u_aff ON a.user_id = u_aff.id
+                    LEFT JOIN user_roles ur_aff ON (u_aff.id = ur_aff.user_id AND ur_aff.role = 'student')
+                    LEFT JOIN students s_aff ON (ur_aff.reference_id = s_aff.id OR u_aff.identity_key = s_aff.email)
+                    ORDER BY c.created_at DESC
+                ");
+            }
             $commissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($commissions);
         } catch (PDOException $e) {
@@ -61,24 +101,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     } else {
         // list affiliates
         try {
-            $stmt = $pdo->query("
-                SELECT 
-                    a.id, a.user_id, a.tenant_id, a.referral_code, a.commission_rate,
-                    COALESCE(a.bank_name, '') as bank_name,
-                    COALESCE(a.bank_account, '') as bank_account,
-                    COALESCE(a.bank_owner, '') as bank_owner,
-                    a.created_at,
-                    COALESCE(u.identity_key, s.email, 'Mitra') as identity_key,
-                    COALESCE(s.name, a.bank_owner, u.identity_key, 'Mitra Afiliasi') as affiliate_name,
-                    COALESCE(s.email, u.identity_key, '-') as email,
-                    (SELECT COUNT(*) FROM students WHERE referred_by = a.id) as total_referrals,
-                    (SELECT COALESCE(SUM(amount), 0) FROM commissions WHERE affiliate_id = a.id AND status = 'pending') as pending_commission
-                FROM affiliates a
-                LEFT JOIN users u ON a.user_id = u.id
-                LEFT JOIN user_roles ur ON (u.id = ur.user_id AND ur.role = 'student')
-                LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
-                ORDER BY a.created_at DESC
-            ");
+            if ($payload->role === 'affiliate') {
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        a.id, a.user_id, a.tenant_id, a.referral_code, a.commission_rate,
+                        COALESCE(a.bank_name, '') as bank_name,
+                        COALESCE(a.bank_account, '') as bank_account,
+                        COALESCE(a.bank_owner, '') as bank_owner,
+                        a.created_at,
+                        COALESCE(u.identity_key, s.email, 'Mitra') as identity_key,
+                        COALESCE(s.name, a.bank_owner, u.identity_key, 'Mitra Afiliasi') as affiliate_name,
+                        COALESCE(s.email, u.identity_key, '-') as email,
+                        (SELECT COUNT(*) FROM students WHERE referred_by = a.id) as total_referrals,
+                        (SELECT COALESCE(SUM(amount), 0) FROM commissions WHERE affiliate_id = a.id AND status = 'pending') as pending_commission
+                    FROM affiliates a
+                    LEFT JOIN users u ON a.user_id = u.id
+                    LEFT JOIN user_roles ur ON (u.id = ur.user_id AND ur.role = 'student')
+                    LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
+                    WHERE a.user_id = ? OR a.id = ?
+                    ORDER BY a.created_at DESC
+                ");
+                $stmt->execute([$payload->user_id, $payload->id]);
+            } else {
+                $stmt = $pdo->query("
+                    SELECT 
+                        a.id, a.user_id, a.tenant_id, a.referral_code, a.commission_rate,
+                        COALESCE(a.bank_name, '') as bank_name,
+                        COALESCE(a.bank_account, '') as bank_account,
+                        COALESCE(a.bank_owner, '') as bank_owner,
+                        a.created_at,
+                        COALESCE(u.identity_key, s.email, 'Mitra') as identity_key,
+                        COALESCE(s.name, a.bank_owner, u.identity_key, 'Mitra Afiliasi') as affiliate_name,
+                        COALESCE(s.email, u.identity_key, '-') as email,
+                        (SELECT COUNT(*) FROM students WHERE referred_by = a.id) as total_referrals,
+                        (SELECT COALESCE(SUM(amount), 0) FROM commissions WHERE affiliate_id = a.id AND status = 'pending') as pending_commission
+                    FROM affiliates a
+                    LEFT JOIN users u ON a.user_id = u.id
+                    LEFT JOIN user_roles ur ON (u.id = ur.user_id AND ur.role = 'student')
+                    LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
+                    ORDER BY a.created_at DESC
+                ");
+            }
             $affiliates = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($affiliates);
         } catch (PDOException $e) {
@@ -90,6 +153,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $input = json_decode(file_get_contents('php://input'), true);
     if (!is_array($input)) $input = [];
     $action = $input['action'] ?? '';
+    
+    if ($payload->role === 'affiliate' && !in_array($action, ['request_payout', 'update_bank'])) {
+        http_response_code(403);
+        echo json_encode(["error" => "Mitra afiliasi tidak memiliki izin untuk tindakan ini"]);
+        exit;
+    }
     
     if ($action === 'approve_payout') {
         $payout_id = $input['payout_id'] ?? '';
@@ -195,7 +264,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $aff_id = substr($aff_id,0,8).'-'.substr($aff_id,8,4).'-'.substr($aff_id,12,4).'-'.substr($aff_id,16,4).'-'.substr($aff_id,20,12);
 
             $stmtAff = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate, bank_name, bank_account, bank_owner, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-            $stmtAff->execute([$aff_id, $user_id, $payload->tenant_id ?: null, $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner]);
+            $stmtAff->execute([$aff_id, $user_id, $payload->tenant_id ?: 'default_tenant', $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner]);
+
+            $ur_id = 'ur-' . substr(bin2hex(random_bytes(8)), 0, 10);
+            $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'affiliate', ?) ON DUPLICATE KEY UPDATE role = 'affiliate', reference_id = VALUES(reference_id)")
+                ->execute([$ur_id, $user_id, $payload->tenant_id ?: 'default_tenant', $aff_id]);
 
             $pdo->commit();
             echo json_encode(["success" => true, "id" => $aff_id]);

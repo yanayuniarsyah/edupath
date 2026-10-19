@@ -78,8 +78,13 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$user_id, $email, $hashed_password]);
         }
 
-        $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $tenant_id, $referred_by]);
+        try {
+            $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $tenant_id, $referred_by]);
+        } catch (PDOException $e) {
+            $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $tenant_id]);
+        }
 
         $ur_id = bin2hex(random_bytes(16));
         $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($ur_id,20,12);
@@ -149,33 +154,49 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $stmt = $pdo->prepare("
-        SELECT u.id as user_id, u.password, ur.role, ur.tenant_id, ur.reference_id, COALESCE(s.id, a.id, ur.reference_id) as student_id, COALESCE(s.name, a.name, 'Admin') as name, COALESCE(s.email, a.username, u.identity_key) as email, COALESCE(s.target_ptn, 'UI') as target_ptn, COALESCE(t.is_active, 1) as tenant_active
+        SELECT u.id as user_id, u.password as user_password, s.password as student_password, ur.role, ur.tenant_id, ur.reference_id, 
+               COALESCE(s.id, a.id, ur.reference_id) as student_id, 
+               COALESCE(s.name, a.name, 'Admin') as name, 
+               COALESCE(s.email, a.username, u.identity_key) as email, 
+               COALESCE(s.target_ptn, 'UI') as target_ptn, 
+               COALESCE(s.plan, 'free') as plan,
+               COALESCE(t.is_active, 1) as tenant_active
         FROM users u 
         JOIN user_roles ur ON u.id = ur.user_id 
-        LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
+        LEFT JOIN students s ON (ur.reference_id = s.id OR LOWER(u.identity_key) = LOWER(s.email))
         LEFT JOIN admins a ON (ur.reference_id = a.id OR u.identity_key = a.username)
         LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE u.identity_key = ? AND u.is_active = 1
+        WHERE (LOWER(u.identity_key) = LOWER(?) OR (s.email IS NOT NULL AND LOWER(s.email) = LOWER(?))) 
+          AND u.is_active = 1
     ");
-    $stmt->execute([$email]);
+    $stmt->execute([$email, $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $password_matched = false;
     if ($user) {
-        $stored_hash = $user['password'] ?? '';
-        if (password_verify($password, $stored_hash) || $stored_hash === $password || $stored_hash === md5($password)) {
-            $password_matched = true;
-            // Auto-upgrade to bcrypt if plain text or md5 or needs rehash
-            if ($stored_hash === $password || $stored_hash === md5($password) || password_needs_rehash($stored_hash, PASSWORD_BCRYPT)) {
+        $candidates = array_filter([$user['user_password'] ?? '', $user['student_password'] ?? '']);
+        foreach ($candidates as $stored_hash) {
+            if (password_verify($password, $stored_hash) || $stored_hash === $password || $stored_hash === md5($password)) {
+                $password_matched = true;
+                // Auto-upgrade / sync hash into both tables
                 $new_hash = password_hash($password, PASSWORD_BCRYPT);
                 try {
                     $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$new_hash, $user['user_id']]);
-                } catch (\Exception $e) {}
+                    if (!empty($user['student_id'])) {
+                        $pdo->prepare("UPDATE students SET password = ? WHERE id = ?")->execute([$new_hash, $user['student_id']]);
+                    }
+                } catch (\Throwable $e) {}
+                break;
             }
         }
     }
 
     if ($user && $password_matched) {
+        if ($user['role'] !== 'student') {
+            http_response_code(403);
+            echo json_encode(["error" => "Akun Staf/Guru/Tutor/Admin tidak diizinkan masuk melalui portal siswa. Silakan masuk melalui halaman login staf di /#/admin."]);
+            exit;
+        }
         if ((int)$user['tenant_active'] === 0) {
             http_response_code(403);
             echo json_encode(["error" => "Tenant anda telah dinonaktifkan."]);
@@ -209,7 +230,21 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $csrf_token = generate_csrf_token();
         set_auth_cookies($token, $csrf_token);
 
-        unset($user['password']);
+        unset($user['user_password'], $user['student_password'], $user['password']);
+        $plan = strtolower($user['plan'] ?? 'free');
+        $is_paid_plan = ($plan !== 'free' && !empty($plan));
+        $user['is_premium'] = $is_paid_plan;
+        $plan_labels = [
+            'mandiri' => 'Paket Mandiri',
+            'starter' => 'Paket Mandiri',
+            'utama'   => 'Paket Pejuang PTN (Utama)',
+            'pejuang' => 'Paket Pejuang PTN (Utama)',
+            'vip'     => 'Paket Elite Mentoring (VIP)',
+            'elite'   => 'Paket Elite Mentoring (VIP)',
+            'free'    => 'Paket Free / Trial'
+        ];
+        $user['plan_name'] = $plan_labels[$plan] ?? ucfirst($plan);
+
         echo json_encode([
             "token"         => $token,          // Backward compat: Bearer untuk mobile
             "refresh_token" => $refresh_token,
@@ -371,8 +406,14 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Cek email dipakai akun lain
-    $stmt = $pdo->prepare("SELECT id FROM students WHERE email = ? AND id != ?");
-    $stmt->execute([$email, $payload->id]);
+    $isStaffRole = in_array($payload->role, ['admin', 'superadmin', 'teacher', 'guru', 'tutor']);
+    if ($isStaffRole) {
+        $stmt = $pdo->prepare("SELECT id FROM admins WHERE username = ? AND id != ?");
+        $stmt->execute([$email, $payload->id]);
+    } else {
+        $stmt = $pdo->prepare("SELECT id FROM students WHERE email = ? AND id != ?");
+        $stmt->execute([$email, $payload->id]);
+    }
     if ($stmt->fetch()) {
         http_response_code(409);
         echo json_encode(["error" => "Email sudah digunakan oleh akun lain"]);
@@ -386,14 +427,24 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ? WHERE id = ?");
-        $stmt->execute([$name, $email, $hashed_password, $payload->id]);
+        if ($isStaffRole) {
+            $stmt = $pdo->prepare("UPDATE admins SET name = ?, username = ?, password = ? WHERE id = ?");
+            $stmt->execute([$name, $email, $hashed_password, $payload->id]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ? WHERE id = ?");
+            $stmt->execute([$name, $email, $hashed_password, $payload->id]);
+        }
 
         $stmt = $pdo->prepare("UPDATE users SET identity_key = ?, password = ? WHERE id = ?");
         $stmt->execute([$email, $hashed_password, $payload->user_id]);
     } else {
-        $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ? WHERE id = ?");
-        $stmt->execute([$name, $email, $payload->id]);
+        if ($isStaffRole) {
+            $stmt = $pdo->prepare("UPDATE admins SET name = ?, username = ? WHERE id = ?");
+            $stmt->execute([$name, $email, $payload->id]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ? WHERE id = ?");
+            $stmt->execute([$name, $email, $payload->id]);
+        }
 
         $stmt = $pdo->prepare("UPDATE users SET identity_key = ? WHERE id = ?");
         $stmt->execute([$email, $payload->user_id]);
@@ -405,8 +456,8 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $payload = authenticate();
 
-    // Admin / Superadmin: ambil data dari tabel admins
-    if ($payload->role === 'admin' || $payload->role === 'superadmin') {
+    // Staff (Admin, Superadmin, Teacher, Guru, Tutor)
+    if (in_array($payload->role, ['admin', 'superadmin', 'teacher', 'guru', 'tutor'])) {
         $stmt = $pdo->prepare("SELECT id, username, name FROM admins WHERE id = ?");
         $stmt->execute([$payload->id]);
         $admin = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -414,7 +465,7 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         if ($admin) {
             $user = [
                 'id'         => $admin['id'],
-                'name'       => $admin['name'] ?? $admin['username'] ?? 'Admin',
+                'name'       => $admin['name'] ?? $admin['username'] ?? 'Staff',
                 'email'      => $admin['username'] ?? '',
                 'role'       => $payload->role,
                 'is_premium' => true,
@@ -423,8 +474,20 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             header('Cache-Control: private, max-age=30');
             echo json_encode(["user" => $user]);
         } else {
-            http_response_code(404);
-            echo json_encode(["error" => "Admin tidak ditemukan"]);
+            // Fallback jika belum di admins table, ambil dari users
+            $stmtU = $pdo->prepare("SELECT id, identity_key FROM users WHERE id = ?");
+            $stmtU->execute([$payload->user_id]);
+            $u = $stmtU->fetch(PDO::FETCH_ASSOC);
+            $user = [
+                'id'         => $payload->id,
+                'name'       => $payload->role === 'teacher' ? 'Guru / Tutor' : 'Administrator',
+                'email'      => $u['identity_key'] ?? '',
+                'role'       => $payload->role,
+                'is_premium' => true,
+                'tenant_id'  => $payload->tenant_id,
+            ];
+            header('Cache-Control: private, max-age=30');
+            echo json_encode(["user" => $user]);
         }
         exit;
     }
@@ -448,9 +511,21 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if ($user) {
         unset($user['password']);
-        $user['is_premium']  = (bool)$user['is_premium'];
+        $plan = strtolower($user['plan'] ?? 'free');
+        $is_paid_plan = ($plan !== 'free' && !empty($plan));
+        $user['is_premium']  = $is_paid_plan || (bool)$user['is_premium'];
         $user['role']        = 'student';
         $user['tenant_id']   = $payload->tenant_id;
+        $plan_labels = [
+            'mandiri' => 'Paket Mandiri',
+            'starter' => 'Paket Mandiri',
+            'utama'   => 'Paket Pejuang PTN (Utama)',
+            'pejuang' => 'Paket Pejuang PTN (Utama)',
+            'vip'     => 'Paket Elite Mentoring (VIP)',
+            'elite'   => 'Paket Elite Mentoring (VIP)',
+            'free'    => 'Paket Free / Trial'
+        ];
+        $user['plan_name'] = $plan_labels[$plan] ?? ucfirst($plan);
 
         // Header cache hint untuk CDN / reverse proxy (jika ada)
         // Browser tidak meng-cache karena credentials: include

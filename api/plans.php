@@ -17,7 +17,12 @@ try {
         SELECT id, code, name, description 
         FROM products 
         WHERE status = 'active'
-        ORDER BY name ASC
+        ORDER BY CASE 
+            WHEN code = 'MANDIRI' OR code = 'STARTER' THEN 1
+            WHEN code = 'UTBK' OR code = 'UTAMA' THEN 2
+            WHEN code = 'VIP' OR code = 'ELITE' THEN 3
+            ELSE 4 
+        END ASC
     ");
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
