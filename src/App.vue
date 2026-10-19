@@ -437,35 +437,35 @@
               </p>
             </div>
 
-            <!-- 3 Staggered Cards — seperti SAMPLE.HTML -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative items-end">
-              <!-- Card 1 — rotate -3deg -->
-              <div class="reveal reveal-delay-1">
-                <div class="bouncy-card group rounded-3xl p-8 pt-16 relative origin-bottom -rotate-3 hover:rotate-0 hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full">
+            <!-- 3 Cards — Ukuran panjang dan lebar sama persis -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative items-stretch">
+              <!-- Card 1 -->
+              <div class="reveal reveal-delay-1 h-full">
+                <div class="bouncy-card group rounded-3xl p-8 pt-16 relative hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full flex flex-col justify-between">
                   <div class="absolute -top-8 left-8 w-20 h-20 rounded-3xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-3xl shadow-[0_0_30px_rgba(192,255,0,0.4)]">01</div>
-                  <div class="space-y-3">
+                  <div class="space-y-3 flex-grow">
                     <h3 class="text-2xl md:text-3xl font-black text-white">Blind Spot Belajar</h3>
                     <p class="text-white/50 font-medium leading-relaxed">Belajar acak tanpa tahu materi mana yang paling nahan kenaikan skormu. Gak terarah, gak efisien.</p>
                   </div>
                 </div>
               </div>
 
-              <!-- Card 2 — center, taller -->
-              <div class="reveal reveal-delay-2 md:-translate-y-8">
-                <div class="bouncy-card group rounded-3xl p-8 pt-16 relative origin-bottom hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full">
+              <!-- Card 2 -->
+              <div class="reveal reveal-delay-2 h-full">
+                <div class="bouncy-card group rounded-3xl p-8 pt-16 relative hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full flex flex-col justify-between">
                   <div class="absolute -top-8 left-8 w-20 h-20 rounded-3xl bg-white flex items-center justify-center font-black text-black text-3xl">02</div>
-                  <div class="space-y-3">
+                  <div class="space-y-3 flex-grow">
                     <h3 class="text-2xl md:text-3xl font-black text-white">Hafalan Buta Rumus</h3>
                     <p class="text-white/50 font-medium leading-relaxed">Hafal rumus mati tanpa ngerti logikanya. Pas ketemu soal HOTS variasi baru — blank total.</p>
                   </div>
                 </div>
               </div>
 
-              <!-- Card 3 — rotate +3deg -->
-              <div class="reveal reveal-delay-3">
-                <div class="bouncy-card group rounded-3xl p-8 pt-16 relative origin-bottom rotate-3 hover:rotate-0 hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full">
+              <!-- Card 3 -->
+              <div class="reveal reveal-delay-3 h-full">
+                <div class="bouncy-card group rounded-3xl p-8 pt-16 relative hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full flex flex-col justify-between">
                   <div class="absolute -top-8 left-8 w-20 h-20 rounded-3xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-3xl shadow-[0_0_30px_rgba(192,255,0,0.4)]">03</div>
-                  <div class="space-y-3">
+                  <div class="space-y-3 flex-grow">
                     <h3 class="text-2xl md:text-3xl font-black text-white">Skor Tryout Mandek</h3>
                     <p class="text-white/50 font-medium leading-relaxed">Latihan terlalu mudah atau susah tanpa kalibrasi IRT. Skor stuck di angka yang sama berbulan-bulan.</p>
                   </div>

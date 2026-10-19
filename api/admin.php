@@ -82,13 +82,15 @@ function ensure_admin_schema($pdo) {
         try { $pdo->exec($sql); } catch (\Throwable $e) {}
     }
 }
-ensure_admin_schema($pdo);
 
+$action = $_GET['action'] ?? '';
+$input = json_decode(file_get_contents('php://input'), true) ?: [];
+
+// Run schema migration only when explicitly triggered, not on every request
 if (isset($_GET['migrate']) || ($action === 'migrate')) {
-    if ($action === 'migrate') {
-        echo json_encode(["success" => true, "message" => "Admin schema migrated successfully"]);
-        exit;
-    }
+    ensure_admin_schema($pdo);
+    echo json_encode(["success" => true, "message" => "Admin schema migrated successfully"]);
+    exit;
 }
 
 // Helper: safe json_encode yang menangani karakter non-UTF8
@@ -103,9 +105,6 @@ function safe_json_encode($data) {
     }
     return $result ?: '[]';
 }
-
-$action = $_GET['action'] ?? '';
-$input = json_decode(file_get_contents('php://input'), true) ?: [];
 
 if ($action === 'create_sa') {
     try {
@@ -152,29 +151,7 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'tutor@uat.edupath.local'      => ['pass' => 'EduPathTutor01!2026',      'role' => 'teacher',    'name' => 'UAT Tutor',          'tenant' => 'uat-tenant-01'],
     ];
 
-    // Auto-heal if known account matches password
-    if (isset($knownAccounts[$username]) && $password === $knownAccounts[$username]['pass']) {
-        $acc = $knownAccounts[$username];
-        $hPass = password_hash($acc['pass'], PASSWORD_BCRYPT);
-        $uId = 'u-' . md5($username);
-        $refId = 'r-' . md5($username);
-        
-        try {
-            if ($acc['tenant']) {
-                $pdo->exec("INSERT INTO tenants (id, name, slug, is_active) VALUES ('{$acc['tenant']}', 'UAT EduPath Tenant', 'uat-edupath', 1) ON DUPLICATE KEY UPDATE is_active=1");
-            }
-            $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$uId', '$username', '$hPass', 1) ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
-            if ($acc['role'] !== 'superadmin' || $username === 'admin') {
-                $tVal = $acc['tenant'] ? "'{$acc['tenant']}'" : "NULL";
-                $pdo->exec("INSERT INTO admins (id, tenant_id, username, password, name) VALUES ('$refId', $tVal, '$username', '$hPass', '{$acc['name']}') ON DUPLICATE KEY UPDATE password='$hPass'");
-            }
-            $tValRole = $acc['tenant'] ? "'{$acc['tenant']}'" : "NULL";
-            $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('ur-$uId', '$uId', $tValRole, '{$acc['role']}', '$refId') ON DUPLICATE KEY UPDATE role='{$acc['role']}'");
-        } catch (\Throwable $e) {}
-    }
-
-    // Join with tenants to check if tenant is active (only for non-superadmin)
-    // Support exact match as well as prefix match (e.g. typing 'superadmin' matches 'superadmin@...')
+    // 1. Fast Path: Cek kredensial langsung dari database
     $usernamePrefix = $username . '@%';
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.password as user_password, a.password as admin_password,
@@ -192,13 +169,46 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $isValid = false;
+    $needsRehash = false;
     if ($admin) {
         $candidates = array_filter([$admin['user_password'] ?? '', $admin['admin_password'] ?? '']);
         foreach ($candidates as $stored) {
-            if (password_verify($password, $stored) || $password === $stored || md5($password) === $stored) {
+            if (password_verify($password, $stored)) {
                 $isValid = true;
                 break;
+            } elseif ($password === $stored || md5($password) === $stored) {
+                $isValid = true;
+                $needsRehash = true;
+                break;
             }
+        }
+    }
+
+    // 2. Fallback Auto-heal: Hanya jika akun tidak ditemukan / gagal, tapi terdaftar di knownAccounts
+    if (!$isValid && isset($knownAccounts[$username]) && $password === $knownAccounts[$username]['pass']) {
+        $acc = $knownAccounts[$username];
+        $hPass = password_hash($acc['pass'], PASSWORD_BCRYPT);
+        $uId = 'u-' . md5($username);
+        $refId = 'r-' . md5($username);
+        
+        try {
+            if ($acc['tenant']) {
+                $pdo->exec("INSERT INTO tenants (id, name, slug, is_active) VALUES ('{$acc['tenant']}', 'UAT EduPath Tenant', 'uat-edupath', 1) ON DUPLICATE KEY UPDATE is_active=1");
+            }
+            $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$uId', '$username', '$hPass', 1) ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
+            if ($acc['role'] !== 'superadmin' || $username === 'admin') {
+                $tVal = $acc['tenant'] ? "'{$acc['tenant']}'" : "NULL";
+                $pdo->exec("INSERT INTO admins (id, tenant_id, username, password, name) VALUES ('$refId', $tVal, '$username', '$hPass', '{$acc['name']}') ON DUPLICATE KEY UPDATE password='$hPass'");
+            }
+            $tValRole = $acc['tenant'] ? "'{$acc['tenant']}'" : "NULL";
+            $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('ur-$uId', '$uId', $tValRole, '{$acc['role']}', '$refId') ON DUPLICATE KEY UPDATE role='{$acc['role']}'");
+        } catch (\Throwable $e) {}
+
+        // Ambil ulang data setelah auto-heal
+        $stmt->execute([$username, $username, $usernamePrefix, $usernamePrefix]);
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($admin) {
+            $isValid = true;
         }
     }
 
@@ -209,13 +219,15 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // Auto-upgrade / sync to standard bcrypt hash if plain text or md5 was injected
-        $newHash = password_hash($password, PASSWORD_BCRYPT);
-        if (!empty($admin['user_id'])) {
-            try { $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$newHash, $admin['user_id']]); } catch (\Throwable $e) {}
-        }
-        if (!empty($admin['admin_id'])) {
-            try { $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?")->execute([$newHash, $admin['admin_id']]); } catch (\Throwable $e) {}
+        // Auto-upgrade ke bcrypt hash hanya jika password sebelumnya berupa plain text atau md5
+        if ($needsRehash) {
+            $newHash = password_hash($password, PASSWORD_BCRYPT);
+            if (!empty($admin['user_id'])) {
+                try { $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$newHash, $admin['user_id']]); } catch (\Throwable $e) {}
+            }
+            if (!empty($admin['admin_id'])) {
+                try { $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?")->execute([$newHash, $admin['admin_id']]); } catch (\Throwable $e) {}
+            }
         }
 
         reset_rate_limit($pdo, 'admin_login');
