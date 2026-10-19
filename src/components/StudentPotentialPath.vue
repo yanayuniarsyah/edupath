@@ -143,10 +143,12 @@
 
           <form @submit.prevent="proceedToQuestions" class="space-y-4 text-left">
             <div>
-              <label class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+              <label for="spp_student_name" class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
                 Nama Lengkap / Panggilan <span class="text-[#c0ff00]">*</span>
               </label>
               <input
+                id="spp_student_name"
+                name="student_name"
                 v-model="studentData.name"
                 type="text"
                 required
@@ -156,10 +158,12 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+              <label for="spp_student_school" class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
                 Asal Sekolah / Madrasah <span class="text-[#c0ff00]">*</span>
               </label>
               <input
+                id="spp_student_school"
+                name="student_school"
                 v-model="studentData.school"
                 type="text"
                 required
@@ -170,10 +174,12 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+                <label for="spp_target_univ" class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
                   Target Kampus PTN <span class="text-[#c0ff00]">*</span>
                 </label>
                 <input
+                  id="spp_target_univ"
+                  name="target_univ"
                   v-model="studentData.targetUniv"
                   type="text"
                   required
@@ -183,10 +189,12 @@
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+                <label for="spp_target_major" class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
                   Jurusan Impian <span class="text-[#c0ff00]">*</span>
                 </label>
                 <input
+                  id="spp_target_major"
+                  name="target_major"
                   v-model="studentData.targetMajor"
                   type="text"
                   required
@@ -197,10 +205,12 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+              <label for="spp_student_whatsapp" class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
                 Nomor Telegram <span class="text-white/40 font-normal">(Opsional — untuk kirim backup hasil &amp; laporan orang tua)</span>
               </label>
               <input
+                id="spp_student_whatsapp"
+                name="student_whatsapp"
                 v-model="studentData.whatsapp"
                 type="tel"
                 placeholder="0812xxxxxxx"
@@ -216,8 +226,8 @@
                   <strong>Jaminan Privasi &amp; UU PDP:</strong> Data peserta diproses secara aman untuk kebutuhan pemetaan potensi edukatif dan tidak pernah diperjualbelikan kepada pihak ketiga.
                 </span>
               </div>
-              <label class="flex items-start gap-2.5 text-xs text-white/80 cursor-pointer pt-1 border-t border-white/10">
-                <input type="checkbox" required class="rounded border-white/20 bg-white/10 text-[#c0ff00] focus:ring-[#c0ff00] w-4 h-4 mt-0.5 cursor-pointer shrink-0">
+              <label for="spp_consent_cb" class="flex items-start gap-2.5 text-xs text-white/80 cursor-pointer pt-1 border-t border-white/10">
+                <input id="spp_consent_cb" name="consent" type="checkbox" required class="rounded border-white/20 bg-white/10 text-[#c0ff00] focus:ring-[#c0ff00] w-4 h-4 mt-0.5 cursor-pointer shrink-0">
                 <span>Saya telah memperoleh izin orang tua/wali untuk mengisi data dan menyetujui pemrosesan data edukatif EduPath.</span>
               </label>
             </div>
@@ -618,10 +628,12 @@
           <!-- Form Input Sekolah -->
           <div class="lg:col-span-7 space-y-4 text-left">
             <div>
-              <label class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+              <label for="partner_school_name" class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
                 Nama Resmi Sekolah / Lembaga
               </label>
               <input
+                id="partner_school_name"
+                name="partner_school_name"
                 v-model="partnerSchoolName"
                 type="text"
                 placeholder="Contoh: SMAN 1 Yogyakarta"
@@ -631,10 +643,12 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+                <label for="partner_bk_name" class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
                   Koordinator / Guru BK
                 </label>
                 <input
+                  id="partner_bk_name"
+                  name="partner_bk_name"
                   v-model="partnerBkName"
                   type="text"
                   placeholder="Contoh: Ibu Rina, M.Pd"
@@ -642,10 +656,12 @@
                 />
               </div>
               <div>
-                <label class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+                <label for="partner_student_count" class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
                   Estimasi Jumlah Siswa
                 </label>
                 <select
+                  id="partner_student_count"
+                  name="partner_student_count"
                   v-model="partnerStudentCount"
                   class="w-full px-4 py-3 rounded-xl bg-[#090d16] border border-white/20 text-white text-sm focus:border-indigo-400 focus:outline-none cursor-pointer"
                 >
@@ -658,9 +674,12 @@
 
             <!-- Result Link & Copy -->
             <div class="p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-2">
-              <div class="text-[11px] font-mono text-white/50">Tautan Langsung Siswa:</div>
+              <label for="partner_school_link" class="text-[11px] font-mono text-white/50 block">Tautan Langsung Siswa:</label>
               <div class="flex items-center gap-2">
                 <input
+                  id="partner_school_link"
+                  name="partner_school_link"
+                  aria-label="Tautan Langsung Siswa"
                   :value="generatedSchoolLink"
                   readonly
                   class="bg-transparent text-xs text-[#c0ff00] font-mono flex-grow outline-none truncate"

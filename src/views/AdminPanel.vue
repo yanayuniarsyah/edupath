@@ -31,10 +31,12 @@
 
         <form @submit.prevent="doLogin" class="space-y-4">
           <div>
-            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Email atau Username</label>
+            <label for="admin_login_username" class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Email atau Username</label>
             <div class="relative">
               <i class="ph-bold ph-user absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
               <input
+                id="admin_login_username"
+                name="username"
                 v-model="loginForm.username"
                 type="text"
                 placeholder="superadmin@uat.edupath.local / username"
@@ -46,10 +48,12 @@
             </div>
           </div>
           <div class="mt-4">
-            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Password</label>
+            <label for="admin_login_password" class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Password</label>
             <div class="relative">
               <i class="ph-bold ph-lock absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
               <input
+                id="admin_login_password"
+                name="password"
                 v-model="loginForm.password"
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="••••••••"
@@ -421,9 +425,9 @@
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-2.5 border border-white/10 flex flex-wrap items-center gap-2">
             <div class="relative flex-grow min-w-[180px]">
               <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
-              <input v-model="studentSearch" type="text" placeholder="Cari nama atau email siswa..." class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors" />
+              <input id="student_search_input" name="student_search" aria-label="Cari nama atau email siswa" v-model="studentSearch" type="text" placeholder="Cari nama atau email siswa..." class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors" />
             </div>
-            <select v-model="studentPlanFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+            <select id="student_plan_filter" name="student_plan_filter" aria-label="Filter Paket Belajar" v-model="studentPlanFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
               <option value="all" class="bg-[#0d1427]">Semua Paket</option>
               <option value="free" class="bg-[#0d1427]">Free</option>
               <option value="mandiri" class="bg-[#0d1427]">Mandiri</option>
@@ -528,9 +532,9 @@
                 </button>
               </div>
 
-              <input v-model="qSearch" type="text" placeholder="Cari soal / materi / topik..." class="flex-grow min-w-[180px] px-3.5 py-2 text-xs text-white placeholder-white/40 bg-black/40 border border-white/10 rounded-xl outline-none focus:border-[#c0ff00]/50 transition-colors" />
+              <input id="q_search_input" name="q_search" aria-label="Cari soal / materi / topik" v-model="qSearch" type="text" placeholder="Cari soal / materi / topik..." class="flex-grow min-w-[180px] px-3.5 py-2 text-xs text-white placeholder-white/40 bg-black/40 border border-white/10 rounded-xl outline-none focus:border-[#c0ff00]/50 transition-colors" />
 
-              <select v-model="qSubMateri" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
+              <select id="q_sub_materi_select" name="q_sub_materi" aria-label="Semua Komponen & Subtes" v-model="qSubMateri" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
                 <option value="all" class="bg-[#0d1427]">Semua Komponen & Subtes</option>
                 <optgroup label="Komponen: TPS" class="bg-[#0d1427] font-bold text-[#c0ff00]">
                   <option value="Penalaran Umum" class="bg-[#0d1427]">Penalaran Umum (PU)</option>
@@ -678,7 +682,7 @@
 
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
             <div class="p-2.5 border-b border-white/10 flex gap-2 bg-black/20">
-              <input v-model="mSearch" type="text" placeholder="Cari materi..." class="flex-grow px-3 py-1.5 text-[11px] text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50" />
+              <input id="m_search_input" name="m_search" aria-label="Cari materi" v-model="mSearch" type="text" placeholder="Cari materi..." class="flex-grow px-3 py-1.5 text-[11px] text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50" />
             </div>
             
             <div v-if="materialsLoading" class="p-6 text-center text-white/40">
@@ -1000,12 +1004,12 @@
               </div>
               <div class="space-y-3 text-xs">
                 <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
-                  <input v-model="affiliateSettingsForm.name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Nama Lengkap Mitra" />
+                  <label for="aff_set_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
+                  <input id="aff_set_name" name="name" v-model="affiliateSettingsForm.name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Nama Lengkap Mitra" />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Akun (Identity)</label>
-                  <input v-model="affiliateSettingsForm.email" type="email" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="email@edupath.id" />
+                  <label for="aff_set_email" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Akun (Identity)</label>
+                  <input id="aff_set_email" name="email" v-model="affiliateSettingsForm.email" type="email" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="email@edupath.id" />
                 </div>
                 <div>
                   <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peran Akun</label>
@@ -1025,8 +1029,8 @@
               </div>
               <div class="space-y-3 text-xs">
                 <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Bank / E-Wallet</label>
-                  <select v-model="affiliateSettingsForm.bank_name" class="w-full p-2.5 bg-[#0d1427] border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                  <label for="aff_set_bank_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Bank / E-Wallet</label>
+                  <select id="aff_set_bank_name" name="bank_name" v-model="affiliateSettingsForm.bank_name" class="w-full p-2.5 bg-[#0d1427] border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
                     <option value="BCA">Bank Central Asia (BCA)</option>
                     <option value="MANDIRI">Bank Mandiri</option>
                     <option value="BRI">Bank Rakyat Indonesia (BRI)</option>
@@ -1038,12 +1042,12 @@
                   </select>
                 </div>
                 <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor Rekening / No. HP E-Wallet</label>
-                  <input v-model="affiliateSettingsForm.bank_account" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: 8830192831" />
+                  <label for="aff_set_bank_account" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor Rekening / No. HP E-Wallet</label>
+                  <input id="aff_set_bank_account" name="bank_account" v-model="affiliateSettingsForm.bank_account" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: 8830192831" />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Pemilik Rekening</label>
-                  <input v-model="affiliateSettingsForm.bank_owner" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Budi Santoso" />
+                  <label for="aff_set_bank_owner" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Pemilik Rekening</label>
+                  <input id="aff_set_bank_owner" name="bank_owner" v-model="affiliateSettingsForm.bank_owner" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Budi Santoso" />
                 </div>
               </div>
             </div>
@@ -1056,12 +1060,12 @@
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password Baru (Kosongkan jika tidak diubah)</label>
-                  <input v-model="affiliateSettingsForm.new_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Minimal 6 karakter" />
+                  <label for="aff_set_new_password" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password Baru (Kosongkan jika tidak diubah)</label>
+                  <input id="aff_set_new_password" name="new_password" v-model="affiliateSettingsForm.new_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Minimal 6 karakter" />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Konfirmasi Password Baru</label>
-                  <input v-model="affiliateSettingsForm.confirm_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Ulangi password baru" />
+                  <label for="aff_set_confirm_password" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Konfirmasi Password Baru</label>
+                  <input id="aff_set_confirm_password" name="confirm_password" v-model="affiliateSettingsForm.confirm_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Ulangi password baru" />
                 </div>
               </div>
             </div>
@@ -1235,27 +1239,27 @@
         </div>
         <form @submit.prevent="saveManualOrder" class="p-4 space-y-3">
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pilih Siswa</label>
-            <select v-model="orderForm.student_id" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+            <label for="order_student_id" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pilih Siswa</label>
+            <select id="order_student_id" name="student_id" v-model="orderForm.student_id" @change="syncOrderPlanPrice" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
               <option value="" disabled>-- Pilih Siswa --</option>
               <option v-for="s in allStudents" :key="s.id" :value="s.id" class="bg-[#0d1427] text-white">{{ s.name }} ({{ s.email }})</option>
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket Belajar</label>
-            <select v-model="orderForm.plan_id" @change="syncOrderPlanPrice" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+            <label for="order_plan_id" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket Belajar</label>
+            <select id="order_plan_id" name="plan_id" v-model="orderForm.plan_id" @change="syncOrderPlanPrice" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
               <option value="plan-mandiri" class="bg-[#0d1427] text-white">Paket Mandiri (Rp 100.000)</option>
               <option value="plan-utama" class="bg-[#0d1427] text-white">Paket Utama (Rp 200.000)</option>
               <option value="plan-vip" class="bg-[#0d1427] text-white">Paket VIP (Rp 450.000)</option>
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nominal Pembayaran (Rp)</label>
-            <input v-model="orderForm.amount" required type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="order_amount" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nominal Pembayaran (Rp)</label>
+            <input id="order_amount" name="amount" v-model="orderForm.amount" required type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Transaksi</label>
-            <select v-model="orderForm.status" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+            <label for="order_status" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Transaksi</label>
+            <select id="order_status" name="status" v-model="orderForm.status" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
               <option value="paid" class="bg-[#0d1427] text-white">Lunas / Paid (Auto-Aktifkan Paket)</option>
               <option value="pending" class="bg-[#0d1427] text-white">Pending</option>
             </select>
@@ -1321,8 +1325,8 @@
             <div class="font-black text-lg text-[#c0ff00]">{{ formatCurrency(selectedCommission?.amount) }}</div>
           </div>
           <div>
-            <label class="block text-white/50 text-[10px] font-bold mb-1 uppercase tracking-wider">Referensi Pembayaran (Opsional)</label>
-            <input v-model="payoutReference" type="text" placeholder="Misal: TRX-BCA-123" class="w-full px-3 py-1.5 rounded-lg border border-white/10 bg-black/40 focus:border-[#c0ff00]/50 outline-none text-xs font-medium text-white placeholder-white/20 transition-colors" />
+            <label for="payout_ref_input" class="block text-white/50 text-[10px] font-bold mb-1 uppercase tracking-wider">Referensi Pembayaran (Opsional)</label>
+            <input id="payout_ref_input" name="payout_reference" v-model="payoutReference" type="text" placeholder="Misal: TRX-BCA-123" class="w-full px-3 py-1.5 rounded-lg border border-white/10 bg-black/40 focus:border-[#c0ff00]/50 outline-none text-xs font-medium text-white placeholder-white/20 transition-colors" />
           </div>
         </div>
         <div class="p-4 border-t border-white/10 flex gap-2">
@@ -1344,8 +1348,8 @@
         </div>
         <div class="p-4 space-y-3">
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Alasan Penolakan</label>
-            <textarea v-model="rejectReason" rows="3" placeholder="Misal: Nomor rekening tidak valid / tidak cocok dengan nama akun" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-rose-500/50 transition-all font-medium"></textarea>
+            <label for="reject_reason_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Alasan Penolakan</label>
+            <textarea id="reject_reason_input" name="reject_reason" v-model="rejectReason" rows="3" placeholder="Misal: Nomor rekening tidak valid / tidak cocok dengan nama akun" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-rose-500/50 transition-all font-medium"></textarea>
           </div>
         </div>
         <div class="p-4 border-t border-white/10 flex gap-2">
@@ -1366,30 +1370,30 @@
         </div>
         <form @submit.prevent="saveAffiliate" class="p-4 space-y-3">
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Mitra</label>
-            <input v-model="affiliateForm.email" :disabled="isEditingAffiliate" required type="email" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
+            <label for="aff_form_email" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Mitra</label>
+            <input id="aff_form_email" name="email" v-model="affiliateForm.email" :disabled="isEditingAffiliate" required type="email" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kode Referral</label>
-            <input v-model="affiliateForm.referral_code" required type="text" placeholder="MISAL: BELAJARHEMAT" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium uppercase font-mono" />
+            <label for="aff_form_ref" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kode Referral</label>
+            <input id="aff_form_ref" name="referral_code" v-model="affiliateForm.referral_code" required type="text" placeholder="MISAL: BELAJARHEMAT" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium uppercase font-mono" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komisi (%)</label>
-            <input v-model="affiliateForm.commission_rate" required type="number" step="0.5" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="aff_form_comm" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komisi (%)</label>
+            <input id="aff_form_comm" name="commission_rate" v-model="affiliateForm.commission_rate" required type="number" step="0.5" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Bank</label>
-              <input v-model="affiliateForm.bank_name" placeholder="BCA / BRI / Mandiri" type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <label for="aff_form_bname" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Bank</label>
+              <input id="aff_form_bname" name="bank_name" v-model="affiliateForm.bank_name" placeholder="BCA / BRI / Mandiri" type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor Rekening</label>
-              <input v-model="affiliateForm.bank_account" placeholder="1234567890" type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <label for="aff_form_bacc" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor Rekening</label>
+              <input id="aff_form_bacc" name="bank_account" v-model="affiliateForm.bank_account" placeholder="1234567890" type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
             </div>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Pemilik Rekening</label>
-            <input v-model="affiliateForm.bank_owner" placeholder="Nama sesuai buku tabungan" type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="aff_form_bowner" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Pemilik Rekening</label>
+            <input id="aff_form_bowner" name="bank_owner" v-model="affiliateForm.bank_owner" placeholder="Nama sesuai buku tabungan" type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
             <button type="button" @click="showAffiliateModal = false" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>
@@ -1410,27 +1414,27 @@
         </div>
         <form @submit.prevent="saveStudent" class="p-4 space-y-3">
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
-            <input v-model="studentForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="student_form_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
+            <input id="student_form_name" name="name" v-model="studentForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div v-if="isSuperadmin && tenantsList.length > 1">
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang / Lembaga Bimbel (Opsional)</label>
-            <select v-model="studentForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStudent">
+            <label for="student_form_tenant" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang / Lembaga Bimbel (Opsional)</label>
+            <select id="student_form_tenant" name="tenant_id" v-model="studentForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStudent">
               <option value="" class="bg-[#0d1427] text-white">-- Bimbel Utama (Default) --</option>
               <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email</label>
-            <input v-model="studentForm.email" required type="email" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="student_form_email" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email</label>
+            <input id="student_form_email" name="email" v-model="studentForm.email" required type="email" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password {{ isEditingStudent ? '(Kosongkan jika tidak ubah)' : '' }}</label>
-            <input v-model="studentForm.password" :required="!isEditingStudent" type="password" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="student_form_password" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password {{ isEditingStudent ? '(Kosongkan jika tidak ubah)' : '' }}</label>
+            <input id="student_form_password" name="password" v-model="studentForm.password" :required="!isEditingStudent" type="password" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket Belajar</label>
-            <select v-model="studentForm.plan" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+            <label for="student_form_plan" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket Belajar</label>
+            <select id="student_form_plan" name="plan" v-model="studentForm.plan" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
               <option value="free" class="bg-[#0d1427] text-white">Free / Trial</option>
               <option value="mandiri" class="bg-[#0d1427] text-white">Paket Mandiri</option>
               <option value="utama" class="bg-[#0d1427] text-white">Paket Utama (Pejuang PTN)</option>
@@ -1438,8 +1442,8 @@
             </select>
           </div>
           <div v-if="isEditingStudent">
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Akun</label>
-            <select v-model="studentForm.is_active" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+            <label for="student_form_status" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Akun</label>
+            <select id="student_form_status" name="is_active" v-model="studentForm.is_active" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
               <option :value="1" class="bg-[#0d1427] text-white">Aktif</option>
               <option :value="0" class="bg-[#0d1427] text-white">Nonaktif</option>
             </select>
@@ -1464,28 +1468,28 @@
         </div>
         <form @submit.prevent="savePlan" class="p-4 space-y-3">
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Paket</label>
-            <input v-model="pForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="plan_form_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Paket</label>
+            <input id="plan_form_name" name="name" v-model="pForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div class="grid grid-cols-3 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Harga Asli</label>
-              <input v-model="pForm.price" required type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <label for="plan_form_price" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Harga Asli</label>
+              <input id="plan_form_price" name="price" v-model="pForm.price" required type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Diskon</label>
-              <input v-model="pForm.discount" type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <label for="plan_form_discount" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Diskon</label>
+              <input id="plan_form_discount" name="discount" v-model="pForm.discount" type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Durasi (Hr)</label>
-              <input v-model="pForm.duration" required type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <label for="plan_form_duration" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Durasi (Hr)</label>
+              <input id="plan_form_duration" name="duration" v-model="pForm.duration" required type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
             </div>
           </div>
           <div>
             <label class="block text-[10px] font-bold text-white/50 mb-1.5 uppercase tracking-wider">Entitlement (Fitur Akses)</label>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               <label v-for="ent in entitlementsDict" :key="ent.key" class="flex items-center gap-2 p-2 border border-white/10 rounded-lg cursor-pointer hover:bg-white/5 transition-colors text-xs" :class="{'bg-[#c0ff00]/10 border-[#c0ff00]/40 text-white': pForm.features.includes(ent.key)}">
-                <input type="checkbox" :value="ent.key" v-model="pForm.features" class="w-3.5 h-3.5 text-[#c0ff00] rounded border-white/20 bg-black/40 focus:ring-[#c0ff00]" />
+                <input type="checkbox" :id="'plan_ent_' + ent.key" :name="'plan_ent_' + ent.key" :value="ent.key" v-model="pForm.features" class="w-3.5 h-3.5 text-[#c0ff00] rounded border-white/20 bg-black/40 focus:ring-[#c0ff00]" />
                 <span class="text-xs font-medium">{{ ent.label }}</span>
               </label>
             </div>
@@ -1509,30 +1513,30 @@
         </div>
         <form @submit.prevent="saveStaff" class="p-4 space-y-3">
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email (sebagai Username)</label>
-            <input v-model="sForm.username" :disabled="isEditingStaff && sForm.username === 'admin'" required type="text" placeholder="nama@bimbel.com" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
+            <label for="staff_form_username" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email (sebagai Username)</label>
+            <input id="staff_form_username" name="username" v-model="sForm.username" :disabled="isEditingStaff && sForm.username === 'admin'" required type="text" placeholder="nama@bimbel.com" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
           </div>
           <div v-if="isSuperadmin && tenantsList.length > 1">
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang / Lembaga Bimbel (Opsional)</label>
-            <select v-model="sForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStaff">
+            <label for="staff_form_tenant" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang / Lembaga Bimbel (Opsional)</label>
+            <select id="staff_form_tenant" name="tenant_id" v-model="sForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStaff">
               <option value="" class="bg-[#0d1427] text-white">-- Bimbel Utama (Default) --</option>
               <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
-            <input v-model="sForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="staff_form_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
+            <input id="staff_form_name" name="name" v-model="sForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peran (Role)</label>
-            <select v-model="sForm.role" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="sForm.username === 'admin'">
+            <label for="staff_form_role" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peran (Role)</label>
+            <select id="staff_form_role" name="role" v-model="sForm.role" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="sForm.username === 'admin'">
               <option value="teacher" class="bg-[#0d1427] text-white">Guru / Tutor</option>
               <option value="admin" class="bg-[#0d1427] text-white">Administrator Utama</option>
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password {{ isEditingStaff ? '(Kosongkan jika tidak ubah)' : '' }}</label>
-            <input v-model="sForm.password" :required="!isEditingStaff" type="password" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="staff_form_password" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password {{ isEditingStaff ? '(Kosongkan jika tidak ubah)' : '' }}</label>
+            <input id="staff_form_password" name="password" v-model="sForm.password" :required="!isEditingStaff" type="password" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
             <button type="button" @click="closeStaffModal" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>
@@ -1555,12 +1559,12 @@
           <!-- Row 1: Ujian & Komponen -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Ujian</label>
-              <input v-model="qForm.exam" readonly class="w-full p-2 text-xs text-white/70 bg-black/40 border border-white/10 rounded-lg outline-none cursor-not-allowed font-medium" />
+              <label for="q_exam_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Ujian</label>
+              <input id="q_exam_input" name="exam" v-model="qForm.exam" readonly class="w-full p-2 text-xs text-white/70 bg-black/40 border border-white/10 rounded-lg outline-none cursor-not-allowed font-medium" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komponen Ujian</label>
-              <select v-model="qForm.test_component" @change="onQComponentChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <label for="q_component_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komponen Ujian</label>
+              <select id="q_component_select" name="test_component" v-model="qForm.test_component" @change="onQComponentChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="c in qAvailableComponents" :key="c.name" :value="c.name" class="bg-[#0d1427] text-white">{{ c.label || c.name }}</option>
               </select>
             </div>
@@ -1569,14 +1573,14 @@
           <!-- Row 2: Subtes & Topik -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes</label>
-              <select v-model="qForm.subtest" @change="onQSubtestChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <label for="q_subtest_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes</label>
+              <select id="q_subtest_select" name="subtest" v-model="qForm.subtest" @change="onQSubtestChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="s in qAvailableSubtests" :key="s.name" :value="s.name" class="bg-[#0d1427] text-white">{{ s.name }}</option>
               </select>
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Topik</label>
-              <select v-model="qForm.topic" @change="onQTopicChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <label for="q_topic_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Topik</label>
+              <select id="q_topic_select" name="topic" v-model="qForm.topic" @change="onQTopicChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="t in qAvailableTopics" :key="t.name" :value="t.name" class="bg-[#0d1427] text-white">{{ t.name }}</option>
               </select>
             </div>
@@ -1585,15 +1589,15 @@
           <!-- Row 3: Subtopik & Skill -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtopik</label>
-              <input v-model="qForm.subtopic" list="qSubtopicDatalist" placeholder="e.g. Pola Bilangan..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <label for="q_subtopic_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtopik</label>
+              <input id="q_subtopic_input" name="subtopic" v-model="qForm.subtopic" list="qSubtopicDatalist" placeholder="e.g. Pola Bilangan..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
               <datalist id="qSubtopicDatalist">
                 <option v-for="st in (qCurrentTopicObj?.subtopics || [])" :key="st" :value="st"></option>
               </datalist>
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Skill / Kompetensi</label>
-              <input v-model="qForm.skill" list="qSkillDatalist" placeholder="e.g. Identifikasi Pola..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <label for="q_skill_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Skill / Kompetensi</label>
+              <input id="q_skill_input" name="skill" v-model="qForm.skill" list="qSkillDatalist" placeholder="e.g. Identifikasi Pola..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
               <datalist id="qSkillDatalist">
                 <option v-for="sk in (qCurrentTopicObj?.skills || [])" :key="sk" :value="sk"></option>
               </datalist>
@@ -1603,15 +1607,15 @@
           <!-- Row 4: Indikator & Tipe Soal -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Indikator Soal</label>
-              <input v-model="qForm.indicator" list="qIndicatorDatalist" placeholder="e.g. Menentukan pola berikutnya..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <label for="q_indicator_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Indikator Soal</label>
+              <input id="q_indicator_input" name="indicator" v-model="qForm.indicator" list="qIndicatorDatalist" placeholder="e.g. Menentukan pola berikutnya..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
               <datalist id="qIndicatorDatalist">
                 <option v-for="ind in (qCurrentTopicObj?.indicators || [])" :key="ind" :value="ind"></option>
               </datalist>
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tipe Soal</label>
-              <select v-model="qForm.question_type" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <label for="q_type_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tipe Soal</label>
+              <select id="q_type_select" name="question_type" v-model="qForm.question_type" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option value="multiple_choice" class="bg-[#0d1427] text-white">Pilihan Ganda (A-E)</option>
                 <option value="complex_mcq" class="bg-[#0d1427] text-white">Pilihan Ganda Kompleks</option>
                 <option value="short_answer" class="bg-[#0d1427] text-white">Isian Singkat</option>
@@ -1623,24 +1627,24 @@
           <!-- Row 5: Kesulitan, Penggunaan, Kognitif & QC -->
           <div class="grid grid-cols-3 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tingkat Kesulitan</label>
-              <select v-model="qForm.difficulty" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <label for="q_diff_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tingkat Kesulitan</label>
+              <select id="q_diff_select" name="difficulty" v-model="qForm.difficulty" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option value="easy" class="bg-[#0d1427] text-white">Mudah</option>
                 <option value="medium" class="bg-[#0d1427] text-white">Sedang</option>
                 <option value="hard" class="bg-[#0d1427] text-white">Sulit</option>
               </select>
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Penggunaan</label>
-              <select v-model="qForm.usage_type" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <label for="q_usage_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Penggunaan</label>
+              <select id="q_usage_select" name="usage_type" v-model="qForm.usage_type" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option value="latihan" class="bg-[#0d1427] text-white">Latihan Harian</option>
                 <option value="tryout" class="bg-[#0d1427] text-white">Tryout Resmi</option>
                 <option value="diagnostik" class="bg-[#0d1427] text-white">Diagnostik</option>
               </select>
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Level Kognitif</label>
-              <select v-model="qForm.cognitive_demand" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <label for="q_cog_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Level Kognitif</label>
+              <select id="q_cog_select" name="cognitive_demand" v-model="qForm.cognitive_demand" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option value="C1" class="bg-[#0d1427] text-white">C1 - Mengingat</option>
                 <option value="C2" class="bg-[#0d1427] text-white">C2 - Memahami</option>
                 <option value="C3" class="bg-[#0d1427] text-white">C3 - Aplikasi</option>
@@ -1652,24 +1656,24 @@
           </div>
 
           <div class="flex items-center gap-2 pt-1">
-            <input type="checkbox" id="qc_passed" v-model="qForm.is_qc_passed" :true-value="1" :false-value="0" class="w-3.5 h-3.5 text-[#c0ff00] bg-black/40 border-white/20 rounded focus:ring-[#c0ff00]">
+            <input type="checkbox" id="qc_passed" name="is_qc_passed" v-model="qForm.is_qc_passed" :true-value="1" :false-value="0" class="w-3.5 h-3.5 text-[#c0ff00] bg-black/40 border-white/20 rounded focus:ring-[#c0ff00]">
             <label for="qc_passed" class="text-xs font-bold text-white/80 cursor-pointer">Telah Melewati Proses QC (Guru / Superadmin)</label>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pertanyaan</label>
-            <textarea v-model="qForm.question" required rows="2" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
+            <label for="q_question_textarea" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pertanyaan</label>
+            <textarea id="q_question_textarea" name="question" v-model="qForm.question" required rows="2" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
           </div>
           <div class="space-y-2">
             <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Opsi Jawaban</label>
             <div v-for="opt in ['a','b','c','d','e']" :key="opt" class="flex items-center gap-1.5">
-              <input type="radio" v-model="qForm.correct" :value="opt" name="correctOpt" required class="w-3.5 h-3.5 text-[#c0ff00]" />
-              <span class="text-xs font-bold uppercase w-5 text-white/80">{{ opt }}.</span>
-              <input v-model="qForm['option_' + opt]" :required="opt !== 'e'" type="text" placeholder="..." class="flex-grow p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 placeholder-white/20 transition-all font-medium" />
+              <input type="radio" :id="'correct_opt_' + opt" v-model="qForm.correct" :value="opt" name="correctOpt" required class="w-3.5 h-3.5 text-[#c0ff00]" />
+              <label :for="'correct_opt_' + opt" class="text-xs font-bold uppercase w-5 text-white/80 cursor-pointer">{{ opt }}.</label>
+              <input :id="'q_opt_' + opt" :name="'option_' + opt" v-model="qForm['option_' + opt]" :required="opt !== 'e'" type="text" placeholder="..." class="flex-grow p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 placeholder-white/20 transition-all font-medium" />
             </div>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pembahasan Lengkap</label>
-            <textarea v-model="qForm.explanation" rows="2" placeholder="Uraian langkah penyelesaian..." class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
+            <label for="q_explanation_textarea" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pembahasan Lengkap</label>
+            <textarea id="q_explanation_textarea" name="explanation" v-model="qForm.explanation" rows="2" placeholder="Uraian langkah penyelesaian..." class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
           </div>
           <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
             <button type="button" @click="closeQuestionModal" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>
@@ -1690,20 +1694,20 @@
         </div>
         <form @submit.prevent="saveMaterial" class="p-4 space-y-3">
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Judul Materi</label>
-            <input v-model="mForm.title" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="m_title_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Judul Materi</label>
+            <input id="m_title_input" name="title" v-model="mForm.title" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <!-- Komponen & Subtes -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komponen Ujian</label>
-              <select v-model="mForm.test_component" @change="onMComponentChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <label for="m_component_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komponen Ujian</label>
+              <select id="m_component_select" name="test_component" v-model="mForm.test_component" @change="onMComponentChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="c in mAvailableComponents" :key="c.name" :value="c.name" class="bg-[#0d1427] text-white">{{ c.label || c.name }}</option>
               </select>
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes</label>
-              <select v-model="mForm.subtest" @change="onMSubtestChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <label for="m_subtest_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes</label>
+              <select id="m_subtest_select" name="subtest" v-model="mForm.subtest" @change="onMSubtestChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="s in mAvailableSubtests" :key="s.name" :value="s.name" class="bg-[#0d1427] text-white">{{ s.name }}</option>
               </select>
             </div>
@@ -1712,37 +1716,37 @@
           <!-- Topik & Subtopik -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Topik</label>
-              <select v-model="mForm.topic" @change="onMTopicChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <label for="m_topic_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Topik</label>
+              <select id="m_topic_select" name="topic" v-model="mForm.topic" @change="onMTopicChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="t in mAvailableTopics" :key="t.name" :value="t.name" class="bg-[#0d1427] text-white">{{ t.name }}</option>
               </select>
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtopik</label>
-              <input v-model="mForm.subtopic" list="mSubtopicDatalist" placeholder="e.g. Pola Bilangan..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <label for="m_subtopic_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtopik</label>
+              <input id="m_subtopic_input" name="subtopic" v-model="mForm.subtopic" list="mSubtopicDatalist" placeholder="e.g. Pola Bilangan..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
               <datalist id="mSubtopicDatalist">
                 <option v-for="st in (mCurrentTopicObj?.subtopics || [])" :key="st" :value="st"></option>
               </datalist>
             </div>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Guru / Penanggung Jawab</label>
-            <select v-model="mForm.teacher_name" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+            <label for="m_teacher_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Guru / Penanggung Jawab</label>
+            <select id="m_teacher_select" name="teacher_name" v-model="mForm.teacher_name" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
               <option value="" class="bg-[#0d1427] text-white">-- Pilih Guru / Tidak Ada --</option>
               <option v-for="s in staffMembers" :key="s.id" :value="s.name" class="bg-[#0d1427] text-white">{{ s.name }} ({{ s.role }})</option>
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Lampiran Dokumen / File Materi (PDF, DOCX, PPT)</label>
+            <label for="m_file_upload" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Lampiran Dokumen / File Materi (PDF, DOCX, PPT)</label>
             <div class="flex items-center gap-2">
-              <input type="file" ref="materialFileInput" @change="handleMaterialFileUpload" class="text-xs text-white/70 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#c0ff00] file:text-black hover:file:bg-[#b0ef00] cursor-pointer" />
+              <input id="m_file_upload" name="file" type="file" ref="materialFileInput" @change="handleMaterialFileUpload" class="text-xs text-white/70 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#c0ff00] file:text-black hover:file:bg-[#b0ef00] cursor-pointer" />
               <span v-if="isUploadingFile" class="text-xs text-[#c0ff00] animate-pulse">Mengunggah...</span>
             </div>
-            <input v-model="mForm.file_url" type="text" placeholder="URL File / Lampiran (otomatis terisi setelah unggah)" class="mt-1.5 w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none font-mono" />
+            <input id="m_file_url_input" name="file_url" aria-label="URL File / Lampiran" v-model="mForm.file_url" type="text" placeholder="URL File / Lampiran (otomatis terisi setelah unggah)" class="mt-1.5 w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none font-mono" />
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Isi / Konten Materi</label>
-            <textarea v-model="mForm.content" required rows="5" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
+            <label for="m_content_textarea" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Isi / Konten Materi</label>
+            <textarea id="m_content_textarea" name="content" v-model="mForm.content" required rows="5" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
           </div>
           <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
             <button type="button" @click="closeMaterialModal" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>

@@ -66,6 +66,7 @@ $created = api_call('https://edupath.co.id/api/admin.php?action=students', 'POST
     'plan' => 'utama'
 ], $csrf);
 echo "    -> HTTP Code: {$created['code']}\n";
+echo "    -> Response: " . json_encode($created['body']) . "\n";
 $createdId = $created['body']['id'] ?? null;
 echo "    -> Created Student ID: $createdId\n\n";
 

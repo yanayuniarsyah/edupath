@@ -4,6 +4,17 @@ import router from './router/index.js'
 import './index.css'
 
 // ----------------------------------------------------------------
+// Analytics Tracker & Safe Wrapper (GA4 / Meta Pixel)
+// ----------------------------------------------------------------
+window.dataLayer = window.dataLayer || [];
+window.gtag = window.gtag || function() { window.dataLayer.push(arguments); };
+window.trackEvent = window.trackEvent || function(eventName, eventParams = {}) {
+  window.gtag('event', eventName, eventParams);
+  if (window.fbq) window.fbq('trackCustom', eventName, eventParams);
+  console.log('[Analytics Tracker]', eventName, eventParams);
+};
+
+// ----------------------------------------------------------------
 // Midtrans Snap — injeksi dinamis dari environment variable
 // Ini mencegah client key hardcoded di source code atau index.html
 // ----------------------------------------------------------------

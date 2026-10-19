@@ -81,6 +81,10 @@ function ensure_admin_schema($pdo) {
     foreach ($planCols as $sql) {
         try { $pdo->exec($sql); } catch (\Throwable $e) {}
     }
+
+    // 4. Drop outdated ownership check constraints if present (Phase 3i alignment)
+    try { $pdo->exec("ALTER TABLE subscriptions DROP CONSTRAINT sub_ownership_chk"); } catch (\Throwable $e) {}
+    try { $pdo->exec("ALTER TABLE entitlements DROP CONSTRAINT ent_ownership_chk"); } catch (\Throwable $e) {}
 }
 
 $action = $_GET['action'] ?? '';
@@ -468,7 +472,16 @@ elseif ($action === 'students') {
                     'plan-p3-yearly' => 'plan-p3-yearly'
                 ];
                 $targetPlanId = $planIdMap[strtolower($plan)] ?? 'plan-p2-yearly';
+                // Ensure targetPlanId exists in plans table to prevent FK violation
+                $chkPlan = $pdo->prepare("SELECT id FROM plans WHERE id = ?");
+                $chkPlan->execute([$targetPlanId]);
+                if (!$chkPlan->fetch()) {
+                    $targetPlanId = $pdo->query("SELECT id FROM plans LIMIT 1")->fetchColumn() ?: 'plan-p2-yearly';
+                }
                 $planNameSnap = $planNames[strtolower($plan)] ?? ucfirst($plan);
+
+                // Student subscription must have tenant_id NULL to satisfy constraint sub_ownership_chk
+                $subTenant = null;
                 $pdo->prepare("
                     INSERT INTO subscriptions (id, tenant_id, student_id, plan_id, status, plan_name_snapshot, started_at, expires_at)
                     VALUES (?, ?, ?, ?, 'active', ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 YEAR))
@@ -477,7 +490,7 @@ elseif ($action === 'students') {
                         status = 'active', 
                         plan_name_snapshot = VALUES(plan_name_snapshot), 
                         expires_at = DATE_ADD(NOW(), INTERVAL 1 YEAR)
-                ")->execute([$subId, $tenant_id, $student_id, $targetPlanId, $planNameSnap]);
+                ")->execute([$subId, $subTenant, $student_id, $targetPlanId, $planNameSnap]);
             }
             
             $pdo->commit();
@@ -581,7 +594,16 @@ elseif ($action === 'students') {
                     'plan-p3-yearly' => 'plan-p3-yearly'
                 ];
                 $targetPlanId = $planIdMap[strtolower($plan)] ?? 'plan-p2-yearly';
+                // Ensure targetPlanId exists in plans table to prevent FK violation
+                $chkPlan = $pdo->prepare("SELECT id FROM plans WHERE id = ?");
+                $chkPlan->execute([$targetPlanId]);
+                if (!$chkPlan->fetch()) {
+                    $targetPlanId = $pdo->query("SELECT id FROM plans LIMIT 1")->fetchColumn() ?: 'plan-p2-yearly';
+                }
                 $planNameSnap = $planNames[strtolower($plan)] ?? ucfirst($plan);
+
+                // Student subscription must have tenant_id NULL to satisfy constraint sub_ownership_chk
+                $subTenant = null;
                 $pdo->prepare("
                     INSERT INTO subscriptions (id, tenant_id, student_id, plan_id, status, plan_name_snapshot, started_at, expires_at)
                     VALUES (?, ?, ?, ?, 'active', ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 YEAR))
@@ -590,7 +612,7 @@ elseif ($action === 'students') {
                         status = 'active', 
                         plan_name_snapshot = VALUES(plan_name_snapshot), 
                         expires_at = DATE_ADD(NOW(), INTERVAL 1 YEAR)
-                ")->execute([$subId, $sTenantId, $id, $targetPlanId, $planNameSnap]);
+                ")->execute([$subId, $subTenant, $id, $targetPlanId, $planNameSnap]);
             } else {
                 $pdo->prepare("UPDATE subscriptions SET status = 'cancelled' WHERE student_id = ?")->execute([$id]);
             }

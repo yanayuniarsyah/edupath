@@ -86,6 +86,7 @@
                    :class="answers[activeIndex] === option.id ? 'border-[#024a86] bg-[#024a86] text-white' : 'border-gray-400 text-gray-600'">
                 <input 
                   type="radio" 
+                  :id="'q_' + activeIndex + '_' + option.id"
                   :name="'question-' + activeIndex" 
                   :value="option.id"
                   v-model="answers[activeIndex]"
@@ -108,9 +109,11 @@
             ← Soal Sebelumnya
           </button>
 
-          <label class="flex items-center gap-2 cursor-pointer px-5 py-2.5 bg-[#facc15] text-yellow-900 border border-yellow-500 font-bold rounded shadow-sm hover:bg-yellow-500 uppercase transition-colors">
+          <label :for="'doubt_' + activeIndex" class="flex items-center gap-2 cursor-pointer px-5 py-2.5 bg-[#facc15] text-yellow-900 border border-yellow-500 font-bold rounded shadow-sm hover:bg-yellow-500 uppercase transition-colors">
             <input 
               type="checkbox" 
+              :id="'doubt_' + activeIndex"
+              :name="'doubt_' + activeIndex"
               v-model="doubt[activeIndex]"
               class="w-5 h-5 accent-yellow-600 cursor-pointer"
             >
