@@ -2338,14 +2338,11 @@
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- SECTION: Misi Harian, Peringkat Streak & Ruang Belajar Virtual 24/7 (Pomodoro) -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Col 1-5: Misi Harian & Peringkat Streak Belajar -->
-            <div class="lg:col-span-5 space-y-5">
+            <!-- Misi Harian & Peringkat Streak Belajar Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
               <!-- Misi Harian Card -->
-              <div class="glass-card p-5 rounded-2xl border border-amber-500/20">
+              <div class="glass-card p-5 md:p-6 rounded-2xl border border-amber-500/20">
                 <div class="flex items-center justify-between mb-3">
                   <div class="flex items-center gap-2">
                     <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-base">
@@ -2356,10 +2353,10 @@
                       <p class="text-[10px] text-white/50">Selesaikan misi untuk XP &amp; naik level.</p>
                     </div>
                   </div>
-                  <span class="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-[11px] font-black">+{{ dailyMissions.reduce((acc, m) => acc + (m.completed ? m.reward : 0), 0) }} XP</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-[11px] font-black">+{{ dailyMissions.reduce((acc, m) => acc + (m.completed ? m.reward : 0), 0) }} XP</span>
                 </div>
-                <ul class="space-y-2">
-                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/25' : 'bg-white/5 border-white/10 hover:border-white/20']">
+                <ul class="space-y-2.5">
+                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-2.5 p-3 rounded-xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/25' : 'bg-white/5 border-white/10 hover:border-white/20']">
                     <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-white text-emerald-400 focus:ring-emerald-500 focus:ring-offset-0 w-4 h-4 cursor-pointer appearance-none checked:bg-emerald-500/100 checked:border-emerald-500 relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-[10px] checked:after:font-black checked:after:left-[3px] checked:after:top-[0px]" @change="checkMissionReward(m)">
                     <span :class="['text-xs font-bold flex-grow text-white transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
                     <span class="text-xs font-black font-mono shrink-0 text-amber-400">+{{ m.reward }}</span>
@@ -2368,7 +2365,7 @@
               </div>
 
               <!-- Peringkat Streak Belajar Card -->
-              <div class="glass-card p-5 rounded-2xl border border-indigo-500/20">
+              <div class="glass-card p-5 md:p-6 rounded-2xl border border-indigo-500/20">
                 <div class="flex items-center justify-between mb-3">
                   <div class="flex items-center gap-2">
                     <span class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-base">
@@ -2406,63 +2403,6 @@
                     <span class="text-xs text-white/50 font-mono shrink-0">5 Hari</span>
                   </li>
                 </ul>
-              </div>
-            </div>
-
-            <!-- Col 6-12: Virtual Study Room 24/7 (Pomodoro Focus & Lo-Fi Ambience) -->
-            <div class="lg:col-span-7 glass-card p-5 md:p-6 rounded-2xl border border-white/10 flex flex-col justify-between">
-              <div>
-                <div class="flex flex-wrap justify-between items-start border-b border-white/10 pb-3 mb-5 gap-2">
-                  <div>
-                    <div class="flex items-center gap-2">
-                      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                      <h3 class="text-lg font-black font-heading text-white">Virtual Study Room 24/7</h3>
-                    </div>
-                    <p class="text-xs text-white/60 mt-0.5">Sesi fokus mandiri teknik Pomodoro bersama pejuang SNBT se-Indonesia.</p>
-                  </div>
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-xs font-bold text-emerald-400 rounded-full">
-                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span>
-                    {{ onlineStudents }} Pejuang Online
-                  </span>
-                </div>
-
-                <!-- Pomodoro Widget Display -->
-                <div class="py-8 bg-black/40 rounded-2xl border border-white/10 text-center space-y-3 relative overflow-hidden">
-                  <div class="timer-display font-heading font-black text-5xl md:text-6xl text-white tracking-widest font-mono">{{ formattedTime }}</div>
-                  <div class="text-xs text-indigo-400 uppercase tracking-widest font-black">
-                    {{ isBreak ? '☕ Waktunya Istirahat (5 Menit)' : '🎯 Sesi Fokus Belajar (25 Menit)' }}
-                  </div>
-                  <div class="flex justify-center gap-3 pt-3">
-                    <button class="px-6 py-2.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-105 active:scale-95 cursor-pointer" @click="toggleTimer">
-                      {{ timerActive ? 'Jeda (Pause)' : 'Mulai Sesi Fokus' }}
-                    </button>
-                    <button class="px-5 py-2.5 bg-white/10 border border-white/15 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition-all cursor-pointer" @click="resetTimer">
-                      Reset
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Lo-Fi Music Selector -->
-              <div class="mt-5 border-t border-white/10 pt-4">
-                <label class="text-[11px] text-white/60 font-bold uppercase tracking-wider block mb-2.5 flex items-center gap-1.5">
-                  <i class="ph-bold ph-headphones text-sm text-indigo-400"></i> Pilihan Musik Lofi Ambience:
-                </label>
-                <div class="flex flex-wrap gap-2">
-                  <button 
-                    v-for="track in lofiTracks" 
-                    :key="track.id" 
-                    :class="['px-3.5 py-2 border rounded-xl text-xs font-bold transition-all cursor-pointer', 
-                      currentTrack === track.id 
-                        ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.5)]' 
-                        : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20 hover:text-white'
-                    ]"
-                    @click="playTrack(track.id)"
-                  >
-                    <i class="ph-bold" :class="currentTrack === track.id ? 'ph-speaker-high animate-bounce' : 'ph-play'"></i>
-                    {{ track.name }}
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -2526,7 +2466,7 @@
         </section>
 
         <!-- TAB 2: DIAGNOSTIC & TRY OUT -->
-        <section v-if="currentTab === 'diagnostic'" class="animate-fade-in space-y-6 pt-20 lg:pt-4 px-3 sm:px-6">
+        <section v-if="currentTab === 'diagnostic'" class="animate-fade-in space-y-6 pt-24 lg:pt-24 px-3 sm:px-6">
           <!-- Top Close & Back Bar -->
           <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
             <div class="flex items-center gap-3">
@@ -2562,9 +2502,48 @@
           <div class="grid grid-cols-1 gap-6" :class="showIrtInfo ? 'lg:grid-cols-3' : ''">
             <div class="light-mode-card rounded-2xl p-6 lg:p-8" :class="showIrtInfo ? 'lg:col-span-2' : 'w-full'">
               <h3 class="text-xl font-black font-heading text-slate-900 mb-2">Diagnostic &amp; Adaptive Simulation Test</h3>
-              <p v-if="!diagnosticFocus" class="text-xs text-slate-600 mb-6 font-medium">
+              <p v-if="!diagnosticFocus" class="text-xs text-slate-600 mb-5 font-medium">
                 Sistem simulasi ujian dengan Item Response Theory (IRT). Kesulitan soal dinamis sesuai respons kemampuan Anda.
               </p>
+
+              <!-- Panduan Komunikatif: Kapan & Berapa Kali Tes Ini Dilakukan? -->
+              <div v-if="!diagnosticActive && !diagnosticFinished" class="mb-6 p-4 md:p-5 rounded-2xl bg-gradient-to-r from-indigo-50/90 via-purple-50/70 to-blue-50/90 border border-indigo-200/80 text-left space-y-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs shrink-0 shadow-sm">
+                    <i class="ph-bold ph-info"></i>
+                  </span>
+                  <h4 class="text-xs md:text-sm font-black text-slate-900 uppercase tracking-wide">Panduan Alur: Kapan &amp; Berapa Kali Tes Ini Dilakukan?</h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div class="p-3 rounded-xl bg-white/95 border border-indigo-100 shadow-sm space-y-1">
+                    <div class="flex items-center gap-1.5 text-indigo-700 font-black text-xs">
+                      <span class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-[11px] font-bold">1</span>
+                      <span>Asesmen Awal (1x Saat Gabung)</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
+                      Wajib diambil <strong>1 kali di awal</strong> untuk memetakan kekuatan, kelemahan, dan blind-spot materi Anda secara akurat.
+                    </p>
+                  </div>
+                  <div class="p-3 rounded-xl bg-white/95 border border-purple-100 shadow-sm space-y-1">
+                    <div class="flex items-center gap-1.5 text-purple-700 font-black text-xs">
+                      <span class="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-[11px] font-bold">2</span>
+                      <span>Belajar Modul &amp; Drill Soal</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
+                      Selesaikan materi &amp; drill latihan terfokus sesuai urutan rekomendasi AI yang otomatis disusun setelah tes awal.
+                    </p>
+                  </div>
+                  <div class="p-3 rounded-xl bg-white/95 border border-blue-100 shadow-sm space-y-1">
+                    <div class="flex items-center gap-1.5 text-blue-700 font-black text-xs">
+                      <span class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-[11px] font-bold">3</span>
+                      <span>Evaluasi Berkala (Tiap 2-4 Minggu)</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
+                      Ulangi tes diagnostic secara berkala <strong>tiap 2-4 minggu</strong> untuk memantau lonjakan skor IRT dan peluang lolos PTN.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               <div v-if="!diagnosticActive && !diagnosticFinished" class="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
                 <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-2xl mx-auto mb-4 font-black font-mono">
@@ -2688,19 +2667,55 @@
         </section>
 
         <!-- TAB 3: MATERI UTBK & MICRO-LESSONS -->
-        <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-6 pt-20 lg:pt-4 px-3 sm:px-6">
+        <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-6 pt-24 lg:pt-24 px-3 sm:px-6">
           <!-- Top Close & Back Bar -->
-          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
+          <div class="flex flex-wrap lg:flex-nowrap items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-3.5 sm:p-4 backdrop-blur-xl shadow-xl gap-3">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] border border-[#c0ff00]/30 flex items-center justify-center text-xl font-black">
+              <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] border border-[#c0ff00]/30 flex items-center justify-center text-xl font-black shrink-0">
                 <i class="ph-bold ph-books"></i>
               </div>
               <div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-[#c0ff00]">Modul Pembelajaran Mandiri</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-[#c0ff00]">Modul Pembelajaran Mandiri</span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 rounded-full">
+                    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
+                    {{ onlineStudents }} Pejuang Online
+                  </span>
+                </div>
                 <h2 class="text-base md:text-lg font-black text-white">Materi &amp; Drill Soal UTBK 2027</h2>
               </div>
             </div>
-            <div class="flex items-center gap-2">
+
+            <!-- Focus Pomodoro Timer (Compact) -->
+            <div class="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-1.5 rounded-xl shadow-inner">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full" :class="timerActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'"></span>
+                <span class="text-[10px] uppercase font-black tracking-wider text-indigo-300 hidden sm:inline">
+                  {{ isBreak ? '☕ Break' : '🎯 Fokus' }}
+                </span>
+                <span class="font-mono font-black text-sm md:text-base text-white tracking-widest px-1">{{ formattedTime }}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <button 
+                  @click="toggleTimer"
+                  :class="['px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1 shadow-sm active:scale-95', 
+                    timerActive ? 'bg-amber-500 text-black hover:bg-amber-400' : 'bg-[#c0ff00] text-black hover:bg-[#b0ef00]']"
+                  :title="timerActive ? 'Jeda Pomodoro' : 'Mulai Sesi Fokus'"
+                >
+                  <i :class="timerActive ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
+                  <span class="hidden md:inline">{{ timerActive ? 'Jeda' : 'Fokus' }}</span>
+                </button>
+                <button 
+                  @click="resetTimer"
+                  class="p-1 text-white/50 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  title="Reset Timer Pomodoro"
+                >
+                  <i class="ph-bold ph-arrows-counter-clockwise text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
               <button 
                 type="button"
                 @click="hideBabSidebar = !hideBabSidebar" 
@@ -3054,7 +3069,7 @@
         </section>
 
         <!-- TAB 7: 2027 AI INTELLIGENCE & PERFORMANCE COCKPIT (Ujian 2027 Simulasi) -->
-        <section v-if="currentTab === 'simulator' || currentTab === 'projection2027'" class="animate-fade-in space-y-6 pt-20 lg:pt-4 px-3 sm:px-6">
+        <section v-if="currentTab === 'simulator' || currentTab === 'projection2027'" class="animate-fade-in space-y-6 pt-24 lg:pt-24 px-3 sm:px-6">
           <!-- Top Header Bar -->
           <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
             <div class="flex items-center gap-3">
@@ -3074,83 +3089,6 @@
               <span>Tutup</span>
               <i class="ph-bold ph-x text-base"></i>
             </button>
-          </div>
-          
-          <!-- Top KPI Strip -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-            <!-- KPI 1: Projected IRT Score -->
-            <div class="light-mode-card rounded-2xl p-4 md:p-5 relative overflow-hidden group">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-500">Proyeksi Skor IRT</span>
-                <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-black font-mono">TOP 4.2%</span>
-              </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-3xl md:text-4xl font-black font-heading text-slate-900 font-mono">685</span>
-                <span class="text-xs font-bold text-slate-500">/ {{ selectedUniversity.targetScore }} Target</span>
-              </div>
-              <div class="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-                <div class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: 88%;"></div>
-              </div>
-              <div class="flex justify-between items-center text-[10px] font-semibold text-slate-500 mt-1.5">
-                <span>Gap: <strong>35 Poin</strong></span>
-                <span class="text-emerald-600 font-bold">+18 minggu ini</span>
-              </div>
-            </div>
-
-            <!-- KPI 2: HOTS Accuracy -->
-            <div class="light-mode-card rounded-2xl p-4 md:p-5 relative overflow-hidden group">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-500">Akurasi Soal HOTS</span>
-                <span class="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-200 text-[10px] font-black font-mono">HIGH-TIER</span>
-              </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-3xl md:text-4xl font-black font-heading text-slate-900 font-mono">78.4%</span>
-                <span class="text-xs font-bold text-emerald-600 font-mono">+12.3% ↗</span>
-              </div>
-              <div class="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-                <div class="bg-sky-500 h-full rounded-full transition-all duration-500" style="width: 78.4%;"></div>
-              </div>
-              <div class="flex justify-between items-center text-[10px] font-semibold text-slate-500 mt-1.5">
-                <span>Total 182 Soal</span>
-                <span class="text-sky-700 font-bold">142 Benar</span>
-              </div>
-            </div>
-
-            <!-- KPI 3: Velocity Pace -->
-            <div class="light-mode-card rounded-2xl p-4 md:p-5 relative overflow-hidden group">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-500">Velocity Pace</span>
-                <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black font-mono">OPTIMAL</span>
-              </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-3xl md:text-4xl font-black font-heading text-slate-900 font-mono">42s</span>
-                <span class="text-xs font-bold text-slate-500">/ Soal (Batas 55s)</span>
-              </div>
-              <div class="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-                <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 76%;"></div>
-              </div>
-              <div class="flex justify-between items-center text-[10px] font-semibold text-slate-500 mt-1.5">
-                <span>Efisiensi: <strong>+24% Lebih Cepat</strong></span>
-              </div>
-            </div>
-
-            <!-- KPI 4: Admission Probability -->
-            <div class="light-mode-card rounded-2xl p-4 md:p-5 border-emerald-300 relative overflow-hidden group shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] md:text-xs font-black uppercase tracking-widest text-emerald-700">Peluang Lolos PTN</span>
-                <span class="px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[10px] font-black">TERJANGKAU</span>
-              </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-3xl md:text-4xl font-black font-heading text-emerald-600 font-mono">88%</span>
-                <span class="text-xs font-bold text-slate-600">{{ selectedUniversity.name }}</span>
-              </div>
-              <div class="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-                <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 88%;"></div>
-              </div>
-              <div class="flex justify-between items-center text-[10px] font-semibold text-slate-500 mt-1.5">
-                <span>Status: <strong>Pertahankan Ritme</strong></span>
-              </div>
-            </div>
           </div>
 
           <!-- Main CBT Exam Simulation Grid (Official SNPMB Interface) -->
@@ -3438,8 +3376,8 @@
         </section>
       </div>
 
-      <!-- 14. Footer (Global - tampil di semua tab) -->
-      <footer class="border-t border-white/10 pt-12 pb-8 text-sm text-white/50 font-medium">
+      <!-- 14. Footer (Hidden during diagnostic test, learning material, and tryout simulator for distraction-free focus) -->
+      <footer v-if="!['diagnostic', 'learning', 'simulator'].includes(currentTab)" class="border-t border-white/10 pt-12 pb-8 text-sm text-white/50 font-medium">
         <div class="section-wrapper">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10 text-left">
 
@@ -4755,11 +4693,11 @@ export default {
     ];
 
     const adminTabs = [
-      { id: 'admin_overview', label: 'Admin Dashboard', icon: 'ph-squares-four', adminTab: 'overview' },
-      { id: 'admin_students', label: 'Manajemen Siswa', icon: 'ph-users-three', adminTab: 'students' },
-      { id: 'admin_transactions', label: 'Riwayat Transaksi', icon: 'ph-receipt', adminTab: 'transactions' },
-      { id: 'admin_questions', label: 'Bank Soal CBT', icon: 'ph-book-open', adminTab: 'questions' },
-      { id: 'admin_materials', label: 'Manajemen Materi', icon: 'ph-books', adminTab: 'materials' },
+      { id: 'admin_overview', label: 'Dashboard', icon: 'ph-squares-four', adminTab: 'overview' },
+      { id: 'admin_students', label: 'Siswa', icon: 'ph-users-three', adminTab: 'students' },
+      { id: 'admin_transactions', label: 'Transaksi', icon: 'ph-receipt', adminTab: 'transactions' },
+      { id: 'admin_questions', label: 'Soal', icon: 'ph-book-open', adminTab: 'questions' },
+      { id: 'admin_materials', label: 'Materi', icon: 'ph-books', adminTab: 'materials' },
       { id: 'admin_vouchers', label: 'Voucher Diskon', icon: 'ph-ticket', adminTab: 'vouchers' },
       { id: 'admin_affiliates', label: 'Program Afiliasi', icon: 'ph-hand-coins', adminTab: 'affiliates' },
       { id: 'admin_settings', label: 'Paket & Staff', icon: 'ph-gear', adminTab: 'settings' },

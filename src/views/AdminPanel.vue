@@ -1,6 +1,12 @@
 <template>
+  <!-- ===== LOGOUT TRANSITION OVERLAY ===== -->
+  <div v-if="isLoggingOut" class="fixed inset-0 z-[999] bg-[#050a18] flex flex-col items-center justify-center text-white space-y-3">
+    <div class="w-9 h-9 rounded-full border-2 border-[#c0ff00] border-t-transparent animate-spin"></div>
+    <span class="text-xs font-black text-white/70 tracking-widest uppercase">Mengalihkan ke Halaman Utama...</span>
+  </div>
+
   <!-- ===== LOGIN GATE ===== -->
-  <div v-if="!isAuthenticated" class="min-h-screen flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(135deg, #050a18 0%, #0d1224 60%, #050a18 100%);">
+  <div v-if="!isAuthenticated && !isLoggingOut" class="min-h-screen flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(135deg, #050a18 0%, #0d1224 60%, #050a18 100%);">
     <!-- Glow decorations -->
     <div class="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #c0ff00 0%, transparent 70%);"></div>
     <div class="absolute bottom-0 right-1/4 w-80 h-80 rounded-full opacity-15 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #6366f1 0%, transparent 70%);"></div>
@@ -1340,23 +1346,127 @@
 
         <!-- ===== TAB: PENGATURAN (AFILIATOR & PROFIL) ===== -->
         <div v-if="activeTab === 'settings'" class="space-y-6 animate-fade-in max-w-4xl">
-          <div class="flex justify-between items-center">
+          <!-- Header Bar with Edit / Action Buttons -->
+          <div class="flex flex-wrap justify-between items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
             <div>
-              <h2 class="text-xs font-black text-white uppercase tracking-wider">Pengaturan Akun & Rekening Pencairan</h2>
-              <p class="text-[10px] text-white/40">Kelola informasi profil, rekening penarikan komisi, dan keamanan akun</p>
+              <h2 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="ph-bold ph-gear text-[#c0ff00]"></i>
+                <span>Pengaturan Akun &amp; Rekening Pencairan</span>
+              </h2>
+              <p class="text-xs text-white/50 mt-0.5">
+                {{ isEditingAffiliateSettings ? 'Perbarui informasi profil, rekening pencairan, atau password Anda di bawah ini.' : 'Informasi profil terdaftar dan rekening tujuan pencairan komisi Anda.' }}
+              </p>
             </div>
-            <button @click="saveAffiliateSettings" :disabled="isSavingSettings" class="px-4 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-xl transition-all shadow-lg shadow-[#c0ff00]/20 flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
-              <i class="ph-bold ph-floppy-disk"></i>
-              <span>{{ isSavingSettings ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
-            </button>
+            <div class="flex items-center gap-2">
+              <button 
+                v-if="!isEditingAffiliateSettings"
+                @click="isEditingAffiliateSettings = true" 
+                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer"
+              >
+                <i class="ph-bold ph-pencil-simple text-sm"></i>
+                <span>Edit Pengaturan</span>
+              </button>
+              <template v-else>
+                <button 
+                  @click="cancelEditAffiliateSettings" 
+                  class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button 
+                  @click="saveAffiliateSettings" 
+                  :disabled="isSavingSettings" 
+                  class="px-4 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-xl transition-all shadow-lg shadow-[#c0ff00]/20 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <i class="ph-bold ph-floppy-disk"></i>
+                  <span>{{ isSavingSettings ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
+                </button>
+              </template>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Card 1: Data Mitra & Profil -->
+          <!-- 1. VIEW MODE (Data Ditampilkan Dulu Sesuai Permintaan) -->
+          <div v-if="!isEditingAffiliateSettings" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- View Card 1: Data Mitra & Profil -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Informasi Profil Mitra</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Aktif</span>
+              </div>
+              <div class="space-y-3.5 text-xs">
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Lengkap</span>
+                  <div class="text-sm font-bold text-white">{{ affiliateSettingsForm.name || currentAdminUser?.name || '-' }}</div>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Email Akun (Identity)</span>
+                  <div class="text-sm font-mono text-white/90">{{ affiliateSettingsForm.email || currentAdminUser?.email || '-' }}</div>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Peran Akun</span>
+                  <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/15 border border-indigo-500/30 rounded-lg text-indigo-300 font-bold text-xs mt-1">
+                    <i class="ph-bold ph-shield-check"></i>
+                    <span>Mitra Afiliasi Resmi EduPath</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- View Card 2: Rekening Bank & E-Wallet Penarikan -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-bank text-emerald-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Rekening Pencairan Komisi</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Siap Transfer</span>
+              </div>
+              <div class="space-y-3.5 text-xs">
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Bank / E-Wallet</span>
+                  <div class="text-sm font-bold text-white">{{ affiliateSettingsForm.bank_name || '-' }}</div>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nomor Rekening / No. HP E-Wallet</span>
+                  <div class="text-sm font-mono font-bold text-[#c0ff00]">{{ affiliateSettingsForm.bank_account || '-' }}</div>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Pemilik Rekening</span>
+                  <div class="text-sm font-bold text-white uppercase">{{ affiliateSettingsForm.bank_owner || '-' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- View Card 3: Keamanan Akun -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-3 md:col-span-2">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Kata Sandi</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">Terenkripsi BCRYPT</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs text-white/70">Password akun terlindungi dengan enkripsi aman standar perbankan.</span>
+                </div>
+                <button @click="isEditingAffiliateSettings = true" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold underline cursor-pointer">
+                  Ubah Kata Sandi &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. EDIT MODE (Tampil saat tombol Edit ditekan) -->
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Edit Card 1: Data Mitra & Profil -->
             <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
               <div class="flex items-center gap-2 border-b border-white/10 pb-3">
                 <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
-                <h3 class="font-black text-white text-xs uppercase tracking-wider">Informasi Profil Mitra</h3>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Profil Mitra</h3>
               </div>
               <div class="space-y-3 text-xs">
                 <div>
@@ -1377,11 +1487,11 @@
               </div>
             </div>
 
-            <!-- Card 2: Rekening Bank & E-Wallet Penarikan -->
+            <!-- Edit Card 2: Rekening Bank & E-Wallet Penarikan -->
             <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
               <div class="flex items-center gap-2 border-b border-white/10 pb-3">
                 <i class="ph-bold ph-bank text-emerald-400 text-lg"></i>
-                <h3 class="font-black text-white text-xs uppercase tracking-wider">Rekening Pencairan Komisi</h3>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Rekening Pencairan</h3>
               </div>
               <div class="space-y-3 text-xs">
                 <div>
@@ -1408,11 +1518,11 @@
               </div>
             </div>
 
-            <!-- Card 3: Keamanan / Ganti Password -->
+            <!-- Edit Card 3: Keamanan / Ganti Password -->
             <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4 md:col-span-2">
               <div class="flex items-center gap-2 border-b border-white/10 pb-3">
                 <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
-                <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan Akun</h3>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Ganti Password</h3>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 <div>
@@ -2240,6 +2350,7 @@ const router = useRouter()
 
 // ── Data ──
 const isAuthenticated = ref(false);
+const isLoggingOut = ref(false);
 const sidebarOpen = ref(true);
 const initialTab = () => {
   const stored = sessionStorage.getItem('admin_active_tab');
@@ -2355,7 +2466,7 @@ const navItems = computed(() => {
       { id: 'affiliate_dashboard', label: 'Dashboard Afiliasi', icon: 'ph-chart-pie-slice', roles: ['affiliate'] },
       { id: 'affiliate_referrals', label: 'Siswa Rujukan Saya', icon: 'ph-users-three',      roles: ['affiliate'] },
       { id: 'affiliate_payouts',   label: 'Pencairan Komisi',    icon: 'ph-wallet',           roles: ['affiliate'] },
-      { id: 'settings',            label: 'Pengaturan Rekening', icon: 'ph-gear',             roles: ['affiliate'] }
+      { id: 'settings',            label: 'Pengaturan',          icon: 'ph-gear',             roles: ['affiliate'] }
     ];
   }
 
@@ -2364,13 +2475,13 @@ const navItems = computed(() => {
   const role = currentRole.value || 'admin';
 
   const items = [
-    { id: 'overview',     label: 'Overview',              icon: 'ph-squares-four',  roles: ['superadmin', 'admin', 'teacher'] },
+    { id: 'overview',     label: 'Dashboard',             icon: 'ph-squares-four',  roles: ['superadmin', 'admin', 'teacher'] },
     ...(isT ? [{ id: 'teacher_hub', label: 'Siswa & Jadwal Saya', icon: 'ph-chalkboard-teacher', roles: ['teacher'] }] : []),
-    { id: 'questions',   label: isT ? 'Bank Soal Saya' : 'Bank Soal CBT', icon: 'ph-books', roles: ['superadmin', 'admin', 'teacher'] },
-    { id: 'materials',   label: isT ? 'Materi Saya' : 'Manajemen Materi', icon: 'ph-file-text', roles: ['superadmin', 'admin', 'teacher'] },
-    { id: 'students',    label: 'Manajemen Siswa',       icon: 'ph-users-three',   roles: ['superadmin', 'admin'] },
-    { id: 'transactions',label: 'Riwayat Transaksi',     icon: 'ph-receipt',       roles: ['superadmin', 'admin'] },
-    { id: 'packages',    label: 'Manajemen Paket',       icon: 'ph-package',       roles: ['superadmin', 'admin'] },
+    { id: 'questions',   label: isT ? 'Bank Soal Saya' : 'Soal', icon: 'ph-books', roles: ['superadmin', 'admin', 'teacher'] },
+    { id: 'materials',   label: isT ? 'Materi Saya' : 'Materi', icon: 'ph-file-text', roles: ['superadmin', 'admin', 'teacher'] },
+    { id: 'students',    label: 'Siswa',                 icon: 'ph-users-three',   roles: ['superadmin', 'admin'] },
+    { id: 'transactions',label: 'Transaksi',             icon: 'ph-receipt',       roles: ['superadmin', 'admin'] },
+    { id: 'packages',    label: 'Paket',                 icon: 'ph-package',       roles: ['superadmin', 'admin'] },
     { id: 'affiliates',  label: 'Afiliasi & Komisi',     icon: 'ph-hand-coins',    roles: ['superadmin', 'admin'] },
     { id: 'staff',       label: 'Manajemen Staff',       icon: 'ph-users-three',   roles: ['superadmin'] },
     { id: 'reports',     label: 'Laporan & Analitik',    icon: 'ph-chart-bar',     roles: ['superadmin', 'admin'] },
@@ -2513,8 +2624,7 @@ const doLogin = async () => {
 };
 
 const doLogout = async () => {
-  // Update UI optimistically to give instant feedback
-  isAuthenticated.value = false;
+  isLoggingOut.value = true;
   document.body.style.pointerEvents = 'none'; // Prevent further clicks
   
   try {
@@ -2528,12 +2638,16 @@ const doLogout = async () => {
   localStorage.removeItem('user_role');
   localStorage.removeItem('user_name');
   localStorage.removeItem('user_email');
+  localStorage.removeItem('user');
+  sessionStorage.removeItem('admin_token');
+  sessionStorage.removeItem('admin_role');
+  sessionStorage.removeItem('ep_user');
   currentRole.value = '';
   
   document.body.style.pointerEvents = '';
-  window.location.hash = '#/';
-  location.reload();
-}
+  window.location.href = window.location.origin + window.location.pathname + '#/';
+  window.location.reload();
+};
 
 onMounted(async () => {
   const adminToken = sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token');
@@ -3469,6 +3583,12 @@ const submitPayout = async () => {
 
 // ── Affiliate Portal Settings ──
 const isSavingSettings = ref(false);
+const isEditingAffiliateSettings = ref(false);
+const cancelEditAffiliateSettings = () => {
+  isEditingAffiliateSettings.value = false;
+  loadAffiliateSettings();
+};
+
 const affiliateSettingsForm = reactive({
   name: '',
   email: '',
@@ -3527,6 +3647,7 @@ const saveAffiliateSettings = async () => {
       new_password: affiliateSettingsForm.new_password
     });
     alert('Pengaturan berhasil disimpan!');
+    isEditingAffiliateSettings.value = false;
     affiliateSettingsForm.new_password = '';
     affiliateSettingsForm.confirm_password = '';
     if (affiliateSettingsForm.name) {
