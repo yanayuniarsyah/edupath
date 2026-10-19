@@ -812,6 +812,12 @@
 
         <!-- 1. TAB: AFFILIATE DASHBOARD -->
         <div v-if="activeTab === 'affiliate_dashboard' && isAffiliate" class="space-y-6 animate-fade-in">
+          <!-- ✨ Banner Gambar EduPath Partner (Gambar 1.jpeg Wanita EduPath Partner) -->
+          <div class="rounded-3xl overflow-hidden border border-amber-500/30 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
+            <img src="/1.jpeg" alt="EduPath Partner Banner" class="w-full h-44 md:h-56 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+            <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-90 z-10"></div>
+          </div>
+
           <!-- Hero Banner & Referral Link -->
           <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0c1836] via-[#0e1f4d] to-[#0a1226] border border-amber-500/30 p-6 shadow-2xl">
             <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
@@ -2367,6 +2373,11 @@ const formatCurrency = (value) => {
   return 'Rp ' + Number(value || 0).toLocaleString('id-ID');
 };
 
+const stripHtml = (html) => {
+  if (!html) return '';
+  return String(html).replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
+};
+
 // ── Question Preview & Teacher Ownership State ──
 const showQuestionPreviewModal = ref(false);
 const selectedQuestionForPreview = ref(null);
@@ -2518,10 +2529,12 @@ onMounted(async () => {
   const tokenToInspect = adminToken || mainToken;
   if (tokenToInspect) {
     const roleFromTok = extractRoleFromToken(tokenToInspect);
-    if (roleFromTok) {
-      currentRole.value = roleFromTok;
-      localStorage.setItem('user_role', roleFromTok);
-      sessionStorage.setItem('admin_role', roleFromTok);
+    const storedRole = sessionStorage.getItem('admin_role') || localStorage.getItem('user_role') || '';
+    const roleToUse = (storedRole === 'affiliate' || roleFromTok === 'affiliate') ? 'affiliate' : (roleFromTok || storedRole);
+    if (roleToUse) {
+      currentRole.value = roleToUse;
+      localStorage.setItem('user_role', roleToUse);
+      sessionStorage.setItem('admin_role', roleToUse);
     }
   }
 

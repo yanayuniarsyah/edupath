@@ -77,16 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                 });
 
-                if (!joinRes.ok) {
-                    console.error("Gagal join afiliasi otomatis, bisa diabaikan atau ditangani di dashboard");
+                let finalToken = token;
+                if (joinRes.ok) {
+                    try {
+                        const joinData = await joinRes.json();
+                        if (joinData.token) finalToken = joinData.token;
+                    } catch (e) {}
                 }
 
                 // Simpan token ke localStorage & sessionStorage (untuk kompatibilitas)
-                localStorage.setItem('auth_token', token);
-                localStorage.setItem('token', token);
-                sessionStorage.setItem('ep_session_token', token);
-                sessionStorage.setItem('admin_token', token);
+                localStorage.setItem('auth_token', finalToken);
+                localStorage.setItem('token', finalToken);
+                sessionStorage.setItem('ep_session_token', finalToken);
+                sessionStorage.setItem('admin_token', finalToken);
                 sessionStorage.setItem('admin_role', 'affiliate');
+                localStorage.setItem('user_role', 'affiliate');
                 localStorage.setItem('user', JSON.stringify({ ...regData.user, role: 'affiliate' }));
 
                 // Tampilkan pesan sukses dan delay redirect
@@ -145,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sessionStorage.setItem('ep_session_token', resData.token);
                 sessionStorage.setItem('admin_token', resData.token);
                 sessionStorage.setItem('admin_role', 'affiliate');
+                localStorage.setItem('user_role', 'affiliate');
                 localStorage.setItem('user', JSON.stringify(resData.user));
 
                 window.location.href = '/#/admin';

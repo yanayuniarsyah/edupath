@@ -265,7 +265,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Remove dummy student record so they do not show in students list
         $pdo->prepare("DELETE FROM students WHERE id = ? OR id = ? OR email = (SELECT identity_key FROM users WHERE id = ?)")->execute([$user_id, $payload->id, $user_id]);
 
-        echo json_encode(["success" => true, "referral_code" => $referral_code]);
+        // Generate updated JWT token with role 'affiliate'
+        $uStmt = $pdo->prepare("SELECT identity_key FROM users WHERE id = ?");
+        $uStmt->execute([$user_id]);
+        $uEmail = $uStmt->fetchColumn() ?: '';
+
+        $newToken = generate_jwt([
+            'user_id' => $user_id,
+            'id' => $id,
+            'role' => 'affiliate',
+            'tenant_id' => $tenant_id
+        ]);
+
+        echo json_encode([
+            "success" => true,
+            "token" => $newToken,
+            "referral_code" => $referral_code,
+            "user" => [
+                "id" => $user_id,
+                "name" => $name,
+                "email" => $uEmail,
+                "role" => "affiliate"
+            ]
+        ]);
     } catch (PDOException $e) {
         http_response_code(500);
         echo json_encode(["error" => "Database error: " . $e->getMessage()]);
