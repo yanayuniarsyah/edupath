@@ -880,9 +880,16 @@ elseif ($action === 'commissions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 elseif ($action === 'affiliate_settings') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        try {
+            $affCols = $pdo->query("DESCRIBE affiliates")->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('name', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN name VARCHAR(150) NULL");
+            if (!in_array('email', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN email VARCHAR(150) NULL");
+        } catch (\Throwable $e) {}
+
         $stmt = $pdo->prepare("
             SELECT a.id, a.referral_code, a.commission_rate, a.bank_name, a.bank_account, a.bank_owner,
-                   u.identity_key as email, COALESCE(s.name, u.identity_key) as name
+                   COALESCE(a.email, u.identity_key) as email, 
+                   COALESCE(a.name, s.name, u.identity_key) as name
             FROM affiliates a
             JOIN users u ON a.user_id = u.id
             LEFT JOIN students s ON (LOWER(s.email) = LOWER(u.identity_key))
@@ -926,10 +933,10 @@ elseif ($action === 'affiliate_settings') {
             if ($affId) {
                 $stmt = $pdo->prepare("
                     UPDATE affiliates 
-                    SET bank_name = ?, bank_account = ?, bank_owner = ? 
+                    SET bank_name = ?, bank_account = ?, bank_owner = ?, name = ?, email = ? 
                     WHERE id = ?
                 ");
-                $stmt->execute([$bank_name, $bank_account, $bank_owner, $affId]);
+                $stmt->execute([$bank_name, $bank_account, $bank_owner, $name, $email, $affId]);
             } else {
                 $tId = (!empty($payload->tenant_id)) ? $payload->tenant_id : 'default_tenant';
                 $stmt = $pdo->prepare("

@@ -153,11 +153,18 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (\Throwable $e) {}
     }
 
+    // Ensure affiliates columns exist for backward-compatibility
+    try {
+        $affCols = $pdo->query("DESCRIBE affiliates")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('name', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN name VARCHAR(150) NULL");
+        if (!in_array('email', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN email VARCHAR(150) NULL");
+    } catch (\Throwable $e) {}
+
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.password as user_password, s.password as student_password, ur.role, ur.tenant_id, ur.reference_id, 
                COALESCE(s.id, a.id, ur.reference_id) as student_id, 
-               COALESCE(s.name, aff.bank_owner, a.name, 'Mitra Afiliasi') as name, 
-               COALESCE(s.email, a.username, u.identity_key) as email, 
+               COALESCE(s.name, aff.name, aff.bank_owner, a.name, 'Mitra Afiliasi') as name, 
+               COALESCE(s.email, aff.email, a.username, u.identity_key) as email, 
                COALESCE(s.target_ptn, 'UI') as target_ptn, 
                COALESCE(s.plan, 'free') as plan,
                COALESCE(t.is_active, 1) as tenant_active,

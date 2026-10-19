@@ -87,7 +87,7 @@
               <div class="relative shrink-0 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'w-6 h-6' : 'w-8 h-8'">
                 <span class="absolute text-xs font-black opacity-100 text-white">{{ tab.label.charAt(0) }}</span>
                 <i :class="['ph-bold relative z-10', tab.icon, (sidebarExpanded || mobileSidebarOpen) ? 'text-lg' : 'text-xl', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/70 group-hover:text-white']"></i>
-                <i v-if="['diagnostic', 'learning', 'simulator', 'studyroom'].includes(tab.id) && isLoggedIn && !currentUser?.is_premium && !isStaff" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
+                <i v-if="['diagnostic', 'learning', 'simulator'].includes(tab.id) && isLoggedIn && !currentUser?.is_premium && !isStaff" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
               </div>
               <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="font-bold tracking-tight whitespace-nowrap" :class="currentTab === tab.id ? 'text-white' : ''">{{ tab.label }}</span>
             </button>
@@ -2171,11 +2171,11 @@
             <div class="flex flex-wrap items-center gap-3 shrink-0">
               <button @click="handleTabClick('diagnostic')" class="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
                 <i class="ph-bold ph-exam text-base"></i>
-                <span>Mulai Tryout</span>
+                <span>Mulai Asesmen</span>
               </button>
               <button @click="handleTabClick('learning')" class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
                 <i class="ph-bold ph-book-open text-base text-white/70"></i>
-                <span>Belajar Materi</span>
+                <span>Materi</span>
               </button>
               <button @click="handleTabClick('practice')" class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
                 <i class="ph-bold ph-pencil-simple text-base text-white/70"></i>
@@ -2270,21 +2270,199 @@
               </div>
             </div>
 
-            <!-- Daily Mission Card -->
-            <div class="glass-card flex flex-col justify-between p-4 md:p-5 rounded-2xl">
+            <!-- Radar Blind-Spot & Kelemahan Card (Pindahan dari Tryout) -->
+            <div class="glass-card flex flex-col justify-between p-4 md:p-5 rounded-2xl border border-rose-500/20 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-rose-950/20">
               <div>
-                <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-xl font-black font-heading text-white tracking-tight">Misi Harian</h3>
-                  <i class="ph-fill ph-sword text-2xl text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]"></i>
+                <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-base">
+                      <i class="ph-bold ph-radar"></i>
+                    </span>
+                    <div>
+                      <h4 class="text-sm font-black text-white tracking-tight uppercase">Radar Blind-Spot AI</h4>
+                      <p class="text-[10px] text-white/50">Deteksi kelemahan materi sebelum UTBK</p>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">1 Kritis</span>
                 </div>
-                <p class="text-[11px] text-white/60 mb-3 font-medium">Selesaikan misi untuk XP.</p>
-                <ul class="space-y-3">
-                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-white/5 border-white/10 hover:border-white/20']">
-                    <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-white text-emerald-400 focus:ring-emerald-500 focus:ring-offset-0 w-5 h-5 cursor-pointer appearance-none checked:bg-emerald-500/100 checked:border-emerald-500 relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-xs checked:after:font-black checked:after:left-[4px] checked:after:top-[1px]" @change="checkMissionReward(m)">
-                    <span :class="['text-[11px] font-bold flex-grow text-white transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
+
+                <div class="space-y-2.5">
+                  <!-- Skill 1: Geometri (Critical) -->
+                  <div class="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="font-bold text-white">Geometri Bangun Ruang (3D)</span>
+                      <span class="text-rose-400 font-mono font-black text-[11px]">35% · Kritis</span>
+                    </div>
+                    <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-rose-500 h-full rounded-full" style="width: 35%;"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px]">
+                      <span class="text-white/60">Skor hilang: <strong class="text-rose-400">-35 Poin</strong></span>
+                      <button @click="handleTabClick('learning')" class="font-black text-[#c0ff00] hover:underline cursor-pointer">
+                        Drill 5 Menit &raquo;
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Skill 2: Silogisme (Moderate) -->
+                  <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="font-bold text-white">Silogisme &amp; Logika Majemuk</span>
+                      <span class="text-amber-400 font-mono font-black text-[11px]">60% · Pemantapan</span>
+                    </div>
+                    <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-amber-500 h-full rounded-full" style="width: 60%;"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px]">
+                      <span class="text-white/60">Akurasi: <strong class="text-white/80">6/10 Soal</strong></span>
+                      <button @click="handleTabClick('practice')" class="font-black text-amber-300 hover:underline cursor-pointer">
+                        Latihan &raquo;
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Skill 3: Aljabar (Strong) -->
+                  <div class="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="font-bold text-white">Aljabar &amp; Persamaan Kuadrat</span>
+                      <span class="text-emerald-400 font-mono font-black text-[11px]">85% · Kuasai</span>
+                    </div>
+                    <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-emerald-500 h-full rounded-full" style="width: 85%;"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px]">
+                      <span class="text-white/60">Tingkat akurasi tinggi</span>
+                      <span class="text-emerald-400 font-mono font-bold">AMAN</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION: Misi Harian, Peringkat Streak & Ruang Belajar Virtual 24/7 (Pomodoro) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Col 1-5: Misi Harian & Peringkat Streak Belajar -->
+            <div class="lg:col-span-5 space-y-5">
+              <!-- Misi Harian Card -->
+              <div class="glass-card p-5 rounded-2xl border border-amber-500/20">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-base">
+                      <i class="ph-fill ph-sword"></i>
+                    </span>
+                    <div>
+                      <h3 class="text-base font-black font-heading text-white tracking-tight">Misi Harian</h3>
+                      <p class="text-[10px] text-white/50">Selesaikan misi untuk XP &amp; naik level.</p>
+                    </div>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-[11px] font-black">+{{ dailyMissions.reduce((acc, m) => acc + (m.completed ? m.reward : 0), 0) }} XP</span>
+                </div>
+                <ul class="space-y-2">
+                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/25' : 'bg-white/5 border-white/10 hover:border-white/20']">
+                    <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-white text-emerald-400 focus:ring-emerald-500 focus:ring-offset-0 w-4 h-4 cursor-pointer appearance-none checked:bg-emerald-500/100 checked:border-emerald-500 relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-[10px] checked:after:font-black checked:after:left-[3px] checked:after:top-[0px]" @change="checkMissionReward(m)">
+                    <span :class="['text-xs font-bold flex-grow text-white transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
                     <span class="text-xs font-black font-mono shrink-0 text-amber-400">+{{ m.reward }}</span>
                   </li>
                 </ul>
+              </div>
+
+              <!-- Peringkat Streak Belajar Card -->
+              <div class="glass-card p-5 rounded-2xl border border-indigo-500/20">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-base">
+                      <i class="ph-bold ph-fire"></i>
+                    </span>
+                    <div>
+                      <h3 class="text-base font-black font-heading text-white tracking-tight">Peringkat Streak Belajar</h3>
+                      <p class="text-[10px] text-white/50">Konsistensi harian kunci kelulusan PTN.</p>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-black font-mono">🔥 {{ streakCount }} Hari</span>
+                </div>
+                <ul class="space-y-2">
+                  <li class="flex items-center gap-2.5 p-2 rounded-xl bg-gradient-to-r from-indigo-500/20 to-purple-500/10 border border-indigo-500/30">
+                    <span class="w-6 h-6 rounded-full bg-[#c0ff00] text-black flex items-center justify-center font-mono font-black text-xs">1</span>
+                    <div class="flex-grow min-w-0">
+                      <div class="text-xs font-bold text-white truncate">{{ currentUser?.name || 'Anda (Siswa Mandiri)' }}</div>
+                      <div class="text-[10px] text-[#c0ff00] font-semibold">Streak Aktif</div>
+                    </div>
+                    <span class="text-xs text-[#c0ff00] font-black font-mono shrink-0">{{ streakCount }} Hari</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 p-2 rounded-xl bg-white/5 border border-white/5">
+                    <span class="w-6 h-6 rounded-full bg-white/10 text-white/70 flex items-center justify-center font-mono font-bold text-xs">2</span>
+                    <span class="text-xs font-medium text-white/80 flex-grow truncate">Budi Santoso</span>
+                    <span class="text-xs text-white/50 font-mono shrink-0">6 Hari</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 p-2 rounded-xl bg-white/5 border border-white/5">
+                    <span class="w-6 h-6 rounded-full bg-white/10 text-white/70 flex items-center justify-center font-mono font-bold text-xs">3</span>
+                    <span class="text-xs font-medium text-white/80 flex-grow truncate">Citra Lestari</span>
+                    <span class="text-xs text-white/50 font-mono shrink-0">5 Hari</span>
+                  </li>
+                  <li class="flex items-center gap-2.5 p-2 rounded-xl bg-white/5 border border-white/5">
+                    <span class="w-6 h-6 rounded-full bg-white/10 text-white/70 flex items-center justify-center font-mono font-bold text-xs">4</span>
+                    <span class="text-xs font-medium text-white/80 flex-grow truncate">Dewi Setyowati</span>
+                    <span class="text-xs text-white/50 font-mono shrink-0">5 Hari</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Col 6-12: Virtual Study Room 24/7 (Pomodoro Focus & Lo-Fi Ambience) -->
+            <div class="lg:col-span-7 glass-card p-5 md:p-6 rounded-2xl border border-white/10 flex flex-col justify-between">
+              <div>
+                <div class="flex flex-wrap justify-between items-start border-b border-white/10 pb-3 mb-5 gap-2">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <h3 class="text-lg font-black font-heading text-white">Virtual Study Room 24/7</h3>
+                    </div>
+                    <p class="text-xs text-white/60 mt-0.5">Sesi fokus mandiri teknik Pomodoro bersama pejuang SNBT se-Indonesia.</p>
+                  </div>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-xs font-bold text-emerald-400 rounded-full">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span>
+                    {{ onlineStudents }} Pejuang Online
+                  </span>
+                </div>
+
+                <!-- Pomodoro Widget Display -->
+                <div class="py-8 bg-black/40 rounded-2xl border border-white/10 text-center space-y-3 relative overflow-hidden">
+                  <div class="timer-display font-heading font-black text-5xl md:text-6xl text-white tracking-widest font-mono">{{ formattedTime }}</div>
+                  <div class="text-xs text-indigo-400 uppercase tracking-widest font-black">
+                    {{ isBreak ? '☕ Waktunya Istirahat (5 Menit)' : '🎯 Sesi Fokus Belajar (25 Menit)' }}
+                  </div>
+                  <div class="flex justify-center gap-3 pt-3">
+                    <button class="px-6 py-2.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-105 active:scale-95 cursor-pointer" @click="toggleTimer">
+                      {{ timerActive ? 'Jeda (Pause)' : 'Mulai Sesi Fokus' }}
+                    </button>
+                    <button class="px-5 py-2.5 bg-white/10 border border-white/15 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition-all cursor-pointer" @click="resetTimer">
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lo-Fi Music Selector -->
+              <div class="mt-5 border-t border-white/10 pt-4">
+                <label class="text-[11px] text-white/60 font-bold uppercase tracking-wider block mb-2.5 flex items-center gap-1.5">
+                  <i class="ph-bold ph-headphones text-sm text-indigo-400"></i> Pilihan Musik Lofi Ambience:
+                </label>
+                <div class="flex flex-wrap gap-2">
+                  <button 
+                    v-for="track in lofiTracks" 
+                    :key="track.id" 
+                    :class="['px-3.5 py-2 border rounded-xl text-xs font-bold transition-all cursor-pointer', 
+                      currentTrack === track.id 
+                        ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.5)]' 
+                        : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20 hover:text-white'
+                    ]"
+                    @click="playTrack(track.id)"
+                  >
+                    <i class="ph-bold" :class="currentTrack === track.id ? 'ph-speaker-high animate-bounce' : 'ph-play'"></i>
+                    {{ track.name }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -2356,8 +2534,8 @@
                 <i class="ph-bold ph-exam"></i>
               </div>
               <div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Simulasi & Assessment Adaptif</span>
-                <h2 class="text-base md:text-lg font-black text-white">Diagnostic &amp; Adaptive Simulation Test</h2>
+                <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Asesmen Diagnostik Adaptif</span>
+                <h2 class="text-base md:text-lg font-black text-white">Asesmen Diagnostik &amp; Pemetaan Kemampuan</h2>
               </div>
             </div>
             <div class="flex items-center gap-2">
@@ -2787,89 +2965,7 @@
           </div>
         </section>
 
-        <!-- TAB 5: VIRTUAL STUDY ROOM -->
-        <section v-if="currentTab === 'studyroom'" class="animate-fade-in space-y-6">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Room Status Card -->
-            <div class="light-mode-card rounded-2xl p-6 lg:col-span-2 flex flex-col justify-between">
-              <div>
-                <div class="flex justify-between items-start border-b border-slate-200 pb-3 mb-6">
-                  <div>
-                    <h3 class="text-xl font-black font-heading text-slate-900">Virtual Study Room 24/7</h3>
-                    <p class="text-xs text-slate-500 mt-1 font-medium">Belajar mandiri bersama pejuang PTN lainnya dengan teknik fokus Pomodoro.</p>
-                  </div>
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-700 rounded-full">
-                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                    {{ onlineStudents }} online
-                  </span>
-                </div>
 
-                <!-- Pomodoro Widget -->
-                <div class="py-12 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-4">
-                  <div class="timer-display font-heading font-black text-6xl text-slate-900 tracking-widest font-mono">{{ formattedTime }}</div>
-                  <div class="text-xs text-indigo-600 uppercase tracking-widest font-black">
-                    {{ isBreak ? 'Waktunya Istirahat' : 'Sesi Fokus Belajar' }}
-                  </div>
-                  <div class="flex justify-center gap-3 pt-4">
-                    <button class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.3)]" @click="toggleTimer">
-                      {{ timerActive ? 'Pause' : 'Start Sesi' }}
-                    </button>
-                    <button class="px-5 py-2.5 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors" @click="resetTimer">
-                      Reset
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-8 border-t border-slate-200 pt-6">
-                <label class="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-3">Pilihan Musik Lofi Ambience:</label>
-                <div class="flex gap-2">
-                  <button 
-                    v-for="track in lofiTracks" 
-                    :key="track.id" 
-                    :class="['px-4 py-2 border rounded-xl text-xs font-bold transition-all', 
-                      currentTrack === track.id 
-                        ? 'bg-indigo-50 border-indigo-400 text-indigo-900 shadow-[0_8px_32px_rgba(0,0,0,0.3)]' 
-                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
-                    ]"
-                    @click="playTrack(track.id)"
-                  >
-                    {{ track.name }}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Accountability leaderboard -->
-            <div class="light-mode-card rounded-2xl p-6">
-              <h3 class="text-lg font-black font-heading text-slate-900 mb-1">Peringkat Streak Belajar</h3>
-              <p class="text-xs text-slate-500 mb-6 font-medium">Konsistensi harian mengalahkan kecepatan menyelesaikan soal.</p>
-
-              <ul class="space-y-2.5">
-                <li class="flex items-center gap-3 p-3 bg-indigo-50/70 border border-indigo-200 rounded-xl">
-                  <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center font-mono font-black text-xs">1</span>
-                  <span class="text-xs font-bold text-slate-900 flex-grow">Anda (Siswa Mandiri)</span>
-                  <span class="text-xs text-indigo-600 font-black font-mono">{{ streakCount }} Hari</span>
-                </li>
-                <li class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                  <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-mono font-bold text-xs">2</span>
-                  <span class="text-xs font-medium text-slate-700 flex-grow">Budi Santoso</span>
-                  <span class="text-xs text-slate-500 font-mono">6 Hari</span>
-                </li>
-                <li class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                  <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-mono font-bold text-xs">3</span>
-                  <span class="text-xs font-medium text-slate-700 flex-grow">Citra Lestari</span>
-                  <span class="text-xs text-slate-500 font-mono">5 Hari</span>
-                </li>
-                <li class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                  <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-mono font-bold text-xs">4</span>
-                  <span class="text-xs font-medium text-slate-700 flex-grow">Dewi Setyowati</span>
-                  <span class="text-xs text-slate-500 font-mono">5 Hari</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
 
         <!-- TAB 6: PARENT PORTAL -->
         <section v-if="currentTab === 'parent'" class="animate-fade-in space-y-6 pt-24 lg:pt-28 px-3 sm:px-6">
@@ -2966,8 +3062,8 @@
                 <i class="ph-bold ph-chart-polar"></i>
               </div>
               <div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Simulasi &amp; Intelligence Cockpit</span>
-                <h2 class="text-base md:text-lg font-black text-white">Simulasi UTBK 2027 &amp; Proyeksi IRT Adaptif</h2>
+                <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Tryout UTBK SNBT 2027</span>
+                <h2 class="text-base md:text-lg font-black text-white">Tryout UTBK 2027 &amp; Proyeksi IRT Adaptif</h2>
               </div>
             </div>
             <button 
@@ -3057,248 +3153,284 @@
             </div>
           </div>
 
-          <!-- Main Interactive Cockpit Grid -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Main CBT Exam Simulation Grid (Official SNPMB Interface) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
-            <!-- Left Panel (7 cols): AI Hybrid HOTS Question Engine & Simulator -->
-            <div class="lg:col-span-7 space-y-4">
+            <!-- Left Workspace (Col 8): Official CBT Question Area -->
+            <div class="lg:col-span-8 space-y-4">
               
-              <!-- Subtest Pill Navigation Strip -->
-              <div class="light-mode-card rounded-2xl p-4 space-y-3">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <h3 class="text-base font-black text-slate-900 tracking-tight">Simulator Prediksi Soal UTBK 2027</h3>
-                    <p class="text-xs text-slate-500 font-medium">Model soal prediksi kombinasi penalaran logika &amp; spasial 3D.</p>
-                  </div>
+              <!-- Subtest Selector Bar (Official SNPMB Subtests) -->
+              <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3 shadow-lg">
+                <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-white/10">
                   <div class="flex items-center gap-2">
-                    <span class="px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-[11px] font-mono font-bold text-indigo-600">
-                      {{ SIMULATOR_DATABASE[activeSubtest] ? SIMULATOR_DATABASE[activeSubtest].length : 0 }} Soal Aktif
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#c0ff00] animate-pulse"></span>
+                    <span class="text-xs font-black uppercase tracking-wider text-white">Subtes Aktif:</span>
+                    <span class="text-xs font-bold text-[#c0ff00]">
+                      {{ activeSubtest === 'PU' ? 'Penalaran Umum (PU)' : 
+                         activeSubtest === 'PK' ? 'Pengetahuan Kuantitatif (PK)' : 
+                         activeSubtest === 'PBM' ? 'Pemahaman Bacaan & Menulis (PBM)' : 
+                         activeSubtest === 'PPU' ? 'Pengetahuan & Pemahaman Umum (PPU)' : 
+                         activeSubtest === 'LIndo' ? 'Literasi Bahasa Indonesia' : 
+                         activeSubtest === 'LEng' ? 'Literasi Bahasa Inggris' : 'Penalaran Matematika (PM)' }}
                     </span>
                   </div>
+                  <span class="text-[11px] font-mono text-white/60 font-bold">
+                    {{ currentSubtestQuestions.length }} Soal
+                  </span>
                 </div>
 
-                <!-- Subtest Pills -->
-                <div class="flex gap-2 overflow-x-auto pb-1 border-t border-slate-200 pt-3">
+                <div class="flex gap-2 overflow-x-auto pb-1">
                   <button 
                     v-for="sub in [
-                      { id: 'PU', name: 'Penalaran Umum (PU)' },
-                      { id: 'PK', name: 'Pengetahuan Kuantitatif (PK)' },
-                      { id: 'LIndo', name: 'Literasi B. Indonesia' },
-                      { id: 'LEng', name: 'Literasi B. Inggris' },
-                      { id: 'PM', name: 'Penalaran Matematika (PM)' }
+                      { id: 'PU', name: 'PU', fullName: 'Penalaran Umum (30)' },
+                      { id: 'PK', name: 'PK', fullName: 'Kuantitatif (15)' },
+                      { id: 'PBM', name: 'PBM', fullName: 'PBM (20)' },
+                      { id: 'PPU', name: 'PPU', fullName: 'PPU (20)' },
+                      { id: 'LIndo', name: 'L.Indo', fullName: 'Literasi B.Indo (30)' },
+                      { id: 'LEng', name: 'L.Ingg', fullName: 'Literasi B.Ingg (20)' },
+                      { id: 'PM', name: 'PM', fullName: 'Penalaran MTK (20)' }
                     ]" 
                     :key="sub.id"
-                    :class="['px-3 py-2 rounded-xl text-xs font-bold transition-all shrink-0 border text-left', 
+                    :class="['px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 border cursor-pointer', 
                       activeSubtest === sub.id 
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-[0_8px_32px_rgba(0,0,0,0.3)] font-black' 
-                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                        ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-500/30 font-black' 
+                        : 'bg-white/5 border-white/10 text-white/70 hover:text-white hover:bg-white/10'
                     ]"
-                    @click="activeSubtest = sub.id"
+                    @click="setSubtest(sub.id)"
+                    :title="sub.fullName"
                   >
                     {{ sub.name }}
                   </button>
                 </div>
               </div>
 
-              <!-- Question Cards Stack -->
-              <div class="space-y-4">
-                <div 
-                  v-for="q in SIMULATOR_DATABASE[activeSubtest]" 
-                  :key="q.id" 
-                  class="light-mode-card rounded-2xl p-6 space-y-4"
-                >
-                  <!-- Question Badge Header -->
-                  <div class="flex items-center justify-between gap-2 border-b border-slate-200 pb-3">
-                    <div class="flex items-center gap-2">
-                      <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-mono text-xs font-bold">Soal #{{ q.num }}</span>
-                      <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-black uppercase tracking-wider">
-                        HYBRID HOTS 2027
-                      </span>
-                    </div>
-                    <span class="text-xs font-mono text-slate-500 font-bold">Bobot IRT: <strong class="text-indigo-600">+42 Poin</strong></span>
+              <!-- CBT Question Card (Official Paper Style) -->
+              <div v-if="currentCbtQuestion" class="bg-white rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl border border-slate-200">
+                <!-- Question Header Strip -->
+                <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                  <div class="flex items-center gap-3">
+                    <span class="px-3.5 py-1.5 rounded-xl bg-slate-900 text-white font-mono text-sm font-black shadow-sm">
+                      SOAL NO. {{ currentCbtQuestion.num || (cbtCurrentIndex + 1) }}
+                    </span>
+                    <span class="text-xs text-slate-500 font-bold">
+                      dari {{ currentSubtestQuestions.length }} Soal
+                    </span>
                   </div>
 
-                  <!-- Question Text -->
-                  <div class="text-base md:text-lg font-bold text-slate-900 leading-relaxed" v-html="q.question"></div>
+                  <!-- Font Size Switcher & IRT Weight (Official CBT Feature) -->
+                  <div class="flex items-center gap-3">
+                    <div class="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 text-xs font-bold text-slate-700">
+                      <span class="text-[10px] text-slate-400 px-2 uppercase font-mono">Ukuran:</span>
+                      <button @click="cbtFontSize = 'sm'" :class="cbtFontSize === 'sm' ? 'bg-white shadow text-indigo-600' : 'text-slate-500 hover:text-slate-900'" class="px-2 py-1 rounded cursor-pointer">A-</button>
+                      <button @click="cbtFontSize = 'normal'" :class="cbtFontSize === 'normal' ? 'bg-white shadow text-indigo-600' : 'text-slate-500 hover:text-slate-900'" class="px-2 py-1 rounded cursor-pointer">A</button>
+                      <button @click="cbtFontSize = 'lg'" :class="cbtFontSize === 'lg' ? 'bg-white shadow text-indigo-600' : 'text-slate-500 hover:text-slate-900'" class="px-2 py-1 rounded cursor-pointer">A+</button>
+                    </div>
+                    <span class="hidden sm:inline-flex px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold font-mono">
+                      Bobot IRT: +42
+                    </span>
+                  </div>
+                </div>
 
-                  <!-- Option Buttons -->
-                  <div class="grid grid-cols-1 gap-2.5 pt-1">
-                    <button 
-                      v-for="(opt, idx) in q.options" 
-                      :key="idx"
-                      :class="['w-full text-left px-4 py-3 rounded-xl border text-sm font-semibold transition-all outline-none flex items-center justify-between', 
-                        userAnswersMap[q.id] === idx 
-                          ? (idx === q.answer 
-                              ? 'bg-emerald-50 border-emerald-500 text-emerald-900 shadow-[0_8px_32px_rgba(0,0,0,0.3)]' 
-                              : 'bg-rose-50 border-rose-500 text-rose-900 shadow-[0_8px_32px_rgba(0,0,0,0.3)]')
-                          : 'bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-300 hover:bg-slate-100'
-                      ]" 
-                      @click="answerAnalisaQuestion(q.id, idx)"
+                <!-- Question Text / Stimulus -->
+                <div 
+                  :class="cbtFontSize === 'lg' ? 'text-lg md:text-xl' : (cbtFontSize === 'sm' ? 'text-sm md:text-base' : 'text-base md:text-lg')"
+                  class="text-slate-900 font-medium leading-relaxed select-text" 
+                  v-html="currentCbtQuestion.question"
+                ></div>
+
+                <!-- Answer Choices (Official CBT Radio Options) -->
+                <div class="space-y-3 pt-2">
+                  <button 
+                    v-for="(opt, idx) in currentCbtQuestion.options" 
+                    :key="idx"
+                    :class="[
+                      'w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4 cursor-pointer outline-none', 
+                      userAnswersMap[currentCbtQuestion.id] === idx 
+                        ? 'bg-indigo-50/80 border-indigo-600 text-slate-900 ring-2 ring-indigo-500/20 shadow-sm' 
+                        : 'bg-slate-50/70 border-slate-200 text-slate-800 hover:border-slate-300 hover:bg-slate-100/60'
+                    ]" 
+                    @click="answerAnalisaQuestion(currentCbtQuestion.id, idx)"
+                  >
+                    <div 
+                      :class="[
+                        'w-7 h-7 rounded-full flex items-center justify-center font-mono font-black text-xs shrink-0 transition-all shadow-sm',
+                        userAnswersMap[currentCbtQuestion.id] === idx 
+                          ? 'bg-indigo-600 text-white' 
+                          : 'bg-white border border-slate-300 text-slate-700'
+                      ]"
                     >
-                      <div class="flex items-center gap-3">
-                        <span :class="['w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black font-mono shrink-0',
-                          userAnswersMap[q.id] === idx ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-700'
-                        ]">
-                          {{ String.fromCharCode(65 + idx) }}
-                        </span>
-                        <span class="text-sm md:text-base font-medium" v-html="opt"></span>
-                      </div>
-                      <span v-if="userAnswersMap[q.id] === idx" class="text-xs font-mono font-black shrink-0">
-                        {{ idx === q.answer ? '✓ BENAR' : '✕ SALAH' }}
-                      </span>
+                      {{ String.fromCharCode(65 + idx) }}
+                    </div>
+                    <div 
+                      :class="cbtFontSize === 'lg' ? 'text-base' : (cbtFontSize === 'sm' ? 'text-xs' : 'text-sm')"
+                      class="pt-0.5 leading-relaxed font-medium" 
+                      v-html="opt"
+                    ></div>
+                  </button>
+                </div>
+
+                <!-- CBT Action Control Toolbar (Official SNPMB Style) -->
+                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5">
+                  <div class="flex items-center gap-2">
+                    <button 
+                      :disabled="cbtCurrentIndex <= 0" 
+                      @click="prevQuestion" 
+                      class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:pointer-events-none text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                    >
+                      <i class="ph-bold ph-caret-left"></i>
+                      <span>Sebelumnya</span>
+                    </button>
+
+                    <!-- Authentic Yellow Ragu-Ragu Button -->
+                    <button 
+                      @click="toggleRaguRagu(currentCbtQuestion.id)" 
+                      :class="cbtRaguMap[currentCbtQuestion.id] 
+                        ? 'bg-amber-400 hover:bg-amber-500 text-black border-amber-500 shadow-md ring-2 ring-amber-400/30' 
+                        : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300'"
+                      class="px-4 py-2.5 rounded-xl border font-black text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                      title="Tandai soal ini sebagai ragu-ragu"
+                    >
+                      <i class="ph-bold ph-flag"></i>
+                      <span>{{ cbtRaguMap[currentCbtQuestion.id] ? 'Ditandai Ragu-Ragu' : 'Ragu-Ragu' }}</span>
+                    </button>
+
+                    <button 
+                      :disabled="cbtCurrentIndex >= currentSubtestQuestions.length - 1" 
+                      @click="nextQuestion" 
+                      class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-30 disabled:pointer-events-none text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                    >
+                      <span>Berikutnya</span>
+                      <i class="ph-bold ph-caret-right"></i>
                     </button>
                   </div>
 
-                  <!-- AI Deep Breakdown Card (Instant on Answer) -->
-                  <div v-if="userAnswersMap[q.id] !== undefined" class="p-4 rounded-xl bg-slate-900 text-white border border-slate-800 space-y-3 animate-fade-in shadow-lg">
-                    <div class="flex items-center justify-between border-b border-white/10 pb-2">
-                      <span class="text-xs font-black uppercase tracking-wider text-[#c0ff00] flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-[#c0ff00]"></span>
-                        Bedah Analisis AI
-                      </span>
-                      <span :class="['text-xs font-bold font-mono', userAnswersMap[q.id] === q.answer ? 'text-emerald-400' : 'text-rose-400']">
-                        {{ userAnswersMap[q.id] === q.answer ? '+10 XP Logika' : 'Terdeteksi Blindspot' }}
-                      </span>
+                  <button 
+                    @click="cbtShowAnalysis = !cbtShowAnalysis" 
+                    class="px-3.5 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <i class="ph-bold ph-brain"></i>
+                    <span>{{ cbtShowAnalysis ? 'Sembunyikan Bedah AI' : 'Bedah Solusi AI' }}</span>
+                  </button>
+                </div>
+
+                <!-- AI Deep Solution Breakdown (Optional Review on Demand) -->
+                <div v-if="cbtShowAnalysis" class="p-5 rounded-2xl bg-slate-900 text-white border border-slate-800 space-y-4 animate-fade-in shadow-xl">
+                  <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
+                    <span class="text-xs font-black uppercase tracking-wider text-[#c0ff00] flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-[#c0ff00]"></span>
+                      Bedah Solusi &amp; Konsep Kunci SNBT
+                    </span>
+                    <span class="text-xs font-mono font-bold text-slate-400">
+                      Kunci Jawaban: <strong class="text-[#c0ff00]">{{ String.fromCharCode(65 + currentCbtQuestion.answer) }}</strong>
+                    </span>
+                  </div>
+
+                  <div class="space-y-3 text-xs leading-relaxed">
+                    <div>
+                      <strong class="text-white block font-bold mb-1">Analisis Jalur Solusi:</strong>
+                      <p class="text-white/80">{{ currentCbtQuestion.explanation }}</p>
                     </div>
 
-                    <div class="space-y-2 text-xs leading-relaxed">
-                      <div class="text-white/80">
-                        <strong class="text-white block font-bold mb-0.5">Analisis Jalur Solusi:</strong>
-                        <p class="text-white/70">{{ q.explanation }}</p>
-                      </div>
-
-                      <div class="p-2.5 rounded-lg bg-[#c0ff00]/10 border border-[#c0ff00]/25 text-[#c0ff00]">
-                        <strong class="block font-bold mb-0.5">Trik Cepat 30 Detik AI:</strong>
-                        <p class="text-white/90">{{ q.concept }}</p>
-                      </div>
+                    <div class="p-3 rounded-xl bg-[#c0ff00]/10 border border-[#c0ff00]/25 text-[#c0ff00]">
+                      <strong class="block font-bold mb-0.5">Trik Cepat 30 Detik AI:</strong>
+                      <p class="text-white/90">{{ currentCbtQuestion.concept }}</p>
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div v-else class="bg-white rounded-2xl p-12 text-center text-slate-500">
+                <i class="ph-bold ph-info text-3xl mb-2 text-slate-400"></i>
+                <p class="font-bold">Memuat soal subtes...</p>
               </div>
             </div>
 
-            <!-- Right Panel (5 cols): Blind Spot Heatmap & Action Plan -->
-            <div class="lg:col-span-5 space-y-4">
+            <!-- Right Sidebar (Col 4): Official CBT Navigation Grid & Timer -->
+            <div class="lg:col-span-4 space-y-4">
               
-              <!-- 1. Blind Spot Radar Card -->
-              <div class="light-mode-card rounded-2xl p-5 space-y-4">
+              <!-- Countdown Timer Card (Official SNPMB Header) -->
+              <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
                 <div class="flex items-center justify-between">
-                  <h4 class="text-sm font-black text-slate-900 tracking-tight uppercase">Radar Blind-Spot &amp; Kelemahan</h4>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-200">1 Kritis</span>
+                  <span class="text-[11px] font-bold text-white/60 uppercase tracking-wider">Sisa Waktu Ujian</span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 </div>
-
-                <div class="space-y-3">
-                  <!-- Skill 1: Geometri (Critical) -->
-                  <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 space-y-2">
-                    <div class="flex justify-between items-center text-xs">
-                      <span class="font-bold text-slate-900">Geometri Bangun Ruang (3D)</span>
-                      <span class="text-rose-600 font-mono font-black">35% · Kritis</span>
-                    </div>
-                    <div class="w-full bg-rose-200/60 h-1.5 rounded-full overflow-hidden">
-                      <div class="bg-rose-500 h-full rounded-full" style="width: 35%;"></div>
-                    </div>
-                    <div class="flex justify-between items-center pt-1 text-[11px]">
-                      <span class="text-slate-500">Potensi skor hilang: <strong class="text-rose-600">-35 Poin</strong></span>
-                      <button @click="currentTab = 'learning'" class="text-[10px] font-black text-indigo-600 hover:underline">
-                        Drill 5 Menit &raquo;
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Skill 2: Silogisme (Moderate) -->
-                  <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 space-y-2">
-                    <div class="flex justify-between items-center text-xs">
-                      <span class="font-bold text-slate-900">Silogisme &amp; Logika Majemuk</span>
-                      <span class="text-amber-700 font-mono font-black">60% · Pemantapan</span>
-                    </div>
-                    <div class="w-full bg-amber-200/60 h-1.5 rounded-full overflow-hidden">
-                      <div class="bg-amber-500 h-full rounded-full" style="width: 60%;"></div>
-                    </div>
-                    <div class="flex justify-between items-center pt-1 text-[11px]">
-                      <span class="text-slate-500">Akurasi saat ini: <strong>6/10 Soal</strong></span>
-                      <button @click="currentTab = 'practice'" class="text-[10px] font-black text-amber-800 hover:underline">
-                        Latihan Variasi &raquo;
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Skill 3: Aljabar (Strong) -->
-                  <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2">
-                    <div class="flex justify-between items-center text-xs">
-                      <span class="font-bold text-slate-900">Aljabar &amp; Persamaan Kuadrat</span>
-                      <span class="text-emerald-700 font-mono font-black">85% · Kuasai</span>
-                    </div>
-                    <div class="w-full bg-emerald-200/60 h-1.5 rounded-full overflow-hidden">
-                      <div class="bg-emerald-500 h-full rounded-full" style="width: 85%;"></div>
-                    </div>
-                    <div class="flex justify-between items-center pt-1 text-[11px]">
-                      <span class="text-slate-500">Tingkat akurasi konsisten tinggi</span>
-                      <span class="text-emerald-600 font-mono font-bold">AMAN</span>
-                    </div>
-                  </div>
+                <div class="flex items-center justify-center p-3 rounded-xl bg-black/60 border border-white/10 font-mono font-black text-2xl md:text-3xl text-[#c0ff00] tracking-widest">
+                  {{ cbtFormattedTimer }}
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-white/50 border-t border-white/10 pt-2 font-medium">
+                  <span>Peserta: <strong class="text-white">{{ currentUser?.name || 'Siswa Mandiri' }}</strong></span>
+                  <span>SNBT 2027</span>
                 </div>
               </div>
 
-              <!-- 2. AI 7-Day Sprint Action Plan -->
-              <div class="light-mode-card rounded-2xl p-5 space-y-3">
-                <div class="flex items-center justify-between">
-                  <h4 class="text-sm font-black text-slate-900 uppercase tracking-tight">AI 7-Day Sprint Plan</h4>
-                  <span class="text-[10px] font-bold text-indigo-600 font-mono font-black">+45 Poin Goal</span>
+              <!-- Question Grid Number Navigator (Official CBT 5-Column Grid) -->
+              <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
+                <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
+                  <h4 class="text-xs font-black text-white uppercase tracking-wider">Daftar Nomor Soal</h4>
+                  <span class="text-[10px] font-mono text-white/50">Subtes {{ activeSubtest }}</span>
                 </div>
-                <p class="text-xs text-slate-500 font-medium">Jalur prioritas harian untuk menutup blindspot sebelum tryout minggu ini.</p>
 
-                <div class="space-y-2 pt-1">
-                  <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                    <div class="flex items-center gap-2.5">
-                      <span class="w-5 h-5 rounded-full bg-indigo-600 text-white font-black text-[10px] flex items-center justify-center font-mono">1</span>
-                      <span class="text-slate-800 font-medium">Visualisasi Spasial Geometri</span>
-                    </div>
-                    <span class="text-[10px] font-mono text-indigo-600 font-bold">Hari 1-2</span>
+                <!-- CBT Status Legend -->
+                <div class="grid grid-cols-3 gap-2 text-[10px] font-bold text-white/70 py-1 border-b border-white/10">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded bg-emerald-500 shrink-0"></span>
+                    <span>Dijawab</span>
                   </div>
-
-                  <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                    <div class="flex items-center gap-2.5">
-                      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 font-black text-[10px] flex items-center justify-center font-mono">2</span>
-                      <span class="text-slate-800 font-medium">Eliminasi Jebakan Kuantitatif</span>
-                    </div>
-                    <span class="text-[10px] font-mono text-slate-500 font-bold">Hari 3-4</span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded bg-amber-400 shrink-0"></span>
+                    <span>Ragu-Ragu</span>
                   </div>
-
-                  <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                    <div class="flex items-center gap-2.5">
-                      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 font-black text-[10px] flex items-center justify-center font-mono">3</span>
-                      <span class="text-slate-800 font-medium">Simulasi Tryout IRT Lengkap</span>
-                    </div>
-                    <span class="text-[10px] font-mono text-slate-500 font-bold">Hari 5-7</span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded bg-white/10 border border-white/20 shrink-0"></span>
+                    <span>Belum</span>
                   </div>
                 </div>
 
-                <button @click="currentTab = 'learning'" class="w-full mt-2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
-                  Mulai Sprint Belajar Hari Ini
-                </button>
+                <!-- Number Grid (Clickable) -->
+                <div class="grid grid-cols-5 gap-2 max-h-72 overflow-y-auto pr-1 pt-1">
+                  <button 
+                    v-for="(q, idx) in currentSubtestQuestions" 
+                    :key="q.id"
+                    @click="jumpToQuestion(idx)"
+                    :class="[
+                      'h-10 rounded-xl font-mono text-xs font-black transition-all flex items-center justify-center cursor-pointer border',
+                      cbtCurrentIndex === idx ? 'ring-2 ring-indigo-400 scale-105 z-10' : '',
+                      cbtRaguMap[q.id] 
+                        ? 'bg-amber-400 text-black border-amber-500 shadow-sm' 
+                        : (userAnswersMap[q.id] !== undefined 
+                            ? 'bg-emerald-500 text-white border-emerald-400 shadow-sm' 
+                            : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/15 hover:border-white/25')
+                    ]"
+                    :title="`Soal #${idx + 1}`"
+                  >
+                    {{ idx + 1 }}
+                  </button>
+                </div>
+
+                <!-- Summary Counter -->
+                <div class="pt-3 border-t border-white/10 space-y-2">
+                  <div class="flex justify-between text-xs font-semibold text-white/70">
+                    <span>Terjawab: <strong class="text-emerald-400 font-mono">{{ Object.keys(userAnswersMap).filter(id => id.startsWith(activeSubtest)).length }}</strong></span>
+                    <span>Ragu: <strong class="text-amber-400 font-mono">{{ Object.keys(cbtRaguMap).filter(id => id.startsWith(activeSubtest) && cbtRaguMap[id]).length }}</strong></span>
+                    <span>Total: <strong class="text-white font-mono">{{ currentSubtestQuestions.length }}</strong></span>
+                  </div>
+
+                  <button 
+                    @click="currentTab = 'dashboard'"
+                    class="w-full py-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(192,255,0,0.3)] hover:scale-[1.02] active:scale-95 cursor-pointer mt-2 flex items-center justify-center gap-1.5"
+                  >
+                    <i class="ph-bold ph-check-circle text-base"></i>
+                    <span>Selesai &amp; Kumpulkan Subtes</span>
+                  </button>
+                </div>
               </div>
 
-              <!-- 3. Subtest Official Structure Reference -->
-              <div class="light-mode-card rounded-2xl p-5 space-y-3">
-                <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Struktur Subtes Resmi UTBK SNBT</h4>
-                <div class="space-y-2 text-xs">
-                  <div class="flex justify-between items-center text-slate-700 pb-1.5 border-b border-slate-100">
-                    <span>Tes Potensi Skolastik (TPS)</span>
-                    <span class="font-mono text-slate-900 font-bold">70 Soal · 90m</span>
-                  </div>
-                  <div class="flex justify-between items-center text-slate-700 pb-1.5 border-b border-slate-100">
-                    <span>Literasi B. Indonesia</span>
-                    <span class="font-mono text-slate-900 font-bold">30 Soal · 45m</span>
-                  </div>
-                  <div class="flex justify-between items-center text-slate-700 pb-1.5 border-b border-slate-100">
-                    <span>Literasi B. Inggris</span>
-                    <span class="font-mono text-slate-900 font-bold">20 Soal · 30m</span>
-                  </div>
-                  <div class="flex justify-between items-center text-slate-700">
-                    <span>Penalaran Matematika</span>
-                    <span class="font-mono text-slate-900 font-bold">30 Soal · 30m</span>
-                  </div>
-                </div>
+              <!-- Official Structure Info Box -->
+              <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 text-xs space-y-2 shadow-lg">
+                <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Info Standar UTBK BPPP SNPMB</span>
+                <p class="text-white/70 text-[11px] leading-relaxed">
+                  Soal dirancang sesuai kisi-kisi resmi SNBT dengan bobot penskoran <em>Item Response Theory (IRT)</em> adaptif.
+                </p>
               </div>
 
             </div>
@@ -4258,7 +4390,7 @@ export default {
         const regData = await regRes.json();
         if (!regRes.ok) throw new Error(regData.error || 'Gagal mendaftar akun');
 
-        const token = regData.token;
+        let token = regData.token;
         const joinRes = await fetch(`${apiUrl}/affiliate.php`, {
           method: 'POST',
           headers: { 
@@ -4266,18 +4398,33 @@ export default {
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
+            name: affiliateForm.value.name,
             bank_name: affiliateForm.value.bank_name,
             bank_account: affiliateForm.value.bank_account,
-            bank_owner: affiliateForm.value.bank_owner
+            bank_owner: affiliateForm.value.bank_owner || affiliateForm.value.name
           })
         });
 
         if (!joinRes.ok) {
           console.error("Gagal join afiliasi otomatis");
+        } else {
+          try {
+            const joinData = await joinRes.json();
+            if (joinData.token) token = joinData.token;
+          } catch (e) {}
         }
 
+        const affUserData = { 
+          ...(regData.user || {}), 
+          name: affiliateForm.value.name, 
+          email: affiliateForm.value.email, 
+          role: 'affiliate' 
+        };
         localStorage.setItem('auth_token', token);
-        localStorage.setItem('user', JSON.stringify({ ...regData.user, role: 'affiliate' }));
+        localStorage.setItem('user', JSON.stringify(affUserData));
+        localStorage.setItem('user_name', affiliateForm.value.name);
+        localStorage.setItem('user_email', affiliateForm.value.email);
+        sessionStorage.setItem('ep_user', JSON.stringify(affUserData));
         sessionStorage.setItem('admin_token', token);
         sessionStorage.setItem('admin_role', 'affiliate');
         
@@ -4336,6 +4483,55 @@ export default {
     const answerAnalisaQuestion = (id, idx) => {
       userAnswersMap.value = { ...userAnswersMap.value, [id]: idx };
       analisaWorking.value = true;
+    };
+
+    // CBT Tryout SNPMB official engine
+    const cbtCurrentIndex = ref(0);
+    const cbtRaguMap = ref({});
+    const cbtFontSize = ref('normal');
+    const cbtShowAnalysis = ref(false);
+    const cbtTimerSeconds = ref(5400);
+
+    const cbtFormattedTimer = computed(() => {
+      const h = Math.floor(cbtTimerSeconds.value / 3600);
+      const m = Math.floor((cbtTimerSeconds.value % 3600) / 60);
+      const s = cbtTimerSeconds.value % 60;
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    });
+
+    const currentSubtestQuestions = computed(() => {
+      return (SIMULATOR_DATABASE && SIMULATOR_DATABASE[activeSubtest.value]) || [];
+    });
+
+    const currentCbtQuestion = computed(() => {
+      const qs = currentSubtestQuestions.value;
+      if (!qs || !qs.length) return null;
+      const idx = Math.min(Math.max(0, cbtCurrentIndex.value), qs.length - 1);
+      return qs[idx];
+    });
+
+    const toggleRaguRagu = (qId) => {
+      if (!qId) return;
+      cbtRaguMap.value = { ...cbtRaguMap.value, [qId]: !cbtRaguMap.value[qId] };
+    };
+
+    const jumpToQuestion = (idx) => {
+      cbtCurrentIndex.value = idx;
+    };
+
+    const prevQuestion = () => {
+      if (cbtCurrentIndex.value > 0) cbtCurrentIndex.value--;
+    };
+
+    const nextQuestion = () => {
+      if (cbtCurrentIndex.value < currentSubtestQuestions.value.length - 1) {
+        cbtCurrentIndex.value++;
+      }
+    };
+
+    const setSubtest = (subId) => {
+      activeSubtest.value = subId;
+      cbtCurrentIndex.value = 0;
     };
 
     // Live Countdown
@@ -4549,12 +4745,11 @@ export default {
     const isStudentPreviewMode = ref(false);
 
     const studentTabs = [
-      { id: 'home', label: 'Home (Landing)', icon: 'ph-house' },
-      { id: 'dashboard', label: 'Dashboard Belajar', icon: 'ph-gauge' },
-      { id: 'diagnostic', label: 'Asesmen Kesiapan', icon: 'ph-brain' },
-      { id: 'learning', label: 'Materi & Drill', icon: 'ph-books' },
-      { id: 'simulator', label: 'Ujian 2027 Simulasi', icon: 'ph-calculator' },
-      { id: 'studyroom', label: 'Pomodoro Room', icon: 'ph-headphones' },
+      { id: 'home', label: 'Home', icon: 'ph-house' },
+      { id: 'dashboard', label: 'Dashboard', icon: 'ph-gauge' },
+      { id: 'diagnostic', label: 'Asesmen', icon: 'ph-brain' },
+      { id: 'learning', label: 'Materi', icon: 'ph-books' },
+      { id: 'simulator', label: 'Tryout', icon: 'ph-calculator' },
       { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' },
       { id: 'settings', label: 'Pengaturan', icon: 'ph-user-gear' }
     ];
@@ -4586,6 +4781,10 @@ export default {
     const filteredTabs = computed(() => {
       if (isAdmin.value && !isStudentPreviewMode.value) {
         return adminTabs;
+      }
+      // Hide Home tab for logged-in users
+      if (isLoggedIn.value) {
+        return studentTabs.filter(t => t.id !== 'home');
       }
       return studentTabs;
     });
@@ -4785,6 +4984,9 @@ export default {
           streakCount.value = res.user.streak || 0;
           coins.value = res.user.coins || 0;
           if (res.user.target_ptn) simTargetPtn.value = res.user.target_ptn;
+          if (currentTab.value === 'home') {
+            currentTab.value = 'dashboard';
+          }
           if (['admin', 'superadmin', 'teacher', 'guru', 'tutor', 'affiliate'].includes(res.user.role) && !isStudentPreviewMode.value) {
             sessionStorage.setItem('admin_token', token);
             sessionStorage.setItem('admin_role', res.user.role);
@@ -4832,6 +5034,10 @@ export default {
         if (res.user?.role === 'affiliate') {
           sessionStorage.setItem('admin_token', res.token);
           sessionStorage.setItem('admin_role', 'affiliate');
+          sessionStorage.setItem('ep_user', JSON.stringify(res.user));
+          localStorage.setItem('user', JSON.stringify(res.user));
+          if (res.user.name) localStorage.setItem('user_name', res.user.name);
+          if (res.user.email) localStorage.setItem('user_email', res.user.email);
           window.location.hash = '#/admin';
           showToast('Selamat datang di Portal Afiliasi!');
           return;
@@ -5793,6 +5999,19 @@ export default {
       userAnswersMap,
       analisaWorking,
       answerAnalisaQuestion,
+      cbtCurrentIndex,
+      cbtRaguMap,
+      cbtFontSize,
+      cbtShowAnalysis,
+      cbtTimerSeconds,
+      cbtFormattedTimer,
+      currentSubtestQuestions,
+      currentCbtQuestion,
+      toggleRaguRagu,
+      jumpToQuestion,
+      prevQuestion,
+      nextQuestion,
+      setSubtest,
       mobileSidebarOpen,
       toggleMobileSidebar,
       affiliateForm,

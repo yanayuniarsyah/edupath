@@ -364,37 +364,37 @@
               <p class="text-[10px]">Belum ada transaksi tercatat.</p>
             </div>
             <div v-else class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Order ID</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Siswa</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Paket</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Nominal</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Tanggal</th>
-                    <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
+                  <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Order ID</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Siswa</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Paket</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Nominal</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Status</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Tanggal</th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="o in pagedOrders" :key="o.order_id || o.id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 font-mono text-white/60">{{ o.order_id || o.id }}</td>
-                    <td class="px-3 py-2">
-                      <div class="font-bold text-white">{{ o.student_name || '-' }}</div>
-                      <div class="text-white/40 font-medium text-[10px]">{{ o.student_email || '-' }}</div>
+                    <td class="px-4 py-3 font-mono text-white/60 text-xs">{{ o.order_id || o.id }}</td>
+                    <td class="px-4 py-3">
+                      <div class="font-bold text-white text-sm leading-snug">{{ o.student_name || '-' }}</div>
+                      <div class="text-white/50 font-medium text-xs mt-0.5">{{ o.student_email || '-' }}</div>
                     </td>
-                    <td class="px-3 py-2 font-bold text-indigo-400 capitalize">{{ o.plan_name || o.plan_id }}</td>
-                    <td class="px-3 py-2 font-mono text-emerald-400 font-bold">Rp {{ Number(o.amount || 0).toLocaleString('id-ID') }}</td>
-                    <td class="px-3 py-2">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px] uppercase border"
-                            :class="o.status === 'paid' || o.status === 'settlement' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : (o.status === 'pending' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400')">
+                    <td class="px-4 py-3 font-bold text-indigo-400 capitalize text-xs">{{ o.plan_name || o.plan_id }}</td>
+                    <td class="px-4 py-3 font-mono text-emerald-400 font-bold text-sm">Rp {{ Number(o.amount || 0).toLocaleString('id-ID') }}</td>
+                    <td class="px-4 py-3">
+                      <span class="px-2.5 py-1 rounded-md font-bold text-xs uppercase border inline-flex items-center gap-1"
+                            :class="o.status === 'paid' || o.status === 'settlement' ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' : (o.status === 'pending' ? 'bg-amber-500/15 border-amber-500/30 text-amber-400' : 'bg-rose-500/15 border-rose-500/30 text-rose-400')">
                         {{ o.status }}
                       </span>
                     </td>
-                    <td class="px-3 py-2 text-white/40">{{ o.created_at ? new Date(o.created_at).toLocaleString('id-ID') : '-' }}</td>
-                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
-                      <button @click="openEditOrderStatusModal(o)" title="Ubah Status" class="px-2 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all"><i class="ph-bold ph-pencil-simple"></i> Status</button>
-                      <button @click="deleteOrder(o.order_id || o.id)" title="Hapus Transaksi" class="px-2 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all"><i class="ph-bold ph-trash"></i> Hapus</button>
+                    <td class="px-4 py-3 text-white/50 text-xs">{{ o.created_at ? new Date(o.created_at).toLocaleString('id-ID') : '-' }}</td>
+                    <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                      <button @click="openEditOrderStatusModal(o)" title="Ubah Status" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all"><i class="ph-bold ph-pencil-simple"></i> Status</button>
+                      <button @click="deleteOrder(o.order_id || o.id)" title="Hapus Transaksi" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -442,34 +442,35 @@
           <!-- Students Table -->
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-center px-3 py-2 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Siswa <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('plan')">Paket <i v-if="sortKey === 'plan'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
+                  <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Siswa <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('plan')">Paket <i v-if="sortKey === 'plan'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="(s, index) in pagedStudents" :key="s.id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ (studentPage - 1) * PAGE_SIZE + index + 1 }}</td>
-                    <td class="px-3 py-2">
-                      <div class="font-bold text-white">{{ s.name }}</div>
-                      <div class="text-white/40 font-medium text-[10px]">{{ s.email }}</div>
+                    <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ (studentPage - 1) * PAGE_SIZE + index + 1 }}</td>
+                    <td class="px-4 py-3">
+                      <div class="font-bold text-white text-sm leading-snug">{{ s.name }}</div>
+                      <div class="text-white/50 font-medium text-xs mt-0.5">{{ s.email }}</div>
                     </td>
-                    <td class="px-3 py-2">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px] bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 uppercase">{{ s.plan || 'free' }}</span>
+                    <td class="px-4 py-3">
+                      <span class="px-2.5 py-1 rounded-md font-bold text-xs bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 uppercase tracking-wide">{{ s.plan || 'free' }}</span>
                     </td>
-                    <td class="px-3 py-2">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px]" :class="s.is_active != 0 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'">
+                    <td class="px-4 py-3">
+                      <span class="px-2.5 py-1 rounded-md font-bold text-xs inline-flex items-center gap-1" :class="s.is_active != 0 ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/15 border border-rose-500/30 text-rose-400'">
+                        <span class="w-1.5 h-1.5 rounded-full" :class="s.is_active != 0 ? 'bg-emerald-400' : 'bg-rose-400'"></span>
                         {{ s.is_active != 0 ? 'Aktif' : 'Nonaktif' }}
                       </span>
                     </td>
-                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
-                      <button @click="openEditStudentModal(s)" title="Edit Siswa" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
-                      <button @click="deleteStudent(s.id)" title="Hapus Siswa" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm"><i class="ph-bold ph-trash"></i> Hapus</button>
+                    <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                      <button @click="openEditStudentModal(s)" title="Edit Siswa" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deleteStudent(s.id)" title="Hapus Siswa" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -693,33 +694,34 @@
               <p class="text-[10px]">Tidak ada materi yang ditemukan.</p>
             </div>
             <div v-else class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-center px-3 py-2 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('title')">Judul Materi <i v-if="sortKey === 'title'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('sub_materi')">Sub Materi <i v-if="sortKey === 'sub_materi'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('teacher_name')">Guru / PJ <i v-if="sortKey === 'teacher_name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
+                  <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('title')">Judul Materi <i v-if="sortKey === 'title'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('sub_materi')">Sub Materi <i v-if="sortKey === 'sub_materi'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('teacher_name')">Guru / PJ <i v-if="sortKey === 'teacher_name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="(m, index) in pagedMaterials" :key="m.id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ (materialPage - 1) * PAGE_SIZE + index + 1 }}</td>
-                    <td class="px-3 py-2 font-bold text-white">{{ m.title }}</td>
-                    <td class="px-3 py-2 font-bold text-white/80">{{ m.sub_materi }}</td>
-                    <td class="px-3 py-2 font-bold text-white/40 text-[10px]">{{ m.teacher_name || '-' }}</td>
-                    <td class="px-3 py-2">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px]" :class="m.is_active != 0 ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'">
+                    <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ (materialPage - 1) * PAGE_SIZE + index + 1 }}</td>
+                    <td class="px-4 py-3 font-bold text-white text-sm leading-snug">{{ m.title }}</td>
+                    <td class="px-4 py-3 font-bold text-white/80 text-xs">{{ m.sub_materi }}</td>
+                    <td class="px-4 py-3 font-medium text-white/60 text-xs">{{ m.teacher_name || '-' }}</td>
+                    <td class="px-4 py-3">
+                      <span class="px-2.5 py-1 rounded-md font-bold text-xs inline-flex items-center gap-1" :class="m.is_active != 0 ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/15 border border-rose-500/30 text-rose-400'">
+                        <span class="w-1.5 h-1.5 rounded-full" :class="m.is_active != 0 ? 'bg-emerald-400' : 'bg-rose-400'"></span>
                         {{ m.is_active != 0 ? 'Aktif' : 'Nonaktif' }}
                       </span>
                     </td>
-                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
-                      <a v-if="m.file_url" :href="m.file_url" target="_blank" class="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Buka File Materi"><i class="ph-bold ph-file-arrow-down"></i> File</a>
+                    <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                      <a v-if="m.file_url" :href="m.file_url" target="_blank" class="px-3 py-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Buka File Materi"><i class="ph-bold ph-file-arrow-down"></i> File</a>
                       <template v-if="canManageMaterial(m)">
-                        <button @click="openMaterialModal(m)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Materi"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
-                        <button @click="deleteMaterial(m.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Materi"><i class="ph-bold ph-trash"></i> Hapus</button>
+                        <button @click="openMaterialModal(m)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Materi"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                        <button @click="deleteMaterial(m.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Materi"><i class="ph-bold ph-trash"></i> Hapus</button>
                       </template>
                       <span v-else class="text-xs text-white/40 italic px-2 py-1 bg-white/5 rounded-lg border border-white/10">Hanya Pemilik</span>
                     </td>
@@ -759,29 +761,29 @@
           </div>
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-center px-3 py-2 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama Paket <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('price')">Harga Resmi <i v-if="sortKey === 'price'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('duration')">Durasi <i v-if="sortKey === 'duration'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Entitlements</th>
-                    <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
+                  <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama Paket <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('price')">Harga Resmi <i v-if="sortKey === 'price'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('duration')">Durasi <i v-if="sortKey === 'duration'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Entitlements</th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="(p, index) in pagedPlans" :key="p.id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ (planPage - 1) * PAGE_SIZE + index + 1 }}</td>
-                    <td class="px-3 py-2 font-bold text-white">{{ p.name }}</td>
-                    <td class="px-3 py-2 font-bold text-emerald-400 font-mono">Rp {{ Number(p.price || 0).toLocaleString('id-ID') }}</td>
-                    <td class="px-3 py-2 font-bold text-white/80">{{ p.duration }} Hari</td>
-                    <td class="px-3 py-2">
-                      <span class="text-[10px] text-indigo-300 font-medium">{{ Array.isArray(p.features) ? p.features.length : 0 }} fitur</span>
+                    <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ (planPage - 1) * PAGE_SIZE + index + 1 }}</td>
+                    <td class="px-4 py-3 font-bold text-white text-sm leading-snug">{{ p.name }}</td>
+                    <td class="px-4 py-3 font-bold text-emerald-400 font-mono text-sm">Rp {{ Number(p.price || 0).toLocaleString('id-ID') }}</td>
+                    <td class="px-4 py-3 font-bold text-white/80 text-xs">{{ p.duration }} Hari</td>
+                    <td class="px-4 py-3">
+                      <span class="text-xs text-indigo-300 font-medium px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20">{{ Array.isArray(p.features) ? p.features.length : 0 }} fitur</span>
                     </td>
-                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
-                      <button @click="openPlanModal(p)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Paket"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
-                      <button @click="deletePlan(p.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Paket"><i class="ph-bold ph-trash"></i> Hapus</button>
+                    <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                      <button @click="openPlanModal(p)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Paket"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deletePlan(p.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Paket"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -1017,16 +1019,16 @@
 
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 text-white/50 border-b border-white/10">
-                    <th class="py-2.5 px-3 text-left font-bold">#</th>
-                    <th class="py-2.5 px-3 text-left font-bold">Nama Siswa</th>
-                    <th class="py-2.5 px-3 text-left font-bold">Email</th>
-                    <th class="py-2.5 px-3 text-left font-bold">Sekolah / Target</th>
-                    <th class="py-2.5 px-3 text-left font-bold">Paket Belajar</th>
-                    <th class="py-2.5 px-3 text-left font-bold">Status</th>
-                    <th class="py-2.5 px-3 text-left font-bold">Tanggal Gabung</th>
+                  <tr class="bg-black/40 text-white/60 border-b border-white/10">
+                    <th class="py-3 px-4 text-left font-bold">#</th>
+                    <th class="py-3 px-4 text-left font-bold">Nama Siswa</th>
+                    <th class="py-3 px-4 text-left font-bold">Email</th>
+                    <th class="py-3 px-4 text-left font-bold">Sekolah / Target</th>
+                    <th class="py-3 px-4 text-left font-bold">Paket Belajar</th>
+                    <th class="py-3 px-4 text-left font-bold">Status</th>
+                    <th class="py-3 px-4 text-left font-bold">Tanggal Gabung</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1045,21 +1047,22 @@
                     </td>
                   </tr>
                   <tr v-for="(ref, idx) in filteredMyReferrals" :key="idx" class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td class="py-2.5 px-3 text-white/40 font-mono">{{ idx + 1 }}</td>
-                    <td class="py-2.5 px-3 font-bold text-white">{{ ref.name }}</td>
-                    <td class="py-2.5 px-3 text-white/70 font-mono">{{ ref.email }}</td>
-                    <td class="py-2.5 px-3 text-white/60">{{ ref.school || ref.target_ptn || '-' }}</td>
-                    <td class="py-2.5 px-3">
-                      <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-indigo-500/10 border border-indigo-500/20 text-indigo-300">
+                    <td class="py-3 px-4 text-white/50 font-mono">{{ idx + 1 }}</td>
+                    <td class="py-3 px-4 font-bold text-white text-sm leading-snug">{{ ref.name }}</td>
+                    <td class="py-3 px-4 text-white/70 font-mono text-xs">{{ ref.email }}</td>
+                    <td class="py-3 px-4 text-white/60 text-xs">{{ ref.school || ref.target_ptn || '-' }}</td>
+                    <td class="py-3 px-4">
+                      <span class="px-2.5 py-1 rounded text-xs font-bold uppercase bg-indigo-500/15 border border-indigo-500/30 text-indigo-300">
                         {{ ref.plan }}
                       </span>
                     </td>
-                    <td class="py-2.5 px-3">
-                      <span :class="['px-2 py-0.5 rounded text-[9px] font-bold uppercase border', ref.status === 'Aktif' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-white/5 border-white/10 text-white/40']">
+                    <td class="py-3 px-4">
+                      <span :class="['px-2.5 py-1 rounded text-xs font-bold uppercase border inline-flex items-center gap-1', ref.status === 'Aktif' ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' : 'bg-white/5 border-white/10 text-white/40']">
+                        <span class="w-1.5 h-1.5 rounded-full" :class="ref.status === 'Aktif' ? 'bg-emerald-400' : 'bg-white/40'"></span>
                         {{ ref.status }}
                       </span>
                     </td>
-                    <td class="py-2.5 px-3 text-white/40 font-mono text-[10px]">
+                    <td class="py-3 px-4 text-white/50 font-mono text-xs">
                       {{ new Date(ref.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }) }}
                     </td>
                   </tr>
@@ -1111,14 +1114,14 @@
               </button>
             </div>
             <div class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 text-white/50 border-b border-white/10">
-                    <th class="py-2.5 px-3 text-left font-bold">Tanggal Pengajuan</th>
-                    <th class="py-2.5 px-3 text-left font-bold">Nominal (Rp)</th>
-                    <th class="py-2.5 px-3 text-left font-bold">Rekening Bank</th>
-                    <th class="py-2.5 px-3 text-left font-bold">Status</th>
-                    <th class="py-2.5 px-3 text-left font-bold">Catatan</th>
+                  <tr class="bg-black/40 text-white/60 border-b border-white/10">
+                    <th class="py-3 px-4 text-left font-bold">Tanggal Pengajuan</th>
+                    <th class="py-3 px-4 text-left font-bold">Nominal (Rp)</th>
+                    <th class="py-3 px-4 text-left font-bold">Rekening Bank</th>
+                    <th class="py-3 px-4 text-left font-bold">Status</th>
+                    <th class="py-3 px-4 text-left font-bold">Catatan</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1131,25 +1134,25 @@
                     </td>
                   </tr>
                   <tr v-for="pay in myAffiliateData.payouts" :key="pay.id" class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td class="py-2.5 px-3 text-white/70 font-mono text-[10px]">
+                    <td class="py-3 px-4 text-white/60 font-mono text-xs">
                       {{ new Date(pay.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
                     </td>
-                    <td class="py-2.5 px-3 font-mono font-bold text-amber-300 text-xs">
+                    <td class="py-3 px-4 font-mono font-bold text-amber-300 text-sm">
                       {{ formatCurrency(pay.amount) }}
                     </td>
-                    <td class="py-2.5 px-3 text-white/90">
-                      <div class="font-bold">{{ pay.bank_name }} - {{ pay.bank_account }}</div>
-                      <div class="text-[9px] text-white/40">a.n {{ pay.bank_owner }}</div>
+                    <td class="py-3 px-4 text-white/90">
+                      <div class="font-bold text-white text-xs">{{ pay.bank_name }} - {{ pay.bank_account }}</div>
+                      <div class="text-[11px] text-white/50">a.n {{ pay.bank_owner }}</div>
                     </td>
-                    <td class="py-2.5 px-3">
-                      <span :class="['px-2 py-0.5 rounded text-[9px] font-bold uppercase border',
-                        pay.status === 'paid' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
-                        (pay.status === 'rejected' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400')
+                    <td class="py-3 px-4">
+                      <span :class="['px-2.5 py-1 rounded text-xs font-bold uppercase border inline-flex items-center gap-1',
+                        pay.status === 'paid' ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' :
+                        (pay.status === 'rejected' ? 'bg-rose-500/15 border-rose-500/30 text-rose-400' : 'bg-amber-500/15 border-amber-500/30 text-amber-400')
                       ]">
                         {{ pay.status === 'paid' ? 'Ditransfer' : (pay.status === 'rejected' ? 'Ditolak' : 'Menunggu Transfer Admin') }}
                       </span>
                     </td>
-                    <td class="py-2.5 px-3 text-white/50 text-[10px]">
+                    <td class="py-3 px-4 text-white/60 text-xs">
                       {{ pay.notes || '-' }}
                     </td>
                   </tr>
@@ -1180,50 +1183,50 @@
               </button>
             </div>
             <div class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 text-white/50 border-b border-white/10">
-                    <th class="py-2 px-3 text-left font-bold">Mitra</th>
-                    <th class="py-2 px-3 text-left font-bold">Rekening Bank</th>
-                    <th class="py-2 px-3 text-left font-bold">Nominal (Rp)</th>
-                    <th class="py-2 px-3 text-left font-bold">Status</th>
-                    <th class="py-2 px-3 text-right font-bold">Aksi</th>
+                  <tr class="bg-black/40 text-white/60 border-b border-white/10">
+                    <th class="py-3 px-4 text-left font-bold">Mitra</th>
+                    <th class="py-3 px-4 text-left font-bold">Rekening Bank</th>
+                    <th class="py-3 px-4 text-left font-bold">Nominal (Rp)</th>
+                    <th class="py-3 px-4 text-left font-bold">Status</th>
+                    <th class="py-3 px-4 text-right font-bold">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="isLoadingPayouts">
-                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-[10px]">Memuat data payout...</td>
+                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-xs">Memuat data payout...</td>
                   </tr>
                   <tr v-else-if="payoutsList.length === 0">
-                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-[10px]">Belum ada permintaan pencairan</td>
+                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-xs">Belum ada permintaan pencairan</td>
                   </tr>
                   <tr v-for="pay in payoutsList" :key="pay.id" class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td class="py-2.5 px-3">
-                      <div class="font-bold text-white">{{ pay.affiliate_name }}</div>
-                      <div class="font-mono text-[9px] text-indigo-400 font-bold">{{ pay.referral_code }}</div>
+                    <td class="py-3 px-4">
+                      <div class="font-bold text-white text-sm leading-snug">{{ pay.affiliate_name }}</div>
+                      <div class="font-mono text-xs text-indigo-400 font-bold">{{ pay.referral_code }}</div>
                     </td>
-                    <td class="py-2.5 px-3">
-                      <div class="font-bold text-white/90">{{ pay.bank_name }} - {{ pay.bank_account }}</div>
-                      <div class="text-[9px] text-white/40">A.n {{ pay.bank_owner }}</div>
+                    <td class="py-3 px-4">
+                      <div class="font-bold text-white/90 text-xs">{{ pay.bank_name }} - {{ pay.bank_account }}</div>
+                      <div class="text-[11px] text-white/50">A.n {{ pay.bank_owner }}</div>
                     </td>
-                    <td class="py-2.5 px-3 font-mono font-bold text-emerald-400">
+                    <td class="py-3 px-4 font-mono font-bold text-emerald-400 text-sm">
                       {{ formatCurrency(pay.amount) }}
                     </td>
-                    <td class="py-2.5 px-3">
-                      <span :class="['px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border', pay.status === 'paid' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : (pay.status === 'rejected' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400')]">
+                    <td class="py-3 px-4">
+                      <span :class="['px-2.5 py-1 rounded-md text-xs font-bold uppercase border inline-flex items-center gap-1', pay.status === 'paid' ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' : (pay.status === 'rejected' ? 'bg-rose-500/15 border-rose-500/30 text-rose-400' : 'bg-amber-500/15 border-amber-500/30 text-amber-400')]">
                         {{ pay.status }}
                       </span>
                     </td>
-                    <td class="py-2.5 px-3 text-right space-x-1.5">
+                    <td class="py-3 px-4 text-right space-x-2">
                       <template v-if="pay.status === 'pending'">
-                        <button @click="approvePayoutReq(pay.id)" class="px-2 py-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 font-bold rounded-md transition-colors text-[10px]">
+                        <button @click="approvePayoutReq(pay.id)" class="px-2.5 py-1.5 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 font-bold rounded-lg transition-colors text-xs">
                           <i class="ph-bold ph-check"></i> Ditransfer
                         </button>
-                        <button @click="openRejectPayoutModal(pay)" class="px-2 py-1 bg-rose-500/20 border border-rose-500/30 text-rose-400 hover:bg-rose-500/30 font-bold rounded-md transition-colors text-[10px]">
+                        <button @click="openRejectPayoutModal(pay)" class="px-2.5 py-1.5 bg-rose-500/20 border border-rose-500/30 text-rose-400 hover:bg-rose-500/30 font-bold rounded-lg transition-colors text-xs">
                           <i class="ph-bold ph-x"></i> Tolak
                         </button>
                       </template>
-                      <span v-else class="text-[9px] text-white/40">Selesai</span>
+                      <span v-else class="text-xs text-white/50">Selesai</span>
                     </td>
                   </tr>
                 </tbody>
@@ -1240,36 +1243,36 @@
               </button>
             </div>
             <div class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 text-white/50 border-b border-white/10">
-                    <th class="py-2 px-3 text-left font-bold">Mitra</th>
-                    <th class="py-2 px-3 text-left font-bold">Kode Referral</th>
-                    <th class="py-2 px-3 text-left font-bold">Komisi (%)</th>
-                    <th class="py-2 px-3 text-left font-bold">Bank Info</th>
-                    <th class="py-2 px-3 text-right font-bold">Aksi</th>
+                  <tr class="bg-black/40 text-white/60 border-b border-white/10">
+                    <th class="py-3 px-4 text-left font-bold">Mitra</th>
+                    <th class="py-3 px-4 text-left font-bold">Kode Referral</th>
+                    <th class="py-3 px-4 text-left font-bold">Komisi (%)</th>
+                    <th class="py-3 px-4 text-left font-bold">Bank Info</th>
+                    <th class="py-3 px-4 text-right font-bold">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="isLoadingAffiliates">
-                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-[10px]">Memuat data mitra...</td>
+                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-xs">Memuat data mitra...</td>
                   </tr>
                   <tr v-else-if="affiliatesList.length === 0">
-                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-[10px]">Belum ada mitra afiliasi</td>
+                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-xs">Belum ada mitra afiliasi</td>
                   </tr>
                   <tr v-for="aff in affiliatesList" :key="aff.id" class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td class="py-2.5 px-3">
-                      <div class="font-semibold text-white/90">{{ aff.affiliate_name || aff.identity_key }}</div>
-                      <div class="text-[9px] text-white/40">{{ aff.email || aff.identity_key }}</div>
+                    <td class="py-3 px-4">
+                      <div class="font-bold text-white text-sm leading-snug">{{ aff.affiliate_name || aff.identity_key }}</div>
+                      <div class="text-xs text-white/50">{{ aff.email || aff.identity_key }}</div>
                     </td>
-                    <td class="py-2.5 px-3 font-mono text-indigo-400 font-bold">{{ aff.referral_code }}</td>
-                    <td class="py-2.5 px-3 text-amber-400 font-bold">{{ aff.commission_rate }}%</td>
-                    <td class="py-2.5 px-3 text-white/60">
+                    <td class="py-3 px-4 font-mono text-indigo-400 font-bold text-xs">{{ aff.referral_code }}</td>
+                    <td class="py-3 px-4 text-amber-400 font-bold text-xs">{{ aff.commission_rate }}%</td>
+                    <td class="py-3 px-4 text-white/70 text-xs">
                       {{ aff.bank_name ? `${aff.bank_name} (${aff.bank_account})` : '-' }}
                     </td>
-                    <td class="py-2.5 px-3 text-right space-x-1.5 whitespace-nowrap">
-                      <button @click="openEditAffiliateModal(aff)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Mitra"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
-                      <button @click="deleteAffiliate(aff.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Mitra"><i class="ph-bold ph-trash"></i> Hapus</button>
+                    <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
+                      <button @click="openEditAffiliateModal(aff)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Mitra"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deleteAffiliate(aff.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Mitra"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -1286,46 +1289,46 @@
               </button>
             </div>
             <div class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 text-white/50 border-b border-white/10">
-                    <th class="py-2 px-3 text-left font-bold">Siswa</th>
-                    <th class="py-2 px-3 text-left font-bold">Mitra</th>
-                    <th class="py-2 px-3 text-left font-bold">Nominal (Rp)</th>
-                    <th class="py-2 px-3 text-left font-bold">Status</th>
-                    <th class="py-2 px-3 text-right font-bold">Aksi</th>
+                  <tr class="bg-black/40 text-white/60 border-b border-white/10">
+                    <th class="py-3 px-4 text-left font-bold">Siswa</th>
+                    <th class="py-3 px-4 text-left font-bold">Mitra</th>
+                    <th class="py-3 px-4 text-left font-bold">Nominal (Rp)</th>
+                    <th class="py-3 px-4 text-left font-bold">Status</th>
+                    <th class="py-3 px-4 text-right font-bold">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="isLoadingCommissions">
-                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-[10px]">Memuat data komisi...</td>
+                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-xs">Memuat data komisi...</td>
                   </tr>
                   <tr v-else-if="commissionsList.length === 0">
-                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-[10px]">Belum ada data komisi</td>
+                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-xs">Belum ada data komisi</td>
                   </tr>
                   <tr v-for="comm in commissionsList" :key="comm.id" class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td class="py-2.5 px-3">
-                      <div class="font-bold text-white">{{ comm.student_name }}</div>
-                      <div class="text-[9px] text-white/40">{{ comm.order_plan_name }}</div>
+                    <td class="py-3 px-4">
+                      <div class="font-bold text-white text-sm leading-snug">{{ comm.student_name }}</div>
+                      <div class="text-xs text-white/50">{{ comm.order_plan_name }}</div>
                     </td>
-                    <td class="py-2.5 px-3">
-                      <div class="font-bold text-white/90">{{ comm.affiliate_email }}</div>
-                      <div class="font-mono text-[9px] text-indigo-400 font-bold">{{ comm.referral_code }}</div>
+                    <td class="py-3 px-4">
+                      <div class="font-bold text-white/90 text-xs">{{ comm.affiliate_email }}</div>
+                      <div class="font-mono text-xs text-indigo-400 font-bold">{{ comm.referral_code }}</div>
                     </td>
-                    <td class="py-2.5 px-3 font-mono font-bold text-emerald-400">
+                    <td class="py-3 px-4 font-mono font-bold text-emerald-400 text-sm">
                       {{ formatCurrency(comm.amount) }}
                     </td>
-                    <td class="py-2.5 px-3">
-                      <span :class="['px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border', comm.status === 'paid' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400']">
+                    <td class="py-3 px-4">
+                      <span :class="['px-2.5 py-1 rounded-md text-xs font-bold uppercase border inline-flex items-center gap-1', comm.status === 'paid' ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' : 'bg-amber-500/15 border-amber-500/30 text-amber-400']">
                         {{ comm.status }}
                       </span>
                     </td>
-                    <td class="py-2.5 px-3 text-right">
-                      <button v-if="comm.status === 'pending'" @click="openPayoutModal(comm)" class="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 font-bold rounded-md transition-colors text-[10px]">
+                    <td class="py-3 px-4 text-right">
+                      <button v-if="comm.status === 'pending'" @click="openPayoutModal(comm)" class="px-3 py-1.5 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 font-bold rounded-lg transition-colors text-xs">
                         <i class="ph-bold ph-check-circle"></i> Bayar
                       </button>
-                      <div v-else class="text-[9px] text-white/40">
-                        <i class="ph-bold ph-check-circle text-emerald-400 mr-0.5"></i> Telah Dibayar
+                      <div v-else class="text-xs text-white/50">
+                        <i class="ph-bold ph-check-circle text-emerald-400 mr-1"></i> Telah Dibayar
                       </div>
                     </td>
                   </tr>
@@ -1438,31 +1441,32 @@
           </div>
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
-              <table class="w-full text-[11px]">
+              <table class="w-full text-xs">
                 <thead>
-                  <tr class="bg-black/40 border-b border-white/10 text-white/50">
-                    <th class="text-center px-3 py-2 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('username')">Username <i v-if="sortKey === 'username'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('role')">Peran (Role) <i v-if="sortKey === 'role'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-2 font-black uppercase tracking-wider">Status</th>
-                    <th class="text-right px-3 py-2 font-black uppercase tracking-wider">Aksi</th>
+                  <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('username')">Username <i v-if="sortKey === 'username'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('role')">Peran (Role) <i v-if="sortKey === 'role'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Status</th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="(s, index) in sortedStaffMembers" :key="s.id" class="hover:bg-white/5 transition-colors">
-                    <td class="px-3 py-2 text-center text-white/50 font-bold">{{ index + 1 }}</td>
-                    <td class="px-3 py-2 font-bold text-white">{{ s.username }}</td>
-                    <td class="px-3 py-2 font-bold text-white/80">{{ s.name || '-' }}</td>
-                    <td class="px-3 py-2 font-bold text-indigo-400 uppercase">{{ s.role || 'admin' }}</td>
-                    <td class="px-3 py-2">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[9px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                    <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ index + 1 }}</td>
+                    <td class="px-4 py-3 font-bold text-white text-sm leading-snug">{{ s.username }}</td>
+                    <td class="px-4 py-3 font-bold text-white/80 text-xs">{{ s.name || '-' }}</td>
+                    <td class="px-4 py-3 font-bold text-indigo-400 uppercase text-xs">{{ s.role || 'admin' }}</td>
+                    <td class="px-4 py-3">
+                      <span class="px-2.5 py-1 rounded-md font-bold text-xs bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 inline-flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                         Aktif
                       </span>
                     </td>
-                    <td class="px-3 py-2 text-right space-x-1.5 whitespace-nowrap">
-                      <button @click="openStaffModal(s)" class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Staff"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
-                      <button v-if="s.username !== 'admin'" @click="deleteStaff(s.id)" class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-[10px] font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Staff"><i class="ph-bold ph-trash"></i> Hapus</button>
+                    <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                      <button @click="openStaffModal(s)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Staff"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button v-if="s.username !== 'admin'" @click="deleteStaff(s.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Staff"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -2323,8 +2327,17 @@ const currentRole = ref(
   ''
 );
 
-const currentUserId = ref(extractUserIdFromToken(sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token') || localStorage.getItem('auth_token')) || '');
-const currentAdminUser = ref(JSON.parse(sessionStorage.getItem('ep_user') || 'null'));
+const getStoredAdminUser = () => {
+  try {
+    const raw = sessionStorage.getItem('ep_user') || localStorage.getItem('user');
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  const name = localStorage.getItem('user_name') || '';
+  const email = localStorage.getItem('user_email') || '';
+  if (name || email) return { name, email };
+  return null;
+};
+const currentAdminUser = ref(getStoredAdminUser());
 
 const isSuperadmin = computed(() => {
   return currentRole.value === 'superadmin' ||
@@ -3475,6 +3488,16 @@ const loadAffiliateSettings = async () => {
       affiliateSettingsForm.bank_name = res.settings.bank_name || '';
       affiliateSettingsForm.bank_account = res.settings.bank_account || '';
       affiliateSettingsForm.bank_owner = res.settings.bank_owner || '';
+
+      if (res.settings.name) {
+        currentAdminUser.value = {
+          ...(currentAdminUser.value || {}),
+          name: res.settings.name,
+          email: res.settings.email || currentAdminUser.value?.email || ''
+        };
+        sessionStorage.setItem('ep_user', JSON.stringify(currentAdminUser.value));
+        localStorage.setItem('user_name', res.settings.name);
+      }
     }
   } catch (err) {
     console.error('Gagal memuat pengaturan afiliasi:', err);
@@ -3506,6 +3529,15 @@ const saveAffiliateSettings = async () => {
     alert('Pengaturan berhasil disimpan!');
     affiliateSettingsForm.new_password = '';
     affiliateSettingsForm.confirm_password = '';
+    if (affiliateSettingsForm.name) {
+      currentAdminUser.value = {
+        ...(currentAdminUser.value || {}),
+        name: affiliateSettingsForm.name,
+        email: affiliateSettingsForm.email || currentAdminUser.value?.email || ''
+      };
+      sessionStorage.setItem('ep_user', JSON.stringify(currentAdminUser.value));
+      localStorage.setItem('user_name', affiliateSettingsForm.name);
+    }
     loadAffiliateSettings();
   } catch (err) {
     alert(err.message || 'Gagal menyimpan pengaturan.');

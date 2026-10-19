@@ -228,9 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Get student/user name to create referral code
     $stmt = $pdo->prepare("SELECT name FROM students WHERE id = ? OR id = ? OR email = (SELECT identity_key FROM users WHERE id = ?)");
     $stmt->execute([$user_id, $payload->id, $user_id]);
-    $student = $stmt->fetch();
-    $name = !empty($input['bank_owner']) ? $input['bank_owner'] : (!empty($input['name']) ? $input['name'] : ($student ? $student['name'] : 'MITRA'));
-    
+    $name = !empty($input['name']) ? trim($input['name']) : (!empty($student['name']) ? $student['name'] : (!empty($input['bank_owner']) ? trim($input['bank_owner']) : 'Mitra'));
     // Clean name for code (alphanumeric uppercase)
     $clean_name = preg_replace('/[^a-zA-Z0-9]/', '', strtoupper($name));
     $base_code = substr($clean_name, 0, 5) ?: 'EDUP';
@@ -251,13 +249,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $pdo->exec("ALTER TABLE affiliates ADD COLUMN bank_name VARCHAR(50) NULL");
         $pdo->exec("ALTER TABLE affiliates ADD COLUMN bank_account VARCHAR(50) NULL");
         $pdo->exec("ALTER TABLE affiliates ADD COLUMN bank_owner VARCHAR(100) NULL");
+        $pdo->exec("ALTER TABLE affiliates ADD COLUMN name VARCHAR(150) NULL");
+        $pdo->exec("ALTER TABLE affiliates ADD COLUMN email VARCHAR(150) NULL");
     } catch (Exception $e) {
         // Abaikan jika kolom sudah ada
     }
 
+    // Get email for storage
+    $reg_email = '';
+    $eStmt = $pdo->prepare("SELECT identity_key FROM users WHERE id = ?");
+    $eStmt->execute([$user_id]);
+    $reg_email = $eStmt->fetchColumn() ?: '';
+
     try {
-        $stmt = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate, bank_name, bank_account, bank_owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$id, $user_id, $tenant_id, $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner]);
+        $stmt = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate, bank_name, bank_account, bank_owner, name, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$id, $user_id, $tenant_id, $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner, $name, $reg_email]);
         
         // Update user_roles so role is affiliate (not student)
         $pdo->prepare("UPDATE user_roles SET role = 'affiliate', reference_id = ? WHERE user_id = ?")->execute([$id, $user_id]);
@@ -266,15 +272,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $pdo->prepare("DELETE FROM students WHERE id = ? OR id = ? OR email = (SELECT identity_key FROM users WHERE id = ?)")->execute([$user_id, $payload->id, $user_id]);
 
         // Generate updated JWT token with role 'affiliate'
-        $uStmt = $pdo->prepare("SELECT identity_key FROM users WHERE id = ?");
-        $uStmt->execute([$user_id]);
-        $uEmail = $uStmt->fetchColumn() ?: '';
+        $uEmail = $reg_email;
 
         $newToken = generate_jwt([
             'user_id' => $user_id,
             'id' => $id,
             'role' => 'affiliate',
-            'tenant_id' => $tenant_id
+            'tenant_id' => $tenant_id,
+            'name' => $name
         ]);
 
         echo json_encode([
