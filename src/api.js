@@ -121,7 +121,12 @@ export function clearAdminTokens() {
 
 // Legacy read (backward compat — untuk kode yang belum diupdate)
 export function legacyGetToken() {
-  return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem('auth_token') || null;
+  return sessionStorage.getItem(ADMIN_TOKEN_KEY) || 
+         sessionStorage.getItem('admin_token') || 
+         sessionStorage.getItem(TOKEN_KEY) || 
+         localStorage.getItem('auth_token') || 
+         localStorage.getItem('token') || 
+         null;
 }
 
 /**
@@ -454,6 +459,10 @@ export default {
   payoutCommission(id, ref)  { return apiFetch('/admin.php?action=payout_commission', { method: 'POST', body: JSON.stringify({ commission_id: id, payout_reference: ref }) }); },
   getAffiliateSettings()     { return apiFetch('/admin.php?action=affiliate_settings'); },
   saveAffiliateSettings(data){ return apiFetch('/admin.php?action=affiliate_settings', { method: 'POST', body: JSON.stringify(data) }); },
+  getAffiliateDashboardData(){ return apiFetch('/affiliate.php'); },
+  requestAffiliatePayout(amount, bankInfo = {}) {
+    return apiFetch('/affiliate.php', { method: 'POST', body: JSON.stringify({ action: 'request_payout', amount, ...bankInfo }) });
+  },
 
   // ── Staff Management ──
   createAdminStaff(payload) { return apiFetch('/admin.php?action=staff', { method: 'POST', body: JSON.stringify(payload) }); },

@@ -165,11 +165,11 @@
       <div class="shrink-0 border-t border-white/10 p-3 space-y-2">
         <div class="flex items-center gap-2.5" :class="sidebarOpen ? '' : 'justify-center'">
           <div class="w-8 h-8 shrink-0 rounded-lg bg-[#c0ff00]/20 flex items-center justify-center font-black text-[#c0ff00] text-xs border border-[#c0ff00]/30">
-            {{ currentRole === 'teacher' ? 'TC' : (currentRole === 'superadmin' ? 'SA' : 'AD') }}
+            {{ isAffiliate ? 'AF' : (currentRole === 'teacher' ? 'TC' : (currentRole === 'superadmin' ? 'SA' : 'AD')) }}
           </div>
           <div v-show="sidebarOpen" class="flex-grow min-w-0">
-            <h4 class="text-xs font-black text-white truncate">{{ currentAdminUser?.name || (currentRole === 'teacher' ? 'Guru / Tutor' : (currentRole === 'superadmin' ? 'Superadmin' : 'Admin Bimbel')) }}</h4>
-            <span class="text-[10px] text-[#c0ff00] font-bold uppercase tracking-wider">{{ currentRole === 'teacher' ? 'Pendidik / Tutor' : (currentRole === 'superadmin' ? 'Super Admin' : 'Tenant Admin') }}</span>
+            <h4 class="text-xs font-black text-white truncate">{{ currentAdminUser?.name || affiliateSettingsForm.name || (isAffiliate ? 'Mitra Afiliasi' : (currentRole === 'teacher' ? 'Guru / Tutor' : (currentRole === 'superadmin' ? 'Superadmin' : 'Admin Bimbel'))) }}</h4>
+            <span class="text-[10px] text-[#c0ff00] font-bold uppercase tracking-wider">{{ isAffiliate ? 'Mitra Afiliasi' : (currentRole === 'teacher' ? 'Pendidik / Tutor' : (currentRole === 'superadmin' ? 'Super Admin' : 'Tenant Admin')) }}</span>
           </div>
         </div>
         <button
@@ -806,8 +806,355 @@
           </div>
         </div>
 
-        <!-- ===== TAB: AFILIASI & KOMISI ===== -->
-        <div v-if="activeTab === 'affiliates'" class="space-y-4 animate-fade-in">
+        <!-- ============================================== -->
+        <!-- ===== PORTAL MITRA AFILIASI (AFFILIATE VIEW) ===== -->
+        <!-- ============================================== -->
+
+        <!-- 1. TAB: AFFILIATE DASHBOARD -->
+        <div v-if="activeTab === 'affiliate_dashboard' && isAffiliate" class="space-y-6 animate-fade-in">
+          <!-- Hero Banner & Referral Link -->
+          <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0c1836] via-[#0e1f4d] to-[#0a1226] border border-amber-500/30 p-6 shadow-2xl">
+            <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+            <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
+              <div class="space-y-2 max-w-xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-black uppercase tracking-wider">
+                  <i class="ph-bold ph-crown text-amber-400"></i>
+                  <span>Portal Resmi Mitra Afiliasi EduPath</span>
+                </div>
+                <h2 class="text-xl md:text-2xl font-black text-white tracking-tight">
+                  Halo, <span class="text-[#c0ff00]">{{ currentAdminUser?.name || affiliateSettingsForm.name || 'Mitra Hebat' }}</span>! 🚀
+                </h2>
+                <p class="text-white/70 text-xs leading-relaxed">
+                  Bagikan tautan referral Anda kepada calon siswa, teman, atau jejaring Anda. Dapatkan komisi pasif sebesar <span class="text-amber-300 font-bold font-mono">20%</span> setiap kali siswa rujukan Anda berlangganan paket belajar EduPath!
+                </p>
+              </div>
+
+              <!-- Referral Link Card -->
+              <div class="w-full lg:w-auto shrink-0 bg-black/60 border border-white/15 p-4 rounded-xl backdrop-blur-xl space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-white/50">Tautan Afiliasi Unik Anda</span>
+                  <span class="text-[9px] font-mono text-[#c0ff00] font-bold">KODE: {{ myAffiliateData?.referral_code || '...' }}</span>
+                </div>
+                <div class="flex items-center gap-2 bg-black/80 border border-white/20 rounded-lg p-1.5 focus-within:border-[#c0ff00] transition-colors">
+                  <input
+                    type="text"
+                    readonly
+                    :value="referralLinkText"
+                    class="w-full lg:w-64 bg-transparent border-none text-xs text-white font-mono outline-none px-2 select-all"
+                  />
+                  <button
+                    @click="copyMyReferralLink"
+                    class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs rounded-md transition-all shadow-md flex items-center gap-1.5 shrink-0 active:scale-95 cursor-pointer"
+                  >
+                    <i class="ph-bold ph-copy"></i>
+                    <span>Salin</span>
+                  </button>
+                </div>
+                <div class="flex items-center gap-2 pt-1">
+                  <button
+                    @click="shareWhatsApp"
+                    class="w-full py-1.5 px-3 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <i class="ph-bold ph-whatsapp-logo text-sm"></i>
+                    <span>Bagikan ke WhatsApp</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Stats Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Stat 1: Total Rujukan -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-4 relative overflow-hidden group hover:border-[#c0ff00]/40 transition-all">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Total Rujukan</span>
+                <div class="w-8 h-8 rounded-lg bg-indigo-500/15 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
+                  <i class="ph-bold ph-users text-base"></i>
+                </div>
+              </div>
+              <div class="text-2xl font-black font-mono text-white tracking-tight">{{ myAffiliateData?.stats?.total_referrals || 0 }}</div>
+              <p class="text-[10px] text-white/40 mt-1">Siswa mendaftar lewat link</p>
+            </div>
+
+            <!-- Stat 2: Rujukan Aktif -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-4 relative overflow-hidden group hover:border-emerald-500/40 transition-all">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Siswa Aktif</span>
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
+                  <i class="ph-bold ph-user-check text-base"></i>
+                </div>
+              </div>
+              <div class="text-2xl font-black font-mono text-emerald-400 tracking-tight">{{ myAffiliateData?.stats?.active_referrals || 0 }}</div>
+              <p class="text-[10px] text-white/40 mt-1">Berlangganan paket belajar</p>
+            </div>
+
+            <!-- Stat 3: Komisi Siap Tarik (Pending) -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-amber-500/30 p-4 relative overflow-hidden group hover:border-amber-400/60 transition-all shadow-lg shadow-amber-500/5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300">Saldo Siap Tarik</span>
+                <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                  <i class="ph-bold ph-wallet text-base"></i>
+                </div>
+              </div>
+              <div class="text-xl font-black font-mono text-amber-300 tracking-tight">
+                {{ formatCurrency(myAffiliateData?.stats?.total_pending || 0) }}
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between">
+                <span class="text-[9px] text-white/40">Min. Rp 50.000</span>
+                <button
+                  @click="openAffiliatePayoutModal"
+                  :disabled="(myAffiliateData?.stats?.total_pending || 0) < 50000"
+                  class="px-2.5 py-1 bg-amber-400 hover:bg-amber-300 disabled:opacity-40 disabled:pointer-events-none text-black text-[10px] font-black rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <i class="ph-bold ph-paper-plane-tilt"></i> Tarik
+                </button>
+              </div>
+            </div>
+
+            <!-- Stat 4: Komisi Telah Ditransfer -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-4 relative overflow-hidden group hover:border-[#c0ff00]/40 transition-all">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Sudah Dicairkan</span>
+                <div class="w-8 h-8 rounded-lg bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center border border-[#c0ff00]/20">
+                  <i class="ph-bold ph-check-circle text-base"></i>
+                </div>
+              </div>
+              <div class="text-xl font-black font-mono text-[#c0ff00] tracking-tight">
+                {{ formatCurrency(myAffiliateData?.stats?.total_paid || 0) }}
+              </div>
+              <p class="text-[10px] text-white/40 mt-1">Total transfer berhasil</p>
+            </div>
+          </div>
+
+          <!-- Quick Preview Split -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Siswa Rujukan Terbaru -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden">
+              <div class="p-4 border-b border-white/10 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-users text-indigo-400"></i>
+                  <h3 class="font-bold text-white text-xs uppercase tracking-wider">Rujukan Terbaru</h3>
+                </div>
+                <button @click="activeTab = 'affiliate_referrals'" class="text-indigo-400 hover:text-indigo-300 text-[10px] font-bold flex items-center gap-1 cursor-pointer">
+                  Lihat Semua <i class="ph-bold ph-arrow-right"></i>
+                </button>
+              </div>
+              <div class="p-3">
+                <div v-if="myAffiliateData?.referrals?.length > 0" class="divide-y divide-white/5">
+                  <div v-for="(ref, idx) in myAffiliateData.referrals.slice(0, 5)" :key="idx" class="py-2.5 px-2 flex items-center justify-between">
+                    <div>
+                      <div class="text-xs font-bold text-white">{{ ref.name }}</div>
+                      <div class="text-[10px] text-white/40 font-mono">{{ ref.school || ref.target_ptn || 'Siswa' }} • {{ new Date(ref.created_at).toLocaleDateString('id-ID') }}</div>
+                    </div>
+                    <span :class="['px-2 py-0.5 rounded text-[9px] font-bold uppercase border', ref.status === 'Aktif' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-white/5 border-white/10 text-white/50']">
+                      {{ ref.status }}
+                    </span>
+                  </div>
+                </div>
+                <div v-else class="py-8 text-center text-white/40 text-xs">
+                  Belum ada siswa yang mendaftar melalui tautan Anda.
+                </div>
+              </div>
+            </div>
+
+            <!-- Riwayat Komisi & Payout -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden">
+              <div class="p-4 border-b border-white/10 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-receipt text-amber-400"></i>
+                  <h3 class="font-bold text-white text-xs uppercase tracking-wider">Riwayat Komisi Terbaru</h3>
+                </div>
+                <button @click="activeTab = 'affiliate_payouts'" class="text-amber-400 hover:text-amber-300 text-[10px] font-bold flex items-center gap-1 cursor-pointer">
+                  Kelola Pencairan <i class="ph-bold ph-arrow-right"></i>
+                </button>
+              </div>
+              <div class="p-3">
+                <div v-if="myAffiliateData?.history?.length > 0" class="divide-y divide-white/5">
+                  <div v-for="(hist, idx) in myAffiliateData.history.slice(0, 5)" :key="idx" class="py-2.5 px-2 flex items-center justify-between">
+                    <div>
+                      <div class="text-xs font-bold font-mono text-emerald-400">{{ formatCurrency(hist.amount) }}</div>
+                      <div class="text-[10px] text-white/40 font-mono">{{ new Date(hist.created_at).toLocaleDateString('id-ID') }}</div>
+                    </div>
+                    <span :class="['px-2 py-0.5 rounded text-[9px] font-bold uppercase border', hist.status === 'paid' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400']">
+                      {{ hist.status === 'paid' ? 'Ditransfer' : (hist.status === 'requested' ? 'Diproses' : 'Pending') }}
+                    </span>
+                  </div>
+                </div>
+                <div v-else class="py-8 text-center text-white/40 text-xs">
+                  Belum ada komisi tercatat.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. TAB: SISWA RUJUKAN SAYA -->
+        <div v-if="activeTab === 'affiliate_referrals' && isAffiliate" class="space-y-4 animate-fade-in">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider">Daftar Siswa Rujukan Saya</h2>
+              <p class="text-[10px] text-white/40">Siswa yang mendaftar di EduPath melalui kode referral unik Anda</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <input
+                v-model="referralSearchQuery"
+                type="text"
+                placeholder="Cari nama / email siswa..."
+                class="px-3 py-1.5 text-xs bg-black/40 border border-white/10 rounded-lg text-white outline-none focus:border-[#c0ff00]"
+              />
+              <button @click="loadMyAffiliateData" class="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-all cursor-pointer">
+                <i class="ph-bold ph-arrows-clockwise" :class="{'animate-spin': isLoadingMyAffiliate}"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-[11px]">
+                <thead>
+                  <tr class="bg-black/40 text-white/50 border-b border-white/10">
+                    <th class="py-2.5 px-3 text-left font-bold">#</th>
+                    <th class="py-2.5 px-3 text-left font-bold">Nama Siswa</th>
+                    <th class="py-2.5 px-3 text-left font-bold">Email</th>
+                    <th class="py-2.5 px-3 text-left font-bold">Sekolah / Target</th>
+                    <th class="py-2.5 px-3 text-left font-bold">Paket Belajar</th>
+                    <th class="py-2.5 px-3 text-left font-bold">Status</th>
+                    <th class="py-2.5 px-3 text-left font-bold">Tanggal Gabung</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="isLoadingMyAffiliate">
+                    <td colspan="7" class="py-8 text-center text-white/40">Memuat data rujukan...</td>
+                  </tr>
+                  <tr v-else-if="filteredMyReferrals.length === 0">
+                    <td colspan="7" class="py-12 text-center text-white/40">
+                      <div class="space-y-2">
+                        <i class="ph-bold ph-users text-3xl text-white/20"></i>
+                        <p>Belum ada data siswa rujukan yang cocok.</p>
+                        <button @click="copyMyReferralLink" class="px-3 py-1.5 bg-[#c0ff00] text-black font-black text-xs rounded-lg inline-flex items-center gap-1.5 cursor-pointer">
+                          <i class="ph-bold ph-copy"></i> Salin Link Referral Saya
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-for="(ref, idx) in filteredMyReferrals" :key="idx" class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td class="py-2.5 px-3 text-white/40 font-mono">{{ idx + 1 }}</td>
+                    <td class="py-2.5 px-3 font-bold text-white">{{ ref.name }}</td>
+                    <td class="py-2.5 px-3 text-white/70 font-mono">{{ ref.email }}</td>
+                    <td class="py-2.5 px-3 text-white/60">{{ ref.school || ref.target_ptn || '-' }}</td>
+                    <td class="py-2.5 px-3">
+                      <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-indigo-500/10 border border-indigo-500/20 text-indigo-300">
+                        {{ ref.plan }}
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3">
+                      <span :class="['px-2 py-0.5 rounded text-[9px] font-bold uppercase border', ref.status === 'Aktif' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-white/5 border-white/10 text-white/40']">
+                        {{ ref.status }}
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-white/40 font-mono text-[10px]">
+                      {{ new Date(ref.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }) }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. TAB: PENCAIRAN KOMISI (PAYOUT) -->
+        <div v-if="activeTab === 'affiliate_payouts' && isAffiliate" class="space-y-6 animate-fade-in">
+          <!-- Saldo Card & Request Action -->
+          <div class="bg-gradient-to-r from-amber-500/15 via-[#0e1726] to-[#0e1726] border border-amber-500/30 rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-wider text-amber-300/80">Saldo Komisi Tersedia</span>
+              <div class="text-3xl font-black font-mono text-amber-300 mt-1">
+                {{ formatCurrency(myAffiliateData?.stats?.total_pending || 0) }}
+              </div>
+              <p class="text-xs text-white/50 mt-1">
+                Rekening Pencairan: <span class="font-bold text-white">{{ affiliateSettingsForm.bank_name || myAffiliateData?.bank_info?.bank_name || '-' }}</span> • <span class="font-mono text-white">{{ affiliateSettingsForm.bank_account || myAffiliateData?.bank_info?.bank_account || '-' }}</span> (a.n {{ affiliateSettingsForm.bank_owner || myAffiliateData?.bank_info?.bank_owner || '-' }})
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                @click="activeTab = 'settings'"
+                class="px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/15 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <i class="ph-bold ph-gear"></i> Ubah Rekening
+              </button>
+              <button
+                @click="openAffiliatePayoutModal"
+                :disabled="(myAffiliateData?.stats?.total_pending || 0) < 50000"
+                class="px-4 py-2 bg-amber-400 hover:bg-amber-300 disabled:opacity-40 disabled:pointer-events-none text-black text-xs font-black rounded-xl transition-all shadow-lg shadow-amber-400/20 flex items-center gap-1.5 cursor-pointer"
+              >
+                <i class="ph-bold ph-paper-plane-tilt"></i> Ajukan Pencairan Dana
+              </button>
+            </div>
+          </div>
+
+          <!-- Payout History Table -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden">
+            <div class="p-4 border-b border-white/10 flex items-center justify-between">
+              <div>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Riwayat Pengajuan Pencairan Dana</h3>
+                <p class="text-[10px] text-white/40">Status pengajuan penarikan dana ke rekening Anda</p>
+              </div>
+              <button @click="loadMyAffiliateData" class="text-[#c0ff00] text-xs font-bold flex items-center gap-1 cursor-pointer">
+                <i class="ph-bold ph-arrows-clockwise" :class="{'animate-spin': isLoadingMyAffiliate}"></i> Refresh
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-[11px]">
+                <thead>
+                  <tr class="bg-black/40 text-white/50 border-b border-white/10">
+                    <th class="py-2.5 px-3 text-left font-bold">Tanggal Pengajuan</th>
+                    <th class="py-2.5 px-3 text-left font-bold">Nominal (Rp)</th>
+                    <th class="py-2.5 px-3 text-left font-bold">Rekening Bank</th>
+                    <th class="py-2.5 px-3 text-left font-bold">Status</th>
+                    <th class="py-2.5 px-3 text-left font-bold">Catatan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-if="isLoadingMyAffiliate">
+                    <td colspan="5" class="py-8 text-center text-white/40">Memuat riwayat pencairan...</td>
+                  </tr>
+                  <tr v-else-if="!myAffiliateData?.payouts || myAffiliateData.payouts.length === 0">
+                    <td colspan="5" class="py-10 text-center text-white/40">
+                      Belum ada riwayat pengajuan penarikan dana.
+                    </td>
+                  </tr>
+                  <tr v-for="pay in myAffiliateData.payouts" :key="pay.id" class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td class="py-2.5 px-3 text-white/70 font-mono text-[10px]">
+                      {{ new Date(pay.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
+                    </td>
+                    <td class="py-2.5 px-3 font-mono font-bold text-amber-300 text-xs">
+                      {{ formatCurrency(pay.amount) }}
+                    </td>
+                    <td class="py-2.5 px-3 text-white/90">
+                      <div class="font-bold">{{ pay.bank_name }} - {{ pay.bank_account }}</div>
+                      <div class="text-[9px] text-white/40">a.n {{ pay.bank_owner }}</div>
+                    </td>
+                    <td class="py-2.5 px-3">
+                      <span :class="['px-2 py-0.5 rounded text-[9px] font-bold uppercase border',
+                        pay.status === 'paid' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
+                        (pay.status === 'rejected' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400')
+                      ]">
+                        {{ pay.status === 'paid' ? 'Ditransfer' : (pay.status === 'rejected' ? 'Ditolak' : 'Menunggu Transfer Admin') }}
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-white/50 text-[10px]">
+                      {{ pay.notes || '-' }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: AFILIASI & KOMISI (ADMIN MANAGEMENT VIEW) ===== -->
+        <div v-if="activeTab === 'affiliates' && !isAffiliate" class="space-y-4 animate-fade-in">
           <div class="flex justify-between items-center">
             <div>
               <h2 class="text-xs font-black text-white uppercase tracking-wider">Afiliasi & Komisi</h2>
@@ -1405,6 +1752,72 @@
       </div>
     </div>
 
+    <!-- Modal Ajukan Penarikan Dana (Payout) -->
+    <div v-if="showPayoutRequestModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0e1726] border border-white/10 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl animate-fade-in text-white">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2">
+            <i class="ph-bold ph-wallet text-amber-400 text-lg"></i>
+            <h3 class="font-black text-sm text-white">Tarik Saldo Komisi</h3>
+          </div>
+          <button @click="showPayoutRequestModal = false" class="text-white/40 hover:text-white transition-colors cursor-pointer">
+            <i class="ph-bold ph-x text-base"></i>
+          </button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl space-y-1">
+            <span class="text-[10px] text-amber-300 font-bold uppercase tracking-wider">Saldo Komisi Tersedia</span>
+            <div class="text-2xl font-black font-mono text-amber-300">
+              {{ formatCurrency(myAffiliateData?.stats?.total_pending || 0) }}
+            </div>
+            <p class="text-[10px] text-white/60">Minimal penarikan dana adalah Rp 50.000</p>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nominal Penarikan (Rp)</label>
+            <input
+              v-model.number="payoutRequestAmount"
+              type="number"
+              min="50000"
+              :max="myAffiliateData?.stats?.total_pending || 0"
+              class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white font-mono font-bold text-sm outline-none focus:border-amber-400"
+            />
+          </div>
+
+          <div class="p-3 bg-white/5 rounded-xl border border-white/10 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-white/50 font-bold uppercase tracking-wider">Rekening Tujuan</span>
+              <button @click="showPayoutRequestModal = false; activeTab = 'settings'" class="text-[10px] text-indigo-400 hover:underline cursor-pointer">
+                Ubah di Pengaturan
+              </button>
+            </div>
+            <div class="font-bold text-white">{{ affiliateSettingsForm.bank_name || myAffiliateData?.bank_info?.bank_name }} - {{ affiliateSettingsForm.bank_account || myAffiliateData?.bank_info?.bank_account }}</div>
+            <div class="text-[10px] text-white/50">a.n {{ affiliateSettingsForm.bank_owner || myAffiliateData?.bank_info?.bank_owner }}</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-white/10">
+          <button
+            type="button"
+            @click="showPayoutRequestModal = false"
+            class="px-4 py-2 text-xs font-bold text-white/60 hover:text-white rounded-xl transition-colors cursor-pointer"
+          >
+            Batal
+          </button>
+          <button
+            type="button"
+            @click="submitPayoutRequest"
+            :disabled="isSubmittingPayout || payoutRequestAmount < 50000 || payoutRequestAmount > (myAffiliateData?.stats?.total_pending || 0)"
+            class="px-5 py-2 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-black text-xs font-black rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+          >
+            <i class="ph-bold ph-paper-plane-tilt" :class="{'animate-spin': isSubmittingPayout}"></i>
+            <span>{{ isSubmittingPayout ? 'Memproses...' : 'Konfirmasi Penarikan' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Student Modal (Tambah / Edit) -->
     <div v-if="showStudentModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
@@ -1822,7 +2235,7 @@ const initialTab = () => {
   const stored = sessionStorage.getItem('admin_active_tab');
   const role = sessionStorage.getItem('admin_role') || localStorage.getItem('user_role') || '';
   if (['affiliate', 'afiliator'].includes(role)) {
-    return (stored === 'settings') ? 'settings' : 'affiliates';
+    return (['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts', 'settings'].includes(stored)) ? stored : 'affiliate_dashboard';
   }
   return stored || 'overview';
 };
@@ -1920,8 +2333,10 @@ const isAffiliate = computed(() => ['affiliate', 'afiliator'].includes(currentRo
 const navItems = computed(() => {
   if (isAffiliate.value) {
     return [
-      { id: 'affiliates', label: 'Afiliasi & Komisi', icon: 'ph-hand-coins', roles: ['affiliate'] },
-      { id: 'settings',   label: 'Pengaturan',        icon: 'ph-gear',       roles: ['affiliate'] }
+      { id: 'affiliate_dashboard', label: 'Dashboard Afiliasi', icon: 'ph-chart-pie-slice', roles: ['affiliate'] },
+      { id: 'affiliate_referrals', label: 'Siswa Rujukan Saya', icon: 'ph-users-three',      roles: ['affiliate'] },
+      { id: 'affiliate_payouts',   label: 'Pencairan Komisi',    icon: 'ph-wallet',           roles: ['affiliate'] },
+      { id: 'settings',            label: 'Pengaturan Rekening', icon: 'ph-gear',             roles: ['affiliate'] }
     ];
   }
 
@@ -2028,12 +2443,11 @@ const fillCredentials = (user, pass) => {
 
 const loadRoleData = () => {
   if (isAffiliate.value) {
-    if (!['affiliates', 'settings'].includes(activeTab.value)) {
-      activeTab.value = 'affiliates';
+    if (!['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts', 'settings'].includes(activeTab.value)) {
+      activeTab.value = 'affiliate_dashboard';
     }
-    loadAdminAffiliates();
-    loadAdminCommissions();
-    loadAdminPayouts();
+    loadMyAffiliateData();
+    loadAffiliateSettings();
   } else if (isTeacher.value) {
     if (!['questions', 'materials', 'teacher_hub'].includes(activeTab.value)) {
       activeTab.value = 'questions';
@@ -2759,7 +3173,116 @@ const deletePlan = async (id) => {
   }
 };
 
-// ── Affiliates & Commissions ──
+// ── Personal Affiliator Portal State ──
+const myAffiliateData = ref({
+  referral_code: '',
+  commission_rate: 20,
+  bank_info: { bank_name: '', bank_account: '', bank_owner: '' },
+  stats: { total_referrals: 0, active_referrals: 0, total_paid: 0, total_pending: 0 },
+  referrals: [],
+  history: [],
+  payouts: []
+});
+const isLoadingMyAffiliate = ref(false);
+const showPayoutRequestModal = ref(false);
+const payoutRequestAmount = ref(50000);
+const isSubmittingPayout = ref(false);
+const referralSearchQuery = ref('');
+
+const referralLinkText = computed(() => {
+  const code = myAffiliateData.value?.referral_code;
+  return code ? `${window.location.origin}/ref/${code}` : 'Memuat tautan...';
+});
+
+const filteredMyReferrals = computed(() => {
+  const list = myAffiliateData.value?.referrals || [];
+  if (!referralSearchQuery.value) return list;
+  const q = referralSearchQuery.value.toLowerCase();
+  return list.filter(r => 
+    (r.name && r.name.toLowerCase().includes(q)) ||
+    (r.email && r.email.toLowerCase().includes(q)) ||
+    (r.school && r.school.toLowerCase().includes(q)) ||
+    (r.target_ptn && r.target_ptn.toLowerCase().includes(q))
+  );
+});
+
+const loadMyAffiliateData = async () => {
+  isLoadingMyAffiliate.value = true;
+  try {
+    const res = await api.getAffiliateDashboardData();
+    if (res && res.status === 'joined') {
+      myAffiliateData.value = res;
+      if (res.bank_info) {
+        affiliateSettingsForm.bank_name = res.bank_info.bank_name || affiliateSettingsForm.bank_name;
+        affiliateSettingsForm.bank_account = res.bank_info.bank_account || affiliateSettingsForm.bank_account;
+        affiliateSettingsForm.bank_owner = res.bank_info.bank_owner || affiliateSettingsForm.bank_owner;
+      }
+    }
+  } catch (err) {
+    console.error('Gagal memuat data afiliasi:', err);
+  } finally {
+    isLoadingMyAffiliate.value = false;
+  }
+};
+
+const copyMyReferralLink = () => {
+  if (!myAffiliateData.value?.referral_code) return;
+  const link = `${window.location.origin}/ref/${myAffiliateData.value.referral_code}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link);
+  }
+  alert('Link referral berhasil disalin ke clipboard!\n' + link);
+};
+
+const shareWhatsApp = () => {
+  if (!myAffiliateData.value?.referral_code) return;
+  const link = `${window.location.origin}/ref/${myAffiliateData.value.referral_code}`;
+  const text = encodeURIComponent(`Halo! Yuk gabung persiapan UTBK-SNBT bersama Bimbel EduPath. Dapatkan tryout IRT dan materi terlengkap di sini: ${link}`);
+  window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+};
+
+const openAffiliatePayoutModal = () => {
+  const pending = myAffiliateData.value.stats?.total_pending || 0;
+  if (pending < 50000) {
+    alert('Saldo komisi belum mencapai batas minimal penarikan (Rp 50.000). Saldo saat ini: ' + formatCurrency(pending));
+    return;
+  }
+  payoutRequestAmount.value = pending;
+  showPayoutRequestModal.value = true;
+};
+
+const submitPayoutRequest = async () => {
+  const pending = myAffiliateData.value.stats?.total_pending || 0;
+  if (payoutRequestAmount.value < 50000) {
+    alert('Nominal penarikan minimal Rp 50.000');
+    return;
+  }
+  if (payoutRequestAmount.value > pending) {
+    alert('Nominal penarikan melebihi saldo komisi yang tersedia (' + formatCurrency(pending) + ')');
+    return;
+  }
+  const bank = myAffiliateData.value.bank_info || {};
+  if (!bank.bank_account || !bank.bank_name) {
+    alert('Harap lengkapi rekening bank tujuan pencairan terlebih dahulu di Pengaturan Rekening.');
+    showPayoutRequestModal.value = false;
+    activeTab.value = 'settings';
+    return;
+  }
+
+  isSubmittingPayout.value = true;
+  try {
+    const res = await api.requestAffiliatePayout(payoutRequestAmount.value, bank);
+    alert(res.message || 'Pengajuan penarikan dana berhasil dikirim! Menunggu verifikasi admin.');
+    showPayoutRequestModal.value = false;
+    await loadMyAffiliateData();
+  } catch (err) {
+    alert(err.message || 'Gagal mengajukan penarikan');
+  } finally {
+    isSubmittingPayout.value = false;
+  }
+};
+
+// ── Admin Affiliates & Commissions Management ──
 const affiliatesList = ref([]);
 const commissionsList = ref([]);
 const payoutsList = ref([]);
@@ -3186,8 +3709,8 @@ const teacherSchedule = ref([
 
 // ── Watch activeTab to load data ──
 watch(activeTab, (newTab) => {
-  if (isAffiliate.value && !['affiliates', 'settings'].includes(newTab)) {
-    activeTab.value = 'affiliates';
+  if (isAffiliate.value && !['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts', 'settings'].includes(newTab)) {
+    activeTab.value = 'affiliate_dashboard';
     return;
   }
   if (isTeacher.value && ['packages', 'plans', 'transactions', 'affiliates', 'staff', 'students', 'settings'].includes(newTab)) {
@@ -3207,10 +3730,12 @@ watch(activeTab, (newTab) => {
     fetchAdminOrders();
   } else if ((newTab === 'packages' || newTab === 'plans' || newTab === 'staff') && !isTeacher.value && !isAffiliate.value) {
     loadPlansAndStaff();
-  } else if (newTab === 'affiliates') {
+  } else if (newTab === 'affiliates' && !isAffiliate.value) {
     loadAdminAffiliates();
     loadAdminCommissions();
     loadAdminPayouts();
+  } else if (isAffiliate.value && ['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts'].includes(newTab)) {
+    loadMyAffiliateData();
   } else if (newTab === 'settings' && isAffiliate.value) {
     loadAffiliateSettings();
   }

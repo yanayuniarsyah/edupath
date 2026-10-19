@@ -70,9 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
+                        name: data.name,
                         bank_name: data.bank_name,
                         bank_account: data.bank_account,
-                        bank_owner: data.bank_owner
+                        bank_owner: data.bank_owner || data.name
                     })
                 });
 
@@ -81,9 +82,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Simpan token ke localStorage & sessionStorage (untuk kompatibilitas)
+                localStorage.setItem('auth_token', token);
                 localStorage.setItem('token', token);
                 sessionStorage.setItem('ep_session_token', token);
-                localStorage.setItem('user', JSON.stringify(regData.user));
+                sessionStorage.setItem('admin_token', token);
+                sessionStorage.setItem('admin_role', 'affiliate');
+                localStorage.setItem('user', JSON.stringify({ ...regData.user, role: 'affiliate' }));
 
                 // Tampilkan pesan sukses dan delay redirect
                 const btn = document.getElementById('btn-register-submit');
@@ -98,8 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 setTimeout(() => {
-                    window.location.href = '/#/';
-                }, 2000);
+                    window.location.href = '/#/admin';
+                }, 1200);
 
             } catch (err) {
                 alert('Pendaftaran gagal: ' + err.message);
@@ -136,11 +140,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(resData.message || resData.error || 'Gagal login');
                 }
 
+                localStorage.setItem('auth_token', resData.token);
                 localStorage.setItem('token', resData.token);
                 sessionStorage.setItem('ep_session_token', resData.token);
+                sessionStorage.setItem('admin_token', resData.token);
+                sessionStorage.setItem('admin_role', 'affiliate');
                 localStorage.setItem('user', JSON.stringify(resData.user));
 
-                window.location.href = '/#/';
+                window.location.href = '/#/admin';
 
             } catch (err) {
                 alert('Login gagal: ' + err.message);

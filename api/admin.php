@@ -159,10 +159,12 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $usernamePrefix = $username . '@%';
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.password as user_password, a.password as admin_password,
-               ur.role, ur.tenant_id, ur.reference_id, a.id as admin_id, t.is_active as tenant_active
+               ur.role, ur.tenant_id, ur.reference_id, a.id as admin_id, t.is_active as tenant_active,
+               COALESCE(a.name, aff.bank_owner, u.identity_key) as name
         FROM users u 
         JOIN user_roles ur ON u.id = ur.user_id 
         LEFT JOIN admins a ON ur.reference_id = a.id
+        LEFT JOIN affiliates aff ON (ur.reference_id = aff.id OR u.id = aff.user_id)
         LEFT JOIN tenants t ON ur.tenant_id = t.id
         WHERE (u.identity_key = ? OR a.username = ? OR u.identity_key LIKE ? OR a.username LIKE ?) 
           AND u.is_active = 1 

@@ -159,6 +159,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode(["error" => "Mitra afiliasi tidak memiliki izin untuk tindakan ini"]);
         exit;
     }
+
+    if ($action === 'request_payout') {
+        $amount = (float)($input['amount'] ?? 0);
+        $stmt = $pdo->prepare("SELECT id, bank_name, bank_account, bank_owner FROM affiliates WHERE user_id = ? OR id = ?");
+        $stmt->execute([$payload->user_id, $payload->id]);
+        $aff = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$aff) {
+            http_response_code(400); echo json_encode(["error" => "Mitra afiliasi tidak ditemukan"]); exit;
+        }
+
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM commissions WHERE affiliate_id = ? AND status = 'pending'");
+        $stmt->execute([$aff['id']]);
+        $pending = (float)$stmt->fetchColumn();
+
+        if ($amount < 50000 || $amount > $pending) {
+            http_response_code(400); echo json_encode(["error" => "Nominal penarikan minimal Rp 50.000 dan tidak boleh melebihi saldo komisi"]); exit;
+        }
+
+        $bank_name = !empty($input['bank_name']) ? trim($input['bank_name']) : $aff['bank_name'];
+        $bank_account = !empty($input['bank_account']) ? trim($input['bank_account']) : $aff['bank_account'];
+        $bank_owner = !empty($input['bank_owner']) ? trim($input['bank_owner']) : $aff['bank_owner'];
+
+        if (empty($bank_account)) {
+            http_response_code(400); echo json_encode(["error" => "Harap lengkapi nomor rekening pencairan terlebih dahulu"]); exit;
+        }
+
+        $payout_id = bin2hex(random_bytes(16));
+        $payout_id = substr($payout_id,0,8).'-'.substr($payout_id,8,4).'-'.substr($payout_id,12,4).'-'.substr($payout_id,16,4).'-'.substr($payout_id,20,12);
+
+        $pdo->beginTransaction();
+        try {
+            $stmt = $pdo->prepare("INSERT INTO payouts (id, affiliate_id, amount, status, bank_name, bank_account, bank_owner, created_at) VALUES (?, ?, ?, 'pending', ?, ?, ?, NOW())");
+            $stmt->execute([$payout_id, $aff['id'], $amount, $bank_name, $bank_account, $bank_owner]);
+
+            $stmt = $pdo->prepare("UPDATE commissions SET status = 'requested' WHERE affiliate_id = ? AND status = 'pending'");
+            $stmt->execute([$aff['id']]);
+
+            $pdo->commit();
+            echo json_encode(["success" => true, "message" => "Pengajuan penarikan dana berhasil dikirim"]);
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            http_response_code(500); echo json_encode(["error" => "Gagal mengajukan penarikan: " . $e->getMessage()]);
+        }
+        exit;
+    }
     
     if ($action === 'approve_payout') {
         $payout_id = $input['payout_id'] ?? '';

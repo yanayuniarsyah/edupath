@@ -49,7 +49,7 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $referred_by = null;
     if (!empty($referral_code)) {
         // Find affiliate by referral code AND ensure it matches the B2C tenant_id context
-        $stmt_aff = $pdo->prepare("SELECT id FROM affiliates WHERE referral_code = ? AND tenant_id = ?");
+        $stmt_aff = $pdo->prepare("SELECT id FROM affiliates WHERE referral_code = ? AND (tenant_id = ? OR tenant_id IS NULL OR tenant_id = '')");
         $stmt_aff->execute([$referral_code, $tenant_id]);
         $aff = $stmt_aff->fetch();
         if ($aff) {
@@ -156,15 +156,17 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.password as user_password, s.password as student_password, ur.role, ur.tenant_id, ur.reference_id, 
                COALESCE(s.id, a.id, ur.reference_id) as student_id, 
-               COALESCE(s.name, a.name, 'Admin') as name, 
+               COALESCE(s.name, aff.bank_owner, a.name, 'Mitra Afiliasi') as name, 
                COALESCE(s.email, a.username, u.identity_key) as email, 
                COALESCE(s.target_ptn, 'UI') as target_ptn, 
                COALESCE(s.plan, 'free') as plan,
-               COALESCE(t.is_active, 1) as tenant_active
+               COALESCE(t.is_active, 1) as tenant_active,
+               COALESCE(aff.referral_code, '') as referral_code
         FROM users u 
         JOIN user_roles ur ON u.id = ur.user_id 
         LEFT JOIN students s ON (ur.reference_id = s.id OR LOWER(u.identity_key) = LOWER(s.email))
         LEFT JOIN admins a ON (ur.reference_id = a.id OR u.identity_key = a.username)
+        LEFT JOIN affiliates aff ON (ur.reference_id = aff.id OR u.id = aff.user_id)
         LEFT JOIN tenants t ON ur.tenant_id = t.id
         WHERE (LOWER(u.identity_key) = LOWER(?) OR (s.email IS NOT NULL AND LOWER(s.email) = LOWER(?))) 
           AND u.is_active = 1
@@ -192,7 +194,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($user && $password_matched) {
-        if ($user['role'] !== 'student') {
+        if (!in_array($user['role'], ['student', 'affiliate'])) {
             http_response_code(403);
             echo json_encode(["error" => "Akun Staf/Guru/Tutor/Admin tidak diizinkan masuk melalui portal siswa. Silakan masuk melalui halaman login staf di /#/admin."]);
             exit;
@@ -205,11 +207,11 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         reset_rate_limit($pdo, 'login');
         
         // Update last login if student
-        if ($user['student_id']) {
+        if ($user['student_id'] && $user['role'] === 'student') {
             $pdo->prepare("UPDATE students SET last_login = NOW() WHERE id = ?")->execute([$user['student_id']]);
         }
         
-        $token = generate_jwt(['user_id' => $user['user_id'], 'id' => $user['reference_id'], 'role' => $user['role'], 'tenant_id' => $user['tenant_id']]);
+        $token = generate_jwt(['user_id' => $user['user_id'], 'id' => $user['reference_id'] ?? $user['user_id'], 'role' => $user['role'], 'tenant_id' => $user['tenant_id']]);
         
         // Generate Refresh Token
         $refresh_token = bin2hex(random_bytes(32));
