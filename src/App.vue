@@ -2184,7 +2184,7 @@
             </div>
           </div>
 
-          <!-- ✨ Target PTN Selection & Goal Status (SECTION DIBAWAH GAMBAR HERO 2.jpeg) -->
+          <!-- ✨ Target PTN Selection & Goal Status -->
           <div class="glass-card p-4 md:p-5 rounded-2xl border border-sky-500/30 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-950 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <!-- Left: Target Selector -->
@@ -2211,84 +2211,173 @@
                 </div>
               </div>
 
-              <!-- Right: Gap & Target Metrics -->
-              <div class="flex flex-wrap items-center gap-2.5 bg-white/5 border border-white/10 p-2 rounded-xl">
-                <div class="px-3 py-1 border-r border-white/10 text-center">
-                  <span class="block text-[8px] font-black uppercase tracking-widest text-white/50">Skor Saat Ini</span>
-                  <span class="text-sm font-black font-mono text-emerald-400">{{ currentAbilityScore }}</span>
-                </div>
-                <div class="px-3 py-1 border-r border-white/10 text-center">
-                  <span class="block text-[8px] font-black uppercase tracking-widest text-white/50">Target Skor</span>
-                  <span class="text-sm font-black font-mono text-sky-400">{{ selectedUniversity.targetScore }}</span>
-                </div>
-                <div class="px-3 py-1 text-center">
-                  <span class="block text-[8px] font-black uppercase tracking-widest text-white/50">Selisih Gap</span>
-                  <span class="text-sm font-black font-mono text-rose-400">{{ gapScore }} Poin</span>
-                </div>
+              <!-- Right: Target Status Badge -->
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/25 text-sky-300 text-xs font-bold flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+                  <span>Target: <strong class="text-white font-mono">{{ selectedUniversity.targetScore }}</strong></span>
+                </span>
+                <button @click="handleTabClick('diagnostic')" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
+                  <span>Tes Ulang IRT</span>
+                  <i class="ph-bold ph-arrow-clockwise"></i>
+                </button>
               </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Ability Meter Card -->
-            <div class="glass-card lg:col-span-2 flex flex-col justify-between group p-4 md:p-5 rounded-2xl">
-              <div>
-                <div class="flex items-center gap-3 mb-6">
-                  <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-emerald-400">
-                    <i class="ph-bold ph-chart-line-up text-xl"></i>
-                  </div>
-                  <h3 class="text-xl font-black font-heading text-white tracking-tight">Estimasi Kemampuan</h3>
-                </div>
-                
-                <div class="flex items-center justify-around py-3.5 bg-white/5 rounded-xl border border-white/10 relative overflow-hidden">
-                  <!-- abstract bg -->
-                  <div class="absolute inset-0 bg-grid opacity-20 pointer-events-none"></div>
-                  
-                  <div class="text-center relative z-10">
-                    <span class="block text-3xl md:text-4xl font-black font-heading text-emerald-400 font-mono drop-shadow-[0_0_15px_rgba(192,255,0,0.4)]">{{ currentAbilityScore }}</span>
-                    <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-2 block">Skor Saat Ini</span>
-                  </div>
-                  <div class="text-white/40 text-3xl font-black relative z-10 animate-pulse">➔</div>
-                  <div class="text-center relative z-10">
-                    <span class="block text-3xl md:text-4xl font-black font-heading text-[#0ea5e9] font-mono drop-shadow-[0_0_15px_rgba(14,165,233,0.4)]">{{ selectedUniversity.targetScore }}</span>
-                    <span class="text-[10px] text-white/60 font-black uppercase tracking-widest mt-2 block">Target ({{ selectedUniversity.name }})</span>
-                  </div>
-                </div>
+          <!-- ✨ Executive KPI Strip (4 Kolom Proporsional & Presisi) -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Card 1: Skor IRT Terkini -->
+            <div class="glass-card p-4 md:p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/20 via-slate-900/80 to-slate-950 flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Skor IRT Terkini</span>
+                <span class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 text-[10px] font-bold font-mono">TOP 12%</span>
               </div>
-
-              <!-- Progress bar -->
-              <div class="mt-8">
-                <div class="flex justify-between text-xs font-bold text-white mb-3">
-                  <span>Selisih Gap: <strong class="text-[#f43f5e] font-black font-mono text-sm">{{ gapScore }} Poin</strong></span>
-                  <span class="text-[#0ea5e9] font-mono font-black">{{ progressPercentage }}% Tercapai</span>
-                </div>
-                <div class="w-full bg-white/5 rounded-full h-4 overflow-hidden border border-white/10 p-0.5">
-                  <div class="bg-gradient-to-r from-[#c0ff00] via-[#0ea5e9] to-[#8b5cf6] h-full rounded-full transition-all duration-1000 ease-out relative" :style="{ width: progressPercentage + '%' }">
-                    <div class="absolute inset-0 bg-white/20 w-full h-full" style="background-image: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent); background-size: 1rem 1rem;"></div>
-                  </div>
-                </div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl md:text-4xl font-black font-heading text-emerald-400 font-mono drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">{{ currentAbilityScore }}</span>
+                <span class="text-xs text-white/50 font-bold">/ 1000</span>
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-white/60">
+                <span>Status Kemampuan</span>
+                <span class="text-emerald-400 font-bold">Kompetitif</span>
               </div>
             </div>
 
-            <!-- Radar Blind-Spot & Kelemahan Card (Pindahan dari Tryout) -->
-            <div class="glass-card flex flex-col justify-between p-4 md:p-5 rounded-2xl border border-rose-500/20 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-rose-950/20">
-              <div>
-                <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2.5">
-                  <div class="flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-base">
+            <!-- Card 2: Target Kampus Impian -->
+            <div class="glass-card p-4 md:p-5 rounded-2xl border border-sky-500/30 bg-gradient-to-br from-sky-950/20 via-slate-900/80 to-slate-950 flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-sky-400">Target Skor PTN</span>
+                <span class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-300 text-[10px] font-bold">SNBT 2027</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl md:text-4xl font-black font-heading text-sky-400 font-mono drop-shadow-[0_0_12px_rgba(56,189,248,0.3)]">{{ selectedUniversity.targetScore }}</span>
+                <span class="text-xs text-white/50 font-medium truncate max-w-[120px]">{{ selectedUniversity.name }}</span>
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-white/60">
+                <span>Peluang Masuk</span>
+                <span class="text-sky-400 font-bold">Terjangkau</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Gap & Progres Capaian -->
+            <div class="glass-card p-4 md:p-5 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-slate-900/80 to-slate-950 flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-amber-400">Selisih Gap Target</span>
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 text-[10px] font-mono font-bold">{{ progressPercentage }}%</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl md:text-4xl font-black font-heading text-rose-400 font-mono">{{ gapScore }}</span>
+                <span class="text-xs text-white/50 font-bold">Poin tersisa</span>
+              </div>
+              <div class="w-full bg-white/10 h-1.5 rounded-full mt-2 overflow-hidden">
+                <div class="bg-gradient-to-r from-amber-400 to-[#c0ff00] h-full rounded-full transition-all duration-700" :style="{ width: progressPercentage + '%' }"></div>
+              </div>
+            </div>
+
+            <!-- Card 4: Streak Belajar Konsisten -->
+            <div class="glass-card p-4 md:p-5 rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/20 via-slate-900/80 to-slate-950 flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">Streak Konsistensi</span>
+                <span class="px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 text-[10px] font-bold">AKTIF</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl md:text-4xl font-black font-heading text-indigo-400 font-mono">🔥 {{ streakCount }}</span>
+                <span class="text-xs text-white/50 font-bold">Hari Berturut</span>
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-white/60">
+                <span>Kebiasaan Belajar</span>
+                <span class="text-[#c0ff00] font-bold">Pertahankan</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✨ Dual Primary Cockpit (Grid 2 Kolom Seimbang: 7 / 5) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Kolom Kiri (7/12): Skill Map Scanner & Misi Harian -->
+            <div class="lg:col-span-7 space-y-6">
+              
+              <!-- Skill Map Scanner -->
+              <div class="glass-card p-5 md:p-6 rounded-2xl border border-white/10">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center border border-sky-500/30 shadow-sm">
+                      <i class="ph-bold ph-radar text-xl"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-lg font-black font-heading text-white tracking-tight">Skill Map Scanner</h3>
+                      <p class="text-xs text-white/60 font-medium">Pemetaan kekuatan &amp; kelemahan per domain UTBK berbasis AI.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+                  <div v-for="(skills, category) in skillMap" :key="category" class="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                    <h4 class="text-xs font-black text-white mb-3.5 border-b border-white/10 pb-2 flex items-center gap-2 uppercase tracking-widest">
+                      <span class="w-2 h-2 bg-[#0ea5e9] rounded-full shadow-[0_0_8px_rgba(14,165,233,0.8)]"></span>
+                      {{ category }}
+                    </h4>
+                    <div class="space-y-3">
+                      <div v-for="skill in skills" :key="skill" class="space-y-1.5">
+                        <div class="flex justify-between text-[11px] font-bold">
+                          <span class="text-white/80">{{ skill }}</span>
+                          <span class="font-mono font-black" :style="{ color: getSkillColor(getSkillMastery(skill)) }">{{ getSkillMastery(skill) }}%</span>
+                        </div>
+                        <div class="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                          <div class="h-full rounded-full transition-all duration-700 ease-out" :style="{ width: getSkillMastery(skill) + '%', backgroundColor: getSkillColor(getSkillMastery(skill)), boxShadow: `0 0 10px ${getSkillColor(getSkillMastery(skill))}` }"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Misi Harian Card -->
+              <div class="glass-card p-5 md:p-6 rounded-2xl border border-amber-500/20">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg border border-amber-500/30">
+                      <i class="ph-fill ph-sword"></i>
+                    </span>
+                    <div>
+                      <h3 class="text-base font-black font-heading text-white tracking-tight">Misi Harian Belajar</h3>
+                      <p class="text-[11px] text-white/50">Selesaikan misi untuk mendapatkan XP dan menaikkan level persiapan.</p>
+                    </div>
+                  </div>
+                  <span class="px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-xs font-black">+{{ dailyMissions.reduce((acc, m) => acc + (m.completed ? m.reward : 0), 0) }} XP</span>
+                </div>
+                <ul class="space-y-2.5">
+                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/25' : 'bg-white/5 border-white/10 hover:border-white/20']">
+                    <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-white text-emerald-400 focus:ring-emerald-500 focus:ring-offset-0 w-4 h-4 cursor-pointer appearance-none checked:bg-emerald-500/100 checked:border-emerald-500 relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-[10px] checked:after:font-black checked:after:left-[3px] checked:after:top-[0px]" @change="checkMissionReward(m)">
+                    <span :class="['text-xs font-bold flex-grow text-white transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
+                    <span class="text-xs font-black font-mono shrink-0 text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">+{{ m.reward }} XP</span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+            <!-- Kolom Kanan (5/12): Radar Blind-Spot, Jalur AI & Peringkat Streak -->
+            <div class="lg:col-span-5 space-y-6">
+
+              <!-- Radar Blind-Spot & Kelemahan Card -->
+              <div class="glass-card p-5 md:p-6 rounded-2xl border border-rose-500/25 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-rose-950/20">
+                <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-base border border-rose-500/30">
                       <i class="ph-bold ph-radar"></i>
                     </span>
                     <div>
                       <h4 class="text-sm font-black text-white tracking-tight uppercase">Radar Blind-Spot AI</h4>
-                      <p class="text-[10px] text-white/50">Deteksi kelemahan materi sebelum UTBK</p>
+                      <p class="text-[10px] text-white/50">Prioritas materi yang perlu diperbaiki segera</p>
                     </div>
                   </div>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">1 Kritis</span>
+                  <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">1 Kritis</span>
                 </div>
 
-                <div class="space-y-2.5">
+                <div class="space-y-3">
                   <!-- Skill 1: Geometri (Critical) -->
-                  <div class="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 space-y-1.5">
+                  <div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 space-y-2">
                     <div class="flex justify-between items-center text-xs">
                       <span class="font-bold text-white">Geometri Bangun Ruang (3D)</span>
                       <span class="text-rose-400 font-mono font-black text-[11px]">35% · Kritis</span>
@@ -2305,7 +2394,7 @@
                   </div>
 
                   <!-- Skill 2: Silogisme (Moderate) -->
-                  <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-1.5">
+                  <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 space-y-2">
                     <div class="flex justify-between items-center text-xs">
                       <span class="font-bold text-white">Silogisme &amp; Logika Majemuk</span>
                       <span class="text-amber-400 font-mono font-black text-[11px]">60% · Pemantapan</span>
@@ -2322,7 +2411,7 @@
                   </div>
 
                   <!-- Skill 3: Aljabar (Strong) -->
-                  <div class="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 space-y-1.5">
+                  <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 space-y-2">
                     <div class="flex justify-between items-center text-xs">
                       <span class="font-bold text-white">Aljabar &amp; Persamaan Kuadrat</span>
                       <span class="text-emerald-400 font-mono font-black text-[11px]">85% · Kuasai</span>
@@ -2337,43 +2426,41 @@
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Misi Harian & Peringkat Streak Belajar Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              <!-- Misi Harian Card -->
-              <div class="glass-card p-5 md:p-6 rounded-2xl border border-amber-500/20">
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-base">
-                      <i class="ph-fill ph-sword"></i>
-                    </span>
-                    <div>
-                      <h3 class="text-base font-black font-heading text-white tracking-tight">Misi Harian</h3>
-                      <p class="text-[10px] text-white/50">Selesaikan misi untuk XP &amp; naik level.</p>
+              <!-- Jalur AI Rekomendasi Belajar -->
+              <div class="glass-card p-5 md:p-6 rounded-2xl border border-purple-500/25 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-purple-950/20">
+                <div class="flex items-center gap-2.5 mb-3 pb-2 border-b border-white/10">
+                  <i class="ph-bold ph-lightning text-xl text-[#8b5cf6]"></i>
+                  <div>
+                    <h3 class="text-base font-black font-heading text-white tracking-tight">Jalur AI Personal</h3>
+                    <p class="text-[10px] text-white/50">Rekomendasi belajar adaptif otomatis</p>
+                  </div>
+                </div>
+                
+                <div class="space-y-4 pt-1">
+                  <div v-for="(rec, i) in learningRecommendations" :key="i" class="flex gap-3 relative group">
+                    <div v-if="i < learningRecommendations.length - 1" class="absolute left-3.5 top-8 bottom-0 w-[2px] bg-white/10 group-hover:bg-[#8b5cf6]/50 transition-colors"></div>
+                    <div class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-black font-mono text-xs text-[#8b5cf6] shrink-0 z-10 group-hover:bg-[#8b5cf6] group-hover:text-white transition-all">
+                      {{ i + 1 }}
+                    </div>
+                    <div class="pt-0.5">
+                      <h5 class="text-xs font-black text-white leading-tight mb-1">{{ rec.title }}</h5>
+                      <p class="text-[11px] text-white/50 font-medium leading-relaxed">{{ rec.desc }}</p>
                     </div>
                   </div>
-                  <span class="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-[11px] font-black">+{{ dailyMissions.reduce((acc, m) => acc + (m.completed ? m.reward : 0), 0) }} XP</span>
                 </div>
-                <ul class="space-y-2.5">
-                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-2.5 p-3 rounded-xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/25' : 'bg-white/5 border-white/10 hover:border-white/20']">
-                    <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-white text-emerald-400 focus:ring-emerald-500 focus:ring-offset-0 w-4 h-4 cursor-pointer appearance-none checked:bg-emerald-500/100 checked:border-emerald-500 relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-[10px] checked:after:font-black checked:after:left-[3px] checked:after:top-[0px]" @change="checkMissionReward(m)">
-                    <span :class="['text-xs font-bold flex-grow text-white transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
-                    <span class="text-xs font-black font-mono shrink-0 text-amber-400">+{{ m.reward }}</span>
-                  </li>
-                </ul>
               </div>
 
               <!-- Peringkat Streak Belajar Card -->
-              <div class="glass-card p-5 md:p-6 rounded-2xl border border-indigo-500/20">
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-base">
+              <div class="glass-card p-5 md:p-6 rounded-2xl border border-indigo-500/25">
+                <div class="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-base border border-indigo-500/30">
                       <i class="ph-bold ph-fire"></i>
                     </span>
                     <div>
-                      <h3 class="text-base font-black font-heading text-white tracking-tight">Peringkat Streak Belajar</h3>
-                      <p class="text-[10px] text-white/50">Konsistensi harian kunci kelulusan PTN.</p>
+                      <h3 class="text-sm font-black font-heading text-white tracking-tight">Peringkat Streak Belajar</h3>
+                      <p class="text-[10px] text-white/50">Konsistensi harian kunci kelulusan PTN</p>
                     </div>
                   </div>
                   <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-black font-mono">🔥 {{ streakCount }} Hari</span>
@@ -2404,64 +2491,9 @@
                   </li>
                 </ul>
               </div>
-            </div>
-          </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Priority Learning Skills map -->
-            <div class="glass-card lg:col-span-2 p-4 md:p-5 rounded-2xl">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#0ea5e9]">
-                  <i class="ph-bold ph-radar text-xl"></i>
-                </div>
-                <h3 class="text-xl font-black font-heading text-white tracking-tight">Skill Map Scanner</h3>
-              </div>
-              <p class="text-xs text-white/60 mb-8 font-medium">Deteksi kekuatan & kelemahan materi berbasis AI.</p>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div v-for="(skills, category) in skillMap" :key="category" class="bg-white/5 border border-white/10 p-5 rounded-3xl">
-                  <h4 class="text-xs font-black text-white mb-5 border-b border-white/10 pb-3 flex items-center gap-2 uppercase tracking-widest">
-                    <span class="w-2 h-2 bg-[#0ea5e9] rounded-full shadow-[0_0_8px_rgba(14,165,233,0.8)]"></span>
-                    {{ category }}
-                  </h4>
-                  <div class="space-y-4">
-                    <div v-for="skill in skills" :key="skill" class="space-y-2">
-                      <div class="flex justify-between text-[11px] font-bold">
-                        <span class="text-white/80">{{ skill }}</span>
-                        <span class="font-mono font-black" :style="{ color: getSkillColor(getSkillMastery(skill)) }">{{ getSkillMastery(skill) }}%</span>
-                      </div>
-                      <div class="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
-                        <div class="h-full rounded-full transition-all duration-1000 ease-out" :style="{ width: getSkillMastery(skill) + '%', backgroundColor: getSkillColor(getSkillMastery(skill)), boxShadow: `0 0 10px ${getSkillColor(getSkillMastery(skill))}` }"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
-            <!-- Recommendation path -->
-            <div class="glass-card flex flex-col justify-between p-4 md:p-5 rounded-2xl">
-              <div>
-                <div class="flex items-center gap-3 mb-2">
-                  <i class="ph-bold ph-lightning text-2xl text-[#8b5cf6] drop-shadow-[0_0_10px_rgba(139,92,246,0.6)]"></i>
-                  <h3 class="text-xl font-black font-heading text-white tracking-tight">Jalur AI</h3>
-                </div>
-                <p class="text-[11px] text-white/60 mb-8 font-medium">Auto-generated learning path.</p>
-                
-                <div class="space-y-6">
-                  <div v-for="(rec, i) in learningRecommendations" :key="i" class="flex gap-4 relative group">
-                    <div v-if="i < learningRecommendations.length - 1" class="absolute left-4 top-10 bottom-0 w-[2px] bg-white/10 group-hover:bg-[#8b5cf6]/50 transition-colors"></div>
-                    <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black font-mono text-xs text-[#8b5cf6] shrink-0 z-10 group-hover:scale-110 group-hover:bg-[#8b5cf6] group-hover:text-white transition-all shadow-[0_0_15px_rgba(139,92,246,0)] group-hover:shadow-[0_0_15px_rgba(139,92,246,0.4)]">
-                      {{ i + 1 }}
-                    </div>
-                    <div class="pt-1">
-                      <h5 class="text-xs font-black text-white leading-tight mb-1">{{ rec.title }}</h5>
-                      <p class="text-[10px] text-white/40 font-medium leading-relaxed">{{ rec.desc }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 

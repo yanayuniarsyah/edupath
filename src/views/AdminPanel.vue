@@ -2483,7 +2483,7 @@ const navItems = computed(() => {
     { id: 'transactions',label: 'Transaksi',             icon: 'ph-receipt',       roles: ['superadmin', 'admin'] },
     { id: 'packages',    label: 'Paket',                 icon: 'ph-package',       roles: ['superadmin', 'admin'] },
     { id: 'affiliates',  label: 'Afiliasi & Komisi',     icon: 'ph-hand-coins',    roles: ['superadmin', 'admin'] },
-    { id: 'staff',       label: 'Manajemen Staff',       icon: 'ph-users-three',   roles: ['superadmin'] },
+    { id: 'staff',       label: 'Staff',                 icon: 'ph-users-three',   roles: ['superadmin'] },
     { id: 'reports',     label: 'Laporan & Analitik',    icon: 'ph-chart-bar',     roles: ['superadmin', 'admin'] },
   ];
 

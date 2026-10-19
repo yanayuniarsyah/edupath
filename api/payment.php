@@ -460,7 +460,23 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     ->execute([$subscription_id]);
             } else {
                 $subscription_id = $mkuuid();
-                $expires_at = date('Y-m-d H:i:s', time() + ($duration_days * 86400));
+
+                // Dukungan perpanjangan kumulatif: jika masih ada masa aktif, tambahkan dari tanggal expired terakhir
+                $stmt_active_sub = $pdo->prepare("
+                    SELECT expires_at FROM subscriptions
+                    WHERE student_id = ? AND status = 'active' AND expires_at > NOW()
+                    ORDER BY expires_at DESC
+                    LIMIT 1
+                ");
+                $stmt_active_sub->execute([$order['student_id']]);
+                $last_active = $stmt_active_sub->fetch();
+
+                if ($last_active && strtotime($last_active['expires_at']) > time()) {
+                    $base_time = strtotime($last_active['expires_at']);
+                    $expires_at = date('Y-m-d H:i:s', $base_time + ($duration_days * 86400));
+                } else {
+                    $expires_at = date('Y-m-d H:i:s', time() + ($duration_days * 86400));
+                }
 
                 // P1-A: include tenant_id derived from order.tenant_id, ensure not null
                 if (empty($order['tenant_id'])) {
