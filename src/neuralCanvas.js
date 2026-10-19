@@ -67,13 +67,13 @@ export function initNeuralCanvas() {
       if (p.y < 0) p.y = 0;
       if (p.y > height) p.y = height;
 
-      // Draw particle
+      // Draw particle (atom) - soft glowing node
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(34, 211, 238, 0.9)';
+      ctx.fillStyle = 'rgba(34, 211, 238, 0.45)';
       ctx.fill();
 
-      // Draw connections
+      // Draw connections (ikatan kimia) - balanced visibility
       for (let j = i + 1; j < particles.length; j++) {
         const p2 = particles[j];
         const dx = p.x - p2.x;
@@ -85,8 +85,8 @@ export function initNeuralCanvas() {
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = `rgba(34, 211, 238, ${opacity * 0.5})`;
-          ctx.lineWidth = 0.8;
+          ctx.strokeStyle = `rgba(34, 211, 238, ${opacity * 0.28})`;
+          ctx.lineWidth = 0.75;
           ctx.stroke();
         }
       }

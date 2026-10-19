@@ -4210,7 +4210,7 @@ export default {
   setup() {
     const ambientGlowRef = ref(null);
     const canvasOpacity = ref(0);
-    const handleScroll = (e) => { canvasOpacity.value = e.target.scrollTop > 300 ? 0.4 : 0; };
+    const handleScroll = (e) => { canvasOpacity.value = e.target.scrollTop > 300 ? 0.35 : 0; };
     const mobileSidebarOpen = ref(false);
     const toggleMobileSidebar = () => { mobileSidebarOpen.value = !mobileSidebarOpen.value; };
 
