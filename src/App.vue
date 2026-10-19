@@ -4760,7 +4760,7 @@ export default {
       ];
       try {
         const data = await api.getPlans();
-        if (data.products && data.products.length > 0) {
+        if (data.products && data.products.length >= 3) {
           publicPlans.value = data.products;
         } else {
           publicPlans.value = FALLBACK_PRODUCTS;
