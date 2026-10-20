@@ -113,8 +113,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         COALESCE(s.name, a.bank_owner, u.identity_key, 'Mitra Afiliasi') as affiliate_name,
                         COALESCE(s.email, u.identity_key, '-') as email,
                         (SELECT COUNT(*) FROM students WHERE referred_by = a.id) as total_referrals,
-                        (SELECT COALESCE(SUM(amount), 0) FROM commissions WHERE affiliate_id = a.id AND status = 'pending') as pending_commission
+                        (SELECT COALESCE(SUM(amount), 0) FROM commissions WHERE affiliate_id = a.id AND status = 'pending') as pending_commission,
+                        t.name as tenant_name
                     FROM affiliates a
+                    LEFT JOIN tenants t ON a.tenant_id = t.id
                     LEFT JOIN users u ON a.user_id = u.id
                     LEFT JOIN user_roles ur ON (u.id = ur.user_id AND ur.role = 'student')
                     LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
@@ -134,8 +136,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         COALESCE(s.name, a.bank_owner, u.identity_key, 'Mitra Afiliasi') as affiliate_name,
                         COALESCE(s.email, u.identity_key, '-') as email,
                         (SELECT COUNT(*) FROM students WHERE referred_by = a.id) as total_referrals,
-                        (SELECT COALESCE(SUM(amount), 0) FROM commissions WHERE affiliate_id = a.id AND status = 'pending') as pending_commission
+                        (SELECT COALESCE(SUM(amount), 0) FROM commissions WHERE affiliate_id = a.id AND status = 'pending') as pending_commission,
+                        t.name as tenant_name
                     FROM affiliates a
+                    LEFT JOIN tenants t ON a.tenant_id = t.id
                     LEFT JOIN users u ON a.user_id = u.id
                     LEFT JOIN user_roles ur ON (u.id = ur.user_id AND ur.role = 'student')
                     LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
@@ -309,12 +313,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $aff_id = bin2hex(random_bytes(16));
             $aff_id = substr($aff_id,0,8).'-'.substr($aff_id,8,4).'-'.substr($aff_id,12,4).'-'.substr($aff_id,16,4).'-'.substr($aff_id,20,12);
 
+            $aff_tenant_id = !empty($input['tenant_id']) ? $input['tenant_id'] : ($payload->tenant_id ?: null);
+            if (empty($aff_tenant_id)) {
+                $aff_tenant_id = $pdo->query("SELECT id FROM tenants WHERE is_active = 1 LIMIT 1")->fetchColumn() ?: null;
+            }
+
             $stmtAff = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate, bank_name, bank_account, bank_owner, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-            $stmtAff->execute([$aff_id, $user_id, $payload->tenant_id ?: 'default_tenant', $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner]);
+            $stmtAff->execute([$aff_id, $user_id, $aff_tenant_id, $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner]);
 
             $ur_id = 'ur-' . substr(bin2hex(random_bytes(8)), 0, 10);
             $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'affiliate', ?) ON DUPLICATE KEY UPDATE role = 'affiliate', reference_id = VALUES(reference_id)")
-                ->execute([$ur_id, $user_id, $payload->tenant_id ?: 'default_tenant', $aff_id]);
+                ->execute([$ur_id, $user_id, $aff_tenant_id, $aff_id]);
 
             $pdo->commit();
             echo json_encode(["success" => true, "id" => $aff_id]);
@@ -329,14 +338,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $bank_name = trim($input['bank_name'] ?? '');
         $bank_account = trim($input['bank_account'] ?? '');
         $bank_owner = trim($input['bank_owner'] ?? '');
+        $aff_tenant_id = array_key_exists('tenant_id', $input) ? (!empty($input['tenant_id']) ? $input['tenant_id'] : null) : false;
 
         if (empty($id) || empty($referral_code)) {
             http_response_code(400); echo json_encode(["error" => "ID dan kode referral wajib"]); exit;
         }
 
         try {
-            $stmt = $pdo->prepare("UPDATE affiliates SET referral_code = ?, commission_rate = ?, bank_name = ?, bank_account = ?, bank_owner = ? WHERE id = ?");
-            $stmt->execute([$referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner, $id]);
+            if ($aff_tenant_id !== false && $payload->role === 'superadmin') {
+                $stmt = $pdo->prepare("UPDATE affiliates SET referral_code = ?, commission_rate = ?, bank_name = ?, bank_account = ?, bank_owner = ?, tenant_id = ? WHERE id = ?");
+                $stmt->execute([$referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner, $aff_tenant_id, $id]);
+                $pdo->prepare("UPDATE user_roles SET tenant_id = ? WHERE reference_id = ? AND role = 'affiliate'")->execute([$aff_tenant_id, $id]);
+            } else {
+                $stmt = $pdo->prepare("UPDATE affiliates SET referral_code = ?, commission_rate = ?, bank_name = ?, bank_account = ?, bank_owner = ? WHERE id = ?");
+                $stmt->execute([$referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner, $id]);
+            }
             echo json_encode(["success" => true]);
         } catch (PDOException $e) {
             http_response_code(500); echo json_encode(["error" => "Gagal update afiliasi"]);

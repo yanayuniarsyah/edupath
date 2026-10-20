@@ -468,8 +468,10 @@ export default {
   createAdminStaff(payload) { return apiFetch('/admin.php?action=staff', { method: 'POST', body: JSON.stringify(payload) }); },
   getAdminStaff()      { return apiFetch('/admin.php?action=staff'); },
   updateAdminStaff(id, payload) { return apiFetch('/admin.php?action=staff', { method: 'PUT', body: JSON.stringify({ id, ...payload }) }); },
-  deleteAdminStaff(id) { return apiFetch(`/admin.php?action=staff&id=${id}`, { method: 'DELETE' }); },
   getAdminTenants()    { return apiFetch('/admin.php?action=tenants'); },
+  createAdminTenant(payload) { return apiFetch('/admin.php?action=tenants', { method: 'POST', body: JSON.stringify(payload) }); },
+  updateAdminTenant(id, payload) { return apiFetch('/admin.php?action=tenants', { method: 'PUT', body: JSON.stringify({ id, ...payload }) }); },
+  deleteAdminTenant(id) { return apiFetch(`/admin.php?action=tenants&id=${id}`, { method: 'DELETE' }); },
 
   // ── Student Potential Path (SPP) ──
   sppCreateAttempt() {

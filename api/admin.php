@@ -379,16 +379,20 @@ elseif ($action === 'students') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if ($payload->role === 'superadmin' || empty($payload->tenant_id)) {
             $stmt = $pdo->query("
-                SELECT s.id, s.name, s.email, s.plan, s.is_active, s.created_at, s.tenant_id 
+                SELECT s.id, s.name, s.email, s.plan, s.is_active, s.created_at, s.tenant_id,
+                       t.name as tenant_name
                 FROM students s 
+                LEFT JOIN tenants t ON s.tenant_id = t.id
                 WHERE s.id NOT IN (SELECT reference_id FROM user_roles WHERE role = 'affiliate')
                   AND s.email NOT IN (SELECT u.identity_key FROM affiliates a JOIN users u ON a.user_id = u.id)
                 ORDER BY s.created_at DESC
             ");
         } else {
             $stmt = $pdo->prepare("
-                SELECT s.id, s.name, s.email, s.plan, s.is_active, s.created_at, s.tenant_id 
+                SELECT s.id, s.name, s.email, s.plan, s.is_active, s.created_at, s.tenant_id,
+                       t.name as tenant_name
                 FROM students s 
+                LEFT JOIN tenants t ON s.tenant_id = t.id
                 WHERE (s.tenant_id = ? OR s.tenant_id IS NULL OR s.tenant_id = '')
                   AND s.id NOT IN (SELECT reference_id FROM user_roles WHERE role = 'affiliate')
                   AND s.email NOT IN (SELECT u.identity_key FROM affiliates a JOIN users u ON a.user_id = u.id)
@@ -523,9 +527,15 @@ elseif ($action === 'students') {
             $oldEmail = $studentData ? $studentData['email'] : null;
             $sTenantId = $studentData ? $studentData['tenant_id'] : ($payload->tenant_id ?? 'default_tenant');
 
-            // 1. Update students table
-            $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, plan = ?, is_active = ? WHERE id = ?");
-            $stmt->execute([$name, $email, $plan, $is_active, $id]);
+            // 1. Update students table (termasuk tenant_id jika disediakan oleh superadmin)
+            if ($payload->role === 'superadmin' && array_key_exists('tenant_id', $input)) {
+                $newTenantId = !empty($input['tenant_id']) ? $input['tenant_id'] : null;
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, plan = ?, is_active = ?, tenant_id = ? WHERE id = ?");
+                $stmt->execute([$name, $email, $plan, $is_active, $newTenantId, $id]);
+            } else {
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, plan = ?, is_active = ? WHERE id = ?");
+                $stmt->execute([$name, $email, $plan, $is_active, $id]);
+            }
 
             // 2. Find associated user_id from user_roles
             $stmtU = $pdo->prepare("SELECT user_id FROM user_roles WHERE reference_id = ? AND role = 'student' LIMIT 1");
@@ -811,27 +821,30 @@ elseif ($action === 'orders') {
 elseif ($action === 'affiliates' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($payload->role === 'affiliate') {
         $stmt = $pdo->prepare("
-            SELECT a.*, u.identity_key 
+            SELECT a.*, u.identity_key, t.name as tenant_name
             FROM affiliates a 
             JOIN users u ON a.user_id = u.id 
+            LEFT JOIN tenants t ON a.tenant_id = t.id
             WHERE a.user_id = ? OR a.id = ?
             ORDER BY a.created_at DESC
         ");
         $stmt->execute([$payload->user_id, $payload->id]);
     } elseif ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
         $stmt = $pdo->prepare("
-            SELECT a.*, u.identity_key 
+            SELECT a.*, u.identity_key, t.name as tenant_name
             FROM affiliates a 
             JOIN users u ON a.user_id = u.id 
+            LEFT JOIN tenants t ON a.tenant_id = t.id
             WHERE a.tenant_id = ? 
             ORDER BY a.created_at DESC
         ");
         $stmt->execute([$payload->tenant_id]);
     } else {
         $stmt = $pdo->query("
-            SELECT a.*, u.identity_key 
+            SELECT a.*, u.identity_key, t.name as tenant_name
             FROM affiliates a 
             JOIN users u ON a.user_id = u.id 
+            LEFT JOIN tenants t ON a.tenant_id = t.id
             ORDER BY a.created_at DESC
         ");
     }
@@ -1020,11 +1033,40 @@ elseif ($action === 'tenants') {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        echo safe_json_encode($pdo->query("SELECT * FROM tenants ORDER BY created_at DESC")->fetchAll());
+        $sql = "
+            SELECT 
+                t.*,
+                (SELECT COUNT(*) FROM students WHERE tenant_id = t.id) as student_count,
+                (SELECT COUNT(*) FROM user_roles WHERE tenant_id = t.id AND role IN ('admin', 'teacher')) as staff_count,
+                (SELECT COUNT(*) FROM affiliates WHERE tenant_id = t.id) as affiliate_count,
+                (SELECT u.identity_key FROM user_roles ur JOIN users u ON ur.user_id = u.id WHERE ur.tenant_id = t.id AND ur.role = 'admin' LIMIT 1) as admin_email
+            FROM tenants t 
+            ORDER BY t.created_at DESC
+        ";
+        echo safe_json_encode($pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC));
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
         
+        $name = trim($input['name'] ?? '');
+        if (empty($name)) {
+            http_response_code(400); echo json_encode(["error" => "Nama cabang wajib diisi"]); exit;
+        }
+
+        $slug = trim($input['slug'] ?? '');
+        if (empty($slug)) {
+            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
+        }
+        $slug = trim($slug, '-');
+        if (empty($slug)) $slug = 'cabang-' . substr($id, 0, 6);
+
+        // Pastikan slug unik
+        $chk = $pdo->prepare("SELECT id FROM tenants WHERE slug = ?");
+        $chk->execute([$slug]);
+        if ($chk->fetch()) {
+            $slug .= '-' . substr(bin2hex(random_bytes(2)), 0, 4);
+        }
+
         $admin_email = trim($input['admin_email'] ?? '');
         $admin_name = trim($input['admin_name'] ?? '');
         $admin_password = $input['admin_password'] ?? '';
@@ -1034,7 +1076,7 @@ elseif ($action === 'tenants') {
             
             // 1. Create Tenant
             $stmt = $pdo->prepare("INSERT INTO tenants (id, name, slug, is_active) VALUES (?, ?, ?, 1)");
-            $stmt->execute([$id, $input['name'], $input['slug']]);
+            $stmt->execute([$id, $name, $slug]);
             
             // 2. Provision First Admin (if provided)
             if (!empty($admin_email) && !empty($admin_password)) {
@@ -1052,8 +1094,7 @@ elseif ($action === 'tenants') {
                 $admin_id = substr($admin_id,0,8).'-'.substr($admin_id,8,4).'-'.substr($admin_id,12,4).'-'.substr($admin_id,16,4).'-'.substr($admin_id,20,12);
                 
                 $stmt = $pdo->prepare("INSERT INTO admins (id, username, password, name) VALUES (?, ?, ?, ?)");
-                // Admin profile legacy password field is populated for compatibility
-                $stmt->execute([$admin_id, $admin_email, $hashed_password, $admin_name ?: 'Admin']);
+                $stmt->execute([$admin_id, $admin_email, $hashed_password, $admin_name ?: 'Admin Cabang']);
                 
                 // Link Role
                 $ur_id = bin2hex(random_bytes(16));
@@ -1064,7 +1105,7 @@ elseif ($action === 'tenants') {
             }
             
             $pdo->commit();
-            log_audit($pdo, $payload->user_id, null, 'tenant_created', $id, ['name' => $input['name'], 'slug' => $input['slug']]);
+            log_audit($pdo, $payload->user_id, null, 'tenant_created', $id, ['name' => $name, 'slug' => $slug]);
             echo json_encode(["success" => true, "id" => $id]);
         } catch (PDOException $e) {
             $pdo->rollBack();
@@ -1073,13 +1114,42 @@ elseif ($action === 'tenants') {
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $id = $input['id'] ?? '';
+        $name = trim($input['name'] ?? '');
+        $slug = trim($input['slug'] ?? '');
         $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
+
+        if (empty($id) || empty($name)) {
+            http_response_code(400); echo json_encode(["error" => "ID dan nama cabang wajib diisi"]); exit;
+        }
+        if (empty($slug)) {
+            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
+        }
+
         $stmt = $pdo->prepare("UPDATE tenants SET name=?, slug=?, is_active=? WHERE id=?");
-        $stmt->execute([$input['name'], $input['slug'], $is_active, $id]);
+        $stmt->execute([$name, $slug, $is_active, $id]);
         
         log_audit($pdo, $payload->user_id, null, 'tenant_updated', $id, ['is_active' => $is_active]);
-        
         echo json_encode(["success" => true]);
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $id = $_GET['id'] ?? ($input['id'] ?? '');
+        if (empty($id)) {
+            http_response_code(400); echo json_encode(["error" => "ID cabang diperlukan"]); exit;
+        }
+        $stuCount = $pdo->prepare("SELECT COUNT(*) FROM students WHERE tenant_id = ?");
+        $stuCount->execute([$id]);
+        $hasStudents = ((int)$stuCount->fetchColumn()) > 0;
+
+        $staffCount = $pdo->prepare("SELECT COUNT(*) FROM user_roles WHERE tenant_id = ? AND role IN ('admin', 'teacher')");
+        $staffCount->execute([$id]);
+        $hasStaff = ((int)$staffCount->fetchColumn()) > 0;
+
+        if ($hasStudents || $hasStaff) {
+            $pdo->prepare("UPDATE tenants SET is_active = 0 WHERE id = ?")->execute([$id]);
+            echo json_encode(["success" => true, "message" => "Cabang memiliki data terkait, status diubah menjadi Nonaktif"]);
+        } else {
+            $pdo->prepare("DELETE FROM tenants WHERE id = ?")->execute([$id]);
+            echo json_encode(["success" => true, "message" => "Cabang berhasil dihapus"]);
+        }
     }
 }
 elseif ($action === 'entitlements_dictionary') {
@@ -1732,6 +1802,13 @@ elseif ($action === 'staff') {
                 if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
                 $stmt->execute($params);
             }
+
+            if ($payload->role === 'superadmin' && array_key_exists('tenant_id', $input)) {
+                $newTenantId = !empty($input['tenant_id']) ? $input['tenant_id'] : null;
+                $pdo->prepare("UPDATE admins SET tenant_id = ? WHERE id = ?")->execute([$newTenantId, $id]);
+                $pdo->prepare("UPDATE user_roles SET tenant_id = ? WHERE reference_id = ? AND role != 'superadmin'")->execute([$newTenantId, $id]);
+            }
+
             echo json_encode(["success" => true]);
         } catch (PDOException $e) {
             http_response_code(500); echo json_encode(["error" => "Gagal mengupdate staff", "details" => $e->getMessage()]);

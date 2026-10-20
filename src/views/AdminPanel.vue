@@ -245,6 +245,121 @@
           </div>
         </div>
 
+        <!-- ===== TAB: MASTER CABANG (Superadmin) ===== -->
+        <div v-if="activeTab === 'branches'" class="space-y-4 animate-fade-in">
+          <div class="flex flex-wrap justify-between items-center gap-3">
+            <div>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="ph-bold ph-buildings text-[#c0ff00]"></i> Master Cabang Bimbel
+              </h2>
+              <p class="text-[10px] text-white/40">Kelola multi-cabang lembaga bimbel, alokasi data siswa & staff, serta operasional cabang</p>
+            </div>
+            <button @click="openCreateBranchModal" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5 shadow-md shadow-[#c0ff00]/20 cursor-pointer">
+              <i class="ph-bold ph-plus"></i> Tambah Cabang
+            </button>
+          </div>
+
+          <!-- Cabang KPI Strip -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Total Cabang</div>
+              <div class="text-xl font-black text-white font-mono">{{ tenantsList.length }}</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Cabang Aktif</div>
+              <div class="text-xl font-black text-emerald-400 font-mono">{{ tenantsList.filter(t => t.is_active != 0).length }}</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Total Siswa Tersebar</div>
+              <div class="text-xl font-black text-indigo-400 font-mono">{{ tenantsList.reduce((acc, t) => acc + (Number(t.student_count) || 0), 0) }}</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Total Staff & Tutor</div>
+              <div class="text-xl font-black text-[#c0ff00] font-mono">{{ tenantsList.reduce((acc, t) => acc + (Number(t.staff_count) || 0), 0) }}</div>
+            </div>
+          </div>
+
+          <!-- Search & Filter Bar Cabang -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-2.5 border border-white/10 flex flex-wrap items-center gap-2">
+            <div class="relative flex-grow min-w-[180px]">
+              <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
+              <input v-model="branchSearch" type="text" placeholder="Cari nama atau kode cabang..." class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors" />
+            </div>
+            <select v-model="branchStatusFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+              <option value="all" class="bg-[#0d1427]">Semua Status</option>
+              <option value="1" class="bg-[#0d1427]">Aktif Saja</option>
+              <option value="0" class="bg-[#0d1427]">Nonaktif Saja</option>
+            </select>
+            <select v-model="branchAlphaSort" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+              <option value="default" class="bg-[#0d1427]">Urutan Default</option>
+              <option value="asc" class="bg-[#0d1427]">Nama Cabang (A - Z)</option>
+              <option value="desc" class="bg-[#0d1427]">Nama Cabang (Z - A)</option>
+            </select>
+          </div>
+
+          <!-- Table Cabang -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12">No</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Nama Cabang</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Kode / Slug</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Admin Cabang</th>
+                    <th class="text-center px-3 py-3 font-black uppercase tracking-wider">Siswa</th>
+                    <th class="text-center px-3 py-3 font-black uppercase tracking-wider">Staff</th>
+                    <th class="text-center px-3 py-3 font-black uppercase tracking-wider">Mitra</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Status</th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr v-if="filteredBranches.length === 0">
+                    <td colspan="9" class="py-8 text-center text-white/40 font-medium">Belum ada cabang terdaftar atau tidak sesuai filter</td>
+                  </tr>
+                  <tr v-for="(b, idx) in filteredBranches" :key="b.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ idx + 1 }}</td>
+                    <td class="px-4 py-3">
+                      <div class="font-bold text-white text-sm flex items-center gap-1.5">
+                        <i class="ph-bold ph-buildings text-indigo-400"></i>
+                        <span>{{ b.name }}</span>
+                      </div>
+                      <div class="text-[10px] text-white/40 font-mono mt-0.5">ID: {{ b.id }}</div>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-xs font-bold text-indigo-300">
+                      {{ b.slug }}
+                    </td>
+                    <td class="px-4 py-3">
+                      <div v-if="b.admin_email" class="font-medium text-xs text-white/90">{{ b.admin_email }}</div>
+                      <div v-else class="text-white/40 text-[11px] italic">Belum diset</div>
+                    </td>
+                    <td class="px-3 py-3 text-center font-bold font-mono text-white text-xs">
+                      <span class="px-2 py-0.5 rounded bg-indigo-500/15 border border-indigo-500/30 text-indigo-300">{{ b.student_count || 0 }}</span>
+                    </td>
+                    <td class="px-3 py-3 text-center font-bold font-mono text-white text-xs">
+                      <span class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">{{ b.staff_count || 0 }}</span>
+                    </td>
+                    <td class="px-3 py-3 text-center font-bold font-mono text-white text-xs">
+                      <span class="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300">{{ b.affiliate_count || 0 }}</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <button @click="toggleBranchStatus(b)" :title="'Klik untuk ubah status'" class="px-2.5 py-1 rounded-md font-bold text-[11px] inline-flex items-center gap-1 cursor-pointer transition-all hover:opacity-80" :class="b.is_active != 0 ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/15 border border-rose-500/30 text-rose-400'">
+                        <span class="w-1.5 h-1.5 rounded-full" :class="b.is_active != 0 ? 'bg-emerald-400' : 'bg-rose-400'"></span>
+                        {{ b.is_active != 0 ? 'Aktif' : 'Nonaktif' }}
+                      </button>
+                    </td>
+                    <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                      <button @click="openEditBranchModal(b)" class="px-2.5 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Cabang"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deleteBranch(b.id)" class="px-2.5 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus / Nonaktifkan"><i class="ph-bold ph-trash"></i> Hapus</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- ===== TAB: TEACHER HUB (Khusus Guru) ===== -->
         <div v-if="activeTab === 'teacher_hub'" class="space-y-4 animate-fade-in">
           <div class="flex items-center gap-3 mb-2">
@@ -433,6 +548,10 @@
               <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
               <input id="student_search_input" name="student_search" aria-label="Cari nama atau email siswa" v-model="studentSearch" type="text" placeholder="Cari nama atau email siswa..." class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors" />
             </div>
+            <select id="student_tenant_filter" name="student_tenant_filter" aria-label="Filter Cabang" v-model="studentTenantFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+              <option value="all" class="bg-[#0d1427]">Semua Cabang</option>
+              <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427]">{{ t.name }}</option>
+            </select>
             <select id="student_plan_filter" name="student_plan_filter" aria-label="Filter Paket Belajar" v-model="studentPlanFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
               <option value="all" class="bg-[#0d1427]">Semua Paket</option>
               <option value="free" class="bg-[#0d1427]">Free</option>
@@ -440,7 +559,12 @@
               <option value="utama" class="bg-[#0d1427]">Utama</option>
               <option value="vip" class="bg-[#0d1427]">VIP</option>
             </select>
-            <button @click="openCreateStudentModal" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5">
+            <select id="student_alpha_sort" name="student_alpha_sort" aria-label="Urutan Alfabet" v-model="studentAlphaSort" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+              <option value="default" class="bg-[#0d1427]">Urutan Default</option>
+              <option value="asc" class="bg-[#0d1427]">Nama Siswa (A - Z)</option>
+              <option value="desc" class="bg-[#0d1427]">Nama Siswa (Z - A)</option>
+            </select>
+            <button @click="openCreateStudentModal" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5 shadow-md shadow-[#c0ff00]/20 cursor-pointer">
               <i class="ph-bold ph-plus"></i> Tambah Siswa
             </button>
           </div>
@@ -453,17 +577,27 @@
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Siswa <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Cabang</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('plan')">Paket <i v-if="sortKey === 'plan'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
+                  <tr v-if="filteredStudents.length === 0">
+                    <td colspan="6" class="py-8 text-center text-white/40 font-medium">Belum ada data siswa atau tidak sesuai filter</td>
+                  </tr>
                   <tr v-for="(s, index) in pagedStudents" :key="s.id" class="hover:bg-white/5 transition-colors">
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ (studentPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-4 py-3">
                       <div class="font-bold text-white text-sm leading-snug">{{ s.name }}</div>
                       <div class="text-white/50 font-medium text-xs mt-0.5">{{ s.email }}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="px-2 py-0.5 rounded-md font-bold text-[11px] bg-white/5 border border-white/10 text-white/80 inline-flex items-center gap-1">
+                        <i class="ph-bold ph-buildings text-indigo-400"></i>
+                        {{ s.tenant_name || 'Pusat' }}
+                      </span>
                     </td>
                     <td class="px-4 py-3">
                       <span class="px-2.5 py-1 rounded-md font-bold text-xs bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 uppercase tracking-wide">{{ s.plan || 'free' }}</span>
@@ -1242,17 +1376,38 @@
 
           <!-- Affiliates List -->
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden mb-4">
-            <div class="p-2.5 border-b border-white/10 bg-black/20 flex justify-between items-center">
+            <div class="p-2.5 border-b border-white/10 bg-black/20 flex flex-wrap justify-between items-center gap-2">
               <h3 class="font-bold text-white text-xs">Daftar Mitra Afiliasi</h3>
-              <button @click="loadAdminAffiliates" class="text-[#c0ff00] text-[10px] font-bold flex items-center gap-1">
-                <i class="ph-bold ph-arrows-clockwise" :class="{'animate-spin': isLoadingAffiliates}"></i> Refresh
-              </button>
+              <div class="flex items-center gap-2">
+                <button @click="loadAdminAffiliates" class="text-[#c0ff00] text-[10px] font-bold flex items-center gap-1 cursor-pointer">
+                  <i class="ph-bold ph-arrows-clockwise" :class="{'animate-spin': isLoadingAffiliates}"></i> Refresh
+                </button>
+              </div>
             </div>
+
+            <!-- Filter Bar Mitra Afiliasi -->
+            <div class="p-2.5 bg-black/30 border-b border-white/10 flex flex-wrap items-center gap-2">
+              <div class="relative flex-grow min-w-[180px]">
+                <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
+                <input v-model="affiliateSearch" type="text" placeholder="Cari nama, email, atau kode referral mitra..." class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors" />
+              </div>
+              <select v-model="affiliateTenantFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+                <option value="all" class="bg-[#0d1427]">Semua Cabang</option>
+                <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427]">{{ t.name }}</option>
+              </select>
+              <select v-model="affiliateAlphaSort" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+                <option value="default" class="bg-[#0d1427]">Urutan Default</option>
+                <option value="asc" class="bg-[#0d1427]">Nama Mitra (A - Z)</option>
+                <option value="desc" class="bg-[#0d1427]">Nama Mitra (Z - A)</option>
+              </select>
+            </div>
+
             <div class="overflow-x-auto">
               <table class="w-full text-xs">
                 <thead>
                   <tr class="bg-black/40 text-white/60 border-b border-white/10">
                     <th class="py-3 px-4 text-left font-bold">Mitra</th>
+                    <th class="py-3 px-4 text-left font-bold">Cabang</th>
                     <th class="py-3 px-4 text-left font-bold">Kode Referral</th>
                     <th class="py-3 px-4 text-left font-bold">Komisi (%)</th>
                     <th class="py-3 px-4 text-left font-bold">Bank Info</th>
@@ -1261,15 +1416,21 @@
                 </thead>
                 <tbody>
                   <tr v-if="isLoadingAffiliates">
-                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-xs">Memuat data mitra...</td>
+                    <td colspan="6" class="py-6 text-center text-white/40 font-medium text-xs">Memuat data mitra...</td>
                   </tr>
-                  <tr v-else-if="affiliatesList.length === 0">
-                    <td colspan="5" class="py-6 text-center text-white/40 font-medium text-xs">Belum ada mitra afiliasi</td>
+                  <tr v-else-if="filteredAffiliates.length === 0">
+                    <td colspan="6" class="py-6 text-center text-white/40 font-medium text-xs">Belum ada mitra afiliasi atau tidak sesuai filter</td>
                   </tr>
-                  <tr v-for="aff in affiliatesList" :key="aff.id" class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                  <tr v-for="aff in filteredAffiliates" :key="aff.id" class="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td class="py-3 px-4">
                       <div class="font-bold text-white text-sm leading-snug">{{ aff.affiliate_name || aff.identity_key }}</div>
                       <div class="text-xs text-white/50">{{ aff.email || aff.identity_key }}</div>
+                    </td>
+                    <td class="py-3 px-4">
+                      <span class="px-2 py-0.5 rounded-md font-bold text-[11px] bg-white/5 border border-white/10 text-white/80 inline-flex items-center gap-1">
+                        <i class="ph-bold ph-buildings text-indigo-400"></i>
+                        {{ aff.tenant_name || 'Semua Cabang (Pusat)' }}
+                      </span>
                     </td>
                     <td class="py-3 px-4 font-mono text-indigo-400 font-bold text-xs">{{ aff.referral_code }}</td>
                     <td class="py-3 px-4 text-amber-400 font-bold text-xs">{{ aff.commission_rate }}%</td>
@@ -1538,17 +1699,38 @@
           </div>
         </div>
 
-        <!-- ===== TAB: MANAJEMEN STAFF ===== -->
+        <!-- ===== TAB: STAFF ===== -->
         <div v-if="activeTab === 'staff'" class="space-y-4 animate-fade-in">
-          <div class="flex justify-between items-center">
+          <div class="flex flex-wrap justify-between items-center gap-3">
             <div>
-              <h2 class="text-xs font-black text-white uppercase tracking-wider">Manajemen Tim & Pengguna Internal</h2>
-              <p class="text-[10px] text-white/40">Kelola akses tutor, admin operasional, dan role sistem</p>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="ph-bold ph-users-three text-[#c0ff00]"></i> Staff & Tutor
+              </h2>
+              <p class="text-[10px] text-white/40">Kelola akun tutor, pengajar, admin operasional cabang, dan peran sistem</p>
             </div>
-            <button @click="openStaffModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5">
+            <button @click="openStaffModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5 shadow-md shadow-[#c0ff00]/20 cursor-pointer">
               <i class="ph-bold ph-plus"></i> Tambah Staff
             </button>
           </div>
+
+          <!-- Filter Bar Staff -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-2.5 border border-white/10 flex flex-wrap items-center gap-2">
+            <div class="relative flex-grow min-w-[180px]">
+              <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
+              <input v-model="staffSearch" type="text" placeholder="Cari nama atau username/email staff..." class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors" />
+            </div>
+            <select v-model="staffTenantFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+              <option value="all" class="bg-[#0d1427]">Semua Cabang</option>
+              <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427]">{{ t.name }}</option>
+            </select>
+            <select v-model="staffAlphaSort" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+              <option value="default" class="bg-[#0d1427]">Urutan Default</option>
+              <option value="asc" class="bg-[#0d1427]">Nama Staff (A - Z)</option>
+              <option value="desc" class="bg-[#0d1427]">Nama Staff (Z - A)</option>
+            </select>
+          </div>
+
+          <!-- Staff Table -->
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full text-xs">
@@ -1557,16 +1739,26 @@
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('username')">Username <i v-if="sortKey === 'username'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Cabang</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('role')">Peran (Role) <i v-if="sortKey === 'role'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Status</th>
                     <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-for="(s, index) in sortedStaffMembers" :key="s.id" class="hover:bg-white/5 transition-colors">
+                  <tr v-if="filteredStaffMembers.length === 0">
+                    <td colspan="7" class="py-8 text-center text-white/40 font-medium">Belum ada data staff atau tidak sesuai filter</td>
+                  </tr>
+                  <tr v-for="(s, index) in filteredStaffMembers" :key="s.id" class="hover:bg-white/5 transition-colors">
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ index + 1 }}</td>
                     <td class="px-4 py-3 font-bold text-white text-sm leading-snug">{{ s.username }}</td>
                     <td class="px-4 py-3 font-bold text-white/80 text-xs">{{ s.name || '-' }}</td>
+                    <td class="px-4 py-3">
+                      <span class="px-2 py-0.5 rounded-md font-bold text-[11px] bg-white/5 border border-white/10 text-white/80 inline-flex items-center gap-1">
+                        <i class="ph-bold ph-buildings text-indigo-400"></i>
+                        {{ s.tenant_name || 'Semua Cabang (Pusat)' }}
+                      </span>
+                    </td>
                     <td class="px-4 py-3 font-bold text-indigo-400 uppercase text-xs">{{ s.role || 'admin' }}</td>
                     <td class="px-4 py-3">
                       <span class="px-2.5 py-1 rounded-md font-bold text-xs bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 inline-flex items-center gap-1">
@@ -1836,6 +2028,13 @@
           <button @click="showAffiliateModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
         </div>
         <form @submit.prevent="saveAffiliate" class="p-4 space-y-3">
+          <div v-if="isSuperadmin && tenantsList.length > 0">
+            <label for="aff_form_tenant" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang Bimbel</label>
+            <select id="aff_form_tenant" name="tenant_id" v-model="affiliateForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <option value="" class="bg-[#0d1427] text-white">-- Semua Cabang (Pusat) --</option>
+              <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
+            </select>
+          </div>
           <div>
             <label for="aff_form_email" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Mitra</label>
             <input id="aff_form_email" name="email" v-model="affiliateForm.email" :disabled="isEditingAffiliate" required type="email" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
@@ -1950,9 +2149,9 @@
             <label for="student_form_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
             <input id="student_form_name" name="name" v-model="studentForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
-          <div v-if="isSuperadmin && tenantsList.length > 1">
+          <div v-if="isSuperadmin && tenantsList.length > 0">
             <label for="student_form_tenant" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang / Lembaga Bimbel (Opsional)</label>
-            <select id="student_form_tenant" name="tenant_id" v-model="studentForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStudent">
+            <select id="student_form_tenant" name="tenant_id" v-model="studentForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
               <option value="" class="bg-[#0d1427] text-white">-- Bimbel Utama (Default) --</option>
               <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
             </select>
@@ -2049,10 +2248,10 @@
             <label for="staff_form_username" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email (sebagai Username)</label>
             <input id="staff_form_username" name="username" v-model="sForm.username" :disabled="isEditingStaff && sForm.username === 'admin'" required type="text" placeholder="nama@bimbel.com" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
           </div>
-          <div v-if="isSuperadmin && tenantsList.length > 1">
+          <div v-if="isSuperadmin && tenantsList.length > 0">
             <label for="staff_form_tenant" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang / Lembaga Bimbel (Opsional)</label>
-            <select id="staff_form_tenant" name="tenant_id" v-model="sForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="isEditingStaff">
-              <option value="" class="bg-[#0d1427] text-white">-- Bimbel Utama (Default) --</option>
+            <select id="staff_form_tenant" name="tenant_id" v-model="sForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <option value="" class="bg-[#0d1427] text-white">-- Semua Cabang (Pusat) --</option>
               <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
             </select>
           </div>
@@ -2075,6 +2274,62 @@
             <button type="button" @click="closeStaffModal" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>
             <button type="submit" :disabled="isSaving" class="px-5 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50">
               Simpan
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Master Cabang (Tambah / Edit) -->
+    <div v-if="showBranchModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <i class="ph-bold ph-buildings text-[#c0ff00]"></i>
+            {{ isEditingBranch ? 'Edit Master Cabang' : 'Tambah Cabang Baru' }}
+          </h3>
+          <button @click="showBranchModal = false" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+        <form @submit.prevent="saveBranch" class="p-4 space-y-3">
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Cabang</label>
+            <input v-model="branchForm.name" required type="text" placeholder="Contoh: Bimbel EduPath Bandung" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kode / Slug Cabang</label>
+            <input v-model="branchForm.slug" type="text" placeholder="Contoh: edupath-bandung" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium font-mono" />
+            <p class="text-[9px] text-white/40 mt-1">Kosongkan untuk otomatis dibuat dari nama cabang.</p>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Operasional</label>
+            <select v-model="branchForm.is_active" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <option :value="1" class="bg-[#0d1427] text-white">Aktif</option>
+              <option :value="0" class="bg-[#0d1427] text-white">Nonaktif</option>
+            </select>
+          </div>
+
+          <!-- Akun Admin Cabang Baru (Hanya saat Buat Baru) -->
+          <div v-if="!isEditingBranch" class="pt-2 border-t border-white/10 space-y-2">
+            <span class="block text-[10px] font-bold text-amber-400 uppercase tracking-wider">Admin Pengelola Cabang (Opsional)</span>
+            <div>
+              <label class="block text-[9px] font-bold text-white/50 mb-0.5 uppercase tracking-wider">Email Admin</label>
+              <input v-model="branchForm.admin_email" type="email" placeholder="admin.bandung@edupath.id" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-medium" />
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold text-white/50 mb-0.5 uppercase tracking-wider">Nama Admin</label>
+              <input v-model="branchForm.admin_name" type="text" placeholder="Admin EduPath Bandung" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-medium" />
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold text-white/50 mb-0.5 uppercase tracking-wider">Password Admin</label>
+              <input v-model="branchForm.admin_password" type="password" placeholder="••••••••" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-medium" />
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
+            <button type="button" @click="showBranchModal = false" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors cursor-pointer">Batal</button>
+            <button type="submit" :disabled="isSaving" class="px-5 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer">
+              <i v-if="isSaving" class="ph-bold ph-spinner animate-spin"></i>
+              <span>{{ isSaving ? 'Menyimpan...' : 'Simpan Cabang' }}</span>
             </button>
           </div>
         </form>
@@ -2389,6 +2644,33 @@ const doSort = (list) => {
 };
 const studentSearch = ref('');
 const studentPlanFilter = ref('all');
+const studentTenantFilter = ref('all');
+const studentAlphaSort = ref('default');
+
+const staffSearch = ref('');
+const staffTenantFilter = ref('all');
+const staffAlphaSort = ref('default');
+
+const affiliateSearch = ref('');
+const affiliateTenantFilter = ref('all');
+const affiliateAlphaSort = ref('default');
+
+// ── Master Cabang State ──
+const showBranchModal = ref(false);
+const isEditingBranch = ref(false);
+const branchSearch = ref('');
+const branchStatusFilter = ref('all');
+const branchAlphaSort = ref('default');
+const branchForm = reactive({
+  id: null,
+  name: '',
+  slug: '',
+  is_active: 1,
+  admin_email: '',
+  admin_name: '',
+  admin_password: ''
+});
+
 const qSearch = ref('');
 const qSubMateri = ref('all');
 
@@ -2477,6 +2759,7 @@ const navItems = computed(() => {
   const items = [
     { id: 'overview',     label: 'Dashboard',             icon: 'ph-squares-four',  roles: ['superadmin', 'admin', 'teacher'] },
     ...(isT ? [{ id: 'teacher_hub', label: 'Siswa & Jadwal Saya', icon: 'ph-chalkboard-teacher', roles: ['teacher'] }] : []),
+    { id: 'branches',    label: 'Cabang',                icon: 'ph-buildings',     roles: ['superadmin'] },
     { id: 'questions',   label: isT ? 'Bank Soal Saya' : 'Soal', icon: 'ph-books', roles: ['superadmin', 'admin', 'teacher'] },
     { id: 'materials',   label: isT ? 'Materi Saya' : 'Materi', icon: 'ph-file-text', roles: ['superadmin', 'admin', 'teacher'] },
     { id: 'students',    label: 'Siswa',                 icon: 'ph-users-three',   roles: ['superadmin', 'admin'] },
@@ -2731,14 +3014,25 @@ const fetchStudents = async () => {
 };
 
 const filteredStudents = computed(() => {
-  const filtered = allStudents.value.filter(s => {
+  let filtered = allStudents.value.filter(s => {
     const matchSearch = !studentSearch.value ||
       (s.name || '').toLowerCase().includes(studentSearch.value.toLowerCase()) ||
       (s.email || '').toLowerCase().includes(studentSearch.value.toLowerCase());
     const matchPlan = studentPlanFilter.value === 'all' || s.plan === studentPlanFilter.value;
-    return matchSearch && matchPlan;
+    const matchTenant = studentTenantFilter.value === 'all' ||
+      s.tenant_id === studentTenantFilter.value ||
+      (studentTenantFilter.value === 'pusat' && (!s.tenant_id || !s.tenant_name));
+    return matchSearch && matchPlan && matchTenant;
   });
-  return doSort(filtered);
+
+  if (studentAlphaSort.value === 'asc') {
+    filtered = [...filtered].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  } else if (studentAlphaSort.value === 'desc') {
+    filtered = [...filtered].sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+  } else {
+    filtered = doSort(filtered);
+  }
+  return filtered;
 });
 const pagedStudents = computed(() => paginate(filteredStudents.value, studentPage.value));
 const studentTotalPages = computed(() => totalPages(filteredStudents.value));
@@ -3431,10 +3725,42 @@ const isLoadingCommissions = ref(false);
 const isLoadingPayouts = ref(false);
 const showAffiliateModal = ref(false);
 const isEditingAffiliate = ref(false);
-const affiliateForm = reactive({ id: null, email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '' });
+const affiliateForm = reactive({ id: null, tenant_id: '', email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '' });
 const showRejectPayoutModal = ref(false);
 const selectedPayoutToReject = ref(null);
 const rejectReason = ref('');
+
+const filteredAffiliates = computed(() => {
+  let list = (affiliatesList.value || []).filter(aff => {
+    const q = (affiliateSearch.value || '').toLowerCase();
+    const name = aff.affiliate_name || aff.name || aff.identity_key || '';
+    const email = aff.email || aff.identity_key || '';
+    const refCode = aff.referral_code || '';
+    const matchSearch = !q ||
+      name.toLowerCase().includes(q) ||
+      email.toLowerCase().includes(q) ||
+      refCode.toLowerCase().includes(q);
+    const matchTenant = affiliateTenantFilter.value === 'all' ||
+      aff.tenant_id === affiliateTenantFilter.value ||
+      (affiliateTenantFilter.value === 'pusat' && (!aff.tenant_id || !aff.tenant_name));
+    return matchSearch && matchTenant;
+  });
+
+  if (affiliateAlphaSort.value === 'asc') {
+    list = [...list].sort((a, b) => {
+      const nameA = a.affiliate_name || a.name || a.identity_key || '';
+      const nameB = b.affiliate_name || b.name || b.identity_key || '';
+      return nameA.localeCompare(nameB);
+    });
+  } else if (affiliateAlphaSort.value === 'desc') {
+    list = [...list].sort((a, b) => {
+      const nameA = a.affiliate_name || a.name || a.identity_key || '';
+      const nameB = b.affiliate_name || b.name || b.identity_key || '';
+      return nameB.localeCompare(nameA);
+    });
+  }
+  return list;
+});
 
 const loadAdminAffiliates = async () => {
   isLoadingAffiliates.value = true;
@@ -3471,7 +3797,8 @@ const loadAdminPayouts = async () => {
 
 const openCreateAffiliateModal = () => {
   isEditingAffiliate.value = false;
-  Object.assign(affiliateForm, { id: null, email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '' });
+  const defTenant = tenantsList.value?.[0]?.id || '';
+  Object.assign(affiliateForm, { id: null, tenant_id: defTenant, email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '' });
   showAffiliateModal.value = true;
 };
 
@@ -3479,6 +3806,7 @@ const openEditAffiliateModal = (aff) => {
   isEditingAffiliate.value = true;
   Object.assign(affiliateForm, {
     id: aff.id,
+    tenant_id: aff.tenant_id || tenantsList.value?.[0]?.id || '',
     email: aff.email || aff.identity_key,
     name: aff.affiliate_name || '',
     referral_code: aff.referral_code,
@@ -3670,6 +3998,29 @@ const saveAffiliateSettings = async () => {
 // ── Staff ──
 const staffMembers = ref([]);
 const sortedStaffMembers = computed(() => doSort(staffMembers.value));
+
+const filteredStaffMembers = computed(() => {
+  let list = (staffMembers.value || []).filter(s => {
+    const q = (staffSearch.value || '').toLowerCase();
+    const matchSearch = !q ||
+      (s.name || '').toLowerCase().includes(q) ||
+      (s.username || '').toLowerCase().includes(q);
+    const matchTenant = staffTenantFilter.value === 'all' ||
+      s.tenant_id === staffTenantFilter.value ||
+      (staffTenantFilter.value === 'pusat' && (!s.tenant_id || !s.tenant_name));
+    return matchSearch && matchTenant;
+  });
+
+  if (staffAlphaSort.value === 'asc') {
+    list = [...list].sort((a, b) => (a.name || a.username || '').localeCompare(b.name || b.username || ''));
+  } else if (staffAlphaSort.value === 'desc') {
+    list = [...list].sort((a, b) => (b.name || b.username || '').localeCompare(a.name || a.username || ''));
+  } else {
+    list = doSort(list);
+  }
+  return list;
+});
+
 const showStaffModal = ref(false);
 const isEditingStaff = ref(false);
 const sForm = reactive({ id: null, tenant_id: '', username: '', name: '', role: 'teacher', password: '' });
@@ -3701,6 +4052,121 @@ const saveStaff = async () => {
 const deleteStaff = async (id) => {
   if (confirm('Nonaktifkan staff ini?')) {
     try { await api.deleteAdminStaff(id); await loadPlansAndStaff(); } catch (err) { alert(err.message); }
+  }
+};
+
+// ── Master Cabang Computed & Methods ──
+const filteredBranches = computed(() => {
+  let list = (tenantsList.value || []).filter(b => {
+    const q = (branchSearch.value || '').toLowerCase();
+    const matchSearch = !q || (b.name || '').toLowerCase().includes(q) || (b.slug || '').toLowerCase().includes(q);
+    const matchStatus = branchStatusFilter.value === 'all' || String(b.is_active) === branchStatusFilter.value;
+    return matchSearch && matchStatus;
+  });
+
+  if (branchAlphaSort.value === 'asc') {
+    list = [...list].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  } else if (branchAlphaSort.value === 'desc') {
+    list = [...list].sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+  }
+  return list;
+});
+
+const openCreateBranchModal = () => {
+  isEditingBranch.value = false;
+  isSaving.value = false;
+  Object.assign(branchForm, {
+    id: null,
+    name: '',
+    slug: '',
+    is_active: 1,
+    admin_email: '',
+    admin_name: '',
+    admin_password: ''
+  });
+  showBranchModal.value = true;
+};
+
+const openEditBranchModal = (b) => {
+  isEditingBranch.value = true;
+  isSaving.value = false;
+  Object.assign(branchForm, {
+    id: b.id,
+    name: b.name,
+    slug: b.slug,
+    is_active: b.is_active != 0 ? 1 : 0,
+    admin_email: '',
+    admin_name: '',
+    admin_password: ''
+  });
+  showBranchModal.value = true;
+};
+
+const saveBranch = async () => {
+  if (!branchForm.name || !branchForm.name.trim()) {
+    alert('Nama cabang wajib diisi');
+    return;
+  }
+  isSaving.value = true;
+  try {
+    if (isEditingBranch.value) {
+      await api.updateAdminTenant(branchForm.id, {
+        name: branchForm.name,
+        slug: branchForm.slug,
+        is_active: branchForm.is_active
+      });
+      alert('Cabang berhasil diperbarui');
+    } else {
+      await api.createAdminTenant({
+        name: branchForm.name,
+        slug: branchForm.slug,
+        is_active: branchForm.is_active,
+        admin_email: branchForm.admin_email,
+        admin_name: branchForm.admin_name,
+        admin_password: branchForm.admin_password
+      });
+      alert('Cabang baru berhasil dibuat');
+    }
+    showBranchModal.value = false;
+    await fetchTenants();
+  } catch (err) {
+    alert(err?.message || 'Gagal menyimpan cabang');
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+const toggleBranchStatus = async (b) => {
+  const newStatus = b.is_active != 0 ? 0 : 1;
+  try {
+    await api.updateAdminTenant(b.id, {
+      name: b.name,
+      slug: b.slug,
+      is_active: newStatus
+    });
+    b.is_active = newStatus;
+  } catch (err) {
+    alert('Gagal mengubah status cabang');
+  }
+};
+
+const deleteBranch = async (id) => {
+  if (!confirm('Hapus atau nonaktifkan cabang ini?')) return;
+  try {
+    const res = await api.deleteAdminTenant(id);
+    alert(res?.message || 'Cabang berhasil diproses');
+    await fetchTenants();
+  } catch (err) {
+    alert(err?.message || 'Gagal memproses cabang');
+  }
+};
+
+const fetchTenants = async () => {
+  try {
+    const res = await api.getAdminTenants().catch(() => []);
+    tenantsList.value = Array.isArray(res) ? res : [];
+  } catch (err) {
+    console.error('Error load tenants:', err);
   }
 };
 
@@ -3879,15 +4345,18 @@ watch(activeTab, (newTab) => {
     activeTab.value = 'affiliate_dashboard';
     return;
   }
-  if (isTeacher.value && ['packages', 'plans', 'transactions', 'affiliates', 'staff', 'students', 'settings'].includes(newTab)) {
+  if (isTeacher.value && ['packages', 'plans', 'transactions', 'affiliates', 'staff', 'students', 'settings', 'branches'].includes(newTab)) {
     activeTab.value = 'questions';
     return;
   }
   sessionStorage.setItem('admin_active_tab', newTab);
   if (newTab === 'overview' && !isAffiliate.value && !isTeacher.value) {
     fetchDashboard();
+  } else if (newTab === 'branches' && isSuperadmin.value) {
+    fetchTenants();
   } else if (newTab === 'students' && !isTeacher.value && !isAffiliate.value) {
     fetchStudents();
+    if (tenantsList.value.length === 0) fetchTenants();
   } else if (newTab === 'questions' && !isAffiliate.value) {
     fetchQuestions();
   } else if (newTab === 'materials' && !isAffiliate.value) {
@@ -3900,6 +4369,7 @@ watch(activeTab, (newTab) => {
     loadAdminAffiliates();
     loadAdminCommissions();
     loadAdminPayouts();
+    if (tenantsList.value.length === 0) fetchTenants();
   } else if (isAffiliate.value && ['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts'].includes(newTab)) {
     loadMyAffiliateData();
   } else if (newTab === 'settings' && isAffiliate.value) {
