@@ -86,6 +86,87 @@ function ensure_admin_schema($pdo) {
     // 4. Drop outdated ownership check constraints if present (Phase 3i alignment)
     try { $pdo->exec("ALTER TABLE subscriptions DROP CONSTRAINT sub_ownership_chk"); } catch (\Throwable $e) {}
     try { $pdo->exec("ALTER TABLE entitlements DROP CONSTRAINT ent_ownership_chk"); } catch (\Throwable $e) {}
+
+    // 5. Ensure quiz_attempts table and reliability columns
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS quiz_attempts (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                student_id VARCHAR(36) NOT NULL,
+                quiz_type VARCHAR(50) NOT NULL,
+                subtes VARCHAR(100) DEFAULT NULL,
+                status ENUM('started', 'completed') DEFAULT 'started',
+                started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                expires_at DATETIME NULL,
+                completed_at DATETIME DEFAULT NULL,
+                answers JSON NULL,
+                last_saved_at DATETIME NULL,
+                KEY qa_student_idx (student_id),
+                CONSTRAINT qa_student_fk FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
+    try { $pdo->exec("ALTER TABLE quiz_attempts ADD COLUMN expires_at DATETIME NULL AFTER started_at"); } catch (\Throwable $e) {}
+    try { $pdo->exec("ALTER TABLE quiz_attempts ADD COLUMN answers JSON NULL AFTER completed_at"); } catch (\Throwable $e) {}
+    try { $pdo->exec("ALTER TABLE quiz_attempts ADD COLUMN last_saved_at DATETIME NULL AFTER answers"); } catch (\Throwable $e) {}
+
+    // 6. Ensure target universities & programs for PTN Rasionalisasi
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS target_universities (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                name VARCHAR(150) NOT NULL,
+                city VARCHAR(100) DEFAULT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS target_programs (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                university_id VARCHAR(36) NOT NULL,
+                name VARCHAR(150) NOT NULL,
+                target_score INT NOT NULL DEFAULT 650,
+                req_ability JSON DEFAULT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                KEY tp_univ_idx (university_id),
+                CONSTRAINT tp_univ_fk FOREIGN KEY (university_id) REFERENCES target_universities (id) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
+
+    // 7. Ensure SPP Diagnostic Questions & Rate Limits tables
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS spp_diagnostic_questions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                subject VARCHAR(100) NOT NULL,
+                category VARCHAR(100) NOT NULL,
+                skill VARCHAR(150) NOT NULL,
+                difficulty ENUM('easy', 'medium', 'hard') DEFAULT 'medium',
+                question TEXT NOT NULL,
+                options JSON NOT NULL,
+                answer VARCHAR(10) NOT NULL,
+                hint TEXT,
+                concept TEXT,
+                explanation TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
+
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS rate_limits (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                ip_address VARCHAR(45) NOT NULL,
+                endpoint VARCHAR(100) NOT NULL,
+                attempt_count INT DEFAULT 1,
+                lock_until DATETIME DEFAULT NULL,
+                last_attempt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                UNIQUE KEY ip_endpoint_uq (ip_address, endpoint)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
 }
 
 $action = $_GET['action'] ?? '';

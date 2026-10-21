@@ -31,6 +31,9 @@ function verify_jwt(string $jwt): object|false {
 
     [$b64Header, $b64Payload, $b64Sig] = $parts;
 
+    $header = json_decode(base64_decode(strtr($b64Header, '-_', '+/')), true);
+    if (!$header || ($header['alg'] ?? '') !== 'HS256') return false;
+
     $expectedSig = hash_hmac(
         'sha256',
         "$b64Header.$b64Payload",
