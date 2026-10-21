@@ -41,6 +41,7 @@ function ensure_admin_schema($pdo) {
         "ALTER TABLE materials ADD COLUMN subtopic VARCHAR(100) NULL",
         "ALTER TABLE materials ADD COLUMN skill VARCHAR(100) NULL",
         "ALTER TABLE materials ADD COLUMN indicator VARCHAR(100) NULL",
+        "ALTER TABLE materials ADD COLUMN leaf_id VARCHAR(50) NULL",
         "ALTER TABLE materials ADD COLUMN teacher_name VARCHAR(150) NULL",
         "ALTER TABLE materials ADD COLUMN teacher_id VARCHAR(50) NULL",
         "ALTER TABLE materials ADD COLUMN file_url VARCHAR(500) NULL",
@@ -1544,6 +1545,7 @@ elseif ($action === 'materials') {
         $subtopic = $input['subtopic'] ?? null;
         $skill = $input['skill'] ?? null;
         $indicator = $input['indicator'] ?? null;
+        $leaf_id = !empty($input['leaf_id']) ? trim($input['leaf_id']) : null;
         $title = trim($input['title'] ?? 'Materi Belajar');
         $content = $input['content'] ?? '';
         $teacher_name = trim($input['teacher_name'] ?? '');
@@ -1558,13 +1560,23 @@ elseif ($action === 'materials') {
         $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
 
         try {
-            $stmt = $pdo->prepare("
-                INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, title, content, teacher_name, teacher_id, file_url, is_active)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-            $stmt->execute([
-                $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active
-            ]);
+            try {
+                $stmt = $pdo->prepare("
+                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, leaf_id, title, content, teacher_name, teacher_id, file_url, is_active)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ");
+                $stmt->execute([
+                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active
+                ]);
+            } catch (\PDOException $colErr) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, title, content, teacher_name, teacher_id, file_url, is_active)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ");
+                $stmt->execute([
+                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active
+                ]);
+            }
             echo json_encode(["success" => true, "id" => $id]);
         } catch (PDOException $e) {
             http_response_code(500); echo json_encode(["error" => "Gagal menyimpan materi", "details" => $e->getMessage()]);
@@ -1597,6 +1609,7 @@ elseif ($action === 'materials') {
         $subtopic = $input['subtopic'] ?? null;
         $skill = $input['skill'] ?? null;
         $indicator = $input['indicator'] ?? null;
+        $leaf_id = !empty($input['leaf_id']) ? trim($input['leaf_id']) : null;
         $title = trim($input['title'] ?? 'Materi Belajar');
         $content = $input['content'] ?? '';
         $teacher_name = trim($input['teacher_name'] ?? '');
@@ -1611,14 +1624,25 @@ elseif ($action === 'materials') {
         $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
 
         try {
-            $stmt = $pdo->prepare("
-                UPDATE materials SET
-                    exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, title=?, content=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?
-                WHERE id=?
-            ");
-            $stmt->execute([
-                $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active, $id
-            ]);
+            try {
+                $stmt = $pdo->prepare("
+                    UPDATE materials SET
+                        exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, leaf_id=?, title=?, content=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?
+                    WHERE id=?
+                ");
+                $stmt->execute([
+                    $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active, $id
+                ]);
+            } catch (\PDOException $colErr) {
+                $stmt = $pdo->prepare("
+                    UPDATE materials SET
+                        exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, title=?, content=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?
+                    WHERE id=?
+                ");
+                $stmt->execute([
+                    $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active, $id
+                ]);
+            }
             echo json_encode(["success" => true]);
         } catch (PDOException $e) {
             http_response_code(500); echo json_encode(["error" => "Gagal update materi", "details" => $e->getMessage()]);
@@ -1648,33 +1672,41 @@ elseif ($action === 'materials') {
         }
     }
 }
-elseif ($action === 'upload_material_file' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+elseif (in_array($action, ['upload_material_file', 'upload_material_image']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_FILES['file'])) {
         http_response_code(400);
         echo json_encode(["error" => "Tidak ada file yang diunggah"]);
         exit;
     }
     $file = $_FILES['file'];
-    $allowedExts = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'png', 'jpg', 'jpeg'];
+    $isImageOnly = ($action === 'upload_material_image');
+    $allowedExts = $isImageOnly 
+        ? ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']
+        : ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'png', 'jpg', 'jpeg'];
+        
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     if (!in_array($ext, $allowedExts)) {
         http_response_code(400);
-        echo json_encode(["error" => "Format file tidak didukung. Gunakan PDF, DOC, PPT, XLS, atau Gambar."]);
+        $msg = $isImageOnly ? "Format gambar tidak didukung. Gunakan PNG, JPG, JPEG, WEBP, atau SVG." : "Format file tidak didukung. Gunakan PDF, DOC, PPT, XLS, atau Gambar.";
+        echo json_encode(["error" => $msg]);
         exit;
     }
-    if ($file['size'] > 20 * 1024 * 1024) {
+    $maxSize = $isImageOnly ? (10 * 1024 * 1024) : (20 * 1024 * 1024);
+    if ($file['size'] > $maxSize) {
         http_response_code(400);
-        echo json_encode(["error" => "Ukuran file maksimal 20MB"]);
+        $maxMb = $isImageOnly ? '10MB' : '20MB';
+        echo json_encode(["error" => "Ukuran file maksimal $maxMb"]);
         exit;
     }
-    $targetDir = dirname(__DIR__) . '/uploads/materials';
+    $subDir = $isImageOnly ? '/uploads/materials/images' : '/uploads/materials';
+    $targetDir = dirname(__DIR__) . $subDir;
     if (!is_dir($targetDir)) {
         mkdir($targetDir, 0755, true);
     }
-    $safeName = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $file['name']);
+    $safeName = time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
     $dest = $targetDir . '/' . $safeName;
     if (move_uploaded_file($file['tmp_name'], $dest)) {
-        $url = '/uploads/materials/' . $safeName;
+        $url = $subDir . '/' . $safeName;
         echo json_encode([
             "success" => true,
             "url" => $url,

@@ -33,6 +33,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     ORDER BY p.created_at DESC
                 ");
                 $stmt->execute([$payload->user_id, $payload->id]);
+            } elseif ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+                $stmt = $pdo->prepare("
+                    SELECT p.*, 
+                        COALESCE(a.referral_code, '-') as referral_code,
+                        COALESCE(a.bank_name, '-') as bank_name,
+                        COALESCE(a.bank_account, '-') as bank_account,
+                        COALESCE(a.bank_owner, '-') as bank_owner,
+                        COALESCE(s.name, u.identity_key, 'Mitra Afiliasi') as affiliate_name 
+                    FROM payouts p 
+                    LEFT JOIN affiliates a ON p.affiliate_id = a.id
+                    LEFT JOIN users u ON a.user_id = u.id
+                    LEFT JOIN user_roles ur ON (u.id = ur.user_id AND ur.role = 'student')
+                    LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
+                    WHERE a.tenant_id = ?
+                    ORDER BY p.created_at DESC
+                ");
+                $stmt->execute([$payload->tenant_id]);
             } else {
                 $stmt = $pdo->query("
                     SELECT p.*, 
@@ -75,6 +92,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     ORDER BY c.created_at DESC
                 ");
                 $stmt->execute([$payload->user_id, $payload->id]);
+            } elseif ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        c.id, c.affiliate_id, c.tenant_id, c.order_id, c.amount, c.commission_rate_snapshot, c.status, c.created_at,
+                        COALESCE(o.plan_name, 'Paket Belajar') as plan_name,
+                        COALESCE(s_order.name, 'Siswa') as student_name,
+                        COALESCE(a.referral_code, '-') as referral_code,
+                        COALESCE(s_aff.name, u_aff.identity_key, 'Mitra') as affiliate_name
+                    FROM commissions c
+                    LEFT JOIN orders o ON (c.order_id = o.id OR c.order_id = o.order_id)
+                    LEFT JOIN students s_order ON o.student_id = s_order.id
+                    LEFT JOIN affiliates a ON c.affiliate_id = a.id
+                    LEFT JOIN users u_aff ON a.user_id = u_aff.id
+                    LEFT JOIN user_roles ur_aff ON (u_aff.id = ur_aff.user_id AND ur_aff.role = 'student')
+                    LEFT JOIN students s_aff ON (ur_aff.reference_id = s_aff.id OR u_aff.identity_key = s_aff.email)
+                    WHERE (c.tenant_id = ? OR a.tenant_id = ?)
+                    ORDER BY c.created_at DESC
+                ");
+                $stmt->execute([$payload->tenant_id, $payload->tenant_id]);
             } else {
                 $stmt = $pdo->query("
                     SELECT 
@@ -124,6 +160,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     ORDER BY a.created_at DESC
                 ");
                 $stmt->execute([$payload->user_id, $payload->id]);
+            } elseif ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        a.id, a.user_id, a.tenant_id, a.referral_code, a.commission_rate,
+                        COALESCE(a.bank_name, '') as bank_name,
+                        COALESCE(a.bank_account, '') as bank_account,
+                        COALESCE(a.bank_owner, '') as bank_owner,
+                        a.created_at,
+                        COALESCE(u.identity_key, s.email, 'Mitra') as identity_key,
+                        COALESCE(s.name, a.bank_owner, u.identity_key, 'Mitra Afiliasi') as affiliate_name,
+                        COALESCE(s.email, u.identity_key, '-') as email,
+                        (SELECT COUNT(*) FROM students WHERE referred_by = a.id) as total_referrals,
+                        (SELECT COALESCE(SUM(amount), 0) FROM commissions WHERE affiliate_id = a.id AND status = 'pending') as pending_commission,
+                        t.name as tenant_name
+                    FROM affiliates a
+                    LEFT JOIN tenants t ON a.tenant_id = t.id
+                    LEFT JOIN users u ON a.user_id = u.id
+                    LEFT JOIN user_roles ur ON (u.id = ur.user_id AND ur.role = 'student')
+                    LEFT JOIN students s ON (ur.reference_id = s.id OR u.identity_key = s.email)
+                    WHERE a.tenant_id = ?
+                    ORDER BY a.created_at DESC
+                ");
+                $stmt->execute([$payload->tenant_id]);
             } else {
                 $stmt = $pdo->query("
                     SELECT 
@@ -216,13 +275,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $pdo->beginTransaction();
         try {
             // Get payout
-            $stmt = $pdo->prepare("SELECT * FROM payouts WHERE id = ? AND status = 'pending'");
+            $stmt = $pdo->prepare("SELECT p.*, a.tenant_id as aff_tenant FROM payouts p JOIN affiliates a ON p.affiliate_id = a.id WHERE p.id = ? AND p.status = 'pending'");
             $stmt->execute([$payout_id]);
             $payout = $stmt->fetch();
             
             if (!$payout) {
                 http_response_code(404);
                 echo json_encode(["error" => "Payout not found or already processed"]);
+                $pdo->rollBack();
+                exit;
+            }
+
+            if ($payload->role !== 'superadmin' && !empty($payload->tenant_id) && $payout['aff_tenant'] !== $payload->tenant_id) {
+                http_response_code(403);
+                echo json_encode(["error" => "Anda tidak memiliki izin memproses payout cabang lain"]);
                 $pdo->rollBack();
                 exit;
             }
@@ -248,13 +314,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         
         $pdo->beginTransaction();
         try {
-            $stmt = $pdo->prepare("SELECT * FROM payouts WHERE id = ? AND status = 'pending'");
+            $stmt = $pdo->prepare("SELECT p.*, a.tenant_id as aff_tenant FROM payouts p JOIN affiliates a ON p.affiliate_id = a.id WHERE p.id = ? AND p.status = 'pending'");
             $stmt->execute([$payout_id]);
             $payout = $stmt->fetch();
             
             if (!$payout) {
                 http_response_code(404);
                 echo json_encode(["error" => "Payout tidak ditemukan atau sudah diproses"]);
+                $pdo->rollBack();
+                exit;
+            }
+
+            if ($payload->role !== 'superadmin' && !empty($payload->tenant_id) && $payout['aff_tenant'] !== $payload->tenant_id) {
+                http_response_code(403);
+                echo json_encode(["error" => "Anda tidak memiliki izin menolak payout cabang lain"]);
                 $pdo->rollBack();
                 exit;
             }
@@ -313,9 +386,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $aff_id = bin2hex(random_bytes(16));
             $aff_id = substr($aff_id,0,8).'-'.substr($aff_id,8,4).'-'.substr($aff_id,12,4).'-'.substr($aff_id,16,4).'-'.substr($aff_id,20,12);
 
-            $aff_tenant_id = !empty($input['tenant_id']) ? $input['tenant_id'] : ($payload->tenant_id ?: null);
-            if (empty($aff_tenant_id)) {
-                $aff_tenant_id = $pdo->query("SELECT id FROM tenants WHERE is_active = 1 LIMIT 1")->fetchColumn() ?: null;
+            if ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+                $aff_tenant_id = $payload->tenant_id;
+            } else {
+                $aff_tenant_id = !empty($input['tenant_id']) ? $input['tenant_id'] : ($payload->tenant_id ?: null);
+                if (empty($aff_tenant_id)) {
+                    $aff_tenant_id = $pdo->query("SELECT id FROM tenants WHERE is_active = 1 LIMIT 1")->fetchColumn() ?: null;
+                }
             }
 
             $stmtAff = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate, bank_name, bank_account, bank_owner, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
@@ -344,6 +421,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             http_response_code(400); echo json_encode(["error" => "ID dan kode referral wajib"]); exit;
         }
 
+        if ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+            $chk = $pdo->prepare("SELECT tenant_id FROM affiliates WHERE id = ?");
+            $chk->execute([$id]);
+            $currentAffTenant = $chk->fetchColumn();
+            if ($currentAffTenant !== $payload->tenant_id) {
+                http_response_code(403);
+                echo json_encode(["error" => "Anda hanya dapat mengedit mitra pada cabang Anda"]);
+                exit;
+            }
+        }
+
         try {
             if ($aff_tenant_id !== false && $payload->role === 'superadmin') {
                 $stmt = $pdo->prepare("UPDATE affiliates SET referral_code = ?, commission_rate = ?, bank_name = ?, bank_account = ?, bank_owner = ?, tenant_id = ? WHERE id = ?");
@@ -362,11 +450,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (empty($id)) {
             http_response_code(400); echo json_encode(["error" => "ID afiliasi wajib"]); exit;
         }
+
+        if ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+            $chk = $pdo->prepare("SELECT tenant_id FROM affiliates WHERE id = ?");
+            $chk->execute([$id]);
+            $currentAffTenant = $chk->fetchColumn();
+            if ($currentAffTenant !== $payload->tenant_id) {
+                http_response_code(403);
+                echo json_encode(["error" => "Anda hanya dapat menghapus mitra pada cabang Anda"]);
+                exit;
+            }
+        }
+
         $pdo->prepare("DELETE FROM affiliates WHERE id = ?")->execute([$id]);
         echo json_encode(["success" => true]);
     } elseif ($action === 'payout_commission') {
         $comm_id = $input['commission_id'] ?? '';
         $ref = $input['payout_reference'] ?? 'MANUAL_TRANSFER';
+
+        if ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+            $chk = $pdo->prepare("SELECT c.tenant_id, a.tenant_id as aff_tenant FROM commissions c LEFT JOIN affiliates a ON c.affiliate_id = a.id WHERE c.id = ?");
+            $chk->execute([$comm_id]);
+            $cRow = $chk->fetch(PDO::FETCH_ASSOC);
+            if ($cRow && $cRow['tenant_id'] !== $payload->tenant_id && $cRow['aff_tenant'] !== $payload->tenant_id) {
+                http_response_code(403);
+                echo json_encode(["error" => "Anda tidak memiliki akses ke komisi cabang lain"]);
+                exit;
+            }
+        }
+
         try {
             $stmt = $pdo->prepare("UPDATE commissions SET status = 'paid' WHERE id = ?");
             $stmt->execute([$comm_id]);

@@ -1379,6 +1379,9 @@
             <div class="p-2.5 border-b border-white/10 bg-black/20 flex flex-wrap justify-between items-center gap-2">
               <h3 class="font-bold text-white text-xs">Daftar Mitra Afiliasi</h3>
               <div class="flex items-center gap-2">
+                <button v-if="isSuperadmin || currentRole === 'admin'" @click="openCreateAffiliateModal" class="px-2.5 py-1 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[10px] font-black rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
+                  <i class="ph-bold ph-plus"></i> Tambah Mitra
+                </button>
                 <button @click="loadAdminAffiliates" class="text-[#c0ff00] text-[10px] font-bold flex items-center gap-1 cursor-pointer">
                   <i class="ph-bold ph-arrows-clockwise" :class="{'animate-spin': isLoadingAffiliates}"></i> Refresh
                 </button>
@@ -1391,7 +1394,7 @@
                 <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
                 <input v-model="affiliateSearch" type="text" placeholder="Cari nama, email, atau kode referral mitra..." class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors" />
               </div>
-              <select v-model="affiliateTenantFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+              <select v-if="isSuperadmin" v-model="affiliateTenantFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
                 <option value="all" class="bg-[#0d1427]">Semua Cabang</option>
                 <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427]">{{ t.name }}</option>
               </select>
@@ -2475,18 +2478,23 @@
 
     <!-- Material Modal -->
     <div v-if="showMaterialModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
-        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
-          <h3 class="font-black text-sm text-white">{{ isEditingMaterial ? 'Edit Materi' : 'Tambah Materi Baru' }}</h3>
-          <button @click="closeMaterialModal" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-20">
+          <div class="flex items-center gap-2">
+            <i class="ph-bold ph-note-pencil text-[#c0ff00] text-lg"></i>
+            <h3 class="font-black text-sm text-white">{{ isEditingMaterial ? 'Edit Materi Pembelajaran' : 'Tambah Materi Baru' }}</h3>
+          </div>
+          <button @click="closeMaterialModal" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
         </div>
-        <form @submit.prevent="saveMaterial" class="p-4 space-y-3">
+        <form @submit.prevent="saveMaterial" class="p-5 space-y-4">
+          <!-- Judul Materi -->
           <div>
             <label for="m_title_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Judul Materi</label>
-            <input id="m_title_input" name="title" v-model="mForm.title" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <input id="m_title_input" name="title" v-model="mForm.title" required type="text" placeholder="Contoh: Penalaran Induktif & Pola Barisan Angka" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
+
           <!-- Komponen & Subtes -->
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="m_component_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komponen Ujian</label>
               <select id="m_component_select" name="test_component" v-model="mForm.test_component" @change="onMComponentChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
@@ -2502,7 +2510,7 @@
           </div>
 
           <!-- Topik & Subtopik -->
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="m_topic_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Topik</label>
               <select id="m_topic_select" name="topic" v-model="mForm.topic" @change="onMTopicChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
@@ -2517,29 +2525,56 @@
               </datalist>
             </div>
           </div>
-          <div>
-            <label for="m_teacher_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Guru / Penanggung Jawab</label>
-            <select id="m_teacher_select" name="teacher_name" v-model="mForm.teacher_name" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-              <option value="" class="bg-[#0d1427] text-white">-- Pilih Guru / Tidak Ada --</option>
-              <option v-for="s in staffMembers" :key="s.id" :value="s.name" class="bg-[#0d1427] text-white">{{ s.name }} ({{ s.role }})</option>
-            </select>
-          </div>
-          <div>
-            <label for="m_file_upload" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Lampiran Dokumen / File Materi (PDF, DOCX, PPT)</label>
-            <div class="flex items-center gap-2">
-              <input id="m_file_upload" name="file" type="file" ref="materialFileInput" @change="handleMaterialFileUpload" class="text-xs text-white/70 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#c0ff00] file:text-black hover:file:bg-[#b0ef00] cursor-pointer" />
-              <span v-if="isUploadingFile" class="text-xs text-[#c0ff00] animate-pulse">Mengunggah...</span>
+
+          <!-- Learning Objective (Capaian Pembelajaran) & Leaf ID -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label for="m_objective_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Learning Objective / Capaian Pembelajaran</label>
+              <input id="m_objective_input" name="indicator" v-model="mForm.indicator" placeholder="Misal: Siswa mampu menentukan pola barisan bertingkat" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
             </div>
-            <input id="m_file_url_input" name="file_url" aria-label="URL File / Lampiran" v-model="mForm.file_url" type="text" placeholder="URL File / Lampiran (otomatis terisi setelah unggah)" class="mt-1.5 w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none font-mono" />
+            <div>
+              <label for="m_leaf_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Leaf ID / Taksonomi (Opsional)</label>
+              <input id="m_leaf_input" name="leaf_id" v-model="mForm.leaf_id" placeholder="Misal: leaf-pu-induktif-01" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-mono" />
+            </div>
           </div>
-          <div>
-            <label for="m_content_textarea" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Isi / Konten Materi</label>
-            <textarea id="m_content_textarea" name="content" v-model="mForm.content" required rows="5" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
+
+          <!-- Guru & Lampiran Dokumen -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label for="m_teacher_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Guru / Penanggung Jawab</label>
+              <select id="m_teacher_select" name="teacher_name" v-model="mForm.teacher_name" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option value="" class="bg-[#0d1427] text-white">-- Pilih Guru / Tidak Ada --</option>
+                <option v-for="s in staffMembers" :key="s.id" :value="s.name" class="bg-[#0d1427] text-white">{{ s.name }} ({{ s.role }})</option>
+              </select>
+            </div>
+            <div>
+              <label for="m_file_upload" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Lampiran Dokumen Tambahan (PDF/PPT/DOCX)</label>
+              <div class="flex items-center gap-2">
+                <input id="m_file_upload" name="file" type="file" ref="materialFileInput" @change="handleMaterialFileUpload" class="text-xs text-white/70 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#c0ff00] file:text-black hover:file:bg-[#b0ef00] cursor-pointer" />
+                <span v-if="isUploadingFile" class="text-xs text-[#c0ff00] animate-pulse">Mengunggah...</span>
+              </div>
+              <input id="m_file_url_input" name="file_url" aria-label="URL File / Lampiran" v-model="mForm.file_url" type="text" placeholder="URL File / Lampiran (otomatis terisi)" class="mt-1.5 w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none font-mono" />
+            </div>
           </div>
+
+          <!-- WYSIWYG Word-Like Rich Text Editor -->
+          <div class="space-y-1 pt-1">
+            <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Konten Materi (Rich Text & Word-Like Editor)</label>
+            <MaterialRichEditor
+              v-model="mForm.content"
+              :material-id="mForm.id"
+              :leaf-id="mForm.leaf_id"
+              :learning-objective="mForm.indicator"
+              :preview-component="mForm.test_component"
+              :preview-topic="mForm.title || mForm.subtest"
+            />
+          </div>
+
           <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
-            <button type="button" @click="closeMaterialModal" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>
-            <button type="submit" :disabled="isSaving" class="px-5 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50 flex items-center gap-1.5">
-              <i v-if="isSaving" class="ph-bold ph-spinner animate-spin"></i> Simpan
+            <button type="button" @click="closeMaterialModal" class="px-4 py-2 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors cursor-pointer">Batal</button>
+            <button type="submit" :disabled="isSaving" class="px-6 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer">
+              <i v-if="isSaving" class="ph-bold ph-spinner animate-spin"></i>
+              <span>{{ isSaving ? 'Menyimpan...' : 'Simpan Materi' }}</span>
             </button>
           </div>
         </form>
@@ -2600,6 +2635,7 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api';
 import { SNBT_TAXONOMY } from '../EduData.js';
+import MaterialRichEditor from '../components/MaterialRichEditor.vue';
 
 const router = useRouter()
 
@@ -2713,6 +2749,20 @@ function extractRoleFromToken(token) {
   }
 }
 
+function extractTenantIdFromToken(token) {
+  try {
+    if (!token) return '';
+    const parts = token.split('.');
+    if (parts.length < 2) return '';
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return jsonPayload.tenant_id || JSON.parse(jsonPayload).tenant_id || '';
+  } catch (e) {
+    return '';
+  }
+}
+
 const currentRole = ref(
   sessionStorage.getItem('admin_role') ||
   extractRoleFromToken(sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token')) ||
@@ -2731,6 +2781,13 @@ const getStoredAdminUser = () => {
   return null;
 };
 const currentAdminUser = ref(getStoredAdminUser());
+
+const currentAdminTenant = computed(() => {
+  return currentAdminUser.value?.tenant_id ||
+         sessionStorage.getItem('admin_tenant_id') ||
+         extractTenantIdFromToken(sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token')) ||
+         '';
+});
 
 const isSuperadmin = computed(() => {
   return currentRole.value === 'superadmin' ||
@@ -3399,7 +3456,11 @@ const mForm = reactive({
   sub_materi: 'Penalaran Umum',
   topic: 'Induktif',
   subtopic: '',
-  teacher_name: ''
+  skill: '',
+  indicator: '',
+  leaf_id: '',
+  teacher_name: '',
+  file_url: ''
 });
 
 // Cascading helpers for Material Form
@@ -3485,7 +3546,10 @@ const openMaterialModal = (m = null) => {
       sub_materi: sub,
       topic: m.topic || 'Induktif',
       subtopic: m.subtopic || '',
+      indicator: m.indicator || '',
+      leaf_id: m.leaf_id || '',
       teacher_name: m.teacher_name || '',
+      file_url: m.file_url || '',
       title: m.title || '',
       content: m.content || ''
     });
@@ -3499,7 +3563,10 @@ const openMaterialModal = (m = null) => {
       sub_materi: 'Penalaran Umum',
       topic: 'Induktif',
       subtopic: '',
+      indicator: '',
+      leaf_id: '',
       teacher_name: '',
+      file_url: '',
       title: '',
       content: ''
     });
@@ -3740,9 +3807,15 @@ const filteredAffiliates = computed(() => {
       name.toLowerCase().includes(q) ||
       email.toLowerCase().includes(q) ||
       refCode.toLowerCase().includes(q);
-    const matchTenant = affiliateTenantFilter.value === 'all' ||
-      aff.tenant_id === affiliateTenantFilter.value ||
-      (affiliateTenantFilter.value === 'pusat' && (!aff.tenant_id || !aff.tenant_name));
+
+    let matchTenant = true;
+    if (isSuperadmin.value) {
+      matchTenant = affiliateTenantFilter.value === 'all' ||
+        aff.tenant_id === affiliateTenantFilter.value ||
+        (affiliateTenantFilter.value === 'pusat' && (!aff.tenant_id || !aff.tenant_name));
+    } else if (currentAdminTenant.value) {
+      matchTenant = aff.tenant_id === currentAdminTenant.value;
+    }
     return matchSearch && matchTenant;
   });
 
@@ -3797,7 +3870,7 @@ const loadAdminPayouts = async () => {
 
 const openCreateAffiliateModal = () => {
   isEditingAffiliate.value = false;
-  const defTenant = tenantsList.value?.[0]?.id || '';
+  const defTenant = isSuperadmin.value ? (tenantsList.value?.[0]?.id || '') : (currentAdminTenant.value || '');
   Object.assign(affiliateForm, { id: null, tenant_id: defTenant, email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '' });
   showAffiliateModal.value = true;
 };
