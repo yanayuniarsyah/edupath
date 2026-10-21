@@ -39,56 +39,65 @@ if ($action === 'upload' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $success_count = 0;
     $error_count = 0;
     
-    $stmt = $pdo->prepare("INSERT INTO question_imports_staging (id, batch_id, tenant_id, sub_materi, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, status, error_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    try {
+        $pdo->exec("ALTER TABLE question_imports_staging ADD COLUMN classification VARCHAR(50) DEFAULT 'LATIHAN' AFTER sub_materi");
+    } catch (\Throwable $e) {}
 
-    foreach ($data as $row) {
-        $id = bin2hex(random_bytes(16));
-        $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
-        
-        $sub_materi = $row['sub_materi'] ?? '';
-        $classification = strtoupper($row['classification'] ?? 'LATIHAN');
-        $cognitive_demand = $row['cognitive_demand'] ?? null;
-        $difficulty = $row['difficulty'] ?? 'medium';
-        $question = $row['question'] ?? '';
-        $option_a = $row['option_a'] ?? '';
-        $option_b = $row['option_b'] ?? '';
-        $option_c = $row['option_c'] ?? '';
-        $option_d = $row['option_d'] ?? '';
-        $option_e = $row['option_e'] ?? null;
-        $correct = strtoupper($row['correct'] ?? '');
-        $explanation = $row['explanation'] ?? null;
-        $source_type = $row['source_type'] ?? 'author_created';
-        $rights_status = $row['rights_status'] ?? 'unknown';
-        $source_name = $row['source_name'] ?? null;
-        $source_year = !empty($row['source_year']) ? (int)$row['source_year'] : null;
-        $source_reference = $row['source_reference'] ?? null;
+    try {
+        $stmt = $pdo->prepare("INSERT INTO question_imports_staging (id, batch_id, tenant_id, sub_materi, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, status, error_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        $status = 'pending';
-        $error_message = '';
+        foreach ($data as $row) {
+            $id = bin2hex(random_bytes(16));
+            $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
+            
+            $sub_materi = $row['sub_materi'] ?? '';
+            $classification = strtoupper($row['classification'] ?? 'LATIHAN');
+            $cognitive_demand = $row['cognitive_demand'] ?? null;
+            $difficulty = $row['difficulty'] ?? 'medium';
+            $question = $row['question'] ?? '';
+            $option_a = $row['option_a'] ?? '';
+            $option_b = $row['option_b'] ?? '';
+            $option_c = $row['option_c'] ?? '';
+            $option_d = $row['option_d'] ?? '';
+            $option_e = $row['option_e'] ?? null;
+            $correct = strtoupper($row['correct'] ?? '');
+            $explanation = $row['explanation'] ?? null;
+            $source_type = $row['source_type'] ?? 'author_created';
+            $rights_status = $row['rights_status'] ?? 'unknown';
+            $source_name = $row['source_name'] ?? null;
+            $source_year = !empty($row['source_year']) ? (int)$row['source_year'] : null;
+            $source_reference = $row['source_reference'] ?? null;
 
-        if (empty($question) || empty($option_a) || empty($option_b) || empty($correct) || empty($sub_materi)) {
-            $status = 'error';
-            $error_message = 'Data wajib (sub_materi, soal, opsi A/B, kunci) kosong';
-        } elseif (!in_array($correct, ['A', 'B', 'C', 'D', 'E'])) {
-            $status = 'error';
-            $error_message = 'Kunci jawaban harus A/B/C/D/E';
-        } elseif (!in_array($classification, ['LATIHAN', 'TRYOUT', 'ASESMEN'])) {
-            $status = 'error';
-            $error_message = 'Classification harus LATIHAN, TRYOUT, atau ASESMEN';
+            $status = 'pending';
+            $error_message = '';
+
+            if (empty($question) || empty($option_a) || empty($option_b) || empty($correct) || empty($sub_materi)) {
+                $status = 'error';
+                $error_message = 'Data wajib (sub_materi, soal, opsi A/B, kunci) kosong';
+            } elseif (!in_array($correct, ['A', 'B', 'C', 'D', 'E'])) {
+                $status = 'error';
+                $error_message = 'Kunci jawaban harus A/B/C/D/E';
+            } elseif (!in_array($classification, ['LATIHAN', 'TRYOUT', 'ASESMEN'])) {
+                $status = 'error';
+                $error_message = 'Classification harus LATIHAN, TRYOUT, atau ASESMEN';
+            }
+
+            $stmt->execute([
+                $id, $batch_id, $tenant_id, $sub_materi, $classification, $difficulty, $question, $option_a, $option_b, $option_c, $option_d, $option_e, $correct, $explanation, $cognitive_demand, $source_type, $rights_status, $source_name, $source_year, $source_reference, $status, $error_message
+            ]);
+
+            if ($status === 'error') {
+                $error_count++;
+            } else {
+                $success_count++;
+            }
         }
 
-        $stmt->execute([
-            $id, $batch_id, $tenant_id, $sub_materi, $classification, $difficulty, $question, $option_a, $option_b, $option_c, $option_d, $option_e, $correct, $explanation, $cognitive_demand, $source_type, $rights_status, $source_name, $source_year, $source_reference, $status, $error_message
-        ]);
-
-        if ($status === 'error') {
-            $error_count++;
-        } else {
-            $success_count++;
-        }
+        echo json_encode(["success" => true, "batch_id" => $batch_id, "success_count" => $success_count, "error_count" => $error_count]);
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        echo json_encode(["error" => "Upload staging error: " . $e->getMessage()]);
     }
-
-    echo json_encode(["success" => true, "batch_id" => $batch_id, "success_count" => $success_count, "error_count" => $error_count]);
 }
 elseif ($action === 'preview' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $batch_id = $_GET['batch_id'] ?? '';
@@ -128,11 +137,11 @@ elseif ($action === 'commit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
         
-        $insertStmt = $pdo->prepare("INSERT INTO questions (id, sub_materi, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $insertStmt = $pdo->prepare("INSERT INTO questions (id, subtes, sub_materi, bab, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, is_active, is_qc_passed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1)");
         
         foreach ($rows as $row) {
             $insertStmt->execute([
-                $row['id'], $row['sub_materi'], $row['classification'], $row['difficulty'], $row['question'], $row['option_a'], $row['option_b'], $row['option_c'], $row['option_d'], $row['option_e'], $row['correct'], $row['explanation'], $row['cognitive_demand'], $row['source_type'], $row['rights_status'], $row['source_name'], $row['source_year'], $row['source_reference']
+                $row['id'], $row['sub_materi'], $row['sub_materi'], $row['sub_materi'], $row['classification'], $row['difficulty'], $row['question'], $row['option_a'], $row['option_b'], $row['option_c'], $row['option_d'], $row['option_e'], $row['correct'], $row['explanation'], $row['cognitive_demand'], $row['source_type'], $row['rights_status'], $row['source_name'], $row['source_year'], $row['source_reference']
             ]);
         }
         

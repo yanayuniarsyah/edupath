@@ -97,11 +97,12 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if (strtolower($quiz_type) === 'tryout') {
             $tryout_distribution = [
                 'Penalaran Umum' => 30,
-                'Pengetahuan Dan Pemahaman Umum' => 25,
-                'Pengetahuan Kuantitatif' => 25,
+                'Pengetahuan Dan Pemahaman Umum' => 20,
+                'Pemahaman Bacaan Dan Menulis' => 20,
+                'Pengetahuan Kuantitatif' => 20,
                 'Literasi Dalam Bahasa Indonesia' => 20,
                 'Literasi Dalam Bahasa Inggris' => 20,
-                'Penalaran Matematika' => 30
+                'Penalaran Matematika' => 20
             ];
             $questions = [];
             foreach ($tryout_distribution as $sub_name => $sub_limit) {
@@ -160,11 +161,12 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         if (strtolower($quiz_type) === 'tryout') {
             $tryout_distribution = [
                 'Penalaran Umum' => 30,
-                'Pengetahuan Dan Pemahaman Umum' => 25,
-                'Pengetahuan Kuantitatif' => 25,
+                'Pengetahuan Dan Pemahaman Umum' => 20,
+                'Pemahaman Bacaan Dan Menulis' => 20,
+                'Pengetahuan Kuantitatif' => 20,
                 'Literasi Dalam Bahasa Indonesia' => 20,
                 'Literasi Dalam Bahasa Inggris' => 20,
-                'Penalaran Matematika' => 30
+                'Penalaran Matematika' => 20
             ];
             $questions = [];
             foreach ($tryout_distribution as $sub_name => $sub_limit) {
