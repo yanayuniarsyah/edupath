@@ -2341,54 +2341,57 @@
 
     <!-- Question Modal -->
     <div v-if="showQuestionModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
-        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
-          <h3 class="font-black text-sm text-white">{{ isEditingQuestion ? 'Edit Soal' : 'Tambah Soal Baru' }}</h3>
-          <button @click="closeQuestionModal" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-20">
+          <div class="flex items-center gap-2">
+            <i class="ph-bold ph-plus-circle text-[#c0ff00] text-lg"></i>
+            <h3 class="font-black text-sm text-white">{{ isEditingQuestion ? 'Edit Soal Ujian / Latihan' : 'Tambah Soal Baru' }}</h3>
+          </div>
+          <button @click="closeQuestionModal" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
         </div>
-        <form @submit.prevent="saveQuestion" class="p-4 space-y-3">
+        <form @submit.prevent="saveQuestion" class="p-5 space-y-4">
           <!-- Row 1: Ujian & Komponen -->
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="q_exam_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Ujian</label>
-              <input id="q_exam_input" name="exam" v-model="qForm.exam" readonly class="w-full p-2 text-xs text-white/70 bg-black/40 border border-white/10 rounded-lg outline-none cursor-not-allowed font-medium" />
+              <input id="q_exam_input" name="exam" v-model="qForm.exam" readonly class="w-full p-2.5 text-xs text-white/70 bg-black/40 border border-white/10 rounded-lg outline-none cursor-not-allowed font-medium" />
             </div>
             <div>
               <label for="q_component_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komponen Ujian</label>
-              <select id="q_component_select" name="test_component" v-model="qForm.test_component" @change="onQComponentChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <select id="q_component_select" name="test_component" v-model="qForm.test_component" @change="onQComponentChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="c in qAvailableComponents" :key="c.name" :value="c.name" class="bg-[#0d1427] text-white">{{ c.label || c.name }}</option>
               </select>
             </div>
           </div>
 
           <!-- Row 2: Subtes & Topik -->
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="q_subtest_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes</label>
-              <select id="q_subtest_select" name="subtest" v-model="qForm.subtest" @change="onQSubtestChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <select id="q_subtest_select" name="subtest" v-model="qForm.subtest" @change="onQSubtestChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="s in qAvailableSubtests" :key="s.name" :value="s.name" class="bg-[#0d1427] text-white">{{ s.name }}</option>
               </select>
             </div>
             <div>
               <label for="q_topic_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Topik</label>
-              <select id="q_topic_select" name="topic" v-model="qForm.topic" @change="onQTopicChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <select id="q_topic_select" name="topic" v-model="qForm.topic" @change="onQTopicChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="t in qAvailableTopics" :key="t.name" :value="t.name" class="bg-[#0d1427] text-white">{{ t.name }}</option>
               </select>
             </div>
           </div>
 
           <!-- Row 3: Subtopik & Skill -->
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="q_subtopic_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtopik</label>
-              <input id="q_subtopic_input" name="subtopic" v-model="qForm.subtopic" list="qSubtopicDatalist" placeholder="e.g. Pola Bilangan..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <input id="q_subtopic_input" name="subtopic" v-model="qForm.subtopic" list="qSubtopicDatalist" placeholder="e.g. Pola Bilangan..." class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
               <datalist id="qSubtopicDatalist">
                 <option v-for="st in (qCurrentTopicObj?.subtopics || [])" :key="st" :value="st"></option>
               </datalist>
             </div>
             <div>
               <label for="q_skill_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Skill / Kompetensi</label>
-              <input id="q_skill_input" name="skill" v-model="qForm.skill" list="qSkillDatalist" placeholder="e.g. Identifikasi Pola..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <input id="q_skill_input" name="skill" v-model="qForm.skill" list="qSkillDatalist" placeholder="e.g. Identifikasi Pola..." class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
               <datalist id="qSkillDatalist">
                 <option v-for="sk in (qCurrentTopicObj?.skills || [])" :key="sk" :value="sk"></option>
               </datalist>
@@ -2396,17 +2399,17 @@
           </div>
 
           <!-- Row 4: Indikator & Tipe Soal -->
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="q_indicator_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Indikator Soal</label>
-              <input id="q_indicator_input" name="indicator" v-model="qForm.indicator" list="qIndicatorDatalist" placeholder="e.g. Menentukan pola berikutnya..." class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+              <input id="q_indicator_input" name="indicator" v-model="qForm.indicator" list="qIndicatorDatalist" placeholder="e.g. Menentukan pola berikutnya..." class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
               <datalist id="qIndicatorDatalist">
                 <option v-for="ind in (qCurrentTopicObj?.indicators || [])" :key="ind" :value="ind"></option>
               </datalist>
             </div>
             <div>
               <label for="q_type_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tipe Soal</label>
-              <select id="q_type_select" name="question_type" v-model="qForm.question_type" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <select id="q_type_select" name="question_type" v-model="qForm.question_type" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option value="multiple_choice" class="bg-[#0d1427] text-white">Pilihan Ganda (A-E)</option>
                 <option value="complex_mcq" class="bg-[#0d1427] text-white">Pilihan Ganda Kompleks</option>
                 <option value="short_answer" class="bg-[#0d1427] text-white">Isian Singkat</option>
@@ -2416,10 +2419,10 @@
           </div>
 
           <!-- Row 5: Kesulitan, Penggunaan, Kognitif & QC -->
-          <div class="grid grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label for="q_diff_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tingkat Kesulitan</label>
-              <select id="q_diff_select" name="difficulty" v-model="qForm.difficulty" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <select id="q_diff_select" name="difficulty" v-model="qForm.difficulty" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option value="easy" class="bg-[#0d1427] text-white">Mudah</option>
                 <option value="medium" class="bg-[#0d1427] text-white">Sedang</option>
                 <option value="hard" class="bg-[#0d1427] text-white">Sulit</option>
@@ -2427,7 +2430,7 @@
             </div>
             <div>
               <label for="q_usage_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Penggunaan</label>
-              <select id="q_usage_select" name="usage_type" v-model="qForm.usage_type" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <select id="q_usage_select" name="usage_type" v-model="qForm.usage_type" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option value="latihan" class="bg-[#0d1427] text-white">Latihan Harian</option>
                 <option value="tryout" class="bg-[#0d1427] text-white">Tryout Resmi</option>
                 <option value="diagnostik" class="bg-[#0d1427] text-white">Diagnostik</option>
@@ -2435,7 +2438,7 @@
             </div>
             <div>
               <label for="q_cog_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Level Kognitif</label>
-              <select id="q_cog_select" name="cognitive_demand" v-model="qForm.cognitive_demand" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <select id="q_cog_select" name="cognitive_demand" v-model="qForm.cognitive_demand" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option value="C1" class="bg-[#0d1427] text-white">C1 - Mengingat</option>
                 <option value="C2" class="bg-[#0d1427] text-white">C2 - Memahami</option>
                 <option value="C3" class="bg-[#0d1427] text-white">C3 - Aplikasi</option>
@@ -2447,29 +2450,71 @@
           </div>
 
           <div class="flex items-center gap-2 pt-1">
-            <input type="checkbox" id="qc_passed" name="is_qc_passed" v-model="qForm.is_qc_passed" :true-value="1" :false-value="0" class="w-3.5 h-3.5 text-[#c0ff00] bg-black/40 border-white/20 rounded focus:ring-[#c0ff00]">
+            <input type="checkbox" id="qc_passed" name="is_qc_passed" v-model="qForm.is_qc_passed" :true-value="1" :false-value="0" class="w-4 h-4 text-[#c0ff00] bg-black/40 border-white/20 rounded focus:ring-[#c0ff00] cursor-pointer">
             <label for="qc_passed" class="text-xs font-bold text-white/80 cursor-pointer">Telah Melewati Proses QC (Guru / Superadmin)</label>
           </div>
-          <div>
-            <label for="q_question_textarea" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pertanyaan</label>
-            <textarea id="q_question_textarea" name="question" v-model="qForm.question" required rows="2" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
+
+          <!-- Rich Text Pertanyaan & Stimulus Soal -->
+          <div class="space-y-1.5 pt-1">
+            <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider flex items-center justify-between">
+              <span>Pertanyaan & Stimulus Soal</span>
+              <span class="text-[#c0ff00] text-[10px] lowercase font-semibold flex items-center gap-1">
+                <i class="ph-bold ph-function"></i> Mendukung KaTeX, pangkat, akar kuadrat, tabel, gambar & teks Word
+              </span>
+            </label>
+            <MaterialRichEditor
+              v-model="qForm.question"
+              :material-id="qForm.id ? `q_${qForm.id}` : 'new_q'"
+              title="Editor Teks Soal & Stimulus"
+              placeholder="Tuliskan butir soal di sini... (Klik '∑ Rumus' untuk rumus akar, pecahan, eksponen, matriks; klik 'Gambar' untuk stimulus diagram; atau tombol x²/x₂ untuk pangkat cepat)"
+              storage-key-prefix="edupath_q_text_"
+              min-height="240px"
+              :compact="true"
+              :preview-component="qForm.test_component || 'TPS'"
+              :preview-topic="qForm.subtest || qForm.topic || 'Soal Latihan'"
+            />
           </div>
-          <div class="space-y-2">
-            <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Opsi Jawaban</label>
+
+          <!-- Opsi Jawaban -->
+          <div class="space-y-2 pt-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Opsi Jawaban (Pilihan Ganda A - E)</label>
+              <span class="text-[10px] text-white/40">Pilih radio button untuk menandai kunci jawaban yang benar</span>
+            </div>
             <div v-for="opt in ['a','b','c','d','e']" :key="opt" class="flex items-center gap-1.5">
-              <input type="radio" :id="'correct_opt_' + opt" v-model="qForm.correct" :value="opt" name="correctOpt" required class="w-3.5 h-3.5 text-[#c0ff00]" />
+              <input type="radio" :id="'correct_opt_' + opt" v-model="qForm.correct" :value="opt" name="correctOpt" required class="w-4 h-4 text-[#c0ff00] accent-[#c0ff00] cursor-pointer" />
               <label :for="'correct_opt_' + opt" class="text-xs font-bold uppercase w-5 text-white/80 cursor-pointer">{{ opt }}.</label>
               <input :id="'q_opt_' + opt" :name="'option_' + opt" v-model="qForm['option_' + opt]" :required="opt !== 'e'" type="text" placeholder="..." class="flex-grow p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 placeholder-white/20 transition-all font-medium" />
             </div>
+            <p class="text-[10px] text-white/40">Tip: Opsi jawaban mendukung teks, angka, dan simbol (misal: √2, x², ³, ±, π, α, β).</p>
           </div>
-          <div>
-            <label for="q_explanation_textarea" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pembahasan Lengkap</label>
-            <textarea id="q_explanation_textarea" name="explanation" v-model="qForm.explanation" rows="2" placeholder="Uraian langkah penyelesaian..." class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"></textarea>
+
+          <!-- Rich Text Pembahasan Lengkap & Kunci Jawaban -->
+          <div class="space-y-1.5 pt-2">
+            <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider flex items-center justify-between">
+              <span>Pembahasan Lengkap & Kunci Jawaban</span>
+              <span class="text-amber-400 text-[10px] lowercase font-semibold flex items-center gap-1">
+                <i class="ph-bold ph-lightbulb"></i> Langkah pengerjaan, konsep kunci, trik eliminasi & rumus
+              </span>
+            </label>
+            <MaterialRichEditor
+              v-model="qForm.explanation"
+              :material-id="qForm.id ? `exp_${qForm.id}` : 'new_exp'"
+              title="Editor Pembahasan Soal & Kunci Solusi"
+              placeholder="Tuliskan uraian langkah penyelesaian soal secara terstruktur, rumus yang digunakan, dan trik cepat eliminasi..."
+              storage-key-prefix="edupath_q_exp_"
+              min-height="220px"
+              :compact="true"
+              :preview-component="qForm.test_component || 'TPS'"
+              :preview-topic="qForm.subtest || qForm.topic || 'Pembahasan Soal'"
+            />
           </div>
-          <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
-            <button type="button" @click="closeQuestionModal" class="px-3 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors">Batal</button>
-            <button type="submit" :disabled="isSaving" class="px-5 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50 flex items-center gap-1.5">
-              <i v-if="isSaving" class="ph-bold ph-spinner animate-spin"></i> Simpan
+
+          <div class="flex justify-end gap-2 pt-4 border-t border-white/10">
+            <button type="button" @click="closeQuestionModal" class="px-4 py-2 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors cursor-pointer">Batal</button>
+            <button type="submit" :disabled="isSaving" class="px-6 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer">
+              <i v-if="isSaving" class="ph-bold ph-spinner animate-spin"></i>
+              <span>{{ isSaving ? 'Menyimpan...' : 'Simpan Soal' }}</span>
             </button>
           </div>
         </form>

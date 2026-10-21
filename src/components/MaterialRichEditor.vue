@@ -1,11 +1,11 @@
 <template>
   <div class="edupath-rich-editor bg-[#0b1324] border border-white/10 rounded-2xl overflow-hidden flex flex-col text-white">
     <!-- Header / Top Bar -->
-    <div class="p-3 bg-black/40 border-b border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
+    <div class="p-2.5 bg-black/40 border-b border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
       <!-- Left: Title & Mode Toggle -->
       <div class="flex items-center gap-2">
         <span class="font-black text-xs uppercase tracking-wider text-white flex items-center gap-1.5">
-          <i class="ph-bold ph-note-pencil text-[#c0ff00]"></i> Editor Materi EduPath
+          <i class="ph-bold ph-note-pencil text-[#c0ff00]"></i> {{ title || 'Editor EduPath' }}
         </span>
 
         <div class="flex items-center bg-black/50 p-0.5 rounded-lg border border-white/10 ml-2">
@@ -37,7 +37,7 @@
           @click="restoreDraft"
           class="text-[10px] font-black text-amber-300 hover:text-amber-200 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded flex items-center gap-1 transition-all cursor-pointer"
         >
-          <i class="ph-bold ph-clock-counter-clockwise"></i> Pulihkan Draft Terakhir
+          <i class="ph-bold ph-clock-counter-clockwise"></i> Pulihkan Draft
         </button>
 
         <!-- Autosave Status Badge -->
@@ -51,9 +51,9 @@
             }"
           ></span>
           <span class="text-[10px] font-medium text-white/60">
-            <template v-if="saveStatus === 'saved'">Draft Tersimpan ({{ lastSavedTime || 'Otomatis' }})</template>
-            <template v-else-if="saveStatus === 'saving'">Menyimpan Draft...</template>
-            <template v-else-if="saveStatus === 'error'">Gagal Autosave</template>
+            <template v-if="saveStatus === 'saved'">Tersimpan ({{ lastSavedTime || 'Otomatis' }})</template>
+            <template v-else-if="saveStatus === 'saving'">Menyimpan...</template>
+            <template v-else-if="saveStatus === 'error'">Gagal Simpan</template>
           </span>
         </div>
 
@@ -92,10 +92,14 @@
       <span class="divider"></span>
 
       <!-- Font Styles -->
-      <button type="button" @click="exec('bold')" title="Tebal (Bold)" class="tool-btn"><i class="ph-bold ph-text-b"></i></button>
-      <button type="button" @click="exec('italic')" title="Miring (Italic)" class="tool-btn"><i class="ph-bold ph-text-italic"></i></button>
-      <button type="button" @click="exec('underline')" title="Garis Bawah (Underline)" class="tool-btn"><i class="ph-bold ph-text-underline"></i></button>
+      <button type="button" @click="exec('bold')" title="Tebal (Bold, Ctrl+B)" class="tool-btn"><i class="ph-bold ph-text-b"></i></button>
+      <button type="button" @click="exec('italic')" title="Miring (Italic, Ctrl+I)" class="tool-btn"><i class="ph-bold ph-text-italic"></i></button>
+      <button type="button" @click="exec('underline')" title="Garis Bawah (Underline, Ctrl+U)" class="tool-btn"><i class="ph-bold ph-text-underline"></i></button>
       <button type="button" @click="exec('strikeThrough')" title="Coret (Strikethrough)" class="tool-btn"><i class="ph-bold ph-text-strikethrough"></i></button>
+      
+      <!-- Pangkat Cepat (Superscript) & Indeks Bawah Cepat (Subscript) -->
+      <button type="button" @click="exec('superscript')" title="Pangkat Cepat (Superscript, x²)" class="tool-btn font-bold font-mono text-[11px] px-1.5 hover:text-[#c0ff00]">x²</button>
+      <button type="button" @click="exec('subscript')" title="Indeks Bawah Cepat (Subscript, x₂)" class="tool-btn font-bold font-mono text-[11px] px-1.5 hover:text-[#c0ff00]">x₂</button>
 
       <span class="divider"></span>
 
@@ -170,7 +174,7 @@
     </div>
 
     <!-- Main Content Area: Editor vs Preview -->
-    <div class="flex-grow flex flex-col min-h-[420px] max-h-[650px] relative bg-[#060b14]">
+    <div class="flex-grow flex flex-col max-h-[650px] relative bg-[#060b14]" :style="{ minHeight: minHeight || '320px' }">
       <!-- 1. WYSIWYG EDITOR MODE -->
       <div
         v-show="activeView === 'editor'"
@@ -179,8 +183,9 @@
         @input="onContentInput"
         @paste="handlePaste"
         @click="handleEditorClick"
-        class="edupath-prose flex-grow p-6 overflow-y-auto focus:outline-none text-slate-100 text-sm leading-relaxed"
-        data-placeholder="Mulai tulis materi pembelajaran di sini... (Anda dapat mengetik langsung, membuat tabel, menyisipkan rumus KaTeX, gambar, atau menempel teks dari Word)"
+        class="edupath-prose flex-grow p-5 overflow-y-auto focus:outline-none text-slate-100 text-sm leading-relaxed"
+        :style="{ minHeight: minHeight || '320px' }"
+        :data-placeholder="placeholder || 'Mulai tulis materi pembelajaran atau butir soal di sini... (Mendukung rumus KaTeX, tabel, gambar, atau teks dari Word)'"
       ></div>
 
       <!-- 2. PREVIEW MODE -->
@@ -333,60 +338,95 @@
 
     <!-- MODAL: Math Formula (KaTeX) -->
     <div v-if="showMathModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-[#0e1726] border border-white/15 rounded-2xl w-full max-w-lg p-5 space-y-4 shadow-2xl text-white animate-fade-in">
+      <div class="bg-[#0e1726] border border-white/15 rounded-2xl w-full max-w-2xl p-5 space-y-4 shadow-2xl text-white animate-fade-in max-h-[92vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-white/10 pb-3">
-          <h4 class="font-black text-sm flex items-center gap-2 text-[#c0ff00]">
-            <span class="font-serif italic text-base">∑</span> Editor Persamaan Matematika (KaTeX)
-          </h4>
-          <button type="button" @click="showMathModal = false" class="text-white/40 hover:text-white">&times;</button>
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center font-serif font-black text-sm italic">∑</span>
+            <div>
+              <h4 class="font-black text-sm text-white">Editor Persamaan Matematika & Sains (KaTeX)</h4>
+              <p class="text-[10px] text-white/50">Mendukung penulisan pangkat, akar, pecahan, matriks, kalkulus, dan simbol kompleks</p>
+            </div>
+          </div>
+          <button type="button" @click="showMathModal = false" class="text-white/40 hover:text-white cursor-pointer text-xl leading-none">&times;</button>
         </div>
 
-        <!-- Quick Math Snippets -->
-        <div class="space-y-1.5">
-          <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Template Rumus Cepat</label>
-          <div class="flex flex-wrap gap-1.5 text-xs">
-            <button type="button" @click="insertMathTemplate('\\frac{a}{b}')" class="math-btn" title="Pecahan">\frac{a}{b}</button>
-            <button type="button" @click="insertMathTemplate('\\sqrt{x}')" class="math-btn" title="Akar Kuadrat">\sqrt{x}</button>
-            <button type="button" @click="insertMathTemplate('\\sqrt[n]{x}')" class="math-btn" title="Akar Pangkat n">\sqrt[n]{x}</button>
-            <button type="button" @click="insertMathTemplate('x^{n}')" class="math-btn" title="Pangkat">x^{n}</button>
-            <button type="button" @click="insertMathTemplate('x_{i}')" class="math-btn" title="Subskrip">x_{i}</button>
-            <button type="button" @click="insertMathTemplate('\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}')" class="math-btn" title="Matriks 2x2">Matriks</button>
-            <button type="button" @click="insertMathTemplate('\\sum_{i=1}^{n} x_i')" class="math-btn" title="Notasi Sigma">\sum</button>
-            <button type="button" @click="insertMathTemplate('\\int_{a}^{b} f(x) dx')" class="math-btn" title="Integral">\int</button>
-            <button type="button" @click="insertMathTemplate('\\lim_{x \\to 0} f(x)')" class="math-btn" title="Limit">\lim</button>
-            <button type="button" @click="insertMathTemplate('\\pm')" class="math-btn">±</button>
-            <button type="button" @click="insertMathTemplate('\\le')" class="math-btn">≤</button>
-            <button type="button" @click="insertMathTemplate('\\ge')" class="math-btn">≥</button>
-            <button type="button" @click="insertMathTemplate('\\ne')" class="math-btn">≠</button>
-            <button type="button" @click="insertMathTemplate('\\alpha')" class="math-btn">α</button>
-            <button type="button" @click="insertMathTemplate('\\beta')" class="math-btn">β</button>
-            <button type="button" @click="insertMathTemplate('\\pi')" class="math-btn">π</button>
-            <button type="button" @click="insertMathTemplate('\\Delta')" class="math-btn">Δ</button>
+        <!-- Mode Formula: Inline vs Display Block -->
+        <div class="p-2.5 bg-black/40 border border-white/10 rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span class="text-[11px] font-bold text-white/70">Format Penempatan:</span>
+          <div class="flex items-center gap-3">
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold" :class="mathDisplayMode === 'inline' ? 'text-[#c0ff00]' : 'text-white/50'">
+              <input type="radio" v-model="mathDisplayMode" value="inline" @change="renderMathPreview" class="accent-[#c0ff00]" />
+              <span>Inline (Di tengah kalimat)</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold" :class="mathDisplayMode === 'block' ? 'text-[#c0ff00]' : 'text-white/50'">
+              <input type="radio" v-model="mathDisplayMode" value="block" @change="renderMathPreview" class="accent-[#c0ff00]" />
+              <span>Block (Baris sendiri di tengah)</span>
+            </label>
           </div>
         </div>
 
-        <!-- LaTeX Input Textarea -->
+        <!-- Category Tabs -->
+        <div class="space-y-2">
+          <div class="flex flex-wrap gap-1 border-b border-white/10 pb-1.5 text-xs">
+            <button
+              type="button"
+              v-for="cat in mathCategories"
+              :key="cat.id"
+              @click="mathActiveCategory = cat.id"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
+              :class="mathActiveCategory === cat.id ? 'bg-[#c0ff00] text-black shadow-sm' : 'text-white/60 hover:text-white bg-white/5'"
+            >
+              {{ cat.label }}
+            </button>
+          </div>
+
+          <!-- Category Buttons -->
+          <div class="p-2.5 bg-black/30 border border-white/10 rounded-xl max-h-36 overflow-y-auto">
+            <div class="flex flex-wrap gap-1.5 text-xs">
+              <button
+                type="button"
+                v-for="tpl in currentCategoryTemplates"
+                :key="tpl.name + tpl.latex"
+                @click="applyMathTemplate(tpl.latex)"
+                class="math-btn px-2 py-1 rounded text-xs flex items-center gap-1 cursor-pointer"
+                :title="tpl.desc || tpl.latex"
+              >
+                <span class="font-medium text-white/90">{{ tpl.name }}</span>
+                <span class="text-[10px] text-[#c0ff00] font-mono">({{ tpl.label }})</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LaTeX Input Area -->
         <div>
-          <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Formula LaTeX</label>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Formula LaTeX</label>
+            <button type="button" @click="mathFormulaInput = ''; renderMathPreview();" class="text-[10px] text-white/40 hover:text-rose-400 cursor-pointer">Bersihkan</button>
+          </div>
           <textarea
             v-model="mathFormulaInput"
             rows="3"
-            placeholder="Ketik formula LaTeX, misal: f(x) = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}"
-            class="input-field font-mono text-xs"
+            placeholder="Ketik kode LaTeX di sini, misal: f(x) = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}"
+            class="input-field font-mono text-xs w-full p-2.5 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-[#c0ff00]"
           ></textarea>
         </div>
 
-        <!-- Real-time Preview Area with KaTeX rendering -->
-        <div class="p-3 bg-black/50 border border-white/10 rounded-xl min-h-[50px] flex items-center justify-center">
-          <div ref="mathPreviewEl" class="text-base text-amber-200"></div>
+        <!-- Real-time KaTeX Live Preview -->
+        <div>
+          <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Pratinjau Rumus (Real-Time Render)</label>
+          <div class="p-4 bg-black/60 border border-amber-500/30 rounded-xl min-h-[60px] flex items-center justify-center overflow-x-auto">
+            <div ref="mathPreviewEl" class="text-amber-200"></div>
+          </div>
         </div>
 
+        <!-- Modal Actions -->
         <div class="flex justify-between items-center pt-2 border-t border-white/10">
-          <span class="text-[10px] text-white/40">KaTeX v0.19 terintegrasi</span>
+          <span class="text-[10px] text-white/40">KaTeX v0.19 terintegrasi penuh</span>
           <div class="flex gap-2">
             <button type="button" @click="showMathModal = false" class="btn-cancel">Batal</button>
-            <button type="button" :disabled="!mathFormulaInput.trim()" @click="insertMathFormula" class="btn-primary">
-              Sisipkan Rumus
+            <button type="button" :disabled="!mathFormulaInput.trim()" @click="insertMathFormula" class="btn-primary flex items-center gap-1">
+              <i class="ph-bold ph-check"></i> Sisipkan Rumus
             </button>
           </div>
         </div>
@@ -454,6 +494,26 @@ const props = defineProps({
   previewTopic: {
     type: String,
     default: 'Materi Pembelajaran'
+  },
+  title: {
+    type: String,
+    default: 'Editor EduPath'
+  },
+  placeholder: {
+    type: String,
+    default: ''
+  },
+  minHeight: {
+    type: String,
+    default: '320px'
+  },
+  storageKeyPrefix: {
+    type: String,
+    default: 'edupath_editor_draft_'
+  },
+  compact: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -473,7 +533,7 @@ const showPasteNotice = ref(false);
 const hasRecoverableDraft = ref(false);
 
 const draftStorageKey = computed(() => {
-  return `edupath_material_draft_${props.materialId || 'new'}`;
+  return `${props.storageKeyPrefix}${props.materialId || 'new'}`;
 });
 
 // Modals State
@@ -632,26 +692,130 @@ const insertImage = () => {
   onContentInput();
 };
 
-// KaTeX Formulas
+// KaTeX Formulas & Math Notation
+const mathDisplayMode = ref('inline'); // 'inline' | 'block'
+const mathActiveCategory = ref('powers_roots');
+
+const mathCategories = [
+  { id: 'powers_roots', label: 'Pangkat & Akar' },
+  { id: 'fractions_algebra', label: 'Pecahan & Aljabar' },
+  { id: 'matrices_vectors', label: 'Matriks & Vektor' },
+  { id: 'calculus', label: 'Kalkulus & Fungsi' },
+  { id: 'trig_geom', label: 'Trigonometri & Sudut' },
+  { id: 'symbols', label: 'Simbol & Logika' },
+  { id: 'greek', label: 'Huruf Yunani' }
+];
+
+const mathTemplates = {
+  powers_roots: [
+    { name: 'Kuadrat', label: 'x²', latex: 'x^{2}', desc: 'Pangkat dua' },
+    { name: 'Pangkat n', label: 'xⁿ', latex: 'x^{n}', desc: 'Pangkat n umum' },
+    { name: 'Pangkat Majemuk', label: 'a^(3x+1)', latex: 'a^{3x + 1}', desc: 'Eksponen majemuk' },
+    { name: 'Akar Kuadrat', label: '√x', latex: '\\sqrt{x}', desc: 'Akar pangkat 2' },
+    { name: 'Akar Kubik', label: '∛x', latex: '\\sqrt[3]{x}', desc: 'Akar pangkat 3' },
+    { name: 'Akar Pangkat n', label: 'ⁿ√x', latex: '\\sqrt[n]{x}', desc: 'Akar pangkat n' },
+    { name: 'Rumus ABC', label: 'x1,2', latex: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}', desc: 'Akar persamaan kuadrat' },
+    { name: 'Persamaan Kuadrat', label: 'ax²+bx+c=0', latex: 'ax^2 + bx + c = 0', desc: 'Bentuk umum persamaan kuadrat' },
+    { name: 'Eksponensial e', label: 'e^(ix)', latex: 'e^{i\\pi} + 1 = 0', desc: 'Identitas Euler' }
+  ],
+  fractions_algebra: [
+    { name: 'Pecahan Biasa', label: 'a/b', latex: '\\frac{a}{b}', desc: 'Pecahan biasa' },
+    { name: 'Pecahan Display', label: 'dfrac', latex: '\\dfrac{x + 1}{x - 1}', desc: 'Pecahan ukuran proporsional' },
+    { name: 'Pecahan Campuran', label: '1 ½', latex: '1\\frac{1}{2}', desc: 'Pecahan campuran' },
+    { name: 'Subskrip Indeks', label: 'x_i', latex: 'x_{i}', desc: 'Indeks variabel' },
+    { name: 'Indeks Ganda', label: 'x₁, x₂', latex: 'x_{1}, x_{2}', desc: 'Dua indeks variabel' },
+    { name: 'Kombinasi C(n,k)', label: 'nCk', latex: '\\binom{n}{k}', desc: 'Koefisien binomial' },
+    { name: 'Faktorial', label: 'n!', latex: 'n! = n \\times (n-1)!', desc: 'Faktorial' },
+    { name: 'Nilai Mutlak', label: '|x|', latex: '|x - 5| \\le 3', desc: 'Nilai mutlak' }
+  ],
+  matrices_vectors: [
+    { name: 'Matriks 2x2', label: '2×2', latex: '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}', desc: 'Matriks ordo 2x2 tanda kurung' },
+    { name: 'Matriks 3x3', label: '3×3', latex: '\\begin{pmatrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{pmatrix}', desc: 'Matriks ordo 3x3' },
+    { name: 'Determinan 2x2', label: '|det|', latex: '\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}', desc: 'Determinan matriks 2x2' },
+    { name: 'Matriks Kolom', label: 'Kolom', latex: '\\begin{pmatrix} x \\\\ y \\end{pmatrix}', desc: 'Vektor kolom 2D' },
+    { name: 'Vektor Panah', label: 'v⃗', latex: '\\vec{v} = 2\\hat{i} + 3\\hat{j}', desc: 'Notasi vektor' },
+    { name: 'Dot Product', label: 'u · v', latex: '\\vec{u} \\cdot \\vec{v} = |u||v|\\cos\\theta', desc: 'Perkalian titik vektor' }
+  ],
+  calculus: [
+    { name: 'Limit x mendekati 0', label: 'lim', latex: '\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1', desc: 'Limit fungsi' },
+    { name: 'Limit x mendekati ∞', label: 'lim ∞', latex: '\\lim_{x \\to \\infty} \\left(1 + \\frac{1}{x}\\right)^x = e', desc: 'Limit tak hingga' },
+    { name: 'Turunan Pertama', label: 'df/dx', latex: '\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}', desc: 'Definisi turunan' },
+    { name: 'Turunan Aksen', label: "f'(x)", latex: "f'(x) = 3x^2 - 4x + 1", desc: 'Notasi aksen' },
+    { name: 'Integral Tak Tentu', label: '∫ f(x) dx', latex: '\\int (3x^2 + 2x) \\, dx = x^3 + x^2 + C', desc: 'Integral tak tentu' },
+    { name: 'Integral Tentu', label: '∫_a^b', latex: '\\int_{0}^{\\pi} \\sin(x) \\, dx', desc: 'Integral tentu dengan batas' },
+    { name: 'Sigma / Deret', label: '∑', latex: '\\sum_{k=1}^{n} k^2 = \\frac{n(n+1)(2n+1)}{6}', desc: 'Penjumlahan deret' },
+    { name: 'Logaritma Basis a', label: 'log_a', latex: '\\log_{a}(b) = c \\iff a^c = b', desc: 'Logaritma' },
+    { name: 'Logaritma Natural', label: 'ln(x)', latex: '\\ln(x) = \\int_{1}^{x} \\frac{1}{t} \\, dt', desc: 'Logaritma natural' }
+  ],
+  trig_geom: [
+    { name: 'Identitas Pythagoras', label: 'sin²+cos²', latex: '\\sin^2\\theta + \\cos^2\\theta = 1', desc: 'Identitas trigonometri' },
+    { name: 'Tangen', label: 'tan', latex: '\\tan\\theta = \\frac{\\sin\\theta}{\\cos\\theta}', desc: 'Fungsi tangen' },
+    { name: 'Aturan Sinus', label: 'a/sin A', latex: '\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C}', desc: 'Aturan sinus segitiga' },
+    { name: 'Aturan Cosinus', label: 'c²=a²+b²..', latex: 'c^2 = a^2 + b^2 - 2ab\\cos C', desc: 'Aturan cosinus segitiga' },
+    { name: 'Sudut & Derajat', label: '∠ABC', latex: '\\angle ABC = 60^\\circ', desc: 'Besar sudut' },
+    { name: 'Phi & Lingkaran', label: 'Luas L', latex: 'L = \\pi r^2, \\quad K = 2\\pi r', desc: 'Rumus lingkaran' }
+  ],
+  symbols: [
+    { name: 'Plus-Minus', label: '±', latex: '\\pm', desc: 'Plus minus' },
+    { name: 'Kali', label: '×', latex: '\\times', desc: 'Simbol perkalian' },
+    { name: 'Bagi', label: '÷', latex: '\\div', desc: 'Simbol pembagian' },
+    { name: 'Kurang Dari Sama Dengan', label: '≤', latex: '\\le', desc: 'Pertidaksamaan' },
+    { name: 'Lebih Dari Sama Dengan', label: '≥', latex: '\\ge', desc: 'Pertidaksamaan' },
+    { name: 'Tidak Sama Dengan', label: '≠', latex: '\\ne', desc: 'Pertidaksamaan' },
+    { name: 'Mendekati', label: '≈', latex: '\\approx', desc: 'Aproksimasi' },
+    { name: 'Tak Hingga', label: '∞', latex: '\\infty', desc: 'Infinity' },
+    { name: 'Elemen Dari', label: '∈', latex: 'x \\in \\mathbb{R}', desc: 'Anggota himpunan bilangan real' },
+    { name: 'Bukan Elemen', label: '∉', latex: 'x \\notin A', desc: 'Bukan anggota himpunan' },
+    { name: 'Himpunan Bagian', label: '⊂', latex: 'A \\subset B', desc: 'Subset' },
+    { name: 'Irisan', label: '∩', latex: 'A \\cap B', desc: 'Irisan himpunan' },
+    { name: 'Gabungan', label: '∪', latex: 'A \\cup B', desc: 'Gabungan himpunan' }
+  ],
+  greek: [
+    { name: 'Alpha', label: 'α', latex: '\\alpha', desc: 'Alpha' },
+    { name: 'Beta', label: 'β', latex: '\\beta', desc: 'Beta' },
+    { name: 'Gamma', label: 'γ', latex: '\\gamma', desc: 'Gamma' },
+    { name: 'Theta', label: 'θ', latex: '\\theta', desc: 'Theta' },
+    { name: 'Lambda', label: 'λ', latex: '\\lambda', desc: 'Lambda' },
+    { name: 'Mu', label: 'μ', latex: '\\mu', desc: 'Mu' },
+    { name: 'Pi', label: 'π', latex: '\\pi', desc: 'Pi' },
+    { name: 'Sigma Kecil', label: 'σ', latex: '\\sigma', desc: 'Standar deviasi' },
+    { name: 'Delta Besar', label: 'Δ', latex: '\\Delta', desc: 'Perubahan / diskriminan' },
+    { name: 'Omega Besar', label: 'Ω', latex: '\\Omega', desc: 'Omega' }
+  ]
+};
+
+const currentCategoryTemplates = computed(() => {
+  return mathTemplates[mathActiveCategory.value] || mathTemplates.powers_roots;
+});
+
+const applyMathTemplate = (tpl) => {
+  if (!mathFormulaInput.value.trim()) {
+    mathFormulaInput.value = tpl;
+  } else {
+    mathFormulaInput.value += ' ' + tpl;
+  }
+  renderMathPreview();
+};
+
 watch(mathFormulaInput, () => {
   renderMathPreview();
 });
 
 const renderMathPreview = () => {
   if (!mathPreviewEl.value) return;
+  const raw = mathFormulaInput.value.trim();
+  if (!raw) {
+    mathPreviewEl.value.innerHTML = '<span class="text-white/30 text-xs italic">Pratinjau rumus KaTeX akan muncul di sini...</span>';
+    return;
+  }
   try {
-    katex.render(mathFormulaInput.value || '', mathPreviewEl.value, {
+    katex.render(raw, mathPreviewEl.value, {
       throwOnError: false,
-      displayMode: true
+      displayMode: mathDisplayMode.value === 'block'
     });
   } catch (e) {
     mathPreviewEl.value.innerHTML = `<span class="text-rose-400 text-xs">Rumus tidak valid: ${e.message}</span>`;
   }
-};
-
-const insertMathTemplate = (tpl) => {
-  mathFormulaInput.value = tpl;
-  renderMathPreview();
 };
 
 const insertMathFormula = () => {
@@ -659,24 +823,49 @@ const insertMathFormula = () => {
     const rawLatex = mathFormulaInput.value.trim();
     if (!rawLatex) return;
 
+    const isBlock = mathDisplayMode.value === 'block';
     const renderedHtml = katex.renderToString(rawLatex, {
       throwOnError: false,
-      displayMode: true
+      displayMode: isBlock
     });
 
-    const mathBlockHtml = `
-      <div class="edupath-math-block my-4 p-3 bg-black/40 border border-amber-500/30 rounded-xl text-center select-none cursor-pointer hover:border-[#c0ff00]/60 transition-colors" data-latex="${encodeURIComponent(rawLatex)}" title="Klik untuk edit rumus KaTeX">
-        ${renderedHtml}
-      </div>
-      <p><br></p>
-    `;
+    let mathElementHtml = '';
+    if (isBlock) {
+      mathElementHtml = `
+        <div class="edupath-math-block my-3 p-3 bg-black/40 border border-amber-500/30 rounded-xl text-center select-none cursor-pointer hover:border-[#c0ff00]/60 transition-colors" data-latex="${encodeURIComponent(rawLatex)}" data-display-mode="block" title="Klik untuk edit rumus KaTeX: ${rawLatex}">
+          ${renderedHtml}
+        </div>
+        <p><br></p>
+      `;
+    } else {
+      mathElementHtml = `
+        <span class="edupath-math-inline mx-1 px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/25 text-amber-200 select-none cursor-pointer hover:border-[#c0ff00] transition-colors inline-block" data-latex="${encodeURIComponent(rawLatex)}" data-display-mode="inline" title="Klik untuk edit rumus KaTeX: ${rawLatex}">
+          ${renderedHtml}
+        </span>
+      `;
+    }
 
     if (editorEl.value) editorEl.value.focus();
-    document.execCommand('insertHTML', false, mathBlockHtml);
+    document.execCommand('insertHTML', false, mathElementHtml);
     showMathModal.value = false;
     onContentInput();
   } catch (e) {
     alert('Gagal membuat rumus matematika: ' + e.message);
+  }
+};
+
+// Handle clicking on existing math formulas to re-edit
+const handleEditorClick = (e) => {
+  const target = e.target;
+  const mathEl = target.closest('.edupath-math-inline, .edupath-math-block');
+  if (mathEl) {
+    const rawLatex = mathEl.getAttribute('data-latex');
+    if (rawLatex) {
+      mathFormulaInput.value = decodeURIComponent(rawLatex);
+      mathDisplayMode.value = mathEl.getAttribute('data-display-mode') || (mathEl.classList.contains('edupath-math-block') ? 'block' : 'inline');
+      showMathModal.value = true;
+      nextTick(() => renderMathPreview());
+    }
   }
 };
 
@@ -775,19 +964,6 @@ const insertLink = () => {
   document.execCommand('insertHTML', false, linkHtml);
   showLinkModal.value = false;
   onContentInput();
-};
-
-// Click handler on editor (e.g. KaTeX edit trigger)
-const handleEditorClick = (e) => {
-  const mathBlock = e.target.closest('.edupath-math-block');
-  if (mathBlock) {
-    const raw = mathBlock.getAttribute('data-latex');
-    if (raw) {
-      mathFormulaInput.value = decodeURIComponent(raw);
-      showMathModal.value = true;
-      nextTick(() => renderMathPreview());
-    }
-  }
 };
 
 // Word and Char Counter
@@ -1093,6 +1269,36 @@ onMounted(() => {
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   margin: 1.5rem 0;
+}
+.edupath-prose :deep(sup) {
+  font-size: 0.75em;
+  vertical-align: super;
+  line-height: 0;
+}
+.edupath-prose :deep(sub) {
+  font-size: 0.75em;
+  vertical-align: sub;
+  line-height: 0;
+}
+.edupath-prose :deep(.edupath-math-inline) {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.25rem;
+  margin: 0 0.15rem;
+  border-radius: 0.25rem;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  vertical-align: middle;
+}
+.edupath-prose :deep(.edupath-math-block) {
+  display: block;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  text-align: center;
+  overflow-x: auto;
 }
 
 /* Empty placeholder */
