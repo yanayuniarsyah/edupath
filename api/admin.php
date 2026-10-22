@@ -369,6 +369,40 @@ if (!in_array($payload->role, ['admin', 'superadmin', 'teacher', 'affiliate'])) 
     exit;
 }
 
+if (($action === 'me' || $action === 'profile') && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $stmt = $pdo->prepare("
+        SELECT u.id as user_id, ur.role, ur.tenant_id, ur.reference_id, 
+               COALESCE(a.name, t.name, u.identity_key) as name,
+               COALESCE(a.username, u.identity_key) as email,
+               t.name as tenant_name
+        FROM users u
+        JOIN user_roles ur ON u.id = ur.user_id
+        LEFT JOIN admins a ON (ur.reference_id = a.id OR u.identity_key = a.username)
+        LEFT JOIN tenants t ON ur.tenant_id = t.id
+        WHERE u.id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$payload->user_id]);
+    $adminUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $defaultName = 'Administrator';
+    if ($payload->role === 'superadmin') $defaultName = 'Super Administrator';
+    elseif ($payload->role === 'teacher') $defaultName = 'Guru / Tutor';
+    elseif (!empty($adminUser['tenant_name'])) $defaultName = 'Admin ' . $adminUser['tenant_name'];
+
+    $userRes = [
+        'id'          => $adminUser['reference_id'] ?? $payload->id,
+        'user_id'     => $payload->user_id,
+        'name'        => !empty($adminUser['name']) ? $adminUser['name'] : $defaultName,
+        'email'       => $adminUser['email'] ?? ($payload->email ?? ''),
+        'role'        => $payload->role,
+        'tenant_id'   => $payload->tenant_id,
+        'tenant_name' => $adminUser['tenant_name'] ?? null
+    ];
+    echo json_encode(["user" => $userRes]);
+    exit;
+}
+
 if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($payload->role === 'teacher') {
         $tenant_id = $payload->tenant_id;
@@ -1336,7 +1370,9 @@ elseif ($action === 'schools') {
     try {
         $cols = $pdo->query("SHOW COLUMNS FROM students LIKE 'school_id'")->fetchAll();
         if (empty($cols)) {
-            $pdo->exec("ALTER TABLE students ADD COLUMN school_id VARCHAR(36) NULL AFTER school");
+            try { $pdo->exec("ALTER TABLE students ADD COLUMN school_id VARCHAR(36) NULL AFTER school"); } catch (\Throwable $e) {
+                try { $pdo->exec("ALTER TABLE students ADD COLUMN school_id VARCHAR(36) NULL"); } catch (\Throwable $e2) {}
+            }
         }
     } catch (\Throwable $e) {}
 
@@ -1350,22 +1386,34 @@ elseif ($action === 'schools') {
             $params = [$q, $q, $q, $q, $q];
         }
 
-        $stmt = $pdo->prepare("
-            SELECT s.*,
-                COALESCE(s.is_active, 1) as is_active,
-                s.bk_name as bk_coordinator_name,
-                s.bk_email as bk_coordinator_email,
-                s.bk_phone as bk_coordinator_phone,
-                (SELECT COUNT(DISTINCT st.id) FROM students st WHERE st.school_id = s.id OR st.school = s.name OR st.school LIKE CONCAT('%', s.name, '%')) as student_count,
-                (SELECT COUNT(DISTINCT st.id) FROM students st WHERE st.school_id = s.id OR st.school = s.name OR st.school LIKE CONCAT('%', s.name, '%')) as total_students,
-                (SELECT COUNT(DISTINCT st2.id) FROM students st2 JOIN subscriptions sub ON st2.id = sub.student_id AND sub.status = 'active' WHERE st2.school_id = s.id OR st2.school = s.name OR st2.school LIKE CONCAT('%', s.name, '%')) as paid_student_count,
-                (SELECT COUNT(DISTINCT st2.id) FROM students st2 JOIN subscriptions sub ON st2.id = sub.student_id AND sub.status = 'active' WHERE st2.school_id = s.id OR st2.school = s.name OR st2.school LIKE CONCAT('%', s.name, '%')) as paid_students
-            FROM schools s
-            $whereSql
-            ORDER BY s.created_at DESC
-        ");
-        $stmt->execute($params);
-        $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $schools = [];
+        try {
+            $stmt = $pdo->prepare("
+                SELECT s.*,
+                    COALESCE(s.is_active, 1) as is_active,
+                    s.bk_name as bk_coordinator_name,
+                    s.bk_email as bk_coordinator_email,
+                    s.bk_phone as bk_coordinator_phone,
+                    (SELECT COUNT(DISTINCT st.id) FROM students st WHERE st.school_id = s.id OR st.school = s.name) as student_count,
+                    (SELECT COUNT(DISTINCT st.id) FROM students st WHERE st.school_id = s.id OR st.school = s.name) as total_students,
+                    (SELECT COUNT(DISTINCT st2.id) FROM students st2 JOIN subscriptions sub ON st2.id = sub.student_id AND sub.status = 'active' WHERE st2.school_id = s.id OR st2.school = s.name) as paid_student_count,
+                    (SELECT COUNT(DISTINCT st2.id) FROM students st2 JOIN subscriptions sub ON st2.id = sub.student_id AND sub.status = 'active' WHERE st2.school_id = s.id OR st2.school = s.name) as paid_students
+                FROM schools s
+                $whereSql
+                ORDER BY s.created_at DESC
+            ");
+            $stmt->execute($params);
+            $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            // Fallback safe query jika ada kendala di subquery hitungan siswa
+            try {
+                $stmtFallback = $pdo->prepare("SELECT s.*, COALESCE(s.is_active, 1) as is_active, s.bk_name as bk_coordinator_name, s.bk_email as bk_coordinator_email, s.bk_phone as bk_coordinator_phone, 0 as student_count, 0 as total_students, 0 as paid_student_count, 0 as paid_students FROM schools s $whereSql ORDER BY s.created_at DESC");
+                $stmtFallback->execute($params);
+                $schools = $stmtFallback->fetchAll(PDO::FETCH_ASSOC);
+            } catch (\Throwable $e2) {
+                $schools = [];
+            }
+        }
 
         foreach ($schools as &$sch) {
             $sch['total_students'] = (int)($sch['total_students'] ?? 0);
@@ -1590,8 +1638,8 @@ elseif ($action === 'plans') {
         }
         echo safe_json_encode($plans);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (!in_array($payload->role, ['superadmin', 'admin'])) {
-            http_response_code(403); echo json_encode(["error" => "Admin only"]); exit;
+        if ($payload->role !== 'superadmin') {
+            http_response_code(403); echo json_encode(["error" => "Hanya Superadmin yang berwenang menambah paket belajar."]); exit;
         }
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
@@ -1618,8 +1666,8 @@ elseif ($action === 'plans') {
             http_response_code(500); echo json_encode(["error" => "Gagal membuat plan", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        if (!in_array($payload->role, ['superadmin', 'admin'])) {
-            http_response_code(403); echo json_encode(["error" => "Admin only"]); exit;
+        if ($payload->role !== 'superadmin') {
+            http_response_code(403); echo json_encode(["error" => "Hanya Superadmin yang berwenang mengubah paket belajar."]); exit;
         }
         $id = $input['id'] ?? '';
         $features = is_array($input['features']) ? $input['features'] : [];
@@ -1647,8 +1695,8 @@ elseif ($action === 'plans') {
             http_response_code(500); echo json_encode(["error" => "Gagal update plan", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        if (!in_array($payload->role, ['superadmin', 'admin'])) {
-            http_response_code(403); echo json_encode(["error" => "Admin only"]); exit;
+        if ($payload->role !== 'superadmin') {
+            http_response_code(403); echo json_encode(["error" => "Hanya Superadmin yang berwenang menghapus paket belajar."]); exit;
         }
         $id = $_GET['id'] ?? '';
         if (empty($id)) {

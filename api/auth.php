@@ -315,12 +315,20 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("UPDATE students SET last_login = NOW() WHERE id = ?")->execute([$user['student_id']]);
         }
         
+        $ref_id = $user['reference_id'] ?? $user['user_id'];
+        $user_email = $user['student_email'] ?? $user['identity_key'];
+        if ($user['role'] === 'student') {
+            $ref_id = $user['student_id'] ?? $user['reference_id'] ?? $user['user_id'];
+        } elseif ($user['role'] === 'affiliate') {
+            $ref_id = $user['affiliate_id'] ?? $user['reference_id'] ?? $user['user_id'];
+        }
+
         $token_payload = [
-            'user_id' => $user['user_id'], 
-            'id' => $user['student_id'] ?? $user['reference_id'] ?? $user['user_id'], 
-            'role' => $user['role'], 
+            'user_id'   => $user['user_id'], 
+            'id'        => $ref_id, 
+            'role'      => $user['role'], 
             'tenant_id' => $user['tenant_id'],
-            'email' => $user['email']
+            'email'     => $user_email
         ];
 
         if ($user['role'] === 'school_bk') {
@@ -331,7 +339,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 'name' => $user['school_name'] ?? $user['name'],
                 'slug' => $user['school_slug'] ?? '',
                 'bk_name' => $user['bk_name'] ?? 'Koordinator BK',
-                'bk_email' => $user['email'],
+                'bk_email' => $user_email,
                 'city' => $user['school_city'] ?? '',
                 'share_link' => "https://edupath.co.id/?school=" . urlencode($user['school_name'] ?? $user['name']) . "#/spp"
             ];
@@ -359,9 +367,17 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         set_auth_cookies($token, $csrf_token);
 
         unset($user['user_password'], $user['student_password'], $user['password']);
+        $user['email'] = $user_email;
         if ($user['role'] === 'student') {
             $user['school'] = $user['student_school'] ?? '';
             $user['phone'] = $user['student_phone'] ?? '';
+        } elseif ($user['role'] === 'affiliate') {
+            $user['id'] = $ref_id;
+            $user['name'] = $user['affiliate_name'] ?? $user['identity_key'];
+            $user['referral_code'] = $user['affiliate_code'] ?? '';
+            $user['is_premium'] = true;
+            $user['plan'] = 'affiliate';
+            $user['plan_name'] = 'Mitra Afiliasi EduPath';
         }
         $plan = strtolower($user['plan'] ?? 'free');
         $is_paid_plan = false;
@@ -673,37 +689,38 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
     // Staff (Admin, Superadmin, Teacher, Guru, Tutor)
     if (in_array($payload->role, ['admin', 'superadmin', 'teacher', 'guru', 'tutor'])) {
-        $stmt = $pdo->prepare("SELECT id, username, name FROM admins WHERE id = ?");
-        $stmt->execute([$payload->id]);
-        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $pdo->prepare("
+            SELECT u.id as user_id, u.identity_key, ur.role, ur.tenant_id, a.id as admin_id, a.username, 
+                   COALESCE(a.name, t.name, u.identity_key) as name,
+                   t.name as tenant_name
+            FROM users u
+            JOIN user_roles ur ON u.id = ur.user_id
+            LEFT JOIN admins a ON (ur.reference_id = a.id OR u.identity_key = a.username)
+            LEFT JOIN tenants t ON ur.tenant_id = t.id
+            WHERE u.id = ? OR a.id = ? OR LOWER(TRIM(u.identity_key)) = LOWER(TRIM(?))
+            LIMIT 1
+        ");
+        $stmt->execute([$payload->user_id ?? $payload->id, $payload->id, $payload->email ?? '']);
+        $adm = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($admin) {
-            $user = [
-                'id'         => $admin['id'],
-                'name'       => $admin['name'] ?? $admin['username'] ?? 'Staff',
-                'email'      => $admin['username'] ?? '',
-                'role'       => $payload->role,
-                'is_premium' => true,
-                'tenant_id'  => $payload->tenant_id,
-            ];
-            header('Cache-Control: private, max-age=30');
-            echo json_encode(["user" => $user]);
-        } else {
-            // Fallback jika belum di admins table, ambil dari users
-            $stmtU = $pdo->prepare("SELECT id, identity_key FROM users WHERE id = ?");
-            $stmtU->execute([$payload->user_id]);
-            $u = $stmtU->fetch(PDO::FETCH_ASSOC);
-            $user = [
-                'id'         => $payload->id,
-                'name'       => $payload->role === 'teacher' ? 'Guru / Tutor' : 'Administrator',
-                'email'      => $u['identity_key'] ?? '',
-                'role'       => $payload->role,
-                'is_premium' => true,
-                'tenant_id'  => $payload->tenant_id,
-            ];
-            header('Cache-Control: private, max-age=30');
-            echo json_encode(["user" => $user]);
+        $name = $adm['name'] ?? '';
+        if (empty($name) || $name === ($adm['identity_key'] ?? '')) {
+            if ($payload->role === 'superadmin') $name = 'Super Administrator';
+            elseif ($payload->role === 'admin') $name = !empty($adm['tenant_name']) ? ('Admin ' . $adm['tenant_name']) : 'Administrator';
+            elseif (in_array($payload->role, ['teacher', 'guru', 'tutor'])) $name = 'Guru / Tutor';
         }
+
+        $user = [
+            'id'          => $adm['admin_id'] ?? $payload->id,
+            'name'        => $name,
+            'email'       => $adm['username'] ?? ($adm['identity_key'] ?? ($payload->email ?? '')),
+            'role'        => $payload->role,
+            'is_premium'  => true,
+            'tenant_id'   => $payload->tenant_id,
+            'tenant_name' => $adm['tenant_name'] ?? null
+        ];
+        header('Cache-Control: private, max-age=30');
+        echo json_encode(["user" => $user]);
         exit;
     }
 

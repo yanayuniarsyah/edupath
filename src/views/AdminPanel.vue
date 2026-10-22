@@ -176,8 +176,8 @@
             {{ isAffiliate ? 'AF' : (currentRole === 'teacher' ? 'TC' : (currentRole === 'superadmin' ? 'SA' : 'AD')) }}
           </div>
           <div v-show="sidebarOpen" class="flex-grow min-w-0">
-            <h4 class="text-xs font-black text-white truncate">{{ currentAdminUser?.name || affiliateSettingsForm.name || (isAffiliate ? 'Mitra Afiliasi' : (currentRole === 'teacher' ? 'Guru / Tutor' : (currentRole === 'superadmin' ? 'Superadmin' : 'Admin Bimbel'))) }}</h4>
-            <span class="text-[10px] text-[#c0ff00] font-bold uppercase tracking-wider">{{ isAffiliate ? 'Mitra Afiliasi' : (currentRole === 'teacher' ? 'Pendidik / Tutor' : (currentRole === 'superadmin' ? 'Super Admin' : 'Tenant Admin')) }}</span>
+            <h4 class="text-xs font-black text-white truncate">{{ currentAdminUser?.name || (isAffiliate ? 'Mitra Afiliasi' : (currentRole === 'teacher' ? 'Guru / Tutor' : (isSuperadmin ? 'Super Administrator' : 'Administrator'))) }}</h4>
+            <span class="text-[10px] text-[#c0ff00] font-bold uppercase tracking-wider">{{ isAffiliate ? 'Mitra Afiliasi' : (currentRole === 'teacher' ? 'Pendidik / Tutor' : (isSuperadmin ? 'Super Admin' : 'Tenant Admin')) }}</span>
           </div>
         </div>
         <button
@@ -3175,15 +3175,15 @@ const navItems = computed(() => {
   const items = [
     { id: 'overview',     label: 'Dashboard',             icon: 'ph-squares-four',  roles: ['superadmin', 'admin', 'teacher'] },
     ...(isT ? [{ id: 'teacher_hub', label: 'Siswa & Jadwal Saya', icon: 'ph-chalkboard-teacher', roles: ['teacher'] }] : []),
-    { id: 'branches',    label: 'Cabang & Tenant',       icon: 'ph-buildings',     roles: ['superadmin'] },
+    { id: 'branches',    label: 'Cabang',                icon: 'ph-buildings',     roles: ['superadmin'] },
     { id: 'schools',     label: 'Sekolah Mitra',         icon: 'ph-graduation-cap', roles: ['superadmin', 'admin'] },
     { id: 'questions',   label: isT ? 'Bank Soal Saya' : 'Soal', icon: 'ph-books', roles: ['superadmin', 'admin', 'teacher'] },
     { id: 'materials',   label: isT ? 'Materi Saya' : 'Materi', icon: 'ph-file-text', roles: ['superadmin', 'admin', 'teacher'] },
     { id: 'students',    label: 'Siswa',                 icon: 'ph-users-three',   roles: ['superadmin', 'admin'] },
     { id: 'transactions',label: 'Transaksi',             icon: 'ph-receipt',       roles: ['superadmin', 'admin'] },
-    { id: 'packages',    label: 'Paket',                 icon: 'ph-package',       roles: ['superadmin', 'admin'] },
+    { id: 'packages',    label: 'Paket',                 icon: 'ph-package',       roles: ['superadmin'] },
     { id: 'affiliates',  label: 'Afiliasi & Komisi',     icon: 'ph-hand-coins',    roles: ['superadmin', 'admin'] },
-    { id: 'staff',       label: 'Staff & Pengajar',      icon: 'ph-users-three',   roles: ['superadmin', 'admin'] },
+    { id: 'staff',       label: 'Staff',                 icon: 'ph-users-three',   roles: ['superadmin'] },
     { id: 'reports',     label: 'Laporan & Analitik',    icon: 'ph-chart-bar',     roles: ['superadmin', 'admin'] },
   ];
 
@@ -3296,9 +3296,9 @@ const loadRoleData = () => {
     loadPlansAndStaff();
     fetchQuestions();
     fetchMaterials();
+    fetchSchools();
     if (isSuperadmin.value) {
       fetchTenants();
-      fetchSchools();
     }
   }
 };
@@ -3317,6 +3317,13 @@ const doLogin = async () => {
       currentRole.value = roleFound;
       localStorage.setItem('user_role', roleFound);
       sessionStorage.setItem('admin_role', roleFound);
+    }
+    if (res.user) {
+      currentAdminUser.value = res.user;
+      sessionStorage.setItem('ep_user', JSON.stringify(res.user));
+      localStorage.setItem('user', JSON.stringify(res.user));
+      if (res.user.name) localStorage.setItem('user_name', res.user.name);
+      if (res.user.email) localStorage.setItem('user_email', res.user.email);
     }
     isAuthenticated.value = true;
     loadRoleData();
@@ -5003,6 +5010,10 @@ watch(activeTab, (newTab) => {
     activeTab.value = 'affiliate_dashboard';
     return;
   }
+  if (!isSuperadmin.value && ['packages', 'plans', 'staff', 'branches'].includes(newTab)) {
+    activeTab.value = 'overview';
+    return;
+  }
   if (isTeacher.value && ['packages', 'plans', 'transactions', 'affiliates', 'staff', 'students', 'settings', 'branches', 'schools'].includes(newTab)) {
     activeTab.value = 'questions';
     return;
@@ -5012,7 +5023,7 @@ watch(activeTab, (newTab) => {
     fetchDashboard();
   } else if (newTab === 'branches' && isSuperadmin.value) {
     fetchTenants();
-  } else if (newTab === 'schools' && isSuperadmin.value) {
+  } else if (newTab === 'schools') {
     fetchSchools();
   } else if (newTab === 'students' && !isTeacher.value && !isAffiliate.value) {
     fetchStudents();

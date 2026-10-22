@@ -143,7 +143,7 @@
             <i class="ph-bold ph-user text-lg text-black"></i>
           </div>
           <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
-            <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa Mandiri') }}</h4>
+            <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : (isAffiliate ? 'Mitra Afiliasi' : 'Siswa Mandiri')) }}</h4>
             <div v-if="isTeacher" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Guru & Bank Soal">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-emerald-400">
                 Pendidik / Tutor
@@ -161,6 +161,12 @@
                 Guru BK / Mitra
               </span>
               <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Portal BK ➔</span>
+            </div>
+            <div v-else-if="isAffiliate" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Afiliasi">
+              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-amber-400">
+                Mitra Afiliasi
+              </span>
+              <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Portal Afiliasi ➔</span>
             </div>
             <div v-else @click="openPlanSelector" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Lihat Pilihan Paket">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-[#c0ff00]">
@@ -1896,8 +1902,8 @@
                   <span class="w-2.5 h-2.5 rounded-full" :class="(isPremiumUser || isStaff) ? 'bg-[#c0ff00] animate-pulse' : 'bg-amber-400'"></span>
                   <span class="text-xs font-black uppercase tracking-widest text-white/60">Status Akun &amp; Paket</span>
                 </div>
-                <div class="text-2xl md:text-3xl font-black tracking-tight" :class="(isPremiumUser || isStaff) ? 'text-[#c0ff00]' : 'text-amber-400'">
-                  {{ isTeacher ? 'Akun Pendidik / Guru (Akses Penuh)' : (isAdmin ? (currentUser?.role === 'superadmin' ? 'Super Administrator' : 'Administrator Tenant') : (isSchoolBk ? 'Akun Perwakilan Sekolah Mitra (Guru BK)' : (isPremiumUser ? (currentUser?.plan_name || 'Premium UTBK (Aktif)') : 'Paket Gratis / Trial'))) }}
+                <div class="text-2xl md:text-3xl font-black tracking-tight" :class="(isPremiumUser || isStaff || isAffiliate) ? 'text-[#c0ff00]' : 'text-amber-400'">
+                  {{ isTeacher ? 'Akun Pendidik / Guru (Akses Penuh)' : (isAdmin ? (currentUser?.role === 'superadmin' ? 'Super Administrator' : 'Administrator Tenant') : (isSchoolBk ? 'Akun Perwakilan Sekolah Mitra (Guru BK)' : (isAffiliate ? 'Mitra Afiliasi Resmi EduPath' : (isPremiumUser ? (currentUser?.plan_name || 'Premium UTBK (Aktif)') : 'Paket Gratis / Trial')))) }}
                 </div>
                 <p class="text-xs text-white/60 max-w-xl">
                   {{ isTeacher 
@@ -1906,9 +1912,11 @@
                           ? 'Akses administrator sistem penuh untuk manajemen data, pesanan, analitik, dan pengguna platform.' 
                           : (isSchoolBk
                               ? 'Akses portal khusus Guru BK dan Sekolah Mitra untuk memantau agregat hasil asesmen SPP dan tryout siswa.'
-                              : (isPremiumUser 
-                                  ? 'Anda memiliki akses penuh ke seluruh Fitur Simulasi UTBK, Asesmen Kesiapan AI, & Modul Drill HOTS.' 
-                                  : 'Akun Anda saat ini pada mode Gratis / Trial. Upgrade ke Paket Premium untuk membuka akses tanpa batas ke Simulasi SNBT & Tryout.'))) }}
+                              : (isAffiliate
+                                  ? 'Anda terdaftar sebagai Mitra Afiliasi resmi EduPath. Pantau referral, komisi, dan pencairan komisi Anda.'
+                                  : (isPremiumUser 
+                                      ? 'Anda memiliki akses penuh ke seluruh Fitur Simulasi UTBK, Asesmen Kesiapan AI, & Modul Drill HOTS.' 
+                                      : 'Akun Anda saat ini pada mode Gratis / Trial. Upgrade ke Paket Premium untuk membuka akses tanpa batas ke Simulasi SNBT & Tryout.')))) }}
                 </p>
               </div>
 
@@ -1986,7 +1994,7 @@
                   <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
                     <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Peran / Status Pengguna</span>
                     <div class="text-sm font-bold text-[#c0ff00]">
-                      {{ isTeacher ? 'Guru / Tutor (Pendidik)' : (isAdmin ? (currentUser?.role === 'superadmin' ? 'Super Administrator' : 'Administrator Tenant') : (isSchoolBk ? 'Guru BK / Sekolah Mitra' : (isPremiumUser ? 'Siswa Premium (' + (currentUser?.plan_name || currentUser?.plan || 'Utama') + ')' : 'Siswa Mandiri (Trial)'))) }}
+                      {{ isTeacher ? 'Guru / Tutor (Pendidik)' : (isAdmin ? (currentUser?.role === 'superadmin' ? 'Super Administrator' : 'Administrator Tenant') : (isSchoolBk ? 'Guru BK / Sekolah Mitra' : (isAffiliate ? 'Mitra Afiliasi Resmi' : (isPremiumUser ? 'Siswa Premium (' + (currentUser?.plan_name || currentUser?.plan || 'Utama') + ')' : 'Siswa Mandiri (Trial)')))) }}
                     </div>
                   </div>
                   <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
@@ -4814,6 +4822,7 @@ export default {
     const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes(currentUser.value?.role));
     const isStaff = computed(() => isAdmin.value || isTeacher.value);
     const isSchoolBk = computed(() => currentUser.value?.role === 'school_bk');
+    const isAffiliate = computed(() => currentUser.value?.role === 'affiliate' || localStorage.getItem('user_role') === 'affiliate');
     const isPremiumUser = computed(() => {
       if (isStaff.value) return true;
       if (currentUser.value?.role === 'affiliate' || currentUser.value?.role === 'school_bk') return true;
