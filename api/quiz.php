@@ -98,15 +98,31 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         if (strtolower($quiz_type) === 'tryout') {
-            $tryout_distribution = [
-                'Penalaran Umum' => 30,
-                'Pengetahuan Dan Pemahaman Umum' => 20,
-                'Pemahaman Bacaan Dan Menulis' => 20,
-                'Pengetahuan Kuantitatif' => 20,
-                'Literasi Dalam Bahasa Indonesia' => 20,
-                'Literasi Dalam Bahasa Inggris' => 20,
-                'Penalaran Matematika' => 20
-            ];
+            $has_pbm = 0;
+            try {
+                $has_pbm = (int)$pdo->query("SELECT COUNT(*) FROM questions WHERE (sub_materi LIKE '%Bacaan%' OR subtes LIKE '%Bacaan%') AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter")->fetchColumn();
+            } catch (\Throwable $e) {}
+
+            if ($has_pbm >= 20) {
+                $tryout_distribution = [
+                    'Penalaran Umum' => 30,
+                    'Pengetahuan Dan Pemahaman Umum' => 20,
+                    'Pemahaman Bacaan Dan Menulis' => 20,
+                    'Pengetahuan Kuantitatif' => 20,
+                    'Literasi Dalam Bahasa Indonesia' => 20,
+                    'Literasi Dalam Bahasa Inggris' => 20,
+                    'Penalaran Matematika' => 20
+                ];
+            } else {
+                $tryout_distribution = [
+                    'Penalaran Umum' => 30,
+                    'Pengetahuan Dan Pemahaman Umum' => 20,
+                    'Pengetahuan Kuantitatif' => 20,
+                    'Literasi Dalam Bahasa Indonesia' => 30,
+                    'Literasi Dalam Bahasa Inggris' => 20,
+                    'Penalaran Matematika' => 30
+                ];
+            }
             $questions = [];
             foreach ($tryout_distribution as $sub_name => $sub_limit) {
                 $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi LIKE ? OR subtes LIKE ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
@@ -133,12 +149,16 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Resilient fallback: If no questions found matching exact filters, get any active questions
+    // Resilient fallback: If no questions found matching exact filters, get any active questions without ORDER BY RAND
     if (empty($questions)) {
-        $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 ORDER BY RAND() LIMIT ?");
-        $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt = $pdo->query("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1");
         $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($questions) {
+            shuffle($questions);
+            if (count($questions) > (int)$limit) {
+                $questions = array_slice($questions, 0, (int)$limit);
+            }
+        }
     }
 
     echo json_encode([
@@ -172,15 +192,31 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     } else {
         if (strtolower($quiz_type) === 'tryout') {
-            $tryout_distribution = [
-                'Penalaran Umum' => 30,
-                'Pengetahuan Dan Pemahaman Umum' => 20,
-                'Pemahaman Bacaan Dan Menulis' => 20,
-                'Pengetahuan Kuantitatif' => 20,
-                'Literasi Dalam Bahasa Indonesia' => 20,
-                'Literasi Dalam Bahasa Inggris' => 20,
-                'Penalaran Matematika' => 20
-            ];
+            $has_pbm = 0;
+            try {
+                $has_pbm = (int)$pdo->query("SELECT COUNT(*) FROM questions WHERE (sub_materi LIKE '%Bacaan%' OR subtes LIKE '%Bacaan%') AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter")->fetchColumn();
+            } catch (\Throwable $e) {}
+
+            if ($has_pbm >= 20) {
+                $tryout_distribution = [
+                    'Penalaran Umum' => 30,
+                    'Pengetahuan Dan Pemahaman Umum' => 20,
+                    'Pemahaman Bacaan Dan Menulis' => 20,
+                    'Pengetahuan Kuantitatif' => 20,
+                    'Literasi Dalam Bahasa Indonesia' => 20,
+                    'Literasi Dalam Bahasa Inggris' => 20,
+                    'Penalaran Matematika' => 20
+                ];
+            } else {
+                $tryout_distribution = [
+                    'Penalaran Umum' => 30,
+                    'Pengetahuan Dan Pemahaman Umum' => 20,
+                    'Pengetahuan Kuantitatif' => 20,
+                    'Literasi Dalam Bahasa Indonesia' => 30,
+                    'Literasi Dalam Bahasa Inggris' => 20,
+                    'Penalaran Matematika' => 30
+                ];
+            }
             $questions = [];
             foreach ($tryout_distribution as $sub_name => $sub_limit) {
                 $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi LIKE ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
