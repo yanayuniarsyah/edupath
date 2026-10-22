@@ -257,7 +257,11 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         LEFT JOIN affiliates aff ON (ur.reference_id = aff.id OR u.id = aff.user_id OR LOWER(TRIM(u.identity_key)) = LOWER(TRIM(aff.email)))
         LEFT JOIN schools sch ON (ur.reference_id = sch.id OR LOWER(TRIM(u.identity_key)) = LOWER(TRIM(sch.bk_email)))
         LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE (LOWER(TRIM(u.identity_key)) = LOWER(TRIM(?)) OR (s.email IS NOT NULL AND LOWER(TRIM(s.email)) = LOWER(TRIM(?))) OR (aff.email IS NOT NULL AND LOWER(TRIM(aff.email)) = LOWER(TRIM(?))) OR (a.username IS NOT NULL AND LOWER(TRIM(a.username)) = LOWER(TRIM(?)))) 
+        WHERE (LOWER(TRIM(u.identity_key)) = LOWER(TRIM(?)) 
+            OR (s.email IS NOT NULL AND LOWER(TRIM(s.email)) = LOWER(TRIM(?))) 
+            OR (aff.email IS NOT NULL AND LOWER(TRIM(aff.email)) = LOWER(TRIM(?))) 
+            OR (a.username IS NOT NULL AND LOWER(TRIM(a.username)) = LOWER(TRIM(?)))
+            OR (sch.bk_email IS NOT NULL AND LOWER(TRIM(sch.bk_email)) = LOWER(TRIM(?)))) 
           AND u.is_active = 1
         ORDER BY CASE ur.role 
             WHEN 'superadmin' THEN 1 
@@ -269,7 +273,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         END ASC
         LIMIT 1
     ");
-    $stmt->execute([$email, $email, $email, $email]);
+    $stmt->execute([$email, $email, $email, $email, $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $password_matched = false;
@@ -371,34 +375,74 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user['role'] === 'student') {
             $user['school'] = $user['student_school'] ?? '';
             $user['phone'] = $user['student_phone'] ?? '';
+
+            // Check active subscription in subscriptions table
+            $has_active_sub = false;
+            try {
+                $stmtSub = $pdo->prepare("SELECT plan_id, plan_name_snapshot FROM subscriptions WHERE (student_id = ? OR student_id = ?) AND status = 'active' AND expires_at > NOW() ORDER BY id DESC LIMIT 1");
+                $stmtSub->execute([$ref_id, $user['user_id']]);
+                $subRow = $stmtSub->fetch(PDO::FETCH_ASSOC);
+                if ($subRow) {
+                    $has_active_sub = true;
+                    if (!empty($subRow['plan_name_snapshot'])) {
+                        $user['plan_name'] = $subRow['plan_name_snapshot'];
+                    }
+                }
+            } catch (\Throwable $e) {}
+
+            $plan = strtolower($user['plan'] ?? 'free');
+            $paid_keywords = ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium', 'intensif', 'snbt', 'p1', 'p2', 'p3'];
+            $is_paid_plan = false;
+            foreach ($paid_keywords as $kw) {
+                if (str_contains($plan, $kw)) {
+                    $is_paid_plan = true;
+                    break;
+                }
+            }
+            $user['is_premium'] = $is_paid_plan || $has_active_sub;
+            $plan_labels = [
+                'mandiri' => 'Paket Mandiri',
+                'starter' => 'Paket Mandiri',
+                'utama'   => 'Paket Pejuang PTN (Utama)',
+                'pejuang' => 'Paket Pejuang PTN (Utama)',
+                'vip'     => 'Paket Elite Mentoring (VIP)',
+                'elite'   => 'Paket Elite Mentoring (VIP)',
+                'free'    => 'Paket Free / Trial'
+            ];
+            if (empty($user['plan_name'])) {
+                $user['plan_name'] = $plan_labels[$plan] ?? ucfirst($plan);
+            }
+            if ($user['is_premium'] && ($user['plan_name'] === 'Paket Free / Trial' || $user['plan_name'] === 'Free')) {
+                $user['plan_name'] = 'Paket Mandiri';
+            }
+
+            // Bersihkan nama siswa: Jangan pernah menampilkan email sebagai nama
+            $cleanName = trim($user['name'] ?? '');
+            if (empty($cleanName) || str_contains($cleanName, '@')) {
+                $cleanName = 'Siswa EduPath';
+            }
+            $user['name'] = $cleanName;
         } elseif ($user['role'] === 'affiliate') {
             $user['id'] = $ref_id;
-            $user['name'] = $user['affiliate_name'] ?? $user['identity_key'];
-            $user['referral_code'] = $user['affiliate_code'] ?? '';
+            $cleanName = trim($user['name'] ?? '');
+            if (empty($cleanName) || str_contains($cleanName, '@')) {
+                $cleanName = 'Mitra Afiliasi';
+            }
+            $user['name'] = $cleanName;
+            $user['referral_code'] = $user['affiliate_code'] ?? ($user['referral_code'] ?? '');
             $user['is_premium'] = true;
             $user['plan'] = 'affiliate';
-            $user['plan_name'] = 'Mitra Afiliasi EduPath';
-        }
-        $plan = strtolower($user['plan'] ?? 'free');
-        $is_paid_plan = false;
-        $paid_keywords = ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium'];
-        foreach ($paid_keywords as $kw) {
-            if (str_contains($plan, $kw)) {
-                $is_paid_plan = true;
-                break;
+            $user['plan_name'] = 'Mitra Afiliasi Resmi';
+        } elseif ($user['role'] === 'school_bk') {
+            $cleanName = trim($user['name'] ?? '');
+            if (empty($cleanName) || str_contains($cleanName, '@')) {
+                $cleanName = !empty($user['school_name']) ? ("Guru BK " . $user['school_name']) : 'Koordinator BK';
             }
+            $user['name'] = $cleanName;
+            $user['is_premium'] = true;
+            $user['plan'] = 'school_partner';
+            $user['plan_name'] = 'Sekolah Mitra Resmi';
         }
-        $user['is_premium'] = ($user['role'] === 'affiliate' || $user['role'] === 'school_bk') ? true : $is_paid_plan;
-        $plan_labels = [
-            'mandiri' => 'Paket Mandiri',
-            'starter' => 'Paket Mandiri',
-            'utama'   => 'Paket Pejuang PTN (Utama)',
-            'pejuang' => 'Paket Pejuang PTN (Utama)',
-            'vip'     => 'Paket Elite Mentoring (VIP)',
-            'elite'   => 'Paket Elite Mentoring (VIP)',
-            'free'    => 'Paket Free / Trial'
-        ];
-        $user['plan_name'] = $plan_labels[$plan] ?? ucfirst($plan);
 
         echo json_encode([
             "token"         => $token,          // Backward compat: Bearer untuk mobile
@@ -730,9 +774,14 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt->execute([$payload->id, $payload->user_id ?? '', $payload->email ?? '']);
         $aff = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        $cleanName = trim($aff['name'] ?? ($aff['bank_owner'] ?? ''));
+        if (empty($cleanName) || str_contains($cleanName, '@')) {
+            $cleanName = 'Mitra Afiliasi';
+        }
+
         $user = [
             'id'            => $aff['id'] ?? $payload->id,
-            'name'          => $aff['name'] ?? $aff['bank_owner'] ?? 'Mitra Afiliasi',
+            'name'          => $cleanName,
             'email'         => $aff['email'] ?? ($payload->email ?? ''),
             'role'          => 'affiliate',
             'referral_code' => $aff['referral_code'] ?? '',
@@ -741,7 +790,7 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             'bank_owner'    => $aff['bank_owner'] ?? '',
             'is_premium'    => true,
             'plan'          => 'affiliate',
-            'plan_name'     => 'Mitra Afiliasi EduPath',
+            'plan_name'     => 'Mitra Afiliasi Resmi',
             'tenant_id'     => $payload->tenant_id ?? 'default_tenant'
         ];
         header('Cache-Control: private, max-age=30');
@@ -782,7 +831,7 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         }
         $plan = strtolower($user['plan'] ?? 'free');
         $is_paid_plan = false;
-        $paid_keywords = ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium'];
+        $paid_keywords = ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium', 'intensif', 'snbt', 'p1', 'p2', 'p3'];
         foreach ($paid_keywords as $kw) {
             if (str_contains($plan, $kw)) {
                 $is_paid_plan = true;
@@ -792,7 +841,13 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $user['is_premium']  = $is_paid_plan || (bool)($user['has_sub'] ?? false);
         $user['role']        = 'student';
         $user['tenant_id']   = $payload->tenant_id ?? ($user['tenant_id'] ?? 'default_tenant');
-        $user['name']        = !empty(trim($user['name'] ?? '')) ? trim($user['name']) : ($payload->email ?? 'Siswa EduPath');
+        
+        // Bersihkan nama siswa: Jangan tampilkan email sebagai nama
+        $rawStudentName = trim($user['name'] ?? '');
+        if (empty($rawStudentName) || str_contains($rawStudentName, '@')) {
+            $rawStudentName = 'Siswa EduPath';
+        }
+        $user['name']        = $rawStudentName;
         $user['school']      = $user['school'] ?? '';
         $user['school_id']   = $user['school_id'] ?? null;
         $user['target_ptn']  = $user['target_ptn'] ?? '';
@@ -807,6 +862,9 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             'free'    => 'Paket Free / Trial'
         ];
         $user['plan_name'] = $plan_labels[$plan] ?? ucfirst($plan);
+        if ($user['is_premium'] && ($user['plan_name'] === 'Paket Free / Trial' || $user['plan_name'] === 'Free')) {
+            $user['plan_name'] = 'Paket Mandiri';
+        }
 
         // Header cache hint untuk CDN / reverse proxy (jika ada)
         // Browser tidak meng-cache karena credentials: include

@@ -176,7 +176,7 @@
             {{ isAffiliate ? 'AF' : (currentRole === 'teacher' ? 'TC' : (currentRole === 'superadmin' ? 'SA' : 'AD')) }}
           </div>
           <div v-show="sidebarOpen" class="flex-grow min-w-0">
-            <h4 class="text-xs font-black text-white truncate">{{ currentAdminUser?.name || (isAffiliate ? 'Mitra Afiliasi' : (currentRole === 'teacher' ? 'Guru / Tutor' : (isSuperadmin ? 'Super Administrator' : 'Administrator'))) }}</h4>
+            <h4 class="text-xs font-black text-white truncate">{{ getAdminDisplayName() }}</h4>
             <span class="text-[10px] text-[#c0ff00] font-bold uppercase tracking-wider">{{ isAffiliate ? 'Mitra Afiliasi' : (currentRole === 'teacher' ? 'Pendidik / Tutor' : (isSuperadmin ? 'Super Admin' : 'Tenant Admin')) }}</span>
           </div>
         </div>
@@ -259,6 +259,12 @@
             <button @click="openCreateBranchModal" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5 shadow-md shadow-[#c0ff00]/20 cursor-pointer">
               <i class="ph-bold ph-plus"></i> Tambah Cabang
             </button>
+          </div>
+
+          <!-- Guidance Note -->
+          <div class="p-3 bg-amber-500/10 border border-amber-500/25 rounded-xl flex items-start gap-2.5 text-xs text-amber-200/90 font-medium">
+            <i class="ph-bold ph-info text-base text-amber-400 shrink-0 mt-0.5"></i>
+            <span><strong>Catatan:</strong> Menu <strong>Cabang</strong> ini khusus untuk Kantor Cabang Bimbel (Tenant Pengelola). Untuk mendaftarkan Sekolah (SMA/SMK/MA Mitra &amp; Akun Koordinator Guru BK), silakan gunakan menu <strong>Sekolah Mitra</strong>.</span>
           </div>
 
           <!-- Cabang KPI Strip -->
@@ -381,6 +387,12 @@
             </div>
           </div>
 
+          <!-- Guidance Note -->
+          <div class="p-3 bg-[#c0ff00]/10 border border-[#c0ff00]/25 rounded-xl flex items-start gap-2.5 text-xs text-white/90 font-medium">
+            <i class="ph-bold ph-graduation-cap text-base text-[#c0ff00] shrink-0 mt-0.5"></i>
+            <span><strong>Portal Sekolah &amp; Guru BK:</strong> Sekolah mitra dapat login dan melihat analitik agregat siswa di portal <strong>/#/school</strong> menggunakan email &amp; password yang terdaftar di bawah.</span>
+          </div>
+
           <!-- Sekolah KPI Strip -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3 border border-white/10">
@@ -483,6 +495,7 @@
                       </button>
                     </td>
                     <td class="px-4 py-3 text-right space-x-1.5 whitespace-nowrap">
+                      <a href="/#/school" target="_blank" class="px-2.5 py-1.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Buka Portal Guru BK"><i class="ph-bold ph-chalkboard-teacher"></i> Portal BK</a>
                       <button @click="openSchoolReferral(s)" class="px-2.5 py-1.5 bg-[#c0ff00]/15 border border-[#c0ff00]/30 text-[#c0ff00] hover:bg-[#c0ff00]/25 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Link Pendaftaran Khusus Sekolah"><i class="ph-bold ph-link-simple"></i> Link Siswa</button>
                       <button @click="openEditSchoolModal(s)" class="px-2.5 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Edit Data Sekolah &amp; BK"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
                       <button @click="deleteSchool(s.id)" class="px-2.5 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Hapus Sekolah"><i class="ph-bold ph-trash"></i> Hapus</button>
@@ -3151,11 +3164,27 @@ const currentAdminTenant = computed(() => {
 
 const isSuperadmin = computed(() => {
   const r = (currentRole.value || localStorage.getItem('user_role') || sessionStorage.getItem('admin_role') || '').toLowerCase();
+  const u = (currentAdminUser.value?.email || currentAdminUser.value?.username || currentAdminUser.value?.identity_key || localStorage.getItem('user_email') || '').toLowerCase();
+  if (u === 'admin@uat.edupath.local' || (currentAdminTenant.value && r === 'admin')) return false;
+  if (u === 'admin' || u === 'superadmin' || u.startsWith('superadmin@') || u === 'admin.uat@edupath.id') return true;
   return r === 'superadmin' || r === 'super_admin';
 });
 
 const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes(currentRole.value));
 const isAffiliate = computed(() => ['affiliate', 'afiliator'].includes(currentRole.value));
+
+const getAdminDisplayName = () => {
+  const u = currentAdminUser.value;
+  if (isSuperadmin.value) {
+    if (u?.name && !u.name.includes('@') && !u.name.toLowerCase().includes('tenant')) return u.name;
+    return 'Super Administrator';
+  }
+  if (isAffiliate.value) return 'Mitra Afiliasi';
+  if (isTeacher.value) return 'Guru / Tutor';
+  if (u?.tenant_name) return `Admin ${u.tenant_name}`;
+  if (u?.name && !u.name.includes('@')) return u.name;
+  return 'Administrator';
+};
 
 // ── Nav Items (Role-filtered) ──
 const navItems = computed(() => {
@@ -3310,6 +3339,16 @@ const doLogin = async () => {
     const u = (loginForm.value.username || loginForm.value.email || '').trim();
     const p = (loginForm.value.password || '').trim();
     const res = await api.adminLogin(u, p);
+
+    // Jika akun yang login adalah Akun Sekolah Mitra / Guru BK, arahkan langsung ke Portal Sekolah
+    if (res.is_school || res.user?.role === 'school_bk') {
+      sessionStorage.setItem('school_token', res.token);
+      sessionStorage.setItem('school_data', JSON.stringify(res.user?.school || res.user));
+      window.location.hash = '#/school';
+      window.location.reload();
+      return;
+    }
+
     sessionStorage.setItem('admin_token', res.token);
     if (res.csrf_token) sessionStorage.setItem('ep_admin_csrf', res.csrf_token);
     const roleFound = res.user?.role || extractRoleFromToken(res.token) || '';
@@ -4774,7 +4813,7 @@ const saveSchool = async () => {
       bk_name: schoolForm.bk_coordinator_name,
       bk_email: schoolForm.bk_coordinator_email,
       bk_phone: schoolForm.bk_coordinator_phone,
-      password: schoolForm.bk_password || 'EduPathSchool01!2026'
+      password: schoolForm.bk_password ? schoolForm.bk_password : (isEditingSchool.value ? undefined : 'EduPathSchool01!2026')
     };
     if (isEditingSchool.value) {
       await api.updateAdminSchool(schoolForm.id, payload);

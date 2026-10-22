@@ -6,15 +6,12 @@
   RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
   # HTTPS Enforcement (Production)
-  # Redirect HTTP to HTTPS
   RewriteCond %{HTTPS} off
-  # Only enforce if not on localhost (for local development)
   RewriteCond %{HTTP_HOST} !^localhost
   RewriteCond %{HTTP_HOST} !^127\.0\.0\.1
   RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
   # Route everything else to index.html for Vue Router (SPA)
-  # Ignore /api directory so it goes to backend
   RewriteCond %{REQUEST_URI} !^/api/
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
@@ -30,8 +27,7 @@
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
   
   # Content-Security-Policy (CSP)
-  # Comprehensive CSP allowing Self, Midtrans, Google Fonts, Phosphor Icons (unpkg & jsdelivr)
-  Header always set Content-Security-Policy "default-src 'self' https: data: blob:; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.midtrans.com https://app.sandbox.midtrans.com https://*.midtrans.com https://unpkg.com https://cdn.jsdelivr.net; script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://app.midtrans.com https://app.sandbox.midtrans.com https://*.midtrans.com https://unpkg.com https://cdn.jsdelivr.net; script-src-attr 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.jsdelivr.net; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.jsdelivr.net; style-src-attr 'self' 'unsafe-inline'; font-src 'self' data: https://fonts.gstatic.com https://unpkg.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' http://localhost:* ws://localhost:* https://edupath.co.id https://edupath.elyana.biz.id https://*.midtrans.com https://app.midtrans.com https://app.sandbox.midtrans.com https://api.midtrans.com https://unpkg.com https://cdn.jsdelivr.net; frame-src 'self' https://*.midtrans.com https://app.midtrans.com https://app.sandbox.midtrans.com; worker-src 'self' blob:; child-src 'self' blob: https://*.midtrans.com;"
+  Header always set Content-Security-Policy "default-src 'self' https: data: blob:; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.midtrans.com https://app.sandbox.midtrans.com https://*.midtrans.com https://unpkg.com https://cdn.jsdelivr.net; script-src-elem 'self' 'unsafe-inline' https://app.midtrans.com https://app.sandbox.midtrans.com https://*.midtrans.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.jsdelivr.net; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://unpkg.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' http://localhost:* ws://localhost:* https://edupath.co.id https://edupath.elyana.biz.id https://*.midtrans.com https://app.midtrans.com https://app.sandbox.midtrans.com https://api.midtrans.com https://unpkg.com https://cdn.jsdelivr.net; frame-src 'self' https://*.midtrans.com https://app.midtrans.com https://app.sandbox.midtrans.com; worker-src 'self' blob:; child-src 'self' blob: https://*.midtrans.com;"
 </IfModule>
 
 <FilesMatch "\.(html|htm)$">
@@ -70,3 +66,4 @@
 <FilesMatch "(^\.|\.env|\.sql$|\.bak$|\.key$|\.pem$)">
   Require all denied
 </FilesMatch>
+

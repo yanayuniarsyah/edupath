@@ -244,7 +244,7 @@
 
           <!-- ✨ Banner Gambar Dashboard Sekolah (Mirip Dashboard Siswa) -->
           <div class="glass-card rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
-            <img src="/school-banner.png" alt="EduPath School Banner" class="w-full h-48 md:h-60 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+            <img src="/school-banner.png" onerror="if (this.src.indexOf('2.jpeg') === -1) this.src = '/2.jpeg';" alt="EduPath School Banner" class="w-full h-48 md:h-60 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
             <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-90 z-10"></div>
           </div>
 

@@ -249,14 +249,28 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                    s.id as school_id, s.name as school_name, s.slug, s.bk_name, s.bk_email, s.bk_phone, s.city
             FROM users u
             JOIN user_roles ur ON u.id = ur.user_id
-            LEFT JOIN schools s ON ur.reference_id = s.id
-            WHERE LOWER(u.identity_key) = ? AND u.is_active = 1 AND ur.role IN ('school_bk', 'teacher', 'admin', 'superadmin')
+            LEFT JOIN schools s ON (ur.reference_id = s.id OR u.identity_key = s.bk_email)
+            WHERE (LOWER(u.identity_key) = ? OR LOWER(s.bk_email) = ?) 
+              AND u.is_active = 1 
+              AND ur.role IN ('school_bk', 'teacher', 'admin', 'superadmin')
             LIMIT 1
         ");
-        $stmt->execute([$email]);
+        $stmt->execute([$email, $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user || !password_verify($password, $user['user_password'])) {
+        $isPassValid = false;
+        if ($user) {
+            if (password_verify($password, $user['user_password'])) {
+                $isPassValid = true;
+            } elseif ($password === $user['user_password'] || md5($password) === $user['user_password']) {
+                $isPassValid = true;
+                try {
+                    $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([password_hash($password, PASSWORD_BCRYPT), $user['user_id']]);
+                } catch (\Throwable $e) {}
+            }
+        }
+
+        if (!$user || !$isPassValid) {
             http_response_code(401);
             echo json_encode(["error" => "Email atau password salah."]);
             exit;

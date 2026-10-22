@@ -143,7 +143,7 @@
             <i class="ph-bold ph-user text-lg text-black"></i>
           </div>
           <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
-            <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : (isAffiliate ? 'Mitra Afiliasi' : 'Siswa Mandiri')) }}</h4>
+            <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ getStudentDisplayName(currentUser) }}</h4>
             <div v-if="isTeacher" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Guru & Bank Soal">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-emerald-400">
                 Pendidik / Tutor
@@ -1940,6 +1940,14 @@
                   <span>Buka Portal Guru BK ➔</span>
                 </button>
                 <button
+                  v-else-if="isAffiliate"
+                  @click="window.location.hash = '#/admin'"
+                  class="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <i class="ph-bold ph-handshake text-base"></i>
+                  <span>Buka Portal Afiliasi ➔</span>
+                </button>
+                <button
                   v-else
                   @click="openPlanSelector"
                   class="px-6 py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
@@ -1985,7 +1993,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
                     <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Nama Lengkap</span>
-                    <div class="text-sm font-bold text-white">{{ currentUser?.name || profileEditForm.name || '-' }}</div>
+                    <div class="text-sm font-bold text-white">{{ getStudentDisplayName(currentUser) }}</div>
                   </div>
                   <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
                     <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Email Utama</span>
@@ -4821,16 +4829,37 @@ export default {
     const isAdmin = computed(() => currentUser.value?.role === 'admin' || currentUser.value?.role === 'superadmin');
     const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes(currentUser.value?.role));
     const isStaff = computed(() => isAdmin.value || isTeacher.value);
-    const isSchoolBk = computed(() => currentUser.value?.role === 'school_bk');
-    const isAffiliate = computed(() => currentUser.value?.role === 'affiliate' || localStorage.getItem('user_role') === 'affiliate');
+    const isAffiliate = computed(() => {
+      const r = (currentUser.value?.role || localStorage.getItem('user_role') || '').toLowerCase();
+      return r === 'affiliate' || r === 'afiliator';
+    });
+    const isSchoolBk = computed(() => {
+      const r = (currentUser.value?.role || localStorage.getItem('user_role') || '').toLowerCase();
+      return r === 'school_bk' || r === 'school' || r === 'bk';
+    });
     const isPremiumUser = computed(() => {
       if (isStaff.value) return true;
-      if (currentUser.value?.role === 'affiliate' || currentUser.value?.role === 'school_bk') return true;
+      if (isAffiliate.value || isSchoolBk.value) return true;
       if (currentUser.value?.is_premium) return true;
       const p = (currentUser.value?.plan || currentUser.value?.plan_name || '').toLowerCase();
-      if (p === 'free' || p === 'trial' || p === 'paket free / trial' || p === 'paket free') return false;
-      return ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium'].some(k => p.includes(k));
+      if (!p || p === 'free' || p === 'trial' || p === 'paket free / trial' || p === 'paket free') return false;
+      return true;
     });
+
+    const getStudentDisplayName = (u) => {
+      if (!u) return 'Siswa EduPath';
+      if (u.name && !u.name.includes('@')) return u.name;
+      if (u.role === 'superadmin') return 'Super Administrator';
+      if (u.role === 'admin') return u.tenant_name ? `Admin ${u.tenant_name}` : 'Administrator';
+      if (u.role === 'school_bk') return u.school_name ? `Guru BK ${u.school_name}` : 'Guru BK';
+      if (u.role === 'affiliate') return 'Mitra Afiliasi';
+      if (u.role === 'teacher') return 'Guru / Tutor';
+      if (u.email && u.email.includes('@')) {
+        const prefix = u.email.split('@')[0].replace(/[._]/g, ' ');
+        return prefix.charAt(0).toUpperCase() + prefix.slice(1);
+      }
+      return 'Siswa EduPath';
+    };
 
     const showPlanSelectorModal = ref(false);
     const openPlanSelector = () => {
@@ -6217,8 +6246,10 @@ export default {
       isAdmin,
       isTeacher,
       isStaff,
+      isAffiliate,
       isSchoolBk,
       isPremiumUser,
+      getStudentDisplayName,
       showPlanSelectorModal,
       openPlanSelector,
       isEditingProfile,
