@@ -242,9 +242,9 @@
         <!-- ========================================================== -->
         <div v-if="activeTab === 'analytics'" class="space-y-6">
 
-          <!-- ✨ Banner Gambar Dashboard Sekolah (Mirip Dashboard Siswa) -->
+          <!-- ✨ Banner Gambar Dashboard Sekolah (Gambar 2.jpeg Identik dengan Dashboard Siswa) -->
           <div class="glass-card rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
-            <img src="/school-banner.png" onerror="if (this.src.indexOf('2.jpeg') === -1) this.src = '/2.jpeg';" alt="EduPath School Banner" class="w-full h-48 md:h-60 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+            <img src="/2.jpeg" onerror="this.src='/1.jpeg';" alt="EduPath School Banner" class="w-full h-48 md:h-60 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
             <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-90 z-10"></div>
           </div>
 
@@ -471,23 +471,28 @@
                 />
               </div>
 
-              <!-- Filter Buttons -->
-              <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-                <button
-                  v-for="f in [
-                    { key: 'all', label: 'Semua Siswa' },
-                    { key: 'paid', label: '⭐ Ikut Bimbel' },
-                    { key: 'pejuang', label: 'Pejuang PTN' },
-                    { key: 'mandiri', label: 'Mandiri' },
-                    { key: 'elite', label: 'Elite' },
-                    { key: 'free', label: 'Free SPP' }
-                  ]"
-                  :key="f.key"
-                  @click="filterPackage = f.key; fetchStudents(1);"
-                  :class="['px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer', filterPackage === f.key ? 'bg-[#c0ff00] text-black font-black shadow-md shadow-[#c0ff00]/20' : 'bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10']"
-                >
-                  {{ f.label }}
-                </button>
+              <!-- Pull-down Dropdown Menu Filter Siswa (Sesuai Permintaan) -->
+              <div class="flex items-center gap-2 shrink-0">
+                <label for="studentFilterSelect" class="text-white/60 text-xs font-bold flex items-center gap-1.5 whitespace-nowrap">
+                  <i class="ph-bold ph-funnel text-[#c0ff00]"></i>
+                  <span>Sortir Paket:</span>
+                </label>
+                <div class="relative">
+                  <select
+                    id="studentFilterSelect"
+                    v-model="filterPackage"
+                    @change="fetchStudents(1)"
+                    class="appearance-none pl-3.5 pr-9 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border outline-none bg-[#0c1222] text-white border-white/15 hover:border-white/30 focus:border-[#c0ff00] shadow-lg"
+                  >
+                    <option value="all" class="bg-[#0c1222] text-white">Semua Siswa</option>
+                    <option value="paid" class="bg-[#0c1222] text-[#c0ff00] font-bold">⭐ Ikut Bimbel</option>
+                    <option value="pejuang" class="bg-[#0c1222] text-white">Pejuang PTN</option>
+                    <option value="mandiri" class="bg-[#0c1222] text-white">Mandiri</option>
+                    <option value="elite" class="bg-[#0c1222] text-white">Elite</option>
+                    <option value="free" class="bg-[#0c1222] text-white">Free SPP</option>
+                  </select>
+                  <i class="ph-bold ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none text-xs"></i>
+                </div>
               </div>
             </div>
 
@@ -873,12 +878,12 @@ let searchTimeout = null;
 const navItems = computed(() => [
   {
     id: 'analytics',
-    label: 'Ringkasan & KPI Agregat',
+    label: 'Dashboard',
     icon: 'ph-chart-pie-slice'
   },
   {
     id: 'packages',
-    label: 'Monitoring Paket Belajar',
+    label: 'Monitoring Paket',
     icon: 'ph-package',
     badge: `${kpis.value?.paid_package_students || 0} Siswa`,
     badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-400'
@@ -1003,13 +1008,33 @@ async function handleLogin() {
   }
 }
 
-function handleLogout() {
-  sessionStorage.removeItem('school_token');
-  sessionStorage.removeItem('school_data');
-  localStorage.removeItem('auth_token');
+async function handleLogout() {
+  try {
+    if (api && typeof api.logout === 'function') {
+      await api.logout().catch(() => {});
+    }
+  } catch (e) {}
+
+  // Pembersihan menyeluruh semua token sesi dan peran
+  sessionStorage.clear();
+  const storageKeys = [
+    'auth_token', 'ep_session_token', 'ep_csrf', 'ep_token', 'ep_refresh',
+    'ep_admin_token', 'ep_admin_csrf', 'admin_token', 'admin_role', 'admin_active_tab',
+    'school_token', 'school_data', 'user_role', 'user_email', 'user_name', 'ep_user', 'user'
+  ];
+  storageKeys.forEach(k => {
+    try {
+      localStorage.removeItem(k);
+      sessionStorage.removeItem(k);
+    } catch (e) {}
+  });
+
   isAuthenticated.value = false;
   schoolData.value = null;
-  window.location.hash = '#/';
+
+  // Arahkan ke beranda dan reload agar state reaktif bersih
+  window.location.href = window.location.origin + window.location.pathname + '#/';
+  window.location.reload();
 }
 
 async function loadAllDashboardData() {

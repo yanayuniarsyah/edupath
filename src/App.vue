@@ -5289,11 +5289,18 @@ export default {
         console.error('Logout API error', e);
       }
       
-      // Clear all auth related storage keys
-      const keys = ['auth_token', 'ep_session_token', 'ep_csrf', 'ep_admin_token', 'ep_admin_csrf'];
+      // Clear all auth and session related storage keys
+      sessionStorage.clear();
+      const keys = [
+        'auth_token', 'ep_session_token', 'ep_csrf', 'ep_token', 'ep_refresh',
+        'ep_admin_token', 'ep_admin_csrf', 'admin_token', 'admin_role', 'admin_active_tab',
+        'school_token', 'school_data', 'user_role', 'user_email', 'user_name', 'ep_user', 'user'
+      ];
       keys.forEach(k => {
-        sessionStorage.removeItem(k);
-        localStorage.removeItem(k);
+        try {
+          sessionStorage.removeItem(k);
+          localStorage.removeItem(k);
+        } catch (e) {}
       });
       
       document.body.style.pointerEvents = '';

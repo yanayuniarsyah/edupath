@@ -540,20 +540,19 @@ elseif ($action === 'refresh' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 elseif ($action === 'logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $payload = authenticate();
-    $refresh_token = $input['refresh_token'] ?? '';
-    
-    if (!empty($refresh_token)) {
-        $rt_hash = hash('sha256', $refresh_token);
-        try {
-            // Revoke specific refresh token session
+    try {
+        $payload = authenticate();
+        $refresh_token = $input['refresh_token'] ?? '';
+        if (!empty($refresh_token) && !empty($payload->id)) {
+            $rt_hash = hash('sha256', $refresh_token);
             $pdo->prepare("UPDATE refresh_tokens SET revoked_at = NOW() WHERE token_hash = ? AND student_id = ?")
                 ->execute([$rt_hash, $payload->id]);
-        } catch (PDOException $e) {}
-    }
+        }
+    } catch (\Throwable $e) {}
     
     clear_auth_cookies();
     echo json_encode(["success" => true]);
+    exit;
 }
 elseif ($action === 'update_fcm' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $payload = authenticate();

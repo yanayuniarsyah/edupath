@@ -3384,14 +3384,17 @@ const doLogout = async () => {
   }
   
   sessionStorage.clear();
-  localStorage.removeItem('auth_token');
-  localStorage.removeItem('user_role');
-  localStorage.removeItem('user_name');
-  localStorage.removeItem('user_email');
-  localStorage.removeItem('user');
-  sessionStorage.removeItem('admin_token');
-  sessionStorage.removeItem('admin_role');
-  sessionStorage.removeItem('ep_user');
+  const storageKeys = [
+    'auth_token', 'ep_session_token', 'ep_csrf', 'ep_token', 'ep_refresh',
+    'ep_admin_token', 'ep_admin_csrf', 'admin_token', 'admin_role', 'admin_active_tab',
+    'school_token', 'school_data', 'user_role', 'user_email', 'user_name', 'ep_user', 'user'
+  ];
+  storageKeys.forEach(k => {
+    try {
+      localStorage.removeItem(k);
+      sessionStorage.removeItem(k);
+    } catch (e) {}
+  });
   currentRole.value = '';
   
   document.body.style.pointerEvents = '';
