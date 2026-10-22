@@ -229,7 +229,13 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($user && $password_matched) {
-        if (!in_array($user['role'], ['student', 'school_bk', 'teacher', 'tutor', 'admin', 'superadmin', 'affiliate'])) {
+        if (in_array($user['role'], ['admin', 'superadmin'])) {
+            http_response_code(403);
+            echo json_encode(["error" => "Akun Administrator & Superadmin wajib masuk melalui portal admin di /#/admin."]);
+            exit;
+        }
+
+        if (!in_array($user['role'], ['student', 'school_bk', 'teacher', 'tutor', 'affiliate'])) {
             http_response_code(403);
             echo json_encode(["error" => "Peran akun tidak dikenali."]);
             exit;

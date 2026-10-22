@@ -3724,10 +3724,10 @@
             <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
           <h3 class="text-lg font-bold font-heading text-white">
-            {{ isForgotPasswordMode ? 'Lupa Password?' : (isResetPasswordMode ? 'Reset Password' : (isLoginMode ? 'Masuk ke EduPath' : 'Daftar Akun EduPath')) }}
+            {{ isForgotPasswordMode ? 'Lupa Password?' : (isResetPasswordMode ? 'Reset Password' : (isLoginMode ? 'Masuk ke EduPath' : 'Daftar Akun Siswa')) }}
           </h3>
           <p class="text-xs text-slate-400 font-light mt-1">
-            {{ isForgotPasswordMode ? 'Masukkan email Anda untuk menerima token pemulihan.' : (isResetPasswordMode ? 'Masukkan token dan password baru Anda.' : (isLoginMode ? 'Satu pintu masuk untuk Siswa, Guru BK, Pengajar, & Administrator' : 'Mulai perjalanan belajarmu hari ini.')) }}
+            {{ isForgotPasswordMode ? 'Masukkan email Anda untuk menerima token pemulihan.' : (isResetPasswordMode ? 'Masukkan token dan password baru Anda.' : (isLoginMode ? 'Pintu masuk terpadu untuk Siswa & Guru BK / Sekolah Mitra' : 'Mulai perjalanan belajarmu hari ini.')) }}
           </p>
         </div>
 
@@ -5031,8 +5031,16 @@ export default {
           return;
         }
 
-        // 2. SMART REDIRECT: Staf Admin, Guru, Tutor, & Superadmin
-        if (['teacher', 'tutor', 'admin', 'superadmin'].includes(res.user?.role)) {
+        // 2. STRICT SEPARATION: Admin & Superadmin wajib login lewat /#/admin
+        if (['admin', 'superadmin'].includes(res.user?.role)) {
+          sessionStorage.clear();
+          localStorage.removeItem('auth_token');
+          authError.value = 'Akun Administrator & Superadmin tetap dipisah khusus. Silakan masuk melalui portal /#/admin.';
+          return;
+        }
+
+        // 3. Guru & Tutor Bimbel (non-admin)
+        if (['teacher', 'tutor'].includes(res.user?.role)) {
           sessionStorage.setItem('admin_token', res.token);
           sessionStorage.setItem('admin_role', res.user.role);
           sessionStorage.setItem('ep_user', JSON.stringify(res.user));
@@ -5040,12 +5048,12 @@ export default {
           if (res.user.name) localStorage.setItem('user_name', res.user.name);
           if (res.user.email) localStorage.setItem('user_email', res.user.email);
           showLoginModal.value = false;
-          showToast('Selamat datang di Portal Pengajar / Admin!');
+          showToast('Selamat datang di Portal Pengajar!');
           window.location.hash = '#/admin';
           return;
         }
 
-        // 3. SMART REDIRECT: Mitra Afiliasi
+        // 4. Mitra Afiliasi
         if (res.user?.role === 'affiliate') {
           sessionStorage.setItem('admin_token', res.token);
           sessionStorage.setItem('admin_role', 'affiliate');
@@ -5059,7 +5067,7 @@ export default {
           return;
         }
 
-        // 4. Default: Akun Siswa
+        // 5. Default: Akun Siswa
         isLoggedIn.value = true;
         showLoginModal.value = false;
         currentAbilityScore.value = res.user.total_score || 0;
