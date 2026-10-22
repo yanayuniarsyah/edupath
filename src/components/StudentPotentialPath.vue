@@ -1155,6 +1155,11 @@ export default {
             const el = document.getElementById('spp');
             if (el) el.scrollIntoView({ behavior: 'smooth' });
           }, 350);
+        } else if (window.location.hash && window.location.hash.includes('spp')) {
+          setTimeout(() => {
+            const el = document.getElementById('spp');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }, 350);
         }
       } catch (err) {
         console.warn('SPP school parameter parse error:', err);

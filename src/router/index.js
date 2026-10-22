@@ -10,6 +10,8 @@ try {
       window.location.replace('/#/tryout');
     } else if (currentPath === 'terms') {
       window.location.replace('/#/terms');
+    } else if (currentPath === 'spp') {
+      window.location.replace('/#/spp' + window.location.search);
     }
   }
 } catch (e) {}
@@ -17,6 +19,10 @@ try {
 const routes = [
   {
     path: '/',
+    component: () => import('../App.vue'),
+  },
+  {
+    path: '/spp',
     component: () => import('../App.vue'),
   },
   {
@@ -35,6 +41,10 @@ const routes = [
   {
     path: '/terms',
     component: () => import(/* webpackChunkName: "terms" */ '../views/TermsView.vue'),
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
   },
 ]
 
