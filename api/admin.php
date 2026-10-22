@@ -227,30 +227,48 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($input['username'] ?? '');
     $password = trim($input['password'] ?? '');
 
-    // Known persistent accounts auto-healing map
+    // Known persistent accounts auto-healing map (ONLY Superadmin & Admin)
     $knownAccounts = [
         'superadmin@uat.edupath.local' => ['pass' => 'EduPathSuperAdmin01!2026', 'role' => 'superadmin', 'name' => 'UAT Super Admin', 'tenant' => null],
         'superadmin'                   => ['pass' => 'EduPathSuperAdmin01!2026', 'role' => 'superadmin', 'name' => 'UAT Super Admin', 'tenant' => null],
         'admin.uat@edupath.id'         => ['pass' => 'admin123',                 'role' => 'superadmin', 'name' => 'Admin UAT',         'tenant' => null],
         'admin'                        => ['pass' => 'admin123',                 'role' => 'superadmin', 'name' => 'Main Admin',        'tenant' => null],
         'admin@uat.edupath.local'      => ['pass' => 'EduPathAdmin01!2026',      'role' => 'admin',      'name' => 'UAT Tenant Admin',   'tenant' => 'uat-tenant-01'],
-        'tutor@uat.edupath.local'      => ['pass' => 'EduPathTutor01!2026',      'role' => 'teacher',    'name' => 'UAT Tutor',          'tenant' => 'uat-tenant-01'],
     ];
 
-    // 1. Fast Path: Cek kredensial langsung dari database
     $usernamePrefix = $username . '@%';
+
+    // STRICT CHECK: Jika akun ini adalah Guru/Tutor, Siswa, atau Guru BK, tolak keras dari /admin
+    $stmt_check_role = $pdo->prepare("
+        SELECT ur.role 
+        FROM users u 
+        JOIN user_roles ur ON u.id = ur.user_id 
+        WHERE (u.identity_key = ? OR u.identity_key LIKE ?) 
+        LIMIT 1
+    ");
+    $stmt_check_role->execute([$username, $usernamePrefix]);
+    $user_role_found = $stmt_check_role->fetchColumn();
+
+    if ($user_role_found && in_array($user_role_found, ['teacher', 'guru', 'tutor', 'school_bk', 'student'])) {
+        http_response_code(403);
+        echo json_encode([
+            "error" => "Akses khusus Administrator & Superadmin. Guru/Pengajar, Guru BK, dan Siswa wajib masuk melalui form login di halaman depan."
+        ]);
+        exit;
+    }
+
+    // 1. Fast Path: Cek kredensial langsung dari database (HANYA admin & superadmin)
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.password as user_password, a.password as admin_password,
                ur.role, ur.tenant_id, ur.reference_id, a.id as admin_id, t.is_active as tenant_active,
-               COALESCE(a.name, aff.bank_owner, u.identity_key) as name
+               COALESCE(a.name, u.identity_key) as name
         FROM users u 
         JOIN user_roles ur ON u.id = ur.user_id 
         LEFT JOIN admins a ON ur.reference_id = a.id
-        LEFT JOIN affiliates aff ON (ur.reference_id = aff.id OR u.id = aff.user_id)
         LEFT JOIN tenants t ON ur.tenant_id = t.id
         WHERE (u.identity_key = ? OR a.username = ? OR u.identity_key LIKE ? OR a.username LIKE ?) 
           AND u.is_active = 1 
-          AND ur.role IN ('admin', 'superadmin', 'teacher', 'affiliate')
+          AND ur.role IN ('admin', 'superadmin')
         LIMIT 1
     ");
     $stmt->execute([$username, $username, $usernamePrefix, $usernamePrefix]);
@@ -395,7 +413,12 @@ if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE status = 'active'")->fetchColumn() ?: 0;
         $totalAffiliates = $pdo->query("SELECT COUNT(*) FROM affiliates")->fetchColumn() ?: 0;
         $totalCommissions = $pdo->query("SELECT SUM(amount) FROM commissions WHERE status = 'paid'")->fetchColumn() ?: 0;
-        $totalTenants = $pdo->query("SELECT COUNT(*) FROM tenants")->fetchColumn() ?: 0;
+        $totalSchools = 0;
+        $totalSchoolStudents = 0;
+        try {
+            $totalSchools = (int)($pdo->query("SELECT COUNT(*) FROM schools")->fetchColumn() ?: 0);
+            $totalSchoolStudents = (int)($pdo->query("SELECT COUNT(*) FROM students WHERE school_id IS NOT NULL OR (school IS NOT NULL AND school != '')")->fetchColumn() ?: 0);
+        } catch (\Throwable $e) {}
 
         $statsData = [
             "totalStudents" => (int)$totalStudents,
@@ -405,7 +428,9 @@ if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             "activeSubscriptions" => (int)$activeSubscriptions,
             "totalAffiliates" => (int)$totalAffiliates,
             "totalCommissions" => (float)$totalCommissions,
-            "totalTenants" => (int)$totalTenants
+            "totalTenants" => (int)$totalTenants,
+            "totalSchools" => (int)$totalSchools,
+            "totalSchoolStudents" => (int)$totalSchoolStudents
         ];
         echo json_encode(array_merge($statsData, ["stats" => $statsData]));
         exit;
@@ -1231,6 +1256,191 @@ elseif ($action === 'tenants') {
         } else {
             $pdo->prepare("DELETE FROM tenants WHERE id = ?")->execute([$id]);
             echo json_encode(["success" => true, "message" => "Cabang berhasil dihapus"]);
+        }
+    }
+}
+elseif ($action === 'schools') {
+    if (!in_array($payload->role, ['superadmin', 'admin'])) {
+        http_response_code(403);
+        echo json_encode(["error" => "Akses khusus Administrator & Superadmin"]);
+        exit;
+    }
+
+    // Ensure schools table and schema
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS schools (
+                id VARCHAR(36) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                slug VARCHAR(255) NOT NULL UNIQUE,
+                npsn VARCHAR(20) NULL,
+                city VARCHAR(100) NULL,
+                province VARCHAR(100) NULL,
+                bk_name VARCHAR(150) NOT NULL,
+                bk_phone VARCHAR(50) NOT NULL,
+                bk_email VARCHAR(150) NOT NULL,
+                estimated_students INT DEFAULT 200,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_school_name (name),
+                INDEX idx_school_slug (slug)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
+
+    try {
+        $cols = $pdo->query("SHOW COLUMNS FROM students LIKE 'school_id'")->fetchAll();
+        if (empty($cols)) {
+            $pdo->exec("ALTER TABLE students ADD COLUMN school_id VARCHAR(36) NULL AFTER school");
+        }
+    } catch (\Throwable $e) {}
+
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $search = trim($_GET['search'] ?? '');
+        $whereSql = '';
+        $params = [];
+        if (!empty($search)) {
+            $whereSql = "WHERE s.name LIKE ? OR s.city LIKE ? OR s.bk_name LIKE ? OR s.bk_email LIKE ? OR s.npsn LIKE ?";
+            $q = "%$search%";
+            $params = [$q, $q, $q, $q, $q];
+        }
+
+        $stmt = $pdo->prepare("
+            SELECT s.*,
+                (SELECT COUNT(DISTINCT st.id) FROM students st WHERE st.school_id = s.id OR st.school = s.name OR st.school LIKE CONCAT('%', s.name, '%')) as total_students,
+                (SELECT COUNT(DISTINCT st2.id) FROM students st2 JOIN subscriptions sub ON st2.id = sub.student_id AND sub.status = 'active' WHERE st2.school_id = s.id OR st2.school = s.name OR st2.school LIKE CONCAT('%', s.name, '%')) as paid_students
+            FROM schools s
+            $whereSql
+            ORDER BY s.created_at DESC
+        ");
+        $stmt->execute($params);
+        $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($schools as &$sch) {
+            $sch['total_students'] = (int)($sch['total_students'] ?? 0);
+            $sch['paid_students'] = (int)($sch['paid_students'] ?? 0);
+            $sch['share_link'] = "https://edupath.co.id/?school=" . urlencode($sch['name']) . "#/spp";
+        }
+        unset($sch);
+
+        echo safe_json_encode(["schools" => $schools]);
+        exit;
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $name = trim($input['name'] ?? '');
+        $bk_name = trim($input['bk_name'] ?? '');
+        $bk_email = strtolower(trim($input['bk_email'] ?? ($input['email'] ?? '')));
+        $bk_phone = trim($input['bk_phone'] ?? ($input['phone'] ?? ''));
+        $npsn = trim($input['npsn'] ?? '');
+        $city = trim($input['city'] ?? '');
+        $province = trim($input['province'] ?? '');
+        $password = $input['password'] ?? 'EduPathSchool01!2026';
+        $estimated_students = (int)($input['estimated_students'] ?? 200);
+
+        if (empty($name) || empty($bk_name) || empty($bk_email) || empty($bk_phone)) {
+            http_response_code(400);
+            echo json_encode(["error" => "Nama Sekolah, Koordinator BK, Email BK, dan No. HP/WA wajib diisi"]);
+            exit;
+        }
+
+        $baseSlug = preg_replace('/[^a-z0-9]+/i', '-', strtolower($name));
+        $baseSlug = trim($baseSlug, '-');
+        if (empty($baseSlug)) $baseSlug = 'sekolah';
+        $slug = $baseSlug;
+        $suffix = 1;
+        while (true) {
+            $stmt_s = $pdo->prepare("SELECT id FROM schools WHERE slug = ?");
+            $stmt_s->execute([$slug]);
+            if (!$stmt_s->fetch()) break;
+            $slug = $baseSlug . '-' . (++$suffix);
+        }
+
+        $school_id = bin2hex(random_bytes(16));
+        $school_id = substr($school_id,0,8).'-'.substr($school_id,8,4).'-'.substr($school_id,12,4).'-'.substr($school_id,16,4).'-'.substr($school_id,20,12);
+
+        $user_id = bin2hex(random_bytes(16));
+        $user_id = substr($user_id,0,8).'-'.substr($user_id,8,4).'-'.substr($user_id,12,4).'-'.substr($user_id,16,4).'-'.substr($user_id,20,12);
+
+        $ur_id = bin2hex(random_bytes(16));
+        $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($ur_id,20,12);
+
+        $hashed_pass = password_hash($password, PASSWORD_BCRYPT);
+
+        try {
+            $pdo->beginTransaction();
+            $pdo->exec("INSERT INTO tenants (id, name, slug, is_active) VALUES ('default_tenant', 'Default EduPath Tenant', 'default', 1) ON DUPLICATE KEY UPDATE name=name");
+
+            $stmt = $pdo->prepare("INSERT INTO schools (id, name, slug, npsn, city, province, bk_name, bk_phone, bk_email, estimated_students) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$school_id, $name, $slug, $npsn, $city, $province, $bk_name, $bk_phone, $bk_email, $estimated_students]);
+
+            $stmt_u = $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE password = VALUES(password)");
+            $stmt_u->execute([$user_id, $bk_email, $hashed_pass]);
+
+            $stmt_ur = $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, 'default_tenant', 'school_bk', ?) ON DUPLICATE KEY UPDATE role='school_bk', reference_id=VALUES(reference_id)");
+            $stmt_ur->execute([$ur_id, $user_id, $school_id]);
+
+            $pdo->commit();
+            log_audit($pdo, $payload->user_id, null, 'school_created', $school_id, ['name' => $name, 'bk_email' => $bk_email]);
+            echo json_encode(["success" => true, "id" => $school_id, "message" => "Sekolah mitra berhasil ditambahkan"]);
+            exit;
+        } catch (\Throwable $e) {
+            $pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(["error" => "Gagal menambahkan sekolah: " . $e->getMessage()]);
+            exit;
+        }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+        $id = $input['id'] ?? '';
+        $name = trim($input['name'] ?? '');
+        $bk_name = trim($input['bk_name'] ?? '');
+        $bk_email = strtolower(trim($input['bk_email'] ?? ($input['email'] ?? '')));
+        $bk_phone = trim($input['bk_phone'] ?? ($input['phone'] ?? ''));
+        $npsn = trim($input['npsn'] ?? '');
+        $city = trim($input['city'] ?? '');
+        $province = trim($input['province'] ?? '');
+        $estimated_students = (int)($input['estimated_students'] ?? 200);
+
+        if (empty($id) || empty($name)) {
+            http_response_code(400); echo json_encode(["error" => "ID dan nama sekolah wajib diisi"]); exit;
+        }
+
+        try {
+            $stmt = $pdo->prepare("UPDATE schools SET name=?, npsn=?, city=?, province=?, bk_name=?, bk_phone=?, bk_email=?, estimated_students=? WHERE id=?");
+            $stmt->execute([$name, $npsn, $city, $province, $bk_name, $bk_phone, $bk_email, $estimated_students, $id]);
+
+            if (!empty($input['password'])) {
+                $newPass = password_hash($input['password'], PASSWORD_BCRYPT);
+                $stmt_u = $pdo->prepare("
+                    UPDATE users u 
+                    JOIN user_roles ur ON u.id = ur.user_id 
+                    SET u.password = ? 
+                    WHERE ur.reference_id = ? AND ur.role = 'school_bk'
+                ");
+                $stmt_u->execute([$newPass, $id]);
+            }
+
+            log_audit($pdo, $payload->user_id, null, 'school_updated', $id, ['name' => $name]);
+            echo json_encode(["success" => true, "message" => "Data sekolah mitra berhasil diperbarui"]);
+            exit;
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Gagal memperbarui sekolah: " . $e->getMessage()]);
+            exit;
+        }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $id = $_GET['id'] ?? ($input['id'] ?? '');
+        if (empty($id)) {
+            http_response_code(400); echo json_encode(["error" => "ID sekolah diperlukan"]); exit;
+        }
+        try {
+            $pdo->prepare("DELETE FROM schools WHERE id = ?")->execute([$id]);
+            $pdo->prepare("DELETE FROM user_roles WHERE reference_id = ? AND role = 'school_bk'")->execute([$id]);
+            log_audit($pdo, $payload->user_id, null, 'school_deleted', $id);
+            echo json_encode(["success" => true, "message" => "Sekolah berhasil dihapus"]);
+            exit;
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Gagal menghapus sekolah: " . $e->getMessage()]);
+            exit;
         }
     }
 }

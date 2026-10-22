@@ -25,14 +25,21 @@
             <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
             <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
-          <h2 class="text-white font-black text-lg">Masuk sebagai Admin</h2>
-          <p class="text-white/40 text-xs font-semibold uppercase tracking-widest mt-1">Admin Panel Portal</p>
+          <h2 class="text-white font-black text-lg">Masuk Administrator</h2>
+          <p class="text-[#c0ff00] text-[11px] font-bold uppercase tracking-wider mt-1">Khusus Superadmin &amp; Admin Tenant</p>
         </div>
 
         <!-- Error Message -->
-        <div v-if="loginError" class="mb-4 px-4 py-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-bold flex items-center gap-2">
-          <i class="ph-bold ph-warning-circle"></i>
-          {{ loginError }}
+        <div v-if="loginError" class="mb-4 p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-medium space-y-2.5">
+          <div class="flex items-start gap-2.5">
+            <i class="ph-bold ph-warning-circle text-base text-rose-400 shrink-0 mt-0.5"></i>
+            <div class="leading-relaxed">{{ loginError }}</div>
+          </div>
+          <div v-if="loginError.includes('halaman depan') || loginError.includes('Guru') || loginError.includes('Siswa')" class="pt-2 border-t border-rose-500/20 text-center">
+            <a href="#/" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold transition-all">
+              Buka Form Login Portal Siswa/Guru <i class="ph-bold ph-arrow-right"></i>
+            </a>
+          </div>
         </div>
 
         <form @submit.prevent="doLogin" class="space-y-4">
@@ -83,11 +90,11 @@
           <!-- Quick Fill Demo Accounts -->
           <div class="pt-1">
             <span class="block text-[10px] uppercase font-black text-white/40 tracking-wider mb-1.5">Pilih Akun Demo UAT:</span>
-            <div class="grid grid-cols-3 gap-1.5">
+            <div class="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 @click="fillCredentials('superadmin@uat.edupath.local', 'EduPathSuperAdmin01!2026')"
-                class="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c0ff00]/40 text-[10px] font-bold text-white/80 hover:text-[#c0ff00] transition-all text-center truncate"
+                class="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#c0ff00]/40 text-xs font-bold text-white/80 hover:text-[#c0ff00] transition-all text-center truncate cursor-pointer"
                 title="Super Admin: superadmin@uat.edupath.local"
               >
                 👑 Superadmin
@@ -95,18 +102,10 @@
               <button
                 type="button"
                 @click="fillCredentials('admin@uat.edupath.local', 'EduPathAdmin01!2026')"
-                class="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-sky-400/40 text-[10px] font-bold text-white/80 hover:text-sky-300 transition-all text-center truncate"
+                class="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-sky-400/40 text-xs font-bold text-white/80 hover:text-sky-300 transition-all text-center truncate cursor-pointer"
                 title="Admin Tenant: admin@uat.edupath.local"
               >
-                🏢 Admin
-              </button>
-              <button
-                type="button"
-                @click="fillCredentials('tutor@uat.edupath.local', 'EduPathTutor01!2026')"
-                class="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/40 text-[10px] font-bold text-white/80 hover:text-emerald-300 transition-all text-center truncate"
-                title="Guru / Tutor: tutor@uat.edupath.local"
-              >
-                👨‍🏫 Guru
+                🏢 Admin Tenant
               </button>
             </div>
           </div>
@@ -114,7 +113,7 @@
           <button
             type="submit"
             :disabled="loginLoading"
-            class="w-full py-3 rounded-xl font-black text-sm text-black transition-all hover:opacity-90 active:scale-95 mt-2 disabled:opacity-50"
+            class="w-full py-3 rounded-xl font-black text-sm text-black transition-all hover:opacity-90 active:scale-95 mt-2 disabled:opacity-50 cursor-pointer"
             style="background: #c0ff00;"
           >
             <span v-if="!loginLoading">Masuk ke Admin Panel</span>
@@ -123,8 +122,11 @@
 
         </form>
 
-        <div class="mt-5 pt-4 border-t border-white/8 text-center">
-          <p class="text-white/30 text-[11px] font-medium">Akses terbatas untuk administrator & guru pengajar.</p>
+        <div class="mt-5 pt-4 border-t border-white/8 text-center space-y-2">
+          <p class="text-white/40 text-[11px] font-medium">Bukan Administrator? Guru, Guru BK, dan Siswa wajib masuk melalui form login di halaman depan.</p>
+          <a href="#/" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#c0ff00] hover:underline cursor-pointer">
+            <i class="ph-bold ph-arrow-left"></i> Ke Form Login Portal Utama
+          </a>
         </div>
       </div>
     </div>
@@ -352,6 +354,138 @@
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
                       <button @click="openEditBranchModal(b)" class="px-2.5 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Cabang"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
                       <button @click="deleteBranch(b.id)" class="px-2.5 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus / Nonaktifkan"><i class="ph-bold ph-trash"></i> Hapus</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: MASTER SEKOLAH MITRA (Superadmin) ===== -->
+        <div v-if="activeTab === 'schools'" class="space-y-4 animate-fade-in">
+          <div class="flex flex-wrap justify-between items-center gap-3">
+            <div>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="ph-bold ph-graduation-cap text-[#c0ff00]"></i> Master Sekolah Mitra &amp; Guru BK
+              </h2>
+              <p class="text-[10px] text-white/40">Kelola data sekolah rekanan, akun koordinator BK, link referral pendaftaran siswa, dan pantau sebaran siswa &amp; paket</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button @click="fetchSchools" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-white/10 cursor-pointer">
+                <i class="ph-bold ph-arrows-clockwise" :class="isSchoolsLoading ? 'animate-spin' : ''"></i> Refresh
+              </button>
+              <button @click="openCreateSchoolModal" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5 shadow-md shadow-[#c0ff00]/20 cursor-pointer">
+                <i class="ph-bold ph-plus"></i> Tambah Sekolah Mitra
+              </button>
+            </div>
+          </div>
+
+          <!-- Sekolah KPI Strip -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Total Sekolah Mitra</div>
+              <div class="text-xl font-black text-white font-mono">{{ adminSchoolsList.length }}</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Sekolah Aktif</div>
+              <div class="text-xl font-black text-emerald-400 font-mono">{{ adminSchoolsList.filter(s => s.is_active != 0).length }}</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Total Siswa Terdata</div>
+              <div class="text-xl font-black text-indigo-400 font-mono">{{ adminSchoolsList.reduce((acc, s) => acc + (Number(s.student_count) || 0), 0) }}</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Siswa Berlangganan</div>
+              <div class="text-xl font-black text-[#c0ff00] font-mono">{{ adminSchoolsList.reduce((acc, s) => acc + (Number(s.paid_student_count) || 0), 0) }}</div>
+            </div>
+          </div>
+
+          <!-- Search & Filter Bar Sekolah -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-2.5 border border-white/10 flex flex-wrap items-center gap-2">
+            <div class="relative flex-grow min-w-[200px]">
+              <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
+              <input v-model="schoolSearch" type="text" placeholder="Cari nama sekolah, NPSN, kota, atau koordinator BK..." class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors" />
+            </div>
+            <select v-model="schoolStatusFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+              <option value="all" class="bg-[#0d1427]">Semua Status</option>
+              <option value="1" class="bg-[#0d1427]">Aktif Saja</option>
+              <option value="0" class="bg-[#0d1427]">Nonaktif Saja</option>
+            </select>
+            <select v-model="schoolAlphaSort" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+              <option value="default" class="bg-[#0d1427]">Urutan Default</option>
+              <option value="asc" class="bg-[#0d1427]">Nama Sekolah (A - Z)</option>
+              <option value="desc" class="bg-[#0d1427]">Nama Sekolah (Z - A)</option>
+              <option value="students" class="bg-[#0d1427]">Siswa Terbanyak</option>
+            </select>
+          </div>
+
+          <!-- Table Sekolah Mitra -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="text-center px-3 py-3 font-black uppercase tracking-wider w-10">No</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Nama Sekolah &amp; NPSN</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Wilayah</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Koordinator Guru BK</th>
+                    <th class="text-center px-3 py-3 font-black uppercase tracking-wider">Siswa Terdata</th>
+                    <th class="text-center px-3 py-3 font-black uppercase tracking-wider">Paket Aktif</th>
+                    <th class="text-left px-3 py-3 font-black uppercase tracking-wider">Status</th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr v-if="filteredAdminSchools.length === 0">
+                    <td colspan="8" class="py-10 text-center text-white/40 font-medium">
+                      <div class="flex flex-col items-center justify-center gap-2">
+                        <i class="ph-bold ph-graduation-cap text-3xl text-white/20"></i>
+                        <span>Belum ada sekolah mitra terdaftar atau tidak sesuai kata kunci</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-for="(s, idx) in filteredAdminSchools" :key="s.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-3 py-3 text-center text-white/50 font-bold text-xs">{{ idx + 1 }}</td>
+                    <td class="px-4 py-3">
+                      <div class="font-bold text-white text-sm flex items-center gap-1.5">
+                        <i class="ph-bold ph-graduation-cap text-[#c0ff00]"></i>
+                        <span>{{ s.name }}</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-[10px] text-white/40 font-mono mt-0.5">
+                        <span v-if="s.npsn" class="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/60">NPSN: {{ s.npsn }}</span>
+                        <span>ID: {{ s.id.substring(0, 8) }}...</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <div class="font-medium text-xs text-white/90">{{ s.city || '-' }}</div>
+                      <div class="text-[10px] text-white/40">{{ s.province || '' }}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <div class="font-bold text-xs text-indigo-300">{{ s.bk_coordinator_name || 'Koordinator BK' }}</div>
+                      <div class="text-[10px] text-white/50 font-mono">{{ s.bk_coordinator_email || '-' }}</div>
+                      <div v-if="s.bk_coordinator_phone" class="text-[10px] text-emerald-400 font-mono">{{ s.bk_coordinator_phone }}</div>
+                    </td>
+                    <td class="px-3 py-3 text-center font-bold font-mono text-white text-xs">
+                      <span class="px-2.5 py-1 rounded-lg bg-indigo-500/15 border border-indigo-500/30 text-indigo-300">
+                        {{ s.student_count || 0 }} Siswa
+                      </span>
+                    </td>
+                    <td class="px-3 py-3 text-center font-bold font-mono text-white text-xs">
+                      <span class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
+                        {{ s.paid_student_count || 0 }} Paket
+                      </span>
+                    </td>
+                    <td class="px-3 py-3">
+                      <button @click="toggleSchoolStatus(s)" :title="'Klik untuk ubah status sekolah'" class="px-2.5 py-1 rounded-md font-bold text-[10px] inline-flex items-center gap-1 cursor-pointer transition-all hover:opacity-80" :class="s.is_active != 0 ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/15 border border-rose-500/30 text-rose-400'">
+                        <span class="w-1.5 h-1.5 rounded-full" :class="s.is_active != 0 ? 'bg-emerald-400' : 'bg-rose-400'"></span>
+                        {{ s.is_active != 0 ? 'Aktif' : 'Nonaktif' }}
+                      </button>
+                    </td>
+                    <td class="px-4 py-3 text-right space-x-1.5 whitespace-nowrap">
+                      <button @click="openSchoolReferral(s)" class="px-2.5 py-1.5 bg-[#c0ff00]/15 border border-[#c0ff00]/30 text-[#c0ff00] hover:bg-[#c0ff00]/25 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Link Pendaftaran Khusus Sekolah"><i class="ph-bold ph-link-simple"></i> Link Siswa</button>
+                      <button @click="openEditSchoolModal(s)" class="px-2.5 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Edit Data Sekolah &amp; BK"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deleteSchool(s.id)" class="px-2.5 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Hapus Sekolah"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -2339,6 +2473,159 @@
       </div>
     </div>
 
+    <!-- Modal Master Sekolah Mitra (Tambah / Edit) -->
+    <div v-if="showSchoolModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <i class="ph-bold ph-graduation-cap text-[#c0ff00]"></i>
+            {{ isEditingSchool ? 'Edit Data Sekolah Mitra' : 'Tambah Sekolah Mitra Baru' }}
+          </h3>
+          <button @click="showSchoolModal = false" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+        <form @submit.prevent="saveSchool" class="p-4 space-y-3.5">
+          <!-- Row 1: Nama & NPSN -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2">
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Sekolah <span class="text-rose-400">*</span></label>
+              <input v-model="schoolForm.name" required type="text" placeholder="Contoh: SMAN 1 Jakarta" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">NPSN</label>
+              <input v-model="schoolForm.npsn" type="text" placeholder="8 digit NPSN" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-mono" />
+            </div>
+          </div>
+
+          <!-- Row 2: Kota & Provinsi -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kota / Kabupaten</label>
+              <input v-model="schoolForm.city" type="text" placeholder="Contoh: Jakarta Pusat" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-medium" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Provinsi</label>
+              <input v-model="schoolForm.province" type="text" placeholder="Contoh: DKI Jakarta" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-medium" />
+            </div>
+          </div>
+
+          <!-- Alamat & Telepon -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2">
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Alamat Lengkap</label>
+              <input v-model="schoolForm.address" type="text" placeholder="Jl. Budi Utomo No. 7" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-medium" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Telp Sekolah</label>
+              <input v-model="schoolForm.phone" type="text" placeholder="021-xxxxxxx" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-mono" />
+            </div>
+          </div>
+
+          <!-- Koordinator Guru BK -->
+          <div class="pt-2.5 border-t border-white/10 space-y-3">
+            <span class="block text-[10px] font-black text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="ph-bold ph-chalkboard-teacher"></i> Koordinator &amp; PIC Guru BK
+            </span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[9px] font-bold text-white/50 mb-0.5 uppercase tracking-wider">Nama Guru BK</label>
+                <input v-model="schoolForm.bk_coordinator_name" type="text" placeholder="Dra. Hj. Siti Aminah, M.Pd" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-medium" />
+              </div>
+              <div>
+                <label class="block text-[9px] font-bold text-white/50 mb-0.5 uppercase tracking-wider">WhatsApp Guru BK</label>
+                <input v-model="schoolForm.bk_coordinator_phone" type="text" placeholder="081234567890" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-mono" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-[9px] font-bold text-white/50 mb-0.5 uppercase tracking-wider">Email Koordinator BK</label>
+              <input v-model="schoolForm.bk_coordinator_email" type="email" placeholder="bk.sman1jkt@gmail.com" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-medium" />
+            </div>
+          </div>
+
+          <!-- Akun Login Portal Guru BK -->
+          <div class="pt-2.5 border-t border-white/10 space-y-2.5">
+            <span class="block text-[10px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="ph-bold ph-key"></i> Akun Login Portal Guru BK
+            </span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[9px] font-bold text-white/50 mb-0.5 uppercase tracking-wider">Username Login</label>
+                <input v-model="schoolForm.bk_username" type="text" placeholder="bk_sman1jkt" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-mono" />
+              </div>
+              <div>
+                <label class="block text-[9px] font-bold text-white/50 mb-0.5 uppercase tracking-wider">{{ isEditingSchool ? 'Password Baru (Opsional)' : 'Password Awal' }}</label>
+                <input v-model="schoolForm.bk_password" type="password" placeholder="••••••••" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-mono" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Operasional -->
+          <div class="pt-2 border-t border-white/10">
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Kemitraan</label>
+            <select v-model="schoolForm.is_active" class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 font-medium">
+              <option :value="1" class="bg-[#0d1427] text-white">Aktif (Siswa &amp; BK Dapat Mengakses Sistem)</option>
+              <option :value="0" class="bg-[#0d1427] text-white">Nonaktif / Penangguhan</option>
+            </select>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
+            <button type="button" @click="showSchoolModal = false" class="px-3.5 py-1.5 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors cursor-pointer">Batal</button>
+            <button type="submit" :disabled="isSavingSchool" class="px-5 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer">
+              <i v-if="isSavingSchool" class="ph-bold ph-spinner animate-spin"></i>
+              <span>{{ isSavingSchool ? 'Menyimpan...' : (isEditingSchool ? 'Perbarui Sekolah' : 'Simpan Sekolah Mitra') }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Link Referral Pendaftaran Siswa Khusus Sekolah -->
+    <div v-if="showSchoolReferralModal && selectedSchoolForReferral" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-md shadow-2xl animate-fade-in text-white p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-[#c0ff00]/20 text-[#c0ff00] flex items-center justify-center text-lg">
+              <i class="ph-bold ph-link-simple"></i>
+            </div>
+            <div>
+              <h3 class="font-black text-sm text-white">Tautan Registrasi Siswa Mitra</h3>
+              <p class="text-[10px] text-white/50">{{ selectedSchoolForReferral.name }}</p>
+            </div>
+          </div>
+          <button @click="showSchoolReferralModal = false" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+
+        <p class="text-xs text-white/70 leading-relaxed">
+          Bagikan tautan pendaftaran khusus ini kepada siswa atau pihak sekolah. Siswa yang mendaftar melalui link ini akan otomatis terhubung ke database <strong class="text-[#c0ff00]">{{ selectedSchoolForReferral.name }}</strong> sehingga hasil tryout dan pilihan prodi mereka terpantau langsung di Dashboard Guru BK.
+        </p>
+
+        <div class="space-y-1.5">
+          <label class="block text-[10px] font-bold text-white/40 uppercase tracking-wider">Link Registrasi Khusus:</label>
+          <div class="flex items-center gap-1.5 bg-black/50 border border-white/10 rounded-xl p-2 font-mono text-xs text-[#c0ff00] break-all">
+            <span class="flex-grow select-all">{{ getSchoolReferralLink(selectedSchoolForReferral) }}</span>
+            <button @click="copySchoolReferral(getSchoolReferralLink(selectedSchoolForReferral))" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs rounded-lg transition-all shrink-0 cursor-pointer flex items-center gap-1">
+              <i class="ph-bold" :class="referralCopied ? 'ph-check' : 'ph-copy'"></i>
+              <span>{{ referralCopied ? 'Tersalin!' : 'Salin' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[11px] space-y-1">
+          <div class="font-bold flex items-center gap-1.5">
+            <i class="ph-bold ph-info"></i> Login Guru BK Sekolah Ini:
+          </div>
+          <div class="text-[10px] text-white/70">
+            Guru BK dapat login langsung dari form login halaman depan (portal utama) menggunakan username atau email koordinator yang telah didaftarkan.
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end">
+          <button @click="showSchoolReferralModal = false" class="px-4 py-2 bg-white/10 hover:bg-white/15 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Question Modal -->
     <div v-if="showQuestionModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
@@ -2862,6 +3149,7 @@ const navItems = computed(() => {
     { id: 'overview',     label: 'Dashboard',             icon: 'ph-squares-four',  roles: ['superadmin', 'admin', 'teacher'] },
     ...(isT ? [{ id: 'teacher_hub', label: 'Siswa & Jadwal Saya', icon: 'ph-chalkboard-teacher', roles: ['teacher'] }] : []),
     { id: 'branches',    label: 'Cabang',                icon: 'ph-buildings',     roles: ['superadmin'] },
+    { id: 'schools',     label: 'Sekolah Mitra',         icon: 'ph-graduation-cap', roles: ['superadmin'] },
     { id: 'questions',   label: isT ? 'Bank Soal Saya' : 'Soal', icon: 'ph-books', roles: ['superadmin', 'admin', 'teacher'] },
     { id: 'materials',   label: isT ? 'Materi Saya' : 'Materi', icon: 'ph-file-text', roles: ['superadmin', 'admin', 'teacher'] },
     { id: 'students',    label: 'Siswa',                 icon: 'ph-users-three',   roles: ['superadmin', 'admin'] },
@@ -2981,6 +3269,10 @@ const loadRoleData = () => {
     loadPlansAndStaff();
     fetchQuestions();
     fetchMaterials();
+    if (isSuperadmin.value) {
+      fetchTenants();
+      fetchSchools();
+    }
   }
 };
 
@@ -4288,6 +4580,179 @@ const fetchTenants = async () => {
   }
 };
 
+// ── School Master State & Methods (Superadmin) ──
+const adminSchoolsList = ref([]);
+const isSchoolsLoading = ref(false);
+const schoolSearch = ref('');
+const schoolStatusFilter = ref('all');
+const schoolAlphaSort = ref('default');
+const showSchoolModal = ref(false);
+const isEditingSchool = ref(false);
+const isSavingSchool = ref(false);
+const showSchoolReferralModal = ref(false);
+const selectedSchoolForReferral = ref(null);
+const referralCopied = ref(false);
+
+const schoolForm = reactive({
+  id: null,
+  name: '',
+  npsn: '',
+  city: '',
+  province: '',
+  address: '',
+  phone: '',
+  bk_coordinator_name: '',
+  bk_coordinator_email: '',
+  bk_coordinator_phone: '',
+  bk_username: '',
+  bk_password: '',
+  is_active: 1
+});
+
+const filteredAdminSchools = computed(() => {
+  let list = adminSchoolsList.value || [];
+  const q = (schoolSearch.value || '').trim().toLowerCase();
+  list = list.filter(s => {
+    const matchSearch = !q ||
+      (s.name || '').toLowerCase().includes(q) ||
+      (s.npsn || '').toLowerCase().includes(q) ||
+      (s.city || '').toLowerCase().includes(q) ||
+      (s.province || '').toLowerCase().includes(q) ||
+      (s.bk_coordinator_name || '').toLowerCase().includes(q);
+    const matchStatus = schoolStatusFilter.value === 'all' || String(s.is_active) === schoolStatusFilter.value;
+    return matchSearch && matchStatus;
+  });
+
+  if (schoolAlphaSort.value === 'asc') {
+    list = [...list].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  } else if (schoolAlphaSort.value === 'desc') {
+    list = [...list].sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+  } else if (schoolAlphaSort.value === 'students') {
+    list = [...list].sort((a, b) => (Number(b.student_count) || 0) - (Number(a.student_count) || 0));
+  }
+  return list;
+});
+
+const fetchSchools = async () => {
+  isSchoolsLoading.value = true;
+  try {
+    const res = await api.getAdminSchools();
+    adminSchoolsList.value = Array.isArray(res) ? res : [];
+  } catch (err) {
+    console.error('Error fetching admin schools:', err);
+  } finally {
+    isSchoolsLoading.value = false;
+  }
+};
+
+const openCreateSchoolModal = () => {
+  isEditingSchool.value = false;
+  isSavingSchool.value = false;
+  Object.assign(schoolForm, {
+    id: null,
+    name: '',
+    npsn: '',
+    city: '',
+    province: '',
+    address: '',
+    phone: '',
+    bk_coordinator_name: '',
+    bk_coordinator_email: '',
+    bk_coordinator_phone: '',
+    bk_username: '',
+    bk_password: '',
+    is_active: 1
+  });
+  showSchoolModal.value = true;
+};
+
+const openEditSchoolModal = (s) => {
+  isEditingSchool.value = true;
+  isSavingSchool.value = false;
+  Object.assign(schoolForm, {
+    id: s.id,
+    name: s.name,
+    npsn: s.npsn || '',
+    city: s.city || '',
+    province: s.province || '',
+    address: s.address || '',
+    phone: s.phone || '',
+    bk_coordinator_name: s.bk_coordinator_name || '',
+    bk_coordinator_email: s.bk_coordinator_email || '',
+    bk_coordinator_phone: s.bk_coordinator_phone || '',
+    bk_username: '',
+    bk_password: '',
+    is_active: s.is_active != 0 ? 1 : 0
+  });
+  showSchoolModal.value = true;
+};
+
+const saveSchool = async () => {
+  if (!schoolForm.name || !schoolForm.name.trim()) {
+    alert('Nama sekolah mitra wajib diisi');
+    return;
+  }
+  isSavingSchool.value = true;
+  try {
+    if (isEditingSchool.value) {
+      await api.updateAdminSchool(schoolForm.id, schoolForm);
+      alert('Data sekolah mitra berhasil diperbarui');
+    } else {
+      await api.createAdminSchool(schoolForm);
+      alert('Sekolah mitra & koordinator BK berhasil ditambahkan');
+    }
+    showSchoolModal.value = false;
+    await fetchSchools();
+  } catch (err) {
+    alert(err?.message || 'Gagal menyimpan data sekolah');
+  } finally {
+    isSavingSchool.value = false;
+  }
+};
+
+const toggleSchoolStatus = async (s) => {
+  const newStatus = s.is_active != 0 ? 0 : 1;
+  try {
+    await api.updateAdminSchool(s.id, { is_active: newStatus });
+    s.is_active = newStatus;
+  } catch (err) {
+    alert('Gagal mengubah status sekolah');
+  }
+};
+
+const deleteSchool = async (id) => {
+  if (!confirm('Hapus atau nonaktifkan data sekolah mitra ini?')) return;
+  try {
+    const res = await api.deleteAdminSchool(id);
+    alert(res?.message || 'Sekolah berhasil diproses');
+    await fetchSchools();
+  } catch (err) {
+    alert(err?.message || 'Gagal memproses sekolah mitra');
+  }
+};
+
+const openSchoolReferral = (s) => {
+  selectedSchoolForReferral.value = s;
+  referralCopied.value = false;
+  showSchoolReferralModal.value = true;
+};
+
+const getSchoolReferralLink = (s) => {
+  if (!s) return '';
+  const origin = window.location.origin + window.location.pathname;
+  return `${origin}?school=${encodeURIComponent(s.name)}&school_id=${encodeURIComponent(s.id)}`;
+};
+
+const copySchoolReferral = async (link) => {
+  try {
+    await navigator.clipboard.writeText(link);
+    referralCopied.value = true;
+    setTimeout(() => { referralCopied.value = false; }, 3000);
+  } catch (err) {
+    prompt('Salin link registrasi siswa sekolah ini:', link);
+  }
+};
+
 // ── Reports Exporters ──
 const downloadCSV = (filename, rows) => {
   const processRow = (row) => {
@@ -4463,7 +4928,7 @@ watch(activeTab, (newTab) => {
     activeTab.value = 'affiliate_dashboard';
     return;
   }
-  if (isTeacher.value && ['packages', 'plans', 'transactions', 'affiliates', 'staff', 'students', 'settings', 'branches'].includes(newTab)) {
+  if (isTeacher.value && ['packages', 'plans', 'transactions', 'affiliates', 'staff', 'students', 'settings', 'branches', 'schools'].includes(newTab)) {
     activeTab.value = 'questions';
     return;
   }
@@ -4472,6 +4937,8 @@ watch(activeTab, (newTab) => {
     fetchDashboard();
   } else if (newTab === 'branches' && isSuperadmin.value) {
     fetchTenants();
+  } else if (newTab === 'schools' && isSuperadmin.value) {
+    fetchSchools();
   } else if (newTab === 'students' && !isTeacher.value && !isAffiliate.value) {
     fetchStudents();
     if (tenantsList.value.length === 0) fetchTenants();

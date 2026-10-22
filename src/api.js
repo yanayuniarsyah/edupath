@@ -481,6 +481,13 @@ export const api = {
   updateAdminTenant(id, payload) { return apiFetch('/admin.php?action=tenants', { method: 'PUT', body: JSON.stringify({ id, ...payload }) }); },
   deleteAdminTenant(id) { return apiFetch(`/admin.php?action=tenants&id=${id}`, { method: 'DELETE' }); },
 
+  // ── School & BK Management (Superadmin & Public) ──
+  getAdminSchools(search = '') { return apiFetch(`/admin.php?action=schools&search=${encodeURIComponent(search)}`); },
+  createAdminSchool(data)      { return apiFetch('/admin.php?action=schools', { method: 'POST', body: JSON.stringify(data) }); },
+  updateAdminSchool(id, data)  { return apiFetch('/admin.php?action=schools', { method: 'PUT', body: JSON.stringify({ id, ...data }) }); },
+  deleteAdminSchool(id)        { return apiFetch(`/admin.php?action=schools&id=${id}`, { method: 'DELETE' }); },
+  getPublicSchools()           { return apiFetch('/school.php?action=public_list'); },
+
   // ── Student Potential Path (SPP) ──
   sppCreateAttempt() {
     return apiFetch('/spp.php?action=create_attempt', { method: 'POST' });

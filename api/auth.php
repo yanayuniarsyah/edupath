@@ -78,12 +78,28 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$user_id, $email, $hashed_password]);
         }
 
+        $school = trim($input['school'] ?? ($input['school_name'] ?? ''));
+        $school_id = trim($input['school_id'] ?? '');
+        if (!empty($school) && empty($school_id)) {
+            try {
+                $stmt_sch = $pdo->prepare("SELECT id FROM schools WHERE LOWER(name) = LOWER(?) LIMIT 1");
+                $stmt_sch->execute([$school]);
+                $found_id = $stmt_sch->fetchColumn();
+                if ($found_id) $school_id = $found_id;
+            } catch (\Throwable $e) {}
+        }
+
         try {
-            $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $tenant_id, $referred_by]);
+            $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, school, school_id, tenant_id, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $school ?: null, $school_id ?: null, $tenant_id, $referred_by]);
         } catch (PDOException $e) {
-            $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $tenant_id]);
+            try {
+                $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, school, tenant_id, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $school ?: null, $tenant_id, $referred_by]);
+            } catch (PDOException $e2) {
+                $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $tenant_id]);
+            }
         }
 
         $ur_id = bin2hex(random_bytes(16));
@@ -534,23 +550,55 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+        $school = trim($input['school'] ?? '');
+        $school_id = trim($input['school_id'] ?? '');
+        if (!empty($school) && empty($school_id)) {
+            try {
+                $stmt_sch = $pdo->prepare("SELECT id FROM schools WHERE LOWER(name) = LOWER(?) LIMIT 1");
+                $stmt_sch->execute([$school]);
+                $found_id = $stmt_sch->fetchColumn();
+                if ($found_id) $school_id = $found_id;
+            } catch (\Throwable $e) {}
+        }
+
         if ($isStaffRole) {
             $stmt = $pdo->prepare("UPDATE admins SET name = ?, username = ?, password = ? WHERE id = ?");
             $stmt->execute([$name, $email, $hashed_password, $payload->id]);
         } else {
-            $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ? WHERE id = ?");
-            $stmt->execute([$name, $email, $hashed_password, $payload->id]);
+            try {
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ?, school = ?, school_id = ? WHERE id = ?");
+                $stmt->execute([$name, $email, $hashed_password, $school ?: null, $school_id ?: null, $payload->id]);
+            } catch (\Throwable $e) {
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ? WHERE id = ?");
+                $stmt->execute([$name, $email, $hashed_password, $payload->id]);
+            }
         }
 
         $stmt = $pdo->prepare("UPDATE users SET identity_key = ?, password = ? WHERE id = ?");
         $stmt->execute([$email, $hashed_password, $payload->user_id]);
     } else {
+        $school = trim($input['school'] ?? '');
+        $school_id = trim($input['school_id'] ?? '');
+        if (!empty($school) && empty($school_id)) {
+            try {
+                $stmt_sch = $pdo->prepare("SELECT id FROM schools WHERE LOWER(name) = LOWER(?) LIMIT 1");
+                $stmt_sch->execute([$school]);
+                $found_id = $stmt_sch->fetchColumn();
+                if ($found_id) $school_id = $found_id;
+            } catch (\Throwable $e) {}
+        }
+
         if ($isStaffRole) {
             $stmt = $pdo->prepare("UPDATE admins SET name = ?, username = ? WHERE id = ?");
             $stmt->execute([$name, $email, $payload->id]);
         } else {
-            $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ? WHERE id = ?");
-            $stmt->execute([$name, $email, $payload->id]);
+            try {
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, school = ?, school_id = ? WHERE id = ?");
+                $stmt->execute([$name, $email, $school ?: null, $school_id ?: null, $payload->id]);
+            } catch (\Throwable $e) {
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ? WHERE id = ?");
+                $stmt->execute([$name, $email, $payload->id]);
+            }
         }
 
         $stmt = $pdo->prepare("UPDATE users SET identity_key = ? WHERE id = ?");
@@ -562,6 +610,28 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $payload = authenticate();
+
+    // School BK Coordinator
+    if ($payload->role === 'school_bk') {
+        $schId = $payload->school_id ?? $payload->reference_id ?? $payload->id;
+        $stmt = $pdo->prepare("SELECT id, name, npsn, city, province, bk_coordinator_name, bk_coordinator_email FROM schools WHERE id = ?");
+        $stmt->execute([$schId]);
+        $sch = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = [
+            'id' => $payload->id,
+            'name' => $sch['bk_coordinator_name'] ?? $sch['name'] ?? 'Koordinator BK',
+            'email' => $sch['bk_coordinator_email'] ?? '',
+            'role' => 'school_bk',
+            'school_id' => $schId,
+            'school_name' => $sch['name'] ?? '',
+            'school' => $sch,
+            'is_premium' => true,
+            'tenant_id' => $payload->tenant_id ?? 'default_tenant'
+        ];
+        header('Cache-Control: private, max-age=30');
+        echo json_encode(["user" => $user]);
+        exit;
+    }
 
     // Staff (Admin, Superadmin, Teacher, Guru, Tutor)
     if (in_array($payload->role, ['admin', 'superadmin', 'teacher', 'guru', 'tutor'])) {

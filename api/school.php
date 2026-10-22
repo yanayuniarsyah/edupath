@@ -67,6 +67,20 @@ function generate_school_uuid() {
 }
 
 // -------------------------------------------------------------
+// PUBLIC LIST (Untuk dropdown asal sekolah saat registrasi/profil siswa)
+// -------------------------------------------------------------
+if ($action === 'public_list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    try {
+        $stmt = $pdo->query("SELECT id, name, city, province FROM schools ORDER BY name ASC");
+        $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(["success" => true, "schools" => $schools]);
+    } catch (\Throwable $e) {
+        echo json_encode(["success" => true, "schools" => []]);
+    }
+    exit;
+}
+
+// -------------------------------------------------------------
 // 1. REGISTER SEKOLAH / GURU BK
 // -------------------------------------------------------------
 if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -333,8 +347,8 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $schoolMatch = "%" . $current_school_name . "%";
 
     // 1. Total Siswa Terdata
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM students WHERE school LIKE ? OR school = ?");
-    $stmt->execute([$schoolMatch, $current_school_name]);
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM students WHERE (school_id = ? OR school = ? OR school LIKE ?)");
+    $stmt->execute([$current_school_id, $current_school_name, $schoolMatch]);
     $total_students = (int)$stmt->fetchColumn();
 
     // 2. Paket EduPath Breakdown & Subscriptions
@@ -356,10 +370,10 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         FROM students st
         LEFT JOIN subscriptions sub ON st.id = sub.student_id AND sub.status = 'active'
         LEFT JOIN plans p ON sub.plan_id = p.id
-        WHERE st.school LIKE ? OR st.school = ?
+        WHERE (st.school_id = ? OR st.school = ? OR st.school LIKE ?)
         GROUP BY p.code, p.name, sub.status
     ");
-    $stmt_pkg->execute([$schoolMatch, $current_school_name]);
+    $stmt_pkg->execute([$current_school_id, $current_school_name, $schoolMatch]);
     $pkg_rows = $stmt_pkg->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($pkg_rows as $row) {
@@ -392,9 +406,9 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             AVG(qa.score) as avg_tryout_score
         FROM quiz_attempts qa
         JOIN students st ON qa.student_id = st.id
-        WHERE (st.school LIKE ? OR st.school = ?) AND qa.status = 'completed' AND qa.quiz_type = 'tryout'
+        WHERE (st.school_id = ? OR st.school = ? OR st.school LIKE ?) AND qa.status = 'completed' AND qa.quiz_type = 'tryout'
     ");
-    $stmt_to->execute([$schoolMatch, $current_school_name]);
+    $stmt_to->execute([$current_school_id, $current_school_name, $schoolMatch]);
     $tryout_stats = $stmt_to->fetch(PDO::FETCH_ASSOC) ?: [
         'tryout_participants' => 0,
         'total_tryouts_taken' => 0,
@@ -405,12 +419,12 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt_univ = $pdo->prepare("
         SELECT target_ptn, COUNT(*) as total
         FROM students
-        WHERE (school LIKE ? OR school = ?) AND target_ptn IS NOT NULL AND target_ptn != ''
+        WHERE (school_id = ? OR school = ? OR school LIKE ?) AND target_ptn IS NOT NULL AND target_ptn != ''
         GROUP BY target_ptn
         ORDER BY total DESC
         LIMIT 5
     ");
-    $stmt_univ->execute([$schoolMatch, $current_school_name]);
+    $stmt_univ->execute([$current_school_id, $current_school_name, $schoolMatch]);
     $top_universities = $stmt_univ->fetchAll(PDO::FETCH_ASSOC);
 
     // 6. Growth Areas (Tantangan Belajar Bersama)
@@ -471,8 +485,8 @@ if ($action === 'students' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $limit = max(1, min(100, (int)($_GET['limit'] ?? 25)));
     $offset = ($page - 1) * $limit;
 
-    $where = ["(st.school LIKE ? OR st.school = ?)"];
-    $params = [$schoolMatch, $current_school_name];
+    $where = ["(st.school_id = ? OR st.school = ? OR st.school LIKE ?)"];
+    $params = [$current_school_id, $current_school_name, $schoolMatch];
 
     if (!empty($search)) {
         $where[] = "(st.name LIKE ? OR st.email LIKE ? OR st.target_ptn LIKE ?)";

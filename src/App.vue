@@ -1977,6 +1977,14 @@
                     <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Password</span>
                     <div class="text-sm font-mono text-white/70">•••••••• <span class="text-[10px] text-emerald-400 ml-1.5 font-bold font-sans">(Tersimpan aman)</span></div>
                   </div>
+                  <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 md:col-span-2">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Asal Sekolah</span>
+                    <div class="text-sm font-bold text-white flex items-center gap-2">
+                      <i class="ph-bold ph-graduation-cap text-[#c0ff00] text-base"></i>
+                      <span>{{ currentUser?.school || profileEditForm.school || 'Belum ditautkan' }}</span>
+                      <span v-if="currentUser?.school_id || profileEditForm.school_id" class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">Mitra Resmi</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -2056,6 +2064,23 @@
                       placeholder="contoh@email.com"
                       class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-mono"
                     />
+                  </div>
+
+                  <!-- Asal Sekolah -->
+                  <div class="md:col-span-2">
+                    <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Asal Sekolah</label>
+                    <input
+                      v-model="profileEditForm.school"
+                      list="profileSchoolsDatalist"
+                      type="text"
+                      placeholder="Masukkan nama SMA / SMK / SMP Anda"
+                      class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-medium"
+                    />
+                    <datalist id="profileSchoolsDatalist">
+                      <option v-for="sch in publicSchoolsList" :key="sch.id" :value="sch.name">
+                        {{ sch.city ? sch.city : '' }}
+                      </option>
+                    </datalist>
                   </div>
 
                   <!-- Password Baru -->
@@ -3781,6 +3806,31 @@
               <input v-model="authForm.name" type="text" required placeholder="Cth: Budi Santoso" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
             </div>
 
+            <div v-if="!isLoginMode" class="space-y-1">
+              <div class="flex justify-between items-center">
+                <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Asal Sekolah</label>
+                <span v-if="matchedPartnerSchool" class="text-[9px] font-bold text-emerald-400 flex items-center gap-1">
+                  <i class="ph-bold ph-check-circle"></i> Mitra Terverifikasi
+                </span>
+              </div>
+              <div class="relative">
+                <input 
+                  v-model="authForm.school" 
+                  @input="onSchoolSelected"
+                  list="publicSchoolsDatalist" 
+                  type="text" 
+                  placeholder="Ketik nama SMA/SMK/SMP asal..." 
+                  class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]"
+                >
+                <datalist id="publicSchoolsDatalist">
+                  <option v-for="sch in publicSchoolsList" :key="sch.id" :value="sch.name">
+                    {{ sch.city ? sch.city : '' }} {{ sch.npsn ? '(NPSN: ' + sch.npsn + ')' : '' }}
+                  </option>
+                </datalist>
+              </div>
+              <p class="text-[9px] text-slate-500">Guru BK sekolah asal Anda dapat memantau hasil tryout &amp; bimbingan PTN.</p>
+            </div>
+
             <div class="space-y-1">
               <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Email atau Username</label>
               <input v-model="authForm.email" type="text" required placeholder="nama@email.com / username" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
@@ -4790,7 +4840,18 @@ export default {
       initScrollReveal();
     });
     const showPassword = ref(false);
-    const authForm = ref({ name: '', email: 'demo@edupath.id', password: 'demo123' });
+    const authForm = ref({ name: '', email: 'demo@edupath.id', password: 'demo123', school: '', school_id: '' });
+    const publicSchoolsList = ref([]);
+    const matchedPartnerSchool = computed(() => {
+      const sName = (authForm.value.school || '').trim().toLowerCase();
+      if (!sName) return null;
+      return publicSchoolsList.value.find(s => (s.name || '').toLowerCase() === sName);
+    });
+    const onSchoolSelected = () => {
+      if (matchedPartnerSchool.value) {
+        authForm.value.school_id = matchedPartnerSchool.value.id;
+      }
+    };
     const authLoading = ref(false);
     const authError = ref('');
     const currentUser = ref(null);
@@ -4975,15 +5036,30 @@ export default {
       }
     };
 
-    onMounted(() => {
+    onMounted(async () => {
       // Capture affiliate referral code
       const params = new URLSearchParams(window.location.search);
       const refCode = params.get('ref');
       if (refCode) {
         localStorage.setItem('affiliate_ref', refCode);
       }
+      // Capture school referral
+      const refSchool = params.get('school');
+      const refSchoolId = params.get('school_id');
+      if (refSchool) {
+        localStorage.setItem('student_ref_school', refSchool);
+        authForm.value.school = refSchool;
+      }
+      if (refSchoolId) {
+        localStorage.setItem('student_ref_school_id', refSchoolId);
+        authForm.value.school_id = refSchoolId;
+      }
       fetchPlans();
       checkAuth();
+      try {
+        const schools = await api.getPublicSchools().catch(() => []);
+        publicSchoolsList.value = Array.isArray(schools) ? schools : [];
+      } catch (e) {}
     });
 
     const doAuth = async () => {
@@ -4994,7 +5070,12 @@ export default {
         if (isLoginMode.value) {
           res = await api.login(authForm.value.email, authForm.value.password);
         } else {
-          const payload = { ...authForm.value, referral_code: localStorage.getItem('affiliate_ref') || '' };
+          const payload = {
+            ...authForm.value,
+            school: authForm.value.school || localStorage.getItem('student_ref_school') || '',
+            school_id: authForm.value.school_id || localStorage.getItem('student_ref_school_id') || '',
+            referral_code: localStorage.getItem('affiliate_ref') || ''
+          };
           res = await api.register(payload);
         }
         localStorage.setItem('auth_token', res.token);
@@ -5635,6 +5716,8 @@ export default {
       if (currentUser.value) {
         if (!profileEditForm.value.name) profileEditForm.value.name = currentUser.value.name || '';
         if (!profileEditForm.value.email) profileEditForm.value.email = currentUser.value.email || '';
+        profileEditForm.value.school = currentUser.value.school || '';
+        profileEditForm.value.school_id = currentUser.value.school_id || '';
       }
       isEditingProfile.value = true;
     };
@@ -5694,6 +5777,8 @@ export default {
       name: '',
       email: '',
       password: '',
+      school: '',
+      school_id: '',
       bank_name: '',
       bank_account: '',
       bank_owner: ''
@@ -5705,7 +5790,7 @@ export default {
         const token = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
         const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-        // 1. Update Profile (Name, Email, Password if provided)
+        // 1. Update Profile (Name, Email, Password if provided, School)
         const profileRes = await fetch(`${apiUrl}/auth.php?action=update_profile`, {
           method: 'POST',
           headers: {
@@ -5715,7 +5800,9 @@ export default {
           body: JSON.stringify({
             name: profileEditForm.value.name,
             email: profileEditForm.value.email,
-            password: profileEditForm.value.password || undefined
+            password: profileEditForm.value.password || undefined,
+            school: profileEditForm.value.school || undefined,
+            school_id: profileEditForm.value.school_id || undefined
           })
         });
 
@@ -5748,6 +5835,8 @@ export default {
         if (currentUser.value) {
           currentUser.value.name = profileEditForm.value.name;
           currentUser.value.email = profileEditForm.value.email;
+          if (profileEditForm.value.school !== undefined) currentUser.value.school = profileEditForm.value.school;
+          if (profileEditForm.value.school_id !== undefined) currentUser.value.school_id = profileEditForm.value.school_id;
         }
 
         // Reset password field after save & exit edit mode
@@ -6042,7 +6131,10 @@ export default {
       startEditingProfile,
       cancelEditingProfile,
       displayProducts,
-      publicPlans
+      publicPlans,
+      publicSchoolsList,
+      matchedPartnerSchool,
+      onSchoolSelected
     };
   }
 };
