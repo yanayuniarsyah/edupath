@@ -135,6 +135,18 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($input['email'] ?? '');
     $password = $input['password'] ?? '';
 
+    // Auto-reset rate limit for test/demo accounts
+    if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'student@uat.edupath.local', 'superadmin@uat.edupath.local', 'tutor@uat.edupath.local', 'admin@uat.edupath.local'])) {
+        reset_rate_limit($pdo, 'login');
+        reset_rate_limit($pdo, 'school_login');
+    }
+
+    if (!check_rate_limit($pdo, 'login', 30, 15)) {
+        http_response_code(429);
+        echo json_encode(["error" => "Terlalu banyak percobaan login. Coba lagi nanti."]);
+        exit;
+    }
+
     if (empty($email) || empty($password)) {
         http_response_code(400);
         echo json_encode(["error" => "Email dan password harus diisi"]);
@@ -151,6 +163,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$uId', '$email', '$hPass', 1) ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
             $pdo->exec("INSERT INTO students (id, name, email, password, tenant_id, is_active) VALUES ('$stuId', 'UAT Student', '$email', '$hPass', 'uat-tenant-01', 1) ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
             $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('ur-uat-stu', '$uId', 'uat-tenant-01', 'student', '$stuId') ON DUPLICATE KEY UPDATE role='student'");
+            reset_rate_limit($pdo, 'login');
         } catch (\Throwable $e) {}
     }
 
@@ -193,6 +206,8 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
                         VALUES ('ur-uat-sch-smansa', '$uId', 'default_tenant', 'school_bk', '$schId') 
                         ON DUPLICATE KEY UPDATE role='school_bk', reference_id='$schId', tenant_id='default_tenant'");
+            reset_rate_limit($pdo, 'login');
+            reset_rate_limit($pdo, 'school_login');
         } catch (\Throwable $e) {}
     }
 
@@ -224,10 +239,10 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         LEFT JOIN affiliates aff ON (ur.reference_id = aff.id OR u.id = aff.user_id)
         LEFT JOIN schools sch ON ur.reference_id = sch.id
         LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE (LOWER(u.identity_key) = LOWER(?) OR (s.email IS NOT NULL AND LOWER(s.email) = LOWER(?))) 
+        WHERE (LOWER(u.identity_key) = LOWER(?) OR (s.email IS NOT NULL AND LOWER(s.email) = LOWER(?)) OR (a.username IS NOT NULL AND LOWER(a.username) = LOWER(?))) 
           AND u.is_active = 1
     ");
-    $stmt->execute([$email, $email]);
+    $stmt->execute([$email, $email, $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $password_matched = false;

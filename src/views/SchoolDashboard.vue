@@ -924,12 +924,14 @@ const riasecList = computed(() => {
 
 // ── Lifecycle & Init ──
 onMounted(() => {
-  const savedToken = sessionStorage.getItem('school_token');
-  const savedData = sessionStorage.getItem('school_data');
+  const savedToken = sessionStorage.getItem('school_token') || localStorage.getItem('auth_token');
+  const savedData = sessionStorage.getItem('school_data') || localStorage.getItem('school_data');
 
   if (savedToken) {
     try {
-      if (savedData) schoolData.value = JSON.parse(savedData);
+      if (savedData) {
+        schoolData.value = typeof savedData === 'string' ? JSON.parse(savedData) : savedData;
+      }
       isAuthenticated.value = true;
       loadAllDashboardData();
     } catch (e) {
@@ -963,8 +965,10 @@ async function handleLogin() {
 function handleLogout() {
   sessionStorage.removeItem('school_token');
   sessionStorage.removeItem('school_data');
+  localStorage.removeItem('auth_token');
   isAuthenticated.value = false;
   schoolData.value = null;
+  window.location.hash = '#/';
 }
 
 async function loadAllDashboardData() {

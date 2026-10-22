@@ -3766,8 +3766,14 @@
 
         <div v-else>
           <form @submit.prevent="doAuth" class="space-y-4">
-            <div v-if="authError" class="px-3 py-2 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-[11px] font-bold text-center">
-              {{ authError }}
+            <div v-if="authError" class="px-3 py-2.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-[11px] font-bold text-center">
+              <div>{{ authError }}</div>
+              <div v-if="authError.includes('/admin') || authError.includes('Administrator')" class="mt-2 flex justify-center">
+                <a href="#/admin" @click="showLoginModal = false" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-black text-[10px] uppercase tracking-wider transition-all shadow-md shadow-amber-500/20 cursor-pointer">
+                  <i class="ph-bold ph-shield-check text-xs"></i>
+                  <span>Buka Portal Admin / Superadmin &rarr;</span>
+                </a>
+              </div>
             </div>
 
             <div v-if="!isLoginMode" class="space-y-1">

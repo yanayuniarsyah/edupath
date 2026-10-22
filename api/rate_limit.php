@@ -3,15 +3,33 @@
 require_once 'config.php';
 
 /**
+ * Resolves the true client IP address taking into account Cloudflare,
+ * reverse proxies, and load balancers.
+ */
+function get_client_ip() {
+    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        return trim($_SERVER['HTTP_CF_CONNECTING_IP']);
+    }
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        return trim($ips[0]);
+    }
+    if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+        return trim($_SERVER['HTTP_X_REAL_IP']);
+    }
+    return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+}
+
+/**
  * Validates rate limits based on IP and Endpoint.
  * Returns true if allowed, false if blocked.
  */
-function check_rate_limit($pdo, $endpoint, $max_attempts = 5, $lock_minutes = 15) {
-    $ip_address = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+function check_rate_limit($pdo, $endpoint, $max_attempts = 30, $lock_minutes = 15) {
+    $ip_address = get_client_ip();
     
     try {
-        // Cleanup is sampled to avoid an extra table-wide write on every API request.
-        if (random_int(1, 100) === 1) {
+        // Auto-cleanup expired locks regularly
+        if (random_int(1, 20) === 1) {
             $pdo->exec("DELETE FROM rate_limits WHERE lock_until IS NOT NULL AND lock_until < NOW()");
         }
 
@@ -49,8 +67,6 @@ function check_rate_limit($pdo, $endpoint, $max_attempts = 5, $lock_minutes = 15
             return true;
         }
     } catch (PDOException $e) {
-        // If the table doesn't exist yet (migration not run), fail open to not break app, or return false?
-        // Since we are applying migration after implementation, we should probably return true to avoid locking out legitimate users during transition, but catch the specific table not found error.
         return true;
     }
 }
@@ -58,8 +74,8 @@ function check_rate_limit($pdo, $endpoint, $max_attempts = 5, $lock_minutes = 15
 /**
  * Resets the rate limit for a given endpoint on success.
  */
-function reset_rate_limit($pdo, $endpoint) {
-    $ip_address = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+function reset_rate_limit($pdo, $endpoint, $ip_override = null) {
+    $ip_address = $ip_override ?: get_client_ip();
     try {
         $stmt = $pdo->prepare("DELETE FROM rate_limits WHERE ip_address = ? AND endpoint = ?");
         $stmt->execute([$ip_address, $endpoint]);
@@ -68,3 +84,4 @@ function reset_rate_limit($pdo, $endpoint) {
     }
 }
 ?>
+

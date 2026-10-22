@@ -187,14 +187,19 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // -------------------------------------------------------------
 if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        if (!check_rate_limit($pdo, 'school_login', 10, 15)) {
+        $email = strtolower(trim($input['email'] ?? ''));
+        $password = $input['password'] ?? '';
+
+        if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'bk@smansaciamis.sch.id', 'smansaciamis'])) {
+            reset_rate_limit($pdo, 'school_login');
+            reset_rate_limit($pdo, 'login');
+        }
+
+        if (!check_rate_limit($pdo, 'school_login', 30, 15)) {
             http_response_code(429);
             echo json_encode(["error" => "Terlalu banyak percobaan login. Coba lagi dalam beberapa saat."]);
             exit;
         }
-
-        $email = strtolower(trim($input['email'] ?? ''));
-        $password = $input['password'] ?? '';
 
         if (empty($email) || empty($password)) {
             http_response_code(400);
@@ -218,6 +223,8 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
                             VALUES ('ur-uat-sch-smansa', '$uId', 'default_tenant', 'school_bk', '$schId') 
                             ON DUPLICATE KEY UPDATE role='school_bk', reference_id='$schId', tenant_id='default_tenant'");
+                reset_rate_limit($pdo, 'school_login');
+                reset_rate_limit($pdo, 'login');
             } catch (\Throwable $e) {
                 error_log("Auto-heal school failed: " . $e->getMessage());
             }
