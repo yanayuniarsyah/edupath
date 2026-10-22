@@ -87,7 +87,7 @@
               <div class="relative shrink-0 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'w-6 h-6' : 'w-8 h-8'">
                 <span class="absolute text-xs font-black opacity-100 text-white">{{ tab.label.charAt(0) }}</span>
                 <i :class="['ph-bold relative z-10', tab.icon, (sidebarExpanded || mobileSidebarOpen) ? 'text-lg' : 'text-xl', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/70 group-hover:text-white']"></i>
-                <i v-if="['diagnostic', 'learning', 'simulator'].includes(tab.id) && isLoggedIn && !currentUser?.is_premium && !isStaff" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
+                <i v-if="['diagnostic', 'learning', 'simulator'].includes(tab.id) && isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
               </div>
               <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="font-bold tracking-tight whitespace-nowrap" :class="currentTab === tab.id ? 'text-white' : ''">{{ tab.label }}</span>
             </button>
@@ -110,7 +110,7 @@
                   <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]/70 shrink-0"></span>
                   <span class="truncate">{{ subtes.subtes }}</span>
                 </div>
-                <i v-if="isLoggedIn && !currentUser?.is_premium && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
               </button>
 
               <!-- Group TES LITERASI -->
@@ -129,7 +129,7 @@
                   <span class="w-1.5 h-1.5 rounded-full bg-sky-400/70 shrink-0"></span>
                   <span class="truncate">{{ subtes.subtes }}</span>
                 </div>
-                <i v-if="isLoggedIn && !currentUser?.is_premium && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
               </button>
             </div>
           </template>
@@ -143,7 +143,7 @@
             <i class="ph-bold ph-user text-lg text-black"></i>
           </div>
           <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
-            <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ currentUser?.name || 'Siswa Mandiri' }}</h4>
+            <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa Mandiri') }}</h4>
             <div v-if="isTeacher" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Guru & Bank Soal">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-emerald-400">
                 Pendidik / Tutor
@@ -156,11 +156,17 @@
               </span>
               <span class="text-[9px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-indigo-400 group-hover:text-black transition-all">Panel ➔</span>
             </div>
+            <div v-else-if="isSchoolBk" @click="window.location.hash = '#/school'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Sekolah / Guru BK">
+              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-amber-400">
+                Guru BK / Mitra
+              </span>
+              <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Portal BK ➔</span>
+            </div>
             <div v-else @click="openPlanSelector" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Lihat Pilihan Paket">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-[#c0ff00]">
-                Status Paket: {{ currentUser?.is_premium ? 'Premium' : 'Trial' }}
+                Status Paket: {{ isPremiumUser ? (currentUser?.plan_name || 'Premium') : 'Trial' }}
               </span>
-              <span v-if="!currentUser?.is_premium" class="text-[9px] bg-[#c0ff00]/20 text-[#c0ff00] border border-[#c0ff00]/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-[#c0ff00] group-hover:text-black transition-all">Pilih Paket ⚡</span>
+              <span v-if="!isPremiumUser" class="text-[9px] bg-[#c0ff00]/20 text-[#c0ff00] border border-[#c0ff00]/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-[#c0ff00] group-hover:text-black transition-all">Pilih Paket ⚡</span>
             </div>
           </div>
         </div>
@@ -1887,20 +1893,22 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div class="space-y-2">
                 <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full" :class="(currentUser?.is_premium || isStaff) ? 'bg-[#c0ff00] animate-pulse' : 'bg-amber-400'"></span>
+                  <span class="w-2.5 h-2.5 rounded-full" :class="(isPremiumUser || isStaff) ? 'bg-[#c0ff00] animate-pulse' : 'bg-amber-400'"></span>
                   <span class="text-xs font-black uppercase tracking-widest text-white/60">Status Akun &amp; Paket</span>
                 </div>
-                <div class="text-2xl md:text-3xl font-black tracking-tight" :class="(currentUser?.is_premium || isStaff) ? 'text-[#c0ff00]' : 'text-amber-400'">
-                  {{ isTeacher ? 'Akun Pendidik / Guru (Akses Penuh)' : (isAdmin ? (currentUser?.role === 'superadmin' ? 'Super Administrator' : 'Administrator Tenant') : (currentUser?.is_premium ? (currentUser?.plan_name || 'Premium UTBK (Aktif)') : 'Paket Gratis / Trial')) }}
+                <div class="text-2xl md:text-3xl font-black tracking-tight" :class="(isPremiumUser || isStaff) ? 'text-[#c0ff00]' : 'text-amber-400'">
+                  {{ isTeacher ? 'Akun Pendidik / Guru (Akses Penuh)' : (isAdmin ? (currentUser?.role === 'superadmin' ? 'Super Administrator' : 'Administrator Tenant') : (isSchoolBk ? 'Akun Perwakilan Sekolah Mitra (Guru BK)' : (isPremiumUser ? (currentUser?.plan_name || 'Premium UTBK (Aktif)') : 'Paket Gratis / Trial'))) }}
                 </div>
                 <p class="text-xs text-white/60 max-w-xl">
                   {{ isTeacher 
                       ? 'Anda memiliki hak akses pengajar penuh untuk mengelola modul materi, kurikulum, bank soal, dan analitik siswa.' 
                       : (isAdmin 
                           ? 'Akses administrator sistem penuh untuk manajemen data, pesanan, analitik, dan pengguna platform.' 
-                          : (currentUser?.is_premium 
-                              ? 'Anda memiliki akses penuh ke seluruh Fitur Simulasi UTBK, Asesmen Kesiapan AI, & Modul Drill HOTS.' 
-                              : 'Akun Anda saat ini pada mode Gratis / Trial. Upgrade ke Paket Premium untuk membuka akses tanpa batas ke Simulasi SNBT & Tryout.')) }}
+                          : (isSchoolBk
+                              ? 'Akses portal khusus Guru BK dan Sekolah Mitra untuk memantau agregat hasil asesmen SPP dan tryout siswa.'
+                              : (isPremiumUser 
+                                  ? 'Anda memiliki akses penuh ke seluruh Fitur Simulasi UTBK, Asesmen Kesiapan AI, & Modul Drill HOTS.' 
+                                  : 'Akun Anda saat ini pada mode Gratis / Trial. Upgrade ke Paket Premium untuk membuka akses tanpa batas ke Simulasi SNBT & Tryout.'))) }}
                 </p>
               </div>
 
@@ -1916,12 +1924,20 @@
                   <span>{{ isTeacher ? 'Buka Portal Guru / Bank Soal ➔' : 'Buka Admin Panel ➔' }}</span>
                 </button>
                 <button
+                  v-else-if="isSchoolBk"
+                  @click="window.location.hash = '#/school'"
+                  class="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <i class="ph-bold ph-buildings text-base"></i>
+                  <span>Buka Portal Guru BK ➔</span>
+                </button>
+                <button
                   v-else
                   @click="openPlanSelector"
                   class="px-6 py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <i class="ph-bold ph-lightning text-base"></i>
-                  <span>{{ currentUser?.is_premium ? 'Perpanjang / Ganti Paket' : 'Pilih Paket Belajar ⚡' }}</span>
+                  <span>{{ isPremiumUser ? 'Perpanjang / Ganti Paket' : 'Pilih Paket Belajar ⚡' }}</span>
                 </button>
               </div>
             </div>
@@ -1970,7 +1986,7 @@
                   <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
                     <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Peran / Status Pengguna</span>
                     <div class="text-sm font-bold text-[#c0ff00]">
-                      {{ isTeacher ? 'Guru / Tutor (Pendidik)' : (isAdmin ? (currentUser?.role === 'superadmin' ? 'Super Administrator' : 'Administrator Tenant') : (currentUser?.is_premium ? 'Siswa Premium' : 'Siswa Mandiri (Trial)')) }}
+                      {{ isTeacher ? 'Guru / Tutor (Pendidik)' : (isAdmin ? (currentUser?.role === 'superadmin' ? 'Super Administrator' : 'Administrator Tenant') : (isSchoolBk ? 'Guru BK / Sekolah Mitra' : (isPremiumUser ? 'Siswa Premium (' + (currentUser?.plan_name || currentUser?.plan || 'Utama') + ')' : 'Siswa Mandiri (Trial)'))) }}
                     </div>
                   </div>
                   <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
@@ -2187,7 +2203,7 @@
                   <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
                   <p class="text-[#c0ff00] font-black text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
                 </div>
-                <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || 'Siswa Mandiri' }}!</span></h2>
+                <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa Mandiri') }}!</span></h2>
                 <p class="text-white/70 text-xs md:text-sm font-medium">Persiapkan SNBT 2027 dengan asesmen IRT adaptif & latihan soal terfokus.</p>
               </div>
             </div>
@@ -4797,6 +4813,13 @@ export default {
     const isAdmin = computed(() => currentUser.value?.role === 'admin' || currentUser.value?.role === 'superadmin');
     const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes(currentUser.value?.role));
     const isStaff = computed(() => isAdmin.value || isTeacher.value);
+    const isSchoolBk = computed(() => currentUser.value?.role === 'school_bk');
+    const isPremiumUser = computed(() => {
+      if (isStaff.value) return true;
+      if (currentUser.value?.is_premium) return true;
+      const p = (currentUser.value?.plan || '').toLowerCase();
+      return ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite'].includes(p);
+    });
 
     const showPlanSelectorModal = ref(false);
     const openPlanSelector = () => {
@@ -5009,25 +5032,54 @@ export default {
 
 
     const checkAuth = async () => {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
       if (token) {
         try {
           const res = await api.getProfile();
-          currentUser.value = res.user;
-          isLoggedIn.value = true;
-          // Update global states based on user data
-          currentAbilityScore.value = res.user.total_score || 0;
-          streakCount.value = res.user.streak || 0;
-          coins.value = res.user.coins || 0;
-          if (res.user.target_ptn) simTargetPtn.value = res.user.target_ptn;
-          if (currentTab.value === 'home') {
-            currentTab.value = 'dashboard';
-          }
-          if (['admin', 'superadmin', 'teacher', 'guru', 'tutor', 'affiliate'].includes(res.user.role) && !isStudentPreviewMode.value) {
-            sessionStorage.setItem('admin_token', token);
-            sessionStorage.setItem('admin_role', res.user.role);
-            window.location.hash = '#/admin';
-            return;
+          if (res?.user) {
+            const plan = (res.user.plan || '').toLowerCase();
+            res.user.is_premium = Boolean(res.user.is_premium || ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite'].includes(plan));
+            currentUser.value = res.user;
+            isLoggedIn.value = true;
+            // Update global states based on user data
+            currentAbilityScore.value = res.user.total_score || 0;
+            streakCount.value = res.user.streak || 0;
+            coins.value = res.user.coins || 0;
+            if (res.user.target_ptn) simTargetPtn.value = res.user.target_ptn;
+            
+            // Sync profileEditForm
+            profileEditForm.value.name = res.user.name || '';
+            profileEditForm.value.email = res.user.email || '';
+            profileEditForm.value.school = res.user.school || '';
+            profileEditForm.value.school_id = res.user.school_id || '';
+            profileEditForm.value.target_ptn = res.user.target_ptn || '';
+            profileEditForm.value.phone = res.user.phone || '';
+
+            if (currentTab.value === 'home') {
+              currentTab.value = 'dashboard';
+            }
+
+            // SMART REDIRECT: Guru BK / Perwakilan Sekolah Mitra
+            if (res.user.role === 'school_bk') {
+              sessionStorage.setItem('school_token', token);
+              const sData = res.user.school || {
+                id: res.user.school_id || res.user.reference_id,
+                name: res.user.school_name || res.user.name,
+                bk_name: res.user.bk_name || res.user.name,
+                bk_email: res.user.email,
+                city: res.user.school_city || ''
+              };
+              sessionStorage.setItem('school_data', JSON.stringify(sData));
+              window.location.hash = '#/school';
+              return;
+            }
+
+            if (['admin', 'superadmin', 'teacher', 'guru', 'tutor', 'affiliate'].includes(res.user.role) && !isStudentPreviewMode.value) {
+              sessionStorage.setItem('admin_token', token);
+              sessionStorage.setItem('admin_role', res.user.role);
+              window.location.hash = '#/admin';
+              return;
+            }
           }
         } catch (e) {
           console.error("Session expired", e);
@@ -5079,10 +5131,24 @@ export default {
           res = await api.register(payload);
         }
         localStorage.setItem('auth_token', res.token);
+        if (res.user) {
+          const plan = (res.user.plan || '').toLowerCase();
+          res.user.is_premium = Boolean(res.user.is_premium || ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite'].includes(plan));
+        }
         currentUser.value = res.user;
 
-        // 1. SMART REDIRECT: Guru BK / Perwakilan Sekolah Mitra
-        if (res.user?.role === 'school_bk' || res.user?.school_id) {
+        // Sync profileEditForm
+        if (res.user) {
+          profileEditForm.value.name = res.user.name || '';
+          profileEditForm.value.email = res.user.email || '';
+          profileEditForm.value.school = res.user.school || '';
+          profileEditForm.value.school_id = res.user.school_id || '';
+          profileEditForm.value.target_ptn = res.user.target_ptn || '';
+          profileEditForm.value.phone = res.user.phone || '';
+        }
+
+        // 1. SMART REDIRECT: Guru BK / Perwakilan Sekolah Mitra (HANYA role school_bk)
+        if (res.user?.role === 'school_bk') {
           sessionStorage.setItem('school_token', res.token);
           const sData = res.user.school || {
             id: res.user.school_id || res.user.reference_id,
@@ -5213,7 +5279,7 @@ export default {
         showToast('Silakan Masuk Akun untuk mengakses modul ini!');
         return;
       }
-      if (premiumTabs.includes(tabId) && !currentUser.value?.is_premium && !isStaff.value) {
+      if (premiumTabs.includes(tabId) && !isPremiumUser.value) {
         showToast('Fitur ini khusus pengguna Premium. Silakan pilih paket belajar Anda.');
         openPlanSelector();
         return;
@@ -5230,7 +5296,7 @@ export default {
         showToast('Silakan Masuk Akun untuk mengakses fitur ini!');
         return;
       }
-      if (!currentUser.value?.is_premium && !isStaff.value) {
+      if (!isPremiumUser.value) {
         showToast('Fitur ini khusus pengguna Premium. Silakan pilih paket belajar Anda.');
         openPlanSelector();
         return;
@@ -5714,10 +5780,12 @@ export default {
 
     const startEditingProfile = () => {
       if (currentUser.value) {
-        if (!profileEditForm.value.name) profileEditForm.value.name = currentUser.value.name || '';
-        if (!profileEditForm.value.email) profileEditForm.value.email = currentUser.value.email || '';
+        profileEditForm.value.name = currentUser.value.name || '';
+        profileEditForm.value.email = currentUser.value.email || '';
         profileEditForm.value.school = currentUser.value.school || '';
         profileEditForm.value.school_id = currentUser.value.school_id || '';
+        profileEditForm.value.target_ptn = currentUser.value.target_ptn || '';
+        profileEditForm.value.phone = currentUser.value.phone || '';
       }
       isEditingProfile.value = true;
     };
@@ -6125,6 +6193,8 @@ export default {
       isAdmin,
       isTeacher,
       isStaff,
+      isSchoolBk,
+      isPremiumUser,
       showPlanSelectorModal,
       openPlanSelector,
       isEditingProfile,

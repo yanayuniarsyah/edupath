@@ -237,25 +237,27 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.password as user_password, s.password as student_password, ur.role, ur.tenant_id, ur.reference_id, 
                COALESCE(s.id, a.id, sch.id, ur.reference_id) as student_id, 
-               COALESCE(s.name, aff.name, aff.bank_owner, a.name, sch.name, 'Pengguna EduPath') as name, 
+               COALESCE(NULLIF(TRIM(s.name), ''), NULLIF(TRIM(aff.name), ''), NULLIF(TRIM(aff.bank_owner), ''), NULLIF(TRIM(a.name), ''), NULLIF(TRIM(sch.name), ''), 'Pengguna EduPath') as name, 
                COALESCE(s.email, aff.email, a.username, sch.bk_email, u.identity_key) as email, 
-               COALESCE(s.target_ptn, 'UI') as target_ptn, 
+               s.school as student_school,
+               s.phone as student_phone,
+               COALESCE(s.target_ptn, '') as target_ptn, 
                COALESCE(s.plan, 'free') as plan,
                COALESCE(t.is_active, 1) as tenant_active,
                COALESCE(aff.referral_code, '') as referral_code,
-               sch.id as school_id,
+               COALESCE(s.school_id, sch.id) as school_id,
                sch.name as school_name,
                sch.bk_name,
                sch.city as school_city,
                sch.slug as school_slug
         FROM users u 
         JOIN user_roles ur ON u.id = ur.user_id 
-        LEFT JOIN students s ON (ur.reference_id = s.id OR LOWER(u.identity_key) = LOWER(s.email))
+        LEFT JOIN students s ON (ur.reference_id = s.id OR LOWER(TRIM(u.identity_key)) = LOWER(TRIM(s.email)))
         LEFT JOIN admins a ON (ur.reference_id = a.id OR u.identity_key = a.username)
         LEFT JOIN affiliates aff ON (ur.reference_id = aff.id OR u.id = aff.user_id)
-        LEFT JOIN schools sch ON ur.reference_id = sch.id
+        LEFT JOIN schools sch ON (ur.reference_id = sch.id OR LOWER(TRIM(u.identity_key)) = LOWER(TRIM(sch.bk_email)))
         LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE (LOWER(u.identity_key) = LOWER(?) OR (s.email IS NOT NULL AND LOWER(s.email) = LOWER(?)) OR (a.username IS NOT NULL AND LOWER(a.username) = LOWER(?))) 
+        WHERE (LOWER(TRIM(u.identity_key)) = LOWER(TRIM(?)) OR (s.email IS NOT NULL AND LOWER(TRIM(s.email)) = LOWER(TRIM(?))) OR (a.username IS NOT NULL AND LOWER(TRIM(a.username)) = LOWER(TRIM(?)))) 
           AND u.is_active = 1
     ");
     $stmt->execute([$email, $email, $email]);
@@ -306,13 +308,13 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $token_payload = [
             'user_id' => $user['user_id'], 
-            'id' => $user['reference_id'] ?? $user['user_id'], 
+            'id' => $user['student_id'] ?? $user['reference_id'] ?? $user['user_id'], 
             'role' => $user['role'], 
             'tenant_id' => $user['tenant_id'],
             'email' => $user['email']
         ];
 
-        if ($user['role'] === 'school_bk' || !empty($user['school_id'])) {
+        if ($user['role'] === 'school_bk') {
             $token_payload['school_id'] = $user['school_id'] ?? $user['reference_id'];
             $token_payload['school_name'] = $user['school_name'] ?? $user['name'];
             $user['school'] = [
@@ -348,8 +350,12 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         set_auth_cookies($token, $csrf_token);
 
         unset($user['user_password'], $user['student_password'], $user['password']);
+        if ($user['role'] === 'student') {
+            $user['school'] = $user['student_school'] ?? '';
+            $user['phone'] = $user['student_phone'] ?? '';
+        }
         $plan = strtolower($user['plan'] ?? 'free');
-        $is_paid_plan = ($plan !== 'free' && !empty($plan));
+        $is_paid_plan = in_array($plan, ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite']);
         $user['is_premium'] = $is_paid_plan;
         $plan_labels = [
             'mandiri' => 'Paket Mandiri',
@@ -566,16 +572,22 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$name, $email, $hashed_password, $payload->id]);
         } else {
             try {
-                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ?, school = ?, school_id = ? WHERE id = ?");
-                $stmt->execute([$name, $email, $hashed_password, $school ?: null, $school_id ?: null, $payload->id]);
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ?, school = ?, school_id = ? WHERE id = ? OR id = ? OR LOWER(email) = LOWER(?)");
+                $stmt->execute([$name, $email, $hashed_password, $school ?: null, $school_id ?: null, $payload->id, $payload->user_id ?? '', $payload->email ?? '']);
             } catch (\Throwable $e) {
-                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ? WHERE id = ?");
-                $stmt->execute([$name, $email, $hashed_password, $payload->id]);
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ? WHERE id = ? OR id = ? OR LOWER(email) = LOWER(?)");
+                $stmt->execute([$name, $email, $hashed_password, $payload->id, $payload->user_id ?? '', $payload->email ?? '']);
             }
         }
 
         $stmt = $pdo->prepare("UPDATE users SET identity_key = ?, password = ? WHERE id = ?");
         $stmt->execute([$email, $hashed_password, $payload->user_id]);
+        try {
+            $userCols = $pdo->query("DESCRIBE users")->fetchAll(PDO::FETCH_COLUMN);
+            if (in_array('name', $userCols)) {
+                $pdo->prepare("UPDATE users SET name = ? WHERE id = ?")->execute([$name, $payload->user_id]);
+            }
+        } catch (\Throwable $e) {}
     } else {
         $school = trim($input['school'] ?? '');
         $school_id = trim($input['school_id'] ?? '');
@@ -593,16 +605,22 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$name, $email, $payload->id]);
         } else {
             try {
-                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, school = ?, school_id = ? WHERE id = ?");
-                $stmt->execute([$name, $email, $school ?: null, $school_id ?: null, $payload->id]);
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, school = ?, school_id = ? WHERE id = ? OR id = ? OR LOWER(email) = LOWER(?)");
+                $stmt->execute([$name, $email, $school ?: null, $school_id ?: null, $payload->id, $payload->user_id ?? '', $payload->email ?? '']);
             } catch (\Throwable $e) {
-                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ? WHERE id = ?");
-                $stmt->execute([$name, $email, $payload->id]);
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ? WHERE id = ? OR id = ? OR LOWER(email) = LOWER(?)");
+                $stmt->execute([$name, $email, $payload->id, $payload->user_id ?? '', $payload->email ?? '']);
             }
         }
 
         $stmt = $pdo->prepare("UPDATE users SET identity_key = ? WHERE id = ?");
         $stmt->execute([$email, $payload->user_id]);
+        try {
+            $userCols = $pdo->query("DESCRIBE users")->fetchAll(PDO::FETCH_COLUMN);
+            if (in_array('name', $userCols)) {
+                $pdo->prepare("UPDATE users SET name = ? WHERE id = ?")->execute([$name, $payload->user_id]);
+            }
+        } catch (\Throwable $e) {}
     }
 
     echo json_encode(["success" => true, "message" => "Profil berhasil diperbarui"]);
@@ -614,15 +632,19 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // School BK Coordinator
     if ($payload->role === 'school_bk') {
         $schId = $payload->school_id ?? $payload->reference_id ?? $payload->id;
-        $stmt = $pdo->prepare("SELECT id, name, npsn, city, province, bk_coordinator_name, bk_coordinator_email FROM schools WHERE id = ?");
-        $stmt->execute([$schId]);
+        $stmt = $pdo->prepare("SELECT * FROM schools WHERE id = ? OR LOWER(bk_email) = LOWER(?) LIMIT 1");
+        $stmt->execute([$schId, $payload->email ?? '']);
         $sch = $stmt->fetch(PDO::FETCH_ASSOC);
+        $bkName = $sch['bk_name'] ?? $sch['bk_coordinator_name'] ?? $sch['name'] ?? 'Koordinator BK';
+        $bkEmail = $sch['bk_email'] ?? $sch['bk_coordinator_email'] ?? ($payload->email ?? '');
+        $bkPhone = $sch['bk_phone'] ?? $sch['bk_coordinator_phone'] ?? '';
         $user = [
             'id' => $payload->id,
-            'name' => $sch['bk_coordinator_name'] ?? $sch['name'] ?? 'Koordinator BK',
-            'email' => $sch['bk_coordinator_email'] ?? '',
+            'name' => $bkName,
+            'email' => $bkEmail,
+            'phone' => $bkPhone,
             'role' => 'school_bk',
-            'school_id' => $schId,
+            'school_id' => $sch['id'] ?? $schId,
             'school_name' => $sch['name'] ?? '',
             'school' => $sch,
             'is_premium' => true,
@@ -670,8 +692,6 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     // Student: query biasa + subscription check
-    // Optimasi: gabungkan student data + subscription check dalam SATU query
-    // menggunakan subquery EXISTS untuk menghindari round-trip kedua ke DB
     $stmt = $pdo->prepare("
         SELECT s.*,
                (SELECT COUNT(*) > 0
@@ -679,20 +699,39 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
                 WHERE sub.student_id = s.id
                   AND sub.status = 'active'
                   AND sub.expires_at > NOW()
-                LIMIT 1) AS is_premium
+                LIMIT 1) AS has_sub
         FROM students s
         WHERE s.id = ?
+           OR s.id = ?
+           OR (s.email IS NOT NULL AND LOWER(TRIM(s.email)) = LOWER(TRIM(?)))
+        LIMIT 1
     ");
-    $stmt->execute([$payload->id]);
+    $stmt->execute([$payload->id, $payload->user_id ?? '', $payload->email ?? '']);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
         unset($user['password']);
+        if (empty(trim($user['name'] ?? '')) && !empty($payload->user_id)) {
+            try {
+                $stmtU = $pdo->prepare("SELECT name FROM users WHERE id = ?");
+                $stmtU->execute([$payload->user_id]);
+                $uName = $stmtU->fetchColumn();
+                if (!empty(trim($uName ?? ''))) {
+                    $user['name'] = trim($uName);
+                    $pdo->prepare("UPDATE students SET name = ? WHERE id = ?")->execute([$user['name'], $user['id']]);
+                }
+            } catch (\Throwable $e) {}
+        }
         $plan = strtolower($user['plan'] ?? 'free');
-        $is_paid_plan = ($plan !== 'free' && !empty($plan));
-        $user['is_premium']  = $is_paid_plan || (bool)$user['is_premium'];
+        $is_paid_plan = in_array($plan, ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite']);
+        $user['is_premium']  = $is_paid_plan || (bool)($user['has_sub'] ?? false);
         $user['role']        = 'student';
-        $user['tenant_id']   = $payload->tenant_id;
+        $user['tenant_id']   = $payload->tenant_id ?? ($user['tenant_id'] ?? 'default_tenant');
+        $user['name']        = !empty(trim($user['name'] ?? '')) ? trim($user['name']) : ($payload->email ?? 'Siswa EduPath');
+        $user['school']      = $user['school'] ?? '';
+        $user['school_id']   = $user['school_id'] ?? null;
+        $user['target_ptn']  = $user['target_ptn'] ?? '';
+        $user['phone']       = $user['phone'] ?? '';
         $plan_labels = [
             'mandiri' => 'Paket Mandiri',
             'starter' => 'Paket Mandiri',
@@ -709,9 +748,39 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         header('Cache-Control: private, max-age=30');
 
         echo json_encode(["user" => $user]);
+        exit;
     } else {
+        // Fallback auto-heal if user exists in users table
+        try {
+            $stmtFallback = $pdo->prepare("SELECT id, identity_key, COALESCE(name, '') as name FROM users WHERE id = ? OR LOWER(TRIM(identity_key)) = LOWER(TRIM(?)) LIMIT 1");
+            $stmtFallback->execute([$payload->user_id ?? $payload->id, $payload->email ?? '']);
+            $fb = $stmtFallback->fetch(PDO::FETCH_ASSOC);
+            if ($fb) {
+                $newStdId = $payload->id ?: ('std_' . bin2hex(random_bytes(8)));
+                $stdName = !empty(trim($fb['name'])) ? trim($fb['name']) : explode('@', $fb['identity_key'])[0];
+                $pdo->prepare("INSERT INTO students (id, name, email, plan, tenant_id) VALUES (?, ?, ?, 'free', 'default_tenant') ON DUPLICATE KEY UPDATE name=VALUES(name)")
+                    ->execute([$newStdId, $stdName, $fb['identity_key']]);
+                
+                header('Cache-Control: private, max-age=30');
+                echo json_encode([
+                    "user" => [
+                        'id' => $newStdId,
+                        'name' => $stdName,
+                        'email' => $fb['identity_key'],
+                        'role' => 'student',
+                        'plan' => 'free',
+                        'plan_name' => 'Paket Free / Trial',
+                        'is_premium' => false,
+                        'tenant_id' => $payload->tenant_id ?? 'default_tenant'
+                    ]
+                ]);
+                exit;
+            }
+        } catch (\Throwable $e) {}
+
         http_response_code(404);
         echo json_encode(["error" => "User tidak ditemukan"]);
+        exit;
     }
 }
 else {

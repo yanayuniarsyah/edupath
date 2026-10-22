@@ -711,7 +711,7 @@
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Siswa <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Cabang</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Asal Sekolah &amp; Target PTN</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('plan')">Paket <i v-if="sortKey === 'plan'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
@@ -726,12 +726,21 @@
                     <td class="px-4 py-3">
                       <div class="font-bold text-white text-sm leading-snug">{{ s.name }}</div>
                       <div class="text-white/50 font-medium text-xs mt-0.5">{{ s.email }}</div>
+                      <div v-if="s.phone" class="text-emerald-400 font-mono text-[10px] flex items-center gap-1 mt-0.5">
+                        <i class="ph-bold ph-whatsapp-logo"></i> {{ s.phone }}
+                      </div>
                     </td>
                     <td class="px-4 py-3">
-                      <span class="px-2 py-0.5 rounded-md font-bold text-[11px] bg-white/5 border border-white/10 text-white/80 inline-flex items-center gap-1">
-                        <i class="ph-bold ph-buildings text-indigo-400"></i>
-                        {{ s.tenant_name || 'Pusat' }}
-                      </span>
+                      <div class="font-bold text-white text-xs flex items-center gap-1">
+                        <i class="ph-bold ph-graduation-cap text-[#c0ff00]"></i>
+                        <span>{{ s.school || 'Siswa Mandiri' }}</span>
+                      </div>
+                      <div v-if="s.target_ptn" class="text-indigo-300 font-bold text-[10px] flex items-center gap-1 mt-0.5">
+                        <i class="ph-bold ph-buildings"></i> Target: {{ s.target_ptn }}
+                      </div>
+                      <div class="text-[10px] text-white/40 mt-0.5">
+                        {{ s.tenant_name || 'Bimbel Pusat' }}
+                      </div>
                     </td>
                     <td class="px-4 py-3">
                       <span class="px-2.5 py-1 rounded-md font-bold text-xs bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 uppercase tracking-wide">{{ s.plan || 'free' }}</span>
@@ -2302,6 +2311,25 @@
             <input id="student_form_password" name="password" v-model="studentForm.password" :required="!isEditingStudent" type="password" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div>
+            <label for="student_form_school" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Asal Sekolah</label>
+            <input id="student_form_school" name="school" list="adminSchoolsDatalist" v-model="studentForm.school" placeholder="Ketik nama sekolah SMA/SMK/SMP..." type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <datalist id="adminSchoolsDatalist">
+              <option v-for="sch in adminSchoolsList" :key="sch.id" :value="sch.name">
+                {{ sch.city ? sch.city : '' }}
+              </option>
+            </datalist>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="student_form_ptn" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Target PTN Impian</label>
+              <input id="student_form_ptn" name="target_ptn" v-model="studentForm.target_ptn" placeholder="UI, ITB, UGM, Unair..." type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            </div>
+            <div>
+              <label for="student_form_phone" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">No. WhatsApp / HP</label>
+              <input id="student_form_phone" name="phone" v-model="studentForm.phone" placeholder="08xxxxxxxxxx" type="tel" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium font-mono" />
+            </div>
+          </div>
+          <div>
             <label for="student_form_plan" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket Belajar</label>
             <select id="student_form_plan" name="plan" v-model="studentForm.plan" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
               <option value="free" class="bg-[#0d1427] text-white">Free / Trial</option>
@@ -3381,7 +3409,19 @@ const allStudents = ref([]);
 const isEditingStudent = ref(false);
 const showStudentModal = ref(false);
 const isSaving = ref(false);
-const studentForm = reactive({ id: null, tenant_id: '', name: '', email: '', password: '', plan: 'free', is_active: 1 });
+const studentForm = reactive({
+  id: null,
+  tenant_id: '',
+  name: '',
+  email: '',
+  password: '',
+  plan: 'free',
+  school: '',
+  school_id: '',
+  target_ptn: '',
+  phone: '',
+  is_active: 1
+});
 
 // ── Pagination helpers ──
 const PAGE_SIZE = 10;
@@ -3411,7 +3451,9 @@ const filteredStudents = computed(() => {
   let filtered = allStudents.value.filter(s => {
     const matchSearch = !studentSearch.value ||
       (s.name || '').toLowerCase().includes(studentSearch.value.toLowerCase()) ||
-      (s.email || '').toLowerCase().includes(studentSearch.value.toLowerCase());
+      (s.email || '').toLowerCase().includes(studentSearch.value.toLowerCase()) ||
+      (s.school || '').toLowerCase().includes(studentSearch.value.toLowerCase()) ||
+      (s.target_ptn || '').toLowerCase().includes(studentSearch.value.toLowerCase());
     const matchPlan = studentPlanFilter.value === 'all' || s.plan === studentPlanFilter.value;
     const matchTenant = studentTenantFilter.value === 'all' ||
       s.tenant_id === studentTenantFilter.value ||
@@ -3435,14 +3477,38 @@ const openCreateStudentModal = () => {
   isSaving.value = false;
   isEditingStudent.value = false;
   const defTenant = tenantsList.value?.[0]?.id || '';
-  Object.assign(studentForm, { id: null, tenant_id: defTenant, name: '', email: '', password: '', plan: 'free', is_active: 1 });
+  Object.assign(studentForm, {
+    id: null,
+    tenant_id: defTenant,
+    name: '',
+    email: '',
+    password: '',
+    plan: 'free',
+    school: '',
+    school_id: '',
+    target_ptn: '',
+    phone: '',
+    is_active: 1
+  });
   showStudentModal.value = true;
 };
 
 const openEditStudentModal = (s) => {
   isSaving.value = false;
   isEditingStudent.value = true;
-  Object.assign(studentForm, { id: s.id, tenant_id: s.tenant_id || tenantsList.value?.[0]?.id || '', name: s.name, email: s.email, password: '', plan: s.plan || 'free', is_active: s.is_active != 0 ? 1 : 0 });
+  Object.assign(studentForm, {
+    id: s.id,
+    tenant_id: s.tenant_id || tenantsList.value?.[0]?.id || '',
+    name: s.name,
+    email: s.email,
+    password: '',
+    plan: s.plan || 'free',
+    school: s.school || '',
+    school_id: s.school_id || '',
+    target_ptn: s.target_ptn || '',
+    phone: s.phone || '',
+    is_active: s.is_active != 0 ? 1 : 0
+  });
   showStudentModal.value = true;
 };
 
@@ -4637,7 +4703,7 @@ const fetchSchools = async () => {
   isSchoolsLoading.value = true;
   try {
     const res = await api.getAdminSchools();
-    adminSchoolsList.value = Array.isArray(res) ? res : [];
+    adminSchoolsList.value = res?.schools || (Array.isArray(res) ? res : []);
   } catch (err) {
     console.error('Error fetching admin schools:', err);
   } finally {
@@ -4677,9 +4743,9 @@ const openEditSchoolModal = (s) => {
     province: s.province || '',
     address: s.address || '',
     phone: s.phone || '',
-    bk_coordinator_name: s.bk_coordinator_name || '',
-    bk_coordinator_email: s.bk_coordinator_email || '',
-    bk_coordinator_phone: s.bk_coordinator_phone || '',
+    bk_coordinator_name: s.bk_coordinator_name || s.bk_name || '',
+    bk_coordinator_email: s.bk_coordinator_email || s.bk_email || '',
+    bk_coordinator_phone: s.bk_coordinator_phone || s.bk_phone || '',
     bk_username: '',
     bk_password: '',
     is_active: s.is_active != 0 ? 1 : 0
@@ -4694,11 +4760,18 @@ const saveSchool = async () => {
   }
   isSavingSchool.value = true;
   try {
+    const payload = {
+      ...schoolForm,
+      bk_name: schoolForm.bk_coordinator_name,
+      bk_email: schoolForm.bk_coordinator_email,
+      bk_phone: schoolForm.bk_coordinator_phone,
+      password: schoolForm.bk_password || 'EduPathSchool01!2026'
+    };
     if (isEditingSchool.value) {
-      await api.updateAdminSchool(schoolForm.id, schoolForm);
+      await api.updateAdminSchool(schoolForm.id, payload);
       alert('Data sekolah mitra berhasil diperbarui');
     } else {
-      await api.createAdminSchool(schoolForm);
+      await api.createAdminSchool(payload);
       alert('Sekolah mitra & koordinator BK berhasil ditambahkan');
     }
     showSchoolModal.value = false;

@@ -483,10 +483,19 @@ if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
 }
 elseif ($action === 'students') {
+    // Ensure columns exist on students table
+    try {
+        $stCols = $pdo->query("SHOW COLUMNS FROM students")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('school_id', $stCols)) $pdo->exec("ALTER TABLE students ADD COLUMN school_id VARCHAR(36) NULL AFTER school");
+        if (!in_array('target_ptn', $stCols)) $pdo->exec("ALTER TABLE students ADD COLUMN target_ptn VARCHAR(150) NULL AFTER school_id");
+        if (!in_array('phone', $stCols)) $pdo->exec("ALTER TABLE students ADD COLUMN phone VARCHAR(50) NULL AFTER target_ptn");
+    } catch (\Throwable $e) {}
+
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if ($payload->role === 'superadmin' || empty($payload->tenant_id)) {
             $stmt = $pdo->query("
                 SELECT s.id, s.name, s.email, s.plan, s.is_active, s.created_at, s.tenant_id,
+                       s.school, s.school_id, s.target_ptn, s.phone,
                        t.name as tenant_name
                 FROM students s 
                 LEFT JOIN tenants t ON s.tenant_id = t.id
@@ -497,6 +506,7 @@ elseif ($action === 'students') {
         } else {
             $stmt = $pdo->prepare("
                 SELECT s.id, s.name, s.email, s.plan, s.is_active, s.created_at, s.tenant_id,
+                       s.school, s.school_id, s.target_ptn, s.phone,
                        t.name as tenant_name
                 FROM students s 
                 LEFT JOIN tenants t ON s.tenant_id = t.id
@@ -515,6 +525,19 @@ elseif ($action === 'students') {
         $email = trim($input['email'] ?? '');
         $password = $input['password'] ?? '';
         $plan = $input['plan'] ?? 'free';
+        $school = trim($input['school'] ?? '');
+        $school_id = trim($input['school_id'] ?? '');
+        $target_ptn = trim($input['target_ptn'] ?? '');
+        $phone = trim($input['phone'] ?? '');
+
+        if (!empty($school) && empty($school_id)) {
+            try {
+                $stmt_sch = $pdo->prepare("SELECT id FROM schools WHERE LOWER(name) = LOWER(?) LIMIT 1");
+                $stmt_sch->execute([$school]);
+                $found_id = $stmt_sch->fetchColumn();
+                if ($found_id) $school_id = $found_id;
+            } catch (\Throwable $e) {}
+        }
         
         if (empty($name) || empty($email) || empty($password)) {
             http_response_code(400); echo json_encode(["error" => "Nama, email, dan password wajib diisi"]); exit;
@@ -554,8 +577,8 @@ elseif ($action === 'students') {
             $stmt = $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1)");
             $stmt->execute([$user_id, $email, $hashed]);
             
-            $stmt = $pdo->prepare("INSERT INTO students (id, tenant_id, name, email, password, plan, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)");
-            $stmt->execute([$student_id, $tenant_id, $name, $email, $hashed, $plan]);
+            $stmt = $pdo->prepare("INSERT INTO students (id, tenant_id, name, email, password, plan, school, school_id, target_ptn, phone, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
+            $stmt->execute([$student_id, $tenant_id, $name, $email, $hashed, $plan, $school ?: null, $school_id ?: null, $target_ptn ?: null, $phone ?: null]);
             
             $ur_id = bin2hex(random_bytes(16));
             $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($user_id,20,12);
@@ -620,6 +643,19 @@ elseif ($action === 'students') {
         $plan = $input['plan'] ?? 'free';
         $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
         $password = $input['password'] ?? '';
+        $school = trim($input['school'] ?? '');
+        $school_id = trim($input['school_id'] ?? '');
+        $target_ptn = trim($input['target_ptn'] ?? '');
+        $phone = trim($input['phone'] ?? '');
+
+        if (!empty($school) && empty($school_id)) {
+            try {
+                $stmt_sch = $pdo->prepare("SELECT id FROM schools WHERE LOWER(name) = LOWER(?) LIMIT 1");
+                $stmt_sch->execute([$school]);
+                $found_id = $stmt_sch->fetchColumn();
+                if ($found_id) $school_id = $found_id;
+            } catch (\Throwable $e) {}
+        }
 
         if (empty($id) || empty($name) || empty($email)) {
             http_response_code(400); echo json_encode(["error" => "ID, nama, dan email wajib diisi"]); exit;
@@ -634,17 +670,17 @@ elseif ($action === 'students') {
             $oldEmail = $studentData ? $studentData['email'] : null;
             $sTenantId = $studentData ? $studentData['tenant_id'] : ($payload->tenant_id ?? 'default_tenant');
 
-            // 1. Update students table (termasuk tenant_id jika disediakan oleh superadmin)
+            // 1. Update students table (termasuk atribut sekolah, target PTN, HP, tenant_id)
             if ($payload->role === 'superadmin' && array_key_exists('tenant_id', $input)) {
                 $newTenantId = !empty($input['tenant_id']) ? $input['tenant_id'] : null;
-                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, plan = ?, is_active = ?, tenant_id = ? WHERE id = ?");
-                $stmt->execute([$name, $email, $plan, $is_active, $newTenantId, $id]);
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, plan = ?, is_active = ?, school = ?, school_id = ?, target_ptn = ?, phone = ?, tenant_id = ? WHERE id = ?");
+                $stmt->execute([$name, $email, $plan, $is_active, $school ?: null, $school_id ?: null, $target_ptn ?: null, $phone ?: null, $newTenantId, $id]);
             } else {
-                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, plan = ?, is_active = ? WHERE id = ?");
-                $stmt->execute([$name, $email, $plan, $is_active, $id]);
+                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, plan = ?, is_active = ?, school = ?, school_id = ?, target_ptn = ?, phone = ? WHERE id = ?");
+                $stmt->execute([$name, $email, $plan, $is_active, $school ?: null, $school_id ?: null, $target_ptn ?: null, $phone ?: null, $id]);
             }
 
-            // 2. Find associated user_id from user_roles
+            // 2. Find associated user_id from user_roles or users
             $stmtU = $pdo->prepare("SELECT user_id FROM user_roles WHERE reference_id = ? AND role = 'student' LIMIT 1");
             $stmtU->execute([$id]);
             $userId = $stmtU->fetchColumn();
@@ -663,6 +699,7 @@ elseif ($action === 'students') {
                 } else {
                     $pdo->prepare("UPDATE users SET identity_key = ?, is_active = ? WHERE id = ?")->execute([$email, $is_active, $userId]);
                 }
+                $pdo->prepare("UPDATE user_roles SET reference_id = ? WHERE user_id = ? AND role = 'student'")->execute([$id, $userId]);
             } else {
                 // Check if user exists by identity_key
                 $stmtFindUser = $pdo->prepare("SELECT id FROM users WHERE LOWER(identity_key) = LOWER(?) OR LOWER(identity_key) = LOWER(?) LIMIT 1");
@@ -677,7 +714,7 @@ elseif ($action === 'students') {
                     }
                     $ur_id = bin2hex(random_bytes(16));
                     $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($ur_id,20,12);
-                    $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'student', ?) ON DUPLICATE KEY UPDATE user_id = VALUES(user_id)")->execute([$ur_id, $foundUserId, $sTenantId, $id]);
+                    $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'student', ?) ON DUPLICATE KEY UPDATE user_id = VALUES(user_id), reference_id = VALUES(reference_id)")->execute([$ur_id, $foundUserId, $sTenantId, $id]);
                 } else {
                     // Create user row if it never existed
                     $newUserId = bin2hex(random_bytes(16));
@@ -1280,12 +1317,20 @@ elseif ($action === 'schools') {
                 bk_phone VARCHAR(50) NOT NULL,
                 bk_email VARCHAR(150) NOT NULL,
                 estimated_students INT DEFAULT 200,
+                is_active TINYINT DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 INDEX idx_school_name (name),
                 INDEX idx_school_slug (slug)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
+    } catch (\Throwable $e) {}
+
+    try {
+        $cols = $pdo->query("SHOW COLUMNS FROM schools LIKE 'is_active'")->fetchAll();
+        if (empty($cols)) {
+            $pdo->exec("ALTER TABLE schools ADD COLUMN is_active TINYINT DEFAULT 1");
+        }
     } catch (\Throwable $e) {}
 
     try {
@@ -1307,7 +1352,13 @@ elseif ($action === 'schools') {
 
         $stmt = $pdo->prepare("
             SELECT s.*,
+                COALESCE(s.is_active, 1) as is_active,
+                s.bk_name as bk_coordinator_name,
+                s.bk_email as bk_coordinator_email,
+                s.bk_phone as bk_coordinator_phone,
+                (SELECT COUNT(DISTINCT st.id) FROM students st WHERE st.school_id = s.id OR st.school = s.name OR st.school LIKE CONCAT('%', s.name, '%')) as student_count,
                 (SELECT COUNT(DISTINCT st.id) FROM students st WHERE st.school_id = s.id OR st.school = s.name OR st.school LIKE CONCAT('%', s.name, '%')) as total_students,
+                (SELECT COUNT(DISTINCT st2.id) FROM students st2 JOIN subscriptions sub ON st2.id = sub.student_id AND sub.status = 'active' WHERE st2.school_id = s.id OR st2.school = s.name OR st2.school LIKE CONCAT('%', s.name, '%')) as paid_student_count,
                 (SELECT COUNT(DISTINCT st2.id) FROM students st2 JOIN subscriptions sub ON st2.id = sub.student_id AND sub.status = 'active' WHERE st2.school_id = s.id OR st2.school = s.name OR st2.school LIKE CONCAT('%', s.name, '%')) as paid_students
             FROM schools s
             $whereSql
@@ -1318,7 +1369,13 @@ elseif ($action === 'schools') {
 
         foreach ($schools as &$sch) {
             $sch['total_students'] = (int)($sch['total_students'] ?? 0);
+            $sch['student_count'] = (int)($sch['student_count'] ?? 0);
             $sch['paid_students'] = (int)($sch['paid_students'] ?? 0);
+            $sch['paid_student_count'] = (int)($sch['paid_student_count'] ?? 0);
+            $sch['is_active'] = (int)($sch['is_active'] ?? 1);
+            $sch['bk_coordinator_name'] = $sch['bk_coordinator_name'] ?: ($sch['bk_name'] ?? '');
+            $sch['bk_coordinator_email'] = $sch['bk_coordinator_email'] ?: ($sch['bk_email'] ?? '');
+            $sch['bk_coordinator_phone'] = $sch['bk_coordinator_phone'] ?: ($sch['bk_phone'] ?? '');
             $sch['share_link'] = "https://edupath.co.id/?school=" . urlencode($sch['name']) . "#/spp";
         }
         unset($sch);
@@ -1327,14 +1384,15 @@ elseif ($action === 'schools') {
         exit;
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = trim($input['name'] ?? '');
-        $bk_name = trim($input['bk_name'] ?? '');
-        $bk_email = strtolower(trim($input['bk_email'] ?? ($input['email'] ?? '')));
-        $bk_phone = trim($input['bk_phone'] ?? ($input['phone'] ?? ''));
+        $bk_name = trim($input['bk_name'] ?? ($input['bk_coordinator_name'] ?? ''));
+        $bk_email = strtolower(trim($input['bk_email'] ?? ($input['bk_coordinator_email'] ?? ($input['email'] ?? ''))));
+        $bk_phone = trim($input['bk_phone'] ?? ($input['bk_coordinator_phone'] ?? ($input['phone'] ?? '')));
         $npsn = trim($input['npsn'] ?? '');
         $city = trim($input['city'] ?? '');
         $province = trim($input['province'] ?? '');
-        $password = $input['password'] ?? 'EduPathSchool01!2026';
+        $password = $input['password'] ?? ($input['bk_password'] ?? 'EduPathSchool01!2026');
         $estimated_students = (int)($input['estimated_students'] ?? 200);
+        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
 
         if (empty($name) || empty($bk_name) || empty($bk_email) || empty($bk_phone)) {
             http_response_code(400);
@@ -1361,7 +1419,7 @@ elseif ($action === 'schools') {
         $user_id = substr($user_id,0,8).'-'.substr($user_id,8,4).'-'.substr($user_id,12,4).'-'.substr($user_id,16,4).'-'.substr($user_id,20,12);
 
         $ur_id = bin2hex(random_bytes(16));
-        $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($ur_id,20,12);
+        $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($user_id,20,12);
 
         $hashed_pass = password_hash($password, PASSWORD_BCRYPT);
 
@@ -1369,8 +1427,8 @@ elseif ($action === 'schools') {
             $pdo->beginTransaction();
             $pdo->exec("INSERT INTO tenants (id, name, slug, is_active) VALUES ('default_tenant', 'Default EduPath Tenant', 'default', 1) ON DUPLICATE KEY UPDATE name=name");
 
-            $stmt = $pdo->prepare("INSERT INTO schools (id, name, slug, npsn, city, province, bk_name, bk_phone, bk_email, estimated_students) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$school_id, $name, $slug, $npsn, $city, $province, $bk_name, $bk_phone, $bk_email, $estimated_students]);
+            $stmt = $pdo->prepare("INSERT INTO schools (id, name, slug, npsn, city, province, bk_name, bk_phone, bk_email, estimated_students, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$school_id, $name, $slug, $npsn, $city, $province, $bk_name, $bk_phone, $bk_email, $estimated_students, $is_active]);
 
             $stmt_u = $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE password = VALUES(password)");
             $stmt_u->execute([$user_id, $bk_email, $hashed_pass]);
@@ -1391,21 +1449,27 @@ elseif ($action === 'schools') {
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $id = $input['id'] ?? '';
         $name = trim($input['name'] ?? '');
-        $bk_name = trim($input['bk_name'] ?? '');
-        $bk_email = strtolower(trim($input['bk_email'] ?? ($input['email'] ?? '')));
-        $bk_phone = trim($input['bk_phone'] ?? ($input['phone'] ?? ''));
+        $bk_name = trim($input['bk_name'] ?? ($input['bk_coordinator_name'] ?? ''));
+        $bk_email = strtolower(trim($input['bk_email'] ?? ($input['bk_coordinator_email'] ?? ($input['email'] ?? ''))));
+        $bk_phone = trim($input['bk_phone'] ?? ($input['bk_coordinator_phone'] ?? ($input['phone'] ?? '')));
         $npsn = trim($input['npsn'] ?? '');
         $city = trim($input['city'] ?? '');
         $province = trim($input['province'] ?? '');
         $estimated_students = (int)($input['estimated_students'] ?? 200);
+        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : null;
 
         if (empty($id) || empty($name)) {
             http_response_code(400); echo json_encode(["error" => "ID dan nama sekolah wajib diisi"]); exit;
         }
 
         try {
-            $stmt = $pdo->prepare("UPDATE schools SET name=?, npsn=?, city=?, province=?, bk_name=?, bk_phone=?, bk_email=?, estimated_students=? WHERE id=?");
-            $stmt->execute([$name, $npsn, $city, $province, $bk_name, $bk_phone, $bk_email, $estimated_students, $id]);
+            if ($is_active !== null) {
+                $stmt = $pdo->prepare("UPDATE schools SET name=?, npsn=?, city=?, province=?, bk_name=?, bk_phone=?, bk_email=?, estimated_students=?, is_active=? WHERE id=?");
+                $stmt->execute([$name, $npsn, $city, $province, $bk_name, $bk_phone, $bk_email, $estimated_students, $is_active, $id]);
+            } else {
+                $stmt = $pdo->prepare("UPDATE schools SET name=?, npsn=?, city=?, province=?, bk_name=?, bk_phone=?, bk_email=?, estimated_students=? WHERE id=?");
+                $stmt->execute([$name, $npsn, $city, $province, $bk_name, $bk_phone, $bk_email, $estimated_students, $id]);
+            }
 
             if (!empty($input['password'])) {
                 $newPass = password_hash($input['password'], PASSWORD_BCRYPT);
