@@ -46,7 +46,7 @@ header('Content-Type: application/json');
 // ----------------------------------------------------------------
 // DATABASE — Dari environment variable
 // ----------------------------------------------------------------
-$host    = env('DB_HOST', '127.0.0.1');
+$host    = env('DB_HOST', 'localhost');
 $db_user = env('DB_USER');
 $db_pass = env('DB_PASSWORD');
 $db_name = env('DB_NAME');
@@ -64,24 +64,37 @@ if (empty($db_user) || empty($db_name)) {
     exit;
 }
 
+$pdo_options = [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES => false,
+    PDO::ATTR_TIMEOUT => 4 // 4s timeout prevents LiteSpeed 503 worker crash
+];
+
 try {
-    $pdo = new PDO(
-        "mysql:host=$host;port=$port;dbname=$db_name;charset=utf8mb4",
-        $db_user,
-        $db_pass
-    );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    $dsn = "mysql:host=$host;dbname=$db_name;charset=utf8mb4";
+    if ($host !== 'localhost' && !empty($port)) {
+        $dsn .= ";port=$port";
+    }
+    $pdo = new PDO($dsn, $db_user, $db_pass, $pdo_options);
 } catch (PDOException $e) {
-    http_response_code(500);
-    $is_dev = (env('APP_ENV', 'production') === 'development');
-    echo json_encode([
-        "error" => "Koneksi database gagal.",
-        // Hanya tampilkan detail error di development
-        "detail" => $is_dev ? $e->getMessage() : null
-    ]);
-    exit;
+    // Auto-fallback: if localhost fails try 127.0.0.1, or vice versa
+    $fallbackHost = ($host === 'localhost') ? '127.0.0.1' : 'localhost';
+    try {
+        $dsnFallback = "mysql:host=$fallbackHost;dbname=$db_name;charset=utf8mb4";
+        if ($fallbackHost !== 'localhost' && !empty($port)) {
+            $dsnFallback .= ";port=$port";
+        }
+        $pdo = new PDO($dsnFallback, $db_user, $db_pass, $pdo_options);
+    } catch (PDOException $eFallback) {
+        http_response_code(500);
+        $is_dev = (env('APP_ENV', 'production') === 'development');
+        echo json_encode([
+            "error" => "Koneksi database gagal.",
+            "detail" => $is_dev ? $eFallback->getMessage() : null
+        ]);
+        exit;
+    }
 }
 
 // ----------------------------------------------------------------
