@@ -3823,7 +3823,16 @@
             </button>
           </p>
 
-          <div v-if="isLoginMode" class="mt-3 pt-3 border-t border-white/10 text-center space-y-1">
+          <div v-if="isLoginMode" class="mt-3 pt-3 border-t border-white/10 text-center space-y-2">
+            <!-- Quick Fill Demo School Account -->
+            <button
+              type="button"
+              @click="authForm.email = 'bk.smansaciamis@edupath.co.id'; authForm.password = 'EduPathSchool01!2026'"
+              class="w-full py-1.5 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-[10px] font-bold text-emerald-300 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <i class="ph-bold ph-chalkboard-teacher"></i>
+              <span>Isi Akun Demo Sekolah: SMANSA Ciamis</span>
+            </button>
             <p class="text-[10px] text-slate-400 font-light flex items-center justify-center gap-1">
               <span>Perwakilan Sekolah / Guru BK?</span>
               <a href="#/school" @click="showLoginModal = false" class="text-[#c0ff00] font-bold hover:underline">

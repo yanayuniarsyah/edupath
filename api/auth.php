@@ -153,6 +153,25 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (\Throwable $e) {}
     }
 
+    // Auto-heal Demo / UAT School BK account (SMANSA Ciamis)
+    if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'bk@smansaciamis.sch.id', 'smansaciamis']) && ($password === 'EduPathSchool01!2026' || $password === 'smansa123')) {
+        try {
+            $uId = 'uat-u-school-smansa';
+            $schId = 'uat-r-school-smansa';
+            $hPass = password_hash('EduPathSchool01!2026', PASSWORD_BCRYPT);
+            $schName = 'SMANSA Ciamis';
+            $pdo->exec("INSERT INTO schools (id, name, slug, npsn, city, bk_name, bk_phone, bk_email, estimated_students) 
+                        VALUES ('$schId', '$schName', 'smansa-ciamis', '20211567', 'Kabupaten Ciamis', 'Dra. H. Nuraeni, M.Pd', '081223344556', 'bk.smansaciamis@edupath.co.id', 350) 
+                        ON DUPLICATE KEY UPDATE name='$schName', bk_name='Dra. H. Nuraeni, M.Pd', bk_email='bk.smansaciamis@edupath.co.id'");
+            $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) 
+                        VALUES ('$uId', '$email', '$hPass', 1) 
+                        ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
+            $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
+                        VALUES ('ur-uat-sch-smansa', '$uId', NULL, 'school_bk', '$schId') 
+                        ON DUPLICATE KEY UPDATE role='school_bk', reference_id='$schId'");
+        } catch (\Throwable $e) {}
+    }
+
     // Ensure affiliates columns exist for backward-compatibility
     try {
         $affCols = $pdo->query("DESCRIBE affiliates")->fetchAll(PDO::FETCH_COLUMN);
