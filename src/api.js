@@ -220,8 +220,13 @@ export async function apiFetch(endpoint, options = {}) {
       clearTimeout(timeout);
     }
 
-    const contentType = response.headers.get('content-type') || '';
-    const data = contentType.includes('application/json') ? await response.json() : await response.text();
+    let data;
+    const text = await response.text();
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = { error: text || `Terjadi kendala pada server (HTTP ${response.status})` };
+    }
 
     if (!response.ok) {
       // Retry pada 503 (server overload) untuk GET requests
@@ -230,7 +235,7 @@ export async function apiFetch(endpoint, options = {}) {
         await new Promise(r => setTimeout(r, delay));
         return doFetch(attempt + 1);
       }
-      throw new Error(data.error || data.message || 'Terjadi kesalahan pada server');
+      throw new Error(data.error || data.message || `Terjadi kendala pada server (HTTP ${response.status})`);
     }
 
     return data;

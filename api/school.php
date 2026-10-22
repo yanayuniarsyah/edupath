@@ -28,8 +28,10 @@ function ensure_school_schema($pdo) {
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 INDEX idx_school_name (name),
                 INDEX idx_school_slug (slug)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
+        // Convert to default charset to eliminate any collation mismatch
+        try { $pdo->exec("ALTER TABLE schools CONVERT TO CHARACTER SET utf8mb4"); } catch (\Throwable $e) {}
     } catch (\Throwable $e) {
         error_log("School schema creation failed: " . $e->getMessage());
     }
@@ -138,8 +140,8 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1)");
         $stmt->execute([$user_id, $email, $hashed_pass]);
 
-        // Insert into user_roles
-        $stmt = $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, NULL, 'school_bk', ?)");
+        // Insert into user_roles (using default_tenant to satisfy foreign key & NOT NULL)
+        $stmt = $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, 'default_tenant', 'school_bk', ?)");
         $stmt->execute([$ur_id, $user_id, $school_id]);
 
         $pdo->commit();
@@ -175,7 +177,7 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->rollBack();
         http_response_code(500);
         error_log("School registration failed: " . $e->getMessage());
-        echo json_encode(["error" => "Gagal mendaftarkan sekolah. Silakan coba beberapa saat lagi."]);
+        echo json_encode(["error" => "Gagal mendaftarkan sekolah: " . $e->getMessage()]);
         exit;
     }
 }
@@ -184,89 +186,98 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // 2. LOGIN GURU BK / SEKOLAH
 // -------------------------------------------------------------
 if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!check_rate_limit($pdo, 'school_login', 10, 15)) {
-        http_response_code(429);
-        echo json_encode(["error" => "Terlalu banyak percobaan login. Coba lagi dalam beberapa saat."]);
+    try {
+        if (!check_rate_limit($pdo, 'school_login', 10, 15)) {
+            http_response_code(429);
+            echo json_encode(["error" => "Terlalu banyak percobaan login. Coba lagi dalam beberapa saat."]);
+            exit;
+        }
+
+        $email = strtolower(trim($input['email'] ?? ''));
+        $password = $input['password'] ?? '';
+
+        if (empty($email) || empty($password)) {
+            http_response_code(400);
+            echo json_encode(["error" => "Email dan password wajib diisi."]);
+            exit;
+        }
+
+        // Auto-heal Demo School account (SMANSA Ciamis)
+        if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'bk@smansaciamis.sch.id', 'smansaciamis']) && ($password === 'EduPathSchool01!2026' || $password === 'smansa123')) {
+            try {
+                $uId = 'uat-u-school-smansa';
+                $schId = 'uat-r-school-smansa';
+                $hPass = password_hash('EduPathSchool01!2026', PASSWORD_BCRYPT);
+                $schName = 'SMANSA Ciamis';
+                $pdo->exec("INSERT INTO schools (id, name, slug, npsn, city, bk_name, bk_phone, bk_email, estimated_students) 
+                            VALUES ('$schId', '$schName', 'smansa-ciamis', '20211567', 'Kabupaten Ciamis', 'Dra. H. Nuraeni, M.Pd', '081223344556', 'bk.smansaciamis@edupath.co.id', 350) 
+                            ON DUPLICATE KEY UPDATE name='$schName', bk_name='Dra. H. Nuraeni, M.Pd', bk_email='bk.smansaciamis@edupath.co.id'");
+                $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) 
+                            VALUES ('$uId', '$email', '$hPass', 1) 
+                            ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
+                $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
+                            VALUES ('ur-uat-sch-smansa', '$uId', 'default_tenant', 'school_bk', '$schId') 
+                            ON DUPLICATE KEY UPDATE role='school_bk', reference_id='$schId', tenant_id='default_tenant'");
+            } catch (\Throwable $e) {
+                error_log("Auto-heal school failed: " . $e->getMessage());
+            }
+        }
+
+        $stmt = $pdo->prepare("
+            SELECT u.id as user_id, u.password as user_password, ur.role, ur.reference_id,
+                   s.id as school_id, s.name as school_name, s.slug, s.bk_name, s.bk_email, s.bk_phone, s.city
+            FROM users u
+            JOIN user_roles ur ON u.id = ur.user_id
+            LEFT JOIN schools s ON ur.reference_id = s.id
+            WHERE LOWER(u.identity_key) = ? AND u.is_active = 1 AND ur.role IN ('school_bk', 'teacher', 'admin', 'superadmin')
+            LIMIT 1
+        ");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user || !password_verify($password, $user['user_password'])) {
+            http_response_code(401);
+            echo json_encode(["error" => "Email atau password salah."]);
+            exit;
+        }
+
+        reset_rate_limit($pdo, 'school_login');
+
+        $school_id = $user['school_id'] ?? $user['reference_id'];
+        $school_name = $user['school_name'] ?? 'Sekolah Mitra';
+
+        $token = generate_jwt([
+            'user_id' => $user['user_id'],
+            'id' => $school_id,
+            'role' => $user['role'],
+            'school_id' => $school_id,
+            'school_name' => $school_name,
+            'email' => $email
+        ]);
+
+        $share_link = "https://edupath.co.id/?school=" . urlencode($school_name) . "#/spp";
+
+        echo json_encode([
+            "success" => true,
+            "token" => $token,
+            "school" => [
+                "id" => $school_id,
+                "name" => $school_name,
+                "slug" => $user['slug'] ?? '',
+                "bk_name" => $user['bk_name'] ?? 'Koordinator BK',
+                "bk_email" => $email,
+                "bk_phone" => $user['bk_phone'] ?? '',
+                "city" => $user['city'] ?? '',
+                "share_link" => $share_link
+            ]
+        ]);
+        exit;
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        error_log("School login error: " . $e->getMessage());
+        echo json_encode(["error" => "Terjadi kendala saat login sekolah: " . $e->getMessage()]);
         exit;
     }
-
-    $email = strtolower(trim($input['email'] ?? ''));
-    $password = $input['password'] ?? '';
-
-    if (empty($email) || empty($password)) {
-        http_response_code(400);
-        echo json_encode(["error" => "Email dan password wajib diisi."]);
-        exit;
-    }
-
-    // Auto-heal Demo School account (SMANSA Ciamis)
-    if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'bk@smansaciamis.sch.id', 'smansaciamis']) && ($password === 'EduPathSchool01!2026' || $password === 'smansa123')) {
-        try {
-            $uId = 'uat-u-school-smansa';
-            $schId = 'uat-r-school-smansa';
-            $hPass = password_hash($password, PASSWORD_BCRYPT);
-            $schName = 'SMANSA Ciamis';
-            $pdo->exec("INSERT INTO schools (id, name, slug, npsn, city, bk_name, bk_phone, bk_email, estimated_students) 
-                        VALUES ('$schId', '$schName', 'smansa-ciamis', '20211567', 'Kabupaten Ciamis', 'Dra. H. Nuraeni, M.Pd', '081223344556', 'bk.smansaciamis@edupath.co.id', 350) 
-                        ON DUPLICATE KEY UPDATE name='$schName', bk_name='Dra. H. Nuraeni, M.Pd', bk_email='bk.smansaciamis@edupath.co.id'");
-            $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) 
-                        VALUES ('$uId', '$email', '$hPass', 1) 
-                        ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
-            $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
-                        VALUES ('ur-uat-sch-smansa', '$uId', NULL, 'school_bk', '$schId') 
-                        ON DUPLICATE KEY UPDATE role='school_bk', reference_id='$schId'");
-        } catch (\Throwable $e) {}
-    }
-
-    $stmt = $pdo->prepare("
-        SELECT u.id as user_id, u.password as user_password, ur.role, ur.reference_id,
-               s.id as school_id, s.name as school_name, s.slug, s.bk_name, s.bk_email, s.bk_phone, s.city
-        FROM users u
-        JOIN user_roles ur ON u.id = ur.user_id
-        LEFT JOIN schools s ON (ur.reference_id = s.id OR s.bk_email = u.identity_key)
-        WHERE u.identity_key = ? AND u.is_active = 1 AND ur.role IN ('school_bk', 'teacher', 'admin', 'superadmin')
-        LIMIT 1
-    ");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$user || !password_verify($password, $user['user_password'])) {
-        http_response_code(401);
-        echo json_encode(["error" => "Email atau password salah."]);
-        exit;
-    }
-
-    reset_rate_limit($pdo, 'school_login');
-
-    $school_id = $user['school_id'] ?? $user['reference_id'];
-    $school_name = $user['school_name'] ?? 'Sekolah Mitra';
-
-    $token = generate_jwt([
-        'user_id' => $user['user_id'],
-        'id' => $school_id,
-        'role' => $user['role'],
-        'school_id' => $school_id,
-        'school_name' => $school_name,
-        'email' => $email
-    ]);
-
-    $share_link = "https://edupath.co.id/?school=" . urlencode($school_name) . "#/spp";
-
-    echo json_encode([
-        "success" => true,
-        "token" => $token,
-        "school" => [
-            "id" => $school_id,
-            "name" => $school_name,
-            "slug" => $user['slug'] ?? '',
-            "bk_name" => $user['bk_name'] ?? 'Koordinator BK',
-            "bk_email" => $email,
-            "bk_phone" => $user['bk_phone'] ?? '',
-            "city" => $user['city'] ?? '',
-            "share_link" => $share_link
-        ]
-    ]);
-    exit;
 }
 
 // -------------------------------------------------------------

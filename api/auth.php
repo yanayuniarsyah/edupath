@@ -141,7 +141,8 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Auto-heal UAT student account if credentials match
+    try {
+        // Auto-heal UAT student account if credentials match
     if ($email === 'student@uat.edupath.local' && $password === 'EduPathStudent01!2026') {
         try {
             $uId = 'uat-u-student';
@@ -153,33 +154,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (\Throwable $e) {}
     }
 
-    // Auto-heal Demo / UAT School BK account (SMANSA Ciamis)
-    if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'bk@smansaciamis.sch.id', 'smansaciamis']) && ($password === 'EduPathSchool01!2026' || $password === 'smansa123')) {
-        try {
-            $uId = 'uat-u-school-smansa';
-            $schId = 'uat-r-school-smansa';
-            $hPass = password_hash('EduPathSchool01!2026', PASSWORD_BCRYPT);
-            $schName = 'SMANSA Ciamis';
-            $pdo->exec("INSERT INTO schools (id, name, slug, npsn, city, bk_name, bk_phone, bk_email, estimated_students) 
-                        VALUES ('$schId', '$schName', 'smansa-ciamis', '20211567', 'Kabupaten Ciamis', 'Dra. H. Nuraeni, M.Pd', '081223344556', 'bk.smansaciamis@edupath.co.id', 350) 
-                        ON DUPLICATE KEY UPDATE name='$schName', bk_name='Dra. H. Nuraeni, M.Pd', bk_email='bk.smansaciamis@edupath.co.id'");
-            $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) 
-                        VALUES ('$uId', '$email', '$hPass', 1) 
-                        ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
-            $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
-                        VALUES ('ur-uat-sch-smansa', '$uId', NULL, 'school_bk', '$schId') 
-                        ON DUPLICATE KEY UPDATE role='school_bk', reference_id='$schId'");
-        } catch (\Throwable $e) {}
-    }
-
-    // Ensure affiliates columns exist for backward-compatibility
-    try {
-        $affCols = $pdo->query("DESCRIBE affiliates")->fetchAll(PDO::FETCH_COLUMN);
-        if (!in_array('name', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN name VARCHAR(150) NULL");
-        if (!in_array('email', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN email VARCHAR(150) NULL");
-    } catch (\Throwable $e) {}
-
-    // Ensure schools table exists for join
+    // Ensure schools table exists for join and auto-heal
     try {
         $pdo->exec("
             CREATE TABLE IF NOT EXISTS schools (
@@ -197,8 +172,35 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 INDEX idx_school_name (name),
                 INDEX idx_school_slug (slug)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
+        try { $pdo->exec("ALTER TABLE schools CONVERT TO CHARACTER SET utf8mb4"); } catch (\Throwable $e) {}
+    } catch (\Throwable $e) {}
+
+    // Auto-heal Demo / UAT School BK account (SMANSA Ciamis)
+    if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'bk@smansaciamis.sch.id', 'smansaciamis']) && ($password === 'EduPathSchool01!2026' || $password === 'smansa123')) {
+        try {
+            $uId = 'uat-u-school-smansa';
+            $schId = 'uat-r-school-smansa';
+            $hPass = password_hash('EduPathSchool01!2026', PASSWORD_BCRYPT);
+            $schName = 'SMANSA Ciamis';
+            $pdo->exec("INSERT INTO schools (id, name, slug, npsn, city, bk_name, bk_phone, bk_email, estimated_students) 
+                        VALUES ('$schId', '$schName', 'smansa-ciamis', '20211567', 'Kabupaten Ciamis', 'Dra. H. Nuraeni, M.Pd', '081223344556', 'bk.smansaciamis@edupath.co.id', 350) 
+                        ON DUPLICATE KEY UPDATE name='$schName', bk_name='Dra. H. Nuraeni, M.Pd', bk_email='bk.smansaciamis@edupath.co.id'");
+            $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) 
+                        VALUES ('$uId', '$email', '$hPass', 1) 
+                        ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
+            $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
+                        VALUES ('ur-uat-sch-smansa', '$uId', 'default_tenant', 'school_bk', '$schId') 
+                        ON DUPLICATE KEY UPDATE role='school_bk', reference_id='$schId', tenant_id='default_tenant'");
+        } catch (\Throwable $e) {}
+    }
+
+    // Ensure affiliates columns exist for backward-compatibility
+    try {
+        $affCols = $pdo->query("DESCRIBE affiliates")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('name', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN name VARCHAR(150) NULL");
+        if (!in_array('email', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN email VARCHAR(150) NULL");
     } catch (\Throwable $e) {}
 
     $stmt = $pdo->prepare("
@@ -220,12 +222,12 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         LEFT JOIN students s ON (ur.reference_id = s.id OR LOWER(u.identity_key) = LOWER(s.email))
         LEFT JOIN admins a ON (ur.reference_id = a.id OR u.identity_key = a.username)
         LEFT JOIN affiliates aff ON (ur.reference_id = aff.id OR u.id = aff.user_id)
-        LEFT JOIN schools sch ON (ur.reference_id = sch.id OR LOWER(u.identity_key) = LOWER(sch.bk_email))
+        LEFT JOIN schools sch ON ur.reference_id = sch.id
         LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE (LOWER(u.identity_key) = LOWER(?) OR (s.email IS NOT NULL AND LOWER(s.email) = LOWER(?)) OR (sch.bk_email IS NOT NULL AND LOWER(sch.bk_email) = LOWER(?))) 
+        WHERE (LOWER(u.identity_key) = LOWER(?) OR (s.email IS NOT NULL AND LOWER(s.email) = LOWER(?))) 
           AND u.is_active = 1
     ");
-    $stmt->execute([$email, $email, $email]);
+    $stmt->execute([$email, $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $password_matched = false;
@@ -340,6 +342,12 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         http_response_code(401);
         echo json_encode(["success" => false, "message" => "Email atau password salah"]); // Web app compatibility
     }
+} catch (\Throwable $e) {
+    http_response_code(500);
+    error_log("Auth login error: " . $e->getMessage());
+    echo json_encode(["error" => "Terjadi kendala saat login: " . $e->getMessage()]);
+    exit;
+}
 }
 elseif ($action === 'refresh' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!check_rate_limit($pdo, 'refresh', 20, 15)) {
