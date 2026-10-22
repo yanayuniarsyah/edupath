@@ -87,12 +87,15 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($subtes) {
-        $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi = ? OR subtes = ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
-        $stmt->bindValue(1, $subtes);
-        $stmt->bindValue(2, $subtes);
-        $stmt->bindValue(3, (int)$limit, PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi = ? OR subtes = ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+        $stmt->execute([$subtes, $subtes]);
         $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($questions) {
+            shuffle($questions);
+            if (count($questions) > (int)$limit) {
+                $questions = array_slice($questions, 0, (int)$limit);
+            }
+        }
     } else {
         if (strtolower($quiz_type) === 'tryout') {
             $tryout_distribution = [
@@ -106,21 +109,27 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             $questions = [];
             foreach ($tryout_distribution as $sub_name => $sub_limit) {
-                $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi LIKE ? OR subtes LIKE ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
-                $stmt->bindValue(1, "%" . $sub_name . "%");
-                $stmt->bindValue(2, "%" . $sub_name . "%");
-                $stmt->bindValue(3, $sub_limit, PDO::PARAM_INT);
-                $stmt->execute();
+                $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi LIKE ? OR subtes LIKE ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+                $stmt->execute(["%" . $sub_name . "%", "%" . $sub_name . "%"]);
                 $fetched = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($fetched) {
+                    shuffle($fetched);
+                    if (count($fetched) > $sub_limit) {
+                        $fetched = array_slice($fetched, 0, $sub_limit);
+                    }
                     $questions = array_merge($questions, $fetched);
                 }
             }
         } else {
-            $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
-            $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
+            $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
             $stmt->execute();
             $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if ($questions) {
+                shuffle($questions);
+                if (count($questions) > (int)$limit) {
+                    $questions = array_slice($questions, 0, (int)$limit);
+                }
+            }
         }
     }
 
@@ -152,11 +161,15 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     if ($sub_materi_input) {
-        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
-        $stmt->bindValue(1, $sub_materi_input);
-        $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+        $stmt->execute([$sub_materi_input]);
         $questions = $stmt->fetchAll();
+        if ($questions) {
+            shuffle($questions);
+            if (count($questions) > (int)$limit) {
+                $questions = array_slice($questions, 0, (int)$limit);
+            }
+        }
     } else {
         if (strtolower($quiz_type) === 'tryout') {
             $tryout_distribution = [
@@ -170,20 +183,27 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             ];
             $questions = [];
             foreach ($tryout_distribution as $sub_name => $sub_limit) {
-                $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi LIKE ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
-                $stmt->bindValue(1, "%" . $sub_name . "%");
-                $stmt->bindValue(2, $sub_limit, PDO::PARAM_INT);
-                $stmt->execute();
+                $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi LIKE ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+                $stmt->execute(["%" . $sub_name . "%"]);
                 $fetched = $stmt->fetchAll();
                 if ($fetched) {
+                    shuffle($fetched);
+                    if (count($fetched) > $sub_limit) {
+                        $fetched = array_slice($fetched, 0, $sub_limit);
+                    }
                     $questions = array_merge($questions, $fetched);
                 }
             }
         } else {
-            $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter ORDER BY RAND() LIMIT ?");
-            $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
+            $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
             $stmt->execute();
             $questions = $stmt->fetchAll();
+            if ($questions) {
+                shuffle($questions);
+                if (count($questions) > (int)$limit) {
+                    $questions = array_slice($questions, 0, (int)$limit);
+                }
+            }
         }
     }
     
