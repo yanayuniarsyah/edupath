@@ -160,25 +160,53 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array('email', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN email VARCHAR(150) NULL");
     } catch (\Throwable $e) {}
 
+    // Ensure schools table exists for join
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS schools (
+                id VARCHAR(36) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                slug VARCHAR(255) NOT NULL UNIQUE,
+                npsn VARCHAR(20) NULL,
+                city VARCHAR(100) NULL,
+                province VARCHAR(100) NULL,
+                bk_name VARCHAR(150) NOT NULL,
+                bk_phone VARCHAR(50) NOT NULL,
+                bk_email VARCHAR(150) NOT NULL,
+                estimated_students INT DEFAULT 200,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_school_name (name),
+                INDEX idx_school_slug (slug)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ");
+    } catch (\Throwable $e) {}
+
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.password as user_password, s.password as student_password, ur.role, ur.tenant_id, ur.reference_id, 
-               COALESCE(s.id, a.id, ur.reference_id) as student_id, 
-               COALESCE(s.name, aff.name, aff.bank_owner, a.name, 'Mitra Afiliasi') as name, 
-               COALESCE(s.email, aff.email, a.username, u.identity_key) as email, 
+               COALESCE(s.id, a.id, sch.id, ur.reference_id) as student_id, 
+               COALESCE(s.name, aff.name, aff.bank_owner, a.name, sch.name, 'Pengguna EduPath') as name, 
+               COALESCE(s.email, aff.email, a.username, sch.bk_email, u.identity_key) as email, 
                COALESCE(s.target_ptn, 'UI') as target_ptn, 
                COALESCE(s.plan, 'free') as plan,
                COALESCE(t.is_active, 1) as tenant_active,
-               COALESCE(aff.referral_code, '') as referral_code
+               COALESCE(aff.referral_code, '') as referral_code,
+               sch.id as school_id,
+               sch.name as school_name,
+               sch.bk_name,
+               sch.city as school_city,
+               sch.slug as school_slug
         FROM users u 
         JOIN user_roles ur ON u.id = ur.user_id 
         LEFT JOIN students s ON (ur.reference_id = s.id OR LOWER(u.identity_key) = LOWER(s.email))
         LEFT JOIN admins a ON (ur.reference_id = a.id OR u.identity_key = a.username)
         LEFT JOIN affiliates aff ON (ur.reference_id = aff.id OR u.id = aff.user_id)
+        LEFT JOIN schools sch ON (ur.reference_id = sch.id OR LOWER(u.identity_key) = LOWER(sch.bk_email))
         LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE (LOWER(u.identity_key) = LOWER(?) OR (s.email IS NOT NULL AND LOWER(s.email) = LOWER(?))) 
+        WHERE (LOWER(u.identity_key) = LOWER(?) OR (s.email IS NOT NULL AND LOWER(s.email) = LOWER(?)) OR (sch.bk_email IS NOT NULL AND LOWER(sch.bk_email) = LOWER(?))) 
           AND u.is_active = 1
     ");
-    $stmt->execute([$email, $email]);
+    $stmt->execute([$email, $email, $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $password_matched = false;
@@ -191,7 +219,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $new_hash = password_hash($password, PASSWORD_BCRYPT);
                 try {
                     $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$new_hash, $user['user_id']]);
-                    if (!empty($user['student_id'])) {
+                    if (!empty($user['student_id']) && $user['role'] === 'student') {
                         $pdo->prepare("UPDATE students SET password = ? WHERE id = ?")->execute([$new_hash, $user['student_id']]);
                     }
                 } catch (\Throwable $e) {}
@@ -201,9 +229,9 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($user && $password_matched) {
-        if (!in_array($user['role'], ['student', 'affiliate'])) {
+        if (!in_array($user['role'], ['student', 'school_bk', 'teacher', 'tutor', 'admin', 'superadmin', 'affiliate'])) {
             http_response_code(403);
-            echo json_encode(["error" => "Akun Staf/Guru/Tutor/Admin tidak diizinkan masuk melalui portal siswa. Silakan masuk melalui halaman login staf di /#/admin."]);
+            echo json_encode(["error" => "Peran akun tidak dikenali."]);
             exit;
         }
         if ((int)$user['tenant_active'] === 0) {
@@ -218,7 +246,29 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("UPDATE students SET last_login = NOW() WHERE id = ?")->execute([$user['student_id']]);
         }
         
-        $token = generate_jwt(['user_id' => $user['user_id'], 'id' => $user['reference_id'] ?? $user['user_id'], 'role' => $user['role'], 'tenant_id' => $user['tenant_id']]);
+        $token_payload = [
+            'user_id' => $user['user_id'], 
+            'id' => $user['reference_id'] ?? $user['user_id'], 
+            'role' => $user['role'], 
+            'tenant_id' => $user['tenant_id'],
+            'email' => $user['email']
+        ];
+
+        if ($user['role'] === 'school_bk' || !empty($user['school_id'])) {
+            $token_payload['school_id'] = $user['school_id'] ?? $user['reference_id'];
+            $token_payload['school_name'] = $user['school_name'] ?? $user['name'];
+            $user['school'] = [
+                'id' => $user['school_id'] ?? $user['reference_id'],
+                'name' => $user['school_name'] ?? $user['name'],
+                'slug' => $user['school_slug'] ?? '',
+                'bk_name' => $user['bk_name'] ?? 'Koordinator BK',
+                'bk_email' => $user['email'],
+                'city' => $user['school_city'] ?? '',
+                'share_link' => "https://edupath.co.id/?school=" . urlencode($user['school_name'] ?? $user['name']) . "#/spp"
+            ];
+        }
+
+        $token = generate_jwt($token_payload);
         
         // Generate Refresh Token
         $refresh_token = bin2hex(random_bytes(32));

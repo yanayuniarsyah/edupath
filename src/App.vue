@@ -3724,10 +3724,10 @@
             <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
           <h3 class="text-lg font-bold font-heading text-white">
-            {{ isForgotPasswordMode ? 'Lupa Password?' : (isResetPasswordMode ? 'Reset Password' : (isLoginMode ? 'Masuk ke Akun Siswa' : 'Daftar Akun EduPath')) }}
+            {{ isForgotPasswordMode ? 'Lupa Password?' : (isResetPasswordMode ? 'Reset Password' : (isLoginMode ? 'Masuk ke EduPath' : 'Daftar Akun EduPath')) }}
           </h3>
           <p class="text-xs text-slate-400 font-light mt-1">
-            {{ isForgotPasswordMode ? 'Masukkan email Anda untuk menerima token pemulihan.' : (isResetPasswordMode ? 'Masukkan token dan password baru Anda.' : (isLoginMode ? 'Selamat datang kembali pejuang PTN!' : 'Mulai perjalanan belajarmu hari ini.')) }}
+            {{ isForgotPasswordMode ? 'Masukkan email Anda untuk menerima token pemulihan.' : (isResetPasswordMode ? 'Masukkan token dan password baru Anda.' : (isLoginMode ? 'Satu pintu masuk untuk Siswa, Guru BK, Pengajar, & Administrator' : 'Mulai perjalanan belajarmu hari ini.')) }}
           </p>
         </div>
 
@@ -3787,8 +3787,8 @@
             </div>
 
             <div class="space-y-1">
-              <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Email</label>
-              <input v-model="authForm.email" type="email" required placeholder="demo@edupath.id" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
+              <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Email atau Username</label>
+              <input v-model="authForm.email" type="text" required placeholder="siswa@gmail.com / bk.sekolah@sch.id / username" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
             </div>
 
             <div class="space-y-1">
@@ -3817,11 +3817,20 @@
           </form>
 
           <p class="text-[10px] text-slate-500 text-center font-light mt-4">
-            {{ isLoginMode ? 'Belum punya akun?' : 'Sudah punya akun?' }}
+            {{ isLoginMode ? 'Belum punya akun siswa?' : 'Sudah punya akun?' }}
             <button @click="isLoginMode = !isLoginMode" class="text-[#c0ff00] font-bold hover:underline ml-1">
-              {{ isLoginMode ? 'Daftar di sini' : 'Masuk di sini' }}
+              {{ isLoginMode ? 'Daftar siswa di sini' : 'Masuk di sini' }}
             </button>
           </p>
+
+          <div v-if="isLoginMode" class="mt-3 pt-3 border-t border-white/10 text-center space-y-1">
+            <p class="text-[10px] text-slate-400 font-light flex items-center justify-center gap-1">
+              <span>Perwakilan Sekolah / Guru BK?</span>
+              <a href="#/school" @click="showLoginModal = false" class="text-[#c0ff00] font-bold hover:underline">
+                Daftarkan Sekolah Baru &rarr;
+              </a>
+            </p>
+          </div>
 
           <p v-if="!isLoginMode" class="text-[10px] text-slate-500 text-center font-light mt-2">
             Dengan mendaftar, Anda menyetujui 
@@ -5004,13 +5013,39 @@ export default {
         }
         localStorage.setItem('auth_token', res.token);
         currentUser.value = res.user;
-        isLoggedIn.value = true;
-        showLoginModal.value = false;
-        currentAbilityScore.value = res.user.total_score || 0;
-        streakCount.value = res.user.streak || 0;
-        coins.value = res.user.coins || 0;
 
-        // Route affiliates directly to affiliate portal
+        // 1. SMART REDIRECT: Guru BK / Perwakilan Sekolah Mitra
+        if (res.user?.role === 'school_bk' || res.user?.school_id) {
+          sessionStorage.setItem('school_token', res.token);
+          const sData = res.user.school || {
+            id: res.user.school_id || res.user.reference_id,
+            name: res.user.school_name || res.user.name,
+            bk_name: res.user.bk_name || res.user.name,
+            bk_email: res.user.email,
+            city: res.user.school_city || ''
+          };
+          sessionStorage.setItem('school_data', JSON.stringify(sData));
+          showLoginModal.value = false;
+          showToast('Selamat datang di Portal Guru BK ' + (sData.name || '') + '!');
+          window.location.hash = '#/school';
+          return;
+        }
+
+        // 2. SMART REDIRECT: Staf Admin, Guru, Tutor, & Superadmin
+        if (['teacher', 'tutor', 'admin', 'superadmin'].includes(res.user?.role)) {
+          sessionStorage.setItem('admin_token', res.token);
+          sessionStorage.setItem('admin_role', res.user.role);
+          sessionStorage.setItem('ep_user', JSON.stringify(res.user));
+          localStorage.setItem('user', JSON.stringify(res.user));
+          if (res.user.name) localStorage.setItem('user_name', res.user.name);
+          if (res.user.email) localStorage.setItem('user_email', res.user.email);
+          showLoginModal.value = false;
+          showToast('Selamat datang di Portal Pengajar / Admin!');
+          window.location.hash = '#/admin';
+          return;
+        }
+
+        // 3. SMART REDIRECT: Mitra Afiliasi
         if (res.user?.role === 'affiliate') {
           sessionStorage.setItem('admin_token', res.token);
           sessionStorage.setItem('admin_role', 'affiliate');
@@ -5018,19 +5053,18 @@ export default {
           localStorage.setItem('user', JSON.stringify(res.user));
           if (res.user.name) localStorage.setItem('user_name', res.user.name);
           if (res.user.email) localStorage.setItem('user_email', res.user.email);
+          showLoginModal.value = false;
           window.location.hash = '#/admin';
           showToast('Selamat datang di Portal Afiliasi!');
           return;
         }
 
-        // Strict role validation: only students are allowed on student portal
-        if (res.user?.role && res.user.role !== 'student') {
-          sessionStorage.clear();
-          localStorage.removeItem('auth_token');
-          authError.value = 'Akun Staf/Guru/Tutor/Admin tidak diizinkan masuk melalui portal siswa. Silakan masuk melalui portal pengajar di /#/admin.';
-          return;
-        }
-
+        // 4. Default: Akun Siswa
+        isLoggedIn.value = true;
+        showLoginModal.value = false;
+        currentAbilityScore.value = res.user.total_score || 0;
+        streakCount.value = res.user.streak || 0;
+        coins.value = res.user.coins || 0;
         currentTab.value = 'dashboard';
 
         showToast(isLoginMode.value ? 'Masuk Akun Sukses! Selamat datang kembali.' : 'Pendaftaran Berhasil! Mulai perjalananmu.');
