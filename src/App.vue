@@ -4816,9 +4816,11 @@ export default {
     const isSchoolBk = computed(() => currentUser.value?.role === 'school_bk');
     const isPremiumUser = computed(() => {
       if (isStaff.value) return true;
+      if (currentUser.value?.role === 'affiliate' || currentUser.value?.role === 'school_bk') return true;
       if (currentUser.value?.is_premium) return true;
-      const p = (currentUser.value?.plan || '').toLowerCase();
-      return ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite'].includes(p);
+      const p = (currentUser.value?.plan || currentUser.value?.plan_name || '').toLowerCase();
+      if (p === 'free' || p === 'trial' || p === 'paket free / trial' || p === 'paket free') return false;
+      return ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium'].some(k => p.includes(k));
     });
 
     const showPlanSelectorModal = ref(false);
@@ -5037,8 +5039,9 @@ export default {
         try {
           const res = await api.getProfile();
           if (res?.user) {
-            const plan = (res.user.plan || '').toLowerCase();
-            res.user.is_premium = Boolean(res.user.is_premium || ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite'].includes(plan));
+            const p = (res.user.plan || res.user.plan_name || '').toLowerCase();
+            const isPaid = (p !== 'free' && p !== 'trial' && p !== '') && ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium'].some(k => p.includes(k));
+            res.user.is_premium = Boolean(res.user.is_premium || isPaid || res.user.role === 'affiliate' || res.user.role === 'school_bk');
             currentUser.value = res.user;
             isLoggedIn.value = true;
             // Update global states based on user data
@@ -5074,7 +5077,16 @@ export default {
               return;
             }
 
-            if (['admin', 'superadmin', 'teacher', 'guru', 'tutor', 'affiliate'].includes(res.user.role) && !isStudentPreviewMode.value) {
+            if (res.user.role === 'affiliate') {
+              sessionStorage.setItem('admin_token', token);
+              sessionStorage.setItem('admin_role', 'affiliate');
+              sessionStorage.setItem('admin_active_tab', 'affiliate_dashboard');
+              localStorage.setItem('user_role', 'affiliate');
+              window.location.hash = '#/admin';
+              return;
+            }
+
+            if (['admin', 'superadmin', 'teacher', 'guru', 'tutor'].includes(res.user.role) && !isStudentPreviewMode.value) {
               sessionStorage.setItem('admin_token', token);
               sessionStorage.setItem('admin_role', res.user.role);
               window.location.hash = '#/admin';
@@ -5132,8 +5144,9 @@ export default {
         }
         localStorage.setItem('auth_token', res.token);
         if (res.user) {
-          const plan = (res.user.plan || '').toLowerCase();
-          res.user.is_premium = Boolean(res.user.is_premium || ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite'].includes(plan));
+          const p = (res.user.plan || res.user.plan_name || '').toLowerCase();
+          const isPaid = (p !== 'free' && p !== 'trial' && p !== '') && ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium'].some(k => p.includes(k));
+          res.user.is_premium = Boolean(res.user.is_premium || isPaid || res.user.role === 'affiliate' || res.user.role === 'school_bk');
         }
         currentUser.value = res.user;
 
@@ -5190,8 +5203,10 @@ export default {
         if (res.user?.role === 'affiliate') {
           sessionStorage.setItem('admin_token', res.token);
           sessionStorage.setItem('admin_role', 'affiliate');
+          sessionStorage.setItem('admin_active_tab', 'affiliate_dashboard');
           sessionStorage.setItem('ep_user', JSON.stringify(res.user));
           localStorage.setItem('user', JSON.stringify(res.user));
+          localStorage.setItem('user_role', 'affiliate');
           if (res.user.name) localStorage.setItem('user_name', res.user.name);
           if (res.user.email) localStorage.setItem('user_email', res.user.email);
           showLoginModal.value = false;

@@ -254,13 +254,22 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         JOIN user_roles ur ON u.id = ur.user_id 
         LEFT JOIN students s ON (ur.reference_id = s.id OR LOWER(TRIM(u.identity_key)) = LOWER(TRIM(s.email)))
         LEFT JOIN admins a ON (ur.reference_id = a.id OR u.identity_key = a.username)
-        LEFT JOIN affiliates aff ON (ur.reference_id = aff.id OR u.id = aff.user_id)
+        LEFT JOIN affiliates aff ON (ur.reference_id = aff.id OR u.id = aff.user_id OR LOWER(TRIM(u.identity_key)) = LOWER(TRIM(aff.email)))
         LEFT JOIN schools sch ON (ur.reference_id = sch.id OR LOWER(TRIM(u.identity_key)) = LOWER(TRIM(sch.bk_email)))
         LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE (LOWER(TRIM(u.identity_key)) = LOWER(TRIM(?)) OR (s.email IS NOT NULL AND LOWER(TRIM(s.email)) = LOWER(TRIM(?))) OR (a.username IS NOT NULL AND LOWER(TRIM(a.username)) = LOWER(TRIM(?)))) 
+        WHERE (LOWER(TRIM(u.identity_key)) = LOWER(TRIM(?)) OR (s.email IS NOT NULL AND LOWER(TRIM(s.email)) = LOWER(TRIM(?))) OR (aff.email IS NOT NULL AND LOWER(TRIM(aff.email)) = LOWER(TRIM(?))) OR (a.username IS NOT NULL AND LOWER(TRIM(a.username)) = LOWER(TRIM(?)))) 
           AND u.is_active = 1
+        ORDER BY CASE ur.role 
+            WHEN 'superadmin' THEN 1 
+            WHEN 'admin' THEN 2 
+            WHEN 'school_bk' THEN 3 
+            WHEN 'affiliate' THEN 4 
+            WHEN 'teacher' THEN 5 
+            ELSE 6 
+        END ASC
+        LIMIT 1
     ");
-    $stmt->execute([$email, $email, $email]);
+    $stmt->execute([$email, $email, $email, $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $password_matched = false;
@@ -355,8 +364,15 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $user['phone'] = $user['student_phone'] ?? '';
         }
         $plan = strtolower($user['plan'] ?? 'free');
-        $is_paid_plan = in_array($plan, ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite']);
-        $user['is_premium'] = $is_paid_plan;
+        $is_paid_plan = false;
+        $paid_keywords = ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium'];
+        foreach ($paid_keywords as $kw) {
+            if (str_contains($plan, $kw)) {
+                $is_paid_plan = true;
+                break;
+            }
+        }
+        $user['is_premium'] = ($user['role'] === 'affiliate' || $user['role'] === 'school_bk') ? true : $is_paid_plan;
         $plan_labels = [
             'mandiri' => 'Paket Mandiri',
             'starter' => 'Paket Mandiri',
@@ -691,6 +707,31 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         exit;
     }
 
+    // Mitra Afiliasi
+    if ($payload->role === 'affiliate') {
+        $stmt = $pdo->prepare("SELECT * FROM affiliates WHERE id = ? OR user_id = ? OR LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1");
+        $stmt->execute([$payload->id, $payload->user_id ?? '', $payload->email ?? '']);
+        $aff = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $user = [
+            'id'            => $aff['id'] ?? $payload->id,
+            'name'          => $aff['name'] ?? $aff['bank_owner'] ?? 'Mitra Afiliasi',
+            'email'         => $aff['email'] ?? ($payload->email ?? ''),
+            'role'          => 'affiliate',
+            'referral_code' => $aff['referral_code'] ?? '',
+            'bank_name'     => $aff['bank_name'] ?? '',
+            'bank_account'  => $aff['bank_account'] ?? '',
+            'bank_owner'    => $aff['bank_owner'] ?? '',
+            'is_premium'    => true,
+            'plan'          => 'affiliate',
+            'plan_name'     => 'Mitra Afiliasi EduPath',
+            'tenant_id'     => $payload->tenant_id ?? 'default_tenant'
+        ];
+        header('Cache-Control: private, max-age=30');
+        echo json_encode(["user" => $user]);
+        exit;
+    }
+
     // Student: query biasa + subscription check
     $stmt = $pdo->prepare("
         SELECT s.*,
@@ -723,7 +764,14 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             } catch (\Throwable $e) {}
         }
         $plan = strtolower($user['plan'] ?? 'free');
-        $is_paid_plan = in_array($plan, ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite']);
+        $is_paid_plan = false;
+        $paid_keywords = ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium'];
+        foreach ($paid_keywords as $kw) {
+            if (str_contains($plan, $kw)) {
+                $is_paid_plan = true;
+                break;
+            }
+        }
         $user['is_premium']  = $is_paid_plan || (bool)($user['has_sub'] ?? false);
         $user['role']        = 'student';
         $user['tenant_id']   = $payload->tenant_id ?? ($user['tenant_id'] ?? 'default_tenant');

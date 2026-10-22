@@ -3150,9 +3150,8 @@ const currentAdminTenant = computed(() => {
 });
 
 const isSuperadmin = computed(() => {
-  return currentRole.value === 'superadmin' ||
-         localStorage.getItem('user_role') === 'superadmin' ||
-         sessionStorage.getItem('admin_role') === 'superadmin';
+  const r = (currentRole.value || localStorage.getItem('user_role') || sessionStorage.getItem('admin_role') || '').toLowerCase();
+  return r === 'superadmin' || r === 'super_admin';
 });
 
 const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes(currentRole.value));
@@ -3170,21 +3169,21 @@ const navItems = computed(() => {
   }
 
   const isT = isTeacher.value;
-  const isSuper = isSuperadmin.value || currentRole.value === 'superadmin';
+  const isSuper = isSuperadmin.value || currentRole.value === 'superadmin' || currentRole.value === 'super_admin';
   const role = currentRole.value || 'admin';
 
   const items = [
     { id: 'overview',     label: 'Dashboard',             icon: 'ph-squares-four',  roles: ['superadmin', 'admin', 'teacher'] },
     ...(isT ? [{ id: 'teacher_hub', label: 'Siswa & Jadwal Saya', icon: 'ph-chalkboard-teacher', roles: ['teacher'] }] : []),
-    { id: 'branches',    label: 'Cabang',                icon: 'ph-buildings',     roles: ['superadmin'] },
-    { id: 'schools',     label: 'Sekolah Mitra',         icon: 'ph-graduation-cap', roles: ['superadmin'] },
+    { id: 'branches',    label: 'Cabang & Tenant',       icon: 'ph-buildings',     roles: ['superadmin'] },
+    { id: 'schools',     label: 'Sekolah Mitra',         icon: 'ph-graduation-cap', roles: ['superadmin', 'admin'] },
     { id: 'questions',   label: isT ? 'Bank Soal Saya' : 'Soal', icon: 'ph-books', roles: ['superadmin', 'admin', 'teacher'] },
     { id: 'materials',   label: isT ? 'Materi Saya' : 'Materi', icon: 'ph-file-text', roles: ['superadmin', 'admin', 'teacher'] },
     { id: 'students',    label: 'Siswa',                 icon: 'ph-users-three',   roles: ['superadmin', 'admin'] },
     { id: 'transactions',label: 'Transaksi',             icon: 'ph-receipt',       roles: ['superadmin', 'admin'] },
     { id: 'packages',    label: 'Paket',                 icon: 'ph-package',       roles: ['superadmin', 'admin'] },
     { id: 'affiliates',  label: 'Afiliasi & Komisi',     icon: 'ph-hand-coins',    roles: ['superadmin', 'admin'] },
-    { id: 'staff',       label: 'Staff',                 icon: 'ph-users-three',   roles: ['superadmin'] },
+    { id: 'staff',       label: 'Staff & Pengajar',      icon: 'ph-users-three',   roles: ['superadmin', 'admin'] },
     { id: 'reports',     label: 'Laporan & Analitik',    icon: 'ph-chart-bar',     roles: ['superadmin', 'admin'] },
   ];
 
@@ -3367,6 +3366,9 @@ onMounted(async () => {
       currentRole.value = roleToUse;
       localStorage.setItem('user_role', roleToUse);
       sessionStorage.setItem('admin_role', roleToUse);
+      if (roleToUse === 'affiliate' && !['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts', 'settings'].includes(activeTab.value)) {
+        activeTab.value = 'affiliate_dashboard';
+      }
     }
   }
 
