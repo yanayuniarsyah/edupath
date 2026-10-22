@@ -13,6 +13,11 @@ ini_set('display_errors', 0);
 // Gunakan file api/.env terlebih dahulu (spesifik backend), lalu fallback ke root .env
 load_env(__DIR__ . '/.env');
 load_env(dirname(__DIR__) . '/.env');
+if (!empty($_SERVER['DOCUMENT_ROOT'])) {
+    load_env($_SERVER['DOCUMENT_ROOT'] . '/.env');
+    load_env($_SERVER['DOCUMENT_ROOT'] . '/api/.env');
+}
+load_env(dirname(dirname(__DIR__)) . '/.env');
 
 // ----------------------------------------------------------------
 $allowed_origins_raw = env('ALLOWED_ORIGINS', 'http://localhost:5173');
@@ -54,10 +59,16 @@ $port    = env('DB_PORT', '3306');
 
 // Validasi: pastikan konfigurasi database ada
 if (empty($db_user) || empty($db_name)) {
-    http_response_code(500);
     echo json_encode([
-        "error" => "Konfigurasi server tidak lengkap: DB_USER atau DB_NAME belum dikonfigurasi di .env cPanel.",
-        "status" => "error"
+        "success" => false,
+        "error" => "Konfigurasi server tidak lengkap: DB_USER atau DB_NAME belum terbaca di .env cPanel.",
+        "status" => "error",
+        "debug_paths" => [
+            "api_dir" => __DIR__,
+            "root_dir" => dirname(__DIR__),
+            "api_env_exists" => file_exists(__DIR__ . '/.env'),
+            "root_env_exists" => file_exists(dirname(__DIR__) . '/.env')
+        ]
     ]);
     exit;
 }
@@ -93,10 +104,12 @@ try {
         }
         $pdo = new PDO($dsnFallback, $db_user, $db_pass, $pdo_options);
     } catch (PDOException $eFallback) {
-        http_response_code(500);
         echo json_encode([
+            "success" => false,
             "error" => "Koneksi database gagal. Periksa kredensial MySQL di .env hosting.",
-            "detail" => $eFallback->getMessage()
+            "detail" => $eFallback->getMessage(),
+            "host_tried" => $primaryHost,
+            "fallback_tried" => $fallbackHost
         ]);
         exit;
     }
@@ -118,8 +131,8 @@ $jwt_secret = env('JWT_SECRET', '');
 
 if (empty($jwt_secret)) {
     // JWT_SECRET WAJIB ada. Tanpa ini, auth tidak bisa berjalan.
-    http_response_code(500);
     echo json_encode([
+        "success" => false,
         "error" => "Konfigurasi autentikasi tidak lengkap: JWT_SECRET belum dikonfigurasi di .env hosting.",
         "status" => "error"
     ]);
