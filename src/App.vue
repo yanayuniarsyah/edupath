@@ -284,12 +284,6 @@
               <span>Afiliasi</span>
               <i class="ph-bold ph-arrow-up-right text-[10px]"></i>
             </button>
-
-            <!-- 7. Portal Sekolah & Guru BK -->
-            <a href="#/school" class="hover:text-[#c0ff00] transition-colors py-1 flex items-center gap-1.5 whitespace-nowrap text-[#c0ff00]/90 font-bold">
-              <i class="ph-bold ph-chalkboard-teacher text-sm"></i>
-              <span>Portal BK</span>
-            </a>
           </nav>
 
           <div class="flex items-center gap-2">
@@ -3523,11 +3517,6 @@
           <div class="flex flex-wrap items-center gap-4 text-xs">
             <button @click="showTermsModal = true" class="text-[#c0ff00] hover:underline font-bold">Syarat &amp; Ketentuan</button>
             <button @click="showContactModal = true" class="hover:underline">Detail Kontak Resmi</button>
-            <a href="#/school" class="text-[#c0ff00]/90 hover:text-[#c0ff00] font-bold hover:underline flex items-center gap-1">
-              <i class="ph-bold ph-chalkboard-teacher text-xs"></i>
-              Portal Sekolah &amp; BK &rarr;
-            </a>
-            <a href="#/admin" class="text-amber-400/80 hover:text-amber-300 font-bold hover:underline">Portal Administrator &rarr;</a>
           </div>
         </div>
         </div><!-- /section-wrapper -->
@@ -3727,7 +3716,7 @@
             {{ isForgotPasswordMode ? 'Lupa Password?' : (isResetPasswordMode ? 'Reset Password' : (isLoginMode ? 'Masuk ke EduPath' : 'Daftar Akun Siswa')) }}
           </h3>
           <p class="text-xs text-slate-400 font-light mt-1">
-            {{ isForgotPasswordMode ? 'Masukkan email Anda untuk menerima token pemulihan.' : (isResetPasswordMode ? 'Masukkan token dan password baru Anda.' : (isLoginMode ? 'Pintu masuk terpadu untuk Siswa & Guru BK / Sekolah Mitra' : 'Mulai perjalanan belajarmu hari ini.')) }}
+            {{ isForgotPasswordMode ? 'Masukkan email Anda untuk menerima token pemulihan.' : (isResetPasswordMode ? 'Masukkan token dan password baru Anda.' : (isLoginMode ? 'Silakan masuk dengan email/username dan password akun Anda.' : 'Mulai perjalanan belajarmu hari ini.')) }}
           </p>
         </div>
 
@@ -3788,7 +3777,7 @@
 
             <div class="space-y-1">
               <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Email atau Username</label>
-              <input v-model="authForm.email" type="text" required placeholder="siswa@gmail.com / bk.sekolah@sch.id / username" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
+              <input v-model="authForm.email" type="text" required placeholder="nama@email.com / username" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
             </div>
 
             <div class="space-y-1">
@@ -3822,24 +3811,6 @@
               {{ isLoginMode ? 'Daftar siswa di sini' : 'Masuk di sini' }}
             </button>
           </p>
-
-          <div v-if="isLoginMode" class="mt-3 pt-3 border-t border-white/10 text-center space-y-2">
-            <!-- Quick Fill Demo School Account -->
-            <button
-              type="button"
-              @click="authForm.email = 'bk.smansaciamis@edupath.co.id'; authForm.password = 'EduPathSchool01!2026'"
-              class="w-full py-1.5 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-[10px] font-bold text-emerald-300 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <i class="ph-bold ph-chalkboard-teacher"></i>
-              <span>Isi Akun Demo Sekolah: SMANSA Ciamis</span>
-            </button>
-            <p class="text-[10px] text-slate-400 font-light flex items-center justify-center gap-1">
-              <span>Perwakilan Sekolah / Guru BK?</span>
-              <a href="#/school" @click="showLoginModal = false" class="text-[#c0ff00] font-bold hover:underline">
-                Daftarkan Sekolah Baru &rarr;
-              </a>
-            </p>
-          </div>
 
           <p v-if="!isLoginMode" class="text-[10px] text-slate-500 text-center font-light mt-2">
             Dengan mendaftar, Anda menyetujui 

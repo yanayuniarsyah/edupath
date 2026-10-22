@@ -1,400 +1,248 @@
 <template>
-  <div class="min-h-screen text-white relative overflow-x-hidden" style="background: linear-gradient(145deg, #050a18 0%, #0a1128 50%, #050a18 100%);">
-    <!-- Ambient Glows -->
-    <div class="fixed top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full opacity-20 blur-[130px] pointer-events-none" style="background: radial-gradient(circle, #c0ff00 0%, transparent 70%);"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full opacity-15 blur-[130px] pointer-events-none" style="background: radial-gradient(circle, #3b82f6 0%, transparent 70%);"></div>
+  <!-- ============================================================== -->
+  <!-- GATE 1: UNAUTHENTICATED (LOGIN GATE MIRRORING ADMIN/GURU DESIGN) -->
+  <!-- ============================================================== -->
+  <div v-if="!isAuthenticated" class="min-h-screen flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(135deg, #050a18 0%, #0d1224 60%, #050a18 100%);">
+    <!-- Glow decorations -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #c0ff00 0%, transparent 70%);"></div>
+    <div class="absolute bottom-0 right-1/4 w-80 h-80 rounded-full opacity-15 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #6366f1 0%, transparent 70%);"></div>
 
-    <!-- ============================================================== -->
-    <!-- GATE 1: UNAUTHENTICATED (LOGIN / REGISTRATION SEKOLAH & BK)    -->
-    <!-- ============================================================== -->
-    <div v-if="!isAuthenticated" class="min-h-screen flex flex-col justify-between p-4 sm:p-6 md:p-10 relative z-10">
-      <!-- Navbar Brand -->
-      <div class="max-w-6xl w-full mx-auto flex items-center justify-between pb-6 border-b border-white/10">
-        <a href="#/" class="flex items-center gap-2.5 group">
-          <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-[0_0_20px_rgba(192,255,0,0.35)] group-hover:scale-105 transition-transform">E</div>
-          <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
-        </a>
-        <div class="flex items-center gap-3">
-          <a href="#/" class="px-4 py-2 rounded-xl text-xs font-bold text-white/70 hover:text-white hover:bg-white/5 transition-all">
-            &larr; Halaman Siswa
-          </a>
-          <a href="#/admin" class="px-3 py-1.5 rounded-lg text-[11px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 hover:bg-amber-400/20 transition-all">
-            Admin Panel &rarr;
-          </a>
-        </div>
-      </div>
+    <div class="relative z-10 w-full max-w-md mx-4">
+      <!-- Login Card -->
+      <div class="rounded-3xl p-8 border relative backdrop-blur-2xl shadow-2xl" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08);">
+        <!-- Close button to home -->
+        <button @click="$router.push('/')" class="!absolute top-5 right-5 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-transparent hover:border-rose-500/30 text-sm cursor-pointer" title="Kembali ke Beranda">
+          <i class="ph-bold ph-x"></i>
+        </button>
 
-      <!-- Main Container: Hero & Auth Card -->
-      <div class="max-w-6xl w-full mx-auto my-auto py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        <!-- Left: Value Proposition for Guru BK -->
-        <div class="lg:col-span-7 space-y-6">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-black uppercase tracking-wider">
-            <i class="ph-bold ph-chalkboard-teacher text-sm"></i>
-            Portal Khusus Sekolah &amp; Guru BK
+        <!-- Logo & Header -->
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center gap-2.5 group select-none mb-2">
+            <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
+            <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
-          <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight">
-            Pantau Kesiapan SNBT &amp; Minat Bakat Siswa <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#c0ff00] via-emerald-300 to-teal-400">Secara Objektif</span>
-          </h1>
-          <p class="text-white/70 text-sm sm:text-base leading-relaxed max-w-xl">
-            Bantu Guru BK memetakan minat jurusan, pola belajar, paket bimbingan yang diikuti, dan area penguatan ratusan siswa dalam satu dashboard analitik agregat yang terpusat dan instan.
-          </p>
-
-          <!-- 4 Core Features -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md hover:border-[#c0ff00]/30 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-[#c0ff00]/20 text-[#c0ff00] flex items-center justify-center mb-2.5">
-                <i class="ph-bold ph-users-three text-lg"></i>
-              </div>
-              <h3 class="text-xs font-black uppercase tracking-wider text-white">Monitoring Paket Belajar</h3>
-              <p class="text-[11px] text-white/60 mt-1">Lacak status siswa yang mengikuti Paket Pejuang PTN, Mandiri, Elite Mentoring, atau Free SPP.</p>
-            </div>
-
-            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md hover:border-sky-400/30 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-sky-400/20 text-sky-400 flex items-center justify-center mb-2.5">
-                <i class="ph-bold ph-compass text-lg"></i>
-              </div>
-              <h3 class="text-xs font-black uppercase tracking-wider text-white">RIASEC Holland Code</h3>
-              <p class="text-[11px] text-white/60 mt-1">Distribusi minat jurusan siswa berdasarkan riset psikometri ilmiah 6 tipe kepribadian.</p>
-            </div>
-
-            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md hover:border-purple-400/30 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-purple-400/20 text-purple-400 flex items-center justify-center mb-2.5">
-                <i class="ph-bold ph-chart-bar text-lg"></i>
-              </div>
-              <h3 class="text-xs font-black uppercase tracking-wider text-white">Rapor Tryout CBT Agregat</h3>
-              <p class="text-[11px] text-white/60 mt-1">Rata-rata skor SNBT sekolah, subtes paling menantang, dan peluang lolos PTN.</p>
-            </div>
-
-            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md hover:border-emerald-400/30 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-emerald-400/20 text-emerald-400 flex items-center justify-center mb-2.5">
-                <i class="ph-bold ph-qr-code text-lg"></i>
-              </div>
-              <h3 class="text-xs font-black uppercase tracking-wider text-white">QR Code &amp; Link Sekolah</h3>
-              <p class="text-[11px] text-white/60 mt-1">Cukup sebar 1 tautan khusus, siswa otomatis terdata ke dalam dashboard sekolah Anda.</p>
-            </div>
-          </div>
+          <h2 class="text-white font-black text-lg">Portal Sekolah &amp; Guru BK</h2>
+          <p class="text-white/40 text-xs font-semibold uppercase tracking-widest mt-1">Dashboard Analitik Agregat &amp; Minat Bakat Siswa</p>
         </div>
 
-        <!-- Right: Auth Box (Login / Register Tabs) -->
-        <div class="lg:col-span-5">
-          <div class="p-6 sm:p-8 rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-2xl shadow-2xl relative">
-            <!-- Tab Switcher -->
-            <div class="flex p-1 rounded-2xl bg-black/40 border border-white/10 mb-6">
-              <button
-                @click="authTab = 'login'; authError = '';"
-                :class="['flex-1 py-2 text-xs font-black rounded-xl transition-all', authTab === 'login' ? 'bg-[#c0ff00] text-black shadow-lg shadow-[#c0ff00]/20' : 'text-white/60 hover:text-white']"
-              >
-                Masuk Guru BK
-              </button>
-              <button
-                @click="authTab = 'register'; authError = '';"
-                :class="['flex-1 py-2 text-xs font-black rounded-xl transition-all', authTab === 'register' ? 'bg-[#c0ff00] text-black shadow-lg shadow-[#c0ff00]/20' : 'text-white/60 hover:text-white']"
-              >
-                Daftar Sekolah Baru
-              </button>
-            </div>
-
-            <!-- Error Banner -->
-            <div v-if="authError" class="mb-4 p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-bold flex items-center gap-2">
-              <i class="ph-bold ph-warning-circle text-base shrink-0"></i>
-              <span>{{ authError }}</span>
-            </div>
-
-            <!-- Success Banner -->
-            <div v-if="authSuccess" class="mb-4 p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2">
-              <i class="ph-bold ph-check-circle text-base shrink-0"></i>
-              <span>{{ authSuccess }}</span>
-            </div>
-
-            <!-- FORM 1: LOGIN GURU BK -->
-            <form v-if="authTab === 'login'" @submit.prevent="handleLogin" class="space-y-4">
-              <div>
-                <label class="block text-[11px] font-black uppercase tracking-wider text-white/60 mb-1.5">Email Guru BK / Sekolah</label>
-                <div class="relative">
-                  <i class="ph-bold ph-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"></i>
-                  <input
-                    v-model="loginForm.email"
-                    type="email"
-                    required
-                    placeholder="bk.sman1@sekolah.sch.id"
-                    class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <label class="block text-[11px] font-black uppercase tracking-wider text-white/60">Password</label>
-                </div>
-                <div class="relative">
-                  <i class="ph-bold ph-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"></i>
-                  <input
-                    v-model="loginForm.password"
-                    :type="showPassword ? 'text' : 'password'"
-                    required
-                    placeholder="••••••••"
-                    class="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-                  />
-                  <button type="button" @click="showPassword = !showPassword" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white">
-                    <i :class="['ph-bold', showPassword ? 'ph-eye-slash' : 'ph-eye']"></i>
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                :disabled="authLoading"
-                class="w-full py-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0f000] text-black font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#c0ff00]/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                <span v-if="authLoading" class="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
-                <span v-else>Masuk ke Dashboard Sekolah</span>
-                <i v-if="!authLoading" class="ph-bold ph-arrow-right"></i>
-              </button>
-
-              <!-- Quick Demo Login Button for instant evaluation -->
-              <div class="pt-3 border-t border-white/10 text-center">
-                <span class="text-[10px] uppercase font-black text-white/40 tracking-wider block mb-2">Akses Cepat UAT / Demo Sekolah:</span>
-                <button
-                  type="button"
-                  @click="quickDemoLogin('SMANSA Ciamis')"
-                  class="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-bold text-white/80 hover:text-[#c0ff00] transition-all flex items-center justify-center gap-2"
-                >
-                  <i class="ph-bold ph-buildings text-emerald-400"></i>
-                  <span>Jelajahi Demo: SMAN 1 Ciamis</span>
-                </button>
-              </div>
-            </form>
-
-            <!-- FORM 2: REGISTRATION SEKOLAH & GURU BK -->
-            <form v-else @submit.prevent="handleRegister" class="space-y-3.5">
-              <div>
-                <label class="block text-[10px] font-black uppercase tracking-wider text-white/60 mb-1">Nama Resmi Sekolah</label>
-                <input
-                  v-model="registerForm.name"
-                  type="text"
-                  required
-                  placeholder="Contoh: SMAN 1 Ciamis"
-                  class="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-                />
-              </div>
-
-              <div class="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block text-[10px] font-black uppercase tracking-wider text-white/60 mb-1">NPSN (Opsional)</label>
-                  <input
-                    v-model="registerForm.npsn"
-                    type="text"
-                    placeholder="202xxxxx"
-                    class="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-                  />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black uppercase tracking-wider text-white/60 mb-1">Kota / Kabupaten</label>
-                  <input
-                    v-model="registerForm.city"
-                    type="text"
-                    required
-                    placeholder="Kab. Ciamis"
-                    class="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block text-[10px] font-black uppercase tracking-wider text-white/60 mb-1">Nama Koordinator BK</label>
-                  <input
-                    v-model="registerForm.bk_name"
-                    type="text"
-                    required
-                    placeholder="Dra. Siti Rahmah, M.Pd"
-                    class="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-                  />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black uppercase tracking-wider text-white/60 mb-1">No. WhatsApp BK</label>
-                  <input
-                    v-model="registerForm.phone"
-                    type="tel"
-                    required
-                    placeholder="081234567890"
-                    class="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-[10px] font-black uppercase tracking-wider text-white/60 mb-1">Email Resmi Sekolah / BK</label>
-                <input
-                  v-model="registerForm.email"
-                  type="email"
-                  required
-                  placeholder="bk.sman1ciamis@gmail.com"
-                  class="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-                />
-              </div>
-
-              <div class="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block text-[10px] font-black uppercase tracking-wider text-white/60 mb-1">Password</label>
-                  <input
-                    v-model="registerForm.password"
-                    type="password"
-                    required
-                    placeholder="Min. 6 Karakter"
-                    class="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-                  />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black uppercase tracking-wider text-white/60 mb-1">Estimasi Siswa Kls 12</label>
-                  <input
-                    v-model.number="registerForm.estimated_students"
-                    type="number"
-                    min="10"
-                    placeholder="Contoh: 350"
-                    class="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                :disabled="authLoading"
-                class="w-full py-3 mt-2 rounded-xl bg-[#c0ff00] hover:bg-[#b0f000] text-black font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#c0ff00]/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                <span v-if="authLoading" class="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
-                <span v-else>Daftarkan Sekolah &amp; Dapatkan Link Siswa</span>
-                <i v-if="!authLoading" class="ph-bold ph-sparkle"></i>
-              </button>
-            </form>
-          </div>
+        <!-- Error Message -->
+        <div v-if="authError" class="mb-4 px-4 py-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-bold flex items-center gap-2">
+          <i class="ph-bold ph-warning-circle text-base shrink-0"></i>
+          <span>{{ authError }}</span>
         </div>
-      </div>
 
-      <!-- Footer Sub -->
-      <div class="max-w-6xl w-full mx-auto text-center text-xs text-white/40 pt-6 border-t border-white/5">
-        &copy; 2026 PT Kreasi Hasanah Indonesia &bull; EduPath Adaptive Learning Platform &bull; Portal Khusus Sekolah &amp; Guru BK
+        <!-- Success Message -->
+        <div v-if="authSuccess" class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2">
+          <i class="ph-bold ph-check-circle text-base shrink-0"></i>
+          <span>{{ authSuccess }}</span>
+        </div>
+
+        <form @submit.prevent="handleLogin" class="space-y-4">
+          <div>
+            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Email Guru BK / Sekolah</label>
+            <div class="relative">
+              <i class="ph-bold ph-envelope absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
+              <input
+                v-model="loginForm.email"
+                type="email"
+                required
+                placeholder="bk.sekolah@sch.id"
+                class="w-full pl-9 pr-4 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all placeholder:text-white/20"
+                style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Password</label>
+            <div class="relative">
+              <i class="ph-bold ph-lock absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
+              <input
+                v-model="loginForm.password"
+                :type="showPassword ? 'text' : 'password'"
+                required
+                placeholder="••••••••"
+                class="w-full pl-9 pr-10 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all placeholder:text-white/20"
+                style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);"
+              />
+              <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors cursor-pointer select-none p-1">
+                <i :class="['ph-bold', showPassword ? 'ph-eye-slash text-[#c0ff00]' : 'ph-eye']"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Fill Demo School Account -->
+          <div class="pt-1">
+            <span class="block text-[10px] uppercase font-black text-white/40 tracking-wider mb-1.5">Pilih Akun Demo Sekolah:</span>
+            <button
+              type="button"
+              @click="loginForm.email = 'bk.smansaciamis@edupath.co.id'; loginForm.password = 'EduPathSchool01!2026'"
+              class="w-full px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-xs font-bold text-emerald-300 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <i class="ph-bold ph-chalkboard-teacher"></i>
+              <span>Isi Akun Demo: SMANSA Ciamis</span>
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            :disabled="authLoading"
+            class="w-full py-3 rounded-xl font-black text-sm text-black transition-all hover:opacity-90 active:scale-95 mt-2 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+            style="background: #c0ff00;"
+          >
+            <span v-if="!authLoading">Masuk ke Portal Sekolah</span>
+            <span v-else class="flex items-center gap-2">
+              <i class="ph-bold ph-spinner animate-spin"></i> Memverifikasi...
+            </span>
+          </button>
+        </form>
+
+        <div class="mt-5 pt-4 border-t border-white/8 text-center space-y-1">
+          <p class="text-white/30 text-[11px] font-medium">Akses khusus Koordinator BK &amp; Tim Bimbingan Karir Sekolah Mitra.</p>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- ============================================================== -->
-    <!-- GATE 2: AUTHENTICATED SCHOOL DASHBOARD                         -->
-    <!-- ============================================================== -->
-    <div v-else class="min-h-screen flex flex-col relative z-10 pb-16">
-      <!-- TOP NAV / EXECUTIVE HEADER BAR -->
-      <header class="border-b border-white/10 bg-[#080d1d]/80 backdrop-blur-xl sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
-          <!-- Left: Brand & School Badge -->
-          <div class="flex items-center gap-3">
-            <a href="#/" class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base shadow-[0_0_15px_rgba(192,255,0,0.3)]">E</div>
-              <span class="font-black text-lg text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
-            </a>
-            <div class="h-5 w-[1px] bg-white/10 hidden sm:block"></div>
-            <div class="flex items-center gap-2">
-              <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-              <div>
-                <span class="font-extrabold text-sm text-white block leading-tight">{{ schoolData?.name || 'Sekolah Mitra' }}</span>
-                <span class="text-[10px] text-white/50 block font-semibold">Koordinator: {{ schoolData?.bk_name || 'Guru BK' }} &bull; {{ schoolData?.city || 'Indonesia' }}</span>
-              </div>
-            </div>
-          </div>
+  <!-- ============================================================== -->
+  <!-- GATE 2: AUTHENTICATED DASHBOARD WITH SIDEBAR NAVIGATION        -->
+  <!-- ============================================================== -->
+  <div v-else class="flex h-screen bg-[#070b14] font-body overflow-hidden text-white select-none">
+    <!-- ===== SIDEBAR (POSISINYA ADA DI SAMPING SEPERTI ADMIN/GURU) ===== -->
+    <aside
+      class="flex flex-col h-full shrink-0 transition-all duration-300 ease-out overflow-hidden border-r border-white/10 shadow-2xl relative z-30"
+      :class="sidebarOpen ? 'w-64' : 'w-[72px]'"
+      style="background: linear-gradient(160deg, #050a18 0%, #0d1224 60%, #050a18 100%);"
+    >
+      <!-- Logo Header with Collapser -->
+      <div
+        class="flex items-center gap-3 px-4 py-4 border-b border-white/10 shrink-0 cursor-pointer select-none group"
+        @click="sidebarOpen = !sidebarOpen"
+        :title="sidebarOpen ? 'Ciutkan Sidebar' : 'Perluas Sidebar'"
+      >
+        <div class="w-9 h-9 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20 group-hover:scale-105 transition-transform">E</div>
+        <div v-show="sidebarOpen" class="min-w-0">
+          <span class="font-black text-lg tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+          <p class="text-[10px] text-[#c0ff00] font-black uppercase tracking-widest whitespace-nowrap">Portal Guru BK &amp; Sekolah</p>
+        </div>
+      </div>
 
-          <!-- Right: Action Buttons -->
-          <div class="flex items-center gap-2 flex-wrap">
-            <button
-              @click="openQrModal = true"
-              class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/90 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              title="Tampilkan QR Code untuk disebar ke siswa"
-            >
-              <i class="ph-bold ph-qr-code text-[#c0ff00]"></i>
-              <span>QR Code Siswa</span>
-            </button>
+      <!-- School Identity Badge in Sidebar -->
+      <div v-show="sidebarOpen" class="p-3 mx-2.5 my-2.5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md flex items-center gap-2.5">
+        <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></div>
+        <div class="min-w-0 flex-1">
+          <span class="text-xs font-black text-white block truncate">{{ schoolData?.name || 'Sekolah Mitra' }}</span>
+          <span class="text-[10px] text-white/50 block truncate">{{ schoolData?.city || 'Indonesia' }}</span>
+        </div>
+      </div>
 
-            <button
-              @click="copyShareLink"
-              class="px-3 py-1.5 rounded-xl bg-[#c0ff00]/15 hover:bg-[#c0ff00]/25 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              title="Salin link asesmen siswa"
-            >
-              <i :class="['ph-bold', copiedLink ? 'ph-check' : 'ph-link-simple']"></i>
-              <span>{{ copiedLink ? 'Tersalin!' : 'Salin Link Siswa' }}</span>
-            </button>
+      <!-- Sidebar Navigation Menu Items -->
+      <nav class="flex flex-col gap-1 p-2.5 flex-grow overflow-y-auto no-scrollbar">
+        <button
+          v-for="item in navItems" :key="item.id"
+          @click="activeTab = item.id"
+          :title="item.label"
+          :class="[
+            'flex items-center rounded-xl text-xs font-bold transition-all text-left group relative cursor-pointer',
+            sidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center px-0 py-2.5',
+            activeTab === item.id
+              ? 'bg-[#c0ff00]/15 border border-[#c0ff00]/40 text-[#c0ff00]'
+              : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
+          ]"
+        >
+          <i :class="['ph-bold text-base shrink-0', item.icon, activeTab === item.id ? 'text-[#c0ff00]' : 'text-white/50 group-hover:text-white']"></i>
+          <span v-show="sidebarOpen" class="truncate flex-1">{{ item.label }}</span>
+          <span v-if="sidebarOpen && item.badge" :class="item.badgeClass || 'px-1.5 py-0.5 rounded text-[10px] font-black bg-white/10 text-white/70'">
+            {{ item.badge }}
+          </span>
+        </button>
+      </nav>
 
-            <button
-              @click="exportCsv"
-              class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              title="Ekspor rekap siswa ke file CSV/Excel"
-            >
-              <i class="ph-bold ph-microsoft-excel-logo"></i>
-              <span>Unduh CSV</span>
-            </button>
+      <!-- Sidebar Bottom Profile & Logout -->
+      <div class="p-3 border-t border-white/10 shrink-0 bg-white/[0.02]">
+        <div v-show="sidebarOpen" class="mb-2.5 px-1">
+          <span class="text-[10px] text-white/40 uppercase font-black tracking-wider block">Koordinator BK</span>
+          <span class="text-xs font-bold text-white block truncate">{{ schoolData?.bk_name || 'Guru BK' }}</span>
+          <span class="text-[10px] text-white/50 block truncate">{{ schoolData?.bk_email }}</span>
+        </div>
+        <button
+          @click="handleLogout"
+          class="w-full py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+          :title="sidebarOpen ? 'Keluar dari Portal' : 'Keluar'"
+        >
+          <i class="ph-bold ph-sign-out text-sm"></i>
+          <span v-show="sidebarOpen">Keluar Portal</span>
+        </button>
+      </div>
+    </aside>
 
-            <button
-              @click="loadAllDashboardData"
-              class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-all cursor-pointer"
-              title="Segarkan Data"
-            >
-              <i :class="['ph-bold ph-arrows-clockwise text-sm', dataLoading ? 'animate-spin text-[#c0ff00]' : '']"></i>
-            </button>
-
-            <button
-              @click="handleLogout"
-              class="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
-              title="Keluar dari Portal BK"
-            >
-              <i class="ph-bold ph-sign-out"></i>
-              <span class="hidden sm:inline">Keluar</span>
-            </button>
+    <!-- ===== MAIN CONTENT VIEWPORT (RIGHT SIDE) ===== -->
+    <main class="flex-1 flex flex-col h-full min-w-0 overflow-hidden bg-[#070b14]">
+      <!-- Topbar Header -->
+      <header class="h-16 border-b border-white/10 px-4 sm:px-6 flex items-center justify-between gap-4 shrink-0 bg-[#050a18]/80 backdrop-blur-md z-20">
+        <!-- Left: Mobile Sidebar Toggle + Breadcrumb -->
+        <div class="flex items-center gap-3 min-w-0">
+          <button
+            @click="sidebarOpen = !sidebarOpen"
+            class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all cursor-pointer"
+            title="Buka / Tutup Menu Samping"
+          >
+            <i class="ph-bold ph-list text-lg"></i>
+          </button>
+          <div class="min-w-0">
+            <div class="text-[10px] font-bold text-white/40 uppercase tracking-widest truncate">Portal BK &bull; {{ schoolData?.name || 'Sekolah' }}</div>
+            <h1 class="text-sm sm:text-base font-black text-white leading-tight capitalize truncate">{{ activeTabTitle }}</h1>
           </div>
         </div>
 
-        <!-- SUB NAV TABS -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-white/5">
+        <!-- Right: Action Buttons -->
+        <div class="flex items-center gap-2 shrink-0">
           <button
-            @click="activeTab = 'analytics'"
-            :class="['px-4 py-2.5 text-xs font-black uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 whitespace-nowrap', activeTab === 'analytics' ? 'border-[#c0ff00] text-[#c0ff00] bg-[#c0ff00]/5' : 'border-transparent text-white/60 hover:text-white']"
+            @click="openQrModal = true"
+            class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+            title="Tampilkan QR Code Siswa"
           >
-            <i class="ph-bold ph-chart-donut text-sm"></i>
-            Ringkasan &amp; Analitik Agregat
+            <i class="ph-bold ph-qr-code text-[#c0ff00]"></i>
+            <span class="hidden md:inline">QR Code Siswa</span>
           </button>
 
           <button
-            @click="activeTab = 'students'"
-            :class="['px-4 py-2.5 text-xs font-black uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 whitespace-nowrap', activeTab === 'students' ? 'border-[#c0ff00] text-[#c0ff00] bg-[#c0ff00]/5' : 'border-transparent text-white/60 hover:text-white']"
+            @click="copyShareLink"
+            class="px-3 py-1.5 rounded-xl bg-[#c0ff00]/15 hover:bg-[#c0ff00]/25 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+            title="Salin tautan asesmen siswa"
           >
-            <i class="ph-bold ph-student text-sm"></i>
-            Daftar &amp; Status Siswa
-            <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white font-bold">{{ kpis?.total_students || 0 }}</span>
+            <i :class="['ph-bold', copiedLink ? 'ph-check' : 'ph-link-simple']"></i>
+            <span class="hidden md:inline">{{ copiedLink ? 'Tersalin!' : 'Salin Link Siswa' }}</span>
           </button>
 
           <button
-            @click="activeTab = 'packages'"
-            :class="['px-4 py-2.5 text-xs font-black uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 whitespace-nowrap', activeTab === 'packages' ? 'border-[#c0ff00] text-[#c0ff00] bg-[#c0ff00]/5' : 'border-transparent text-white/60 hover:text-white']"
+            @click="exportCsv"
+            class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+            title="Ekspor rekap siswa ke CSV"
           >
-            <i class="ph-bold ph-package text-sm"></i>
-            Informasi Paket EduPath
-            <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-400 font-bold">{{ kpis?.paid_package_students || 0 }} Terdaftar</span>
+            <i class="ph-bold ph-microsoft-excel-logo"></i>
+            <span class="hidden sm:inline">Unduh CSV</span>
           </button>
 
           <button
-            @click="activeTab = 'broadcast'"
-            :class="['px-4 py-2.5 text-xs font-black uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 whitespace-nowrap', activeTab === 'broadcast' ? 'border-[#c0ff00] text-[#c0ff00] bg-[#c0ff00]/5' : 'border-transparent text-white/60 hover:text-white']"
+            @click="loadAllDashboardData"
+            class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+            title="Segarkan Data"
           >
-            <i class="ph-bold ph-megaphone-simple text-sm"></i>
-            Kit Sosialisasi &amp; WhatsApp
+            <i :class="['ph-bold ph-arrows-clockwise text-sm', dataLoading ? 'animate-spin text-[#c0ff00]' : '']"></i>
           </button>
         </div>
       </header>
 
-      <!-- MAIN CONTENT WRAPPER -->
-      <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-6 flex-grow">
-        <!-- ============================================================== -->
-        <!-- TAB 1: ANALYTICS & AGGREGATE DASHBOARD                         -->
-        <!-- ============================================================== -->
+      <!-- Scrollable Tab Content Area -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+        <!-- ========================================================== -->
+        <!-- VIEW 1: RINGKASAN & KPI EKSEKUTIF                          -->
+        <!-- ========================================================== -->
         <div v-if="activeTab === 'analytics'" class="space-y-6">
-          <!-- 1. EXECUTIVE KPIS (6 CARDS) -->
+          <!-- 6 Executive KPI Cards -->
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-            <!-- KPI 1: Total Siswa -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
               <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Total Siswa</span>
               <div class="text-2xl font-black text-white mt-1">{{ kpis?.total_students || 0 }}</div>
@@ -403,35 +251,30 @@
               </span>
             </div>
 
-            <!-- KPI 2: Siswa Paket Bimbel (Paid) -->
             <div class="p-4 rounded-2xl bg-gradient-to-b from-emerald-500/10 to-transparent border border-emerald-500/30 backdrop-blur-xl">
               <span class="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Siswa Ikut Bimbel</span>
               <div class="text-2xl font-black text-[#c0ff00] mt-1">{{ kpis?.paid_package_students || 0 }}</div>
               <span class="text-[10px] text-emerald-300 font-semibold mt-1 block">Paket EduPath Aktif</span>
             </div>
 
-            <!-- KPI 3: Siswa Free SPP -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
               <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Siswa Free SPP</span>
               <div class="text-2xl font-black text-white mt-1">{{ kpis?.free_diagnostic_students || 0 }}</div>
               <span class="text-[10px] text-white/40 font-semibold mt-1 block">Diagnostik Mandiri</span>
             </div>
 
-            <!-- KPI 4: Peserta Tryout -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
               <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Peserta Tryout</span>
               <div class="text-2xl font-black text-sky-400 mt-1">{{ kpis?.tryout_participants || 0 }}</div>
               <span class="text-[10px] text-sky-300 font-semibold mt-1 block">Simulasi CBT SNBT</span>
             </div>
 
-            <!-- KPI 5: Rata-rata Skor -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
               <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Rata-rata Skor</span>
               <div class="text-2xl font-black text-amber-400 mt-1">{{ kpis?.average_tryout_score || 0 }}</div>
               <span class="text-[10px] text-amber-300 font-semibold mt-1 block">Skala SNBT 0 - 1000</span>
             </div>
 
-            <!-- KPI 6: Selesai SPP -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
               <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Selesai SPP</span>
               <div class="text-2xl font-black text-purple-400 mt-1">{{ kpis?.spp_completed_students || 0 }}</div>
@@ -439,7 +282,68 @@
             </div>
           </div>
 
-          <!-- 2. STUDENT PACKAGE BREAKDOWN (INFORMASI PROGRAM/PAKET SISWA) -->
+          <!-- Quick Highlight: Package & RIASEC Summary -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left: Top Universities & Majors -->
+            <div class="lg:col-span-6 p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00] block">Pilihan Favorit Siswa</span>
+                  <h3 class="text-base font-black text-white">Top 5 Universitas Impian</h3>
+                </div>
+                <button @click="activeTab = 'ptn'" class="text-xs text-[#c0ff00] font-bold hover:underline cursor-pointer">
+                  Lihat Selengkapnya &rarr;
+                </button>
+              </div>
+
+              <div class="space-y-3">
+                <div v-for="(univ, idx) in topUniversities.slice(0, 5)" :key="idx" class="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <span class="w-6 h-6 rounded-lg bg-white/5 text-white/60 font-black text-xs flex items-center justify-center">{{ idx + 1 }}</span>
+                    <div>
+                      <span class="text-xs font-bold text-white block">{{ univ.name }}</span>
+                      <span class="text-[10px] text-white/50">{{ univ.popular_major || 'Program Studi Pilihan' }}</span>
+                    </div>
+                  </div>
+                  <span class="px-2 py-1 rounded-lg bg-[#c0ff00]/10 text-[#c0ff00] text-xs font-black">{{ univ.count }} Siswa</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: RIASEC Summary Bar Chart -->
+            <div class="lg:col-span-6 p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] font-black uppercase tracking-wider text-purple-400 block">Psikometri Holland Code</span>
+                  <h3 class="text-base font-black text-white">Distribusi Karakter Minat (RIASEC)</h3>
+                </div>
+                <button @click="activeTab = 'riasec'" class="text-xs text-purple-300 font-bold hover:underline cursor-pointer">
+                  Detail 6 Dimensi &rarr;
+                </button>
+              </div>
+
+              <div class="space-y-2.5">
+                <div v-for="r in riasecList" :key="r.key" class="space-y-1">
+                  <div class="flex justify-between text-xs">
+                    <span class="font-bold text-white/80 flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full" :style="{ background: r.color }"></span>
+                      {{ r.name }}
+                    </span>
+                    <span class="font-black text-white">{{ r.count }} siswa ({{ r.pct }}%)</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-white/5 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-500" :style="{ width: r.pct + '%', background: r.color }"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- VIEW 2: MONITORING PAKET BELAJAR EDUPATH                   -->
+        <!-- ========================================================== -->
+        <div v-if="activeTab === 'packages'" class="space-y-6">
           <div class="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
               <div>
@@ -452,7 +356,7 @@
               </div>
               <button
                 @click="activeTab = 'students'; filterPackage = 'paid'"
-                class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-all flex items-center gap-1.5"
+                class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Lihat Siswa Bimbingan</span>
                 <i class="ph-bold ph-arrow-right text-[#c0ff00]"></i>
@@ -461,266 +365,146 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <!-- Paket 1: Pejuang PTN -->
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-[#c0ff00]/10 via-transparent to-transparent border border-[#c0ff00]/30 relative overflow-hidden">
+              <div class="p-5 rounded-2xl bg-gradient-to-br from-[#c0ff00]/10 via-transparent to-transparent border border-[#c0ff00]/30 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
                   <span class="px-2 py-0.5 rounded-full bg-[#c0ff00] text-black text-[10px] font-black uppercase tracking-wider">Terpopuler</span>
-                  <i class="ph-bold ph-trophy text-[#c0ff00] text-base"></i>
+                  <i class="ph-bold ph-trophy text-[#c0ff00] text-lg"></i>
                 </div>
                 <h3 class="text-xs font-black text-white uppercase tracking-wider">Paket Pejuang PTN</h3>
-                <div class="text-2xl font-black text-[#c0ff00] my-1">{{ packageBreakdown?.pejuang_ptn || 0 }} <span class="text-xs font-medium text-white/60">Siswa</span></div>
+                <div class="text-3xl font-black text-[#c0ff00] my-2">{{ packageBreakdown?.pejuang_ptn || 0 }} <span class="text-xs font-medium text-white/60">Siswa</span></div>
                 <p class="text-[11px] text-white/60 leading-tight">Bimbel intensif UTBK, modul drilling soal, tryout berkala IRT, &amp; grup diskusi.</p>
               </div>
 
               <!-- Paket 2: Mandiri Starter -->
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-sky-500/10 via-transparent to-transparent border border-sky-500/30 relative overflow-hidden">
+              <div class="p-5 rounded-2xl bg-gradient-to-br from-sky-500/10 via-transparent to-transparent border border-sky-500/30 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
                   <span class="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 text-[10px] font-black uppercase tracking-wider">Self-Paced</span>
-                  <i class="ph-bold ph-book-open text-sky-400 text-base"></i>
+                  <i class="ph-bold ph-book-open text-sky-400 text-lg"></i>
                 </div>
                 <h3 class="text-xs font-black text-white uppercase tracking-wider">Paket Mandiri Starter</h3>
-                <div class="text-2xl font-black text-sky-400 my-1">{{ packageBreakdown?.mandiri || 0 }} <span class="text-xs font-medium text-white/60">Siswa</span></div>
+                <div class="text-3xl font-black text-sky-400 my-2">{{ packageBreakdown?.mandiri || 0 }} <span class="text-xs font-medium text-white/60">Siswa</span></div>
                 <p class="text-[11px] text-white/60 leading-tight">Akses video materi lengkap, latihan subtes adaptif, &amp; kunci pembahasan analitis.</p>
               </div>
 
               <!-- Paket 3: Elite Mentoring -->
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 via-transparent to-transparent border border-purple-500/30 relative overflow-hidden">
+              <div class="p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 via-transparent to-transparent border border-purple-500/30 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
                   <span class="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 text-[10px] font-black uppercase tracking-wider">Privat / Intensif</span>
-                  <i class="ph-bold ph-crown text-purple-400 text-base"></i>
+                  <i class="ph-bold ph-crown text-purple-400 text-lg"></i>
                 </div>
                 <h3 class="text-xs font-black text-white uppercase tracking-wider">Paket Elite Mentoring</h3>
-                <div class="text-2xl font-black text-purple-400 my-1">{{ packageBreakdown?.elite || 0 }} <span class="text-xs font-medium text-white/60">Siswa</span></div>
+                <div class="text-3xl font-black text-purple-400 my-2">{{ packageBreakdown?.elite || 0 }} <span class="text-xs font-medium text-white/60">Siswa</span></div>
                 <p class="text-[11px] text-white/60 leading-tight">Mentoring 1-on-1 bersama alumni UI/ITB/UGM, review target rasionalisasi jurusan.</p>
               </div>
 
               <!-- Paket 4: Free SPP Diagnostic -->
-              <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/10 relative overflow-hidden">
+              <div class="p-5 rounded-2xl bg-white/[0.02] border border-white/10 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
                   <span class="px-2 py-0.5 rounded-full bg-white/10 text-white/60 text-[10px] font-black uppercase tracking-wider">Diagnostik Bebas Biaya</span>
-                  <i class="ph-bold ph-sparkle text-white/40 text-base"></i>
+                  <i class="ph-bold ph-sparkle text-white/40 text-lg"></i>
                 </div>
                 <h3 class="text-xs font-black text-white uppercase tracking-wider">Free SPP Diagnostic</h3>
-                <div class="text-2xl font-black text-white my-1">{{ packageBreakdown?.free_spp || 0 }} <span class="text-xs font-medium text-white/60">Siswa</span></div>
-                <p class="text-[11px] text-white/60 leading-tight">Tes diagnostik minat bakat Holland Code &amp; evaluasi kemampuan fondasi SNBT.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. DUA KOLOM: RIASEC HOLLAND CODE & TARGET PTN POPULER -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- KIRI: DISTRIBUSI RIASEC HOLLAND CODE -->
-            <div class="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
-              <div class="flex items-center justify-between mb-4">
-                <div>
-                  <h3 class="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
-                    <i class="ph-bold ph-compass text-[#c0ff00]"></i>
-                    Distribusi Minat Holland Code (RIASEC)
-                  </h3>
-                  <p class="text-xs text-white/60 mt-0.5">Pemetaan kecenderungan karir siswa berdasarkan 6 domain psikometri</p>
-                </div>
-              </div>
-
-              <!-- Progress Bars RIASEC -->
-              <div class="space-y-3.5 mt-4">
-                <div v-for="item in riasecList" :key="item.key">
-                  <div class="flex items-center justify-between text-xs font-bold mb-1">
-                    <span class="flex items-center gap-1.5 text-white">
-                      <span class="w-2 h-2 rounded-full" :style="{ backgroundColor: item.color }"></span>
-                      {{ item.name }} ({{ item.key }})
-                    </span>
-                    <span class="text-white/70">{{ item.count }} Siswa ({{ item.pct }}%)</span>
-                  </div>
-                  <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                    <div
-                      class="h-full rounded-full transition-all duration-700"
-                      :style="{ width: item.pct + '%', backgroundColor: item.color }"
-                    ></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-5 p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-white/70 flex items-start gap-2.5">
-                <i class="ph-bold ph-lightbulb-filament text-amber-400 text-base shrink-0 mt-0.5"></i>
-                <div class="text-[11px] leading-relaxed">
-                  <strong>Insight Guru BK:</strong> Dominasi tipe <strong>Social &amp; Enterprising</strong> mengindikasikan tingginya minat siswa pada jurusan Manajemen, Hukum, Komunikasi, dan Pendidikan.
-                </div>
-              </div>
-            </div>
-
-            <!-- KANAN: TOP 5 TARGET UNIVERSITAS -->
-            <div class="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
-              <div class="flex items-center justify-between mb-4">
-                <div>
-                  <h3 class="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
-                    <i class="ph-bold ph-buildings text-sky-400"></i>
-                    Top 5 Target Perguruan Tinggi Negeri (PTN)
-                  </h3>
-                  <p class="text-xs text-white/60 mt-0.5">Universitas impian yang paling banyak dipilih siswa sekolah Anda</p>
-                </div>
-              </div>
-
-              <div v-if="topUniversities && topUniversities.length > 0" class="space-y-3 mt-4">
-                <div
-                  v-for="(univ, idx) in topUniversities"
-                  :key="idx"
-                  class="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between"
-                >
-                  <div class="flex items-center gap-3">
-                    <div class="w-7 h-7 rounded-lg bg-[#c0ff00]/15 text-[#c0ff00] font-black text-xs flex items-center justify-center">
-                      #{{ idx + 1 }}
-                    </div>
-                    <div>
-                      <h4 class="text-xs font-black text-white">{{ univ.target_ptn }}</h4>
-                      <span class="text-[10px] text-white/50">Target Pilihan Utama Siswa</span>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <span class="text-sm font-black text-white">{{ univ.total }}</span>
-                    <span class="text-[10px] text-white/50 block">Peminat</span>
-                  </div>
-                </div>
-              </div>
-              <div v-else class="text-center py-8 text-xs text-white/40">
-                Belum ada data target PTN yang diinput siswa.
-              </div>
-
-              <!-- Growth Areas Highlight -->
-              <div class="mt-5 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20">
-                <div class="text-xs font-black text-rose-300 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                  <i class="ph-bold ph-warning text-base"></i>
-                  Fokus Penguatan Bersama (Tantangan Belajar)
-                </div>
-                <div class="space-y-1.5 text-[11px] text-white/70">
-                  <div v-for="(ga, i) in growthAreas" :key="i" class="flex items-start gap-1.5">
-                    <span class="text-rose-400 font-bold">&bull;</span>
-                    <div><strong>{{ ga.title }}:</strong> {{ ga.desc }}</div>
-                  </div>
-                </div>
+                <div class="text-3xl font-black text-white my-2">{{ packageBreakdown?.free_spp || 0 }} <span class="text-xs font-medium text-white/60">Siswa</span></div>
+                <p class="text-[11px] text-white/60 leading-tight">Hasil asesmen minat bakat Holland Code gratis &amp; pemetaan awal peluang PTN.</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ============================================================== -->
-        <!-- TAB 2: ROSTER DAFTAR SISWA & STATUS PAKET                     -->
-        <!-- ============================================================== -->
-        <div v-if="activeTab === 'students'" class="space-y-4">
-          <!-- Filter & Search Toolbar -->
-          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl flex flex-wrap items-center justify-between gap-3">
-            <!-- Search Input -->
-            <div class="relative flex-1 min-w-[240px]">
-              <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm"></i>
-              <input
-                v-model="searchQuery"
-                @input="debounceSearch"
-                type="text"
-                placeholder="Cari nama siswa, email, atau target PTN..."
-                class="w-full pl-9 pr-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-medium placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-colors"
-              />
+        <!-- ========================================================== -->
+        <!-- VIEW 3: ROSTER DATA SISWA & REKAP INTERAKTIF              -->
+        <!-- ========================================================== -->
+        <div v-if="activeTab === 'students'" class="space-y-6">
+          <div class="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-4">
+            <!-- Header Controls: Search & Package Filters -->
+            <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+              <!-- Search Box -->
+              <div class="relative flex-1 max-w-md">
+                <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"></i>
+                <input
+                  v-model="searchQuery"
+                  @input="debounceSearch"
+                  type="text"
+                  placeholder="Cari nama siswa, target PTN, atau minat..."
+                  class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs placeholder:text-white/30 focus:border-[#c0ff00] focus:outline-none transition-all"
+                />
+              </div>
+
+              <!-- Filter Buttons -->
+              <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <button
+                  v-for="f in [
+                    { key: 'all', label: 'Semua Siswa' },
+                    { key: 'paid', label: '⭐ Ikut Bimbel' },
+                    { key: 'pejuang', label: 'Pejuang PTN' },
+                    { key: 'mandiri', label: 'Mandiri' },
+                    { key: 'elite', label: 'Elite' },
+                    { key: 'free', label: 'Free SPP' }
+                  ]"
+                  :key="f.key"
+                  @click="filterPackage = f.key; fetchStudents(1);"
+                  :class="['px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer', filterPackage === f.key ? 'bg-[#c0ff00] text-black font-black shadow-md shadow-[#c0ff00]/20' : 'bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10']"
+                >
+                  {{ f.label }}
+                </button>
+              </div>
             </div>
 
-            <!-- Filter Paket -->
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-white/50 font-bold hidden sm:inline">Paket:</span>
-              <select
-                v-model="filterPackage"
-                @change="fetchStudents(1)"
-                class="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-medium focus:border-[#c0ff00] focus:outline-none cursor-pointer"
-              >
-                <option value="all">Semua Program Siswa</option>
-                <option value="paid">Hanya Siswa Bimbel (Berbayar)</option>
-                <option value="pejuang_ptn">Paket Pejuang PTN</option>
-                <option value="mandiri">Paket Mandiri Starter</option>
-                <option value="elite">Paket Elite Mentoring</option>
-                <option value="free">Free SPP Diagnostic</option>
-              </select>
-            </div>
-
-            <!-- Export Button -->
-            <button
-              @click="exportCsv"
-              class="px-3 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-            >
-              <i class="ph-bold ph-file-csv text-base"></i>
-              <span>Ekspor Rekap CSV</span>
-            </button>
-          </div>
-
-          <!-- Students Table -->
-          <div class="rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl overflow-hidden shadow-2xl">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
+            <!-- Table Container -->
+            <div class="overflow-x-auto rounded-2xl border border-white/10">
+              <table class="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr class="border-b border-white/10 bg-white/[0.02] text-white/50 uppercase tracking-wider text-[10px] font-black">
-                    <th class="py-3 px-4">Nama Siswa</th>
-                    <th class="py-3 px-4">Program / Paket EduPath</th>
-                    <th class="py-3 px-4">Target PTN</th>
-                    <th class="py-3 px-4">Holland Code (RIASEC)</th>
-                    <th class="py-3 px-4 text-center">Skor Tryout Terakhir</th>
-                    <th class="py-3 px-4 text-right">Aksi</th>
+                  <tr class="border-b border-white/10 bg-white/[0.02] text-white/50 text-[10px] font-black uppercase tracking-wider">
+                    <th class="p-3.5">No</th>
+                    <th class="p-3.5">Nama Siswa</th>
+                    <th class="p-3.5">Program / Paket</th>
+                    <th class="p-3.5">Minat Holland (RIASEC)</th>
+                    <th class="p-3.5">Target PTN</th>
+                    <th class="p-3.5">Skor Tryout</th>
+                    <th class="p-3.5 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-if="studentsLoading">
-                    <td colspan="6" class="py-12 text-center text-white/50">
-                      <div class="w-6 h-6 border-2 border-[#c0ff00] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                      Memuat daftar siswa...
+                    <td colspan="7" class="p-8 text-center text-white/50">
+                      <i class="ph-bold ph-spinner animate-spin text-xl text-[#c0ff00] inline-block mb-1"></i>
+                      <p>Memuat data siswa...</p>
                     </td>
                   </tr>
                   <tr v-else-if="students.length === 0">
-                    <td colspan="6" class="py-12 text-center text-white/40">
-                      <i class="ph-bold ph-folder-open text-3xl mb-2 block opacity-40"></i>
-                      Tidak ada siswa ditemukan dengan filter saat ini.
+                    <td colspan="7" class="p-8 text-center text-white/50">
+                      <i class="ph-bold ph-users-three text-2xl text-white/20 inline-block mb-1"></i>
+                      <p>Belum ada siswa yang cocok dengan kriteria filter.</p>
                     </td>
                   </tr>
-                  <tr v-for="stu in students" :key="stu.id" class="hover:bg-white/[0.02] transition-colors">
-                    <!-- Siswa -->
-                    <td class="py-3 px-4">
-                      <div class="font-bold text-white">{{ stu.name }}</div>
-                      <div class="text-[11px] text-white/40">{{ stu.email }} &bull; {{ stu.phone }}</div>
+                  <tr v-for="(stu, idx) in students" :key="stu.id || idx" class="hover:bg-white/[0.02] transition-colors">
+                    <td class="p-3.5 text-white/40 font-mono">{{ (studentPage - 1) * studentLimit + idx + 1 }}</td>
+                    <td class="p-3.5">
+                      <span class="font-bold text-white block">{{ stu.name }}</span>
+                      <span class="text-[10px] text-white/40">{{ stu.email }}</span>
                     </td>
-
-                    <!-- Program / Paket EduPath -->
-                    <td class="py-3 px-4">
-                      <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider" :class="getPackageBadgeClass(stu.package_code)">
-                        <i class="ph-bold ph-package text-xs"></i>
-                        <span>{{ stu.package_name }}</span>
-                      </div>
-                      <div v-if="stu.package_status === 'active'" class="text-[10px] text-emerald-400 font-semibold mt-0.5">
-                        Aktif s/d {{ stu.package_expires_at ? formatDate(stu.package_expires_at) : 'Selesai SNBT' }}
-                      </div>
-                      <div v-else class="text-[10px] text-white/30 mt-0.5">Akses Diagnostik</div>
+                    <td class="p-3.5">
+                      <span :class="['px-2 py-0.5 rounded-md text-[10px] font-black tracking-wider uppercase inline-block', getPackageBadgeClass(stu.package_code)]">
+                        {{ stu.package_name }}
+                      </span>
                     </td>
-
-                    <!-- Target PTN -->
-                    <td class="py-3 px-4">
-                      <span class="font-medium text-white/90">{{ stu.target_ptn || '-' }}</span>
-                    </td>
-
-                    <!-- Holland Code -->
-                    <td class="py-3 px-4">
-                      <span v-if="stu.riasec_badge !== 'Belum Tes'" class="px-2 py-0.5 rounded-lg bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 font-extrabold text-[10px]">
+                    <td class="p-3.5">
+                      <span class="font-mono font-bold text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
                         {{ stu.riasec_badge }}
                       </span>
-                      <span v-else class="text-[10px] text-white/30 italic">Belum Tes</span>
                     </td>
-
-                    <!-- Skor Tryout -->
-                    <td class="py-3 px-4 text-center">
-                      <span v-if="stu.latest_tryout_score !== null" class="font-black text-amber-400 text-sm">
-                        {{ stu.latest_tryout_score }}
-                      </span>
-                      <span v-else class="text-[10px] text-white/30 italic">-</span>
+                    <td class="p-3.5 font-medium text-white/90">
+                      {{ stu.target_ptn || 'UI / ITB' }}
                     </td>
-
-                    <!-- Aksi -->
-                    <td class="py-3 px-4 text-right">
+                    <td class="p-3.5 font-mono font-bold text-amber-400">
+                      {{ stu.latest_tryout_score || '-' }}
+                    </td>
+                    <td class="p-3.5 text-center">
                       <button
                         @click="openStudentDetail(stu)"
-                        class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 hover:text-[#c0ff00] text-[11px] font-bold transition-all inline-flex items-center gap-1 cursor-pointer"
+                        class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-white text-[11px] font-bold border border-white/10 transition-all cursor-pointer"
                       >
-                        <i class="ph-bold ph-eye"></i>
-                        <span>Detail</span>
+                        Detail &amp; WA
                       </button>
                     </td>
                   </tr>
@@ -729,135 +513,117 @@
             </div>
 
             <!-- Pagination Bar -->
-            <div class="p-4 border-t border-white/5 flex items-center justify-between text-xs text-white/50">
-              <div>
-                Menampilkan halaman {{ studentPage }} dari {{ Math.ceil(studentTotal / studentLimit) || 1 }} (Total {{ studentTotal }} siswa)
-              </div>
-              <div class="flex items-center gap-2">
+            <div class="flex items-center justify-between text-xs text-white/60 pt-2">
+              <span>Menampilkan {{ students.length }} dari {{ studentTotal }} total siswa</span>
+              <div class="flex gap-2">
                 <button
                   :disabled="studentPage <= 1"
                   @click="fetchStudents(studentPage - 1)"
-                  class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+                  class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-40 border border-white/10 cursor-pointer"
                 >
-                  &larr; Prev
+                  &larr; Sebelumnya
                 </button>
                 <button
-                  :disabled="studentPage >= Math.ceil(studentTotal / studentLimit)"
+                  :disabled="studentPage * studentLimit >= studentTotal"
                   @click="fetchStudents(studentPage + 1)"
-                  class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+                  class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-40 border border-white/10 cursor-pointer"
                 >
-                  Next &rarr;
+                  Selanjutnya &rarr;
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ============================================================== -->
-        <!-- TAB 3: INFORMASI PAKET BELAJAR (KATALOG UNTUK GURU BK)         -->
-        <!-- ============================================================== -->
-        <div v-if="activeTab === 'packages'" class="space-y-6">
-          <div class="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
-            <div class="max-w-2xl">
-              <span class="text-xs font-black uppercase tracking-wider text-[#c0ff00] block mb-1">Panduan Program EduPath untuk Guru BK</span>
-              <h2 class="text-2xl font-black text-white">Struktur Paket Bimbingan Siswa</h2>
-              <p class="text-xs text-white/70 mt-1 leading-relaxed">
-                Sekolah mitra dapat merekomendasikan program intensif berikut kepada siswa kelas 12 untuk mendongkrak peluang kelolosan SNBT dan Seleksi Mandiri.
-              </p>
+        <!-- ========================================================== -->
+        <!-- VIEW 4: PEMETAAN RIASEC (HOLLAND CODE)                     -->
+        <!-- ========================================================== -->
+        <div v-if="activeTab === 'riasec'" class="space-y-6">
+          <div class="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-6">
+            <div>
+              <span class="text-xs font-black uppercase tracking-wider text-purple-400 block mb-1">Psikometri Ilmiah 6 Dimensi</span>
+              <h2 class="text-xl font-black text-white">Pemetaan Minat Karir &amp; Jurusan Siswa (Holland Code RIASEC)</h2>
+              <p class="text-xs text-white/60 mt-1">Gunakan hasil agregat ini untuk memandu sesi bimbingan karir, wali kelas, dan rasionalisasi SNBP/SNBT.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-              <!-- Card 1 -->
-              <div class="p-6 rounded-3xl bg-white/[0.02] border border-white/10 flex flex-col justify-between">
-                <div>
-                  <div class="inline-flex px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-400 text-[10px] font-black uppercase tracking-wider mb-3">Akses Mandiri</div>
-                  <h3 class="text-lg font-black text-white">Paket Mandiri Starter</h3>
-                  <div class="text-2xl font-black text-sky-400 my-2">Rp 99.000 <span class="text-xs text-white/50 font-normal">/ musim</span></div>
-                  <ul class="text-xs text-white/70 space-y-2 mt-4">
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-sky-400"></i> Bank Soal 5.000+ Soal HOTS</li>
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-sky-400"></i> Video Materi TPS &amp; Literasi</li>
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-sky-400"></i> 5x Simulasi CBT IRT Nasional</li>
-                  </ul>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div v-for="r in riasecList" :key="r.key" class="p-5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="w-8 h-8 rounded-xl font-black text-black flex items-center justify-center text-sm" :style="{ background: r.color }">
+                    {{ r.key }}
+                  </span>
+                  <span class="text-xs font-black text-white">{{ r.count }} Siswa ({{ r.pct }}%)</span>
                 </div>
-                <div class="mt-6 pt-4 border-t border-white/5">
-                  <div class="text-[11px] text-white/40">Siswa Anda terdaftar: <strong>{{ packageBreakdown?.mandiri || 0 }} Siswa</strong></div>
+                <h3 class="text-sm font-black text-white">{{ r.name }}</h3>
+                <div class="w-full h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-500" :style="{ width: r.pct + '%', background: r.color }"></div>
                 </div>
-              </div>
-
-              <!-- Card 2: Featured -->
-              <div class="p-6 rounded-3xl bg-gradient-to-b from-[#c0ff00]/15 via-white/[0.03] to-transparent border-2 border-[#c0ff00]/40 flex flex-col justify-between shadow-xl shadow-[#c0ff00]/10">
-                <div>
-                  <div class="inline-flex px-2.5 py-1 rounded-full bg-[#c0ff00] text-black text-[10px] font-black uppercase tracking-wider mb-3">Pilihan Utama Siswa</div>
-                  <h3 class="text-lg font-black text-white">Paket Pejuang PTN (All-In)</h3>
-                  <div class="text-2xl font-black text-[#c0ff00] my-2">Rp 249.000 <span class="text-xs text-white/50 font-normal">/ musim</span></div>
-                  <ul class="text-xs text-white/80 space-y-2 mt-4">
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-[#c0ff00]"></i> <strong>Semua Fitur Paket Mandiri</strong></li>
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-[#c0ff00]"></i> 15x Tryout Akbar IRT Nasional</li>
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-[#c0ff00]"></i> Live Class Interaktif &amp; Drilling Soal</li>
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-[#c0ff00]"></i> Komunitas Belajar &amp; Tanya Tutor</li>
-                  </ul>
-                </div>
-                <div class="mt-6 pt-4 border-t border-white/10">
-                  <div class="text-[11px] text-[#c0ff00]">Siswa Anda terdaftar: <strong>{{ packageBreakdown?.pejuang_ptn || 0 }} Siswa</strong></div>
-                </div>
-              </div>
-
-              <!-- Card 3 -->
-              <div class="p-6 rounded-3xl bg-white/[0.02] border border-white/10 flex flex-col justify-between">
-                <div>
-                  <div class="inline-flex px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-400 text-[10px] font-black uppercase tracking-wider mb-3">Intensif &amp; Kedinasan</div>
-                  <h3 class="text-lg font-black text-white">Paket Elite Mentoring</h3>
-                  <div class="text-2xl font-black text-purple-400 my-2">Rp 599.000 <span class="text-xs text-white/50 font-normal">/ musim</span></div>
-                  <ul class="text-xs text-white/70 space-y-2 mt-4">
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-purple-400"></i> <strong>Semua Fitur Pejuang PTN</strong></li>
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-purple-400"></i> Mentoring 1-on-1 Rasionalisasi SNBT</li>
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-purple-400"></i> Modul Khusus Kedinasan &amp; Mandiri</li>
-                    <li class="flex items-center gap-2"><i class="ph-bold ph-check text-purple-400"></i> Jalur Konsultasi Khusus Ortu &amp; Siswa</li>
-                  </ul>
-                </div>
-                <div class="mt-6 pt-4 border-t border-white/5">
-                  <div class="text-[11px] text-white/40">Siswa Anda terdaftar: <strong>{{ packageBreakdown?.elite || 0 }} Siswa</strong></div>
-                </div>
+                <p class="text-[11px] text-white/60 leading-relaxed">
+                  Cocok untuk program studi sains &amp; teknologi, kedokteran, teknik, atau rumpun keilmuan yang linear dengan kepribadian {{ r.key }}.
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ============================================================== -->
-        <!-- TAB 4: KIT SOSIALISASI & BROADCAST WHATSAPP                    -->
-        <!-- ============================================================== -->
+        <!-- ========================================================== -->
+        <!-- VIEW 5: TARGET KAMPUS PTN & PRODI FAVORIT                 -->
+        <!-- ========================================================== -->
+        <div v-if="activeTab === 'ptn'" class="space-y-6">
+          <div class="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-6">
+            <div>
+              <span class="text-xs font-black uppercase tracking-wider text-[#c0ff00] block mb-1">Target Pilihan Siswa</span>
+              <h2 class="text-xl font-black text-white">Universitas &amp; Rumpun Jurusan Terfavorit</h2>
+              <p class="text-xs text-white/60 mt-1">Data agregat pilihan kampus impian yang dimasukkan siswa saat pendaftaran &amp; tryout SNBT.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div v-for="(u, idx) in topUniversities" :key="idx" class="p-5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="px-2 py-0.5 rounded-md bg-white/10 text-white font-mono text-[10px] font-black">Rank #{{ idx + 1 }}</span>
+                  <span class="text-xs font-black text-[#c0ff00]">{{ u.count }} Peminat</span>
+                </div>
+                <h3 class="text-sm font-black text-white">{{ u.name }}</h3>
+                <p class="text-[11px] text-white/60">Prodi Populer: <strong class="text-white/80">{{ u.popular_major || 'Kedokteran / Teknik Informatika' }}</strong></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- VIEW 6: SEBAR LINK & QR CODE SISWA                        -->
+        <!-- ========================================================== -->
         <div v-if="activeTab === 'broadcast'" class="space-y-6">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Left: QR Code Display -->
-            <div class="lg:col-span-5 p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl text-center">
-              <h3 class="text-sm font-black uppercase tracking-wider text-white mb-1">QR Code Asesmen Resmi</h3>
-              <p class="text-xs text-white/60 mb-4">{{ schoolData?.name }}</p>
-
-              <div class="p-4 bg-white rounded-2xl inline-block shadow-2xl">
-                <img
-                  :src="qrCodeUrl"
-                  alt="QR Code Sekolah"
-                  class="w-48 h-48 sm:w-56 sm:h-56 object-contain"
-                />
+            <!-- Left: QR Code & Link Card -->
+            <div class="lg:col-span-5 p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl flex flex-col justify-between space-y-4">
+              <div>
+                <span class="text-xs font-black uppercase tracking-wider text-[#c0ff00] block mb-1">Akses Langsung Siswa</span>
+                <h3 class="text-lg font-black text-white">Tautan &amp; QR Khusus {{ schoolData?.name }}</h3>
+                <p class="text-xs text-white/60 mt-1">Siswa yang mendaftar melalui barcode ini otomatis tercatat di dashboard Anda.</p>
               </div>
 
-              <div class="mt-4 space-y-2">
-                <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-[11px] text-white/70 font-mono break-all">
+              <div class="p-4 bg-white rounded-2xl inline-block mx-auto shadow-2xl my-4">
+                <img :src="qrCodeUrl" alt="QR Code Sekolah" class="w-48 h-48 object-contain" />
+              </div>
+
+              <div class="space-y-2">
+                <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-[11px] font-mono text-white/70 break-all select-all">
                   {{ shareLink }}
                 </div>
-                <div class="flex items-center justify-center gap-2 pt-2">
+                <div class="flex gap-2">
                   <button
                     @click="copyShareLink"
-                    class="px-4 py-2 rounded-xl bg-[#c0ff00] text-black font-black text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-lg shadow-[#c0ff00]/20"
+                    class="flex-1 py-2 rounded-xl bg-[#c0ff00] text-black font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-[#c0ff00]/20"
                   >
                     <i :class="['ph-bold', copiedLink ? 'ph-check' : 'ph-copy']"></i>
-                    <span>{{ copiedLink ? 'Tautan Tersalin' : 'Salin Tautan' }}</span>
+                    <span>{{ copiedLink ? 'Tersalin!' : 'Salin Tautan' }}</span>
                   </button>
                   <a
                     :href="qrCodeUrl"
                     download="qrcode_sekolah.png"
                     target="_blank"
-                    class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all flex items-center gap-1.5"
+                    class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5"
                   >
                     <i class="ph-bold ph-download-simple"></i>
                     <span>Unduh Gambar</span>
@@ -870,7 +636,7 @@
             <div class="lg:col-span-7 p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-4">
               <div>
                 <span class="text-xs font-black uppercase tracking-wider text-[#c0ff00] block mb-1">Templat Siap Sebar</span>
-                <h3 class="text-lg font-black text-white">Pesan WhatsApp untuk Grup Kelas / Orang Tua</h3>
+                <h3 class="text-lg font-black text-white">Pesan WhatsApp untuk Grup Kelas / Wali Murid</h3>
                 <p class="text-xs text-white/60">Guru BK dapat langsung menyalin teks ini dan menempelkannya ke WhatsApp Group Kelas 12.</p>
               </div>
 
@@ -893,110 +659,111 @@
               <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 leading-relaxed flex items-start gap-2.5">
                 <i class="ph-bold ph-whatsapp-logo text-lg text-emerald-400 shrink-0 mt-0.5"></i>
                 <div>
-                  <strong>Tips Distribusi Efektif:</strong> Sebar link ini pada jam wali kelas atau bimbingan karir sekolah. Dalam 15 menit, seluruh siswa akan otomatis terdaftar dan grafik agregat sekolah langsung terisi!
+                  <strong>Tips Bimbingan:</strong> Sebar link ini pada jam wali kelas atau bimbingan karir sekolah. Rapor potensi dan minat langsung terbit otomatis begitu siswa selesai mengisi!
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </main>
 
-      <!-- ============================================================== -->
-      <!-- MODAL: QR CODE SISWA POPUP                                     -->
-      <!-- ============================================================== -->
-      <div v-if="openQrModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="openQrModal = false"></div>
-        <div class="relative z-10 w-full max-w-sm p-6 rounded-3xl bg-[#090e1f] border border-white/15 text-center shadow-2xl">
-          <button @click="openQrModal = false" class="absolute top-4 right-4 text-white/40 hover:text-white">
-            <i class="ph-bold ph-x text-lg"></i>
+      </div>
+    </main>
+
+    <!-- ============================================================== -->
+    <!-- MODAL: QR CODE SISWA POPUP                                     -->
+    <!-- ============================================================== -->
+    <div v-if="openQrModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="openQrModal = false"></div>
+      <div class="relative z-10 w-full max-w-sm p-6 rounded-3xl bg-[#090e1f] border border-white/15 text-center shadow-2xl">
+        <button @click="openQrModal = false" class="absolute top-4 right-4 text-white/40 hover:text-white cursor-pointer">
+          <i class="ph-bold ph-x text-lg"></i>
+        </button>
+        <div class="w-10 h-10 rounded-2xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center mx-auto mb-3">
+          <i class="ph-bold ph-qr-code text-xl"></i>
+        </div>
+        <h3 class="text-base font-black text-white">{{ schoolData?.name }}</h3>
+        <p class="text-xs text-white/60 mb-4">Pindai untuk asesmen minat bakat &amp; diagnostik SNBT</p>
+
+        <div class="p-3 bg-white rounded-2xl inline-block shadow-lg">
+          <img :src="qrCodeUrl" alt="QR Code" class="w-48 h-48 object-contain" />
+        </div>
+
+        <div class="mt-4 flex gap-2">
+          <button @click="copyShareLink" class="flex-1 py-2 rounded-xl bg-[#c0ff00] text-black font-black text-xs cursor-pointer">
+            {{ copiedLink ? 'Tersalin!' : 'Salin Link' }}
           </button>
-          <div class="w-10 h-10 rounded-2xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center mx-auto mb-3">
-            <i class="ph-bold ph-qr-code text-xl"></i>
-          </div>
-          <h3 class="text-base font-black text-white">{{ schoolData?.name }}</h3>
-          <p class="text-xs text-white/60 mb-4">Pindai untuk mengikuti Student Potential Path &amp; Diagnostik SNBT</p>
-
-          <div class="p-3 bg-white rounded-2xl inline-block shadow-lg">
-            <img :src="qrCodeUrl" alt="QR Code" class="w-48 h-48 object-contain" />
-          </div>
-
-          <div class="mt-4 flex gap-2">
-            <button @click="copyShareLink" class="flex-1 py-2 rounded-xl bg-[#c0ff00] text-black font-black text-xs">
-              {{ copiedLink ? 'Tersalin!' : 'Salin Link' }}
-            </button>
-            <button @click="openQrModal = false" class="px-4 py-2 rounded-xl bg-white/10 text-white font-bold text-xs">
-              Tutup
-            </button>
-          </div>
+          <button @click="openQrModal = false" class="px-4 py-2 rounded-xl bg-white/10 text-white font-bold text-xs cursor-pointer">
+            Tutup
+          </button>
         </div>
       </div>
+    </div>
 
-      <!-- ============================================================== -->
-      <!-- MODAL: DETAIL SISWA POPUP                                      -->
-      <!-- ============================================================== -->
-      <div v-if="selectedStudent" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="selectedStudent = null"></div>
-        <div class="relative z-10 w-full max-w-md p-6 rounded-3xl bg-[#090e1f] border border-white/15 shadow-2xl space-y-4">
-          <div class="flex items-center justify-between border-b border-white/10 pb-3">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-xl bg-[#c0ff00]/20 text-[#c0ff00] flex items-center justify-center font-bold">
-                {{ selectedStudent.name.charAt(0) }}
-              </div>
-              <div>
-                <h3 class="text-sm font-black text-white">{{ selectedStudent.name }}</h3>
-                <span class="text-[10px] text-white/50">{{ selectedStudent.email }}</span>
-              </div>
+    <!-- ============================================================== -->
+    <!-- MODAL: DETAIL SISWA POPUP                                      -->
+    <!-- ============================================================== -->
+    <div v-if="selectedStudent" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="selectedStudent = null"></div>
+      <div class="relative z-10 w-full max-w-md p-6 rounded-3xl bg-[#090e1f] border border-white/15 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-[#c0ff00]/20 text-[#c0ff00] flex items-center justify-center font-bold">
+              {{ selectedStudent.name.charAt(0) }}
             </div>
-            <button @click="selectedStudent = null" class="text-white/40 hover:text-white">
-              <i class="ph-bold ph-x text-lg"></i>
-            </button>
-          </div>
-
-          <div class="space-y-3 text-xs">
-            <div class="flex justify-between py-1.5 border-b border-white/5">
-              <span class="text-white/50">Program / Paket:</span>
-              <span class="font-bold text-[#c0ff00]">{{ selectedStudent.package_name }}</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-white/5">
-              <span class="text-white/50">Status Paket:</span>
-              <span class="font-bold uppercase" :class="selectedStudent.package_status === 'active' ? 'text-emerald-400' : 'text-white/60'">
-                {{ selectedStudent.package_status }}
-              </span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-white/5">
-              <span class="text-white/50">Target PTN:</span>
-              <span class="font-bold text-white">{{ selectedStudent.target_ptn || 'Belum dipilih' }}</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-white/5">
-              <span class="text-white/50">Minat Holland (RIASEC):</span>
-              <span class="font-bold text-indigo-300">{{ selectedStudent.riasec_badge }}</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-white/5">
-              <span class="text-white/50">Skor Tryout Terbaru:</span>
-              <span class="font-bold text-amber-400">{{ selectedStudent.latest_tryout_score || 'Belum pernah tryout' }}</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-white/5">
-              <span class="text-white/50">No. WhatsApp Siswa:</span>
-              <a :href="'https://wa.me/' + cleanPhone(selectedStudent.phone)" target="_blank" class="font-bold text-emerald-400 hover:underline flex items-center gap-1">
-                <i class="ph-bold ph-whatsapp-logo"></i>
-                {{ selectedStudent.phone }}
-              </a>
+            <div>
+              <h3 class="text-sm font-black text-white">{{ selectedStudent.name }}</h3>
+              <span class="text-[10px] text-white/50">{{ selectedStudent.email }}</span>
             </div>
           </div>
+          <button @click="selectedStudent = null" class="text-white/40 hover:text-white cursor-pointer">
+            <i class="ph-bold ph-x text-lg"></i>
+          </button>
+        </div>
 
-          <div class="pt-2 flex gap-2">
-            <a
-              :href="'https://wa.me/' + cleanPhone(selectedStudent.phone) + '?text=' + encodeURIComponent('Halo ' + selectedStudent.name + ', ini dari Guru BK ' + (schoolData?.name || 'Sekolah') + ' seputar hasil pemetaan minat SNBT EduPath kamu.')"
-              target="_blank"
-              class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5"
-            >
-              <i class="ph-bold ph-chat-circle-dots"></i>
-              <span>Hubungi via WhatsApp</span>
+        <div class="space-y-3 text-xs">
+          <div class="flex justify-between py-1.5 border-b border-white/5">
+            <span class="text-white/50">Program / Paket:</span>
+            <span class="font-bold text-[#c0ff00]">{{ selectedStudent.package_name }}</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-white/5">
+            <span class="text-white/50">Status Paket:</span>
+            <span class="font-bold uppercase" :class="selectedStudent.package_status === 'active' ? 'text-emerald-400' : 'text-white/60'">
+              {{ selectedStudent.package_status }}
+            </span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-white/5">
+            <span class="text-white/50">Target PTN:</span>
+            <span class="font-bold text-white">{{ selectedStudent.target_ptn || 'Belum dipilih' }}</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-white/5">
+            <span class="text-white/50">Minat Holland (RIASEC):</span>
+            <span class="font-bold text-indigo-300">{{ selectedStudent.riasec_badge }}</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-white/5">
+            <span class="text-white/50">Skor Tryout Terbaru:</span>
+            <span class="font-bold text-amber-400">{{ selectedStudent.latest_tryout_score || 'Belum pernah tryout' }}</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-white/5">
+            <span class="text-white/50">No. WhatsApp Siswa:</span>
+            <a :href="'https://wa.me/' + cleanPhone(selectedStudent.phone)" target="_blank" class="font-bold text-emerald-400 hover:underline flex items-center gap-1">
+              <i class="ph-bold ph-whatsapp-logo"></i>
+              {{ selectedStudent.phone }}
             </a>
-            <button @click="selectedStudent = null" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs">
-              Tutup
-            </button>
           </div>
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <a
+            :href="'https://wa.me/' + cleanPhone(selectedStudent.phone) + '?text=' + encodeURIComponent('Halo ' + selectedStudent.name + ', ini dari Guru BK ' + (schoolData?.name || 'Sekolah') + ' seputar hasil pemetaan minat SNBT EduPath kamu.')"
+            target="_blank"
+            class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5"
+          >
+            <i class="ph-bold ph-chat-circle-dots"></i>
+            <span>Hubungi via WhatsApp</span>
+          </a>
+          <button @click="selectedStudent = null" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs cursor-pointer">
+            Tutup
+          </button>
         </div>
       </div>
     </div>
@@ -1009,7 +776,6 @@ import { api } from '../api.js';
 
 // ── State Autentikasi ──
 const isAuthenticated = ref(false);
-const authTab = ref('login'); // 'login' | 'register'
 const authLoading = ref(false);
 const authError = ref('');
 const authSuccess = ref('');
@@ -1020,26 +786,16 @@ const loginForm = ref({
   password: ''
 });
 
-const registerForm = ref({
-  name: '',
-  npsn: '',
-  city: '',
-  bk_name: '',
-  phone: '',
-  email: '',
-  password: '',
-  estimated_students: 250
-});
-
-// ── State Dashboard & Sekolah ──
+// ── State Layout & Sidebar (Matching AdminPanel.vue) ──
+const sidebarOpen = ref(true);
+const activeTab = ref('analytics'); // 'analytics' | 'packages' | 'students' | 'riasec' | 'ptn' | 'broadcast'
 const schoolData = ref(null);
-const activeTab = ref('analytics'); // 'analytics' | 'students' | 'packages' | 'broadcast'
 const dataLoading = ref(false);
 const copiedLink = ref(false);
 const copiedBroadcast = ref(false);
 const openQrModal = ref(false);
 
-// ── Data Agregat ──
+// ── Data Agregat Dashboard ──
 const kpis = ref({
   total_students: 0,
   paid_package_students: 0,
@@ -1072,7 +828,53 @@ const selectedStudent = ref(null);
 
 let searchTimeout = null;
 
-// ── Computed Properties ──
+// ── Computed Navigation Items (Sidebar Layout) ──
+const navItems = computed(() => [
+  {
+    id: 'analytics',
+    label: 'Ringkasan & KPI Agregat',
+    icon: 'ph-chart-pie-slice'
+  },
+  {
+    id: 'packages',
+    label: 'Monitoring Paket Belajar',
+    icon: 'ph-package',
+    badge: `${kpis.value?.paid_package_students || 0} Siswa`,
+    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-400'
+  },
+  {
+    id: 'students',
+    label: 'Roster & Data Siswa',
+    icon: 'ph-users-three',
+    badge: `${kpis.value?.total_students || 0}`,
+    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-white/10 text-white'
+  },
+  {
+    id: 'riasec',
+    label: 'Peminatan RIASEC',
+    icon: 'ph-compass',
+    badge: '6 Tipe',
+    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-purple-500/20 text-purple-300'
+  },
+  {
+    id: 'ptn',
+    label: 'Target Kampus PTN',
+    icon: 'ph-buildings',
+    badge: 'Top 5',
+    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-sky-500/20 text-sky-300'
+  },
+  {
+    id: 'broadcast',
+    label: 'Sebar Link & QR Code',
+    icon: 'ph-qr-code'
+  }
+]);
+
+const activeTabTitle = computed(() => {
+  const item = navItems.value.find(n => n.id === activeTab.value);
+  return item ? item.label : 'Dashboard Sekolah';
+});
+
 const shareLink = computed(() => {
   const schoolName = schoolData.value?.name || 'Sekolah';
   return `https://edupath.co.id/?school=${encodeURIComponent(schoolName)}#/spp`;
@@ -1158,61 +960,11 @@ async function handleLogin() {
   }
 }
 
-async function quickDemoLogin(demoSchoolName) {
-  authLoading.value = true;
-  authError.value = '';
-  try {
-    // Generate mock school session for instant UAT verification
-    const demoData = {
-      id: 'demo-school-01',
-      name: demoSchoolName || 'SMANSA Ciamis',
-      slug: 'smansa-ciamis',
-      bk_name: 'Dra. H. Nuraeni, M.Pd',
-      bk_email: 'bk.smansaciamis@edupath.co.id',
-      bk_phone: '081223344556',
-      city: 'Kabupaten Ciamis'
-    };
-    // Fetch mock or live data
-    schoolData.value = demoData;
-    sessionStorage.setItem('school_data', JSON.stringify(demoData));
-    sessionStorage.setItem('school_token', 'demo_token_authenticated');
-    isAuthenticated.value = true;
-    await loadAllDashboardData();
-  } catch (err) {
-    authError.value = 'Mode demo tidak dapat diinisialisasi.';
-  } finally {
-    authLoading.value = false;
-  }
-}
-
-async function handleRegister() {
-  authLoading.value = true;
-  authError.value = '';
-  authSuccess.value = '';
-  try {
-    const res = await api.registerSchool(registerForm.value);
-    if (res.success && res.token) {
-      sessionStorage.setItem('school_token', res.token);
-      sessionStorage.setItem('school_data', JSON.stringify(res.school));
-      schoolData.value = res.school;
-      isAuthenticated.value = true;
-      await loadAllDashboardData();
-    } else {
-      throw new Error(res.error || 'Pendaftaran gagal.');
-    }
-  } catch (err) {
-    authError.value = err.message || 'Pendaftaran gagal. Periksa data kembali.';
-  } finally {
-    authLoading.value = false;
-  }
-}
-
 function handleLogout() {
   sessionStorage.removeItem('school_token');
   sessionStorage.removeItem('school_data');
   isAuthenticated.value = false;
   schoolData.value = null;
-  authTab.value = 'login';
 }
 
 async function loadAllDashboardData() {
@@ -1228,7 +980,6 @@ async function loadAllDashboardData() {
       growthAreas.value = res.growth_areas || [];
       riasecRaw.value = res.riasec_distribution || {};
     } else {
-      // Sediakan default analytics untuk sekolah baru
       growthAreas.value = [
         { title: "Penalaran Matematika & Kuantitatif", desc: "Perlu penguatan aljabar & interpretasi tabel data." },
         { title: "Literasi Bahasa Inggris", desc: "Perlu pembiasaan inferensi ide pokok dari teks panjang." }
@@ -1310,16 +1061,6 @@ function getPackageBadgeClass(code) {
     return 'bg-purple-400/15 text-purple-400 border border-purple-400/40';
   }
   return 'bg-white/5 text-white/50 border border-white/10';
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return '-';
-  try {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-  } catch (e) {
-    return dateStr;
-  }
 }
 
 function cleanPhone(phone) {
