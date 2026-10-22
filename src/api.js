@@ -150,11 +150,14 @@ function getCookie(name) {
 
 export async function apiFetch(endpoint, options = {}) {
   const isAdminRoute = endpoint.includes('admin.php') || endpoint.includes('admin_affiliate.php');
+  const isSchoolRoute = endpoint.includes('school.php');
   const method = (options.method || 'GET').toUpperCase();
 
-  const token = isAdminRoute
-    ? (sessionStorage.getItem(ADMIN_TOKEN_KEY) || sessionStorage.getItem('admin_token') || legacyGetToken())
-    : legacyGetToken();
+  const token = isSchoolRoute
+    ? (sessionStorage.getItem('school_token') || sessionStorage.getItem('ep_school_token') || legacyGetToken())
+    : (isAdminRoute
+      ? (sessionStorage.getItem(ADMIN_TOKEN_KEY) || sessionStorage.getItem('admin_token') || legacyGetToken())
+      : legacyGetToken());
 
   const csrf = (isAdminRoute ? sessionStorage.getItem(ADMIN_CSRF_KEY) : getCsrfToken())
     || sessionStorage.getItem(ADMIN_CSRF_KEY)
@@ -252,7 +255,7 @@ export async function apiFetch(endpoint, options = {}) {
   return doFetch();
 }
 
-export default {
+export const api = {
   // ── Plans ──
   /**
    * Retrieve list of available subscription plans.
@@ -490,6 +493,22 @@ export default {
     return apiFetch(`/spp.php?action=get_school_aggregate&school_name=${encodeURIComponent(schoolName)}`);
   },
 
+  // ── School & Guru BK Management ──
+  registerSchool(data) {
+    return apiFetch('/school.php?action=register', { method: 'POST', body: JSON.stringify(data) });
+  },
+  loginSchool(data) {
+    return apiFetch('/school.php?action=login', { method: 'POST', body: JSON.stringify(data) });
+  },
+  getSchoolDashboard(schoolName = '') {
+    const q = schoolName ? `&school_name=${encodeURIComponent(schoolName)}` : '';
+    return apiFetch(`/school.php?action=dashboard${q}`);
+  },
+  getSchoolStudents(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/school.php?action=students${q ? '&' + q : ''}`);
+  },
+
   // ── Analytics ──
   trackEvent(eventName, payload = {}) {
     // Analytics abstraction as requested. Currently a no-op / local mock.
@@ -498,3 +517,5 @@ export default {
     }
   }
 };
+
+export default api;

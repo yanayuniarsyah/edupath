@@ -10,6 +10,8 @@ try {
       window.location.replace('/#/tryout');
     } else if (currentPath === 'terms') {
       window.location.replace('/#/terms');
+    } else if (currentPath === 'school' || currentPath === 'school/login') {
+      window.location.replace('/#/school' + window.location.search);
     } else if (currentPath === 'spp') {
       window.location.replace('/#/spp' + window.location.search);
     }
@@ -24,6 +26,14 @@ const routes = [
   {
     path: '/spp',
     component: () => import('../App.vue'),
+  },
+  {
+    path: '/school',
+    component: () => import(/* webpackChunkName: "school" */ '../views/SchoolDashboard.vue'),
+  },
+  {
+    path: '/school/login',
+    redirect: '/school',
   },
   {
     path: '/admin',

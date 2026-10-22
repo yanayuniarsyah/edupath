@@ -284,6 +284,12 @@
               <span>Afiliasi</span>
               <i class="ph-bold ph-arrow-up-right text-[10px]"></i>
             </button>
+
+            <!-- 7. Portal Sekolah & Guru BK -->
+            <a href="#/school" class="hover:text-[#c0ff00] transition-colors py-1 flex items-center gap-1.5 whitespace-nowrap text-[#c0ff00]/90 font-bold">
+              <i class="ph-bold ph-chalkboard-teacher text-sm"></i>
+              <span>Portal BK</span>
+            </a>
           </nav>
 
           <div class="flex items-center gap-2">
@@ -3517,6 +3523,10 @@
           <div class="flex flex-wrap items-center gap-4 text-xs">
             <button @click="showTermsModal = true" class="text-[#c0ff00] hover:underline font-bold">Syarat &amp; Ketentuan</button>
             <button @click="showContactModal = true" class="hover:underline">Detail Kontak Resmi</button>
+            <a href="#/school" class="text-[#c0ff00]/90 hover:text-[#c0ff00] font-bold hover:underline flex items-center gap-1">
+              <i class="ph-bold ph-chalkboard-teacher text-xs"></i>
+              Portal Sekolah &amp; BK &rarr;
+            </a>
             <a href="#/admin" class="text-amber-400/80 hover:text-amber-300 font-bold hover:underline">Portal Administrator &rarr;</a>
           </div>
         </div>
