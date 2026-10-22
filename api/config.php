@@ -55,11 +55,9 @@ $port    = env('DB_PORT', '3306');
 // Validasi: pastikan konfigurasi database ada
 if (empty($db_user) || empty($db_name)) {
     http_response_code(500);
-    // JANGAN ekspos detail error di production
-    $is_dev = (env('APP_ENV', 'production') === 'development');
     echo json_encode([
-        "error" => "Konfigurasi server tidak lengkap.",
-        "detail" => $is_dev ? "DB_USER atau DB_NAME tidak dikonfigurasi di .env" : null
+        "error" => "Konfigurasi server tidak lengkap: DB_USER atau DB_NAME belum dikonfigurasi di .env cPanel.",
+        "status" => "error"
     ]);
     exit;
 }
@@ -68,18 +66,26 @@ $pdo_options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     PDO::ATTR_EMULATE_PREPARES => false,
-    PDO::ATTR_TIMEOUT => 4 // 4s timeout prevents LiteSpeed 503 worker crash
+    PDO::ATTR_TIMEOUT => 2 // 2s timeout prevents LiteSpeed 503 worker crash
 ];
 
+// On Linux/cPanel environments, MySQL is accessed via UNIX socket ('localhost')
+// 127.0.0.1 forces TCP which is blocked/disabled on cPanel, causing hung processes and LiteSpeed 503
+if (PHP_OS_FAMILY !== 'Windows' && $host === '127.0.0.1') {
+    $primaryHost  = 'localhost';
+    $fallbackHost = '127.0.0.1';
+} else {
+    $primaryHost  = $host;
+    $fallbackHost = ($host === 'localhost') ? '127.0.0.1' : 'localhost';
+}
+
 try {
-    $dsn = "mysql:host=$host;dbname=$db_name;charset=utf8mb4";
-    if ($host !== 'localhost' && !empty($port)) {
+    $dsn = "mysql:host=$primaryHost;dbname=$db_name;charset=utf8mb4";
+    if ($primaryHost !== 'localhost' && !empty($port)) {
         $dsn .= ";port=$port";
     }
     $pdo = new PDO($dsn, $db_user, $db_pass, $pdo_options);
 } catch (PDOException $e) {
-    // Auto-fallback: if localhost fails try 127.0.0.1, or vice versa
-    $fallbackHost = ($host === 'localhost') ? '127.0.0.1' : 'localhost';
     try {
         $dsnFallback = "mysql:host=$fallbackHost;dbname=$db_name;charset=utf8mb4";
         if ($fallbackHost !== 'localhost' && !empty($port)) {
@@ -88,10 +94,9 @@ try {
         $pdo = new PDO($dsnFallback, $db_user, $db_pass, $pdo_options);
     } catch (PDOException $eFallback) {
         http_response_code(500);
-        $is_dev = (env('APP_ENV', 'production') === 'development');
         echo json_encode([
-            "error" => "Koneksi database gagal.",
-            "detail" => $is_dev ? $eFallback->getMessage() : null
+            "error" => "Koneksi database gagal. Periksa kredensial MySQL di .env hosting.",
+            "detail" => $eFallback->getMessage()
         ]);
         exit;
     }
@@ -114,10 +119,9 @@ $jwt_secret = env('JWT_SECRET', '');
 if (empty($jwt_secret)) {
     // JWT_SECRET WAJIB ada. Tanpa ini, auth tidak bisa berjalan.
     http_response_code(500);
-    $is_dev = (env('APP_ENV', 'production') === 'development');
     echo json_encode([
-        "error" => "Konfigurasi autentikasi tidak lengkap.",
-        "detail" => $is_dev ? "JWT_SECRET tidak dikonfigurasi di .env" : null
+        "error" => "Konfigurasi autentikasi tidak lengkap: JWT_SECRET belum dikonfigurasi di .env hosting.",
+        "status" => "error"
     ]);
     exit;
 }

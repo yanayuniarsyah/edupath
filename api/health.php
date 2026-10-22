@@ -1,10 +1,13 @@
 <?php
 // api/health.php
-require_once 'config.php';
-
 header('Content-Type: application/json');
 
-// Minimal ping to database
+if (isset($_GET['ping'])) {
+    echo json_encode(["status" => "ok", "service" => "alive"]);
+    exit;
+}
+
+require_once 'config.php';
 try {
     $stmt = $pdo->query("SELECT 1");
     if ($stmt->fetch()) {
