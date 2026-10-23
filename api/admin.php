@@ -243,65 +243,11 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmtRole->execute([$username]);
     $user_role_found = $stmtRole->fetchColumn() ?: '';
 
-    // Support School BK login through /admin redirecting to /#/school
-    if ($user_role_found === 'school_bk') {
-        $stmt_sch = $pdo->prepare("
-            SELECT u.id as user_id, u.password as user_password, ur.role, ur.reference_id,
-                   s.id as school_id, s.name as school_name, s.slug, s.bk_name, s.bk_email, s.bk_phone, s.city
-            FROM users u
-            JOIN user_roles ur ON u.id = ur.user_id
-            LEFT JOIN schools s ON ur.reference_id = s.id
-            WHERE (LOWER(u.identity_key) = LOWER(?) OR (s.bk_email IS NOT NULL AND LOWER(s.bk_email) = LOWER(?)))
-              AND u.is_active = 1
-            LIMIT 1
-        ");
-        $stmt_sch->execute([$username, $username]);
-        $schUser = $stmt_sch->fetch(PDO::FETCH_ASSOC);
-        if ($schUser && (password_verify($password, $schUser['user_password']) || $password === 'EduPathSchool01!2026')) {
-            $school_id = $schUser['school_id'] ?? $schUser['reference_id'];
-            $school_name = $schUser['school_name'] ?? 'Sekolah Mitra';
-            $token = generate_jwt([
-                'user_id' => $schUser['user_id'],
-                'id' => $school_id,
-                'role' => 'school_bk',
-                'school_id' => $school_id,
-                'school_name' => $school_name,
-                'email' => $schUser['bk_email'] ?? $username
-            ]);
-            $csrf_token = generate_csrf_token();
-            set_auth_cookies($token, $csrf_token);
-            $cleanBkName = trim($schUser['bk_name'] ?? '');
-            if (empty($cleanBkName) || str_contains($cleanBkName, '@')) $cleanBkName = "Guru BK $school_name";
-            echo json_encode([
-                "token" => $token,
-                "csrf_token" => $csrf_token,
-                "is_school" => true,
-                "role" => "school_bk",
-                "user" => [
-                    "id" => $school_id,
-                    "name" => $cleanBkName,
-                    "email" => $schUser['bk_email'] ?? $username,
-                    "role" => "school_bk",
-                    "school_id" => $school_id,
-                    "school_name" => $school_name,
-                    "school" => [
-                        "id" => $school_id,
-                        "name" => $school_name,
-                        "slug" => $schUser['slug'] ?? '',
-                        "bk_name" => $cleanBkName,
-                        "bk_email" => $schUser['bk_email'] ?? $username,
-                        "city" => $schUser['city'] ?? ''
-                    ]
-                ]
-            ]);
-            exit;
-        }
-    }
-
-    if ($user_role_found && in_array($user_role_found, ['teacher', 'guru', 'tutor', 'student'])) {
+    // Enforce User Rule: "semua role masuk melalui form login siswa kecuali admin dan super admin melalui /admin."
+    if ($user_role_found && in_array($user_role_found, ['school_bk', 'teacher', 'guru', 'tutor', 'student', 'affiliate'])) {
         http_response_code(403);
         echo json_encode([
-            "error" => "Akses khusus Administrator & Superadmin. Guru/Pengajar dan Siswa wajib masuk melalui form login di halaman depan."
+            "error" => "Akses khusus Administrator & Superadmin. Silakan masuk melalui form login siswa di halaman depan."
         ]);
         exit;
     }
@@ -2428,24 +2374,42 @@ elseif ($action === 'payout_commission' && $_SERVER['REQUEST_METHOD'] === 'POST'
     }
 }
 elseif ($action === 'update_profile' && in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])) {
-    $name = trim($input['name'] ?? ($input['display_name'] ?? ''));
-    $email = strtolower(trim($input['email'] ?? ($input['username'] ?? '')));
+    $hasNameInput = array_key_exists('name', $input) || array_key_exists('display_name', $input);
+    $hasEmailInput = array_key_exists('email', $input) || array_key_exists('username', $input);
+    $hasPasswordInput = array_key_exists('password', $input) || array_key_exists('new_password', $input);
+
+    $rawName = trim($input['name'] ?? ($input['display_name'] ?? ''));
+    $rawEmail = strtolower(trim($input['email'] ?? ($input['username'] ?? '')));
     $password = $input['password'] ?? ($input['new_password'] ?? '');
 
-    // Fetch existing admin data
-    $stmtCur = $pdo->prepare("SELECT identity_key, display_name FROM users WHERE id = ? LIMIT 1");
+    // Fetch existing admin & user data
+    $stmtCur = $pdo->prepare("
+        SELECT u.id as user_id, u.identity_key, u.display_name, ur.role, ur.tenant_id, ur.reference_id,
+               a.id as admin_id, a.name as admin_name, a.username as admin_username
+        FROM users u
+        JOIN user_roles ur ON u.id = ur.user_id
+        LEFT JOIN admins a ON (ur.reference_id = a.id OR u.identity_key = a.username)
+        WHERE u.id = ?
+        LIMIT 1
+    ");
     $stmtCur->execute([$payload->user_id]);
     $curUser = $stmtCur->fetch(PDO::FETCH_ASSOC);
 
-    $currentEmail = strtolower(trim($curUser['identity_key'] ?? ($payload->email ?? '')));
-    $currentName = trim($curUser['display_name'] ?? '');
+    if (!$curUser) {
+        http_response_code(404);
+        echo json_encode(["error" => "Akun admin tidak ditemukan"]);
+        exit;
+    }
 
-    if (empty($name)) {
-        $name = !empty($currentName) ? $currentName : 'Administrator';
+    $currentEmail = strtolower(trim($curUser['identity_key'] ?? ($curUser['admin_username'] ?? ($payload->email ?? ''))));
+    $currentName = trim($curUser['display_name'] ?? ($curUser['admin_name'] ?? ''));
+    if (empty($currentName)) {
+        $currentName = $curUser['role'] === 'superadmin' ? 'Super Administrator' : 'Administrator';
     }
-    if (empty($email)) {
-        $email = $currentEmail;
-    }
+
+    // Determine target name & email (allow editing only one attribute)
+    $name = ($hasNameInput && $rawName !== '') ? $rawName : $currentName;
+    $email = ($hasEmailInput && $rawEmail !== '') ? $rawEmail : $currentEmail;
 
     try {
         $pdo->beginTransaction();
@@ -2462,7 +2426,7 @@ elseif ($action === 'update_profile' && in_array($_SERVER['REQUEST_METHOD'], ['P
             }
         }
 
-        // 2. Update users table
+        // 2. Update users table (display_name & identity_key)
         $stmt = $pdo->prepare("UPDATE users SET display_name = ?, identity_key = ? WHERE id = ?");
         $stmt->execute([$name, $email, $payload->user_id]);
 
@@ -2478,35 +2442,53 @@ elseif ($action === 'update_profile' && in_array($_SERVER['REQUEST_METHOD'], ['P
             $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$hashed, $payload->user_id]);
         }
 
-        // 3. Update admins table if exists
-        $adminId = $payload->id ?? $payload->reference_id ?? null;
-        if ($adminId) {
-            $stmtAdm = $pdo->prepare("SELECT id FROM admins WHERE id = ? OR username = ?");
-            $stmtAdm->execute([$adminId, $email]);
-            $admRow = $stmtAdm->fetch(PDO::FETCH_ASSOC);
-            if ($admRow) {
-                $stmtUpd = $pdo->prepare("UPDATE admins SET name = ?, username = ? WHERE id = ?");
-                $stmtUpd->execute([$name, $email, $admRow['id']]);
-                if ($hashed) {
-                    $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?")->execute([$hashed, $admRow['id']]);
-                }
+        // 3. Update admins table if exists or referenced
+        $adminId = $curUser['admin_id'] ?? $curUser['reference_id'] ?? ($payload->id ?? null);
+        $stmtAdm = $pdo->prepare("SELECT id FROM admins WHERE id = ? OR username = ? OR username = ? LIMIT 1");
+        $stmtAdm->execute([$adminId, $currentEmail, $email]);
+        $admRow = $stmtAdm->fetch(PDO::FETCH_ASSOC);
+
+        if ($admRow) {
+            $stmtUpd = $pdo->prepare("UPDATE admins SET name = ?, username = ? WHERE id = ?");
+            $stmtUpd->execute([$name, $email, $admRow['id']]);
+            if ($hashed) {
+                $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?")->execute([$hashed, $admRow['id']]);
             }
+        } elseif ($curUser['role'] === 'admin') {
+            // Ensure admins record exists for tenant admin
+            $insAdm = $pdo->prepare("INSERT INTO admins (id, tenant_id, username, password, name) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), username = VALUES(username)");
+            $tId = $curUser['tenant_id'] ?? $payload->tenant_id;
+            $insAdm->execute([$adminId ?: ('r-' . md5($email)), $tId, $email, $hashed ?: 'preserved', $name]);
         }
 
         $pdo->commit();
         log_audit($pdo, $payload->user_id, $payload->tenant_id, 'profile_updated', $adminId, ['name' => $name, 'email' => $email]);
 
+        // Generate refreshed token
+        $newToken = generate_jwt([
+            'user_id'   => $payload->user_id,
+            'id'        => $adminId ?? $payload->user_id,
+            'role'      => $curUser['role'] ?? $payload->role,
+            'tenant_id' => $curUser['tenant_id'] ?? $payload->tenant_id,
+            'email'     => $email
+        ]);
+        $csrf_token = generate_csrf_token();
+        set_auth_cookies($newToken, $csrf_token);
+
         echo json_encode([
             "success" => true,
-            "message" => "Profil berhasil diperbarui",
+            "message" => "Pengaturan akun berhasil disimpan",
+            "token"   => $newToken,
+            "csrf_token" => $csrf_token,
             "user" => [
-                "id"           => $adminId,
+                "id"           => $adminId ?? $payload->user_id,
                 "user_id"      => $payload->user_id,
                 "name"         => $name,
                 "display_name" => $name,
                 "email"        => $email,
-                "role"         => $payload->role,
-                "tenant_id"    => $payload->tenant_id
+                "username"     => $email,
+                "role"         => $curUser['role'] ?? $payload->role,
+                "tenant_id"    => $curUser['tenant_id'] ?? $payload->tenant_id
             ]
         ]);
         exit;

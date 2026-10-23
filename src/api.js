@@ -532,6 +532,9 @@ export const api = {
       body: JSON.stringify(data)
     });
   },
+  getAdminProfile() {
+    return apiFetch('/admin.php?action=profile');
+  },
 
   // ── Analytics ──
   trackEvent(eventName, payload = {}) {

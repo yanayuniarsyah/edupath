@@ -318,6 +318,16 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(["error" => "Peran akun tidak dikenali."]);
             exit;
         }
+
+        // Strict Separation: "semua role masuk melalui form login siswa kecuali admin dan super admin melalui /admin."
+        if (in_array($user['role'], ['admin', 'superadmin']) && empty($user['school_id'])) {
+            http_response_code(403);
+            echo json_encode([
+                "error" => "Akun Administrator & Superadmin wajib masuk melalui portal admin di /#/admin."
+            ]);
+            exit;
+        }
+
         if ((int)$user['tenant_active'] === 0) {
             http_response_code(403);
             echo json_encode(["error" => "Tenant anda telah dinonaktifkan."]);

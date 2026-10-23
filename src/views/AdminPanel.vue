@@ -4718,6 +4718,26 @@ const loadAdminSettings = () => {
   adminSettingsForm.confirm_password = '';
 };
 
+const fetchAdminProfile = async () => {
+  try {
+    const res = await api.getAdminProfile();
+    if (res && (res.name || res.email)) {
+      currentAdminUser.value = {
+        ...(currentAdminUser.value || {}),
+        ...res,
+        name: res.name || res.display_name,
+        display_name: res.display_name || res.name,
+        email: res.email,
+        username: res.email
+      };
+      sessionStorage.setItem('ep_user', JSON.stringify(currentAdminUser.value));
+      localStorage.setItem('user', JSON.stringify(currentAdminUser.value));
+      if (res.name) localStorage.setItem('user_name', res.name);
+      if (res.email) localStorage.setItem('user_email', res.email);
+    }
+  } catch (e) {}
+};
+
 const startEditAdminSettings = () => {
   loadAdminSettings();
   isEditingAdminSettings.value = true;
@@ -4729,28 +4749,35 @@ const cancelEditAdminSettings = () => {
 };
 
 const saveAdminSettings = async () => {
-  if (!adminSettingsForm.name.trim() || !adminSettingsForm.email.trim()) {
-    alert('Nama dan email/username wajib diisi.');
+  const inputName = adminSettingsForm.name ? adminSettingsForm.name.trim() : '';
+  const inputEmail = adminSettingsForm.email ? adminSettingsForm.email.trim() : '';
+  const inputPass = adminSettingsForm.new_password || '';
+
+  // Izinkan edit hanya salah satu atribut (Nama saja, Email saja, atau Password saja)
+  if (!inputName && !inputEmail && !inputPass) {
+    alert('Harap isi setidaknya salah satu atribut (Nama Lengkap, Email, atau Password Baru) untuk disimpan.');
     return;
   }
-  if (adminSettingsForm.new_password) {
-    if (adminSettingsForm.new_password.length < 6) {
-      alert('Password minimal 6 karakter.');
+
+  if (inputPass) {
+    if (inputPass.length < 6) {
+      alert('Password baru minimal 6 karakter.');
       return;
     }
-    if (adminSettingsForm.new_password !== adminSettingsForm.confirm_password) {
-      alert('Konfirmasi password tidak cocok.');
+    if (inputPass !== adminSettingsForm.confirm_password) {
+      alert('Konfirmasi password baru tidak cocok.');
       return;
     }
   }
 
   isSavingAdminSettings.value = true;
   try {
-    const res = await api.updateAdminProfile({
-      name: adminSettingsForm.name.trim(),
-      email: adminSettingsForm.email.trim(),
-      password: adminSettingsForm.new_password
-    });
+    const payload = {};
+    if (inputName) payload.name = inputName;
+    if (inputEmail) payload.email = inputEmail;
+    if (inputPass) payload.password = inputPass;
+
+    const res = await api.updateAdminProfile(payload);
     alert('Pengaturan akun berhasil disimpan!');
     isEditingAdminSettings.value = false;
     adminSettingsForm.new_password = '';
@@ -4761,10 +4788,18 @@ const saveAdminSettings = async () => {
         ...(currentAdminUser.value || {}),
         name: res.user.name,
         display_name: res.user.display_name || res.user.name,
-        email: res.user.email
+        email: res.user.email,
+        username: res.user.email
       };
       sessionStorage.setItem('ep_user', JSON.stringify(currentAdminUser.value));
+      localStorage.setItem('user', JSON.stringify(currentAdminUser.value));
       localStorage.setItem('user_name', res.user.name);
+      localStorage.setItem('user_email', res.user.email);
+      if (res.token) {
+        sessionStorage.setItem('admin_token', res.token);
+        localStorage.setItem('auth_token', res.token);
+      }
+      loadAdminSettings();
     }
   } catch (err) {
     alert(err.message || 'Gagal menyimpan pengaturan.');
@@ -5340,6 +5375,7 @@ watch(activeTab, (newTab) => {
     if (isAffiliate.value) {
       loadAffiliateSettings();
     } else {
+      fetchAdminProfile();
       loadAdminSettings();
     }
   }

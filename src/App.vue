@@ -5217,19 +5217,9 @@ export default {
           return;
         }
 
-        // 2. Administrator & Superadmin: Auto-redirect smoothly to /#/admin
+        // 2. Administrator & Superadmin wajib masuk melalui portal admin di /#/admin
         if (['admin', 'superadmin'].includes(res.user?.role)) {
-          sessionStorage.setItem('admin_token', res.token);
-          sessionStorage.setItem('admin_role', res.user.role);
-          sessionStorage.setItem('ep_user', JSON.stringify(res.user));
-          localStorage.setItem('user', JSON.stringify(res.user));
-          localStorage.setItem('user_role', res.user.role);
-          if (res.user.name) localStorage.setItem('user_name', res.user.name);
-          if (res.user.email) localStorage.setItem('user_email', res.user.email);
-          showLoginModal.value = false;
-          showToast('Selamat datang di Portal Administrator!');
-          window.location.hash = '#/admin';
-          window.location.reload();
+          authError.value = 'Akun Administrator & Superadmin wajib masuk melalui portal admin di /#/admin.';
           return;
         }
 
