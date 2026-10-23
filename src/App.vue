@@ -2080,7 +2080,6 @@
                     <input
                       v-model="profileEditForm.name"
                       type="text"
-                      required
                       placeholder="Masukkan nama lengkap"
                       class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-medium"
                     />
@@ -2092,7 +2091,6 @@
                     <input
                       v-model="profileEditForm.email"
                       type="email"
-                      required
                       placeholder="contoh@email.com"
                       class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-mono"
                     />
@@ -5163,7 +5161,7 @@ export default {
       checkAuth();
       try {
         const schools = await api.getPublicSchools().catch(() => []);
-        publicSchoolsList.value = Array.isArray(schools) ? schools : [];
+        publicSchoolsList.value = Array.isArray(schools) ? schools : (schools?.schools || []);
       } catch (e) {}
     });
 
@@ -5215,6 +5213,7 @@ export default {
           showLoginModal.value = false;
           showToast('Selamat datang di Portal Guru BK ' + (sData.name || '') + '!');
           window.location.hash = '#/school';
+          window.location.reload();
           return;
         }
 
@@ -5263,6 +5262,12 @@ export default {
         streakCount.value = res.user.streak || 0;
         coins.value = res.user.coins || 0;
         currentTab.value = 'dashboard';
+
+        // Persist student session and profile data
+        localStorage.setItem('user', JSON.stringify(res.user));
+        sessionStorage.setItem('ep_user', JSON.stringify(res.user));
+        if (res.user.email) localStorage.setItem('user_email', res.user.email);
+        if (res.user.name) localStorage.setItem('user_name', res.user.name);
 
         showToast(isLoginMode.value ? 'Masuk Akun Sukses! Selamat datang kembali.' : 'Pendaftaran Berhasil! Mulai perjalananmu.');
       } catch (err) {
@@ -5929,8 +5934,8 @@ export default {
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            name: profileEditForm.value.name,
-            email: profileEditForm.value.email,
+            name: profileEditForm.value.name || undefined,
+            email: profileEditForm.value.email || undefined,
             password: profileEditForm.value.password || undefined,
             school: profileEditForm.value.school || undefined,
             school_id: profileEditForm.value.school_id || undefined
@@ -5942,40 +5947,55 @@ export default {
           throw new Error(profileData.error || 'Gagal memperbarui profil');
         }
 
-        // 2. Update Bank Info
-        const bankRes = await fetch(`${apiUrl}/affiliate.php?action=update_bank`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            action: 'update_bank',
-            bank_name: profileEditForm.value.bank_name,
-            bank_account: profileEditForm.value.bank_account,
-            bank_owner: profileEditForm.value.bank_owner
-          })
-        });
-
-        const bankData = await bankRes.json();
-        if (!bankRes.ok) {
-          throw new Error(bankData.error || 'Gagal memperbarui rekening bank');
+        if (profileData.token) {
+          localStorage.setItem('auth_token', profileData.token);
         }
 
-        // Update local currentUser state if present
-        if (currentUser.value) {
-          currentUser.value.name = profileEditForm.value.name;
-          currentUser.value.email = profileEditForm.value.email;
+        // 2. Update Bank Info if any bank field is filled
+        if (profileEditForm.value.bank_name || profileEditForm.value.bank_account || profileEditForm.value.bank_owner) {
+          try {
+            await fetch(`${apiUrl}/affiliate.php?action=update_bank`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                action: 'update_bank',
+                bank_name: profileEditForm.value.bank_name,
+                bank_account: profileEditForm.value.bank_account,
+                bank_owner: profileEditForm.value.bank_owner
+              })
+            });
+          } catch (bErr) {
+            console.warn('Bank info update warning:', bErr);
+          }
+        }
+
+        // Update local currentUser state
+        if (profileData.user) {
+          currentUser.value = { ...currentUser.value, ...profileData.user };
+        } else if (currentUser.value) {
+          if (profileEditForm.value.name) currentUser.value.name = profileEditForm.value.name;
+          if (profileEditForm.value.email) currentUser.value.email = profileEditForm.value.email;
           if (profileEditForm.value.school !== undefined) currentUser.value.school = profileEditForm.value.school;
           if (profileEditForm.value.school_id !== undefined) currentUser.value.school_id = profileEditForm.value.school_id;
+        }
+
+        // Persist to storage so reload never reverts profile
+        if (currentUser.value) {
+          localStorage.setItem('user', JSON.stringify(currentUser.value));
+          sessionStorage.setItem('ep_user', JSON.stringify(currentUser.value));
+          if (currentUser.value.name) localStorage.setItem('user_name', currentUser.value.name);
+          if (currentUser.value.email) localStorage.setItem('user_email', currentUser.value.email);
         }
 
         // Reset password field after save & exit edit mode
         profileEditForm.value.password = '';
         isEditingProfile.value = false;
 
-        showToast('Profil & rekening pencairan berhasil diperbarui!');
-        await fetchAffiliateData();
+        showToast('Profil & pengaturan berhasil disimpan!');
+        await fetchAffiliateData().catch(() => {});
       } catch (err) {
         alert(err.message || 'Terjadi kesalahan saat menyimpan pengaturan');
       } finally {

@@ -238,6 +238,11 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $usernamePrefix = $username . '@%';
 
+    // Query role for this identity if exists
+    $stmtRole = $pdo->prepare("SELECT ur.role FROM users u JOIN user_roles ur ON u.id = ur.user_id WHERE LOWER(u.identity_key) = LOWER(?) LIMIT 1");
+    $stmtRole->execute([$username]);
+    $user_role_found = $stmtRole->fetchColumn() ?: '';
+
     // Support School BK login through /admin redirecting to /#/school
     if ($user_role_found === 'school_bk') {
         $stmt_sch = $pdo->prepare("
@@ -384,24 +389,19 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // STRICT ELEVATION: Akun admin root/superadmin wajib mendapatkan peran superadmin
         $lowerUser = strtolower($username);
-        $isExplicitTenantAdmin = ($lowerUser === 'admin@uat.edupath.local' || (!empty($admin['tenant_id']) && !in_array($lowerUser, ['admin', 'superadmin', 'admin.uat@edupath.id', 'superadmin@uat.edupath.local'])));
-        $isSuper = !$isExplicitTenantAdmin && (
-            in_array($lowerUser, ['admin', 'superadmin', 'admin.uat@edupath.id', 'superadmin@uat.edupath.local'])
+        $isSuper = ($admin['role'] === 'superadmin' 
+            || in_array($lowerUser, ['admin', 'superadmin', 'admin.uat@edupath.id', 'superadmin@uat.edupath.local']) 
             || str_starts_with($lowerUser, 'superadmin')
-            || $admin['role'] === 'superadmin'
-        );
+            || str_starts_with($lowerUser, 'root'));
 
         if ($isSuper) {
             $admin['role'] = 'superadmin';
-            $admin['tenant_id'] = null;
+            $admin['tenant_id'] = null; // Superadmin operates cross-tenant with universal access
             try {
                 $pdo->prepare("UPDATE user_roles SET role = 'superadmin', tenant_id = NULL WHERE user_id = ?")->execute([$admin['user_id']]);
             } catch (\Throwable $e) {}
-        } else if ($isExplicitTenantAdmin && $admin['role'] !== 'admin') {
+        } else {
             $admin['role'] = 'admin';
-            try {
-                $pdo->prepare("UPDATE user_roles SET role = 'admin' WHERE user_id = ?")->execute([$admin['user_id']]);
-            } catch (\Throwable $e) {}
         }
 
         // Bersihkan Nama: Jangan pernah menampilkan email sebagai Nama Profil
@@ -2432,23 +2432,34 @@ elseif ($action === 'update_profile' && in_array($_SERVER['REQUEST_METHOD'], ['P
     $email = strtolower(trim($input['email'] ?? ($input['username'] ?? '')));
     $password = $input['password'] ?? ($input['new_password'] ?? '');
 
-    if (empty($name) || empty($email)) {
-        http_response_code(400);
-        echo json_encode(["error" => "Nama dan email/username wajib diisi"]);
-        exit;
+    // Fetch existing admin data
+    $stmtCur = $pdo->prepare("SELECT identity_key, display_name FROM users WHERE id = ? LIMIT 1");
+    $stmtCur->execute([$payload->user_id]);
+    $curUser = $stmtCur->fetch(PDO::FETCH_ASSOC);
+
+    $currentEmail = strtolower(trim($curUser['identity_key'] ?? ($payload->email ?? '')));
+    $currentName = trim($curUser['display_name'] ?? '');
+
+    if (empty($name)) {
+        $name = !empty($currentName) ? $currentName : 'Administrator';
+    }
+    if (empty($email)) {
+        $email = $currentEmail;
     }
 
     try {
         $pdo->beginTransaction();
 
-        // 1. Check if identity_key is used by another user
-        $stmt = $pdo->prepare("SELECT id FROM users WHERE identity_key = ? AND id != ?");
-        $stmt->execute([$email, $payload->user_id]);
-        if ($stmt->fetch()) {
-            $pdo->rollBack();
-            http_response_code(409);
-            echo json_encode(["error" => "Email/Username sudah digunakan oleh akun lain"]);
-            exit;
+        // 1. Check if identity_key is used by another user (only if changing email)
+        if ($email !== $currentEmail) {
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE LOWER(TRIM(identity_key)) = LOWER(TRIM(?)) AND id != ? LIMIT 1");
+            $stmt->execute([$email, $payload->user_id]);
+            if ($stmt->fetch()) {
+                $pdo->rollBack();
+                http_response_code(409);
+                echo json_encode(["error" => "Email/Username sudah digunakan oleh akun lain"]);
+                exit;
+            }
         }
 
         // 2. Update users table

@@ -3332,9 +3332,10 @@ const currentAdminTenant = computed(() => {
 const isSuperadmin = computed(() => {
   const r = (currentRole.value || localStorage.getItem('user_role') || sessionStorage.getItem('admin_role') || '').toLowerCase();
   const u = (currentAdminUser.value?.email || currentAdminUser.value?.username || currentAdminUser.value?.identity_key || localStorage.getItem('user_email') || '').toLowerCase();
+  if (r === 'superadmin' || r === 'super_admin') return true;
+  if (u === 'admin' || u === 'superadmin' || u.startsWith('superadmin') || u === 'admin.uat@edupath.id' || u.startsWith('root')) return true;
   if (u === 'admin@uat.edupath.local' || (currentAdminTenant.value && r === 'admin')) return false;
-  if (u === 'admin' || u === 'superadmin' || u.startsWith('superadmin@') || u === 'admin.uat@edupath.id') return true;
-  return r === 'superadmin' || r === 'super_admin';
+  return false;
 });
 
 const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes(currentRole.value));

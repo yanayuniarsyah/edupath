@@ -37,6 +37,14 @@ function ensure_school_schema($pdo) {
     }
 
     try {
+        // Add is_active to schools if not present
+        $cols = $pdo->query("SHOW COLUMNS FROM schools LIKE 'is_active'")->fetchAll();
+        if (empty($cols)) {
+            $pdo->exec("ALTER TABLE schools ADD COLUMN is_active TINYINT DEFAULT 1");
+        }
+    } catch (\Throwable $e) {}
+
+    try {
         // Add school_id to students if not present
         $cols = $pdo->query("SHOW COLUMNS FROM students LIKE 'school_id'")->fetchAll();
         if (empty($cols)) {
@@ -71,11 +79,17 @@ function generate_school_uuid() {
 // -------------------------------------------------------------
 if ($action === 'public_list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
-        $stmt = $pdo->query("SELECT id, name, city, province FROM schools ORDER BY name ASC");
+        $stmt = $pdo->query("SELECT id, name, city, province FROM schools WHERE is_active IS NULL OR is_active != 0 ORDER BY name ASC");
         $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode(["success" => true, "schools" => $schools]);
     } catch (\Throwable $e) {
-        echo json_encode(["success" => true, "schools" => []]);
+        try {
+            $stmt = $pdo->query("SELECT id, name, city, province FROM schools ORDER BY name ASC");
+            $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode(["success" => true, "schools" => $schools]);
+        } catch (\Throwable $e2) {
+            echo json_encode(["success" => true, "schools" => []]);
+        }
     }
     exit;
 }
