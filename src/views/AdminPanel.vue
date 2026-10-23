@@ -1664,198 +1664,365 @@
           </div>
         </div>
 
-        <!-- ===== TAB: PENGATURAN (AFILIATOR & PROFIL) ===== -->
+        <!-- ===== TAB: PENGATURAN (ALL ROLES) ===== -->
         <div v-if="activeTab === 'settings'" class="space-y-6 animate-fade-in max-w-4xl">
-          <!-- Header Bar with Edit / Action Buttons -->
-          <div class="flex flex-wrap justify-between items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
-            <div>
-              <h2 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <i class="ph-bold ph-gear text-[#c0ff00]"></i>
-                <span>Pengaturan Akun &amp; Rekening Pencairan</span>
-              </h2>
-              <p class="text-xs text-white/50 mt-0.5">
-                {{ isEditingAffiliateSettings ? 'Perbarui informasi profil, rekening pencairan, atau password Anda di bawah ini.' : 'Informasi profil terdaftar dan rekening tujuan pencairan komisi Anda.' }}
-              </p>
-            </div>
-            <div class="flex items-center gap-2">
-              <button 
-                v-if="!isEditingAffiliateSettings"
-                @click="isEditingAffiliateSettings = true" 
-                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer"
-              >
-                <i class="ph-bold ph-pencil-simple text-sm"></i>
-                <span>Edit Pengaturan</span>
-              </button>
-              <template v-else>
+          <!-- Affiliate View -->
+          <template v-if="isAffiliate">
+            <!-- Header Bar with Edit / Action Buttons -->
+            <div class="flex flex-wrap justify-between items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+              <div>
+                <h2 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <i class="ph-bold ph-gear text-[#c0ff00]"></i>
+                  <span>Pengaturan Akun &amp; Rekening Pencairan</span>
+                </h2>
+                <p class="text-xs text-white/50 mt-0.5">
+                  {{ isEditingAffiliateSettings ? 'Perbarui informasi profil, rekening pencairan, atau password Anda di bawah ini.' : 'Informasi profil terdaftar dan rekening tujuan pencairan komisi Anda.' }}
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
                 <button 
-                  @click="cancelEditAffiliateSettings" 
-                  class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                  v-if="!isEditingAffiliateSettings"
+                  @click="isEditingAffiliateSettings = true" 
+                  class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer"
                 >
-                  Batal
+                  <i class="ph-bold ph-pencil-simple text-sm"></i>
+                  <span>Edit Pengaturan</span>
                 </button>
-                <button 
-                  @click="saveAffiliateSettings" 
-                  :disabled="isSavingSettings" 
-                  class="px-4 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-xl transition-all shadow-lg shadow-[#c0ff00]/20 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                >
-                  <i class="ph-bold ph-floppy-disk"></i>
-                  <span>{{ isSavingSettings ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
-                </button>
-              </template>
+                <template v-else>
+                  <button 
+                    @click="cancelEditAffiliateSettings" 
+                    class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button 
+                    @click="saveAffiliateSettings" 
+                    :disabled="isSavingSettings" 
+                    class="px-4 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-xl transition-all shadow-lg shadow-[#c0ff00]/20 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    <i class="ph-bold ph-floppy-disk"></i>
+                    <span>{{ isSavingSettings ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
+                  </button>
+                </template>
+              </div>
             </div>
-          </div>
 
-          <!-- 1. VIEW MODE (Data Ditampilkan Dulu Sesuai Permintaan) -->
-          <div v-if="!isEditingAffiliateSettings" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- View Card 1: Data Mitra & Profil -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
-              <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                <div class="flex items-center gap-2">
+            <!-- 1. VIEW MODE (Data Ditampilkan Dulu Sesuai Permintaan) -->
+            <div v-if="!isEditingAffiliateSettings" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- View Card 1: Data Mitra & Profil -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
+                    <h3 class="font-black text-white text-xs uppercase tracking-wider">Informasi Profil Mitra</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Aktif</span>
+                </div>
+                <div class="space-y-3.5 text-xs">
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Lengkap</span>
+                    <div class="text-sm font-bold text-white">{{ affiliateSettingsForm.name || currentAdminUser?.name || '-' }}</div>
+                  </div>
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Email Akun (Identity)</span>
+                    <div class="text-sm font-mono text-white/90">{{ affiliateSettingsForm.email || currentAdminUser?.email || '-' }}</div>
+                  </div>
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Peran Akun</span>
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/15 border border-indigo-500/30 rounded-lg text-indigo-300 font-bold text-xs mt-1">
+                      <i class="ph-bold ph-shield-check"></i>
+                      <span>Mitra Afiliasi Resmi EduPath</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- View Card 2: Rekening Bank & E-Wallet Penarikan -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-bank text-emerald-400 text-lg"></i>
+                    <h3 class="font-black text-white text-xs uppercase tracking-wider">Rekening Pencairan Komisi</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Siap Transfer</span>
+                </div>
+                <div class="space-y-3.5 text-xs">
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Bank / E-Wallet</span>
+                    <div class="text-sm font-bold text-white">{{ affiliateSettingsForm.bank_name || '-' }}</div>
+                  </div>
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nomor Rekening / No. HP E-Wallet</span>
+                    <div class="text-sm font-mono font-bold text-[#c0ff00]">{{ affiliateSettingsForm.bank_account || '-' }}</div>
+                  </div>
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Pemilik Rekening</span>
+                    <div class="text-sm font-bold text-white uppercase">{{ affiliateSettingsForm.bank_owner || '-' }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- View Card 3: Keamanan Akun -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-3 md:col-span-2">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
+                    <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Kata Sandi</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">Terenkripsi BCRYPT</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="text-xs text-white/70">Password akun terlindungi dengan enkripsi aman standar perbankan.</span>
+                  </div>
+                  <button @click="isEditingAffiliateSettings = true" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold underline cursor-pointer">
+                    Ubah Kata Sandi &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. EDIT MODE (Tampil saat tombol Edit ditekan) -->
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Edit Card 1: Data Mitra & Profil -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+                <div class="flex items-center gap-2 border-b border-white/10 pb-3">
                   <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
-                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Informasi Profil Mitra</h3>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Profil Mitra</h3>
                 </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Aktif</span>
-              </div>
-              <div class="space-y-3.5 text-xs">
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Lengkap</span>
-                  <div class="text-sm font-bold text-white">{{ affiliateSettingsForm.name || currentAdminUser?.name || '-' }}</div>
-                </div>
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Email Akun (Identity)</span>
-                  <div class="text-sm font-mono text-white/90">{{ affiliateSettingsForm.email || currentAdminUser?.email || '-' }}</div>
-                </div>
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Peran Akun</span>
-                  <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/15 border border-indigo-500/30 rounded-lg text-indigo-300 font-bold text-xs mt-1">
-                    <i class="ph-bold ph-shield-check"></i>
-                    <span>Mitra Afiliasi Resmi EduPath</span>
+                <div class="space-y-3 text-xs">
+                  <div>
+                    <label for="aff_set_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
+                    <input id="aff_set_name" name="name" v-model="affiliateSettingsForm.name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Nama Lengkap Mitra" />
+                  </div>
+                  <div>
+                    <label for="aff_set_email" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Akun (Identity)</label>
+                    <input id="aff_set_email" name="email" v-model="affiliateSettingsForm.email" type="email" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="email@edupath.id" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peran Akun</label>
+                    <div class="p-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-300 font-bold flex items-center gap-2">
+                      <i class="ph-bold ph-shield-check"></i>
+                      <span>Mitra Afiliasi Resmi EduPath</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- View Card 2: Rekening Bank & E-Wallet Penarikan -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
-              <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                <div class="flex items-center gap-2">
+              <!-- Edit Card 2: Rekening Bank & E-Wallet Penarikan -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+                <div class="flex items-center gap-2 border-b border-white/10 pb-3">
                   <i class="ph-bold ph-bank text-emerald-400 text-lg"></i>
-                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Rekening Pencairan Komisi</h3>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Rekening Pencairan</h3>
                 </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Siap Transfer</span>
+                <div class="space-y-3 text-xs">
+                  <div>
+                    <label for="aff_set_bank_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Bank / E-Wallet</label>
+                    <select id="aff_set_bank_name" name="bank_name" v-model="affiliateSettingsForm.bank_name" class="w-full p-2.5 bg-[#0d1427] border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                      <option value="BCA">Bank Central Asia (BCA)</option>
+                      <option value="MANDIRI">Bank Mandiri</option>
+                      <option value="BRI">Bank Rakyat Indonesia (BRI)</option>
+                      <option value="BNI">Bank Negara Indonesia (BNI)</option>
+                      <option value="BSI">Bank Syariah Indonesia (BSI)</option>
+                      <option value="GOPAY">GoPay</option>
+                      <option value="OVO">OVO</option>
+                      <option value="DANA">DANA</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="aff_set_bank_account" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor Rekening / No. HP E-Wallet</label>
+                    <input id="aff_set_bank_account" name="bank_account" v-model="affiliateSettingsForm.bank_account" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: 8830192831" />
+                  </div>
+                  <div>
+                    <label for="aff_set_bank_owner" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Pemilik Rekening</label>
+                    <input id="aff_set_bank_owner" name="bank_owner" v-model="affiliateSettingsForm.bank_owner" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Budi Santoso" />
+                  </div>
+                </div>
               </div>
-              <div class="space-y-3.5 text-xs">
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Bank / E-Wallet</span>
-                  <div class="text-sm font-bold text-white">{{ affiliateSettingsForm.bank_name || '-' }}</div>
-                </div>
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nomor Rekening / No. HP E-Wallet</span>
-                  <div class="text-sm font-mono font-bold text-[#c0ff00]">{{ affiliateSettingsForm.bank_account || '-' }}</div>
-                </div>
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Pemilik Rekening</span>
-                  <div class="text-sm font-bold text-white uppercase">{{ affiliateSettingsForm.bank_owner || '-' }}</div>
-                </div>
-              </div>
-            </div>
 
-            <!-- View Card 3: Keamanan Akun -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-3 md:col-span-2">
-              <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                <div class="flex items-center gap-2">
+              <!-- Edit Card 3: Keamanan / Ganti Password -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4 md:col-span-2">
+                <div class="flex items-center gap-2 border-b border-white/10 pb-3">
                   <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
-                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Kata Sandi</h3>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Ganti Password</h3>
                 </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">Terenkripsi BCRYPT</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <div>
-                  <span class="text-xs text-white/70">Password akun terlindungi dengan enkripsi aman standar perbankan.</span>
-                </div>
-                <button @click="isEditingAffiliateSettings = true" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold underline cursor-pointer">
-                  Ubah Kata Sandi &rarr;
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 2. EDIT MODE (Tampil saat tombol Edit ditekan) -->
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Edit Card 1: Data Mitra & Profil -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
-              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
-                <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
-                <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Profil Mitra</h3>
-              </div>
-              <div class="space-y-3 text-xs">
-                <div>
-                  <label for="aff_set_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
-                  <input id="aff_set_name" name="name" v-model="affiliateSettingsForm.name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Nama Lengkap Mitra" />
-                </div>
-                <div>
-                  <label for="aff_set_email" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Akun (Identity)</label>
-                  <input id="aff_set_email" name="email" v-model="affiliateSettingsForm.email" type="email" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="email@edupath.id" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peran Akun</label>
-                  <div class="p-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-300 font-bold flex items-center gap-2">
-                    <i class="ph-bold ph-shield-check"></i>
-                    <span>Mitra Afiliasi Resmi EduPath</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <label for="aff_set_new_password" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password Baru (Kosongkan jika tidak diubah)</label>
+                    <input id="aff_set_new_password" name="new_password" v-model="affiliateSettingsForm.new_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Minimal 6 karakter" />
+                  </div>
+                  <div>
+                    <label for="aff_set_confirm_password" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Konfirmasi Password Baru</label>
+                    <input id="aff_set_confirm_password" name="confirm_password" v-model="affiliateSettingsForm.confirm_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Ulangi password baru" />
                   </div>
                 </div>
               </div>
             </div>
+          </template>
 
-            <!-- Edit Card 2: Rekening Bank & E-Wallet Penarikan -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
-              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
-                <i class="ph-bold ph-bank text-emerald-400 text-lg"></i>
-                <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Rekening Pencairan</h3>
+          <!-- Non-Affiliate View (Superadmin, Tenant Admin, Teacher) -->
+          <template v-else>
+            <!-- Header Bar with Edit / Action Buttons -->
+            <div class="flex flex-wrap justify-between items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+              <div>
+                <h2 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <i class="ph-bold ph-gear text-[#c0ff00]"></i>
+                  <span>Pengaturan Akun &amp; Profil</span>
+                </h2>
+                <p class="text-xs text-white/50 mt-0.5">
+                  {{ isEditingAdminSettings ? 'Perbarui informasi profil dan kata sandi akun Anda di bawah ini.' : 'Informasi profil terdaftar, hak akses, dan pengaturan keamanan Anda.' }}
+                </p>
               </div>
-              <div class="space-y-3 text-xs">
-                <div>
-                  <label for="aff_set_bank_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Bank / E-Wallet</label>
-                  <select id="aff_set_bank_name" name="bank_name" v-model="affiliateSettingsForm.bank_name" class="w-full p-2.5 bg-[#0d1427] border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
-                    <option value="BCA">Bank Central Asia (BCA)</option>
-                    <option value="MANDIRI">Bank Mandiri</option>
-                    <option value="BRI">Bank Rakyat Indonesia (BRI)</option>
-                    <option value="BNI">Bank Negara Indonesia (BNI)</option>
-                    <option value="BSI">Bank Syariah Indonesia (BSI)</option>
-                    <option value="GOPAY">GoPay</option>
-                    <option value="OVO">OVO</option>
-                    <option value="DANA">DANA</option>
-                  </select>
+              <div class="flex items-center gap-2">
+                <button 
+                  v-if="!isEditingAdminSettings"
+                  @click="startEditAdminSettings" 
+                  class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <i class="ph-bold ph-pencil-simple text-sm"></i>
+                  <span>Edit Pengaturan</span>
+                </button>
+                <template v-else>
+                  <button 
+                    @click="cancelEditAdminSettings" 
+                    class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button 
+                    @click="saveAdminSettings" 
+                    :disabled="isSavingAdminSettings" 
+                    class="px-4 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-xl transition-all shadow-lg shadow-[#c0ff00]/20 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    <i class="ph-bold ph-floppy-disk"></i>
+                    <span>{{ isSavingAdminSettings ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
+                  </button>
+                </template>
+              </div>
+            </div>
+
+            <!-- 1. VIEW MODE (Non-Affiliate) -->
+            <div v-if="!isEditingAdminSettings" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- View Card 1: Data Profil -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
+                    <h3 class="font-black text-white text-xs uppercase tracking-wider">Informasi Profil Akun</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Aktif</span>
                 </div>
-                <div>
-                  <label for="aff_set_bank_account" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor Rekening / No. HP E-Wallet</label>
-                  <input id="aff_set_bank_account" name="bank_account" v-model="affiliateSettingsForm.bank_account" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: 8830192831" />
+                <div class="space-y-3.5 text-xs">
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Lengkap</span>
+                    <div class="text-sm font-bold text-white">{{ currentAdminUser?.name || currentAdminUser?.display_name || '-' }}</div>
+                  </div>
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Email / Username</span>
+                    <div class="text-sm font-mono text-white/90">{{ currentAdminUser?.email || currentAdminUser?.username || '-' }}</div>
+                  </div>
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Peran / Hak Akses</span>
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/15 border border-indigo-500/30 rounded-lg text-indigo-300 font-bold text-xs mt-1">
+                      <i class="ph-bold ph-shield-check"></i>
+                      <span>{{ isSuperadmin ? 'Super Administrator' : (isTeacher ? 'Pendidik / Tutor' : (currentAdminUser?.tenant_name ? 'Admin Tenant (' + currentAdminUser.tenant_name + ')' : 'Administrator Tenant')) }}</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label for="aff_set_bank_owner" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Pemilik Rekening</label>
-                  <input id="aff_set_bank_owner" name="bank_owner" v-model="affiliateSettingsForm.bank_owner" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Budi Santoso" />
+              </div>
+
+              <!-- View Card 2: Lembaga & Tenant -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-buildings text-emerald-400 text-lg"></i>
+                    <h3 class="font-black text-white text-xs uppercase tracking-wider">Lembaga &amp; Tenant</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Terverifikasi</span>
+                </div>
+                <div class="space-y-3.5 text-xs">
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Lembaga / Cabang</span>
+                    <div class="text-sm font-bold text-white">{{ currentAdminUser?.tenant_name || 'Kantor Pusat EduPath' }}</div>
+                  </div>
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">ID Tenant</span>
+                    <div class="text-sm font-mono text-white/60">{{ currentAdminUser?.tenant_id || 'System Root (Global)' }}</div>
+                  </div>
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Status Layanan</span>
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 font-bold text-xs mt-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span>Sistem Berjalan Normal</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- View Card 3: Keamanan Akun -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-3 md:col-span-2">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
+                    <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Kata Sandi</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">Terenkripsi BCRYPT</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-white/70">Password akun terlindungi dengan enkripsi aman standar perbankan.</span>
+                  <button @click="startEditAdminSettings" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold underline cursor-pointer">
+                    Ubah Kata Sandi &rarr;
+                  </button>
                 </div>
               </div>
             </div>
 
-            <!-- Edit Card 3: Keamanan / Ganti Password -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4 md:col-span-2">
-              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
-                <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
-                <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Ganti Password</h3>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label for="aff_set_new_password" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password Baru (Kosongkan jika tidak diubah)</label>
-                  <input id="aff_set_new_password" name="new_password" v-model="affiliateSettingsForm.new_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Minimal 6 karakter" />
+            <!-- 2. EDIT MODE (Non-Affiliate) -->
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Edit Card 1: Data Profil -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+                <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                  <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Profil Akun</h3>
                 </div>
-                <div>
-                  <label for="aff_set_confirm_password" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Konfirmasi Password Baru</label>
-                  <input id="aff_set_confirm_password" name="confirm_password" v-model="affiliateSettingsForm.confirm_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Ulangi password baru" />
+                <div class="space-y-3 text-xs">
+                  <div>
+                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
+                    <input v-model="adminSettingsForm.name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Nama Lengkap" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email / Username</label>
+                    <input v-model="adminSettingsForm.email" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Email atau username" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peran Akun</label>
+                    <div class="p-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-300 font-bold flex items-center gap-2">
+                      <i class="ph-bold ph-shield-check"></i>
+                      <span>{{ isSuperadmin ? 'Super Administrator' : (isTeacher ? 'Pendidik / Tutor' : 'Administrator Tenant') }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Edit Card 2: Keamanan / Ganti Password -->
+              <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+                <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                  <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Ganti Password</h3>
+                </div>
+                <div class="space-y-3 text-xs">
+                  <div>
+                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password Baru (Kosongkan jika tidak diubah)</label>
+                    <input v-model="adminSettingsForm.new_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Minimal 6 karakter" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Konfirmasi Password Baru</label>
+                    <input v-model="adminSettingsForm.confirm_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Ulangi password baru" />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
 
         <!-- ===== TAB: STAFF ===== -->
@@ -3175,14 +3342,23 @@ const isAffiliate = computed(() => ['affiliate', 'afiliator'].includes(currentRo
 
 const getAdminDisplayName = () => {
   const u = currentAdminUser.value;
-  if (isSuperadmin.value) {
-    if (u?.name && !u.name.includes('@') && !u.name.toLowerCase().includes('tenant')) return u.name;
-    return 'Super Administrator';
+  if (!u) return 'Pengguna';
+  if (u.display_name && u.display_name.trim()) return u.display_name.trim();
+  if (u.name && u.name.trim() && !u.name.includes('@')) return u.name.trim();
+  if (u.email && u.email.includes('@')) {
+    const prefix = u.email.split('@')[0].replace(/[._]/g, ' ');
+    return prefix.charAt(0).toUpperCase() + prefix.slice(1);
   }
+  if (u.username && u.username.includes('@')) {
+    const prefix = u.username.split('@')[0].replace(/[._]/g, ' ');
+    return prefix.charAt(0).toUpperCase() + prefix.slice(1);
+  }
+  if (u.username) return u.username;
+  if (u.name && u.name.trim()) return u.name.trim();
+  if (isSuperadmin.value) return 'Super Administrator';
+  if (u?.tenant_name) return `Admin ${u.tenant_name}`;
   if (isAffiliate.value) return 'Mitra Afiliasi';
   if (isTeacher.value) return 'Guru / Tutor';
-  if (u?.tenant_name) return `Admin ${u.tenant_name}`;
-  if (u?.name && !u.name.includes('@')) return u.name;
   return 'Administrator';
 };
 
@@ -3214,6 +3390,7 @@ const navItems = computed(() => {
     { id: 'affiliates',  label: 'Afiliasi & Komisi',     icon: 'ph-hand-coins',    roles: ['superadmin', 'admin'] },
     { id: 'staff',       label: 'Staff',                 icon: 'ph-users-three',   roles: ['superadmin'] },
     { id: 'reports',     label: 'Laporan & Analitik',    icon: 'ph-chart-bar',     roles: ['superadmin', 'admin'] },
+    { id: 'settings',    label: 'Pengaturan',            icon: 'ph-gear',          roles: ['superadmin', 'admin', 'teacher'] },
   ];
 
   if (isSuper) return items;
@@ -3313,7 +3490,7 @@ const loadRoleData = () => {
     loadMyAffiliateData();
     loadAffiliateSettings();
   } else if (isTeacher.value) {
-    if (!['questions', 'materials', 'teacher_hub'].includes(activeTab.value)) {
+    if (!['questions', 'materials', 'teacher_hub', 'settings'].includes(activeTab.value)) {
       activeTab.value = 'questions';
     }
     fetchQuestions();
@@ -4522,6 +4699,79 @@ const saveAffiliateSettings = async () => {
   }
 };
 
+// ── Admin & Teacher Settings ──
+const isSavingAdminSettings = ref(false);
+const isEditingAdminSettings = ref(false);
+const adminSettingsForm = reactive({
+  name: '',
+  email: '',
+  new_password: '',
+  confirm_password: ''
+});
+
+const loadAdminSettings = () => {
+  const u = currentAdminUser.value || {};
+  adminSettingsForm.name = u.display_name || u.name || '';
+  adminSettingsForm.email = u.email || u.username || '';
+  adminSettingsForm.new_password = '';
+  adminSettingsForm.confirm_password = '';
+};
+
+const startEditAdminSettings = () => {
+  loadAdminSettings();
+  isEditingAdminSettings.value = true;
+};
+
+const cancelEditAdminSettings = () => {
+  isEditingAdminSettings.value = false;
+  loadAdminSettings();
+};
+
+const saveAdminSettings = async () => {
+  if (!adminSettingsForm.name.trim() || !adminSettingsForm.email.trim()) {
+    alert('Nama dan email/username wajib diisi.');
+    return;
+  }
+  if (adminSettingsForm.new_password) {
+    if (adminSettingsForm.new_password.length < 6) {
+      alert('Password minimal 6 karakter.');
+      return;
+    }
+    if (adminSettingsForm.new_password !== adminSettingsForm.confirm_password) {
+      alert('Konfirmasi password tidak cocok.');
+      return;
+    }
+  }
+
+  isSavingAdminSettings.value = true;
+  try {
+    const res = await api.updateAdminProfile({
+      name: adminSettingsForm.name.trim(),
+      email: adminSettingsForm.email.trim(),
+      password: adminSettingsForm.new_password
+    });
+    alert('Pengaturan akun berhasil disimpan!');
+    isEditingAdminSettings.value = false;
+    adminSettingsForm.new_password = '';
+    adminSettingsForm.confirm_password = '';
+
+    if (res && res.user) {
+      currentAdminUser.value = {
+        ...(currentAdminUser.value || {}),
+        name: res.user.name,
+        display_name: res.user.display_name || res.user.name,
+        email: res.user.email
+      };
+      sessionStorage.setItem('ep_user', JSON.stringify(currentAdminUser.value));
+      localStorage.setItem('user_name', res.user.name);
+    }
+  } catch (err) {
+    alert(err.message || 'Gagal menyimpan pengaturan.');
+  } finally {
+    isSavingAdminSettings.value = false;
+  }
+};
+
 // ── Staff ──
 const staffMembers = ref([]);
 const sortedStaffMembers = computed(() => doSort(staffMembers.value));
@@ -5056,7 +5306,7 @@ watch(activeTab, (newTab) => {
     activeTab.value = 'overview';
     return;
   }
-  if (isTeacher.value && ['packages', 'plans', 'transactions', 'affiliates', 'staff', 'students', 'settings', 'branches', 'schools'].includes(newTab)) {
+  if (isTeacher.value && ['packages', 'plans', 'transactions', 'affiliates', 'staff', 'students', 'branches', 'schools'].includes(newTab)) {
     activeTab.value = 'questions';
     return;
   }
@@ -5085,8 +5335,12 @@ watch(activeTab, (newTab) => {
     if (tenantsList.value.length === 0) fetchTenants();
   } else if (isAffiliate.value && ['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts'].includes(newTab)) {
     loadMyAffiliateData();
-  } else if (newTab === 'settings' && isAffiliate.value) {
-    loadAffiliateSettings();
+  } else if (newTab === 'settings') {
+    if (isAffiliate.value) {
+      loadAffiliateSettings();
+    } else {
+      loadAdminSettings();
+    }
   }
 }, { immediate: true });
 </script>

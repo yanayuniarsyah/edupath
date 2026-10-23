@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Outer Glow / Subtle Ring -->
+  <circle cx="32" cy="32" r="31" fill="#050505"/>
+  <!-- Circular Badge -->
+  <circle cx="32" cy="32" r="28" fill="#ffffff"/>
+  <!-- Letter E -->
+  <text x="32" y="44" font-family="'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="900" fill="#000000" text-anchor="middle">E</text>
+  <!-- Dot .ai Accent in Lime Green -->
+  <circle cx="48" cy="16" r="6.5" fill="#c0ff00" stroke="#050505" stroke-width="2"/>
+</svg>

@@ -1,0 +1,67 @@
+/* public/affiliate.css */
+/* Glass‑morphism utilities */
+.glass-panel {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  color: #f9fafb;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.75rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Fade‑in animation for sections */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.8s ease forwards;
+  opacity: 0; /* start hidden, animation will set to 1 */
+}
+
+/* Responsive grid adjustments – Tailwind handles most, but ensure cards have equal height */
+@media (min-width: 768px) {
+  .grid-cols-2 > .glass-card {
+    min-height: 180px;
+  }
+}
+@media (min-width: 1024px) {
+  .grid-cols-3 > .glass-card {
+    min-height: 200px;
+  }
+}
+
+/* Button hover gradient transition */
+.btn-primary {
+  background: linear-gradient(135deg, #06b6d4, #6366f1);
+  transition: background 0.3s ease;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #22d3ee, #818cf8);
+}
+
+/* Import Inter font for modern typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+body {
+  font-family: 'Inter', sans-serif;
+}

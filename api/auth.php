@@ -235,9 +235,9 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (\Throwable $e) {}
 
     $stmt = $pdo->prepare("
-        SELECT u.id as user_id, u.password as user_password, s.password as student_password, ur.role, ur.tenant_id, ur.reference_id, 
-               COALESCE(s.id, a.id, sch.id, ur.reference_id) as student_id, 
-               COALESCE(NULLIF(TRIM(s.name), ''), NULLIF(TRIM(aff.name), ''), NULLIF(TRIM(aff.bank_owner), ''), NULLIF(TRIM(a.name), ''), NULLIF(TRIM(sch.name), ''), 'Pengguna EduPath') as name, 
+        SELECT u.id as user_id, u.display_name as user_display_name, u.password as user_password, s.password as student_password, ur.role, ur.tenant_id, ur.reference_id, 
+               COALESCE(s.id, a.id, sch.id, aff.id, ur.reference_id) as student_id, 
+               COALESCE(NULLIF(TRIM(u.display_name), ''), NULLIF(TRIM(aff.name), ''), NULLIF(TRIM(s.name), ''), NULLIF(TRIM(aff.bank_owner), ''), NULLIF(TRIM(a.name), ''), NULLIF(TRIM(sch.name), ''), 'Pengguna EduPath') as name, 
                COALESCE(s.email, aff.email, a.username, sch.bk_email, u.identity_key) as email, 
                s.school as student_school,
                s.phone as student_phone,
@@ -424,21 +424,24 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $user['name'] = $cleanName;
         } elseif ($user['role'] === 'affiliate') {
             $user['id'] = $ref_id;
-            $cleanName = trim($user['name'] ?? '');
-            if (empty($cleanName) || str_contains($cleanName, '@')) {
-                $cleanName = 'Mitra Afiliasi';
+            $cleanName = trim($user['user_display_name'] ?? ($user['name'] ?? ''));
+            if (empty($cleanName) || str_contains($cleanName, '@') || $cleanName === 'Pengguna EduPath') {
+                $emailPrefix = explode('@', $user_email)[0];
+                $cleanName = !empty($user['referral_code']) ? $user['referral_code'] : ucfirst($emailPrefix);
             }
             $user['name'] = $cleanName;
+            $user['display_name'] = $cleanName;
             $user['referral_code'] = $user['affiliate_code'] ?? ($user['referral_code'] ?? '');
             $user['is_premium'] = true;
             $user['plan'] = 'affiliate';
             $user['plan_name'] = 'Mitra Afiliasi Resmi';
         } elseif ($user['role'] === 'school_bk') {
-            $cleanName = trim($user['name'] ?? '');
-            if (empty($cleanName) || str_contains($cleanName, '@')) {
+            $cleanName = trim($user['user_display_name'] ?? ($user['name'] ?? ''));
+            if (empty($cleanName) || str_contains($cleanName, '@') || $cleanName === 'Pengguna EduPath') {
                 $cleanName = !empty($user['school_name']) ? ("Guru BK " . $user['school_name']) : 'Koordinator BK';
             }
             $user['name'] = $cleanName;
+            $user['display_name'] = $cleanName;
             $user['is_premium'] = true;
             $user['plan'] = 'school_partner';
             $user['plan_name'] = 'Sekolah Mitra Resmi';
@@ -614,6 +617,12 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($isStaffRole) {
         $stmt = $pdo->prepare("SELECT id FROM admins WHERE username = ? AND id != ?");
         $stmt->execute([$email, $payload->id]);
+    } elseif ($payload->role === 'affiliate') {
+        $stmt = $pdo->prepare("SELECT id FROM affiliates WHERE email = ? AND id != ?");
+        $stmt->execute([$email, $payload->id]);
+    } elseif ($payload->role === 'school_bk') {
+        $stmt = $pdo->prepare("SELECT id FROM schools WHERE bk_email = ? AND id != ?");
+        $stmt->execute([$email, $payload->school_id ?? $payload->reference_id ?? $payload->id]);
     } else {
         $stmt = $pdo->prepare("SELECT id FROM students WHERE email = ? AND id != ?");
         $stmt->execute([$email, $payload->id]);
@@ -624,6 +633,18 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    $school = trim($input['school'] ?? '');
+    $school_id = trim($input['school_id'] ?? '');
+    if (!empty($school) && empty($school_id)) {
+        try {
+            $stmt_sch = $pdo->prepare("SELECT id FROM schools WHERE LOWER(name) = LOWER(?) LIMIT 1");
+            $stmt_sch->execute([$school]);
+            $found_id = $stmt_sch->fetchColumn();
+            if ($found_id) $school_id = $found_id;
+        } catch (\Throwable $e) {}
+    }
+
+    $hashed_password = null;
     if (!empty($password)) {
         if (strlen($password) < 6) {
             http_response_code(400);
@@ -631,21 +652,35 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-        $school = trim($input['school'] ?? '');
-        $school_id = trim($input['school_id'] ?? '');
-        if (!empty($school) && empty($school_id)) {
-            try {
-                $stmt_sch = $pdo->prepare("SELECT id FROM schools WHERE LOWER(name) = LOWER(?) LIMIT 1");
-                $stmt_sch->execute([$school]);
-                $found_id = $stmt_sch->fetchColumn();
-                if ($found_id) $school_id = $found_id;
-            } catch (\Throwable $e) {}
-        }
+    }
 
-        if ($isStaffRole) {
+    // Role-specific table updates
+    if ($payload->role === 'affiliate') {
+        $bank_name = trim($input['bank_name'] ?? '');
+        $bank_account = trim($input['bank_account'] ?? '');
+        $bank_owner = trim($input['bank_owner'] ?? '');
+        try {
+            $pdo->prepare("UPDATE affiliates SET name = ?, email = ?, bank_name = ?, bank_account = ?, bank_owner = ? WHERE id = ? OR user_id = ?")
+                ->execute([$name, $email, $bank_name, $bank_account, $bank_owner, $payload->id, $payload->user_id ?? '']);
+        } catch (\Throwable $e) {}
+    } elseif ($payload->role === 'school_bk') {
+        $phone = trim($input['phone'] ?? '');
+        $schId = $payload->school_id ?? $payload->reference_id ?? $payload->id;
+        try {
+            $pdo->prepare("UPDATE schools SET bk_name = ?, bk_email = ?, bk_phone = ? WHERE id = ?")
+                ->execute([$name, $email, $phone, $schId]);
+        } catch (\Throwable $e) {}
+    } elseif ($isStaffRole) {
+        if ($hashed_password) {
             $stmt = $pdo->prepare("UPDATE admins SET name = ?, username = ?, password = ? WHERE id = ?");
             $stmt->execute([$name, $email, $hashed_password, $payload->id]);
         } else {
+            $stmt = $pdo->prepare("UPDATE admins SET name = ?, username = ? WHERE id = ?");
+            $stmt->execute([$name, $email, $payload->id]);
+        }
+    } else {
+        // Student
+        if ($hashed_password) {
             try {
                 $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ?, school = ?, school_id = ? WHERE id = ? OR id = ? OR LOWER(email) = LOWER(?)");
                 $stmt->execute([$name, $email, $hashed_password, $school ?: null, $school_id ?: null, $payload->id, $payload->user_id ?? '', $payload->email ?? '']);
@@ -653,31 +688,6 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ? WHERE id = ? OR id = ? OR LOWER(email) = LOWER(?)");
                 $stmt->execute([$name, $email, $hashed_password, $payload->id, $payload->user_id ?? '', $payload->email ?? '']);
             }
-        }
-
-        $stmt = $pdo->prepare("UPDATE users SET identity_key = ?, password = ? WHERE id = ?");
-        $stmt->execute([$email, $hashed_password, $payload->user_id]);
-        try {
-            $userCols = $pdo->query("DESCRIBE users")->fetchAll(PDO::FETCH_COLUMN);
-            if (in_array('name', $userCols)) {
-                $pdo->prepare("UPDATE users SET name = ? WHERE id = ?")->execute([$name, $payload->user_id]);
-            }
-        } catch (\Throwable $e) {}
-    } else {
-        $school = trim($input['school'] ?? '');
-        $school_id = trim($input['school_id'] ?? '');
-        if (!empty($school) && empty($school_id)) {
-            try {
-                $stmt_sch = $pdo->prepare("SELECT id FROM schools WHERE LOWER(name) = LOWER(?) LIMIT 1");
-                $stmt_sch->execute([$school]);
-                $found_id = $stmt_sch->fetchColumn();
-                if ($found_id) $school_id = $found_id;
-            } catch (\Throwable $e) {}
-        }
-
-        if ($isStaffRole) {
-            $stmt = $pdo->prepare("UPDATE admins SET name = ?, username = ? WHERE id = ?");
-            $stmt->execute([$name, $email, $payload->id]);
         } else {
             try {
                 $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, school = ?, school_id = ? WHERE id = ? OR id = ? OR LOWER(email) = LOWER(?)");
@@ -687,15 +697,15 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$name, $email, $payload->id, $payload->user_id ?? '', $payload->email ?? '']);
             }
         }
+    }
 
-        $stmt = $pdo->prepare("UPDATE users SET identity_key = ? WHERE id = ?");
-        $stmt->execute([$email, $payload->user_id]);
-        try {
-            $userCols = $pdo->query("DESCRIBE users")->fetchAll(PDO::FETCH_COLUMN);
-            if (in_array('name', $userCols)) {
-                $pdo->prepare("UPDATE users SET name = ? WHERE id = ?")->execute([$name, $payload->user_id]);
-            }
-        } catch (\Throwable $e) {}
+    // Always update users identity_key and display_name
+    if ($hashed_password) {
+        $stmt = $pdo->prepare("UPDATE users SET identity_key = ?, password = ?, display_name = ? WHERE id = ?");
+        $stmt->execute([$email, $hashed_password, $name, $payload->user_id ?? $payload->id]);
+    } else {
+        $stmt = $pdo->prepare("UPDATE users SET identity_key = ?, display_name = ? WHERE id = ?");
+        $stmt->execute([$email, $name, $payload->user_id ?? $payload->id]);
     }
 
     echo json_encode(["success" => true, "message" => "Profil berhasil diperbarui"]);
@@ -707,15 +717,16 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // School BK Coordinator
     if ($payload->role === 'school_bk') {
         $schId = $payload->school_id ?? $payload->reference_id ?? $payload->id;
-        $stmt = $pdo->prepare("SELECT * FROM schools WHERE id = ? OR LOWER(bk_email) = LOWER(?) LIMIT 1");
+        $stmt = $pdo->prepare("SELECT s.*, u.display_name FROM schools s LEFT JOIN user_roles ur ON s.id = ur.reference_id LEFT JOIN users u ON ur.user_id = u.id WHERE s.id = ? OR LOWER(s.bk_email) = LOWER(?) LIMIT 1");
         $stmt->execute([$schId, $payload->email ?? '']);
         $sch = $stmt->fetch(PDO::FETCH_ASSOC);
-        $bkName = $sch['bk_name'] ?? $sch['bk_coordinator_name'] ?? $sch['name'] ?? 'Koordinator BK';
+        $bkName = $sch['display_name'] ?? ($sch['bk_name'] ?? ($sch['bk_coordinator_name'] ?? ($sch['name'] ?? 'Koordinator BK')));
         $bkEmail = $sch['bk_email'] ?? $sch['bk_coordinator_email'] ?? ($payload->email ?? '');
         $bkPhone = $sch['bk_phone'] ?? $sch['bk_coordinator_phone'] ?? '';
         $user = [
             'id' => $payload->id,
             'name' => $bkName,
+            'display_name' => $bkName,
             'email' => $bkEmail,
             'phone' => $bkPhone,
             'role' => 'school_bk',
@@ -733,8 +744,8 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // Staff (Admin, Superadmin, Teacher, Guru, Tutor)
     if (in_array($payload->role, ['admin', 'superadmin', 'teacher', 'guru', 'tutor'])) {
         $stmt = $pdo->prepare("
-            SELECT u.id as user_id, u.identity_key, ur.role, ur.tenant_id, a.id as admin_id, a.username, 
-                   COALESCE(a.name, t.name, u.identity_key) as name,
+            SELECT u.id as user_id, u.identity_key, u.display_name, ur.role, ur.tenant_id, a.id as admin_id, a.username, 
+                   COALESCE(NULLIF(TRIM(u.display_name), ''), a.name, t.name, u.identity_key) as name,
                    t.name as tenant_name
             FROM users u
             JOIN user_roles ur ON u.id = ur.user_id
@@ -756,6 +767,7 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $user = [
             'id'          => $adm['admin_id'] ?? $payload->id,
             'name'        => $name,
+            'display_name'=> $name,
             'email'       => $adm['username'] ?? ($adm['identity_key'] ?? ($payload->email ?? '')),
             'role'        => $payload->role,
             'is_premium'  => true,
@@ -769,18 +781,20 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
     // Mitra Afiliasi
     if ($payload->role === 'affiliate') {
-        $stmt = $pdo->prepare("SELECT * FROM affiliates WHERE id = ? OR user_id = ? OR LOWER(TRIM(email)) = LOWER(TRIM(?)) LIMIT 1");
+        $stmt = $pdo->prepare("SELECT a.*, u.display_name FROM affiliates a LEFT JOIN users u ON (a.user_id = u.id OR a.id = u.id) WHERE a.id = ? OR a.user_id = ? OR LOWER(TRIM(a.email)) = LOWER(TRIM(?)) LIMIT 1");
         $stmt->execute([$payload->id, $payload->user_id ?? '', $payload->email ?? '']);
         $aff = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $cleanName = trim($aff['name'] ?? ($aff['bank_owner'] ?? ''));
-        if (empty($cleanName) || str_contains($cleanName, '@')) {
-            $cleanName = 'Mitra Afiliasi';
+        $cleanName = trim($aff['display_name'] ?? ($aff['name'] ?? ($aff['bank_owner'] ?? '')));
+        if (empty($cleanName) || str_contains($cleanName, '@') || $cleanName === 'Mitra Afiliasi') {
+            $prefix = explode('@', $aff['email'] ?? ($payload->email ?? ''))[0];
+            $cleanName = !empty($aff['referral_code']) ? $aff['referral_code'] : ucfirst($prefix);
         }
 
         $user = [
             'id'            => $aff['id'] ?? $payload->id,
             'name'          => $cleanName,
+            'display_name'  => $cleanName,
             'email'         => $aff['email'] ?? ($payload->email ?? ''),
             'role'          => 'affiliate',
             'referral_code' => $aff['referral_code'] ?? '',

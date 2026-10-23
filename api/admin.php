@@ -305,7 +305,7 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.password as user_password, a.password as admin_password,
                ur.role, ur.tenant_id, ur.reference_id, a.id as admin_id, t.is_active as tenant_active,
-               COALESCE(a.name, t.name) as name,
+               COALESCE(NULLIF(TRIM(u.display_name), ''), NULLIF(TRIM(a.name), ''), NULLIF(TRIM(t.name), '')) as name,
                t.name as tenant_name
         FROM users u 
         JOIN user_roles ur ON u.id = ur.user_id 
@@ -454,8 +454,8 @@ if (!in_array($payload->role, ['admin', 'superadmin', 'teacher', 'affiliate'])) 
 
 if (($action === 'me' || $action === 'profile') && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt = $pdo->prepare("
-        SELECT u.id as user_id, ur.role, ur.tenant_id, ur.reference_id, 
-               COALESCE(a.name, t.name) as name,
+        SELECT u.id as user_id, u.display_name, ur.role, ur.tenant_id, ur.reference_id, 
+               COALESCE(NULLIF(TRIM(u.display_name), ''), NULLIF(TRIM(a.name), ''), NULLIF(TRIM(t.name), '')) as name,
                COALESCE(a.username, u.identity_key) as email,
                t.name as tenant_name
         FROM users u
@@ -474,18 +474,19 @@ if (($action === 'me' || $action === 'profile') && $_SERVER['REQUEST_METHOD'] ==
     elseif (!empty($adminUser['tenant_name'])) $defaultName = 'Admin ' . $adminUser['tenant_name'];
 
     $cleanName = trim($adminUser['name'] ?? '');
-    if (empty($cleanName) || str_contains($cleanName, '@')) {
+    if (empty($cleanName)) {
         $cleanName = $defaultName;
     }
 
     $userRes = [
-        'id'          => $adminUser['reference_id'] ?? $payload->id,
-        'user_id'     => $payload->user_id,
-        'name'        => $cleanName,
-        'email'       => $adminUser['email'] ?? ($payload->email ?? ''),
-        'role'        => $payload->role,
-        'tenant_id'   => $payload->tenant_id,
-        'tenant_name' => $adminUser['tenant_name'] ?? null
+        'id'           => $adminUser['reference_id'] ?? $payload->id,
+        'user_id'      => $payload->user_id,
+        'name'         => $cleanName,
+        'display_name' => $adminUser['display_name'] ?? $cleanName,
+        'email'        => $adminUser['email'] ?? ($payload->email ?? ''),
+        'role'         => $payload->role,
+        'tenant_id'    => $payload->tenant_id,
+        'tenant_name'  => $adminUser['tenant_name'] ?? null
     ];
     echo json_encode(["user" => $userRes]);
     exit;
@@ -2424,6 +2425,85 @@ elseif ($action === 'payout_commission' && $_SERVER['REQUEST_METHOD'] === 'POST'
     } catch (Exception $e) {
         http_response_code(500);
         echo json_encode(["error" => "Gagal memperbarui status komisi"]);
+    }
+}
+elseif ($action === 'update_profile' && in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])) {
+    $name = trim($input['name'] ?? ($input['display_name'] ?? ''));
+    $email = strtolower(trim($input['email'] ?? ($input['username'] ?? '')));
+    $password = $input['password'] ?? ($input['new_password'] ?? '');
+
+    if (empty($name) || empty($email)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Nama dan email/username wajib diisi"]);
+        exit;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. Check if identity_key is used by another user
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE identity_key = ? AND id != ?");
+        $stmt->execute([$email, $payload->user_id]);
+        if ($stmt->fetch()) {
+            $pdo->rollBack();
+            http_response_code(409);
+            echo json_encode(["error" => "Email/Username sudah digunakan oleh akun lain"]);
+            exit;
+        }
+
+        // 2. Update users table
+        $stmt = $pdo->prepare("UPDATE users SET display_name = ?, identity_key = ? WHERE id = ?");
+        $stmt->execute([$name, $email, $payload->user_id]);
+
+        $hashed = null;
+        if (!empty($password)) {
+            if (strlen($password) < 6) {
+                $pdo->rollBack();
+                http_response_code(400);
+                echo json_encode(["error" => "Password minimal 6 karakter"]);
+                exit;
+            }
+            $hashed = password_hash($password, PASSWORD_BCRYPT);
+            $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$hashed, $payload->user_id]);
+        }
+
+        // 3. Update admins table if exists
+        $adminId = $payload->id ?? $payload->reference_id ?? null;
+        if ($adminId) {
+            $stmtAdm = $pdo->prepare("SELECT id FROM admins WHERE id = ? OR username = ?");
+            $stmtAdm->execute([$adminId, $email]);
+            $admRow = $stmtAdm->fetch(PDO::FETCH_ASSOC);
+            if ($admRow) {
+                $stmtUpd = $pdo->prepare("UPDATE admins SET name = ?, username = ? WHERE id = ?");
+                $stmtUpd->execute([$name, $email, $admRow['id']]);
+                if ($hashed) {
+                    $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?")->execute([$hashed, $admRow['id']]);
+                }
+            }
+        }
+
+        $pdo->commit();
+        log_audit($pdo, $payload->user_id, $payload->tenant_id, 'profile_updated', $adminId, ['name' => $name, 'email' => $email]);
+
+        echo json_encode([
+            "success" => true,
+            "message" => "Profil berhasil diperbarui",
+            "user" => [
+                "id"           => $adminId,
+                "user_id"      => $payload->user_id,
+                "name"         => $name,
+                "display_name" => $name,
+                "email"        => $email,
+                "role"         => $payload->role,
+                "tenant_id"    => $payload->tenant_id
+            ]
+        ]);
+        exit;
+    } catch (\Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal memperbarui profil: " . $e->getMessage()]);
+        exit;
     }
 }
 else {

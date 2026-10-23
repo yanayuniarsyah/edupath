@@ -520,6 +520,18 @@ export const api = {
     const q = new URLSearchParams(params).toString();
     return apiFetch(`/school.php?action=students${q ? '&' + q : ''}`);
   },
+  updateSchoolProfile(data) {
+    return apiFetch('/school.php?action=update_profile', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  updateAdminProfile(data) {
+    return apiFetch('/admin.php?action=update_profile', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
 
   // ── Analytics ──
   trackEvent(eventName, payload = {}) {

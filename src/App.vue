@@ -2555,7 +2555,7 @@
         </section>
 
         <!-- TAB 2: DIAGNOSTIC & TRY OUT -->
-        <section v-if="currentTab === 'diagnostic'" class="animate-fade-in space-y-6 pt-24 lg:pt-24 px-3 sm:px-6">
+        <section v-if="currentTab === 'diagnostic'" class="animate-fade-in space-y-6 px-3 sm:px-6">
           <!-- Top Close & Back Bar -->
           <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
             <div class="flex items-center gap-3">
@@ -2756,7 +2756,7 @@
         </section>
 
         <!-- TAB 3: MATERI UTBK & MICRO-LESSONS -->
-        <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-6 pt-24 lg:pt-24 px-3 sm:px-6">
+        <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-6 px-3 sm:px-6">
           <!-- Top Close & Back Bar -->
           <div class="flex flex-wrap lg:flex-nowrap items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-3.5 sm:p-4 backdrop-blur-xl shadow-xl gap-3">
             <div class="flex items-center gap-3">
@@ -3158,7 +3158,7 @@
         </section>
 
         <!-- TAB 7: 2027 AI INTELLIGENCE & PERFORMANCE COCKPIT (Ujian 2027 Simulasi) -->
-        <section v-if="currentTab === 'simulator' || currentTab === 'projection2027'" class="animate-fade-in space-y-6 pt-24 lg:pt-24 px-3 sm:px-6">
+        <section v-if="currentTab === 'simulator' || currentTab === 'projection2027'" class="animate-fade-in space-y-6 px-3 sm:px-6">
           <!-- Top Header Bar -->
           <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
             <div class="flex items-center gap-3">
@@ -4848,16 +4848,19 @@ export default {
 
     const getStudentDisplayName = (u) => {
       if (!u) return 'Siswa EduPath';
-      if (u.name && !u.name.includes('@')) return u.name;
+      if (u.display_name && u.display_name.trim()) return u.display_name.trim();
+      if (u.name && u.name.trim() && !u.name.includes('@')) return u.name.trim();
+      if (u.email && u.email.includes('@')) {
+        const prefix = u.email.split('@')[0].replace(/[._]/g, ' ');
+        return prefix.charAt(0).toUpperCase() + prefix.slice(1);
+      }
+      if (u.username) return u.username;
+      if (u.name && u.name.trim()) return u.name.trim();
       if (u.role === 'superadmin') return 'Super Administrator';
       if (u.role === 'admin') return u.tenant_name ? `Admin ${u.tenant_name}` : 'Administrator';
       if (u.role === 'school_bk') return u.school_name ? `Guru BK ${u.school_name}` : 'Guru BK';
       if (u.role === 'affiliate') return 'Mitra Afiliasi';
       if (u.role === 'teacher') return 'Guru / Tutor';
-      if (u.email && u.email.includes('@')) {
-        const prefix = u.email.split('@')[0].replace(/[._]/g, ' ');
-        return prefix.charAt(0).toUpperCase() + prefix.slice(1);
-      }
       return 'Siswa EduPath';
     };
 

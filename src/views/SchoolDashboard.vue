@@ -161,8 +161,8 @@
       <!-- Sidebar Bottom Profile & Logout -->
       <div class="p-3 border-t border-white/10 shrink-0 bg-white/[0.02]">
         <div v-show="sidebarOpen" class="mb-2.5 px-1">
-          <span class="text-[10px] text-white/40 uppercase font-black tracking-wider block">Koordinator BK</span>
           <span class="text-xs font-bold text-white block truncate">{{ schoolData?.bk_name || 'Guru BK' }}</span>
+          <span class="text-[10px] text-emerald-400 uppercase font-black tracking-wider block">Koordinator BK &bull; {{ schoolData?.name || 'Sekolah' }}</span>
           <span class="text-[10px] text-white/50 block truncate">{{ schoolData?.bk_email }}</span>
         </div>
         <button
@@ -712,6 +712,197 @@
           </div>
         </div>
 
+        <!-- ============================================================== -->
+        <!-- TAB: PENGATURAN PROFIL SEKOLAH & GURU BK                       -->
+        <!-- ============================================================== -->
+        <div v-if="activeTab === 'settings'" class="space-y-6 max-w-4xl animate-fade-in">
+          <!-- Top Header Bar with Edit / Action Buttons -->
+          <div class="flex flex-wrap justify-between items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+            <div>
+              <h2 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="ph-bold ph-gear text-[#c0ff00]"></i>
+                <span>Pengaturan Akun Sekolah &amp; Koordinator BK</span>
+              </h2>
+              <p class="text-xs text-white/50 mt-0.5">
+                {{ isEditingSchoolSettings ? 'Perbarui informasi profil sekolah, kontak koordinator BK, atau kata sandi login di bawah ini.' : 'Informasi identitas sekolah dan kontak resmi guru BK yang terdaftar.' }}
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button 
+                v-if="!isEditingSchoolSettings"
+                @click="startEditSchoolSettings" 
+                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer"
+              >
+                <i class="ph-bold ph-pencil-simple text-sm"></i>
+                <span>Edit Pengaturan</span>
+              </button>
+              <template v-else>
+                <button 
+                  @click="cancelEditSchoolSettings" 
+                  class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button 
+                  @click="saveSchoolSettings" 
+                  :disabled="isSavingSchoolSettings" 
+                  class="px-4 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-xl transition-all shadow-lg shadow-[#c0ff00]/20 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <i class="ph-bold ph-floppy-disk"></i>
+                  <span>{{ isSavingSchoolSettings ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <!-- 1. VIEW MODE (Profil Sekolah) -->
+          <div v-if="!isEditingSchoolSettings" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- View Card 1: Data Koordinator BK -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Koordinator Guru BK</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Aktif</span>
+              </div>
+              <div class="space-y-3.5 text-xs">
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Guru BK</span>
+                  <div class="text-sm font-bold text-white">{{ schoolData?.bk_name || '-' }}</div>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Email Login Guru BK</span>
+                  <div class="text-sm font-mono text-white/90">{{ schoolData?.bk_email || '-' }}</div>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nomor WhatsApp / HP</span>
+                  <div class="text-sm font-mono text-[#c0ff00] font-bold">{{ schoolData?.bk_phone || '-' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- View Card 2: Data Lembaga Sekolah -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-graduation-cap text-emerald-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Identitas Sekolah Mitra</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Mitra Resmi</span>
+              </div>
+              <div class="space-y-3.5 text-xs">
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Sekolah</span>
+                  <div class="text-sm font-bold text-white">{{ schoolData?.name || '-' }}</div>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Kota / Kabupaten</span>
+                  <div class="text-sm font-medium text-white">{{ schoolData?.city || '-' }}</div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">NPSN</span>
+                    <div class="text-xs font-mono text-white/80">{{ schoolData?.npsn || '-' }}</div>
+                  </div>
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Estimasi Siswa</span>
+                    <div class="text-xs font-bold text-white">{{ schoolData?.estimated_students || '200' }} Siswa</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- View Card 3: Keamanan Akun -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-3 md:col-span-2">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Kata Sandi</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">Terenkripsi BCRYPT</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-white/70">Password akun portal BK sekolah Anda terlindungi dengan enkripsi aman standar perbankan.</span>
+                <button @click="startEditSchoolSettings" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold underline cursor-pointer">
+                  Ubah Kata Sandi &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. EDIT MODE (Form Profil Sekolah) -->
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Edit Card 1: Data Koordinator BK -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Data Koordinator BK</h3>
+              </div>
+              <div class="space-y-3 text-xs">
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Koordinator BK</label>
+                  <input v-model="schoolSettingsForm.bk_name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Dra. H. Nuraeni, M.Pd" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Login Koordinator BK</label>
+                  <input v-model="schoolSettingsForm.email" type="email" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="bk@sekolah.sch.id" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor WhatsApp / HP</label>
+                  <input v-model="schoolSettingsForm.phone" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="08123456789" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Edit Card 2: Identitas Sekolah -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                <i class="ph-bold ph-graduation-cap text-emerald-400 text-lg"></i>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Identitas Sekolah</h3>
+              </div>
+              <div class="space-y-3 text-xs">
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Sekolah</label>
+                  <input v-model="schoolSettingsForm.name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: SMAN 1 Ciamis" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kota / Kabupaten</label>
+                  <input v-model="schoolSettingsForm.city" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Kabupaten Ciamis" />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">NPSN</label>
+                    <input v-model="schoolSettingsForm.npsn" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="NPSN Sekolah" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Estimasi Siswa</label>
+                    <input v-model.number="schoolSettingsForm.estimated_students" type="number" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="200" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Edit Card 3: Keamanan / Ganti Password -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4 md:col-span-2">
+              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Ganti Password</h3>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password Baru (Kosongkan jika tidak diubah)</label>
+                  <input v-model="schoolSettingsForm.new_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Minimal 6 karakter" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Konfirmasi Password Baru</label>
+                  <input v-model="schoolSettingsForm.confirm_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Ulangi password baru" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </main>
 
@@ -817,7 +1008,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, reactive, watch } from 'vue';
 import { api } from '../api.js';
 
 // ── State Autentikasi ──
@@ -913,6 +1104,11 @@ const navItems = computed(() => [
     id: 'broadcast',
     label: 'Sebar Link & QR Code',
     icon: 'ph-qr-code'
+  },
+  {
+    id: 'settings',
+    label: 'Pengaturan',
+    icon: 'ph-gear'
   }
 ]);
 
@@ -1036,6 +1232,98 @@ async function handleLogout() {
   window.location.href = window.location.origin + window.location.pathname + '#/';
   window.location.reload();
 }
+
+// ── Settings State & Handlers ──
+const isSavingSchoolSettings = ref(false);
+const isEditingSchoolSettings = ref(false);
+const schoolSettingsForm = reactive({
+  name: '',
+  bk_name: '',
+  email: '',
+  phone: '',
+  city: '',
+  npsn: '',
+  estimated_students: 200,
+  new_password: '',
+  confirm_password: ''
+});
+
+function loadSchoolSettings() {
+  const s = schoolData.value || {};
+  schoolSettingsForm.name = s.name || '';
+  schoolSettingsForm.bk_name = s.bk_name || '';
+  schoolSettingsForm.email = s.bk_email || '';
+  schoolSettingsForm.phone = s.bk_phone || '';
+  schoolSettingsForm.city = s.city || '';
+  schoolSettingsForm.npsn = s.npsn || '';
+  schoolSettingsForm.estimated_students = s.estimated_students || 200;
+  schoolSettingsForm.new_password = '';
+  schoolSettingsForm.confirm_password = '';
+}
+
+function startEditSchoolSettings() {
+  loadSchoolSettings();
+  isEditingSchoolSettings.value = true;
+}
+
+function cancelEditSchoolSettings() {
+  isEditingSchoolSettings.value = false;
+  loadSchoolSettings();
+}
+
+async function saveSchoolSettings() {
+  if (!schoolSettingsForm.name.trim() || !schoolSettingsForm.bk_name.trim() || !schoolSettingsForm.email.trim()) {
+    alert('Nama Sekolah, Koordinator BK, dan Email wajib diisi.');
+    return;
+  }
+  if (schoolSettingsForm.new_password) {
+    if (schoolSettingsForm.new_password.length < 6) {
+      alert('Password minimal 6 karakter.');
+      return;
+    }
+    if (schoolSettingsForm.new_password !== schoolSettingsForm.confirm_password) {
+      alert('Konfirmasi password tidak cocok.');
+      return;
+    }
+  }
+
+  isSavingSchoolSettings.value = true;
+  try {
+    const res = await api.updateSchoolProfile({
+      name: schoolSettingsForm.name.trim(),
+      bk_name: schoolSettingsForm.bk_name.trim(),
+      email: schoolSettingsForm.email.trim(),
+      phone: schoolSettingsForm.phone.trim(),
+      city: schoolSettingsForm.city.trim(),
+      npsn: schoolSettingsForm.npsn.trim(),
+      estimated_students: schoolSettingsForm.estimated_students,
+      password: schoolSettingsForm.new_password
+    });
+    alert('Pengaturan sekolah & akun BK berhasil disimpan!');
+    isEditingSchoolSettings.value = false;
+    schoolSettingsForm.new_password = '';
+    schoolSettingsForm.confirm_password = '';
+
+    if (res && res.school) {
+      schoolData.value = {
+        ...(schoolData.value || {}),
+        ...res.school
+      };
+      sessionStorage.setItem('school_data', JSON.stringify(schoolData.value));
+      localStorage.setItem('user_name', res.school.bk_name || res.school.name);
+    }
+  } catch (err) {
+    alert(err.message || 'Gagal menyimpan pengaturan.');
+  } finally {
+    isSavingSchoolSettings.value = false;
+  }
+}
+
+watch(activeTab, (newTab) => {
+  if (newTab === 'settings') {
+    loadSchoolSettings();
+  }
+});
 
 async function loadAllDashboardData() {
   dataLoading.value = true;

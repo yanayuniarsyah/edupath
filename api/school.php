@@ -658,5 +658,84 @@ if ($action === 'export' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
 }
 
+// -------------------------------------------------------------
+// 6. UPDATE PROFIL SEKOLAH / GURU BK
+// -------------------------------------------------------------
+if ($action === 'update_profile' && in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])) {
+    $name = trim($input['name'] ?? ($input['school_name'] ?? ''));
+    $bk_name = trim($input['bk_name'] ?? ($input['bk_coordinator_name'] ?? ''));
+    $email = strtolower(trim($input['email'] ?? ($input['bk_email'] ?? '')));
+    $phone = trim($input['phone'] ?? ($input['bk_phone'] ?? ''));
+    $city = trim($input['city'] ?? '');
+    $province = trim($input['province'] ?? '');
+    $npsn = trim($input['npsn'] ?? '');
+    $estimated_students = (int)($input['estimated_students'] ?? 200);
+    $new_password = $input['new_password'] ?? ($input['password'] ?? '');
+
+    if (empty($name) || empty($bk_name) || empty($email)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Nama Sekolah, Koordinator BK, dan Email wajib diisi"]);
+        exit;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. Update schools table
+        $stmt = $pdo->prepare("
+            UPDATE schools 
+            SET name = ?, bk_name = ?, bk_email = ?, bk_phone = ?, city = ?, province = ?, npsn = ?, estimated_students = ?
+            WHERE id = ?
+        ");
+        $stmt->execute([$name, $bk_name, $email, $phone, $city, $province, $npsn, $estimated_students, $current_school_id]);
+
+        // 2. Sync linked users table
+        $stmtUser = $pdo->prepare("SELECT user_id FROM user_roles WHERE reference_id = ? AND role = 'school_bk' LIMIT 1");
+        $stmtUser->execute([$current_school_id]);
+        $uId = $stmtUser->fetchColumn();
+
+        if ($uId) {
+            $pdo->prepare("UPDATE users SET identity_key = ?, display_name = ? WHERE id = ?")->execute([$email, $bk_name, $uId]);
+            if (!empty($new_password)) {
+                if (strlen($new_password) < 6) {
+                    $pdo->rollBack();
+                    http_response_code(400);
+                    echo json_encode(["error" => "Password minimal 6 karakter"]);
+                    exit;
+                }
+                $hashed = password_hash($new_password, PASSWORD_BCRYPT);
+                $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$hashed, $uId]);
+            }
+        }
+
+        $pdo->commit();
+
+        $share_link = "https://edupath.co.id/?school=" . urlencode($name) . "#/spp";
+
+        echo json_encode([
+            "success" => true,
+            "message" => "Pengaturan profil sekolah berhasil diperbarui",
+            "school" => [
+                "id" => $current_school_id,
+                "name" => $name,
+                "bk_name" => $bk_name,
+                "bk_email" => $email,
+                "bk_phone" => $phone,
+                "city" => $city,
+                "province" => $province,
+                "npsn" => $npsn,
+                "estimated_students" => $estimated_students,
+                "share_link" => $share_link
+            ]
+        ]);
+        exit;
+    } catch (\Throwable $e) {
+        $pdo->rollBack();
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal memperbarui profil sekolah: " . $e->getMessage()]);
+        exit;
+    }
+}
+
 http_response_code(404);
 echo json_encode(["error" => "Action tidak valid."]);
