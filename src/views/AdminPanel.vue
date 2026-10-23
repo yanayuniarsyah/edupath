@@ -4778,29 +4778,31 @@ const saveAdminSettings = async () => {
     if (inputPass) payload.password = inputPass;
 
     const res = await api.updateAdminProfile(payload);
-    alert('Pengaturan akun berhasil disimpan!');
+    if (!res || res.success === false || !res.user) {
+      throw new Error(res?.error || res?.message || 'Gagal menyimpan pengaturan profil.');
+    }
+
+    currentAdminUser.value = {
+      ...(currentAdminUser.value || {}),
+      name: res.user.name,
+      display_name: res.user.display_name || res.user.name,
+      email: res.user.email,
+      username: res.user.email
+    };
+    sessionStorage.setItem('ep_user', JSON.stringify(currentAdminUser.value));
+    localStorage.setItem('user', JSON.stringify(currentAdminUser.value));
+    localStorage.setItem('user_name', res.user.name);
+    localStorage.setItem('user_email', res.user.email);
+    if (res.token) {
+      sessionStorage.setItem('admin_token', res.token);
+      localStorage.setItem('auth_token', res.token);
+    }
+    loadAdminSettings();
+
     isEditingAdminSettings.value = false;
     adminSettingsForm.new_password = '';
     adminSettingsForm.confirm_password = '';
-
-    if (res && res.user) {
-      currentAdminUser.value = {
-        ...(currentAdminUser.value || {}),
-        name: res.user.name,
-        display_name: res.user.display_name || res.user.name,
-        email: res.user.email,
-        username: res.user.email
-      };
-      sessionStorage.setItem('ep_user', JSON.stringify(currentAdminUser.value));
-      localStorage.setItem('user', JSON.stringify(currentAdminUser.value));
-      localStorage.setItem('user_name', res.user.name);
-      localStorage.setItem('user_email', res.user.email);
-      if (res.token) {
-        sessionStorage.setItem('admin_token', res.token);
-        localStorage.setItem('auth_token', res.token);
-      }
-      loadAdminSettings();
-    }
+    alert('Pengaturan akun berhasil disimpan!');
   } catch (err) {
     alert(err.message || 'Gagal menyimpan pengaturan.');
   } finally {

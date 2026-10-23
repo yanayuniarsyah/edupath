@@ -59,6 +59,7 @@ $port    = env('DB_PORT', '3306');
 
 // Validasi: pastikan konfigurasi database ada
 if (empty($db_user) || empty($db_name)) {
+    http_response_code(500);
     echo json_encode([
         "success" => false,
         "error" => "Konfigurasi server tidak lengkap: DB_USER atau DB_NAME belum terbaca di .env cPanel.",
@@ -104,6 +105,7 @@ try {
         }
         $pdo = new PDO($dsnFallback, $db_user, $db_pass, $pdo_options);
     } catch (PDOException $eFallback) {
+        http_response_code(500);
         echo json_encode([
             "success" => false,
             "error" => "Koneksi database gagal. Periksa kredensial MySQL di .env hosting.",
