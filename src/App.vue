@@ -5199,8 +5199,8 @@ export default {
           profileEditForm.value.phone = res.user.phone || '';
         }
 
-        // 1. SMART REDIRECT: Guru BK / Perwakilan Sekolah Mitra (HANYA role school_bk)
-        if (res.user?.role === 'school_bk') {
+        // 1. SMART REDIRECT: Guru BK / Perwakilan Sekolah Mitra
+        if (res.user?.role === 'school_bk' || res.user?.school_id || res.user?.school?.id) {
           sessionStorage.setItem('school_token', res.token);
           const sData = res.user.school || {
             id: res.user.school_id || res.user.reference_id,
@@ -5217,11 +5217,19 @@ export default {
           return;
         }
 
-        // 2. STRICT SEPARATION: Admin & Superadmin wajib login lewat /#/admin
+        // 2. Administrator & Superadmin: Auto-redirect smoothly to /#/admin
         if (['admin', 'superadmin'].includes(res.user?.role)) {
-          sessionStorage.clear();
-          localStorage.removeItem('auth_token');
-          authError.value = 'Akun Administrator & Superadmin tetap dipisah khusus. Silakan masuk melalui portal /#/admin.';
+          sessionStorage.setItem('admin_token', res.token);
+          sessionStorage.setItem('admin_role', res.user.role);
+          sessionStorage.setItem('ep_user', JSON.stringify(res.user));
+          localStorage.setItem('user', JSON.stringify(res.user));
+          localStorage.setItem('user_role', res.user.role);
+          if (res.user.name) localStorage.setItem('user_name', res.user.name);
+          if (res.user.email) localStorage.setItem('user_email', res.user.email);
+          showLoginModal.value = false;
+          showToast('Selamat datang di Portal Administrator!');
+          window.location.hash = '#/admin';
+          window.location.reload();
           return;
         }
 
