@@ -253,23 +253,28 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // 1. Fast Path: Cek kredensial langsung dari database (HANYA admin & superadmin)
-    $stmt = $pdo->prepare("
-        SELECT u.id as user_id, u.password as user_password, a.password as admin_password,
-               ur.role, ur.tenant_id, ur.reference_id, a.id as admin_id, t.is_active as tenant_active,
-               COALESCE(NULLIF(TRIM(u.display_name), ''), NULLIF(TRIM(a.name), ''), NULLIF(TRIM(t.name), '')) as name,
-               t.name as tenant_name
-        FROM users u 
-        JOIN user_roles ur ON u.id = ur.user_id 
-        LEFT JOIN admins a ON ur.reference_id = a.id
-        LEFT JOIN tenants t ON ur.tenant_id = t.id
-        WHERE (u.identity_key = ? OR a.username = ? OR u.identity_key LIKE ? OR a.username LIKE ?) 
-          AND u.is_active = 1 
-          AND ur.role IN ('admin', 'superadmin')
-        ORDER BY CASE ur.role WHEN 'superadmin' THEN 1 ELSE 2 END ASC
-        LIMIT 1
-    ");
-    $stmt->execute([$username, $username, $usernamePrefix, $usernamePrefix]);
-    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+    $admin = null;
+    try {
+        $stmt = $pdo->prepare("
+            SELECT u.id as user_id, u.password as user_password, a.password as admin_password,
+                   ur.role, ur.tenant_id, ur.reference_id, a.id as admin_id, t.is_active as tenant_active,
+                   COALESCE(NULLIF(TRIM(u.display_name), ''), NULLIF(TRIM(a.name), ''), NULLIF(TRIM(t.name), '')) as name,
+                   t.name as tenant_name
+            FROM users u 
+            JOIN user_roles ur ON u.id = ur.user_id 
+            LEFT JOIN admins a ON ur.reference_id = a.id
+            LEFT JOIN tenants t ON ur.tenant_id = t.id
+            WHERE (u.identity_key = ? OR a.username = ? OR u.identity_key LIKE ? OR a.username LIKE ?) 
+              AND u.is_active = 1 
+              AND ur.role IN ('admin', 'superadmin')
+            ORDER BY CASE ur.role WHEN 'superadmin' THEN 1 ELSE 2 END ASC
+            LIMIT 1
+        ");
+        $stmt->execute([$username, $username, $usernamePrefix, $usernamePrefix]);
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (\Throwable $e) {
+        $admin = null;
+    }
 
     $isValid = false;
     $needsRehash = false;

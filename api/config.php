@@ -118,6 +118,108 @@ try {
 }
 
 // ----------------------------------------------------------------
+// AUTO-HEAL CORE SCHEMA (Ensures critical tables & columns exist)
+// ----------------------------------------------------------------
+function ensure_core_schema_sync($pdo) {
+    static $synced = false;
+    if ($synced) return;
+    $synced = true;
+
+    try {
+        // 1. users table & display_name
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS users (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                identity_key VARCHAR(150) NOT NULL UNIQUE,
+                display_name VARCHAR(150) NULL,
+                password VARCHAR(255) NOT NULL,
+                is_active TINYINT(1) DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        $userCols = $pdo->query("DESCRIBE users")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('display_name', $userCols)) {
+            $pdo->exec("ALTER TABLE users ADD COLUMN display_name VARCHAR(150) NULL AFTER identity_key");
+        }
+    } catch (\Throwable $e) {}
+
+    try {
+        // 2. tenants table
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS tenants (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                name VARCHAR(150) NOT NULL,
+                slug VARCHAR(100) NOT NULL,
+                is_active TINYINT(1) DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
+
+    try {
+        // 3. user_roles table
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS user_roles (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                user_id VARCHAR(36) NOT NULL,
+                tenant_id VARCHAR(36) NULL,
+                role VARCHAR(50) NOT NULL,
+                reference_id VARCHAR(36) NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX (user_id),
+                INDEX (tenant_id),
+                INDEX (role)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
+
+    try {
+        // 4. admins table columns
+        $admCols = $pdo->query("DESCRIBE admins")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('name', $admCols)) {
+            $pdo->exec("ALTER TABLE admins ADD COLUMN name VARCHAR(100) NULL");
+        }
+        if (!in_array('tenant_id', $admCols)) {
+            $pdo->exec("ALTER TABLE admins ADD COLUMN tenant_id VARCHAR(36) NULL");
+        }
+    } catch (\Throwable $e) {}
+
+    try {
+        // 5. students table columns
+        $stuCols = $pdo->query("DESCRIBE students")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('tenant_id', $stuCols)) {
+            $pdo->exec("ALTER TABLE students ADD COLUMN tenant_id VARCHAR(36) NULL");
+        }
+        if (!in_array('school_id', $stuCols)) {
+            $pdo->exec("ALTER TABLE students ADD COLUMN school_id VARCHAR(36) NULL");
+        }
+    } catch (\Throwable $e) {}
+
+    try {
+        // 6. audit_logs table
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS audit_logs (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                actor_id VARCHAR(36) NULL,
+                tenant_id VARCHAR(36) NULL,
+                action VARCHAR(100) NOT NULL,
+                target_id VARCHAR(36) NULL,
+                metadata JSON NULL,
+                ip_address VARCHAR(45) NULL,
+                user_agent TEXT NULL,
+                level VARCHAR(20) DEFAULT 'INFO',
+                signature VARCHAR(64) NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX (actor_id),
+                INDEX (action)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
+}
+ensure_core_schema_sync($pdo);
+
+// ----------------------------------------------------------------
 // MIDTRANS — Dari environment variable
 // ----------------------------------------------------------------
 $midtrans_server_key = env('MIDTRANS_SERVER_KEY', '');
