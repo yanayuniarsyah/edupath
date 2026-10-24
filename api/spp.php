@@ -4,8 +4,9 @@ require_once 'config.php';
 require_once 'jwt.php';
 
 $action = $_GET['action'] ?? '';
+$input = json_decode(file_get_contents('php://input'), true) ?: [];
 
-if ($action === 'data' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+if (($action === 'data' || $action === 'questions') && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // This endpoint can be accessed without auth to allow pre-login SPP assessment, 
     // or with auth. We don't enforce authentication here.
     
@@ -64,11 +65,11 @@ else if ($action === 'submit_attempt' && $_SERVER['REQUEST_METHOD'] === 'POST') 
     $payload = authenticate();
     if ($payload->role !== 'student') { http_response_code(403); echo json_encode(["error" => "Forbidden"]); exit; }
     
-    $attempt_id = $_GET['id'] ?? '';
+    $attempt_id = $_GET['id'] ?? ($input['attempt_id'] ?? ($input['id'] ?? ''));
     if (!$attempt_id) { http_response_code(400); echo json_encode(["error" => "Attempt ID required"]); exit; }
     
-    $duration = $input['duration_seconds'] ?? 0;
-    $responses = $input['responses'] ?? [];
+    $duration = $input['duration_seconds'] ?? ($input['duration'] ?? 0);
+    $responses = $input['responses'] ?? ($input['answers'] ?? []);
     
     $service = new SPPService($pdo);
     $result = $service->submitAttempt($payload->id, $attempt_id, $responses, $duration);
@@ -79,7 +80,7 @@ else if ($action === 'get_result' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $payload = authenticate();
     if ($payload->role !== 'student') { http_response_code(403); echo json_encode(["error" => "Forbidden"]); exit; }
     
-    $attempt_id = $_GET['id'] ?? '';
+    $attempt_id = $_GET['id'] ?? ($input['attempt_id'] ?? ($input['id'] ?? ''));
     if (!$attempt_id) { http_response_code(400); echo json_encode(["error" => "Attempt ID required"]); exit; }
     
     $service = new SPPService($pdo);
@@ -114,4 +115,4 @@ else {
     http_response_code(404);
     echo json_encode(["error" => "Endpoint tidak ditemukan"]);
 }
-?>
+

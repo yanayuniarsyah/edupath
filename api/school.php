@@ -9,7 +9,15 @@ header('Content-Type: application/json; charset=utf-8');
 function ensure_school_schema($pdo) {
     static $done = false;
     if ($done) return;
+
+    $lockFile = sys_get_temp_dir() . '/edupath_school_schema_' . md5(__DIR__) . '.lock';
+    if (!isset($_GET['sync_schema']) && file_exists($lockFile) && (time() - @filemtime($lockFile) < 86400)) {
+        $done = true;
+        return;
+    }
+
     $done = true;
+    @touch($lockFile);
 
     try {
         $pdo->exec("
@@ -41,6 +49,10 @@ function ensure_school_schema($pdo) {
         $cols = $pdo->query("SHOW COLUMNS FROM schools LIKE 'is_active'")->fetchAll();
         if (empty($cols)) {
             $pdo->exec("ALTER TABLE schools ADD COLUMN is_active TINYINT DEFAULT 1");
+        }
+        $tCols = $pdo->query("SHOW COLUMNS FROM schools LIKE 'tenant_id'")->fetchAll();
+        if (empty($tCols)) {
+            $pdo->exec("ALTER TABLE schools ADD COLUMN tenant_id VARCHAR(36) DEFAULT 'default_tenant' AFTER id");
         }
     } catch (\Throwable $e) {}
 
@@ -350,6 +362,19 @@ $current_school_id = $payload->school_id ?? ($payload->id ?? '');
 // If superadmin or admin, allow passing school_name in query param
 if (in_array($payload->role, ['superadmin', 'admin']) && !empty($_GET['school_name'])) {
     $current_school_name = trim($_GET['school_name']);
+    try {
+        $stmt_find = $pdo->prepare("SELECT id, tenant_id FROM schools WHERE LOWER(TRIM(name)) = LOWER(TRIM(?)) LIMIT 1");
+        $stmt_find->execute([$current_school_name]);
+        $found_sch = $stmt_find->fetch(PDO::FETCH_ASSOC);
+        if ($found_sch) {
+            if ($payload->role === 'admin' && !empty($payload->tenant_id) && !empty($found_sch['tenant_id']) && $found_sch['tenant_id'] !== $payload->tenant_id && $found_sch['tenant_id'] !== 'default_tenant') {
+                http_response_code(403);
+                echo json_encode(["error" => "Anda tidak memiliki izin mengakses data sekolah cabang lain."]);
+                exit;
+            }
+            $current_school_id = $found_sch['id'];
+        }
+    } catch (\Throwable $e) {}
 }
 
 // If school name still empty, fetch from schools table
@@ -372,11 +397,17 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         exit;
     }
 
-    $schoolMatch = "%" . $current_school_name . "%";
+    // Auto-link any unlinked students who registered with exact school name
+    if (!empty($current_school_id) && !empty($current_school_name)) {
+        try {
+            $pdo->prepare("UPDATE students SET school_id = ? WHERE (school_id IS NULL OR school_id = '') AND LOWER(TRIM(school)) = LOWER(TRIM(?))")
+                ->execute([$current_school_id, $current_school_name]);
+        } catch (\Throwable $e) {}
+    }
 
-    // 1. Total Siswa Terdata
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM students WHERE (school_id = ? OR school = ? OR school LIKE ?)");
-    $stmt->execute([$current_school_id, $current_school_name, $schoolMatch]);
+    // 1. Total Siswa Terdata (Strict school_id or exact name fallback)
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM students WHERE (school_id = ? OR (school_id IS NULL AND LOWER(TRIM(school)) = LOWER(TRIM(?))))");
+    $stmt->execute([$current_school_id, $current_school_name]);
     $total_students = (int)$stmt->fetchColumn();
 
     // 2. Paket EduPath Breakdown & Subscriptions
@@ -391,17 +422,18 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $stmt_pkg = $pdo->prepare("
         SELECT 
-            COALESCE(p.code, 'FREE') as plan_code,
+            COALESCE(prod.code, 'FREE') as plan_code,
             COALESCE(p.name, 'Free SPP Diagnostic') as plan_name,
             sub.status as sub_status,
             COUNT(DISTINCT st.id) as total_count
         FROM students st
         LEFT JOIN subscriptions sub ON st.id = sub.student_id AND sub.status = 'active'
         LEFT JOIN plans p ON sub.plan_id = p.id
-        WHERE (st.school_id = ? OR st.school = ? OR st.school LIKE ?)
-        GROUP BY p.code, p.name, sub.status
+        LEFT JOIN products prod ON p.product_id = prod.id
+        WHERE (st.school_id = ? OR (st.school_id IS NULL AND LOWER(TRIM(st.school)) = LOWER(TRIM(?))))
+        GROUP BY prod.code, p.name, sub.status
     ");
-    $stmt_pkg->execute([$current_school_id, $current_school_name, $schoolMatch]);
+    $stmt_pkg->execute([$current_school_id, $current_school_name]);
     $pkg_rows = $stmt_pkg->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($pkg_rows as $row) {
@@ -429,14 +461,14 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // 4. Performa CBT Tryout Nasional Sekolah
     $stmt_to = $pdo->prepare("
         SELECT 
-            COUNT(DISTINCT qa.student_id) as tryout_participants,
-            COUNT(qa.id) as total_tryouts_taken,
-            AVG(qa.score) as avg_tryout_score
-        FROM quiz_attempts qa
-        JOIN students st ON qa.student_id = st.id
-        WHERE (st.school_id = ? OR st.school = ? OR st.school LIKE ?) AND qa.status = 'completed' AND qa.quiz_type = 'tryout'
+            COUNT(DISTINCT qr.student_id) as tryout_participants,
+            COUNT(qr.id) as total_tryouts_taken,
+            COALESCE(AVG(qr.score), 0) as avg_tryout_score
+        FROM quiz_results qr
+        JOIN students st ON qr.student_id = st.id
+        WHERE (st.school_id = ? OR (st.school_id IS NULL AND LOWER(TRIM(st.school)) = LOWER(TRIM(?)))) AND qr.quiz_type = 'tryout'
     ");
-    $stmt_to->execute([$current_school_id, $current_school_name, $schoolMatch]);
+    $stmt_to->execute([$current_school_id, $current_school_name]);
     $tryout_stats = $stmt_to->fetch(PDO::FETCH_ASSOC) ?: [
         'tryout_participants' => 0,
         'total_tryouts_taken' => 0,
@@ -447,12 +479,12 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt_univ = $pdo->prepare("
         SELECT target_ptn, COUNT(*) as total
         FROM students
-        WHERE (school_id = ? OR school = ? OR school LIKE ?) AND target_ptn IS NOT NULL AND target_ptn != ''
+        WHERE (school_id = ? OR (school_id IS NULL AND LOWER(TRIM(school)) = LOWER(TRIM(?)))) AND target_ptn IS NOT NULL AND target_ptn != ''
         GROUP BY target_ptn
         ORDER BY total DESC
         LIMIT 5
     ");
-    $stmt_univ->execute([$current_school_id, $current_school_name, $schoolMatch]);
+    $stmt_univ->execute([$current_school_id, $current_school_name]);
     $top_universities = $stmt_univ->fetchAll(PDO::FETCH_ASSOC);
 
     // 6. Growth Areas (Tantangan Belajar Bersama)
@@ -506,15 +538,14 @@ if ($action === 'students' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         exit;
     }
 
-    $schoolMatch = "%" . $current_school_name . "%";
     $search = trim($_GET['search'] ?? '');
     $filter_package = trim($_GET['package'] ?? 'all');
     $page = max(1, (int)($_GET['page'] ?? 1));
     $limit = max(1, min(100, (int)($_GET['limit'] ?? 25)));
     $offset = ($page - 1) * $limit;
 
-    $where = ["(st.school_id = ? OR st.school = ? OR st.school LIKE ?)"];
-    $params = [$current_school_id, $current_school_name, $schoolMatch];
+    $where = ["(st.school_id = ? OR (st.school_id IS NULL AND LOWER(TRIM(st.school)) = LOWER(TRIM(?))))"];
+    $params = [$current_school_id, $current_school_name];
 
     if (!empty($search)) {
         $where[] = "(st.name LIKE ? OR st.email LIKE ? OR st.target_ptn LIKE ?)";
@@ -528,11 +559,11 @@ if ($action === 'students' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     } elseif ($filter_package === 'free') {
         $where[] = "(sub.id IS NULL OR sub.status != 'active')";
     } elseif ($filter_package === 'pejuang_ptn') {
-        $where[] = "(p.code = 'UTBK' OR p.name LIKE '%Pejuang%') AND sub.status = 'active'";
+        $where[] = "(prod.code = 'UTBK' OR p.name LIKE '%Pejuang%') AND sub.status = 'active'";
     } elseif ($filter_package === 'mandiri') {
-        $where[] = "(p.code = 'STARTER' OR p.name LIKE '%Mandiri%') AND sub.status = 'active'";
+        $where[] = "(prod.code = 'STARTER' OR prod.code = 'MANDIRI' OR p.name LIKE '%Mandiri%') AND sub.status = 'active'";
     } elseif ($filter_package === 'elite') {
-        $where[] = "(p.code = 'ELITE' OR p.name LIKE '%Elite%') AND sub.status = 'active'";
+        $where[] = "(prod.code = 'ELITE' OR prod.code = 'VIP' OR p.name LIKE '%Elite%') AND sub.status = 'active'";
     }
 
     $where_sql = implode(" AND ", $where);
@@ -543,6 +574,7 @@ if ($action === 'students' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         FROM students st
         LEFT JOIN subscriptions sub ON st.id = sub.student_id AND sub.status = 'active'
         LEFT JOIN plans p ON sub.plan_id = p.id
+        LEFT JOIN products prod ON p.product_id = prod.id
         WHERE $where_sql
     ");
     $stmt_c->execute($params);
@@ -558,7 +590,7 @@ if ($action === 'students' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             st.target_ptn,
             st.created_at,
             COALESCE(p.name, 'Free SPP Diagnostic') as package_name,
-            COALESCE(p.code, 'FREE') as package_code,
+            COALESCE(prod.code, 'FREE') as package_code,
             COALESCE(sub.status, 'free') as package_status,
             sub.expires_at as package_expires_at,
             (
@@ -575,15 +607,16 @@ if ($action === 'students' && $_SERVER['REQUEST_METHOD'] === 'GET') {
                 WHERE qa.student_id = st.id AND qa.quiz_type = 'tryout'
             ) as tryout_count,
             (
-                SELECT qa.score 
-                FROM quiz_attempts qa 
-                WHERE qa.student_id = st.id AND qa.quiz_type = 'tryout' AND qa.status = 'completed'
-                ORDER BY qa.created_at DESC 
+                SELECT qr.score 
+                FROM quiz_results qr 
+                WHERE qr.student_id = st.id AND qr.quiz_type = 'tryout'
+                ORDER BY qr.created_at DESC 
                 LIMIT 1
             ) as latest_tryout_score
         FROM students st
         LEFT JOIN subscriptions sub ON st.id = sub.student_id AND sub.status = 'active'
         LEFT JOIN plans p ON sub.plan_id = p.id
+        LEFT JOIN products prod ON p.product_id = prod.id
         WHERE $where_sql
         ORDER BY st.created_at DESC
         LIMIT ? OFFSET ?
@@ -626,8 +659,6 @@ if ($action === 'export' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         exit;
     }
 
-    $schoolMatch = "%" . $current_school_name . "%";
-
     $stmt = $pdo->prepare("
         SELECT 
             st.name,
@@ -641,10 +672,10 @@ if ($action === 'export' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         FROM students st
         LEFT JOIN subscriptions sub ON st.id = sub.student_id AND sub.status = 'active'
         LEFT JOIN plans p ON sub.plan_id = p.id
-        WHERE st.school LIKE ? OR st.school = ?
+        WHERE st.school_id = ? OR (st.school_id IS NULL AND LOWER(TRIM(st.school)) = LOWER(TRIM(?)))
         ORDER BY st.created_at DESC
     ");
-    $stmt->execute([$schoolMatch, $current_school_name]);
+    $stmt->execute([$current_school_id, $current_school_name]);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     header('Content-Type: text/csv; charset=utf-8');

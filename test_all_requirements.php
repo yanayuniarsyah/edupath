@@ -58,8 +58,8 @@ $adminLogin = callApi('POST', '/admin.php?action=login', null, [
 assertTest($adminLogin['status'] === 200 && !empty($adminLogin['data']['token']), "Admin Utama login HTTP 200");
 $adminToken = $adminLogin['data']['token'] ?? '';
 
-$tutorLogin = callApi('POST', '/admin.php?action=login', null, [
-    'username' => 'tutor@uat.edupath.local',
+$tutorLogin = callApi('POST', '/auth.php?action=login', null, [
+    'email' => 'tutor@uat.edupath.local',
     'password' => 'EduPathTutor01!2026'
 ]);
 assertTest($tutorLogin['status'] === 200 && !empty($tutorLogin['data']['token']), "Teacher / Tutor login HTTP 200");
@@ -154,6 +154,9 @@ $matPost = callApi('POST', '/admin.php?action=materials', $superToken, [
     'test_component' => 'TPS'
 ]);
 assertTest($matPost['status'] === 200 && !empty($matPost['data']['id']), "Superadmin can create material (HTTP 200)");
+if ($matPost['status'] !== 200) {
+    echo "  [DEBUG matPost] Status: " . $matPost['status'] . " Raw: " . $matPost['raw'] . "\n";
+}
 $testMatId = $matPost['data']['id'] ?? '';
 
 if ($testMatId) {

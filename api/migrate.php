@@ -1,11 +1,11 @@
 <?php
-// migrate.php - Script untuk menjalankan migrasi dari browser
-require_once 'config.php';
-
-$secret_key = 'rahasia123';
-if (!isset($_GET['key']) || $_GET['key'] !== $secret_key) {
-    die("Akses ditolak. Gunakan url: migrate.php?key=rahasia123");
+// migrate.php - Runner migrasi database (hanya boleh dijalankan via CLI)
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    die("Akses ditolak. Script migrasi hanya dapat dijalankan melalui CLI terminal.");
 }
+
+require_once 'config.php';
 
 echo "<h2>Proses Migrasi Database</h2>";
 

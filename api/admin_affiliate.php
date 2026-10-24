@@ -257,8 +257,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $stmt = $pdo->prepare("INSERT INTO payouts (id, affiliate_id, amount, status, bank_name, bank_account, bank_owner, created_at) VALUES (?, ?, ?, 'pending', ?, ?, ?, NOW())");
             $stmt->execute([$payout_id, $aff['id'], $amount, $bank_name, $bank_account, $bank_owner]);
 
-            $stmt = $pdo->prepare("UPDATE commissions SET status = 'requested' WHERE affiliate_id = ? AND status = 'pending'");
+            // FIFO Allocation: Mark pending commissions as requested up to the requested amount
+            $stmt = $pdo->prepare("SELECT id, amount FROM commissions WHERE affiliate_id = ? AND status = 'pending' ORDER BY created_at ASC FOR UPDATE");
             $stmt->execute([$aff['id']]);
+            $pendingComms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $accumulated = 0.0;
+            $commIdsToUpdate = [];
+            foreach ($pendingComms as $c) {
+                if ($accumulated < $amount) {
+                    $accumulated += (float)$c['amount'];
+                    $commIdsToUpdate[] = $c['id'];
+                }
+            }
+
+            if (!empty($commIdsToUpdate)) {
+                $placeholders = implode(',', array_fill(0, count($commIdsToUpdate), '?'));
+                $stmt = $pdo->prepare("UPDATE commissions SET status = 'requested' WHERE id IN ($placeholders)");
+                $stmt->execute($commIdsToUpdate);
+            }
 
             $pdo->commit();
             echo json_encode(["success" => true, "message" => "Pengajuan penarikan dana berhasil dikirim"]);
@@ -297,9 +314,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $stmt = $pdo->prepare("UPDATE payouts SET status = 'paid' WHERE id = ?");
             $stmt->execute([$payout_id]);
             
-            // Mark requested commissions as paid
-            $stmt = $pdo->prepare("UPDATE commissions SET status = 'paid' WHERE affiliate_id = ? AND status = 'requested'");
+            // Mark requested commissions as paid up to the payout amount
+            $stmt = $pdo->prepare("SELECT id, amount FROM commissions WHERE affiliate_id = ? AND status = 'requested' ORDER BY created_at ASC FOR UPDATE");
             $stmt->execute([$payout['affiliate_id']]);
+            $requestedComms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $acc = 0.0;
+            $idsPaid = [];
+            foreach ($requestedComms as $c) {
+                if ($acc < (float)$payout['amount']) {
+                    $acc += (float)$c['amount'];
+                    $idsPaid[] = $c['id'];
+                }
+            }
+            if (!empty($idsPaid)) {
+                $placeholders = implode(',', array_fill(0, count($idsPaid), '?'));
+                $stmt = $pdo->prepare("UPDATE commissions SET status = 'paid' WHERE id IN ($placeholders)");
+                $stmt->execute($idsPaid);
+            }
             
             $pdo->commit();
             echo json_encode(["success" => true]);
@@ -336,9 +368,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $stmt = $pdo->prepare("UPDATE payouts SET status = 'rejected', notes = ? WHERE id = ?");
             $stmt->execute([$reason, $payout_id]);
             
-            // Revert requested commissions back to pending
-            $stmt = $pdo->prepare("UPDATE commissions SET status = 'pending' WHERE affiliate_id = ? AND status = 'requested'");
+            // Revert requested commissions back to pending up to the payout amount
+            $stmt = $pdo->prepare("SELECT id, amount FROM commissions WHERE affiliate_id = ? AND status = 'requested' ORDER BY created_at ASC FOR UPDATE");
             $stmt->execute([$payout['affiliate_id']]);
+            $requestedComms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $acc = 0.0;
+            $idsRevert = [];
+            foreach ($requestedComms as $c) {
+                if ($acc < (float)$payout['amount']) {
+                    $acc += (float)$c['amount'];
+                    $idsRevert[] = $c['id'];
+                }
+            }
+            if (!empty($idsRevert)) {
+                $placeholders = implode(',', array_fill(0, count($idsRevert), '?'));
+                $stmt = $pdo->prepare("UPDATE commissions SET status = 'pending' WHERE id IN ($placeholders)");
+                $stmt->execute($idsRevert);
+            }
             
             $pdo->commit();
             echo json_encode(["success" => true]);
@@ -489,4 +536,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     }
 }
-?>

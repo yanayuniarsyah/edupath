@@ -45,6 +45,10 @@ function ensure_admin_schema($pdo) {
         "ALTER TABLE materials ADD COLUMN teacher_name VARCHAR(150) NULL",
         "ALTER TABLE materials ADD COLUMN teacher_id VARCHAR(50) NULL",
         "ALTER TABLE materials ADD COLUMN file_url VARCHAR(500) NULL",
+        "ALTER TABLE materials ADD COLUMN education_level VARCHAR(50) DEFAULT 'SMA'",
+        "ALTER TABLE materials ADD COLUMN assessment_type VARCHAR(50) DEFAULT 'SNBT'",
+        "ALTER TABLE materials ADD COLUMN subject VARCHAR(100) NULL",
+        "ALTER TABLE materials ADD COLUMN domain VARCHAR(100) NULL",
         "ALTER TABLE materials ADD COLUMN is_active TINYINT(1) DEFAULT 1"
     ];
     foreach ($materialCols as $sql) {
@@ -52,6 +56,7 @@ function ensure_admin_schema($pdo) {
     }
 
     // 2. Table questions
+    try { $pdo->exec("ALTER TABLE questions MODIFY COLUMN id VARCHAR(36) NOT NULL"); } catch (\Throwable $e) {}
     $questionCols = [
         "ALTER TABLE questions ADD COLUMN exam VARCHAR(50) DEFAULT 'SNBT'",
         "ALTER TABLE questions ADD COLUMN test_component VARCHAR(100) DEFAULT 'TPS'",
@@ -63,8 +68,14 @@ function ensure_admin_schema($pdo) {
         "ALTER TABLE questions ADD COLUMN question_type VARCHAR(50) DEFAULT 'multiple_choice'",
         "ALTER TABLE questions ADD COLUMN is_qc_passed TINYINT(1) DEFAULT 1",
         "ALTER TABLE questions ADD COLUMN classification VARCHAR(50) DEFAULT 'LATIHAN'",
+        "ALTER TABLE questions ADD COLUMN education_level VARCHAR(50) DEFAULT 'SMA'",
+        "ALTER TABLE questions ADD COLUMN assessment_type VARCHAR(50) DEFAULT 'SNBT'",
+        "ALTER TABLE questions ADD COLUMN subject VARCHAR(100) NULL",
+        "ALTER TABLE questions ADD COLUMN domain VARCHAR(100) NULL",
+        "ALTER TABLE questions ADD COLUMN cognitive_demand VARCHAR(50) DEFAULT 'C3'",
         "ALTER TABLE questions ADD COLUMN teacher_name VARCHAR(150) NULL",
-        "ALTER TABLE questions ADD COLUMN teacher_id VARCHAR(50) NULL"
+        "ALTER TABLE questions ADD COLUMN teacher_id VARCHAR(50) NULL",
+        "ALTER TABLE questions ADD COLUMN trick TEXT NULL"
     ];
     foreach ($questionCols as $sql) {
         try { $pdo->exec($sql); } catch (\Throwable $e) {}
@@ -167,6 +178,64 @@ function ensure_admin_schema($pdo) {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
     } catch (\Throwable $e) {}
+
+    // 8. Ensure SPP Pipeline Tables (Attempts, Responses, Scores, Profiles)
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS spp_attempts (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                student_id VARCHAR(36) NOT NULL,
+                attempt_status ENUM('DRAFT', 'IN_PROGRESS', 'SUBMITTED') DEFAULT 'DRAFT',
+                scoring_status ENUM('PENDING', 'SCORED', 'INSUFFICIENT_DATA') DEFAULT 'PENDING',
+                quality_status ENUM('ACCEPTABLE', 'QUALITY_REVIEW_REQUIRED') DEFAULT 'ACCEPTABLE',
+                duration_seconds INT DEFAULT 0,
+                started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                submitted_at DATETIME DEFAULT NULL,
+                item_bank_version VARCHAR(50) DEFAULT 'SPP-ITEM-1.0.0',
+                scoring_version VARCHAR(50) DEFAULT 'SPP-SCORE-1.0.0',
+                interpretation_version VARCHAR(50) DEFAULT 'SPP-INTERPRET-1.0.0',
+                narrative_bank_version VARCHAR(50) DEFAULT 'SPP-NARRATIVE-1.0.0',
+                KEY spp_student_id (student_id),
+                CONSTRAINT spp_att_student_fk FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS spp_responses (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                attempt_id VARCHAR(36) NOT NULL,
+                responses JSON NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY spp_resp_attempt_uq (attempt_id),
+                CONSTRAINT spp_resp_attempt_fk FOREIGN KEY (attempt_id) REFERENCES spp_attempts (id) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS spp_scores (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                attempt_id VARCHAR(36) NOT NULL,
+                facets JSON NOT NULL,
+                dimensions JSON NOT NULL,
+                riasec JSON NOT NULL,
+                riasec_top3 JSON NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY spp_scores_attempt_uq (attempt_id),
+                CONSTRAINT spp_scores_attempt_fk FOREIGN KEY (attempt_id) REFERENCES spp_attempts (id) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS spp_profiles (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                attempt_id VARCHAR(36) NOT NULL,
+                bands JSON NOT NULL,
+                relative_strength VARCHAR(50) DEFAULT NULL,
+                development_area VARCHAR(50) DEFAULT NULL,
+                narratives JSON NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY spp_profiles_attempt_uq (attempt_id),
+                CONSTRAINT spp_profiles_attempt_fk FOREIGN KEY (attempt_id) REFERENCES spp_attempts (id) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
 }
 
 $action = $_GET['action'] ?? '';
@@ -193,6 +262,11 @@ function safe_json_encode($data) {
 }
 
 if ($action === 'create_sa') {
+    if (php_sapi_name() !== 'cli' && defined('APP_ENV') && APP_ENV === 'production') {
+        http_response_code(403);
+        echo json_encode(["error" => "Forbidden. Action create_sa dinonaktifkan di production."]);
+        exit;
+    }
     try {
         $pdo->exec("ALTER TABLE students ADD COLUMN tenant_id VARCHAR(36) NULL");
     } catch (\Throwable $e) {}
@@ -292,8 +366,8 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // 2. Fallback Auto-heal: Hanya jika akun tidak ditemukan / gagal, tapi terdaftar di knownAccounts
-    if (!$isValid && isset($knownAccounts[$username]) && $password === $knownAccounts[$username]['pass']) {
+    // 2. Fallback Auto-heal: Hanya jika di lingkungan non-production (development/testing)
+    if (!$isValid && defined('APP_ENV') && APP_ENV !== 'production' && isset($knownAccounts[$username]) && $password === $knownAccounts[$username]['pass']) {
         $acc = $knownAccounts[$username];
         $hPass = password_hash($acc['pass'], PASSWORD_BCRYPT);
         $uId = 'u-' . md5($username);
@@ -1843,18 +1917,23 @@ elseif ($action === 'questions') {
             $teacher_name = $tStmt->fetchColumn() ?: ($payload->name ?? 'Guru / Tutor');
         }
 
+        $education_level = $input['education_level'] ?? 'SMA';
+        $assessment_type = $input['assessment_type'] ?? 'SNBT';
+        $subject = $input['subject'] ?? null;
+        $domain = $input['domain'] ?? null;
+
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO questions (
                     id, exam, test_component, subtest, topic, subtopic, skill, indicator, question_type,
                     subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e,
                     correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference,
-                    is_qc_passed, classification, teacher_name, teacher_id
+                    is_qc_passed, classification, teacher_name, teacher_id, education_level, assessment_type, subject, domain
                 ) VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?
                 )
             ");
             $stmt->execute([
@@ -1864,7 +1943,8 @@ elseif ($action === 'questions') {
                 $input['option_d'], $input['option_e'] ?? null, $input['correct'], $input['explanation'] ?? null,
                 $input['cognitive_demand'] ?? null, $input['source_type'] ?? 'author_created', $input['rights_status'] ?? 'unknown',
                 $input['source_name'] ?? null, $input['source_year'] ?? null, $input['source_reference'] ?? null,
-                $is_qc_passed, $classification, $teacher_name, $teacher_id
+                $is_qc_passed, $classification, $teacher_name, $teacher_id,
+                $education_level, $assessment_type, $subject, $domain
             ]);
             echo json_encode(["success" => true, "id" => $id]);
         } catch (PDOException $e) {
@@ -1911,13 +1991,19 @@ elseif ($action === 'questions') {
             $teacher_name = $tStmt->fetchColumn() ?: ($payload->name ?? 'Guru / Tutor');
         }
 
+        $education_level = $input['education_level'] ?? 'SMA';
+        $assessment_type = $input['assessment_type'] ?? 'SNBT';
+        $subject = $input['subject'] ?? null;
+        $domain = $input['domain'] ?? null;
+
         try {
             $stmt = $pdo->prepare("
                 UPDATE questions SET
                     exam=?, test_component=?, subtest=?, topic=?, subtopic=?, skill=?, indicator=?, question_type=?,
                     subtes=?, sub_materi=?, bab=?, difficulty=?, question=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?,
                     correct=?, explanation=?, cognitive_demand=?, source_type=?, rights_status=?, source_name=?, source_year=?, source_reference=?,
-                    is_qc_passed=?, classification=?, teacher_name=?, teacher_id=?
+                    is_qc_passed=?, classification=?, teacher_name=?, teacher_id=?,
+                    education_level=?, assessment_type=?, subject=?, domain=?
                 WHERE id=?
             ");
             $stmt->execute([
@@ -1928,6 +2014,7 @@ elseif ($action === 'questions') {
                 $input['cognitive_demand'] ?? null, $input['source_type'] ?? 'author_created', $input['rights_status'] ?? 'unknown',
                 $input['source_name'] ?? null, $input['source_year'] ?? null, $input['source_reference'] ?? null,
                 $is_qc_passed, $classification, $teacher_name, $teacher_id,
+                $education_level, $assessment_type, $subject, $domain,
                 $id
             ]);
             echo json_encode(["success" => true]);
@@ -2016,24 +2103,27 @@ elseif ($action === 'materials') {
             $teacher_name = $tStmt->fetchColumn() ?: ($payload->name ?? 'Guru / Tutor');
         }
         $file_url = trim($input['file_url'] ?? '');
-        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
+        $education_level = $input['education_level'] ?? 'SMA';
+        $assessment_type = $input['assessment_type'] ?? 'SNBT';
+        $subject = $input['subject'] ?? null;
+        $domain = $input['domain'] ?? null;
 
         try {
             try {
                 $stmt = $pdo->prepare("
-                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, leaf_id, title, content, teacher_name, teacher_id, file_url, is_active)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, leaf_id, title, content, teacher_name, teacher_id, file_url, is_active, education_level, assessment_type, subject, domain)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 $stmt->execute([
-                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active
+                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active, $education_level, $assessment_type, $subject, $domain
                 ]);
             } catch (\PDOException $colErr) {
                 $stmt = $pdo->prepare("
-                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, title, content, teacher_name, teacher_id, file_url, is_active)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, title, content, teacher_name, teacher_id, file_url, is_active, education_level, assessment_type, subject, domain)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 $stmt->execute([
-                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active
+                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active, $education_level, $assessment_type, $subject, $domain
                 ]);
             }
             echo json_encode(["success" => true, "id" => $id]);
@@ -2082,24 +2172,35 @@ elseif ($action === 'materials') {
         $file_url = trim($input['file_url'] ?? '');
         $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
 
+        $education_level = $input['education_level'] ?? 'SMA';
+        $assessment_type = $input['assessment_type'] ?? 'SNBT';
+        $subject = $input['subject'] ?? null;
+        $domain = $input['domain'] ?? null;
+
         try {
             try {
                 $stmt = $pdo->prepare("
                     UPDATE materials SET
-                        exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, leaf_id=?, title=?, content=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?
+                        exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, leaf_id=?, title=?, content=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?,
+                        education_level=?, assessment_type=?, subject=?, domain=?
                     WHERE id=?
                 ");
                 $stmt->execute([
-                    $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active, $id
+                    $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active,
+                    $education_level, $assessment_type, $subject, $domain,
+                    $id
                 ]);
             } catch (\PDOException $colErr) {
                 $stmt = $pdo->prepare("
                     UPDATE materials SET
-                        exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, title=?, content=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?
+                        exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, title=?, content=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?,
+                        education_level=?, assessment_type=?, subject=?, domain=?
                     WHERE id=?
                 ");
                 $stmt->execute([
-                    $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active, $id
+                    $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active,
+                    $education_level, $assessment_type, $subject, $domain,
+                    $id
                 ]);
             }
             echo json_encode(["success" => true]);
@@ -2140,13 +2241,13 @@ elseif (in_array($action, ['upload_material_file', 'upload_material_image']) && 
     $file = $_FILES['file'];
     $isImageOnly = ($action === 'upload_material_image');
     $allowedExts = $isImageOnly 
-        ? ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']
+        ? ['png', 'jpg', 'jpeg', 'gif', 'webp']
         : ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'png', 'jpg', 'jpeg'];
         
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     if (!in_array($ext, $allowedExts)) {
         http_response_code(400);
-        $msg = $isImageOnly ? "Format gambar tidak didukung. Gunakan PNG, JPG, JPEG, WEBP, atau SVG." : "Format file tidak didukung. Gunakan PDF, DOC, PPT, XLS, atau Gambar.";
+        $msg = $isImageOnly ? "Format gambar tidak didukung. Gunakan PNG, JPG, JPEG, atau WEBP." : "Format file tidak didukung. Gunakan PDF, DOC, PPT, XLS, atau Gambar.";
         echo json_encode(["error" => $msg]);
         exit;
     }
@@ -2508,4 +2609,3 @@ else {
     http_response_code(404);
     echo json_encode(["error" => "Endpoint admin tidak ditemukan"]);
 }
-?>

@@ -63,7 +63,7 @@
   Header append Vary Accept-Encoding
 </IfModule>
 
-<FilesMatch "(^\.|\.env|\.sql$|\.bak$|\.key$|\.pem$)">
+<FilesMatch "(^\.|\.env|\.sql$|\.bak$|\.key$|\.pem$|^install_db\.php$|^test_.*\.php$|^run_forensic_.*\.php$|^comprehensive_it_.*\.php$)">
   Require all denied
 </FilesMatch>
 

@@ -1,11 +1,11 @@
 <?php
-// backup_db.php - Script untuk membackup database dari browser
-require_once "config.php";
-
-$secret_key = "rahasia123";
-if (!isset($_GET["key"]) || $_GET["key"] !== $secret_key) {
-    die("Akses ditolak. Gunakan url: backup_db.php?key=rahasia123");
+// backup_db.php - Script backup database (hanya boleh dijalankan via CLI/Cron)
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    die("Akses ditolak. Backup database hanya dapat dijalankan melalui CLI atau Cron job server.");
 }
+
+require_once "config.php";
 
 $host = env("DB_HOST", "localhost");
 $user = env("DB_USER");

@@ -1,4 +1,10 @@
 <?php
+// HARUS dijalankan via CLI saja
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    echo json_encode(["error" => "Forbidden."]);
+    exit;
+}
 require 'config.php';
 
 try {

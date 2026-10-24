@@ -1,4 +1,11 @@
-﻿<?php
+<?php
+// HARUS dijalankan via CLI saja untuk keamanan (mencegah akses publik tak terotentikasi)
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    echo "Akses ditolak. Database installer hanya dapat dijalankan melalui CLI terminal.";
+    exit;
+}
+
 require_once __DIR__ . '/api/config.php';
 
 echo "<h1>EduPath Database Installer (Self-Contained)</h1>";

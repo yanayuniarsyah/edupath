@@ -67,8 +67,12 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // -----------------------------------------------------------------------
     $subtotal      = (string) $plan['price']; // already DECIMAL(15,2) from DB
     $discount      = (string) ($plan['discount'] ?? '0.00'); // From Plan
-    $tax_amount    = bcmul($subtotal, '0.11', 2);                  // TAX POLICY = 11% PPN
-    $grand_total   = bcsub(bcadd($subtotal, $tax_amount, 2), $discount, 2);
+    $taxable_base  = bcsub($subtotal, $discount, 2);
+    if (bccomp($taxable_base, '0.00', 2) === -1) {
+        $taxable_base = '0.00';
+    }
+    $tax_amount    = bcmul($taxable_base, '0.11', 2);                  // TAX POLICY = 11% PPN on DPP
+    $grand_total   = bcadd($taxable_base, $tax_amount, 2);
     // Ensure grand_total is not negative
     if (bccomp($grand_total, '0.00', 2) === -1) {
         $grand_total = '0.00';
@@ -251,7 +255,7 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+elseif (($action === 'webhook' || $action === 'notification') && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // -----------------------------------------------------------------------
     // MIDTRANS NOTIFICATION WEBHOOK — Phase 2 Remediated
     // Source of truth: server-side signature-verified notification only.
@@ -549,15 +553,26 @@ elseif ($action === 'webhook' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             // 9e. P1-D: COMMISSION — bcmul (no float arithmetic)
             //     Affiliate cross-tenant guard: commission only if affiliate.tenant_id == order.tenant_id
             if (!empty($order['affiliate_id'])) {
-                $stmt_aff = $pdo->prepare("SELECT tenant_id, commission_rate FROM affiliates WHERE id = ?");
+                $stmt_aff = $pdo->prepare("SELECT user_id, tenant_id, commission_rate FROM affiliates WHERE id = ?");
                 $stmt_aff->execute([$order['affiliate_id']]);
                 $affiliate = $stmt_aff->fetch();
 
                 if ($affiliate) {
-                    // CROSS-TENANT AFFILIATE GUARD
-                    // Business rule: commission attribution must be same-tenant.
-                    // If affiliate.tenant_id != order.tenant_id → reject commission silently, log audit.
-                    if ($affiliate['tenant_id'] !== $order['tenant_id']) {
+                    // ANTI-FRAUD SELF-REFERRAL GUARD
+                    // Business rule: An affiliate cannot earn commission on their own plan purchase.
+                    $stmt_stu_user = $pdo->prepare("SELECT user_id FROM user_roles WHERE reference_id = ? AND role = 'student' LIMIT 1");
+                    $stmt_stu_user->execute([$order['student_id']]);
+                    $stu_user_id = $stmt_stu_user->fetchColumn();
+
+                    if (!empty($stu_user_id) && $stu_user_id === $affiliate['user_id']) {
+                        log_audit($pdo, null, $order['tenant_id'], 'commission_self_referral_rejected', $order['id'], [
+                            'affiliate_id' => $order['affiliate_id'],
+                            'student_id'   => $order['student_id'],
+                        ]);
+                    } elseif ($affiliate['tenant_id'] !== $order['tenant_id']) {
+                        // CROSS-TENANT AFFILIATE GUARD
+                        // Business rule: commission attribution must be same-tenant.
+                        // If affiliate.tenant_id != order.tenant_id → reject commission silently, log audit.
                         log_audit($pdo, null, $order['tenant_id'], 'commission_cross_tenant_rejected', $order['id'], [
                             'affiliate_id'        => $order['affiliate_id'],
                             'affiliate_tenant_id' => $affiliate['tenant_id'],
@@ -648,4 +663,3 @@ else {
     http_response_code(404);
     echo json_encode(["error" => "Endpoint payment tidak ditemukan"]);
 }
-?>

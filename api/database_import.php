@@ -164,4 +164,3 @@ if ($action === 'preview' || $action === 'commit') {
     http_response_code(400);
     echo json_encode(["error" => "Aksi tidak valid (gunakan preview atau commit)"]);
 }
-?>

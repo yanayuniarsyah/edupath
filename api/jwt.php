@@ -190,7 +190,7 @@ function generate_csrf_token(): string {
 // ----------------------------------------------------------------
 // AUTHENTICATE — Verifikasi token & CSRF, return payload
 // ----------------------------------------------------------------
-function authenticate(): object {
+function authenticate(?PDO $pdo = null): object {
     // CSRF check untuk non-GET cookie-based requests
     if (!verify_csrf()) {
         http_response_code(403);

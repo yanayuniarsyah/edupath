@@ -9,6 +9,7 @@ require_once __DIR__ . '/env.php';
 // --- Load .env ---
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
+date_default_timezone_set('Asia/Jakarta');
 
 // Gunakan file api/.env terlebih dahulu (spesifik backend), lalu fallback ke root .env
 load_env(__DIR__ . '/.env');
@@ -117,13 +118,26 @@ try {
     }
 }
 
+try {
+    $pdo->exec("SET time_zone = '+07:00'");
+} catch (\Throwable $e) {}
+
 // ----------------------------------------------------------------
 // AUTO-HEAL CORE SCHEMA (Ensures critical tables & columns exist)
 // ----------------------------------------------------------------
 function ensure_core_schema_sync($pdo) {
     static $synced = false;
     if ($synced) return;
+
+    $lockFile = sys_get_temp_dir() . '/edupath_core_schema_' . md5(__DIR__) . '.lock';
+    // Hanya eksekusi DDL jika lockfile belum ada, sudah lewat 24 jam, atau dipaksa via ?sync_schema=1
+    if (!isset($_GET['sync_schema']) && file_exists($lockFile) && (time() - @filemtime($lockFile) < 86400)) {
+        $synced = true;
+        return;
+    }
+
     $synced = true;
+    @touch($lockFile);
 
     try {
         // 1. users table & display_name
@@ -290,4 +304,3 @@ function log_audit(PDO $pdo, ?string $actor_id, ?string $tenant_id, string $acti
         // Silently fail agar aplikasi tidak terganggu jika audit table belum ter‑migrate
     }
 }
-?>

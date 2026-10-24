@@ -61,6 +61,10 @@ export default defineConfig({
           if (id.includes('node_modules/xlsx')) {
             return 'vendor-xlsx';
           }
+          // KaTeX (library render formula matematika/rumus) — besar dan statis
+          if (id.includes('node_modules/katex')) {
+            return 'vendor-katex';
+          }
         },
         // Naming konsisten dengan hash untuk cache busting
         chunkFileNames: 'assets/js/[name]-[hash].js',

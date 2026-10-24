@@ -42,3 +42,4 @@ npm-debug.log*
 # Test artifacts
 test.json
 test_results.json
+scratch/

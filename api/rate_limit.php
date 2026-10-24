@@ -7,17 +7,29 @@ require_once 'config.php';
  * reverse proxies, and load balancers.
  */
 function get_client_ip() {
+    $remote = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+
+    // If Cloudflare connecting IP is provided, validate format
     if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-        return trim($_SERVER['HTTP_CF_CONNECTING_IP']);
+        $cfIp = trim($_SERVER['HTTP_CF_CONNECTING_IP']);
+        if (filter_var($cfIp, FILTER_VALIDATE_IP)) {
+            return $cfIp;
+        }
     }
-    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+
+    // Only trust X-Forwarded-For if request came from loopback or internal proxy
+    $isLocalProxy = in_array($remote, ['127.0.0.1', '::1', 'localhost']) || 
+                    filter_var($remote, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
+
+    if ($isLocalProxy && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
         $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-        return trim($ips[0]);
+        $forwarded = trim($ips[0]);
+        if (filter_var($forwarded, FILTER_VALIDATE_IP)) {
+            return $forwarded;
+        }
     }
-    if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
-        return trim($_SERVER['HTTP_X_REAL_IP']);
-    }
-    return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+
+    return filter_var($remote, FILTER_VALIDATE_IP) ? $remote : '0.0.0.0';
 }
 
 /**
@@ -83,5 +95,3 @@ function reset_rate_limit($pdo, $endpoint, $ip_override = null) {
         // Ignore if table missing
     }
 }
-?>
-

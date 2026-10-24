@@ -12,3 +12,7 @@
   RewriteRule ^payment/(.*)$ payment.php?action=$1 [QSA,L]
   RewriteRule ^quiz/(.*)$ quiz.php?action=$1 [QSA,L]
 </IfModule>
+
+<FilesMatch "(^\.|\.env|\.sql$|\.bak$|^backup_.*\.php$|^seed_.*\.php$|^test_.*\.php$)">
+  Require all denied
+</FilesMatch>

@@ -36,7 +36,10 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $test_component = $_GET['test_component'] ?? '';
     $topic = $_GET['topic'] ?? '';
 
-    $sql = "SELECT id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, teacher_name, created_at FROM materials WHERE 1=1";
+    $education_level = $_GET['education_level'] ?? '';
+    $assessment_type = $_GET['assessment_type'] ?? '';
+
+    $sql = "SELECT id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, teacher_name, education_level, assessment_type, subject, domain, created_at FROM materials WHERE 1=1";
     $params = [];
     if ($subtes) {
         $sql .= " AND (subtest = ? OR subtest LIKE ?)";
@@ -50,6 +53,14 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($topic && $topic !== 'all') {
         $sql .= " AND topic = ?";
         $params[] = $topic;
+    }
+    if ($education_level && $education_level !== 'all') {
+        $sql .= " AND (education_level = ? OR education_level IS NULL)";
+        $params[] = $education_level;
+    }
+    if ($assessment_type && $assessment_type !== 'all') {
+        $sql .= " AND (assessment_type = ? OR assessment_type IS NULL)";
+        $params[] = $assessment_type;
     }
     $sql .= " ORDER BY created_at DESC";
 
@@ -69,4 +80,3 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         ]
     ]);
 }
-?>

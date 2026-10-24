@@ -137,7 +137,7 @@ elseif ($action === 'commit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
         
-        $insertStmt = $pdo->prepare("INSERT INTO questions (id, subtes, sub_materi, bab, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, is_active, is_qc_passed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1)");
+        $insertStmt = $pdo->prepare("INSERT INTO questions (id, subtes, sub_materi, bab, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, is_active, is_qc_passed, education_level, assessment_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 'SMA', 'SNBT')");
         
         foreach ($rows as $row) {
             $insertStmt->execute([

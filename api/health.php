@@ -18,4 +18,3 @@ try {
 } catch (PDOException $e) {
     echo json_encode(["status" => "error", "db" => "disconnected", "detail" => $e->getMessage()]);
 }
-?>

@@ -1,5 +1,12 @@
 <?php
 // api/seed_admin.php
+// HARUS dijalankan via CLI saja untuk keamanan (mencegah remote reset password).
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    echo json_encode(["error" => "Forbidden. Script seeding hanya dapat dijalankan via CLI."]);
+    exit;
+}
+
 require_once 'config.php';
 
 try {

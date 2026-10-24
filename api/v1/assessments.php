@@ -465,4 +465,3 @@ function getAttemptResult($pdo, $attempt_id, $student_id) {
         echo json_encode(["error" => "Database error.", "details" => $e->getMessage()]);
     }
 }
-?>

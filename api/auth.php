@@ -45,15 +45,24 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = bin2hex(random_bytes(16)); // UUID for users
     $user_id = substr($user_id,0,8).'-'.substr($user_id,8,4).'-'.substr($user_id,12,4).'-'.substr($user_id,16,4).'-'.substr($user_id,20,12);
 
-    // Resolve Affiliate Attribution
+    // Resolve Affiliate Attribution with Anti-Fraud Self-Referral Guard
     $referred_by = null;
     if (!empty($referral_code)) {
         // Find affiliate by referral code AND ensure it matches the B2C tenant_id context
-        $stmt_aff = $pdo->prepare("SELECT id FROM affiliates WHERE referral_code = ? AND (tenant_id = ? OR tenant_id IS NULL OR tenant_id = '')");
+        $stmt_aff = $pdo->prepare("
+            SELECT a.id, a.user_id, u.identity_key 
+            FROM affiliates a 
+            LEFT JOIN users u ON a.user_id = u.id 
+            WHERE a.referral_code = ? AND (a.tenant_id = ? OR a.tenant_id IS NULL OR a.tenant_id = '')
+        ");
         $stmt_aff->execute([$referral_code, $tenant_id]);
         $aff = $stmt_aff->fetch();
         if ($aff) {
-            $referred_by = $aff['id'];
+            $aff_identity = strtolower(trim($aff['identity_key'] ?? ''));
+            // Anti-fraud: prevent self-referral if affiliate user identity matches registering email
+            if ($aff_identity !== strtolower(trim($email))) {
+                $referred_by = $aff['id'];
+            }
         }
     }
 
@@ -150,12 +159,6 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $email = trim($input['email'] ?? '');
     $password = $input['password'] ?? '';
-
-    // Auto-reset rate limit for test/demo accounts
-    if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'student@uat.edupath.local', 'superadmin@uat.edupath.local', 'tutor@uat.edupath.local', 'admin@uat.edupath.local'])) {
-        reset_rate_limit($pdo, 'login');
-        reset_rate_limit($pdo, 'school_login');
-    }
 
     if (!check_rate_limit($pdo, 'login', 30, 15)) {
         http_response_code(429);
@@ -285,15 +288,11 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $password_matched = false;
     if ($user) {
         $candidates = array_filter([$user['user_password'] ?? '', $user['student_password'] ?? '', $user['admin_password'] ?? '']);
-        $is_school_default = (($user['role'] === 'school_bk' || !empty($user['school_id'])) && $password === 'EduPathSchool01!2026');
-        $is_admin_default = (in_array($user['role'], ['admin', 'superadmin']) && in_array($password, ['EduPathSuperAdmin01!2026', 'EduPathAdmin01!2026', 'admin123']));
-        if ($is_school_default || $is_admin_default) {
-            $password_matched = true;
-        } else {
-            foreach ($candidates as $stored_hash) {
-                if (password_verify($password, $stored_hash) || $stored_hash === $password || $stored_hash === md5($password)) {
-                    $password_matched = true;
-                    // Auto-upgrade / sync hash into both tables
+        foreach ($candidates as $stored_hash) {
+            if (password_verify($password, $stored_hash) || $stored_hash === $password || $stored_hash === md5($password)) {
+                $password_matched = true;
+                // Auto-upgrade legacy plaintext/MD5 hash into Bcrypt
+                if (!password_verify($password, $stored_hash)) {
                     $new_hash = password_hash($password, PASSWORD_BCRYPT);
                     try {
                         $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$new_hash, $user['user_id']]);
@@ -301,8 +300,8 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                             $pdo->prepare("UPDATE students SET password = ? WHERE id = ?")->execute([$new_hash, $user['student_id']]);
                         }
                     } catch (\Throwable $e) {}
-                    break;
                 }
+                break;
             }
         }
     }
@@ -401,6 +400,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         unset($user['user_password'], $user['student_password'], $user['password']);
         $user['email'] = $user_email;
+        $user['id'] = $ref_id;
         if ($user['role'] === 'student') {
             $user['school'] = $user['student_school'] ?? '';
             $user['phone'] = $user['student_phone'] ?? '';
@@ -1007,4 +1007,3 @@ else {
     http_response_code(404);
     echo json_encode(["error" => "Endpoint tidak ditemukan"]);
 }
-?>

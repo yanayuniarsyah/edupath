@@ -13,6 +13,18 @@ $mkuuid = function() {
 };
 
 function ensure_diagnostic_schema($pdo) {
+    static $done = false;
+    if ($done) return;
+
+    $lockFile = sys_get_temp_dir() . '/edupath_diagnostic_schema_' . md5(__DIR__) . '.lock';
+    if (!isset($_GET['sync_schema']) && file_exists($lockFile) && (time() - @filemtime($lockFile) < 86400)) {
+        $done = true;
+        return;
+    }
+
+    $done = true;
+    @touch($lockFile);
+
     try {
         $pdo->exec("
             CREATE TABLE IF NOT EXISTS diagnostic_results (

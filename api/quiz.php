@@ -14,10 +14,62 @@ if (!in_array($payload->role, ['student', 'admin', 'superadmin', 'teacher'])) {
     exit;
 }
 
-// Akses quiz sementara dibuka untuk testing tryout
-// Entitlement enforcement bisa ditambahkan secara granular per-jenis kuis nanti.
+require_once 'EntitlementService.php';
 
-if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+function verify_quiz_entitlement($pdo, $payload, $quiz_type) {
+    if ($payload->role !== 'student' || strtolower($quiz_type) !== 'tryout') {
+        return true;
+    }
+    
+    $entitlementService = new EntitlementService($pdo);
+    $tenant_id = $payload->tenant_id ?? 'default_tenant';
+    
+    $hasTryout = $entitlementService->hasEntitlement($payload->id, $tenant_id, 'tryout_unlimited')
+              || $entitlementService->hasEntitlement($payload->id, $tenant_id, 'premium_assessments');
+              
+    if (!$hasTryout) {
+        // Auto-heal check if student has active subscription or paid plan record
+        try {
+            $stmt = $pdo->prepare("
+                SELECT s.plan, sub.id as sub_id, sub.expires_at 
+                FROM students s 
+                LEFT JOIN subscriptions sub ON s.id = sub.student_id AND sub.status = 'active' AND (sub.expires_at IS NULL OR sub.expires_at > NOW())
+                WHERE s.id = ?
+            ");
+            $stmt->execute([$payload->id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $plan_name = strtolower($row['plan'] ?? '');
+            
+            $is_paid = !empty($row['sub_id']);
+            if (!$is_paid && $plan_name !== 'free' && $plan_name !== 'trial' && $plan_name !== '') {
+                foreach (['pejuang', 'mandiri', 'elite', 'utbk', 'premium', 'starter', 'utama', 'pro'] as $k) {
+                    if (strpos($plan_name, $k) !== false) {
+                        $is_paid = true;
+                        break;
+                    }
+                }
+            }
+            
+            if ($is_paid) {
+                $entitlementService->grantEntitlement($payload->id, 'tryout_unlimited', $row['sub_id'] ?? null, $row['expires_at'] ?? null);
+                $hasTryout = true;
+            }
+        } catch (\Throwable $e) {}
+    }
+    
+    if (!$hasTryout) {
+        http_response_code(403);
+        echo json_encode([
+            "success" => false,
+            "error" => "Paket Berlangganan Diperlukan. Fitur CBT Tryout Nasional berbobot IRT hanya tersedia untuk pengguna Pro Member.",
+            "code" => "ENTITLEMENT_REQUIRED"
+        ]);
+        exit;
+    }
+    return true;
+}
+
+if (($action === 'save' || $action === 'save_answers') && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $attempt_id = trim($input['attempt_id'] ?? '');
     $answers = $input['answers'] ?? [];
     if ($attempt_id === '' || !is_array($answers)) {
@@ -41,7 +93,7 @@ if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!check_rate_limit($pdo, 'quiz_start', 10, 5)) {
         http_response_code(429);
         echo json_encode(["error" => "Terlalu banyak permintaan mulai kuis."]);
@@ -50,6 +102,7 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $subtes = $input['subtes'] ?? null;
     $quiz_type = $input['quiz_type'] ?? 'latihan';
+    verify_quiz_entitlement($pdo, $payload, $quiz_type);
     $limit = $quiz_type === 'tryout' ? 150 : max(1, min(50, (int)($input['limit'] ?? 10)));
 
     $duration_sec = max(60, min(7200, (int)($input['duration_sec'] ?? 900)));
@@ -84,6 +137,15 @@ if ($action === 'start' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $classification_filter = "classification IN ('LATIHAN', 'TRYOUT')";
     } else {
         $classification_filter = "classification = 'ASESMEN'";
+    }
+
+    $education_level = trim($input['education_level'] ?? ($_GET['education_level'] ?? ''));
+    $assessment_type = trim($input['assessment_type'] ?? ($_GET['assessment_type'] ?? ''));
+    if (!empty($education_level)) {
+        $classification_filter .= " AND (education_level = " . $pdo->quote($education_level) . " OR education_level IS NULL)";
+    }
+    if (!empty($assessment_type)) {
+        $classification_filter .= " AND (assessment_type = " . $pdo->quote($assessment_type) . " OR assessment_type IS NULL)";
     }
 
     if ($subtes) {
@@ -171,6 +233,7 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // Backward compatibility for existing Web App
     $sub_materi_input = $_GET['sub_materi'] ?? $_GET['subtes'] ?? '';
     $quiz_type = $_GET['quiz_type'] ?? 'latihan';
+    verify_quiz_entitlement($pdo, $payload, $quiz_type);
     $limit = $quiz_type === 'tryout' ? 150 : max(1, min(50, (int)($_GET['limit'] ?? 10)));
     
     $allowed_classification = strtoupper($quiz_type);
@@ -178,6 +241,15 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $classification_filter = "classification IN ('LATIHAN', 'TRYOUT')";
     } else {
         $classification_filter = "classification = 'ASESMEN'";
+    }
+
+    $education_level = trim($_GET['education_level'] ?? '');
+    $assessment_type = trim($_GET['assessment_type'] ?? '');
+    if (!empty($education_level)) {
+        $classification_filter .= " AND (education_level = " . $pdo->quote($education_level) . " OR education_level IS NULL)";
+    }
+    if (!empty($assessment_type)) {
+        $classification_filter .= " AND (assessment_type = " . $pdo->quote($assessment_type) . " OR assessment_type IS NULL)";
     }
 
     if ($sub_materi_input) {
@@ -252,7 +324,15 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $answers = $input['answers'] ?? []; 
+    $raw_answers = $input['answers'] ?? []; 
+    $answers = [];
+    foreach ($raw_answers as $k => $v) {
+        if (is_array($v) && isset($v['question_id'])) {
+            $answers[] = $v;
+        } else {
+            $answers[] = ['question_id' => (string)$k, 'answer' => (string)$v];
+        }
+    }
     $quiz_type = $input['quiz_type'] ?? 'latihan';
     $subtes = $input['subtes'] ?? null;
     $duration_sec = $input['duration_sec'] ?? 0;
@@ -323,7 +403,7 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $idList = $qIds;
     $inQuery = implode(',', array_fill(0, count($qIds), '?'));
     // Calculate final scores based on classical properties if available (we keep legacy irt_score field fallback for now if it exists, or just use 1)
-    $stmt = $pdo->prepare("SELECT id, correct, irt_score, p_value, sub_materi AS subtes, bab FROM questions WHERE id IN ($inQuery)");
+    $stmt = $pdo->prepare("SELECT id, correct, irt_score, sub_materi AS subtes, bab FROM questions WHERE id IN ($inQuery)");
     $stmt->execute($idList);
     $questionsDb = $stmt->fetchAll();
 
@@ -341,14 +421,15 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($is_correct) {
                 $correctCount++;
-                $totalScore += (float)$db_q['irt_score'];
+                $qWeight = ((float)($db_q['irt_score'] ?? 0) > 0) ? (float)$db_q['irt_score'] : 1.0;
+                $totalScore += $qWeight;
                 
                 // Update Progress
                 if ($db_q['bab']) {
                     $upd = $pdo->prepare("INSERT INTO progress (id, student_id, subtes, bab, score, mastery) VALUES (?, ?, ?, ?, ?, 1) ON DUPLICATE KEY UPDATE score = score + ?, mastery = mastery + 1, last_study = NOW()");
                     $uuid = bin2hex(random_bytes(16));
                     $uuid = substr($uuid,0,8).'-'.substr($uuid,8,4).'-'.substr($uuid,12,4).'-'.substr($uuid,16,4).'-'.substr($uuid,20,12);
-                    $upd->execute([$uuid, $payload->id, $db_q['subtes'], $db_q['bab'], $db_q['irt_score'], $db_q['irt_score']]);
+                    $upd->execute([$uuid, $payload->id, $db_q['subtes'], $db_q['bab'], $qWeight, $qWeight]);
                 }
             }
 
@@ -386,8 +467,78 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         "message" => "Hasil berhasil disimpan"
     ]);
 }
+elseif ($action === 'review' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $attempt_id = trim($_GET['attempt_id'] ?? '');
+    $result_id = trim($_GET['result_id'] ?? '');
+
+    if (empty($attempt_id) && empty($result_id)) {
+        http_response_code(400);
+        echo json_encode(["error" => "attempt_id atau result_id wajib disertakan"]);
+        exit;
+    }
+
+    if ($result_id) {
+        $stmt = $pdo->prepare("SELECT * FROM quiz_results WHERE id = ? LIMIT 1");
+        $stmt->execute([$result_id]);
+    } else {
+        $stmt = $pdo->prepare("SELECT * FROM quiz_results WHERE attempt_id = ? LIMIT 1");
+        $stmt->execute([$attempt_id]);
+    }
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$result) {
+        http_response_code(404);
+        echo json_encode(["error" => "Hasil kuis tidak ditemukan"]);
+        exit;
+    }
+
+    if ($payload->role === 'student' && $result['student_id'] !== $payload->id) {
+        http_response_code(403);
+        echo json_encode(["error" => "Akses review kuis tidak diizinkan"]);
+        exit;
+    }
+
+    $detailedAnswers = json_decode($result['answers'] ?? '[]', true) ?: [];
+    $qIds = array_column($detailedAnswers, 'question_id');
+
+    $questionsData = [];
+    if (!empty($qIds)) {
+        $inQuery = implode(',', array_fill(0, count($qIds), '?'));
+        $stmt_q = $pdo->prepare("
+            SELECT id, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, trick, sub_materi as subtes, difficulty, irt_score 
+            FROM questions 
+            WHERE id IN ($inQuery)
+        ");
+        $stmt_q->execute($qIds);
+        $questionsList = $stmt_q->fetchAll(PDO::FETCH_ASSOC);
+
+        $qMap = [];
+        foreach ($questionsList as $q) {
+            $qMap[$q['id']] = $q;
+        }
+
+        foreach ($detailedAnswers as $ans) {
+            $qid = $ans['question_id'];
+            if (isset($qMap[$qid])) {
+                $qItem = $qMap[$qid];
+                $qItem['user_answer'] = $ans['user_answer'] ?? '';
+                $qItem['is_correct'] = (bool)($ans['is_correct'] ?? false);
+                $questionsData[] = $qItem;
+            }
+        }
+    }
+
+    echo json_encode([
+        "success" => true,
+        "score" => (float)$result['score'],
+        "correct" => (int)$result['correct'],
+        "total" => (int)$result['total'],
+        "quiz_type" => $result['quiz_type'],
+        "subtes" => $result['subtes'],
+        "questions" => $questionsData
+    ]);
+}
 else {
     http_response_code(404);
     echo json_encode(["error" => "Endpoint quiz tidak ditemukan"]);
 }
-?>

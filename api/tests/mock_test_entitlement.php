@@ -62,7 +62,7 @@ $tests = [
         "name" => "CASE 9: Client manipulates amount",
         "action" => "Hacker mengubah payload amount saat checkout dari frontend",
         "expected" => "Backend ignore payload amount, selalu memprioritaskan harga dari db.plans (Pencarian plan_id)",
-        "status" => "PASS (Code Review `api/payment.php` action=create, $amount = (float)$plan['price'])"
+        "status" => 'PASS (Code Review api/payment.php action=create, $amount = (float)$plan[\'price\'])'
     ],
     [
         "name" => "CASE 10: Client manipulates plan name",
