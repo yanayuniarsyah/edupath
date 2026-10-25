@@ -1143,45 +1143,61 @@ elseif ($action === 'affiliates' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     echo safe_json_encode($stmt->fetchAll());
 }
 elseif ($action === 'commissions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    if ($payload->role === 'affiliate') {
-        $stmt = $pdo->prepare("
-            SELECT c.*, a.referral_code, u.identity_key as affiliate_email, 
-                   o.plan_name as order_plan_name, s.name as student_name
-            FROM commissions c
-            JOIN affiliates a ON c.affiliate_id = a.id
-            JOIN users u ON a.user_id = u.id
-            JOIN orders o ON c.order_id = o.id
-            JOIN students s ON o.student_id = s.id
-            WHERE a.user_id = ? OR a.id = ?
-            ORDER BY c.created_at DESC
-        ");
-        $stmt->execute([$payload->user_id, $payload->id]);
-    } elseif ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
-        $stmt = $pdo->prepare("
-            SELECT c.*, a.referral_code, u.identity_key as affiliate_email, 
-                   o.plan_name as order_plan_name, s.name as student_name
-            FROM commissions c
-            JOIN affiliates a ON c.affiliate_id = a.id
-            JOIN users u ON a.user_id = u.id
-            JOIN orders o ON c.order_id = o.id
-            JOIN students s ON o.student_id = s.id
-            WHERE c.tenant_id = ?
-            ORDER BY c.created_at DESC
-        ");
-        $stmt->execute([$payload->tenant_id]);
-    } else {
-        $stmt = $pdo->query("
-            SELECT c.*, a.referral_code, u.identity_key as affiliate_email, 
-                   o.plan_name as order_plan_name, s.name as student_name
-            FROM commissions c
-            JOIN affiliates a ON c.affiliate_id = a.id
-            JOIN users u ON a.user_id = u.id
-            JOIN orders o ON c.order_id = o.id
-            JOIN students s ON o.student_id = s.id
-            ORDER BY c.created_at DESC
-        ");
+    try {
+        if ($payload->role === 'affiliate') {
+            $stmt = $pdo->prepare("
+                SELECT c.*, 
+                       COALESCE(a.referral_code, '-') as referral_code, 
+                       COALESCE(a.email, u.identity_key) as affiliate_email, 
+                       COALESCE(o.plan_name, 'Paket Belajar') as plan_name,
+                       COALESCE(o.plan_name, 'Paket Belajar') as order_plan_name, 
+                       COALESCE(s.name, 'Siswa') as student_name
+                FROM commissions c
+                LEFT JOIN affiliates a ON c.affiliate_id = a.id
+                LEFT JOIN users u ON a.user_id = u.id
+                LEFT JOIN orders o ON (c.order_id = o.id OR c.order_id = o.order_id)
+                LEFT JOIN students s ON o.student_id = s.id
+                WHERE a.user_id = ? OR a.id = ?
+                ORDER BY c.created_at DESC
+            ");
+            $stmt->execute([$payload->user_id, $payload->id]);
+        } elseif ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+            $stmt = $pdo->prepare("
+                SELECT c.*, 
+                       COALESCE(a.referral_code, '-') as referral_code, 
+                       COALESCE(a.email, u.identity_key) as affiliate_email, 
+                       COALESCE(o.plan_name, 'Paket Belajar') as plan_name,
+                       COALESCE(o.plan_name, 'Paket Belajar') as order_plan_name, 
+                       COALESCE(s.name, 'Siswa') as student_name
+                FROM commissions c
+                LEFT JOIN affiliates a ON c.affiliate_id = a.id
+                LEFT JOIN users u ON a.user_id = u.id
+                LEFT JOIN orders o ON (c.order_id = o.id OR c.order_id = o.order_id)
+                LEFT JOIN students s ON o.student_id = s.id
+                WHERE c.tenant_id = ? OR a.tenant_id = ?
+                ORDER BY c.created_at DESC
+            ");
+            $stmt->execute([$payload->tenant_id, $payload->tenant_id]);
+        } else {
+            $stmt = $pdo->query("
+                SELECT c.*, 
+                       COALESCE(a.referral_code, '-') as referral_code, 
+                       COALESCE(a.email, u.identity_key) as affiliate_email, 
+                       COALESCE(o.plan_name, 'Paket Belajar') as plan_name,
+                       COALESCE(o.plan_name, 'Paket Belajar') as order_plan_name, 
+                       COALESCE(s.name, 'Siswa') as student_name
+                FROM commissions c
+                LEFT JOIN affiliates a ON c.affiliate_id = a.id
+                LEFT JOIN users u ON a.user_id = u.id
+                LEFT JOIN orders o ON (c.order_id = o.id OR c.order_id = o.order_id)
+                LEFT JOIN students s ON o.student_id = s.id
+                ORDER BY c.created_at DESC
+            ");
+        }
+        echo safe_json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } catch (\Throwable $e) {
+        echo json_encode([]);
     }
-    echo safe_json_encode($stmt->fetchAll());
 }
 elseif ($action === 'affiliate_settings') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -1284,9 +1300,14 @@ elseif ($action === 'payout_commission' && $_SERVER['REQUEST_METHOD'] === 'POST'
     try {
         $pdo->beginTransaction();
         
-        // Lock commission row
-        $stmt = $pdo->prepare("SELECT status FROM commissions WHERE id = ? AND tenant_id = ? FOR UPDATE");
-        $stmt->execute([$commission_id, $payload->tenant_id]);
+        // Lock commission row (superadmin can approve any tenant; branch admin scoped to their tenant)
+        if ($payload->role === 'superadmin') {
+            $stmt = $pdo->prepare("SELECT status, tenant_id FROM commissions WHERE id = ? FOR UPDATE");
+            $stmt->execute([$commission_id]);
+        } else {
+            $stmt = $pdo->prepare("SELECT status, tenant_id FROM commissions WHERE id = ? AND tenant_id = ? FOR UPDATE");
+            $stmt->execute([$commission_id, $payload->tenant_id]);
+        }
         $comm = $stmt->fetch();
         
         if (!$comm) {
@@ -1299,22 +1320,27 @@ elseif ($action === 'payout_commission' && $_SERVER['REQUEST_METHOD'] === 'POST'
             http_response_code(400); echo json_encode(["error" => "Commission already paid"]); exit;
         }
 
-        // Update to paid with audit trail
-        $update = $pdo->prepare("
-            UPDATE commissions 
-            SET status = 'paid', 
-                paid_by = ?, 
-                paid_at = NOW(), 
-                payout_reference = ? 
-            WHERE id = ?
-        ");
-        $update->execute([$payload->user_id, $payout_reference, $commission_id]);
+        // Update to paid with audit trail & defensive column fallback
+        try {
+            $update = $pdo->prepare("
+                UPDATE commissions 
+                SET status = 'paid', 
+                    paid_by = ?, 
+                    paid_at = NOW(), 
+                    payout_reference = ? 
+                WHERE id = ?
+            ");
+            $update->execute([$payload->user_id, $payout_reference, $commission_id]);
+        } catch (\Throwable $e2) {
+            $update = $pdo->prepare("UPDATE commissions SET status = 'paid' WHERE id = ?");
+            $update->execute([$commission_id]);
+        }
         
         $pdo->commit();
         echo json_encode(["success" => true]);
     } catch (Exception $e) {
         $pdo->rollBack();
-        http_response_code(500); echo json_encode(["error" => "Database error"]);
+        http_response_code(500); echo json_encode(["error" => "Database error: " . $e->getMessage()]);
     }
 }
 elseif ($action === 'tenants') {
@@ -2442,41 +2468,6 @@ elseif ($action === 'staff') {
             $pdo->rollBack();
             http_response_code(500); echo json_encode(["error" => "Gagal menghapus staff", "details" => $e->getMessage()]);
         }
-    }
-}
-elseif ($action === 'commissions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    try {
-        $stmt = $pdo->query("
-            SELECT 
-                c.id, c.affiliate_id, c.tenant_id, c.order_id, c.amount, c.commission_rate_snapshot, c.status, c.created_at,
-                COALESCE(o.plan_name, 'Paket Belajar') as plan_name,
-                COALESCE(s_order.name, 'Siswa') as student_name,
-                COALESCE(a.referral_code, '-') as referral_code,
-                COALESCE(s_aff.name, u_aff.identity_key, 'Mitra') as affiliate_name
-            FROM commissions c
-            LEFT JOIN orders o ON (c.order_id = o.id OR c.order_id = o.order_id)
-            LEFT JOIN students s_order ON o.student_id = s_order.id
-            LEFT JOIN affiliates a ON c.affiliate_id = a.id
-            LEFT JOIN users u_aff ON a.user_id = u_aff.id
-            LEFT JOIN user_roles ur_aff ON (u_aff.id = ur_aff.user_id AND ur_aff.role = 'student')
-            LEFT JOIN students s_aff ON (ur_aff.reference_id = s_aff.id OR u_aff.identity_key = s_aff.email)
-            ORDER BY c.created_at DESC
-        ");
-        $commissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo safe_json_encode($commissions);
-    } catch (PDOException $e) {
-        echo json_encode([]);
-    }
-}
-elseif ($action === 'payout_commission' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $comm_id = $input['commission_id'] ?? '';
-    try {
-        $stmt = $pdo->prepare("UPDATE commissions SET status = 'paid' WHERE id = ?");
-        $stmt->execute([$comm_id]);
-        echo json_encode(["success" => true]);
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(["error" => "Gagal memperbarui status komisi"]);
     }
 }
 elseif ($action === 'update_profile' && in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])) {

@@ -307,8 +307,8 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($user && $password_matched) {
-        // If account is linked to a school, ensure role is school_bk
-        if (!empty($user['school_id']) || (!empty($user['bk_email']) && strtolower(trim($user['bk_email'])) === strtolower(trim($email)))) {
+        // If account has school_bk role or matches registered school BK email
+        if ($user['role'] === 'school_bk' || (!empty($user['bk_email']) && strtolower(trim($user['bk_email'])) === strtolower(trim($email)))) {
             $user['role'] = 'school_bk';
         }
 
@@ -319,7 +319,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Strict Separation: "semua role masuk melalui form login siswa kecuali admin dan super admin melalui /admin."
-        if (in_array($user['role'], ['admin', 'superadmin']) && empty($user['school_id'])) {
+        if (in_array($user['role'], ['admin', 'superadmin'])) {
             http_response_code(403);
             echo json_encode([
                 "error" => "Akun Administrator & Superadmin wajib masuk melalui portal admin di /#/admin."
@@ -361,8 +361,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             'email'     => $user_email
         ];
 
-        if ($user['role'] === 'school_bk' || !empty($user['school_id'])) {
-            $user['role'] = 'school_bk';
+        if ($user['role'] === 'school_bk') {
             $token_payload['role'] = 'school_bk';
             $token_payload['school_id'] = $user['school_id'] ?? $user['reference_id'];
             $token_payload['school_name'] = $user['school_name'] ?? $user['name'];
@@ -474,6 +473,17 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $user['is_premium'] = true;
             $user['plan'] = 'school_partner';
             $user['plan_name'] = 'Sekolah Mitra Resmi';
+        } elseif (in_array($user['role'], ['teacher', 'guru', 'tutor'])) {
+            $cleanName = trim($user['user_display_name'] ?? ($user['name'] ?? ''));
+            if (empty($cleanName) || str_contains($cleanName, '@') || $cleanName === 'Pengguna EduPath') {
+                $emailPrefix = explode('@', $user_email)[0];
+                $cleanName = 'Pengajar ' . ucfirst($emailPrefix);
+            }
+            $user['name'] = $cleanName;
+            $user['display_name'] = $cleanName;
+            $user['is_premium'] = true;
+            $user['plan'] = 'teacher';
+            $user['plan_name'] = 'Tenaga Pendidik / Tutor';
         }
 
         echo json_encode([

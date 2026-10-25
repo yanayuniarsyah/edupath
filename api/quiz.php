@@ -467,7 +467,7 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         "message" => "Hasil berhasil disimpan"
     ]);
 }
-elseif ($action === 'review' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+elseif (($action === 'review' || $action === 'cbt_review') && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $attempt_id = trim($_GET['attempt_id'] ?? '');
     $result_id = trim($_GET['result_id'] ?? '');
 
