@@ -244,6 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Get student/user name to create referral code
     $stmt = $pdo->prepare("SELECT name FROM students WHERE id = ? OR id = ? OR email = (SELECT identity_key FROM users WHERE id = ?)");
     $stmt->execute([$user_id, $payload->id, $user_id]);
+    $student = $stmt->fetch(PDO::FETCH_ASSOC);
     $name = !empty($input['name']) ? trim($input['name']) : (!empty($student['name']) ? $student['name'] : (!empty($input['bank_owner']) ? trim($input['bank_owner']) : 'Mitra'));
     // Clean name for code (alphanumeric uppercase)
     $clean_name = preg_replace('/[^a-zA-Z0-9]/', '', strtoupper($name));
@@ -284,8 +285,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Update user_roles so role is affiliate (not student)
         $pdo->prepare("UPDATE user_roles SET role = 'affiliate', reference_id = ? WHERE user_id = ?")->execute([$id, $user_id]);
         
-        // Remove dummy student record so they do not show in students list
-        $pdo->prepare("DELETE FROM students WHERE id = ? OR id = ? OR email = (SELECT identity_key FROM users WHERE id = ?)")->execute([$user_id, $payload->id, $user_id]);
+        // Remove dummy student record only if they have no active orders or quiz records
+        try {
+            $hasActivity = false;
+            $stmtAct = $pdo->prepare("SELECT 1 FROM orders WHERE student_id = ? OR student_id = ? LIMIT 1");
+            $stmtAct->execute([$user_id, $payload->id]);
+            if ($stmtAct->fetch()) $hasActivity = true;
+            if (!$hasActivity) {
+                $stmtAct = $pdo->prepare("SELECT 1 FROM quiz_results WHERE student_id = ? OR student_id = ? LIMIT 1");
+                $stmtAct->execute([$user_id, $payload->id]);
+                if ($stmtAct->fetch()) $hasActivity = true;
+            }
+            if (!$hasActivity) {
+                $pdo->prepare("DELETE FROM students WHERE id = ? OR id = ? OR email = (SELECT identity_key FROM users WHERE id = ?)")->execute([$user_id, $payload->id, $user_id]);
+            }
+        } catch (\Throwable $e) {}
 
         // Generate updated JWT token with role 'affiliate'
         $uEmail = $reg_email;

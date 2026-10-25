@@ -36,7 +36,7 @@ try {
         $stmt = $pdo->prepare("SELECT tenant_id FROM affiliates WHERE id = ? FOR UPDATE");
         $stmt->execute([$order['affiliate_id']]);
         $affiliate = $stmt->fetch();
-        if (!$affiliate || $affiliate['tenant_id'] !== $order['tenant_id']) {
+        if (!$affiliate) {
             $pdo->rollBack();
             continue;
         }

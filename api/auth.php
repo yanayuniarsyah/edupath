@@ -249,6 +249,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                COALESCE(s.target_ptn, '') as target_ptn, 
                COALESCE(s.plan, 'free') as plan,
                COALESCE(t.is_active, 1) as tenant_active,
+               aff.id as affiliate_id,
                COALESCE(aff.referral_code, '') as referral_code,
                COALESCE(s.school_id, sch.id) as school_id,
                sch.name as school_name,
@@ -452,6 +453,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $user['name'] = $cleanName;
         } elseif ($user['role'] === 'affiliate') {
             $user['id'] = $ref_id;
+            $user['affiliate_id'] = $ref_id;
             $cleanName = trim($user['user_display_name'] ?? ($user['name'] ?? ''));
             if (empty($cleanName) || str_contains($cleanName, '@') || $cleanName === 'Pengguna EduPath') {
                 $emailPrefix = explode('@', $user_email)[0];

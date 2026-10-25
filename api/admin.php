@@ -659,7 +659,7 @@ elseif ($action === 'students') {
                        t.name as tenant_name
                 FROM students s 
                 LEFT JOIN tenants t ON s.tenant_id = t.id
-                WHERE (s.tenant_id = ? OR s.tenant_id IS NULL OR s.tenant_id = '')
+                WHERE s.tenant_id = ?
                   AND s.id NOT IN (SELECT reference_id FROM user_roles WHERE role = 'affiliate')
                   AND s.email NOT IN (SELECT u.identity_key FROM affiliates a JOIN users u ON a.user_id = u.id)
                 ORDER BY s.created_at DESC
@@ -943,11 +943,17 @@ elseif ($action === 'students') {
             $email = $stmtS->fetchColumn();
 
             // 1. Delete dependent financial data safely
-            try { $pdo->prepare("DELETE FROM commissions WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id]); } catch (\Throwable $e) {}
-            try { $pdo->prepare("DELETE FROM payments WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id]); } catch (\Throwable $e) {}
-            try { $pdo->prepare("DELETE FROM invoices WHERE student_id = ? OR order_id IN (SELECT id FROM orders WHERE student_id = ?)")->execute([$id, $id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM financial_ledger WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?) OR order_id IN (SELECT order_id FROM orders WHERE student_id = ?)")->execute([$id, $id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM royalty_accruals WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?) OR order_id IN (SELECT order_id FROM orders WHERE student_id = ?)")->execute([$id, $id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM commissions WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?) OR order_id IN (SELECT order_id FROM orders WHERE student_id = ?)")->execute([$id, $id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM payments WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?) OR order_id IN (SELECT order_id FROM orders WHERE student_id = ?)")->execute([$id, $id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM invoices WHERE student_id = ? OR order_id IN (SELECT id FROM orders WHERE student_id = ?) OR order_id IN (SELECT order_id FROM orders WHERE student_id = ?)")->execute([$id, $id, $id]); } catch (\Throwable $e) {}
             try { $pdo->prepare("DELETE FROM orders WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
             try { $pdo->prepare("DELETE FROM subscriptions WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+
+            // 1b. Delete SPP diagnostic attempts and scores safely
+            try { $pdo->prepare("DELETE FROM spp_scores WHERE attempt_id IN (SELECT id FROM spp_attempts WHERE student_id = ?)")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM spp_attempts WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
 
             // 2. Delete quiz and learning data safely
             try { $pdo->prepare("DELETE FROM quiz_results WHERE student_id = ?")->execute([$id]); } catch (\Throwable $e) {}
@@ -992,7 +998,8 @@ elseif ($action === 'orders') {
         $params = [];
 
         if ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
-            $sql .= " AND (s.tenant_id = ? OR s.tenant_id IS NULL OR s.tenant_id = '')";
+            $sql .= " AND (o.tenant_id = ? OR s.tenant_id = ?)";
+            $params[] = $payload->tenant_id;
             $params[] = $payload->tenant_id;
         }
 
@@ -1103,12 +1110,30 @@ elseif ($action === 'orders') {
             http_response_code(500); echo json_encode(["error" => "Gagal update transaksi"]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        if ($payload->role !== 'superadmin') {
+            http_response_code(403);
+            echo json_encode(["error" => "Hanya Super Admin yang berhak menghapus data transaksi"]);
+            exit;
+        }
         $order_id = $_GET['order_id'] ?? $_GET['id'] ?? '';
         if (empty($order_id)) {
             http_response_code(400); echo json_encode(["error" => "Order ID wajib"]); exit;
         }
-        $pdo->prepare("DELETE FROM orders WHERE order_id = ? OR id = ?")->execute([$order_id, $order_id]);
-        echo json_encode(["success" => true]);
+        try {
+            $pdo->beginTransaction();
+            try { $pdo->prepare("DELETE FROM financial_ledger WHERE order_id = ? OR order_id IN (SELECT id FROM orders WHERE order_id = ? OR id = ?)")->execute([$order_id, $order_id, $order_id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM royalty_accruals WHERE order_id = ? OR order_id IN (SELECT id FROM orders WHERE order_id = ? OR id = ?)")->execute([$order_id, $order_id, $order_id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM commissions WHERE order_id = ? OR order_id IN (SELECT id FROM orders WHERE order_id = ? OR id = ?)")->execute([$order_id, $order_id, $order_id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM payments WHERE order_id = ? OR order_id IN (SELECT id FROM orders WHERE order_id = ? OR id = ?)")->execute([$order_id, $order_id, $order_id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM invoices WHERE order_id = ? OR order_id IN (SELECT id FROM orders WHERE order_id = ? OR id = ?)")->execute([$order_id, $order_id, $order_id]); } catch (\Throwable $e) {}
+            $pdo->prepare("DELETE FROM orders WHERE order_id = ? OR id = ?")->execute([$order_id, $order_id]);
+            $pdo->commit();
+            echo json_encode(["success" => true]);
+        } catch (\Throwable $e) {
+            $pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(["error" => "Gagal menghapus order: " . $e->getMessage()]);
+        }
     }
 }
 elseif ($action === 'affiliates' && $_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -1412,8 +1437,8 @@ elseif ($action === 'tenants') {
                 $admin_id = bin2hex(random_bytes(16));
                 $admin_id = substr($admin_id,0,8).'-'.substr($admin_id,8,4).'-'.substr($admin_id,12,4).'-'.substr($admin_id,16,4).'-'.substr($admin_id,20,12);
                 
-                $stmt = $pdo->prepare("INSERT INTO admins (id, username, password, name) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$admin_id, $admin_email, $hashed_password, $admin_name ?: 'Admin Cabang']);
+                $stmt = $pdo->prepare("INSERT INTO admins (id, tenant_id, username, password, name) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$admin_id, $id, $admin_email, $hashed_password, $admin_name ?: 'Admin Cabang']);
                 
                 // Link Role
                 $ur_id = bin2hex(random_bytes(16));
@@ -1608,7 +1633,7 @@ elseif ($action === 'schools') {
         $user_id = substr($user_id,0,8).'-'.substr($user_id,8,4).'-'.substr($user_id,12,4).'-'.substr($user_id,16,4).'-'.substr($user_id,20,12);
 
         $ur_id = bin2hex(random_bytes(16));
-        $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($user_id,20,12);
+        $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($ur_id,20,12);
 
         $hashed_pass = password_hash($password, PASSWORD_BCRYPT);
 
@@ -2134,6 +2159,7 @@ elseif ($action === 'materials') {
         $assessment_type = $input['assessment_type'] ?? 'SNBT';
         $subject = $input['subject'] ?? null;
         $domain = $input['domain'] ?? null;
+        $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
 
         try {
             try {
@@ -2260,6 +2286,11 @@ elseif ($action === 'materials') {
     }
 }
 elseif (in_array($action, ['upload_material_file', 'upload_material_image']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+        http_response_code(403);
+        echo json_encode(["error" => "Hanya Pengajar atau Administrator yang berhak mengunggah materi"]);
+        exit;
+    }
     if (!isset($_FILES['file'])) {
         http_response_code(400);
         echo json_encode(["error" => "Tidak ada file yang diunggah"]);

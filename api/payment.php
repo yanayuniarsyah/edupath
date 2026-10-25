@@ -467,14 +467,14 @@ elseif (($action === 'webhook' || $action === 'notification') && $_SERVER['REQUE
         // 8. P0-A: UPDATE PAYMENTS — find attempt record and sync status + gateway info
         //    Lookup: orders.id (UUID PK) → payments.order_id → most recent pending attempt
         if ($invoice_id) {
-            // Find payment attempt for this invoice+order (may be NULL gtx = pending attempt)
+            // Find payment attempt for this invoice+order (matching either UUID or order_id ref)
             $pay_stmt = $pdo->prepare("
                 SELECT id, status FROM payments
-                WHERE order_id = ? AND invoice_id = ?
+                WHERE (order_id = ? OR order_id = ?) AND invoice_id = ?
                 ORDER BY created_at ASC
                 LIMIT 1
             ");
-            $pay_stmt->execute([$order_id, $invoice_id]);
+            $pay_stmt->execute([$order['id'], $order_id, $invoice_id]);
             $payment_row = $pay_stmt->fetch();
 
             if ($payment_row) {
@@ -515,8 +515,8 @@ elseif (($action === 'webhook' || $action === 'notification') && $_SERVER['REQUE
             $duration_days = $plan_row ? (int) $plan_row['duration'] : 30;
 
             // 9b. P1-A: SUBSCRIPTION — idempotent; carry tenant_id from order
-            $stmt_check_sub = $pdo->prepare("SELECT id FROM subscriptions WHERE payment_reference = ?");
-            $stmt_check_sub->execute([$order_id]);
+            $stmt_check_sub = $pdo->prepare("SELECT id FROM subscriptions WHERE payment_reference = ? OR payment_reference = ?");
+            $stmt_check_sub->execute([$order_id, $order['id']]);
             $existing_sub = $stmt_check_sub->fetch();
             $subscription_id = null;
 
