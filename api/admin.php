@@ -2362,9 +2362,9 @@ elseif ($action === 'staff') {
         $stmt->execute($params);
         echo safe_json_encode(["staff" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if ($payload->role !== 'superadmin') {
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
             http_response_code(403);
-            echo json_encode(["error" => "Hanya Superadmin yang memiliki izin untuk menambah, mengedit, atau menghapus staf"]);
+            echo json_encode(["error" => "Hanya Superadmin dan Admin Cabang yang memiliki izin untuk menambah staf/guru"]);
             exit;
         }
         $username = trim($input['username'] ?? '');
@@ -2377,15 +2377,23 @@ elseif ($action === 'staff') {
         }
 
         $tenant_id = $payload->tenant_id;
-        if (empty($tenant_id)) {
-            $tenant_id = $input['tenant_id'] ?? '';
+        if ($payload->role === 'admin') {
+            // Mitra Daerah (Admin Cabang) HANYA diizinkan mendaftarkan Guru / Tutor untuk wilayahnya sendiri
+            $role = 'teacher';
             if (empty($tenant_id)) {
-                // Jika superadmin tidak memilih tenant, pilih tenant pertama yang aktif
-                $tFirst = $pdo->query("SELECT id FROM tenants WHERE is_active = 1 LIMIT 1")->fetchColumn();
-                $tenant_id = $tFirst ?: null;
+                http_response_code(400); echo json_encode(["error" => "Akun admin cabang tidak terhubung ke cabang manapun"]); exit;
             }
+        } else {
+            // Superadmin (Bisa memilih cabang atau default pusat)
+            if (empty($tenant_id)) {
+                $tenant_id = $input['tenant_id'] ?? '';
+                if (empty($tenant_id)) {
+                    $tFirst = $pdo->query("SELECT id FROM tenants WHERE is_active = 1 LIMIT 1")->fetchColumn();
+                    $tenant_id = $tFirst ?: null;
+                }
+            }
+            if (!in_array($role, ['admin', 'teacher'])) $role = 'teacher';
         }
-        if (!in_array($role, ['admin', 'teacher'])) $role = 'teacher';
 
         try {
             $pdo->beginTransaction();
@@ -2417,14 +2425,27 @@ elseif ($action === 'staff') {
             http_response_code(500); echo json_encode(["error" => "Gagal membuat staff", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        if ($payload->role !== 'superadmin') {
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
             http_response_code(403);
-            echo json_encode(["error" => "Hanya Superadmin yang memiliki izin untuk menambah, mengedit, atau menghapus staf"]);
+            echo json_encode(["error" => "Hanya Superadmin dan Admin Cabang yang memiliki izin untuk mengedit staf/guru"]);
             exit;
         }
         $id = $input['id'] ?? '';
         $name = trim($input['name'] ?? '');
         $role = $input['role'] ?? 'teacher';
+        
+        if ($payload->role === 'admin') {
+            // Guardrail Admin Cabang: hanya boleh edit guru di cabangnya sendiri
+            $chk = $pdo->prepare("SELECT ur.role, ur.tenant_id FROM user_roles ur WHERE ur.reference_id = ?");
+            $chk->execute([$id]);
+            $targetStaff = $chk->fetch(PDO::FETCH_ASSOC);
+            if (!$targetStaff || $targetStaff['tenant_id'] !== $payload->tenant_id || $targetStaff['role'] !== 'teacher') {
+                http_response_code(403);
+                echo json_encode(["error" => "Anda hanya berwenang mengelola guru/tutor di cabang Anda sendiri"]);
+                exit;
+            }
+            $role = 'teacher';
+        }
         
         $tenant_id = $payload->role === 'superadmin' ? null : $payload->tenant_id;
         $scope = '';
@@ -2465,9 +2486,9 @@ elseif ($action === 'staff') {
             http_response_code(500); echo json_encode(["error" => "Gagal mengupdate staff", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        if ($payload->role !== 'superadmin') {
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
             http_response_code(403);
-            echo json_encode(["error" => "Hanya Superadmin yang memiliki izin untuk menambah, mengedit, atau menghapus staf"]);
+            echo json_encode(["error" => "Hanya Superadmin dan Admin Cabang yang memiliki izin untuk menghapus staf/guru"]);
             exit;
         }
         $id = $_GET['id'] ?? '';
@@ -2485,9 +2506,11 @@ elseif ($action === 'staff') {
                 http_response_code(403); echo json_encode(["error" => "Tidak dapat menghapus superadmin"]); exit;
             }
 
-            if ($payload->role !== 'superadmin' && $staffInfo['tenant_id'] !== $payload->tenant_id) {
-                $pdo->rollBack();
-                http_response_code(403); echo json_encode(["error" => "Akses ditolak"]); exit;
+            if ($payload->role !== 'superadmin') {
+                if ($staffInfo['tenant_id'] !== $payload->tenant_id || $staffInfo['role'] !== 'teacher') {
+                    $pdo->rollBack();
+                    http_response_code(403); echo json_encode(["error" => "Anda hanya berwenang menghapus guru/tutor di cabang Anda sendiri"]); exit;
+                }
             }
 
             $pdo->prepare("DELETE FROM admins WHERE id = ?")->execute([$id]);

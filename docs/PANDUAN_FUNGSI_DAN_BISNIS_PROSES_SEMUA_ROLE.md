@@ -87,28 +87,25 @@ Dokumen ini membedakan secara transparan antara:
 ## 4. PANDUAN PERAN 2: ADMIN CABANG (OPERASIONAL KANTOR WILAYAH)
 
 ### 4.1 Identitas & Tanggung Jawab Peran
-* **Peran**: Kepala Operasional Cabang Bimbel / Administrator Wilayah.
-* **Tanggung Jawab Utama**: Mengelola operasional harian bimbingan belajar pada kantor cabang yang dipimpinnya, membina sekolah mitra lokal, memverifikasi pembayaran siswa tunai di kasir cabang, **mengatur kelas belajar offline**, dan **menjadwalkan jam mengajar guru offline**.
+* **Peran**: Kepala Operasional Cabang Bimbel / Administrator Wilayah (Mitra Franchise Daerah).
+* **Tanggung Jawab Utama**: Mengelola operasional harian bimbingan belajar pada kantor cabang yang dipimpinnya, membina sekolah mitra lokal, memverifikasi pembayaran siswa tunai di kasir cabang, **merekrut & mendaftarkan Guru/Tutor Lokal Cabang**, **mengatur kelas belajar offline (Rombel)**, dan **menjadwalkan jam mengajar guru offline**.
 * **Pintu Masuk**: Rute `/#/admin` (Kredensial demo UAT: `admin@uat.edupath.local` / `EduPathAdmin01!2026`, terikat ke `tenant_id` cabang).
 
-### 4.2 Siapa yang Mengatur Jadwal Belajar Siswa Offline & Pembagian Kelas?
+### 4.2 Hak Wewenang Perekrutan Guru Daerah (Branch Teacher Delegation)
 > [!IMPORTANT]
-> **JAWABAN ARSITEKTUR & PROSES BISNIS BIMBEL**:
-> Yang mengatur jadwal belajar siswa offline dan menugaskan siswa ke kelas adalah **ADMIN CABANG (`admin`)** (dibantu Koordinator Akademik Cabang).
-> * **Alasan Bisnis**: Ruang fisik kelas, kapasitas meja/kursi, jam operasional gedung, dan ketersediaan tutor tatap muka berada di bawah wewenang kantor cabang fisik masing-masing, bukan kantor pusat.
-> * **Alur Kerja Operasional**:
->   1. Siswa mendaftar program bimbingan tatap muka di cabang.
->   2. **Admin Cabang membuat entitas Rombel/Kelas**: Menentukan nama kelas (misal: *"Kelas Intensif UTBK 12-A"*), ruangan (misal: *"Ruang 201"*), dan daya tampung (misal: 15 siswa).
->   3. **Admin Cabang menugaskan Siswa ke Kelas (*Assign Student to Class*)**: Memasukkan siswa yang telah melunasi administrasi ke daftar rombel kelas tersebut.
->   4. **Admin Cabang mengatur Jadwal Belajar Offline**: Menetapkan hari (Senin/Rabu/Jumat), jam belajar (14.00–16.00 WIB), mata pelajaran (Penalaran Matematika), dan **menugaskan Guru/Tutor** yang mengajar di kelas tersebut.
->   5. **Guru / Tutor**: Melihat jadwal kelas yang ditugaskan kepadanya di portal pengajar dan mengajar siswa yang ada di daftar rombel.
+> **MODEL FRANCHISE & DELEGASI GURU DAERAH**:
+> Mitra Daerah (Admin Cabang) memiliki kewenangan mandiri penuh untuk **menambah, mengedit, dan me-nonaktifkan akun Guru/Tutor (`role: teacher`)** khusus di wilayah cabangnya sendiri melalui menu **"Guru & Tutor Cabang"**.
+> 
+> **Guardrails Keamanan Multi-Tenant**:
+> 1. **Teacher Role Only**: Admin Cabang hanya diizinkan mendaftarkan staf ber-role `teacher`. Dilarang keras membuat akun `superadmin` atau `admin` cabang lain.
+> 2. **Strict Branch Isolation**: Guru yang didaftarkan otomatis terkunci ke `tenant_id` cabang mitra tersebut. Mitra Cabang tidak dapat melihat, menyunting, atau mengintervensi guru dari cabang mitra lain.
 
-### 4.3 Status Kesiapan Fitur Kelas & Jadwal Offline Saat Ini
-* **Fakta Kode & Skema Basis Data Saat Ini**:
-  * Di basis data eksisting ([`schema_dump.json`](file:///c:/Users/yanay/OneDrive/Documents/YANA/ELYANA.BIZ.ID/7%20BIMBEL/BIMBEL%20V1/schema_dump.json) & [`api/database.sql`](file:///c:/Users/yanay/OneDrive/Documents/YANA/ELYANA.BIZ.ID/7%20BIMBEL/BIMBEL%20V1/api/database.sql)), **BELUM TERSEDIA** tabel `classes` (kelas offline) maupun `class_schedules` (jadwal mengajar).
-  * Di antarmuka [`AdminPanel.vue`](file:///c:/Users/yanay/OneDrive/Documents/YANA/ELYANA.BIZ.ID/7%20BIMBEL/BIMBEL%20V1/src/views/AdminPanel.vue) bagian `teacher_hub`, data jadwal mengajar (`teacherSchedule`) dan penugasan siswa saat ini masih berupa **DATA DUMMY / MOCKUP STATIK** (dengan catatan di kode: *"Data dummy jadwal — idealnya dari API admin/teacher-schedule endpoint"*).
-* **Solusi & Target Pengembangan**:
-  * Perlu penambahan tabel `classes` (`id`, `tenant_id`, `name`, `room`, `capacity`), `class_students` (`class_id`, `student_id`), dan `schedules` (`class_id`, `teacher_id`, `day`, `time_start`, `time_end`) pada API `admin.php` agar Admin Cabang dapat melakukan penugasan kelas dan jadwal secara dinamis dari sistem.
+### 4.3 Alur Pengaturan Jadwal Belajar Offline & Pembagian Kelas
+1. **Admin Cabang mendaftarkan Ruang Belajar Fisik (`class_rooms`)**: Menentukan nama ruangan (misal: *"Ruang Newton Lt. 2"*), kapasitas kursi, dan fasilitas kelas.
+2. **Admin Cabang membuat entitas Rombel/Kelas (`classes`)**: Menentukan nama rombel (misal: *"Intensif UTBK 12-A"*), jenjang pendidikan, daya tampung, ruangan default, dan menugaskan tutor utama.
+3. **Admin Cabang menugaskan Siswa ke Rombel (`class_students`)**: Memasukkan siswa aktif cabang ke dalam rombel kelas.
+4. **Admin Cabang mengatur Sesi Tatap Muka (`class_sessions`)**: Menetapkan tanggal, jam belajar (14.00–16.00 WIB), ruangan, dan tutor pengajar dengan proteksi benturan otomatis (*Conflict Detection*).
+5. **Guru / Tutor**: Melihat jadwal kelas yang ditugaskan di portal pengajar, mengisi Berita Acara Pembelajaran (BAP), dan melakukan presensi kehadiran siswa dengan auto-alert Telegram ke orang tua.
 
 ---
 

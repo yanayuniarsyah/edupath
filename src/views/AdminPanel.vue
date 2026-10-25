@@ -2202,12 +2202,14 @@
           <div class="flex flex-wrap justify-between items-center gap-3">
             <div>
               <h2 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <i class="ph-bold ph-users-three text-[#c0ff00]"></i> Staff & Tutor
+                <i class="ph-bold ph-users-three text-[#c0ff00]"></i> {{ isSuperadmin ? 'Staff & Tutor Platform' : 'Guru & Tutor Cabang' }}
               </h2>
-              <p class="text-[10px] text-white/40">Kelola akun tutor, pengajar, admin operasional cabang, dan peran sistem</p>
+              <p class="text-[10px] text-white/40">
+                {{ isSuperadmin ? 'Kelola akun tutor, pengajar, admin operasional cabang, dan peran sistem' : 'Kelola pendaftaran guru dan tutor pengajar lokal untuk cabang Anda' }}
+              </p>
             </div>
             <button @click="openStaffModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5 shadow-md shadow-[#c0ff00]/20 cursor-pointer">
-              <i class="ph-bold ph-plus"></i> Tambah Staff
+              <i class="ph-bold ph-plus"></i> {{ isSuperadmin ? 'Tambah Staff' : '+ Tambah Guru / Tutor' }}
             </button>
           </div>
 
@@ -2215,9 +2217,9 @@
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-2.5 border border-white/10 flex flex-wrap items-center gap-2">
             <div class="relative flex-grow min-w-[180px]">
               <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
-              <input v-model="staffSearch" type="text" placeholder="Cari nama atau username/email staff..." class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors" />
+              <input v-model="staffSearch" type="text" :placeholder="isSuperadmin ? 'Cari nama atau username/email staff...' : 'Cari nama atau email guru/tutor...'" class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors" />
             </div>
-            <select v-model="staffTenantFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
+            <select v-if="isSuperadmin" v-model="staffTenantFilter" class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50">
               <option value="all" class="bg-[#0d1427]">Semua Cabang</option>
               <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427]">{{ t.name }}</option>
             </select>
@@ -3245,13 +3247,13 @@
     <div v-if="showStaffModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
-          <h3 class="font-black text-sm text-white">{{ isEditingStaff ? 'Edit Staff' : 'Tambah Staff Baru' }}</h3>
+          <h3 class="font-black text-sm text-white">{{ isEditingStaff ? (isSuperadmin ? 'Edit Staff' : 'Edit Guru / Tutor') : (isSuperadmin ? 'Tambah Staff Baru' : 'Tambah Guru / Tutor Baru') }}</h3>
           <button @click="closeStaffModal" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
         </div>
         <form @submit.prevent="saveStaff" class="p-4 space-y-3">
           <div>
             <label for="staff_form_username" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email (sebagai Username)</label>
-            <input id="staff_form_username" name="username" v-model="sForm.username" :disabled="isEditingStaff && sForm.username === 'admin'" required type="text" placeholder="nama@bimbel.com" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
+            <input id="staff_form_username" name="username" v-model="sForm.username" :disabled="isEditingStaff && sForm.username === 'admin'" required type="text" :placeholder="isSuperadmin ? 'nama@bimbel.com' : 'email.guru@bimbel.com'" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
           </div>
           <div v-if="isSuperadmin && tenantsList.length > 0">
             <label for="staff_form_tenant" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang / Lembaga Bimbel (Opsional)</label>
@@ -3261,15 +3263,16 @@
             </select>
           </div>
           <div>
-            <label for="staff_form_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap</label>
-            <input id="staff_form_name" name="name" v-model="sForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
+            <label for="staff_form_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap Guru / Tutor</label>
+            <input id="staff_form_name" name="name" v-model="sForm.name" required type="text" placeholder="misal: Bpk. Bambang Pamungkas, S.Pd" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
           <div>
             <label for="staff_form_role" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peran (Role)</label>
-            <select id="staff_form_role" name="role" v-model="sForm.role" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="sForm.username === 'admin'">
-              <option value="teacher" class="bg-[#0d1427] text-white">Guru / Tutor</option>
-              <option value="admin" class="bg-[#0d1427] text-white">Administrator Utama</option>
+            <select id="staff_form_role" name="role" v-model="sForm.role" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" :disabled="sForm.username === 'admin' || !isSuperadmin">
+              <option value="teacher" class="bg-[#0d1427] text-white">Guru / Tutor Pengajar</option>
+              <option v-if="isSuperadmin" value="admin" class="bg-[#0d1427] text-white">Administrator Utama</option>
             </select>
+            <p v-if="!isSuperadmin" class="text-[9px] text-white/40 mt-1">Akun yang didaftarkan otomatis memiliki hak akses sebagai Guru / Tutor pengajar di cabang Anda.</p>
           </div>
           <div>
             <label for="staff_form_password" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password {{ isEditingStaff ? '(Kosongkan jika tidak ubah)' : '' }}</label>
@@ -4159,7 +4162,7 @@ const navItems = computed(() => {
     { id: 'transactions',label: 'Transaksi',             icon: 'ph-receipt',       roles: ['superadmin', 'admin'] },
     { id: 'packages',    label: 'Paket',                 icon: 'ph-package',       roles: ['superadmin'] },
     { id: 'affiliates',  label: 'Afiliasi & Komisi',     icon: 'ph-hand-coins',    roles: ['superadmin', 'admin'] },
-    { id: 'staff',       label: 'Staff',                 icon: 'ph-users-three',   roles: ['superadmin'] },
+    { id: 'staff',       label: isSuper ? 'Staff & Tutor' : 'Guru & Tutor Cabang', icon: 'ph-users-three', roles: ['superadmin', 'admin'] },
     { id: 'reports',     label: 'Laporan & Analitik',    icon: 'ph-chart-bar',     roles: ['superadmin', 'admin'] },
     { id: 'backup_restore', label: 'Backup & Restore DB', icon: 'ph-database',   roles: ['superadmin'] },
     { id: 'settings',    label: 'Pengaturan',            icon: 'ph-gear',          roles: ['superadmin', 'admin', 'teacher'] },
@@ -5617,13 +5620,14 @@ const isEditingStaff = ref(false);
 const sForm = reactive({ id: null, tenant_id: '', username: '', name: '', role: 'teacher', password: '' });
 
 const openStaffModal = (s = null) => {
-  const defTenant = tenantsList.value?.[0]?.id || '';
+  const myTenant = currentAdminUser.value?.tenant_id || tenantsList.value?.[0]?.id || '';
   if (s) {
     isEditingStaff.value = true;
-    Object.assign(sForm, { ...s, password: '', tenant_id: s.tenant_id || defTenant });
+    Object.assign(sForm, { ...s, password: '', tenant_id: s.tenant_id || myTenant });
+    if (!isSuperadmin.value) sForm.role = 'teacher';
   } else {
     isEditingStaff.value = false;
-    Object.assign(sForm, { id: null, tenant_id: defTenant, username: '', name: '', role: 'teacher', password: '' });
+    Object.assign(sForm, { id: null, tenant_id: myTenant, username: '', name: '', role: 'teacher', password: '' });
   }
   showStaffModal.value = true;
 };
@@ -6584,7 +6588,7 @@ watch(activeTab, (newTab) => {
     activeTab.value = 'affiliate_dashboard';
     return;
   }
-  if (!isSuperadmin.value && ['packages', 'plans', 'staff', 'branches', 'backup_restore'].includes(newTab)) {
+  if (!isSuperadmin.value && ['packages', 'plans', 'branches', 'backup_restore'].includes(newTab)) {
     activeTab.value = 'overview';
     return;
   }
