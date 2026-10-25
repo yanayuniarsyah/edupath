@@ -3,6 +3,9 @@
 require_once 'config.php';
 require_once 'jwt.php';
 require_once 'rate_limit.php';
+require_once 'RevenueSplitEngine.php';
+require_once 'FinancialLedger.php';
+require_once 'RoyaltyRegistry.php';
 
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true);
@@ -29,7 +32,7 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // -----------------------------------------------------------------------
 
       // 1. Fetch authenticated student
-      $stmt = $pdo->prepare("SELECT id, name, email, phone FROM students WHERE id = ?");
+      $stmt = $pdo->prepare("SELECT id, name, email, phone, school_id, referred_by FROM students WHERE id = ?");
       $stmt->execute([$payload->id]);
       $student = $stmt->fetch();
   
@@ -41,12 +44,46 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
       
       // Get tenant_id from JWT token (provided by login)
       $student_tenant_id = $payload->tenant_id ?? null;
-      $referred_by = null;
-    if (empty($student_tenant_id)) {
-        http_response_code(403);
-        echo json_encode(["error" => "Student tidak memiliki tenant yang valid"]);
-        exit;
-    }
+      if (empty($student_tenant_id)) {
+          http_response_code(403);
+          echo json_encode(["error" => "Student tidak memiliki tenant yang valid"]);
+          exit;
+      }
+
+      // Resolve Attribution, Channel & Branch Partner (PRD v1.2)
+      $input_ref = $input['referral_code'] ?? null;
+      $referred_by = $student['referred_by'] ?? null;
+      $branch_tenant_id = null;
+      $school_id = $student['school_id'] ?? null;
+      $community_id = $input['community_id'] ?? null;
+
+      if (!empty($input_ref)) {
+          $stmt_aff = $pdo->prepare("SELECT id, tenant_id, user_id FROM affiliates WHERE referral_code = ? LIMIT 1");
+          $stmt_aff->execute([$input_ref]);
+          $aff_row = $stmt_aff->fetch();
+          if ($aff_row) {
+              $referred_by = $aff_row['id'];
+              $branch_tenant_id = $aff_row['tenant_id'];
+          }
+      } elseif (!empty($referred_by)) {
+          $stmt_aff = $pdo->prepare("SELECT tenant_id FROM affiliates WHERE id = ? LIMIT 1");
+          $stmt_aff->execute([$referred_by]);
+          $branch_tenant_id = $stmt_aff->fetchColumn() ?: null;
+      }
+
+      $channel = 'DIRECT';
+      if (!empty($referred_by)) {
+          $channel = 'AFFILIATE';
+      } elseif (!empty($school_id)) {
+          $channel = 'SCHOOL';
+      } elseif (!empty($community_id)) {
+          $channel = 'COMMUNITY';
+      }
+
+      // Check if this is a first transaction or renewal
+      $stmt_first = $pdo->prepare("SELECT id FROM orders WHERE student_id = ? AND status = 'paid' LIMIT 1");
+      $stmt_first->execute([$payload->id]);
+      $is_renewal = (bool) $stmt_first->fetch();
 
     // 2. Lookup plan scoped to student's tenant (cross-tenant access blocked at DB level or global plans)
     $stmt = $pdo->prepare("SELECT id, name, price, discount, duration, features, billing_cycle FROM plans WHERE (id = ? OR name = ?) AND (tenant_id = ? OR tenant_id IS NULL)");
@@ -149,6 +186,22 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $affiliate_id = $referred_by;
 
+        // Calculate Waterfall Simulation & Snapshot via RevenueSplitEngine (PRD v1.2)
+        $royaltyCalc = RoyaltyRegistry::calculateRoyalties($pdo, $plan['id'], (string)$grand_total);
+        $splitParams = [
+            'gross_amount'            => (string)$grand_total,
+            'channel'                 => $channel,
+            'is_renewal'              => $is_renewal,
+            'gateway_rate'            => '0.025',
+            'royalty_fee'             => $royaltyCalc['total_royalty'],
+            'affiliate_id'            => $affiliate_id,
+            'branch_tenant_id'        => $branch_tenant_id,
+            'school_id'               => $school_id,
+            'community_id'            => $community_id,
+        ];
+        $splitResult = RevenueSplitEngine::calculate($splitParams);
+        $rule_snapshot = json_encode($splitResult['rule_snapshot']);
+
         // Pricing snapshot for historical immutability
         $pricing_snapshot = json_encode([
             'plan_id'       => $plan['id'],
@@ -179,8 +232,8 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $pdo->prepare("
                 INSERT INTO orders
-                  (id, tenant_id, plan_id, order_id, student_id, affiliate_id, plan_name, amount, status, snap_token, billing_cycle_snapshot)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
+                  (id, tenant_id, plan_id, order_id, student_id, affiliate_id, channel, branch_tenant_id, school_id, community_id, is_renewal, plan_name, amount, gateway_fee, royalty_fee, distributable_pool, rule_snapshot, status, snap_token, billing_cycle_snapshot)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
             ")->execute([
                 $order_id,
                 $student_tenant_id,   // canonical — from authenticated student
@@ -188,8 +241,17 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $order_ref,
                 $payload->id,
                 $affiliate_id,
+                $channel,
+                $branch_tenant_id,
+                $school_id,
+                $community_id,
+                $is_renewal ? 1 : 0,
                 $plan['name'],
                 $grand_total,         // immutable at time of order — matches invoice
+                $splitResult['gateway_fee'],
+                $splitResult['royalty_fee'],
+                $splitResult['distributable_pool'],
+                $rule_snapshot,
                 $snap_token,
                 $plan['billing_cycle'] ?? 'one-time'
             ]);
@@ -550,73 +612,111 @@ elseif (($action === 'webhook' || $action === 'notification') && $_SERVER['REQUE
             $pdo->prepare("UPDATE students SET plan = ? WHERE id = ?")
                 ->execute([$order['plan_name'], $order['student_id']]);
 
-            // 9e. P1-D: COMMISSION — bcmul (no float arithmetic)
-            //     Affiliate cross-tenant guard: commission only if affiliate.tenant_id == order.tenant_id
-            if (!empty($order['affiliate_id'])) {
-                $stmt_aff = $pdo->prepare("SELECT user_id, tenant_id, commission_rate FROM affiliates WHERE id = ?");
-                $stmt_aff->execute([$order['affiliate_id']]);
-                $affiliate = $stmt_aff->fetch();
+            // 9e. REVENUE SHARING & FINANCIAL LEDGER (PRD v1.2)
+            try {
+                $stmt_ord_meta = $pdo->prepare("SELECT * FROM orders WHERE id = ?");
+                $stmt_ord_meta->execute([$order['id']]);
+                $ord_meta = $stmt_ord_meta->fetch(PDO::FETCH_ASSOC);
 
-                if ($affiliate) {
-                    // ANTI-FRAUD SELF-REFERRAL GUARD
-                    // Business rule: An affiliate cannot earn commission on their own plan purchase.
-                    $stmt_stu_user = $pdo->prepare("SELECT user_id FROM user_roles WHERE reference_id = ? AND role = 'student' LIMIT 1");
-                    $stmt_stu_user->execute([$order['student_id']]);
-                    $stu_user_id = $stmt_stu_user->fetchColumn();
+                $ord_channel = $ord_meta['channel'] ?? 'DIRECT';
+                $ord_is_renewal = !empty($ord_meta['is_renewal']);
+                $ord_branch = $ord_meta['branch_tenant_id'] ?? null;
+                $ord_aff = $ord_meta['affiliate_id'] ?? null;
+                $ord_school = $ord_meta['school_id'] ?? null;
+                $ord_comm = $ord_meta['community_id'] ?? null;
 
-                    if (!empty($stu_user_id) && $stu_user_id === $affiliate['user_id']) {
-                        log_audit($pdo, null, $order['tenant_id'], 'commission_self_referral_rejected', $order['id'], [
-                            'affiliate_id' => $order['affiliate_id'],
-                            'student_id'   => $order['student_id'],
-                        ]);
-                    } elseif ($affiliate['tenant_id'] !== $order['tenant_id']) {
-                        // CROSS-TENANT AFFILIATE GUARD
-                        // Business rule: commission attribution must be same-tenant.
-                        // If affiliate.tenant_id != order.tenant_id → reject commission silently, log audit.
-                        log_audit($pdo, null, $order['tenant_id'], 'commission_cross_tenant_rejected', $order['id'], [
-                            'affiliate_id'        => $order['affiliate_id'],
-                            'affiliate_tenant_id' => $affiliate['tenant_id'],
-                            'order_tenant_id'     => $order['tenant_id'],
-                        ]);
-                    } else {
-                        // Check if this is a first transaction or renewal
-                        $stmt_first = $pdo->prepare("SELECT id FROM orders WHERE student_id = ? AND status = 'paid' AND id != ? LIMIT 1");
-                        $stmt_first->execute([$order['student_id'], $order['id']]);
-                        $is_renewal = (bool) $stmt_first->fetch();
+                // Anti-fraud self-referral guard
+                if (!empty($ord_aff)) {
+                    $stmt_aff = $pdo->prepare("SELECT user_id, tenant_id FROM affiliates WHERE id = ?");
+                    $stmt_aff->execute([$ord_aff]);
+                    $aff_user = $stmt_aff->fetch();
 
-                        // Business rule: 20% first transaction, 10% renewal
-                        $actual_rate = $is_renewal ? '10.00' : '20.00';
-                        // Optionally respect affiliate's custom rate if we need to scale (e.g. if they have > 20% negotiated)
-                        // P1-D: bcmul — no float arithmetic for monetary commission calculation
-                        $amount_str          = (string) $order['amount'];
-                        $commission_amount   = bcmul($amount_str, bcdiv($actual_rate, '100', 10), 2);
+                    if ($aff_user) {
+                        $stmt_stu_user = $pdo->prepare("SELECT user_id FROM user_roles WHERE reference_id = ? AND role = 'student' LIMIT 1");
+                        $stmt_stu_user->execute([$order['student_id']]);
+                        $stu_user_id = $stmt_stu_user->fetchColumn();
 
-                        $comm_id = $mkuuid();
-                        $pdo->prepare("
-                            INSERT IGNORE INTO commissions
-                              (id, affiliate_id, tenant_id, order_id, amount, commission_rate_snapshot, status)
-                            VALUES (?, ?, ?, ?, ?, ?, 'pending')
-                        ")->execute([
-                            $comm_id,
-                            $order['affiliate_id'],
-                            $order_tenant_id,   // use order tenant, not affiliate tenant
-                            $order['id'],
-                            $commission_amount,
-                            $actual_rate,
-                        ]);
+                        if (!empty($stu_user_id) && $stu_user_id === $aff_user['user_id']) {
+                            // Self-referral detected: neutralize affiliate commission
+                            $ord_aff = null;
+                            $ord_channel = 'DIRECT';
+                            log_audit($pdo, null, $order_tenant_id, 'commission_self_referral_rejected', $order['id'], [
+                                'affiliate_id' => $ord_meta['affiliate_id'],
+                                'student_id'   => $order['student_id']
+                            ]);
+                        }
                     }
                 }
+
+                // Compute royalties
+                $royaltyCalc = RoyaltyRegistry::calculateRoyalties($pdo, $ord_meta['plan_id'] ?? null, (string)$ord_meta['amount']);
+
+                // Calculate split
+                $splitResult = RevenueSplitEngine::calculate([
+                    'gross_amount'            => (string)$ord_meta['amount'],
+                    'channel'                 => $ord_channel,
+                    'is_renewal'              => $ord_is_renewal,
+                    'gateway_fee'             => $ord_meta['gateway_fee'] ?? null,
+                    'royalty_fee'             => $royaltyCalc['total_royalty'],
+                    'affiliate_id'            => $ord_aff,
+                    'branch_tenant_id'        => $ord_branch,
+                    'school_id'               => $ord_school,
+                    'community_id'            => $ord_comm
+                ]);
+
+                // Post immutable financial ledger entries
+                FinancialLedger::postOrderSplit($pdo, $order['id'], $order_tenant_id, $ord_channel, $splitResult);
+
+                // Record royalty accruals
+                if (!empty($royaltyCalc['contracts'])) {
+                    RoyaltyRegistry::recordAccruals($pdo, $order['id'], $royaltyCalc['contracts']);
+                }
+
+                // Update orders with finalized split amounts & snapshot
+                $pdo->prepare("
+                    UPDATE orders 
+                    SET gateway_fee = ?, royalty_fee = ?, distributable_pool = ?, rule_snapshot = ?
+                    WHERE id = ?
+                ")->execute([
+                    $splitResult['gateway_fee'],
+                    $splitResult['royalty_fee'],
+                    $splitResult['distributable_pool'],
+                    json_encode($splitResult['rule_snapshot']),
+                    $order['id']
+                ]);
+
+                // Sync legacy commissions table for backward compatibility
+                if ($ord_channel === 'AFFILIATE' && !empty($ord_aff) && bccomp($splitResult['affiliate_amount'], '0.00', 2) > 0) {
+                    $comm_id = $mkuuid();
+                    $actual_rate = $ord_is_renewal ? '10.00' : '20.00';
+                    $pdo->prepare("
+                        INSERT IGNORE INTO commissions
+                          (id, affiliate_id, tenant_id, order_id, amount, commission_rate_snapshot, status)
+                        VALUES (?, ?, ?, ?, ?, ?, 'pending')
+                    ")->execute([
+                        $comm_id,
+                        $ord_aff,
+                        $order_tenant_id,
+                        $order['id'],
+                        $splitResult['affiliate_amount'],
+                        $actual_rate
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                error_log("PRD v1.2 Revenue Split Webhook Exception: " . $e->getMessage());
             }
         } elseif ($new_status === 'paid' && $is_duplicate_event) {
             // Idempotent duplicate of 'paid' — subscription/entitlement already provisioned, skip
             $processing_result = 'duplicate';
         } elseif ($new_status === 'refunded' || $new_status === 'failed') {
-            // REFUND / CANCEL FLOW: cancel pending commission
+            // REFUND / CANCEL FLOW: cancel pending commission and post ledger reversals (PRD v1.2)
             $pdo->prepare("
                 UPDATE commissions 
                 SET status = 'cancelled' 
                 WHERE order_id = ? AND status = 'pending'
             ")->execute([$order['id']]);
+
+            FinancialLedger::reverseOrderLedger($pdo, $order['id'], "Order status changed to $new_status");
         }
 
         // 10. P0-B: WRITE PAYMENT EVENT HISTORY — always inside transaction

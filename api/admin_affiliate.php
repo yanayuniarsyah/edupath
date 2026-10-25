@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         } catch (PDOException $e) {
             echo json_encode([]);
         }
-    } else {
+    } elseif ($action === 'list') {
         // list affiliates
         try {
             if ($payload->role === 'affiliate') {
@@ -209,6 +209,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             echo json_encode($affiliates);
         } catch (PDOException $e) {
             error_log("Affiliates query failed: " . $e->getMessage());
+            echo json_encode([]);
+        }
+    } elseif ($action === 'financial_ledger') {
+        try {
+            if ($payload->role === 'affiliate') {
+                $stmt = $pdo->prepare("
+                    SELECT * FROM financial_ledger 
+                    WHERE party_type = 'AFFILIATE' AND party_id = ? 
+                    ORDER BY created_at DESC LIMIT 100
+                ");
+                $stmt->execute([$payload->id]);
+            } elseif ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+                $stmt = $pdo->prepare("
+                    SELECT * FROM financial_ledger 
+                    WHERE tenant_id = ? OR (party_type = 'BRANCH' AND party_id = ?)
+                    ORDER BY created_at DESC LIMIT 200
+                ");
+                $stmt->execute([$payload->tenant_id, $payload->tenant_id]);
+            } else {
+                $stmt = $pdo->query("SELECT * FROM financial_ledger ORDER BY created_at DESC LIMIT 300");
+            }
+            echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        } catch (PDOException $e) {
+            echo json_encode([]);
+        }
+    } elseif ($action === 'branch_performance') {
+        try {
+            $tenantId = ($payload->role !== 'superadmin') ? $payload->tenant_id : ($_GET['tenant_id'] ?? null);
+            if (!$tenantId) {
+                http_response_code(400);
+                echo json_encode(["error" => "Tenant ID diperlukan"]);
+                exit;
+            }
+
+            // 1. Total Affiliators
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM affiliates WHERE tenant_id = ?");
+            $stmt->execute([$tenantId]);
+            $totalAffiliators = (int)$stmt->fetchColumn();
+
+            // 2. Gross Sales through branch's affiliates
+            $stmt = $pdo->prepare("
+                SELECT 
+                    COALESCE(SUM(amount), 0) as gross_sales,
+                    COUNT(*) as total_orders
+                FROM orders 
+                WHERE branch_tenant_id = ? AND status = 'paid'
+            ");
+            $stmt->execute([$tenantId]);
+            $sales = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // 3. Branch Net Revenue
+            $stmt = $pdo->prepare("
+                SELECT COALESCE(SUM(amount), 0) FROM financial_ledger 
+                WHERE party_type = 'BRANCH' AND party_id = ? AND entry_type = 'BRANCH_NET_REVENUE' AND status = 'posted'
+            ");
+            $stmt->execute([$tenantId]);
+            $branchNet = (float)$stmt->fetchColumn();
+
+            // 4. Affiliate Commissions Deducted from Branch
+            $stmt = $pdo->prepare("
+                SELECT COALESCE(SUM(c.amount), 0) 
+                FROM commissions c 
+                JOIN affiliates a ON c.affiliate_id = a.id 
+                WHERE a.tenant_id = ? AND c.status = 'paid'
+            ");
+            $stmt->execute([$tenantId]);
+            $affCommissionsPaid = (float)$stmt->fetchColumn();
+
+            echo json_encode([
+                "tenant_id"                => $tenantId,
+                "total_affiliators"        => $totalAffiliators,
+                "gross_sales"              => (float)($sales['gross_sales'] ?? 0),
+                "total_paid_orders"        => (int)($sales['total_orders'] ?? 0),
+                "branch_net_revenue"       => $branchNet,
+                "affiliate_commissions_cut"=> $affCommissionsPaid
+            ]);
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    } elseif ($action === 'royalty_summary') {
+        try {
+            if ($payload->role !== 'superadmin') {
+                http_response_code(403);
+                echo json_encode(["error" => "Hanya Superadmin yang dapat melihat ringkasan royalti"]);
+                exit;
+            }
+            $stmt = $pdo->query("
+                SELECT 
+                    co.id as owner_id, co.name as owner_name, co.email,
+                    COUNT(ra.id) as total_accruals,
+                    COALESCE(SUM(ra.total_amount), 0) as total_royalty_accrued,
+                    COALESCE(SUM(CASE WHEN ra.status = 'settled' THEN ra.total_amount ELSE 0 END), 0) as settled_amount,
+                    COALESCE(SUM(CASE WHEN ra.status = 'pending' THEN ra.total_amount ELSE 0 END), 0) as pending_amount
+                FROM content_owners co
+                LEFT JOIN royalty_accruals ra ON co.id = ra.owner_id
+                GROUP BY co.id, co.name, co.email
+            ");
+            echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        } catch (PDOException $e) {
             echo json_encode([]);
         }
     }
