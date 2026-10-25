@@ -53,6 +53,10 @@ const routes = [
     component: () => import(/* webpackChunkName: "terms" */ '../views/TermsView.vue'),
   },
   {
+    path: '/verify-cert',
+    component: () => import(/* webpackChunkName: "verify-cert" */ '../views/VerifyCertificate.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/',
   },

@@ -505,6 +505,13 @@
                 </p>
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
                   <button
+                    @click="viewOfficialCertificate"
+                    class="px-5 py-2.5 rounded-full bg-emerald-500 text-black font-black text-xs hover:bg-emerald-400 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+                  >
+                    <i class="ph-bold ph-certificate text-base"></i>
+                    <span>{{ certLoading ? 'Memuat...' : 'Sertifikat Resmi SPP' }}</span>
+                  </button>
+                  <button
                     @click="shareCard"
                     class="px-5 py-2.5 rounded-full bg-white text-black font-black text-xs hover:bg-[#c0ff00] active:scale-95 transition-all flex items-center gap-2 shadow-lg"
                   >
@@ -826,6 +833,119 @@
 
     </div>
 
+    <!-- ===== MODAL SERTIFIKAT RESMI TERVERIFIKASI ===== -->
+    <div v-if="showCertModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
+      <div class="relative w-full max-w-2xl bg-[#0b1329] border-2 border-emerald-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_60px_rgba(16,185,129,0.25)] text-white space-y-6 my-8">
+        
+        <!-- Modal Top Bar -->
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-xs font-black uppercase tracking-wider text-emerald-400 font-mono">Official Certificate of Assessment</span>
+          </div>
+          <button @click="showCertModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-base">
+            <i class="ph-bold ph-x"></i>
+          </button>
+        </div>
+
+        <!-- Certificate Paper Frame (Printable Area) -->
+        <div id="printable-certificate" class="bg-gradient-to-br from-[#0e1726] to-[#070b14] border border-white/15 rounded-2xl p-6 sm:p-8 space-y-6 relative overflow-hidden text-center sm:text-left">
+          
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-5">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-xl">E</div>
+              <div>
+                <h3 class="font-black text-lg text-white">EduPath Indonesia</h3>
+                <p class="text-[10px] text-white/50 uppercase tracking-widest font-mono">Adaptive Potential Assessment</p>
+              </div>
+            </div>
+            <div class="text-center sm:text-right font-mono">
+              <div class="text-[9px] text-white/40 uppercase">Nomor Registrasi</div>
+              <div class="text-xs font-black text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/30 mt-0.5">
+                {{ certificateData?.certificate_number }}
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center py-2 space-y-1">
+            <span class="text-[10px] text-white/50 tracking-[0.2em] uppercase font-mono">Diberikan Secara Sah Kepada:</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-white font-heading underline decoration-[#c0ff00]/40 underline-offset-4">
+              {{ certificateData?.student_name }}
+            </h2>
+            <p class="text-xs text-white/70 font-semibold">{{ certificateData?.school_name }}</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs bg-white/5 p-4 rounded-xl border border-white/10 font-mono">
+            <div>
+              <span class="text-white/40 text-[10px] block">Tipologi RIASEC:</span>
+              <strong class="text-amber-300 text-sm">{{ certificateData?.riasec_code }}</strong>
+            </div>
+            <div>
+              <span class="text-white/40 text-[10px] block">Gaya Belajar:</span>
+              <strong class="text-[#c0ff00] text-sm">{{ certificateData?.learning_style }}</strong>
+            </div>
+          </div>
+
+          <div v-if="certificateData?.top_recommendations" class="space-y-2">
+            <span class="text-[10px] uppercase font-bold text-white/50 tracking-wider block">Peta Jurusan Rekomendasi:</span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-center">
+                <span class="text-[9px] text-emerald-400 font-bold block uppercase">Utama</span>
+                <span class="text-white font-bold">{{ certificateData.top_recommendations.bidang_utama }}</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-center">
+                <span class="text-[9px] text-sky-400 font-bold block uppercase">Pendukung</span>
+                <span class="text-white font-bold">{{ certificateData.top_recommendations.bidang_pendukung }}</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-center">
+                <span class="text-[9px] text-amber-400 font-bold block uppercase">Alternatif</span>
+                <span class="text-white font-bold">{{ certificateData.top_recommendations.pilihan_alternatif }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Meta & QR -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10">
+            <div class="space-y-1 text-[10px] font-mono text-white/40 text-center sm:text-left">
+              <div>Tanggal Terbit: <strong class="text-white/70">{{ certificateData?.issue_date }}</strong></div>
+              <div class="truncate max-w-xs">Hash: {{ certificateData?.verification_hash }}</div>
+              <div class="text-emerald-400/80">★ Terdaftar di Ledger EduPath Anti-Pemalsuan</div>
+            </div>
+            <div class="p-2 rounded-xl bg-white text-center shrink-0 shadow-lg">
+              <img 
+                :src="`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(getVerifyUrl())}`" 
+                width="80" 
+                height="80" 
+                alt="QR Verifikasi"
+                class="mx-auto" 
+              />
+              <span class="text-[8px] text-slate-800 font-mono font-bold block mt-1">Scan Verifikasi</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center justify-end gap-3 pt-2">
+          <button 
+            @click="openPublicVerifyLink"
+            class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all flex items-center gap-2 border border-white/15"
+          >
+            <i class="ph-bold ph-arrow-square-out text-base"></i>
+            <span>Buka Halaman Verifikasi Publik</span>
+          </button>
+          <button 
+            @click="printCert"
+            class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/25"
+          >
+            <i class="ph-bold ph-printer text-base"></i>
+            <span>Cetak / Simpan PDF</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -867,8 +987,13 @@ export default {
 
     const partnerTelegramUrl = computed(() => {
       const text = `Halo Tim Kemitraan EduPath, saya ${partnerBkName.value} dari ${partnerSchoolName.value} (${partnerStudentCount.value}) ingin mengklaim banner QR Code resmi & fasilitasi asesmen SPP untuk sekolah kami.`;
-      return `https://wa.me/6281234567890?text=${encodeURIComponent(text)}`;
+      return `https://t.me/edupath_support_bot?start=${encodeURIComponent(text)}`;
     });
+
+    // Official Verified Certificate State
+    const showCertModal = ref(false);
+    const certLoading = ref(false);
+    const certificateData = ref(null);
 
     // 30 Canonical Questions
     const questions = [
@@ -1270,6 +1395,78 @@ export default {
       });
     };
 
+    const getVerifyUrl = () => {
+      const num = certificateData.value?.certificate_number || '';
+      return `${window.location.origin}/#/verify-cert?no=${encodeURIComponent(num)}`;
+    };
+
+    const openPublicVerifyLink = () => {
+      window.open(getVerifyUrl(), '_blank');
+    };
+
+    const printCert = () => {
+      window.print();
+    };
+
+    const viewOfficialCertificate = async () => {
+      if (!attemptId.value || attemptId.value.startsWith('guest-')) {
+        certificateData.value = {
+          certificate_number: 'CERT-SPP-' + new Date().getFullYear() + '-PREVIEW',
+          student_name: studentData.name || 'Peserta Didik',
+          school_name: studentData.school || 'Umum',
+          riasec_code: profile.archetype || 'IAR',
+          learning_style: profile.learning || 'Metacognitive Mastery',
+          issue_date: new Date().toISOString().split('T')[0],
+          verification_hash: 'LOCAL_PREVIEW_MODE',
+          top_recommendations: {
+            bidang_utama: profile.fields[0]?.name || 'Sains & Riset Komputasi',
+            bidang_pendukung: profile.fields[1]?.name || 'Teknologi Terapan',
+            pilihan_alternatif: profile.fields[2]?.name || 'Manajemen Bisnis'
+          }
+        };
+        showCertModal.value = true;
+        return;
+      }
+
+      certLoading.value = true;
+      try {
+        const res = await api.sppGetCertificate(attemptId.value);
+        if (res && res.status === 'SUCCESS') {
+          certificateData.value = {
+            certificate_number: res.certificate_number,
+            student_name: res.student_name_snapshot,
+            school_name: res.school_name_snapshot,
+            riasec_code: res.riasec_code,
+            learning_style: res.learning_style,
+            issue_date: res.issue_date,
+            verification_hash: res.verification_hash,
+            top_recommendations: res.top_recommendations
+          };
+          showCertModal.value = true;
+        } else {
+          certificateData.value = {
+            certificate_number: 'CERT-SPP-' + new Date().getFullYear() + '-ACT',
+            student_name: studentData.name || 'Peserta Didik',
+            school_name: studentData.school || 'Umum',
+            riasec_code: profile.archetype || 'IAR',
+            learning_style: profile.learning || 'Metacognitive Mastery',
+            issue_date: new Date().toISOString().split('T')[0],
+            verification_hash: 'SYNC_PENDING',
+            top_recommendations: {
+              bidang_utama: profile.fields[0]?.name || 'Sains & Riset Komputasi',
+              bidang_pendukung: profile.fields[1]?.name || 'Teknologi Terapan',
+              pilihan_alternatif: profile.fields[2]?.name || 'Manajemen Bisnis'
+            }
+          };
+          showCertModal.value = true;
+        }
+      } catch (err) {
+        console.warn("Gagal load sertifikat:", err);
+      } finally {
+        certLoading.value = false;
+      }
+    };
+
     return {
       activeMode,
       sppStage,
@@ -1288,6 +1485,13 @@ export default {
       copySuccess,
       schoolLinkCopied,
       isSubmitting,
+      showCertModal,
+      certLoading,
+      certificateData,
+      viewOfficialCertificate,
+      getVerifyUrl,
+      openPublicVerifyLink,
+      printCert,
       startSppForm,
       proceedToQuestions,
       loadSampleResult,

@@ -111,6 +111,63 @@ else if ($action === 'get_school_aggregate' && $_SERVER['REQUEST_METHOD'] === 'G
     $service = new SPPService($pdo);
     echo json_encode($service->getSchoolAggregate($school_name, $tenant_id));
 }
+else if ($action === 'get_certificate' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    require_once 'spp_service.php';
+    $payload = authenticate();
+    
+    $attempt_id = $_GET['attempt_id'] ?? ($_GET['id'] ?? '');
+    if (!$attempt_id) {
+        http_response_code(400);
+        echo json_encode(["status" => "ERROR", "message" => "Parameter attempt_id wajib disertakan"]);
+        exit;
+    }
+    
+    $service = new SPPService($pdo);
+    
+    // Jika student, hanya boleh ambil miliknya sendiri
+    $student_id = $payload->id;
+    if (in_array($payload->role, ['admin', 'superadmin', 'school_bk'])) {
+        // Admin/BK bisa meminta sertifikat siswa tertentu jika student_id disertakan
+        $student_id = $_GET['student_id'] ?? $payload->id;
+        // Jika tidak diberikan student_id, ambil dari attempt record
+        if (!$student_id || $student_id === $payload->id) {
+            $stmtAtt = $pdo->prepare("SELECT student_id FROM spp_attempts WHERE id = ?");
+            $stmtAtt->execute([$attempt_id]);
+            $student_id = $stmtAtt->fetchColumn();
+        }
+    }
+    
+    if (!$student_id) {
+        http_response_code(400);
+        echo json_encode(["status" => "ERROR", "message" => "Identitas siswa tidak ditemukan"]);
+        exit;
+    }
+    
+    $result = $service->getOrCreateCertificate($attempt_id, $student_id);
+    if (isset($result['status']) && $result['status'] === 'ERROR') {
+        http_response_code(404);
+    }
+    echo json_encode($result);
+}
+else if ($action === 'verify_certificate' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Public endpoint: tidak memerlukan autentikasi JWT agar bisa diakses scan QR
+    require_once 'spp_service.php';
+    
+    $identifier = $_GET['no'] ?? ($_GET['number'] ?? ($_GET['hash'] ?? ($_GET['id'] ?? '')));
+    if (!$identifier) {
+        http_response_code(400);
+        echo json_encode(["valid" => false, "message" => "Nomor sertifikat atau verification hash wajib disertakan"]);
+        exit;
+    }
+    
+    $service = new SPPService($pdo);
+    $result = $service->verifyCertificate($identifier);
+    
+    if (!$result['valid']) {
+        http_response_code(404);
+    }
+    echo json_encode($result);
+}
 else {
     http_response_code(404);
     echo json_encode(["error" => "Endpoint tidak ditemukan"]);

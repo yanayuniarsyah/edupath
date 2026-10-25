@@ -204,4 +204,146 @@ class SPPService {
 
         return $aggregate;
     }
+
+    private function mapRiasecToRecommendations($riasecCode) {
+        $dict = [
+            'R' => ['Teknik Elektro / Mesin', 'Teknologi Informasi & Jaringan', 'Ilmu Pertanian Presisi'],
+            'I' => ['Kedokteran & Biomedis', 'Ilmu Komputer & AI', 'Fisika / Matematika Murni'],
+            'A' => ['Desain Komunikasi Visual', 'Arsitektur', 'Film & Animasi Digital'],
+            'S' => ['Psikologi Pendidikan', 'Pendidikan Guru Profesional', 'Manajemen SDM & Konseling'],
+            'E' => ['Manajemen Bisnis Digital', 'Hubungan Internasional', 'Hukum Bisnis & Korporasi'],
+            'C' => ['Akuntansi Sektor Publik', 'Aktuaria & Analisis Data', 'Administrasi Fiskal / Pajak']
+        ];
+        $primary = substr($riasecCode, 0, 1) ?: 'I';
+        $secondary = substr($riasecCode, 1, 1) ?: 'E';
+        
+        $primaryRecs = $dict[$primary] ?? $dict['I'];
+        $secondaryRecs = $dict[$secondary] ?? $dict['E'];
+        
+        return [
+            "bidang_utama" => $primaryRecs[0] ?? "Ilmu Komputer & Sistem Informasi",
+            "bidang_pendukung" => $secondaryRecs[0] ?? "Manajemen Bisnis",
+            "pilihan_alternatif" => $primaryRecs[1] ?? "Teknologi Terapan",
+            "keterangan_profil" => "Berdasarkan pemetaan dominansi minat psikometri {$riasecCode} dan efikasi belajar adaptif."
+        ];
+    }
+
+    public function getOrCreateCertificate($attempt_id, $student_id) {
+        // 1. Validasi attempt
+        $stmt = $this->pdo->prepare("SELECT a.*, s.name as student_name, s.school as student_school, s.tenant_id 
+                                    FROM spp_attempts a 
+                                    JOIN students s ON s.id = a.student_id 
+                                    WHERE a.id = ? AND a.student_id = ?");
+        $stmt->execute([$attempt_id, $student_id]);
+        $attempt = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$attempt) {
+            return ["status" => "ERROR", "message" => "Data asesmen tidak ditemukan untuk siswa ini."];
+        }
+
+        if ($attempt['scoring_status'] !== 'SCORED') {
+            return ["status" => "ERROR", "message" => "Asesmen belum selesai dinilai atau status skor tidak valid."];
+        }
+
+        // 2. Cek apakah sertifikat sudah pernah dibuat
+        $stmt_cert = $this->pdo->prepare("SELECT * FROM spp_certificates WHERE attempt_id = ?");
+        $stmt_cert->execute([$attempt_id]);
+        $existing = $stmt_cert->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing) {
+            $existing['top_recommendations'] = json_decode($existing['top_recommendations'] ?? '[]', true);
+            $existing['status'] = 'SUCCESS';
+            return $existing;
+        }
+
+        // 3. Ambil data RIASEC & Profil
+        $stmt_score = $this->pdo->prepare("SELECT riasec_top3 FROM spp_scores WHERE attempt_id = ?");
+        $stmt_score->execute([$attempt_id]);
+        $scoreRow = $stmt_score->fetch(PDO::FETCH_ASSOC);
+        $top3 = $scoreRow ? json_decode($scoreRow['riasec_top3'], true) : ['I', 'A', 'R'];
+        $riasecCode = is_array($top3) ? strtoupper(implode('', array_slice($top3, 0, 3))) : 'IAR';
+
+        $stmt_prof = $this->pdo->prepare("SELECT relative_strength FROM spp_profiles WHERE attempt_id = ?");
+        $stmt_prof->execute([$attempt_id]);
+        $profRow = $stmt_prof->fetch(PDO::FETCH_ASSOC);
+        $strength = $profRow['relative_strength'] ?? 'Metacognitive Mastery';
+        $learningStyle = 'Gaya ' . ucwords(str_replace('_', ' ', $strength));
+
+        $recommendations = $this->mapRiasecToRecommendations($riasecCode);
+
+        // 4. Buat Nomor Sertifikat Unik & Hash Verifikasi
+        $certYear = date('Y');
+        $randomHex = strtoupper(substr(hash('crc32b', $attempt_id . microtime()), 0, 8));
+        $certNumber = "CERT-SPP-{$certYear}-{$randomHex}";
+        $issueDate = date('Y-m-d');
+        $verificationHash = hash('sha256', "EDUPATH_SPP_VERIFY|{$certNumber}|{$student_id}|{$attempt['student_name']}|{$riasecCode}|{$issueDate}");
+        $certId = $this->generate_uuid();
+
+        // 5. Simpan ke database
+        $ins = $this->pdo->prepare("INSERT INTO spp_certificates (
+            id, tenant_id, student_id, attempt_id, certificate_number,
+            student_name_snapshot, school_name_snapshot, riasec_code,
+            learning_style, top_recommendations, issue_date,
+            verification_hash, pdf_generation_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ready')");
+        $ins->execute([
+            $certId,
+            $attempt['tenant_id'],
+            $student_id,
+            $attempt_id,
+            $certNumber,
+            $attempt['student_name'],
+            $attempt['student_school'] ?? 'Siswa EduPath',
+            $riasecCode,
+            $learningStyle,
+            json_encode($recommendations),
+            $issueDate,
+            $verificationHash
+        ]);
+
+        return [
+            "status" => "SUCCESS",
+            "id" => $certId,
+            "certificate_number" => $certNumber,
+            "student_name_snapshot" => $attempt['student_name'],
+            "school_name_snapshot" => $attempt['student_school'] ?? 'Siswa EduPath',
+            "riasec_code" => $riasecCode,
+            "learning_style" => $learningStyle,
+            "top_recommendations" => $recommendations,
+            "issue_date" => $issueDate,
+            "verification_hash" => $verificationHash,
+            "pdf_generation_status" => "ready"
+        ];
+    }
+
+    public function verifyCertificate($identifier) {
+        if (!$identifier) {
+            return ["valid" => false, "message" => "Nomor atau hash sertifikat wajib disertakan."];
+        }
+
+        $stmt = $this->pdo->prepare("SELECT * FROM spp_certificates WHERE certificate_number = ? OR verification_hash = ? OR id = ? LIMIT 1");
+        $stmt->execute([$identifier, $identifier, $identifier]);
+        $cert = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$cert) {
+            return [
+                "valid" => false,
+                "message" => "Sertifikat tidak terdaftar atau kode verifikasi tidak cocok dalam sistem EduPath."
+            ];
+        }
+
+        return [
+            "valid" => true,
+            "certificate_number" => $cert['certificate_number'],
+            "student_name" => $cert['student_name_snapshot'],
+            "school_name" => $cert['school_name_snapshot'],
+            "riasec_code" => $cert['riasec_code'],
+            "learning_style" => $cert['learning_style'],
+            "top_recommendations" => json_decode($cert['top_recommendations'] ?? '[]', true),
+            "issue_date" => $cert['issue_date'],
+            "verification_hash" => $cert['verification_hash'],
+            "verified_at" => date('Y-m-d H:i:s'),
+            "issuer" => "EduPath Indonesia - Adaptive Learning & Assessment Platform"
+        ];
+    }
 }

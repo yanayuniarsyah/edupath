@@ -2328,6 +2328,7 @@ elseif (in_array($action, ['upload_material_file', 'upload_material_image']) && 
         echo json_encode([
             "success" => true,
             "url" => $url,
+            "file_url" => $url,
             "filename" => $file['name'],
             "size" => $file['size']
         ]);

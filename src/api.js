@@ -149,7 +149,7 @@ function getCookie(name) {
 }
 
 export async function apiFetch(endpoint, options = {}) {
-  const isAdminRoute = endpoint.includes('admin.php') || endpoint.includes('admin_affiliate.php');
+  const isAdminRoute = endpoint.includes('admin.php') || endpoint.includes('admin_affiliate.php') || (endpoint.includes('classes.php') && !!(sessionStorage.getItem(ADMIN_TOKEN_KEY) || sessionStorage.getItem('admin_token')));
   const isSchoolRoute = endpoint.includes('school.php');
   const method = (options.method || 'GET').toUpperCase();
 
@@ -503,6 +503,66 @@ export const api = {
   },
   sppGetSchoolAggregate(schoolName) {
     return apiFetch(`/spp.php?action=get_school_aggregate&school_name=${encodeURIComponent(schoolName)}`);
+  },
+  sppGetCertificate(attemptId, studentId = '') {
+    const q = studentId ? `&student_id=${encodeURIComponent(studentId)}` : '';
+    return apiFetch(`/spp.php?action=get_certificate&attempt_id=${encodeURIComponent(attemptId)}${q}`);
+  },
+  sppVerifyCertificate(identifier) {
+    return apiFetch(`/spp.php?action=verify_certificate&no=${encodeURIComponent(identifier)}`);
+  },
+
+  // ── Offline Classes & Schedule Management ──
+  getRooms() {
+    return apiFetch('/classes.php?action=rooms');
+  },
+  createRoom(data) {
+    return apiFetch('/classes.php?action=rooms', { method: 'POST', body: JSON.stringify(data) });
+  },
+  getOfflineClasses(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/classes.php?action=classes${q ? '&' + q : ''}`);
+  },
+  createOfflineClass(data) {
+    return apiFetch('/classes.php?action=classes', { method: 'POST', body: JSON.stringify(data) });
+  },
+  updateOfflineClass(id, data) {
+    return apiFetch(`/classes.php?action=classes&id=${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  deleteOfflineClass(id) {
+    return apiFetch(`/classes.php?action=classes&id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+  },
+  getClassStudents(classId) {
+    return apiFetch(`/classes.php?action=class_students&class_id=${encodeURIComponent(classId)}`);
+  },
+  assignClassStudent(data) {
+    return apiFetch('/classes.php?action=class_students', { method: 'POST', body: JSON.stringify(data) });
+  },
+  removeClassStudent(classId, studentId) {
+    return apiFetch(`/classes.php?action=class_students&class_id=${encodeURIComponent(classId)}&student_id=${encodeURIComponent(studentId)}`, { method: 'DELETE' });
+  },
+  getClassSessions(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/classes.php?action=sessions${q ? '&' + q : ''}`);
+  },
+  rescheduleSession(sessionId, data) {
+    return apiFetch(`/classes.php?action=sessions&action_type=reschedule&session_id=${encodeURIComponent(sessionId)}`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  getSessionAttendance(sessionId) {
+    return apiFetch(`/classes.php?action=attendance&session_id=${encodeURIComponent(sessionId)}`);
+  },
+  saveSessionAttendance(data) {
+    return apiFetch('/classes.php?action=attendance', { method: 'POST', body: JSON.stringify(data) });
+  },
+  getTeacherHubData() {
+    return apiFetch('/classes.php?action=teacher_hub');
+  },
+  getEwsReport(classId = '') {
+    const q = classId ? `&class_id=${encodeURIComponent(classId)}` : '';
+    return apiFetch(`/classes.php?action=ews_report${q}`);
   },
 
   // ── School & Guru BK Management ──

@@ -585,12 +585,38 @@
 
               <!-- Jadwal Mengajar -->
               <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
-                <div class="px-3.5 py-2.5 border-b border-white/10 bg-black/20 flex items-center gap-2">
-                  <i class="ph-bold ph-calendar text-amber-400"></i>
-                  <h3 class="font-bold text-white text-xs">Jadwal Mengajar Saya</h3>
+                <div class="px-3.5 py-2.5 border-b border-white/10 bg-black/20 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-calendar text-amber-400"></i>
+                    <h3 class="font-bold text-white text-xs">Jadwal Mengajar & BAP Saya</h3>
+                  </div>
+                  <span class="text-[9px] font-mono text-white/50">{{ teacherUpcomingSessions.length }} Sesi</span>
                 </div>
-                <div v-if="teacherSchedule.length === 0" class="p-4 text-center text-white/40 text-[10px]">
-                  Jadwal belum diatur oleh Admin Bimbel.
+                <div v-if="teacherUpcomingSessions.length === 0 && teacherSchedule.length === 0" class="p-4 text-center text-white/40 text-[10px]">
+                  Belum ada sesi mengajar offline aktif yang ditugaskan oleh Admin Bimbel.
+                </div>
+                <div v-else-if="teacherUpcomingSessions.length > 0" class="divide-y divide-white/5">
+                  <div v-for="session in teacherUpcomingSessions" :key="session.id" class="px-3.5 py-2.5 flex items-center justify-between gap-3 hover:bg-white/5 transition-colors">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div class="w-16 text-center py-1 rounded-lg bg-amber-500/15 border border-amber-500/20 text-amber-300 text-[10px] font-black shrink-0">
+                        {{ session.session_date }}
+                      </div>
+                      <div class="min-w-0">
+                        <div class="text-xs font-bold text-white truncate">{{ session.class_name }} • {{ session.room_name || 'Offline' }}</div>
+                        <div class="text-[10px] text-white/40 truncate">
+                          {{ (session.start_time || '').slice(0, 5) }}–{{ (session.end_time || '').slice(0, 5) }}
+                          <span v-if="session.teaching_topic" class="text-emerald-400 font-semibold">• {{ session.teaching_topic }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button 
+                      @click="openBapModal(session)" 
+                      class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold transition-all flex items-center gap-1 shrink-0"
+                    >
+                      <i class="ph-bold ph-clipboard-text"></i>
+                      <span>{{ session.attendance_count > 0 ? 'Edit BAP' : 'Isi BAP & Presensi' }}</span>
+                    </button>
+                  </div>
                 </div>
                 <div v-else class="divide-y divide-white/5">
                   <div v-for="(sched, idx) in teacherSchedule" :key="idx" class="px-3.5 py-2.5 flex items-center gap-3">
@@ -602,6 +628,152 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: KELAS & JADWAL OFFLINE (Admin Cabang & Superadmin) ===== -->
+        <div v-if="activeTab === 'offline_classes'" class="space-y-4 animate-fade-in">
+          <!-- Top Banner & Quick Actions -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-4 border border-white/10">
+            <div>
+              <h2 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="ph-bold ph-chalkboard-teacher text-[#c0ff00]"></i>
+                <span>Manajemen Kelas Offline & Rombel Belajar</span>
+              </h2>
+              <p class="text-[11px] text-white/50">Kelola rombongan belajar cabang, alokasi ruang kelas, penugasan tutor, dan jadwal tatap muka.</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button 
+                @click="openCreateRoomModal" 
+                class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white border border-white/10 text-xs font-bold transition-all flex items-center gap-1.5"
+              >
+                <i class="ph-bold ph-door"></i>
+                <span>+ Ruangan</span>
+              </button>
+              <button 
+                @click="openCreateClassModal" 
+                class="px-3 py-1.5 rounded-lg bg-[#c0ff00] hover:bg-[#aee600] text-black text-xs font-black transition-all flex items-center gap-1.5 shadow-md shadow-[#c0ff00]/20"
+              >
+                <i class="ph-bold ph-plus"></i>
+                <span>+ Buat Kelas Baru</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats Overview -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Total Kelas Offline</div>
+              <div class="text-xl font-black font-mono text-[#c0ff00]">{{ offlineClasses.length }}</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Ruang Belajar</div>
+              <div class="text-xl font-black font-mono text-sky-400">{{ classRooms.length }}</div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Siswa Terdaftar Rombel</div>
+              <div class="text-xl font-black font-mono text-emerald-400">
+                {{ offlineClasses.reduce((acc, c) => acc + (Number(c.student_count) || 0), 0) }}
+              </div>
+            </div>
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10">
+              <div class="text-[10px] font-bold text-white/50 uppercase tracking-wider mb-1">Rata-rata Kapasitas</div>
+              <div class="text-xl font-black font-mono text-amber-400">
+                {{ offlineClasses.length ? Math.round(offlineClasses.reduce((acc, c) => acc + (Number(c.max_capacity) || 25), 0) / offlineClasses.length) : 0 }} Siswa
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabel Rombel / Kelas Offline -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
+            <div class="px-3.5 py-2.5 border-b border-white/10 flex items-center justify-between bg-black/20">
+              <h3 class="font-bold text-white text-xs flex items-center gap-2">
+                <i class="ph-bold ph-users-three text-[#c0ff00]"></i>
+                <span>Daftar Rombongan Belajar (Rombel)</span>
+              </h3>
+              <span class="text-[10px] font-mono text-white/40">{{ offlineClasses.length }} Kelas Terdaftar</span>
+            </div>
+
+            <div v-if="isLoadingOfflineClasses" class="p-8 text-center text-white/40 text-xs">
+              <div class="w-8 h-8 border-2 border-white/20 border-t-[#c0ff00] rounded-full animate-spin mx-auto mb-2"></div>
+              Memuat data kelas dan jadwal...
+            </div>
+            <div v-else-if="offlineClasses.length === 0" class="p-8 text-center text-white/40 text-xs">
+              Belum ada kelas offline. Klik tombol <strong>+ Buat Kelas Baru</strong> untuk memulai penataan rombel.
+            </div>
+            <div v-else class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="border-b border-white/10 text-white/40 text-[10px] uppercase font-bold tracking-wider bg-black/10">
+                    <th class="px-4 py-2.5">Nama Kelas</th>
+                    <th class="px-3 py-2.5">Jenjang</th>
+                    <th class="px-3 py-2.5">Ruang Kelas</th>
+                    <th class="px-3 py-2.5">Tutor Utama</th>
+                    <th class="px-3 py-2.5">Kapasitas</th>
+                    <th class="px-3 py-2.5">Status</th>
+                    <th class="px-4 py-2.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr v-for="cls in offlineClasses" :key="cls.id" class="hover:bg-white/5 transition-colors">
+                    <td class="px-4 py-3">
+                      <div class="font-bold text-white">{{ cls.name }}</div>
+                      <div class="text-[10px] text-white/40">{{ cls.tenant_name || 'Cabang Utama' }}</div>
+                    </td>
+                    <td class="px-3 py-3">
+                      <span class="px-2 py-0.5 rounded bg-sky-500/15 border border-sky-500/30 text-sky-300 text-[10px] font-bold">
+                        {{ cls.grade_level }}
+                      </span>
+                    </td>
+                    <td class="px-3 py-3 text-white/70">
+                      {{ cls.room_name || 'Belum Ditentukan' }}
+                    </td>
+                    <td class="px-3 py-3 text-white/80 font-medium">
+                      {{ cls.primary_teacher_name || 'Belum Ditugaskan' }}
+                    </td>
+                    <td class="px-3 py-3">
+                      <div class="flex items-center gap-1.5 font-mono text-[11px]">
+                        <span :class="Number(cls.student_count) >= Number(cls.max_capacity) ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'">
+                          {{ cls.student_count || 0 }}
+                        </span>
+                        <span class="text-white/40">/ {{ cls.max_capacity }}</span>
+                      </div>
+                    </td>
+                    <td class="px-3 py-3">
+                      <span :class="['text-[9px] px-2 py-0.5 rounded-full font-bold uppercase', cls.is_active != 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-white/40']">
+                        {{ cls.is_active != 0 ? 'Aktif' : 'Arsip' }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                      <div class="inline-flex items-center gap-1.5">
+                        <button 
+                          @click="openManageStudentsModal(cls)" 
+                          class="px-2 py-1 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold transition-all flex items-center gap-1"
+                          title="Kelola Siswa di Kelas Ini"
+                        >
+                          <i class="ph-bold ph-users"></i>
+                          <span>Siswa ({{ cls.student_count || 0 }})</span>
+                        </button>
+                        <button 
+                          @click="editClass(cls)" 
+                          class="p-1 rounded bg-white/5 hover:bg-white/15 text-white/70 hover:text-white transition-colors"
+                          title="Ubah Kelas"
+                        >
+                          <i class="ph-bold ph-pencil-simple text-xs"></i>
+                        </button>
+                        <button 
+                          @click="deleteClassItem(cls)" 
+                          class="p-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors"
+                          title="Hapus / Arsipkan"
+                        >
+                          <i class="ph-bold ph-trash text-xs"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -972,7 +1144,7 @@
         <div v-if="activeTab === 'materials'" class="space-y-4 animate-fade-in">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-black text-white uppercase tracking-wider">{{ isTeacher ? 'Materi yang Saya Ajar' : 'Manajemen Materi Belajar' }}</h2>
-            <button v-if="!isTeacher" @click="openMaterialModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1">
+            <button @click="openMaterialModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
               <i class="ph-bold ph-plus"></i> Tambah Materi
             </button>
           </div>
@@ -2380,6 +2552,276 @@
 
     <!-- Modals -->
 
+    <!-- Modal Buat / Edit Kelas Offline -->
+    <div v-if="showClassModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-lg shadow-2xl animate-fade-in text-white p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <i class="ph-bold ph-chalkboard-teacher text-[#c0ff00]"></i>
+            <span>{{ classForm.id ? 'Ubah Rombel Offline' : 'Buat Kelas Offline Baru' }}</span>
+          </h3>
+          <button @click="showClassModal = false" class="text-white/40 hover:text-white"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="text-[11px] font-bold text-white/60 block mb-1">Nama Rombel / Kelas</label>
+            <input v-model="classForm.name" type="text" placeholder="misal: Intensif UTBK Saintek A" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#c0ff00]" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[11px] font-bold text-white/60 block mb-1">Jenjang Pendidikan</label>
+              <select v-model="classForm.grade_level" class="w-full px-3 py-2 rounded-xl bg-[#0a0f1e] border border-white/10 text-white focus:outline-none focus:border-[#c0ff00]">
+                <option value="SD">SD</option>
+                <option value="SMP">SMP</option>
+                <option value="SMA-10">SMA Kelas 10</option>
+                <option value="SMA-11">SMA Kelas 11</option>
+                <option value="SMA-12">SMA Kelas 12</option>
+                <option value="UTBK">Alumni / UTBK Intensif</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-white/60 block mb-1">Kapasitas Maksimal (Siswa)</label>
+              <input v-model.number="classForm.max_capacity" type="number" min="1" max="100" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#c0ff00]" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[11px] font-bold text-white/60 block mb-1">Ruangan Belajar</label>
+              <select v-model="classForm.room_id" class="w-full px-3 py-2 rounded-xl bg-[#0a0f1e] border border-white/10 text-white focus:outline-none focus:border-[#c0ff00]">
+                <option value="">-- Pilih Ruangan --</option>
+                <option v-for="r in classRooms" :key="r.id" :value="r.id">{{ r.name }} (Kap: {{ r.capacity }})</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-white/60 block mb-1">Tutor / Guru Utama</label>
+              <select v-model="classForm.primary_teacher_id" class="w-full px-3 py-2 rounded-xl bg-[#0a0f1e] border border-white/10 text-white focus:outline-none focus:border-[#c0ff00]">
+                <option value="">-- Belum Ditugaskan --</option>
+                <option v-for="t in (adminStaffList || []).filter(s => s.role === 'teacher')" :key="t.id" :value="t.id">{{ t.name || t.username }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
+          <button @click="showClassModal = false" class="px-3 py-1.5 rounded-xl bg-white/5 text-white/70 hover:text-white text-xs font-bold">Batal</button>
+          <button @click="saveClassForm" class="px-4 py-1.5 rounded-xl bg-[#c0ff00] text-black text-xs font-black hover:bg-[#aee600]">Simpan Kelas</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Tambah Ruangan -->
+    <div v-if="showRoomModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm shadow-2xl animate-fade-in text-white p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <i class="ph-bold ph-door text-sky-400"></i>
+            <span>Tambah Ruang Belajar</span>
+          </h3>
+          <button @click="showRoomModal = false" class="text-white/40 hover:text-white"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="text-[11px] font-bold text-white/60 block mb-1">Nama / Nomor Ruangan</label>
+            <input v-model="roomForm.name" type="text" placeholder="misal: Ruang Einstein (Lt. 2)" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-400" />
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-white/60 block mb-1">Kapasitas Kursi</label>
+            <input v-model.number="roomForm.capacity" type="number" min="1" max="200" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-400" />
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-white/60 block mb-1">Fasilitas Ruang</label>
+            <input v-model="roomForm.facilities" type="text" placeholder="AC, Proyektor, Whiteboard, WiFi" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-400" />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
+          <button @click="showRoomModal = false" class="px-3 py-1.5 rounded-xl bg-white/5 text-white/70 hover:text-white text-xs font-bold">Batal</button>
+          <button @click="saveRoomForm" class="px-4 py-1.5 rounded-xl bg-sky-500 text-white text-xs font-black hover:bg-sky-400">Tambah Ruangan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Kelola Siswa Rombel Offline -->
+    <div v-if="showManageStudentsModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl animate-fade-in text-white overflow-hidden">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between shrink-0 bg-black/20">
+          <div>
+            <h3 class="font-black text-sm text-white flex items-center gap-2">
+              <i class="ph-bold ph-users text-indigo-400"></i>
+              <span>Kelola Siswa: {{ selectedClassForStudents?.name }}</span>
+            </h3>
+            <p class="text-[10px] text-white/40">Kapasitas: {{ selectedClassStudentsList.length }} / {{ selectedClassForStudents?.max_capacity }} Siswa</p>
+          </div>
+          <button @click="showManageStudentsModal = false" class="text-white/40 hover:text-white"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+
+        <!-- Form Tambah Siswa ke Kelas -->
+        <div class="p-4 border-b border-white/10 bg-white/[0.02] shrink-0 space-y-2">
+          <span class="text-[11px] font-bold text-white/70 block">+ Tugaskan Siswa ke Rombel Ini</span>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <select v-model="studentAssignForm.student_id" class="flex-grow px-3 py-2 rounded-xl bg-[#0a0f1e] border border-white/15 text-xs text-white focus:outline-none focus:border-indigo-400">
+              <option value="">-- Pilih Siswa Cabang --</option>
+              <option v-for="s in allStudents" :key="s.id" :value="s.id">{{ s.name || s.username }} ({{ s.email }})</option>
+            </select>
+            <input v-model="studentAssignForm.joined_at" type="date" title="Tanggal Bergabung" class="px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white focus:outline-none" />
+            <button @click="assignStudentToClass" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shrink-0 transition-all">
+              + Masukkan Siswa
+            </button>
+          </div>
+        </div>
+
+        <!-- List Siswa Terdaftar -->
+        <div class="flex-grow overflow-y-auto p-4">
+          <div v-if="isLoadingClassStudents" class="p-8 text-center text-white/40 text-xs">
+            <div class="w-6 h-6 border-2 border-white/20 border-t-indigo-400 rounded-full animate-spin mx-auto mb-2"></div>
+            Memuat daftar siswa...
+          </div>
+          <div v-else-if="selectedClassStudentsList.length === 0" class="p-8 text-center text-white/40 text-xs">
+            Belum ada siswa yang ditugaskan ke rombel ini.
+          </div>
+          <div v-else class="divide-y divide-white/5">
+            <div v-for="(cs, idx) in selectedClassStudentsList" :key="cs.id" class="py-2.5 flex items-center justify-between gap-3 hover:bg-white/5 px-2 rounded-lg transition-colors text-xs">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-5 text-center text-[10px] text-white/40 font-mono">{{ idx + 1 }}</span>
+                <div class="min-w-0">
+                  <div class="font-bold text-white truncate">{{ cs.student_name }}</div>
+                  <div class="text-[10px] text-white/40 truncate">{{ cs.student_email }} • Bergabung: {{ cs.joined_at }}</div>
+                </div>
+              </div>
+              <button @click="removeStudentFromClass(cs.student_id)" class="px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-[10px] font-bold transition-all shrink-0">
+                Keluarkan
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 border-t border-white/10 bg-black/20 text-right shrink-0">
+          <button @click="showManageStudentsModal = false" class="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold">Tutup</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Pengisian BAP & Presensi Sesi Mengajar Guru -->
+    <div v-if="showBapModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl animate-fade-in text-white overflow-hidden">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between shrink-0 bg-black/30">
+          <div>
+            <h3 class="font-black text-sm text-white flex items-center gap-2">
+              <i class="ph-bold ph-clipboard-text text-emerald-400"></i>
+              <span>Berita Acara Pembelajaran (BAP) & Presensi Mengajar</span>
+            </h3>
+            <p class="text-[10px] text-white/50">
+              {{ activeBapSession?.class_name }} • Tanggal: {{ activeBapSession?.session_date }} ({{ (activeBapSession?.start_time || '').slice(0, 5) }}–{{ (activeBapSession?.end_time || '').slice(0, 5) }}) • Ruang: {{ activeBapSession?.room_name || 'Offline' }}
+            </p>
+          </div>
+          <button @click="showBapModal = false" class="text-white/40 hover:text-white"><i class="ph-bold ph-x text-base"></i></button>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-4 sm:p-6 space-y-5">
+          <!-- BAP Section -->
+          <div class="space-y-3 bg-white/[0.02] p-4 rounded-xl border border-white/10 text-xs">
+            <div>
+              <label class="text-[11px] font-bold text-emerald-400 block mb-1">Materi / Pokok Bahasan yang Diajarkan *</label>
+              <input v-model="bapForm.teaching_topic" type="text" placeholder="misal: Bedah Soal Penalaran Matematika Bab Matriks & Aljabar" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white focus:outline-none focus:border-emerald-400" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-white/60 block mb-1">Catatan / Evaluasi Pembelajaran Kelas</label>
+              <textarea v-model="bapForm.notes" rows="2" placeholder="Catatan keaktifan siswa, kendala materi, atau pekerjaan rumah..." class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-white focus:outline-none focus:border-emerald-400"></textarea>
+            </div>
+          </div>
+
+          <!-- Attendance Section -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-xs flex items-center gap-2">
+                <i class="ph-bold ph-check-square-offset text-sky-400"></i>
+                <span>Presensi Kehadiran Peserta Didik ({{ bapForm.attendances.length }} Siswa)</span>
+              </h4>
+              <label class="flex items-center gap-1.5 text-[10px] text-white/70 cursor-pointer">
+                <input v-model="bapForm.notify_telegram_parents" type="checkbox" class="rounded accent-emerald-500" />
+                <span>Kirim Notifikasi Telegram ke Orang Tua (Jika Tidak Hadir)</span>
+              </label>
+            </div>
+
+            <div v-if="isLoadingBap" class="p-8 text-center text-white/40 text-xs">
+              <div class="w-6 h-6 border-2 border-white/20 border-t-emerald-400 rounded-full animate-spin mx-auto mb-2"></div>
+              Memuat presensi siswa...
+            </div>
+            <div v-else class="divide-y divide-white/5 border border-white/10 rounded-xl overflow-hidden bg-black/20">
+              <div v-for="att in bapForm.attendances" :key="att.student_id" class="p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:bg-white/5 transition-colors">
+                <div class="min-w-0">
+                  <div class="font-bold text-white truncate">{{ att.student_name }}</div>
+                  <div class="text-[10px] text-white/40">
+                    <span v-if="att.parent_telegram_id" class="text-sky-400">Telegram Orang Tua Terhubung</span>
+                    <span v-else class="text-white/30">Telegram Orang Tua Belum Diisi</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  <!-- Attendance Status Pills -->
+                  <div class="inline-flex rounded-lg bg-black/40 p-0.5 border border-white/10">
+                    <button 
+                      type="button" 
+                      @click="att.attendance_status = 'present'" 
+                      :class="['px-2.5 py-1 rounded-md text-[10px] font-bold transition-all', att.attendance_status === 'present' ? 'bg-emerald-500 text-black' : 'text-white/60 hover:text-white']"
+                    >
+                      Hadir
+                    </button>
+                    <button 
+                      type="button" 
+                      @click="att.attendance_status = 'sick'" 
+                      :class="['px-2.5 py-1 rounded-md text-[10px] font-bold transition-all', att.attendance_status === 'sick' ? 'bg-amber-500 text-black' : 'text-white/60 hover:text-white']"
+                    >
+                      Sakit
+                    </button>
+                    <button 
+                      type="button" 
+                      @click="att.attendance_status = 'excused'" 
+                      :class="['px-2.5 py-1 rounded-md text-[10px] font-bold transition-all', att.attendance_status === 'excused' ? 'bg-sky-500 text-black' : 'text-white/60 hover:text-white']"
+                    >
+                      Izin
+                    </button>
+                    <button 
+                      type="button" 
+                      @click="att.attendance_status = 'absent'" 
+                      :class="['px-2.5 py-1 rounded-md text-[10px] font-bold transition-all', att.attendance_status === 'absent' ? 'bg-rose-500 text-white' : 'text-white/60 hover:text-white']"
+                    >
+                      Alpa
+                    </button>
+                  </div>
+
+                  <input 
+                    v-if="att.attendance_status === 'present'" 
+                    v-model.number="att.minutes_late" 
+                    type="number" 
+                    min="0" 
+                    placeholder="Telat (m)" 
+                    title="Menit Keterlambatan" 
+                    class="w-16 px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] text-white text-center focus:outline-none" 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-white/10 bg-black/30 flex items-center justify-between shrink-0">
+          <span class="text-[10px] text-white/40">Data BAP dan presensi langsung tercatat ke basis data payroll honor tutor.</span>
+          <div class="flex items-center gap-2">
+            <button @click="showBapModal = false" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-bold">Batal</button>
+            <button @click="saveBapAttendance" :disabled="isSavingBap" class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
+              <i class="ph-bold ph-check"></i>
+              <span>{{ isSavingBap ? 'Menyimpan...' : 'Simpan BAP & Presensi' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Telegram Blast Delivery Status Modal -->
     <div v-if="showTelegramBlastModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
@@ -3690,8 +4132,9 @@ const navItems = computed(() => {
   const role = currentRole.value || 'admin';
 
   const items = [
-    { id: 'overview',     label: 'Dashboard',             icon: 'ph-squares-four',  roles: ['superadmin', 'admin', 'teacher'] },
+    { id: 'overview',        label: 'Dashboard',             icon: 'ph-squares-four',      roles: ['superadmin', 'admin', 'teacher'] },
     ...(isT ? [{ id: 'teacher_hub', label: 'Siswa & Jadwal Saya', icon: 'ph-chalkboard-teacher', roles: ['teacher'] }] : []),
+    { id: 'offline_classes', label: 'Kelas & Jadwal Offline', icon: 'ph-chalkboard-teacher', roles: ['superadmin', 'admin'] },
     { id: 'branches',    label: 'Cabang',                icon: 'ph-buildings',     roles: ['superadmin'] },
     { id: 'schools',     label: 'Sekolah Mitra',         icon: 'ph-graduation-cap', roles: ['superadmin', 'admin'] },
     { id: 'questions',   label: isT ? 'Bank Soal Saya' : 'Soal', icon: 'ph-books', roles: ['superadmin', 'admin', 'teacher'] },
@@ -3775,7 +4218,7 @@ const handleMaterialFileUpload = async (event) => {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Gagal mengunggah file');
-    mForm.file_url = data.file_url;
+    mForm.file_url = data.file_url || data.url;
   } catch (err) {
     alert(err.message || 'Gagal mengunggah file');
   } finally {
@@ -3808,6 +4251,7 @@ const loadRoleData = () => {
     }
     fetchQuestions();
     fetchMaterials();
+    fetchTeacherHub();
   } else {
     fetchDashboard();
     fetchStudents();
@@ -3816,6 +4260,7 @@ const loadRoleData = () => {
     fetchQuestions();
     fetchMaterials();
     fetchSchools();
+    fetchOfflineClasses();
     if (isSuperadmin.value) {
       fetchTenants();
     }
@@ -4499,6 +4944,8 @@ const openMaterialModal = (m = null) => {
     });
   } else {
     isEditingMaterial.value = false;
+    const myTeacherName = isTeacher.value ? (currentAdminUser.value?.name || '') : '';
+    const myTeacherId = isTeacher.value ? (currentAdminUser.value?.id || currentUserId.value || '') : '';
     Object.assign(mForm, {
       id: null,
       exam: 'SNBT',
@@ -4509,7 +4956,8 @@ const openMaterialModal = (m = null) => {
       subtopic: '',
       indicator: '',
       leaf_id: '',
-      teacher_name: '',
+      teacher_name: myTeacherName,
+      teacher_id: myTeacherId,
       file_url: '',
       title: '',
       content: ''
@@ -5639,12 +6087,257 @@ const teacherSubjects = computed(() => {
   return [...subjects].filter(Boolean);
 });
 
-const teacherSchedule = ref([
-  // Data dummy jadwal — idealnya dari API admin/teacher-schedule endpoint
-  { day: 'Senin', subject: 'Penalaran Matematika', time: '14.00–16.00', room: 'Kelas A' },
-  { day: 'Rabu', subject: 'Literasi Bahasa Indonesia', time: '13.00–15.00', room: 'Kelas B' },
-  { day: 'Jumat', subject: 'Tes Potensi Skolastik', time: '09.00–11.00', room: 'Online' },
-]);
+// ── Offline Classes & Scheduling State (Admin Cabang & Superadmin) ──
+const offlineClasses = ref([]);
+const classRooms = ref([]);
+const classSessionsList = ref([]);
+const isLoadingOfflineClasses = ref(false);
+const showClassModal = ref(false);
+const classForm = reactive({
+  id: null,
+  name: '',
+  grade_level: 'SMA-12',
+  max_capacity: 25,
+  room_id: '',
+  primary_teacher_id: '',
+  is_active: 1
+});
+
+const showRoomModal = ref(false);
+const roomForm = reactive({
+  name: '',
+  capacity: 30,
+  facilities: ''
+});
+
+const showManageStudentsModal = ref(false);
+const selectedClassForStudents = ref(null);
+const selectedClassStudentsList = ref([]);
+const isLoadingClassStudents = ref(false);
+const studentAssignForm = reactive({
+  student_id: '',
+  joined_at: new Date().toISOString().split('T')[0],
+  notes: ''
+});
+
+// ── Teacher Hub Reactive Data & Sesi Mengajar ──
+const teacherClasses = ref([]);
+const teacherUpcomingSessions = ref([]);
+const teacherHubLoading = ref(false);
+const teacherSchedule = ref([]);
+
+// ── BAP & Presensi Mengajar Modal ──
+const showBapModal = ref(false);
+const activeBapSession = ref(null);
+const isLoadingBap = ref(false);
+const isSavingBap = ref(false);
+const bapForm = reactive({
+  session_id: null,
+  teaching_topic: '',
+  notes: '',
+  notify_telegram_parents: true,
+  attendances: []
+});
+
+// Methods Offline Classes
+const fetchOfflineClasses = async () => {
+  isLoadingOfflineClasses.value = true;
+  try {
+    const [clsData, roomsData] = await Promise.all([
+      api.getOfflineClasses(),
+      api.getRooms()
+    ]);
+    offlineClasses.value = Array.isArray(clsData) ? clsData : [];
+    classRooms.value = Array.isArray(roomsData) ? roomsData : [];
+  } catch (err) {
+    console.warn("Gagal memuat data kelas offline:", err);
+  } finally {
+    isLoadingOfflineClasses.value = false;
+  }
+};
+
+const openCreateClassModal = () => {
+  classForm.id = null;
+  classForm.name = '';
+  classForm.grade_level = 'SMA-12';
+  classForm.max_capacity = 25;
+  classForm.room_id = classRooms.value[0]?.id || '';
+  classForm.primary_teacher_id = (adminStaffList.value || []).find(s => s.role === 'teacher')?.id || '';
+  classForm.is_active = 1;
+  showClassModal.value = true;
+};
+
+const editClass = (cls) => {
+  classForm.id = cls.id;
+  classForm.name = cls.name;
+  classForm.grade_level = cls.grade_level;
+  classForm.max_capacity = cls.max_capacity;
+  classForm.room_id = cls.room_id || '';
+  classForm.primary_teacher_id = cls.primary_teacher_id || '';
+  classForm.is_active = cls.is_active;
+  showClassModal.value = true;
+};
+
+const saveClassForm = async () => {
+  if (!classForm.name.trim()) return alert('Nama kelas wajib diisi');
+  try {
+    if (classForm.id) {
+      await api.updateOfflineClass(classForm.id, classForm);
+    } else {
+      await api.createOfflineClass(classForm);
+    }
+    showClassModal.value = false;
+    await fetchOfflineClasses();
+  } catch (err) {
+    alert(err?.message || 'Gagal menyimpan kelas offline');
+  }
+};
+
+const deleteClassItem = async (cls) => {
+  if (!confirm(`Arsipkan kelas ${cls.name}? Riwayat presensi siswa tetap tersimpan untuk audit.`)) return;
+  try {
+    await api.deleteOfflineClass(cls.id);
+    await fetchOfflineClasses();
+  } catch (err) {
+    alert(err?.message || 'Gagal menghapus kelas');
+  }
+};
+
+const openCreateRoomModal = () => {
+  roomForm.name = '';
+  roomForm.capacity = 30;
+  roomForm.facilities = 'AC, Proyektor, Whiteboard, WiFi';
+  showRoomModal.value = true;
+};
+
+const saveRoomForm = async () => {
+  if (!roomForm.name.trim()) return alert('Nama ruangan wajib diisi');
+  try {
+    await api.createRoom(roomForm);
+    showRoomModal.value = false;
+    const rooms = await api.getRooms();
+    classRooms.value = Array.isArray(rooms) ? rooms : [];
+  } catch (err) {
+    alert(err?.message || 'Gagal menambah ruangan');
+  }
+};
+
+// Manage Students in Class
+const openManageStudentsModal = async (cls) => {
+  selectedClassForStudents.value = cls;
+  studentAssignForm.student_id = '';
+  studentAssignForm.joined_at = new Date().toISOString().split('T')[0];
+  studentAssignForm.notes = '';
+  showManageStudentsModal.value = true;
+  isLoadingClassStudents.value = true;
+  try {
+    const list = await api.getClassStudents(cls.id);
+    selectedClassStudentsList.value = Array.isArray(list) ? list : [];
+  } catch (err) {
+    console.warn("Gagal load siswa kelas:", err);
+  } finally {
+    isLoadingClassStudents.value = false;
+  }
+};
+
+const assignStudentToClass = async () => {
+  if (!studentAssignForm.student_id) return alert('Pilih siswa yang akan ditugaskan');
+  try {
+    await api.assignClassStudent({
+      class_id: selectedClassForStudents.value.id,
+      student_id: studentAssignForm.student_id,
+      joined_at: studentAssignForm.joined_at,
+      notes: studentAssignForm.notes
+    });
+    studentAssignForm.student_id = '';
+    const list = await api.getClassStudents(selectedClassForStudents.value.id);
+    selectedClassStudentsList.value = Array.isArray(list) ? list : [];
+    await fetchOfflineClasses();
+  } catch (err) {
+    alert(err?.message || 'Gagal menambahkan siswa ke rombel');
+  }
+};
+
+const removeStudentFromClass = async (studentId) => {
+  if (!confirm('Keluarkan siswa ini dari rombel kelas?')) return;
+  try {
+    await api.removeClassStudent(selectedClassForStudents.value.id, studentId);
+    const list = await api.getClassStudents(selectedClassForStudents.value.id);
+    selectedClassStudentsList.value = Array.isArray(list) ? list : [];
+    await fetchOfflineClasses();
+  } catch (err) {
+    alert(err?.message || 'Gagal mengeluarkan siswa');
+  }
+};
+
+// Teacher Hub Fetch
+const fetchTeacherHub = async () => {
+  if (!isTeacher.value) return;
+  teacherHubLoading.value = true;
+  try {
+    const res = await api.getTeacherHubData();
+    if (res && res.status === 'SUCCESS') {
+      teacherClasses.value = res.classes || [];
+      teacherUpcomingSessions.value = res.upcoming_sessions || [];
+      if (res.upcoming_sessions && res.upcoming_sessions.length > 0) {
+        teacherSchedule.value = res.upcoming_sessions.map(s => ({
+          day: s.session_date,
+          subject: s.subject || s.class_name,
+          time: `${(s.start_time || '').slice(0, 5)}–${(s.end_time || '').slice(0, 5)}`,
+          room: s.room_name || 'Offline'
+        }));
+      }
+    }
+  } catch (err) {
+    console.warn("Gagal memuat teacher hub data:", err);
+  } finally {
+    teacherHubLoading.value = false;
+  }
+};
+
+// BAP & Attendance Modal
+const openBapModal = async (session) => {
+  activeBapSession.value = session;
+  bapForm.session_id = session.id;
+  bapForm.teaching_topic = session.teaching_topic || '';
+  bapForm.notes = session.notes || '';
+  bapForm.notify_telegram_parents = true;
+  bapForm.attendances = [];
+  showBapModal.value = true;
+  isLoadingBap.value = true;
+  try {
+    const res = await api.getSessionAttendance(session.id);
+    if (res && res.students) {
+      bapForm.attendances = res.students.map(s => ({
+        student_id: s.student_id,
+        student_name: s.student_name,
+        parent_telegram_id: s.parent_telegram_id,
+        attendance_status: s.attendance_status || 'present',
+        minutes_late: s.minutes_late || 0,
+        notes: s.notes || ''
+      }));
+    }
+  } catch (err) {
+    console.warn("Gagal load session attendance:", err);
+  } finally {
+    isLoadingBap.value = false;
+  }
+};
+
+const saveBapAttendance = async () => {
+  if (!bapForm.teaching_topic.trim()) return alert('Topik / Materi yang diajarkan wajib diisi');
+  isSavingBap.value = true;
+  try {
+    await api.saveSessionAttendance(bapForm);
+    alert('BAP dan Presensi Mengajar Berhasil Disimpan!');
+    showBapModal.value = false;
+    await fetchTeacherHub();
+  } catch (err) {
+    alert(err?.message || 'Gagal menyimpan BAP');
+  } finally {
+    isSavingBap.value = false;
+  }
+};
 
 // ── Backup & Restore Database (Superadmin Only) ──
 const backupList = ref([]);
