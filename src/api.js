@@ -535,6 +535,45 @@ export const api = {
   getAdminProfile() {
     return apiFetch('/admin.php?action=profile');
   },
+  // ── Database Backup & Restore (Superadmin Only) ──
+  getDatabaseBackups() {
+    return apiFetch('/admin.php?action=database_backups');
+  },
+  createDatabaseBackup(customName = '') {
+    return apiFetch('/admin.php?action=database_backups', {
+      method: 'POST',
+      body: JSON.stringify({ custom_name: customName })
+    });
+  },
+  deleteDatabaseBackup(filename) {
+    return apiFetch(`/admin.php?action=database_backups&filename=${encodeURIComponent(filename)}`, {
+      method: 'DELETE'
+    });
+  },
+  restoreDatabaseSnapshot(filename) {
+    return apiFetch('/admin.php?action=database_restore', {
+      method: 'POST',
+      body: JSON.stringify({ filename })
+    });
+  },
+  restoreDatabaseUpload(formData) {
+    const token = sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token') || localStorage.getItem('auth_token') || '';
+    const csrfToken = sessionStorage.getItem('ep_admin_csrf') || '';
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+    const baseUrl = import.meta.env.VITE_API_URL || '';
+    return fetch(`${baseUrl}/admin.php?action=database_restore`, {
+      method: 'POST',
+      headers,
+      credentials: 'include',
+      body: formData
+    }).then(async res => {
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Gagal restore database');
+      return data;
+    });
+  },
 
   // ── Analytics ──
   trackEvent(eventName, payload = {}) {

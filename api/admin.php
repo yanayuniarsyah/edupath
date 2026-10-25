@@ -3,6 +3,7 @@
 require_once 'config.php';
 require_once 'jwt.php';
 require_once 'rate_limit.php';
+require_once 'DatabaseBackupService.php';
 
 function ensure_admin_schema($pdo) {
     static $done = false;
@@ -2468,6 +2469,123 @@ elseif ($action === 'staff') {
             $pdo->rollBack();
             http_response_code(500); echo json_encode(["error" => "Gagal menghapus staff", "details" => $e->getMessage()]);
         }
+    }
+}
+// =====================================================================
+// SUPERADMIN DATABASE BACKUP & RESTORE ACTIONS
+// =====================================================================
+elseif (in_array($action, ['database_backups', 'database_download_backup', 'database_export_sql', 'database_restore'])) {
+    if ($payload->role !== 'superadmin') {
+        http_response_code(403);
+        echo json_encode(["error" => "Akses ditolak. Fitur backup dan restore basis data hanya diizinkan untuk Super Administrator."]);
+        exit;
+    }
+
+    $backupService = new DatabaseBackupService($pdo);
+
+    if ($action === 'database_backups') {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            try {
+                $list = $backupService->listBackups();
+                echo safe_json_encode(["success" => true, "backups" => $list]);
+            } catch (\Throwable $e) {
+                http_response_code(500);
+                echo json_encode(["error" => "Gagal mengambil daftar backup: " . $e->getMessage()]);
+            }
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $customName = trim($input['filename'] ?? '');
+                $res = $backupService->createBackup(true, !empty($customName) ? $customName : null);
+                echo json_encode([
+                    "success" => true,
+                    "message" => "Snapshot database berhasil dibuat",
+                    "backup"  => $res
+                ]);
+            } catch (\Throwable $e) {
+                http_response_code(500);
+                echo json_encode(["error" => "Gagal membuat snapshot database: " . $e->getMessage()]);
+            }
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            $filename = trim($_GET['filename'] ?? ($input['filename'] ?? ''));
+            if (empty($filename)) {
+                http_response_code(400);
+                echo json_encode(["error" => "Nama file snapshot wajib disertakan"]);
+                exit;
+            }
+            try {
+                $backupService->deleteBackup($filename);
+                echo json_encode(["success" => true, "message" => "Snapshot berhasil dihapus"]);
+            } catch (\Throwable $e) {
+                http_response_code(500);
+                echo json_encode(["error" => "Gagal menghapus snapshot: " . $e->getMessage()]);
+            }
+        }
+        exit;
+    }
+
+    elseif ($action === 'database_download_backup' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        $filename = trim($_GET['filename'] ?? '');
+        try {
+            $filepath = $backupService->getBackupFile($filename);
+            header('Content-Type: application/sql');
+            header('Content-Disposition: attachment; filename="' . basename($filepath) . '"');
+            header('Content-Length: ' . filesize($filepath));
+            readfile($filepath);
+            exit;
+        } catch (\Throwable $e) {
+            http_response_code(404);
+            echo json_encode(["error" => "File backup tidak ditemukan atau tidak valid"]);
+            exit;
+        }
+    }
+
+    elseif ($action === 'database_export_sql' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+        try {
+            $filename = 'edupath_full_export_' . date('Y-m-d_His') . '.sql';
+            $res = $backupService->createBackup(false);
+            header('Content-Type: application/sql');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            echo $res['sql_content'];
+            exit;
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Gagal men-generate export SQL: " . $e->getMessage()]);
+            exit;
+        }
+    }
+
+    elseif ($action === 'database_restore' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Mode 1: Restore dari snapshot yang sudah ada di server (filename)
+        // Mode 2: Restore dari upload konten SQL / file raw
+        $filename = trim($input['filename'] ?? '');
+        $sqlContent = $input['sql_content'] ?? '';
+
+        // Handle multipart file upload if sent via FormData
+        if (!empty($_FILES['backup_file']['tmp_name'])) {
+            $sqlContent = file_get_contents($_FILES['backup_file']['tmp_name']);
+        }
+
+        try {
+            if (!empty($filename)) {
+                $result = $backupService->restoreFromFile($filename, $payload->user_id);
+            } elseif (!empty($sqlContent)) {
+                $result = $backupService->restoreFromSql($sqlContent, $payload->user_id, true);
+            } else {
+                http_response_code(400);
+                echo json_encode(["error" => "Harap pilih file snapshot atau unggah file backup .sql"]);
+                exit;
+            }
+
+            echo json_encode([
+                "success" => $result['success'],
+                "message" => "Proses pemulihan database selesai",
+                "details" => $result
+            ]);
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Gagal melakukan restore database: " . $e->getMessage()]);
+        }
+        exit;
     }
 }
 elseif ($action === 'update_profile' && in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])) {

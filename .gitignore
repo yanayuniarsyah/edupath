@@ -43,3 +43,7 @@ npm-debug.log*
 test.json
 test_results.json
 scratch/
+
+# Database backups
+api/backups/*.sql
+api/backups/*.sql.gz

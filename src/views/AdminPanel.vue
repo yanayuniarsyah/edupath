@@ -2173,6 +2173,208 @@
           </div>
         </div>
 
+        <!-- ===== TAB: BACKUP & RESTORE DB (SUPERADMIN) ===== -->
+        <div v-if="activeTab === 'backup_restore'" class="space-y-4 animate-fade-in">
+          <!-- Header Card -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-emerald-950/40 via-[#0e1726]/80 to-[#0e1726]/80 border border-emerald-500/30 rounded-2xl p-4 sm:p-5">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Superadmin Only</span>
+                <span class="text-xs text-white/40">MySQL / MariaDB Pure-PHP Engine</span>
+              </div>
+              <h2 class="text-lg font-black text-white mt-1 flex items-center gap-2">
+                <i class="ph-bold ph-database text-emerald-400"></i>
+                Backup &amp; Restore Database EduPath
+              </h2>
+              <p class="text-xs text-white/60 mt-0.5 max-w-xl">
+                Buat salinan instan seluruh database ke server, unduh file SQL terkompresi langsung ke komputer lokal, atau pulihkan database dengan fitur proteksi otomatis.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                @click="downloadDirectLiveSql"
+                :disabled="isExportingLiveSql"
+                class="px-3.5 py-2 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 font-bold text-xs inline-flex items-center gap-1.5 transition-all shadow-lg shadow-indigo-900/20 disabled:opacity-50"
+              >
+                <i :class="isExportingLiveSql ? 'ph-bold ph-spinner animate-spin' : 'ph-bold ph-download-simple'"></i>
+                {{ isExportingLiveSql ? 'Mengekspor...' : 'Unduh Dump SQL Langsung' }}
+              </button>
+              <button
+                @click="triggerRestoreUpload"
+                :disabled="isRestoringDb"
+                class="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold text-xs inline-flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-50"
+              >
+                <i class="ph-bold ph-upload-simple"></i>
+                Unggah &amp; Restore File .SQL
+              </button>
+              <input
+                ref="restoreFileInput"
+                type="file"
+                accept=".sql"
+                class="hidden"
+                @change="handleRestoreFileUpload"
+              />
+            </div>
+          </div>
+
+          <!-- Quick Stats / Notice Banner -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl shrink-0">
+                <i class="ph-bold ph-shield-check"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-white/50 uppercase font-bold">Proteksi Pra-Restore</div>
+                <div class="text-xs font-bold text-white mt-0.5">Auto Safety Snapshot</div>
+                <div class="text-[10px] text-white/40">Sistem otomatis membackup DB sebelum restore dijalankan</div>
+              </div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-xl shrink-0">
+                <i class="ph-bold ph-folder-lock"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-white/50 uppercase font-bold">Keamanan Direktori</div>
+                <div class="text-xs font-bold text-white mt-0.5">api/backups/ (.htaccess)</div>
+                <div class="text-[10px] text-white/40">Akses web publik diblokir total dari luar</div>
+              </div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-[#0e1726]/80 border border-white/10 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl shrink-0">
+                <i class="ph-bold ph-files"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-white/50 uppercase font-bold">Total Snapshot Tersimpan</div>
+                <div class="text-xs font-bold text-white mt-0.5">{{ backupList.length }} File Backup</div>
+                <div class="text-[10px] text-white/40">Total ukuran: {{ totalBackupSizeFormatted }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Create Snapshot Action Box -->
+          <div class="p-4 rounded-xl bg-[#0e1726]/80 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex-1">
+              <h3 class="text-xs font-black text-white uppercase tracking-wider">Buat Snapshot Server Baru</h3>
+              <p class="text-[11px] text-white/50 mt-0.5">Snapshot disimpan di folder server dengan timestamp dan nama opsional.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <input
+                v-model="customSnapshotName"
+                type="text"
+                placeholder="Nama kustom (opsional, misal: pre_update)"
+                class="px-3 py-1.5 text-xs text-white bg-black/40 border border-white/15 rounded-lg outline-none focus:border-emerald-400 transition-colors w-64"
+                @keyup.enter="handleCreateSnapshot"
+              />
+              <button
+                @click="handleCreateSnapshot"
+                :disabled="isCreatingBackup"
+                class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs inline-flex items-center gap-1.5 transition-all shadow-md shadow-emerald-500/20 disabled:opacity-50 shrink-0"
+              >
+                <i :class="isCreatingBackup ? 'ph-bold ph-spinner animate-spin' : 'ph-bold ph-plus-circle'"></i>
+                {{ isCreatingBackup ? 'Memproses...' : 'Buat Snapshot Sekarang' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Backup Snapshots Table -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
+            <div class="p-3 border-b border-white/10 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="ph-bold ph-clock-counter-clockwise text-emerald-400 text-base"></i>
+                <h3 class="font-bold text-white text-xs">Daftar Snapshot Database di Server</h3>
+              </div>
+              <button
+                @click="fetchBackupList"
+                :disabled="isLoadingBackups"
+                class="text-xs text-white/60 hover:text-white inline-flex items-center gap-1 transition-colors disabled:opacity-50"
+              >
+                <i :class="isLoadingBackups ? 'ph-bold ph-arrows-clockwise animate-spin' : 'ph-bold ph-arrows-clockwise'"></i>
+                Refresh
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Nama File</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Tipe</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Ukuran</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Tanggal Dibuat</th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr v-if="isLoadingBackups">
+                    <td colspan="5" class="py-8 text-center text-white/40 font-medium">
+                      <div class="inline-flex items-center gap-2">
+                        <div class="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
+                        Memuat daftar backup...
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-else-if="backupList.length === 0">
+                    <td colspan="5" class="py-10 text-center text-white/40 font-medium">
+                      <i class="ph-bold ph-database text-3xl mb-2 block text-white/20"></i>
+                      Belum ada file backup tersimpan di server. Klik "Buat Snapshot Sekarang" untuk membuat backup pertama.
+                    </td>
+                  </tr>
+                  <tr v-for="b in backupList" :key="b.filename" class="hover:bg-white/5 transition-colors">
+                    <td class="px-4 py-3">
+                      <div class="font-mono font-bold text-white text-xs flex items-center gap-2">
+                        <i class="ph-bold ph-file-sql text-indigo-400 text-sm"></i>
+                        {{ b.filename }}
+                      </div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span
+                        :class="[
+                          'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1',
+                          b.is_safety_snapshot
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                            : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        ]"
+                      >
+                        <i :class="b.is_safety_snapshot ? 'ph-bold ph-shield-warning' : 'ph-bold ph-archive'"></i>
+                        {{ b.is_safety_snapshot ? 'Safety Auto' : 'Manual / Scheduled' }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-white/80 text-xs">
+                      {{ b.size_formatted }}
+                    </td>
+                    <td class="px-4 py-3 text-white/60 text-xs">
+                      {{ b.created_at_formatted }}
+                    </td>
+                    <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                      <button
+                        @click="downloadBackupFile(b.filename)"
+                        class="px-2.5 py-1 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all"
+                        title="Unduh File SQL ke Komputer"
+                      >
+                        <i class="ph-bold ph-download-simple"></i> Unduh
+                      </button>
+                      <button
+                        @click="openRestoreModal(b.filename)"
+                        class="px-2.5 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all"
+                        title="Restore Database dari File ini"
+                      >
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i> Restore
+                      </button>
+                      <button
+                        @click="confirmDeleteBackup(b.filename)"
+                        class="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all"
+                        title="Hapus Backup dari Server"
+                      >
+                        <i class="ph-bold ph-trash"></i> Hapus
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
 
@@ -3167,6 +3369,115 @@
         </div>
       </div>
     </div>
+
+    <!-- Database Restore Confirmation Modal -->
+    <div v-if="showRestoreModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-amber-500/40 rounded-2xl w-full max-w-lg shadow-2xl animate-fade-in text-white overflow-hidden">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between bg-amber-500/10">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+              <i class="ph-bold ph-warning"></i>
+            </div>
+            <div>
+              <h3 class="font-black text-sm text-white">Konfirmasi Restore Database</h3>
+              <p class="text-[10px] text-amber-300/80">Tindakan ini akan menimpa data database aktif saat ini</p>
+            </div>
+          </div>
+          <button @click="closeRestoreModal" class="text-white/40 hover:text-white transition-colors">
+            <i class="ph-bold ph-x text-base"></i>
+          </button>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2">
+            <div class="flex items-start gap-2">
+              <i class="ph-bold ph-info text-base text-amber-400 shrink-0 mt-0.5"></i>
+              <div>
+                <span class="font-bold">Perhatian Penting:</span>
+                Proses restore akan mengeksekusi perintah SQL dari file yang dipilih. Sistem akan secara otomatis membuat <strong>Safety Snapshot</strong> terlebih dahulu sebelum restore diterapkan.
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-lg bg-black/40 border border-white/10">
+            <div class="text-[10px] text-white/50 uppercase font-bold">Sumber Restore:</div>
+            <div class="text-xs font-mono font-bold text-white mt-1 break-all flex items-center gap-2">
+              <i class="ph-bold ph-file-sql text-indigo-400"></i>
+              {{ restoreTargetFile ? restoreTargetFile.name : restoreTargetFilename }}
+            </div>
+            <div v-if="restoreTargetFile" class="text-[10px] text-white/40 mt-1">
+              File upload lokal ({{ (restoreTargetFile.size / 1024).toFixed(1) }} KB)
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-white/80 mb-1">
+              Ketik <span class="font-mono text-amber-400 font-black">RESTORE</span> untuk mengonfirmasi:
+            </label>
+            <input
+              v-model="restoreConfirmInput"
+              type="text"
+              placeholder="Ketik RESTORE dengan huruf kapital"
+              class="w-full px-3 py-2 text-xs font-mono font-bold text-white bg-black/50 border border-white/20 rounded-lg outline-none focus:border-amber-400 transition-colors uppercase tracking-widest placeholder:normal-case placeholder:font-sans placeholder:tracking-normal placeholder:text-white/30"
+              @keyup.enter="restoreConfirmInput.trim() === 'RESTORE' && executeRestore()"
+            />
+          </div>
+
+          <div v-if="restoreError" class="p-3 rounded-lg bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs">
+            <i class="ph-bold ph-x-circle mr-1"></i> {{ restoreError }}
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-white/10 bg-black/20 flex items-center justify-end gap-2">
+          <button
+            @click="closeRestoreModal"
+            :disabled="isRestoringDb"
+            class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 font-bold text-xs transition-colors disabled:opacity-50"
+          >
+            Batal
+          </button>
+          <button
+            @click="executeRestore"
+            :disabled="restoreConfirmInput.trim() !== 'RESTORE' || isRestoringDb"
+            class="px-5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-black text-xs inline-flex items-center gap-1.5 transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <i :class="isRestoringDb ? 'ph-bold ph-spinner animate-spin' : 'ph-bold ph-check'"></i>
+            {{ isRestoringDb ? 'Sedang Memulihkan...' : 'Lanjutkan Restore' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Restore Result / Summary Modal -->
+    <div v-if="showRestoreResultModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-emerald-500/40 rounded-2xl w-full max-w-md shadow-2xl animate-fade-in text-white p-5 space-y-4">
+        <div class="text-center space-y-2">
+          <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl mx-auto border border-emerald-500/30">
+            <i class="ph-bold ph-check"></i>
+          </div>
+          <h3 class="text-base font-black text-white">Restore Database Berhasil!</h3>
+          <p class="text-xs text-white/60">Semua pernyataan SQL telah dieksekusi dengan aman ke database.</p>
+        </div>
+
+        <div v-if="restoreResultStats" class="p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-1.5 text-xs">
+          <div class="flex justify-between text-white/70">
+            <span>Pernyataan Dieksekusi:</span>
+            <span class="font-mono font-bold text-emerald-400">{{ restoreResultStats.statements_executed }}</span>
+          </div>
+          <div v-if="restoreResultStats.safety_snapshot" class="flex justify-between text-white/70">
+            <span>Safety Snapshot Dibuat:</span>
+            <span class="font-mono text-white text-[11px] truncate max-w-[180px]">{{ restoreResultStats.safety_snapshot }}</span>
+          </div>
+        </div>
+
+        <button
+          @click="showRestoreResultModal = false"
+          class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-colors"
+        >
+          Selesai &amp; Tutup
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -3391,6 +3702,7 @@ const navItems = computed(() => {
     { id: 'affiliates',  label: 'Afiliasi & Komisi',     icon: 'ph-hand-coins',    roles: ['superadmin', 'admin'] },
     { id: 'staff',       label: 'Staff',                 icon: 'ph-users-three',   roles: ['superadmin'] },
     { id: 'reports',     label: 'Laporan & Analitik',    icon: 'ph-chart-bar',     roles: ['superadmin', 'admin'] },
+    { id: 'backup_restore', label: 'Backup & Restore DB', icon: 'ph-database',   roles: ['superadmin'] },
     { id: 'settings',    label: 'Pengaturan',            icon: 'ph-gear',          roles: ['superadmin', 'admin', 'teacher'] },
   ];
 
@@ -5334,13 +5646,217 @@ const teacherSchedule = ref([
   { day: 'Jumat', subject: 'Tes Potensi Skolastik', time: '09.00–11.00', room: 'Online' },
 ]);
 
+// ── Backup & Restore Database (Superadmin Only) ──
+const backupList = ref([]);
+const isLoadingBackups = ref(false);
+const isCreatingBackup = ref(false);
+const isExportingLiveSql = ref(false);
+const isRestoringDb = ref(false);
+const customSnapshotName = ref('');
+const showRestoreModal = ref(false);
+const showRestoreResultModal = ref(false);
+const restoreTargetFilename = ref(null);
+const restoreTargetFile = ref(null);
+const restoreConfirmInput = ref('');
+const restoreError = ref('');
+const restoreResultStats = ref(null);
+const restoreFileInput = ref(null);
+
+const totalBackupSizeFormatted = computed(() => {
+  const totalBytes = backupList.value.reduce((acc, b) => acc + (b.size_bytes || 0), 0);
+  if (totalBytes < 1024) return totalBytes + ' B';
+  if (totalBytes < 1048576) return (totalBytes / 1024).toFixed(1) + ' KB';
+  return (totalBytes / 1048576).toFixed(2) + ' MB';
+});
+
+const fetchBackupList = async () => {
+  if (!isSuperadmin.value) return;
+  isLoadingBackups.value = true;
+  try {
+    const res = await api.getDatabaseBackups();
+    if (res?.success) {
+      backupList.value = res.backups || [];
+    } else {
+      showToast(res?.error || 'Gagal memuat daftar backup');
+    }
+  } catch (err) {
+    console.error('Fetch backups error:', err);
+    showToast(err.message || 'Gagal terhubung ke server');
+  } finally {
+    isLoadingBackups.value = false;
+  }
+};
+
+const handleCreateSnapshot = async () => {
+  if (!isSuperadmin.value) return;
+  isCreatingBackup.value = true;
+  try {
+    const name = customSnapshotName.value.trim();
+    const res = await api.createDatabaseBackup(name);
+    if (res?.success) {
+      showToast('Snapshot database berhasil dibuat!');
+      customSnapshotName.value = '';
+      await fetchBackupList();
+    } else {
+      showToast(res?.error || 'Gagal membuat snapshot database');
+    }
+  } catch (err) {
+    showToast(`Gagal: ${err.message}`);
+  } finally {
+    isCreatingBackup.value = false;
+  }
+};
+
+const downloadBackupFile = async (filename) => {
+  try {
+    const token = sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token') || localStorage.getItem('auth_token') || '';
+    const baseUrl = import.meta.env.VITE_API_URL || '';
+    const res = await fetch(`${baseUrl}/admin.php?action=database_download_backup&filename=${encodeURIComponent(filename)}`, {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      credentials: 'include'
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.error || `HTTP ${res.status}`);
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    showToast(`Gagal unduh backup: ${err.message}`);
+  }
+};
+
+const downloadDirectLiveSql = async () => {
+  isExportingLiveSql.value = true;
+  try {
+    const token = sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token') || localStorage.getItem('auth_token') || '';
+    const baseUrl = import.meta.env.VITE_API_URL || '';
+    const res = await fetch(`${baseUrl}/admin.php?action=database_export_sql`, {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      credentials: 'include'
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.error || `HTTP ${res.status}`);
+    }
+    const cd = res.headers.get('Content-Disposition') || '';
+    const match = cd.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : `edupath_dump_${new Date().toISOString().slice(0, 10)}.sql`;
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+    showToast('Dump SQL database berhasil diunduh!');
+  } catch (err) {
+    showToast(`Gagal mengekspor database: ${err.message}`);
+  } finally {
+    isExportingLiveSql.value = false;
+  }
+};
+
+const confirmDeleteBackup = async (filename) => {
+  if (!confirm(`Apakah Anda yakin ingin menghapus file backup "${filename}" dari server?`)) return;
+  try {
+    const res = await api.deleteDatabaseBackup(filename);
+    if (res?.success) {
+      showToast('File backup berhasil dihapus.');
+      await fetchBackupList();
+    } else {
+      showToast(res?.error || 'Gagal menghapus file backup');
+    }
+  } catch (err) {
+    showToast(`Gagal: ${err.message}`);
+  }
+};
+
+const triggerRestoreUpload = () => {
+  if (restoreFileInput.value) {
+    restoreFileInput.value.value = '';
+    restoreFileInput.value.click();
+  }
+};
+
+const handleRestoreFileUpload = (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.sql')) {
+    showToast('File harus berekstensi .sql');
+    return;
+  }
+  restoreTargetFilename.value = null;
+  restoreTargetFile.value = file;
+  restoreConfirmInput.value = '';
+  restoreError.value = '';
+  showRestoreModal.value = true;
+};
+
+const openRestoreModal = (filename) => {
+  restoreTargetFilename.value = filename;
+  restoreTargetFile.value = null;
+  restoreConfirmInput.value = '';
+  restoreError.value = '';
+  showRestoreModal.value = true;
+};
+
+const closeRestoreModal = () => {
+  if (isRestoringDb.value) return;
+  showRestoreModal.value = false;
+  restoreTargetFilename.value = null;
+  restoreTargetFile.value = null;
+  restoreConfirmInput.value = '';
+  restoreError.value = '';
+};
+
+const executeRestore = async () => {
+  if (restoreConfirmInput.value.trim() !== 'RESTORE') return;
+  isRestoringDb.value = true;
+  restoreError.value = '';
+  try {
+    let res;
+    if (restoreTargetFile.value) {
+      const formData = new FormData();
+      formData.append('backup_file', restoreTargetFile.value);
+      res = await api.restoreDatabaseUpload(formData);
+    } else if (restoreTargetFilename.value) {
+      res = await api.restoreDatabaseSnapshot(restoreTargetFilename.value);
+    } else {
+      throw new Error('Tidak ada target file yang dipilih');
+    }
+
+    if (res?.success) {
+      showRestoreModal.value = false;
+      restoreResultStats.value = res.stats || { statements_executed: res.statements_executed || 0, safety_snapshot: res.safety_snapshot || null };
+      showRestoreResultModal.value = true;
+      await fetchBackupList();
+    } else {
+      restoreError.value = res?.error || 'Gagal memulihkan database.';
+    }
+  } catch (err) {
+    restoreError.value = err.message || 'Terjadi kesalahan saat restore.';
+  } finally {
+    isRestoringDb.value = false;
+  }
+};
+
 // ── Watch activeTab to load data ──
 watch(activeTab, (newTab) => {
   if (isAffiliate.value && !['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts', 'settings'].includes(newTab)) {
     activeTab.value = 'affiliate_dashboard';
     return;
   }
-  if (!isSuperadmin.value && ['packages', 'plans', 'staff', 'branches'].includes(newTab)) {
+  if (!isSuperadmin.value && ['packages', 'plans', 'staff', 'branches', 'backup_restore'].includes(newTab)) {
     activeTab.value = 'overview';
     return;
   }
@@ -5371,6 +5887,8 @@ watch(activeTab, (newTab) => {
     loadAdminCommissions();
     loadAdminPayouts();
     if (tenantsList.value.length === 0) fetchTenants();
+  } else if (newTab === 'backup_restore' && isSuperadmin.value) {
+    fetchBackupList();
   } else if (isAffiliate.value && ['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts'].includes(newTab)) {
     loadMyAffiliateData();
   } else if (newTab === 'settings') {
