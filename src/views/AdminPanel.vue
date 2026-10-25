@@ -2564,6 +2564,14 @@
         </div>
 
         <div class="space-y-3 text-xs">
+          <div v-if="isSuperadmin">
+            <label class="text-[11px] font-bold text-white/60 block mb-1">Cabang Bimbel (Multi-Cabang)</label>
+            <select v-model="classForm.tenant_id" class="w-full px-3 py-2 rounded-xl bg-[#0a0f1e] border border-white/10 text-white focus:outline-none focus:border-[#c0ff00]">
+              <option value="">-- Pilih Cabang Bimbel --</option>
+              <option v-for="t in tenantsList" :key="t.id" :value="t.id">{{ t.name }}</option>
+            </select>
+          </div>
+
           <div>
             <label class="text-[11px] font-bold text-white/60 block mb-1">Nama Rombel / Kelas</label>
             <input v-model="classForm.name" type="text" placeholder="misal: Intensif UTBK Saintek A" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#c0ff00]" />
@@ -2599,7 +2607,7 @@
               <label class="text-[11px] font-bold text-white/60 block mb-1">Tutor / Guru Utama</label>
               <select v-model="classForm.primary_teacher_id" class="w-full px-3 py-2 rounded-xl bg-[#0a0f1e] border border-white/10 text-white focus:outline-none focus:border-[#c0ff00]">
                 <option value="">-- Belum Ditugaskan --</option>
-                <option v-for="t in (adminStaffList || []).filter(s => s.role === 'teacher')" :key="t.id" :value="t.id">{{ t.name || t.username }}</option>
+                <option v-for="t in (staffMembers || []).filter(s => s.role === 'teacher')" :key="t.id" :value="t.id">{{ t.name || t.username }}</option>
               </select>
             </div>
           </div>
@@ -2624,6 +2632,14 @@
         </div>
 
         <div class="space-y-3 text-xs">
+          <div v-if="isSuperadmin">
+            <label class="text-[11px] font-bold text-white/60 block mb-1">Cabang Bimbel</label>
+            <select v-model="roomForm.tenant_id" class="w-full px-3 py-2 rounded-xl bg-[#0a0f1e] border border-white/10 text-white focus:outline-none focus:border-sky-400">
+              <option value="">-- Pilih Cabang Bimbel --</option>
+              <option v-for="t in tenantsList" :key="t.id" :value="t.id">{{ t.name }}</option>
+            </select>
+          </div>
+
           <div>
             <label class="text-[11px] font-bold text-white/60 block mb-1">Nama / Nomor Ruangan</label>
             <input v-model="roomForm.name" type="text" placeholder="misal: Ruang Einstein (Lt. 2)" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-sky-400" />
@@ -2684,12 +2700,12 @@
             Belum ada siswa yang ditugaskan ke rombel ini.
           </div>
           <div v-else class="divide-y divide-white/5">
-            <div v-for="(cs, idx) in selectedClassStudentsList" :key="cs.id" class="py-2.5 flex items-center justify-between gap-3 hover:bg-white/5 px-2 rounded-lg transition-colors text-xs">
+            <div v-for="(cs, idx) in selectedClassStudentsList" :key="cs.id || cs.enrollment_id || idx" class="py-2.5 flex items-center justify-between gap-3 hover:bg-white/5 px-2 rounded-lg transition-colors text-xs">
               <div class="flex items-center gap-2.5 min-w-0">
                 <span class="w-5 text-center text-[10px] text-white/40 font-mono">{{ idx + 1 }}</span>
                 <div class="min-w-0">
-                  <div class="font-bold text-white truncate">{{ cs.student_name }}</div>
-                  <div class="text-[10px] text-white/40 truncate">{{ cs.student_email }} • Bergabung: {{ cs.joined_at }}</div>
+                  <div class="font-bold text-white truncate">{{ cs.student_name || cs.name }}</div>
+                  <div class="text-[10px] text-white/40 truncate">{{ cs.student_email || cs.email }} • Bergabung: {{ cs.joined_at }}</div>
                 </div>
               </div>
               <button @click="removeStudentFromClass(cs.student_id)" class="px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-[10px] font-bold transition-all shrink-0">
@@ -6096,6 +6112,7 @@ const showClassModal = ref(false);
 const classForm = reactive({
   id: null,
   name: '',
+  tenant_id: '',
   grade_level: 'SMA-12',
   max_capacity: 25,
   room_id: '',
@@ -6106,6 +6123,7 @@ const classForm = reactive({
 const showRoomModal = ref(false);
 const roomForm = reactive({
   name: '',
+  tenant_id: '',
   capacity: 30,
   facilities: ''
 });
@@ -6147,8 +6165,8 @@ const fetchOfflineClasses = async () => {
       api.getOfflineClasses(),
       api.getRooms()
     ]);
-    offlineClasses.value = Array.isArray(clsData) ? clsData : [];
-    classRooms.value = Array.isArray(roomsData) ? roomsData : [];
+    offlineClasses.value = clsData?.classes || clsData?.data || (Array.isArray(clsData) ? clsData : []);
+    classRooms.value = roomsData?.rooms || roomsData?.data || (Array.isArray(roomsData) ? roomsData : []);
   } catch (err) {
     console.warn("Gagal memuat data kelas offline:", err);
   } finally {
@@ -6157,12 +6175,16 @@ const fetchOfflineClasses = async () => {
 };
 
 const openCreateClassModal = () => {
+  if (staffMembers.value.length === 0) loadPlansAndStaff();
+  if (tenantsList.value.length === 0 && isSuperadmin.value) fetchTenants();
+
   classForm.id = null;
   classForm.name = '';
+  classForm.tenant_id = tenantsList.value[0]?.id || '';
   classForm.grade_level = 'SMA-12';
   classForm.max_capacity = 25;
   classForm.room_id = classRooms.value[0]?.id || '';
-  classForm.primary_teacher_id = (adminStaffList.value || []).find(s => s.role === 'teacher')?.id || '';
+  classForm.primary_teacher_id = (staffMembers.value || []).find(s => s.role === 'teacher')?.id || '';
   classForm.is_active = 1;
   showClassModal.value = true;
 };
@@ -6170,21 +6192,26 @@ const openCreateClassModal = () => {
 const editClass = (cls) => {
   classForm.id = cls.id;
   classForm.name = cls.name;
-  classForm.grade_level = cls.grade_level;
-  classForm.max_capacity = cls.max_capacity;
-  classForm.room_id = cls.room_id || '';
+  classForm.tenant_id = cls.tenant_id || '';
+  classForm.grade_level = cls.grade_level || 'SMA-12';
+  classForm.max_capacity = cls.max_capacity || 25;
+  classForm.room_id = cls.room_id || cls.default_room_id || '';
   classForm.primary_teacher_id = cls.primary_teacher_id || '';
-  classForm.is_active = cls.is_active;
+  classForm.is_active = (cls.status !== 'archived' && cls.is_active != 0) ? 1 : 0;
   showClassModal.value = true;
 };
 
 const saveClassForm = async () => {
   if (!classForm.name.trim()) return alert('Nama kelas wajib diisi');
+  const payload = {
+    ...classForm,
+    default_room_id: classForm.room_id || null
+  };
   try {
     if (classForm.id) {
-      await api.updateOfflineClass(classForm.id, classForm);
+      await api.updateOfflineClass(classForm.id, payload);
     } else {
-      await api.createOfflineClass(classForm);
+      await api.createOfflineClass(payload);
     }
     showClassModal.value = false;
     await fetchOfflineClasses();
@@ -6204,7 +6231,9 @@ const deleteClassItem = async (cls) => {
 };
 
 const openCreateRoomModal = () => {
+  if (tenantsList.value.length === 0 && isSuperadmin.value) fetchTenants();
   roomForm.name = '';
+  roomForm.tenant_id = tenantsList.value[0]?.id || '';
   roomForm.capacity = 30;
   roomForm.facilities = 'AC, Proyektor, Whiteboard, WiFi';
   showRoomModal.value = true;
@@ -6216,7 +6245,7 @@ const saveRoomForm = async () => {
     await api.createRoom(roomForm);
     showRoomModal.value = false;
     const rooms = await api.getRooms();
-    classRooms.value = Array.isArray(rooms) ? rooms : [];
+    classRooms.value = rooms?.rooms || rooms?.data || (Array.isArray(rooms) ? rooms : []);
   } catch (err) {
     alert(err?.message || 'Gagal menambah ruangan');
   }
@@ -6230,9 +6259,10 @@ const openManageStudentsModal = async (cls) => {
   studentAssignForm.notes = '';
   showManageStudentsModal.value = true;
   isLoadingClassStudents.value = true;
+  if (allStudents.value.length === 0) fetchStudents();
   try {
     const list = await api.getClassStudents(cls.id);
-    selectedClassStudentsList.value = Array.isArray(list) ? list : [];
+    selectedClassStudentsList.value = list?.students || list?.class_students || (Array.isArray(list) ? list : []);
   } catch (err) {
     console.warn("Gagal load siswa kelas:", err);
   } finally {
@@ -6251,7 +6281,7 @@ const assignStudentToClass = async () => {
     });
     studentAssignForm.student_id = '';
     const list = await api.getClassStudents(selectedClassForStudents.value.id);
-    selectedClassStudentsList.value = Array.isArray(list) ? list : [];
+    selectedClassStudentsList.value = list?.students || list?.class_students || (Array.isArray(list) ? list : []);
     await fetchOfflineClasses();
   } catch (err) {
     alert(err?.message || 'Gagal menambahkan siswa ke rombel');
@@ -6263,7 +6293,7 @@ const removeStudentFromClass = async (studentId) => {
   try {
     await api.removeClassStudent(selectedClassForStudents.value.id, studentId);
     const list = await api.getClassStudents(selectedClassForStudents.value.id);
-    selectedClassStudentsList.value = Array.isArray(list) ? list : [];
+    selectedClassStudentsList.value = list?.students || list?.class_students || (Array.isArray(list) ? list : []);
     await fetchOfflineClasses();
   } catch (err) {
     alert(err?.message || 'Gagal mengeluarkan siswa');
@@ -6278,9 +6308,9 @@ const fetchTeacherHub = async () => {
     const res = await api.getTeacherHubData();
     if (res && res.status === 'SUCCESS') {
       teacherClasses.value = res.classes || [];
-      teacherUpcomingSessions.value = res.upcoming_sessions || [];
-      if (res.upcoming_sessions && res.upcoming_sessions.length > 0) {
-        teacherSchedule.value = res.upcoming_sessions.map(s => ({
+      teacherUpcomingSessions.value = res.upcoming_sessions || res.sessions || [];
+      if (teacherUpcomingSessions.value && teacherUpcomingSessions.value.length > 0) {
+        teacherSchedule.value = teacherUpcomingSessions.value.map(s => ({
           day: s.session_date,
           subject: s.subject || s.class_name,
           time: `${(s.start_time || '').slice(0, 5)}–${(s.end_time || '').slice(0, 5)}`,
@@ -6299,7 +6329,7 @@ const fetchTeacherHub = async () => {
 const openBapModal = async (session) => {
   activeBapSession.value = session;
   bapForm.session_id = session.id;
-  bapForm.teaching_topic = session.teaching_topic || '';
+  bapForm.teaching_topic = session.teaching_topic || session.bap_notes || '';
   bapForm.notes = session.notes || '';
   bapForm.notify_telegram_parents = true;
   bapForm.attendances = [];
@@ -6307,10 +6337,11 @@ const openBapModal = async (session) => {
   isLoadingBap.value = true;
   try {
     const res = await api.getSessionAttendance(session.id);
-    if (res && res.students) {
-      bapForm.attendances = res.students.map(s => ({
+    const list = res?.students || res?.attendances || [];
+    if (list && list.length > 0) {
+      bapForm.attendances = list.map(s => ({
         student_id: s.student_id,
-        student_name: s.student_name,
+        student_name: s.student_name || s.name,
         parent_telegram_id: s.parent_telegram_id,
         attendance_status: s.attendance_status || 'present',
         minutes_late: s.minutes_late || 0,
@@ -6328,7 +6359,11 @@ const saveBapAttendance = async () => {
   if (!bapForm.teaching_topic.trim()) return alert('Topik / Materi yang diajarkan wajib diisi');
   isSavingBap.value = true;
   try {
-    await api.saveSessionAttendance(bapForm);
+    const payload = {
+      ...bapForm,
+      bap_notes: `[Topik: ${bapForm.teaching_topic}]\n${bapForm.notes || ''}`.trim()
+    };
+    await api.saveSessionAttendance(payload);
     alert('BAP dan Presensi Mengajar Berhasil Disimpan!');
     showBapModal.value = false;
     await fetchTeacherHub();
@@ -6560,6 +6595,13 @@ watch(activeTab, (newTab) => {
   sessionStorage.setItem('admin_active_tab', newTab);
   if (newTab === 'overview' && !isAffiliate.value && !isTeacher.value) {
     fetchDashboard();
+  } else if (newTab === 'offline_classes') {
+    fetchOfflineClasses();
+    if (staffMembers.value.length === 0) loadPlansAndStaff();
+    if (tenantsList.value.length === 0 && isSuperadmin.value) fetchTenants();
+    if (allStudents.value.length === 0) fetchStudents();
+  } else if (newTab === 'teacher_hub') {
+    fetchTeacherHub();
   } else if (newTab === 'branches' && isSuperadmin.value) {
     fetchTenants();
   } else if (newTab === 'schools') {

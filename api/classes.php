@@ -58,8 +58,12 @@ if ($action === 'rooms') {
         $name = trim($input['name'] ?? '');
         $capacity = (int)($input['capacity'] ?? 15);
         $tId = $isSuper ? ($input['tenant_id'] ?? $tenant_id) : $tenant_id;
-        if (!$name || !$tId) {
-            http_response_code(400); echo json_encode(["error" => "Nama ruangan dan cabang harus diisi"]); exit;
+        if (!$tId) {
+            $firstTenant = $pdo->query("SELECT id FROM tenants ORDER BY created_at ASC LIMIT 1")->fetchColumn();
+            $tId = $firstTenant ?: 'default';
+        }
+        if (!$name) {
+            http_response_code(400); echo json_encode(["error" => "Nama ruangan harus diisi"]); exit;
         }
         $id = gen_uuid();
         $stmt = $pdo->prepare("INSERT INTO class_rooms (id, tenant_id, name, capacity, is_active) VALUES (?, ?, ?, ?, 1)");
@@ -67,7 +71,7 @@ if ($action === 'rooms') {
         echo json_encode(["success" => true, "id" => $id]);
         exit;
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        $id = $input['id'] ?? '';
+        $id = $input['id'] ?? ($_GET['id'] ?? '');
         $name = trim($input['name'] ?? '');
         $capacity = (int)($input['capacity'] ?? 15);
         $isActive = isset($input['is_active']) ? (int)$input['is_active'] : 1;
@@ -107,7 +111,7 @@ if ($action === 'rooms') {
 elseif ($action === 'classes') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $sql = "
-            SELECT c.*, r.name as room_name, t.name as tenant_name,
+            SELECT c.*, c.default_room_id as room_id, r.name as room_name, t.name as tenant_name,
                    (SELECT COUNT(*) FROM class_students cs WHERE cs.class_id = c.id AND cs.status = 'active') as student_count
             FROM classes c
             LEFT JOIN class_rooms r ON c.default_room_id = r.id
@@ -122,7 +126,8 @@ elseif ($action === 'classes') {
         $sql .= " ORDER BY c.created_at DESC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
-        echo json_encode(["classes" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+        $classList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(["classes" => $classList, "data" => $classList]);
         exit;
     }
 
@@ -135,11 +140,15 @@ elseif ($action === 'classes') {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = trim($input['name'] ?? '');
         $academic_year = trim($input['academic_year'] ?? date('Y') . '/' . (date('Y') + 1));
-        $default_room_id = !empty($input['default_room_id']) ? $input['default_room_id'] : null;
+        $default_room_id = !empty($input['default_room_id']) ? $input['default_room_id'] : (!empty($input['room_id']) ? $input['room_id'] : null);
         $max_capacity = (int)($input['max_capacity'] ?? 15);
         $tId = $isSuper ? ($input['tenant_id'] ?? $tenant_id) : $tenant_id;
+        if (!$tId) {
+            $firstTenant = $pdo->query("SELECT id FROM tenants ORDER BY created_at ASC LIMIT 1")->fetchColumn();
+            $tId = $firstTenant ?: 'default';
+        }
 
-        if (!$name || !$tId) {
+        if (!$name) {
             http_response_code(400); echo json_encode(["error" => "Nama rombel kelas wajib diisi"]); exit;
         }
         $id = gen_uuid();
@@ -151,10 +160,10 @@ elseif ($action === 'classes') {
         echo json_encode(["success" => true, "id" => $id]);
         exit;
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        $id = $input['id'] ?? '';
+        $id = $input['id'] ?? ($_GET['id'] ?? '');
         $name = trim($input['name'] ?? '');
         $academic_year = trim($input['academic_year'] ?? '');
-        $default_room_id = !empty($input['default_room_id']) ? $input['default_room_id'] : null;
+        $default_room_id = !empty($input['default_room_id']) ? $input['default_room_id'] : (!empty($input['room_id']) ? $input['room_id'] : null);
         $max_capacity = (int)($input['max_capacity'] ?? 15);
         $status = $input['status'] ?? 'active';
 
@@ -195,8 +204,8 @@ elseif ($action === 'class_students') {
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $pdo->prepare("
-            SELECT cs.id as enrollment_id, cs.joined_at, cs.status as enrollment_status,
-                   s.id as student_id, s.name, s.email, s.phone, s.school, s.target_ptn, s.plan,
+            SELECT cs.id, cs.id as enrollment_id, cs.joined_at, cs.status as enrollment_status,
+                   s.id as student_id, s.name, s.name as student_name, s.email, s.email as student_email, s.phone, s.school, s.target_ptn, s.plan,
                    s.telegram_chat_id, s.parent_telegram_id
             FROM class_students cs
             JOIN students s ON cs.student_id = s.id
@@ -204,7 +213,8 @@ elseif ($action === 'class_students') {
             ORDER BY s.name ASC
         ");
         $stmt->execute([$class_id]);
-        echo json_encode(["students" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+        $studentsList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(["students" => $studentsList, "class_students" => $studentsList]);
         exit;
     }
 
@@ -374,7 +384,8 @@ elseif ($action === 'attendance') {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Ambil daftar kehadiran sesi beserta seluruh siswa aktif rombel
         $stmt = $pdo->prepare("
-            SELECT s.id as student_id, s.name, s.email, s.phone,
+            SELECT s.id as student_id, s.name, s.name as student_name, s.email, s.email as student_email, s.phone,
+                   s.telegram_chat_id, s.parent_telegram_id,
                    COALESCE(sa.attendance_status, 'present') as attendance_status,
                    COALESCE(sa.minutes_late, 0) as minutes_late,
                    COALESCE(sa.notes, '') as notes,
@@ -394,38 +405,49 @@ elseif ($action === 'attendance') {
         $sesStmt->execute([$session_id]);
         $sesData = $sesStmt->fetch(PDO::FETCH_ASSOC);
 
-        echo json_encode(["attendances" => $attendances, "session" => $sesData]);
+        echo json_encode([
+            "attendances" => $attendances,
+            "students" => $attendances,
+            "session" => $sesData
+        ]);
         exit;
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $attendances = $input['attendances'] ?? [];
+        $teachingTopic = trim($input['teaching_topic'] ?? '');
+        $topicNotes = trim($input['notes'] ?? '');
         $bap_notes = trim($input['bap_notes'] ?? '');
-        $markCompleted = isset($input['mark_completed']) && $input['mark_completed'];
+        if (!$bap_notes && ($teachingTopic || $topicNotes)) {
+            $bap_notes = ($teachingTopic ? "[Materi/Topik: {$teachingTopic}]\n" : '') . $topicNotes;
+        }
+        $markCompleted = isset($input['mark_completed']) ? (bool)$input['mark_completed'] : true;
 
-        if (empty($attendances)) {
-            http_response_code(400); echo json_encode(["error" => "Data presensi siswa tidak boleh kosong"]); exit;
+        if (empty($attendances) && !$bap_notes) {
+            http_response_code(400); echo json_encode(["error" => "Data presensi atau catatan BAP tidak boleh kosong"]); exit;
         }
 
         $pdo->beginTransaction();
         try {
-            $stmtAtt = $pdo->prepare("
-                INSERT INTO session_attendances (id, session_id, student_id, attendance_status, minutes_late, notes, check_in_time)
-                VALUES (?, ?, ?, ?, ?, ?, NOW())
-                ON DUPLICATE KEY UPDATE 
-                    attendance_status = VALUES(attendance_status),
-                    minutes_late = VALUES(minutes_late),
-                    notes = VALUES(notes)
-            ");
+            if (!empty($attendances)) {
+                $stmtAtt = $pdo->prepare("
+                    INSERT INTO session_attendances (id, session_id, student_id, attendance_status, minutes_late, notes, check_in_time)
+                    VALUES (?, ?, ?, ?, ?, ?, NOW())
+                    ON DUPLICATE KEY UPDATE 
+                        attendance_status = VALUES(attendance_status),
+                        minutes_late = VALUES(minutes_late),
+                        notes = VALUES(notes)
+                ");
 
-            foreach ($attendances as $att) {
-                $stdId = $att['student_id'] ?? '';
-                $status = $att['attendance_status'] ?? 'present';
-                $late = (int)($att['minutes_late'] ?? 0);
-                $notes = $att['notes'] ?? '';
-                if ($stdId) {
-                    $attId = gen_uuid();
-                    $stmtAtt->execute([$attId, $session_id, $stdId, $status, $late, $notes]);
+                foreach ($attendances as $att) {
+                    $stdId = $att['student_id'] ?? '';
+                    $status = $att['attendance_status'] ?? 'present';
+                    $late = (int)($att['minutes_late'] ?? 0);
+                    $notes = $att['notes'] ?? '';
+                    if ($stdId) {
+                        $attId = gen_uuid();
+                        $stmtAtt->execute([$attId, $session_id, $stdId, $status, $late, $notes]);
+                    }
                 }
             }
 
@@ -457,7 +479,7 @@ elseif ($action === 'attendance') {
 elseif ($action === 'teacher_hub') {
     $myTeacherId = $payload->role === 'teacher' ? ($payload->user_id ?? $payload->id) : ($input['teacher_id'] ?? $payload->id);
 
-    // Ambil sesi mengajar guru ini untuk minggu ini
+    // Ambil sesi mengajar guru ini
     $sesStmt = $pdo->prepare("
         SELECT ses.*, c.name as class_name, r.name as room_name,
                (SELECT COUNT(*) FROM class_students cs WHERE cs.class_id = c.id AND cs.status = 'active') as student_count
@@ -470,6 +492,18 @@ elseif ($action === 'teacher_hub') {
     ");
     $sesStmt->execute([$myTeacherId]);
     $mySessions = $sesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Ambil daftar rombel/kelas guru ini
+    $clsStmt = $pdo->prepare("
+        SELECT DISTINCT c.*, r.name as room_name,
+               (SELECT COUNT(*) FROM class_students cs WHERE cs.class_id = c.id AND cs.status = 'active') as student_count
+        FROM classes c
+        JOIN class_sessions ses ON ses.class_id = c.id
+        LEFT JOIN class_rooms r ON c.default_room_id = r.id
+        WHERE ses.teacher_id = ? AND c.status = 'active'
+    ");
+    $clsStmt->execute([$myTeacherId]);
+    $myClasses = $clsStmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Ambil daftar siswa unik yang diajar oleh guru ini
     $stdStmt = $pdo->prepare("
@@ -486,11 +520,15 @@ elseif ($action === 'teacher_hub') {
     $myStudents = $stdStmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
+        "status" => "SUCCESS",
         "sessions" => $mySessions,
+        "upcoming_sessions" => $mySessions,
+        "classes" => $myClasses,
         "students" => $myStudents,
         "stats" => [
             "total_sessions" => count($mySessions),
-            "total_students" => count($myStudents)
+            "total_students" => count($myStudents),
+            "total_classes" => count($myClasses)
         ]
     ]);
     exit;
