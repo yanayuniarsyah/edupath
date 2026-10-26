@@ -11,7 +11,14 @@
     <div class="fixed bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-500/10 blur-[130px] pointer-events-none z-0" style="animation: float 10s ease-in-out infinite alternate"></div>
     <canvas id="bg-canvas" :style="{ opacity: canvasOpacity }" class="fixed inset-0 w-full h-full z-0 pointer-events-none transition-opacity duration-700"></canvas>
 
-
+    <!-- Mobile Drawer Backdrop for Logged In User -->
+    <transition name="fade">
+      <div 
+        v-if="isLoggedIn && mobileSidebarOpen" 
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-30 lg:hidden cursor-pointer"
+        @click="mobileSidebarOpen = false"
+      ></div>
+    </transition>
 
     <!-- Sidebar Navigation — auto-hide on desktop -->
     <aside
@@ -191,7 +198,7 @@
     <!-- Main Content Area -->
     <main @scroll="handleScroll" class="relative z-10 flex-grow overflow-y-auto overflow-x-hidden max-h-screen flex flex-col w-full" :class="[
       isLoggedIn ? 'lg:ml-[72px]' : '',
-      (isLoggedIn && currentTab !== 'home') ? 'p-6 lg:pl-6 bg-transparent' : ''
+      (isLoggedIn && currentTab !== 'home') ? 'p-3 sm:p-5 lg:p-6 lg:pl-6 bg-transparent' : ''
     ]">
       
       <!-- Public Top Navbar (Only visible when Logged Out) -->
@@ -427,20 +434,22 @@
       </header>
 
       <!-- App Header Utility (Only visible on Mobile when Logged In) -->
-      <header v-if="isLoggedIn" class="lg:hidden flex justify-between items-center pb-4 border-b border-white/10 mb-6 shrink-0 glass-card px-6 py-3.5 -mx-6 -mt-6 rounded-b-2xl p-6 md:p-8">
-        <div class="flex items-center gap-3">
+      <header v-if="isLoggedIn" class="lg:hidden flex justify-between items-center px-3.5 sm:px-5 py-3 border-b border-white/10 mb-4 shrink-0 glass-card -mx-3 -mt-3 sm:-mx-5 sm:-mt-5 rounded-b-2xl z-20 backdrop-blur-xl">
+        <div class="flex items-center gap-2.5">
           <!-- Mobile Hamburger untuk Menu Siswa -->
-          <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="flex-shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white/70 flex items-center justify-center hover:bg-white/10 transition-all z-50">
-            <i class="ph-bold ph-list text-base"></i>
+          <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/10 active:scale-95 transition-all cursor-pointer" aria-label="Buka Menu Navigasi Siswa">
+            <i class="ph-bold ph-list text-lg"></i>
           </button>
-          <span class="font-black text-sm text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+          <div class="flex items-center gap-1.5 cursor-pointer" @click="handleTabClick('dashboard')">
+            <span class="font-black text-sm text-white tracking-tight">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+          </div>
         </div>
 
         <div class="flex items-center gap-2">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+          <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-sm">
             <span class="text-purple-400 font-black">🔥 {{ streakCount }}d</span>
           </div>
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+          <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-sm">
             <span class="text-amber-400 font-black">🪙 {{ coins }}</span>
           </div>
         </div>
@@ -2341,45 +2350,47 @@
 
 
         <!-- TAB 1: DASHBOARD -->
-        <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-6">
+        <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
 
-          <!-- ✨ Banner Gambar Dashboard Belajar (PALING ATAS - Gambar 2.jpeg Clean & Clear) -->
-          <div class="glass-card rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
-            <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-48 md:h-60 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+          <!-- ✨ Banner Gambar Dashboard Belajar (PALING ATAS - Proporsional di HP & Desktop) -->
+          <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
+            <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-32 sm:h-44 md:h-56 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
             <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-90 z-10"></div>
           </div>
 
           <!-- ✨ Text & Tombol Greeting (DI LETAKAN DI BAWAH GAMBAR) -->
-          <div class="glass-card rounded-3xl p-6 md:p-8 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
             <!-- Left: Avatar & Greeting Info -->
-            <div class="flex items-start md:items-center gap-4 flex-1 min-w-0">
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#c0ff00]/25 via-emerald-500/15 to-transparent border border-[#c0ff00]/40 shadow-[0_0_25px_rgba(192,255,0,0.3)] flex items-center justify-center shrink-0 backdrop-blur-md">
-                <i class="ph-fill ph-user text-2xl text-[#c0ff00]"></i>
+            <div class="flex items-start md:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#c0ff00]/25 via-emerald-500/15 to-transparent border border-[#c0ff00]/40 shadow-[0_0_25px_rgba(192,255,0,0.3)] flex items-center justify-center shrink-0 backdrop-blur-md">
+                <i class="ph-fill ph-user text-xl sm:text-2xl text-[#c0ff00]"></i>
               </div>
-              <div class="space-y-1.5 min-w-0">
+              <div class="space-y-1 min-w-0">
                 <div class="flex items-center gap-2">
                   <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
-                  <p class="text-[#c0ff00] font-black text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
+                  <p class="text-[#c0ff00] font-black text-[10px] sm:text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
                 </div>
-                <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa Mandiri') }}!</span></h2>
-                <p class="text-white/70 text-xs md:text-sm font-medium">Persiapkan SNBT 2027 dengan asesmen IRT adaptif & latihan soal terfokus.</p>
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa Mandiri') }}!</span></h2>
+                <p class="text-white/70 text-xs md:text-sm font-medium leading-relaxed">Persiapkan SNBT 2027 dengan asesmen IRT adaptif &amp; latihan soal terfokus.</p>
               </div>
             </div>
 
             <!-- Right: Shortcut Actions & Quick Info -->
-            <div class="flex flex-wrap items-center gap-3 shrink-0">
-              <button @click="handleTabClick('diagnostic')" class="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto shrink-0 pt-1 lg:pt-0">
+              <button @click="handleTabClick('diagnostic')" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
                 <i class="ph-bold ph-exam text-base"></i>
                 <span>Mulai Asesmen</span>
               </button>
-              <button @click="handleTabClick('learning')" class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
-                <i class="ph-bold ph-book-open text-base text-white/70"></i>
-                <span>Materi</span>
-              </button>
-              <button @click="handleTabClick('practice')" class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
-                <i class="ph-bold ph-pencil-simple text-base text-white/70"></i>
-                <span>Latihan Soal</span>
-              </button>
+              <div class="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center">
+                <button @click="handleTabClick('learning')" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
+                  <i class="ph-bold ph-book-open text-base text-white/70"></i>
+                  <span>Materi</span>
+                </button>
+                <button @click="handleTabClick('practice')" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
+                  <i class="ph-bold ph-pencil-simple text-base text-white/70"></i>
+                  <span>Latihan Soal</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -2391,13 +2402,13 @@
                 <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400 text-lg shrink-0 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
                   🎯
                 </div>
-                <div class="space-y-0.5">
+                <div class="space-y-0.5 min-w-0">
                   <span class="block text-[9px] font-black uppercase tracking-widest text-sky-400">Target PTN Impian Anda</span>
-                  <div class="relative inline-block">
+                  <div class="relative inline-block max-w-full">
                     <select
                       v-model="selectedUniversity"
                       @change="recalcTargetGap"
-                      class="bg-black/60 border border-white/15 text-white text-xs md:text-sm font-black py-1.5 px-3 pr-8 rounded-lg appearance-none outline-none focus:border-sky-400 shadow-inner transition-colors cursor-pointer"
+                      class="bg-black/60 border border-white/15 text-white text-xs md:text-sm font-black py-1.5 px-3 pr-8 rounded-lg appearance-none outline-none focus:border-sky-400 shadow-inner transition-colors cursor-pointer max-w-[200px] xs:max-w-xs sm:max-w-sm truncate"
                     >
                       <option v-for="u in universities" :key="u.name" :value="u" class="bg-slate-900 text-white font-bold">
                         {{ u.name }} (Target: {{ u.targetScore }})
@@ -2697,31 +2708,45 @@
         </section>
 
         <!-- TAB 2: DIAGNOSTIC & TRY OUT -->
-        <section v-if="currentTab === 'diagnostic'" class="animate-fade-in space-y-6 px-3 sm:px-6">
+        <section v-if="currentTab === 'diagnostic'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
           <!-- Top Close & Back Bar -->
-          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xl font-black">
-                <i class="ph-bold ph-exam"></i>
+          <div class="bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:p-4 backdrop-blur-xl shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <!-- Top row on mobile / Left on desktop -->
+            <div class="flex items-center justify-between w-full sm:w-auto">
+              <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/30 flex items-center justify-center text-lg sm:text-xl font-black shrink-0">
+                  <i class="ph-bold ph-exam"></i>
+                </div>
+                <div class="min-w-0">
+                  <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-purple-400 truncate">Asesmen Diagnostik Adaptif</span>
+                  <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Asesmen Diagnostik &amp; Pemetaan Kemampuan</h2>
+                </div>
               </div>
-              <div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Asesmen Diagnostik Adaptif</span>
-                <h2 class="text-base md:text-lg font-black text-white">Asesmen Diagnostik &amp; Pemetaan Kemampuan</h2>
-              </div>
+              <!-- Tutup button visible immediately on top right for mobile -->
+              <button 
+                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+                class="sm:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 text-xs font-bold transition-all shadow-md shrink-0 ml-2 cursor-pointer"
+                title="Tutup Halaman & Kembali"
+              >
+                <span>Tutup</span>
+                <i class="ph-bold ph-x text-sm"></i>
+              </button>
             </div>
-            <div class="flex items-center gap-2">
+
+            <!-- Actions: Desktop & Mobile secondary bar -->
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t border-white/10 sm:border-0">
               <button 
                 type="button"
                 @click="showIrtInfo = !showIrtInfo" 
-                class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+                class="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
                 title="Sembunyikan / Tampilkan Kotak IRT"
               >
-                <span>{{ showIrtInfo ? 'Sembunyikan Panel IRT (Layar Penuh)' : 'Tampilkan Panel IRT' }}</span>
+                <span>{{ showIrtInfo ? 'Sembunyikan Panel IRT' : 'Tampilkan Panel IRT' }}</span>
                 <i :class="showIrtInfo ? 'ph-bold ph-eye-slash' : 'ph-bold ph-eye'"></i>
               </button>
               <button 
                 @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+                class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
                 title="Tutup Halaman & Kembali"
               >
                 <span>Tutup</span>
@@ -2731,7 +2756,7 @@
           </div>
 
           <div class="grid grid-cols-1 gap-6" :class="showIrtInfo ? 'lg:grid-cols-3' : ''">
-            <div class="light-mode-card rounded-2xl p-6 lg:p-8" :class="showIrtInfo ? 'lg:col-span-2' : 'w-full'">
+            <div class="light-mode-card rounded-2xl p-4 sm:p-6 lg:p-8" :class="showIrtInfo ? 'lg:col-span-2' : 'w-full'">
               <h3 class="text-xl font-black font-heading text-slate-900 mb-2">Diagnostic &amp; Adaptive Simulation Test</h3>
               <p v-if="!diagnosticFocus" class="text-xs text-slate-600 mb-5 font-medium">
                 Sistem simulasi ujian dengan Item Response Theory (IRT). Kesulitan soal dinamis sesuai respons kemampuan Anda.
@@ -2898,76 +2923,84 @@
         </section>
 
         <!-- TAB 3: MATERI UTBK & MICRO-LESSONS -->
-        <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-6 px-3 sm:px-6">
+        <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
           <!-- Top Close & Back Bar -->
-          <div class="flex flex-wrap lg:flex-nowrap items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-3.5 sm:p-4 backdrop-blur-xl shadow-xl gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] border border-[#c0ff00]/30 flex items-center justify-center text-xl font-black shrink-0">
-                <i class="ph-bold ph-books"></i>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-black uppercase tracking-widest text-[#c0ff00]">Modul Pembelajaran Mandiri</span>
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 rounded-full">
-                    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
-                    {{ onlineStudents }} Pejuang Online
-                  </span>
+          <div class="bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:p-4 backdrop-blur-xl shadow-xl flex flex-col gap-3">
+            <!-- Top Row: Icon, Title, and Tutup Button (Always in view!) -->
+            <div class="flex items-center justify-between gap-3 w-full">
+              <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] border border-[#c0ff00]/30 flex items-center justify-center text-lg sm:text-xl font-black shrink-0">
+                  <i class="ph-bold ph-books"></i>
                 </div>
-                <h2 class="text-base md:text-lg font-black text-white">Materi &amp; Drill Soal UTBK 2027</h2>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[#c0ff00]">Modul Pembelajaran Mandiri</span>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-[9px] sm:text-[10px] font-bold text-emerald-400 rounded-full whitespace-nowrap shrink-0">
+                      <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
+                      {{ onlineStudents }} Pejuang Online
+                    </span>
+                  </div>
+                  <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Materi &amp; Drill Soal UTBK 2027</h2>
+                </div>
               </div>
-            </div>
 
-            <!-- Focus Pomodoro Timer (Compact) -->
-            <div class="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-1.5 rounded-xl shadow-inner">
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full" :class="timerActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'"></span>
-                <span class="text-[10px] uppercase font-black tracking-wider text-indigo-300 hidden sm:inline">
-                  {{ isBreak ? '☕ Break' : '🎯 Fokus' }}
-                </span>
-                <span class="font-mono font-black text-sm md:text-base text-white tracking-widest px-1">{{ formattedTime }}</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <button 
-                  @click="toggleTimer"
-                  :class="['px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1 shadow-sm active:scale-95', 
-                    timerActive ? 'bg-amber-500 text-black hover:bg-amber-400' : 'bg-[#c0ff00] text-black hover:bg-[#b0ef00]']"
-                  :title="timerActive ? 'Jeda Pomodoro' : 'Mulai Sesi Fokus'"
-                >
-                  <i :class="timerActive ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
-                  <span class="hidden md:inline">{{ timerActive ? 'Jeda' : 'Fokus' }}</span>
-                </button>
-                <button 
-                  @click="resetTimer"
-                  class="p-1 text-white/50 hover:text-white rounded-lg transition-colors cursor-pointer"
-                  title="Reset Timer Pomodoro"
-                >
-                  <i class="ph-bold ph-arrows-counter-clockwise text-xs"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2 shrink-0">
-              <button 
-                type="button"
-                @click="hideBabSidebar = !hideBabSidebar" 
-                class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#c0ff00] border border-[#c0ff00]/30 text-xs font-bold transition-all shadow-md cursor-pointer"
-                :title="hideBabSidebar ? 'Tampilkan Daftar Bab' : 'Sembunyikan Bab (Area Materi Luas)'"
-              >
-                <span>{{ hideBabSidebar ? 'Buka Daftar Bab' : 'Sembunyikan Bab (Area Luas)' }}</span>
-                <i :class="hideBabSidebar ? 'ph-bold ph-sidebar-simple' : 'ph-bold ph-arrows-out-line-horizontal'"></i>
-              </button>
+              <!-- Tutup button: always on top right -->
               <button 
                 @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+                class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
                 title="Tutup Halaman & Kembali"
               >
                 <span>Tutup</span>
-                <i class="ph-bold ph-x text-base"></i>
+                <i class="ph-bold ph-x text-sm sm:text-base"></i>
+              </button>
+            </div>
+
+            <!-- Bottom Row: Pomodoro Timer & Sembunyikan Bab Toggle -->
+            <div class="flex items-center justify-between gap-2 pt-2.5 border-t border-white/10 w-full flex-wrap sm:flex-nowrap">
+              <!-- Focus Pomodoro Timer -->
+              <div class="flex items-center gap-2 bg-black/40 border border-white/10 px-2.5 sm:px-3 py-1.5 rounded-xl shadow-inner">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full" :class="timerActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'"></span>
+                  <span class="text-[9px] sm:text-[10px] uppercase font-black tracking-wider text-indigo-300 hidden xs:inline sm:inline">
+                    {{ isBreak ? '☕ Break' : '🎯 Fokus' }}
+                  </span>
+                  <span class="font-mono font-black text-xs sm:text-sm md:text-base text-white tracking-widest px-0.5 sm:px-1">{{ formattedTime }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button 
+                    @click="toggleTimer"
+                    :class="['px-2 sm:px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1 shadow-sm active:scale-95', 
+                      timerActive ? 'bg-amber-500 text-black hover:bg-amber-400' : 'bg-[#c0ff00] text-black hover:bg-[#b0ef00]']"
+                    :title="timerActive ? 'Jeda Pomodoro' : 'Mulai Sesi Fokus'"
+                  >
+                    <i :class="timerActive ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
+                    <span class="hidden sm:inline">{{ timerActive ? 'Jeda' : 'Fokus' }}</span>
+                  </button>
+                  <button 
+                    @click="resetTimer"
+                    class="p-1 text-white/50 hover:text-white rounded-lg transition-colors cursor-pointer"
+                    title="Reset Timer Pomodoro"
+                  >
+                    <i class="ph-bold ph-arrows-counter-clockwise text-xs"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Toggle Sembunyikan Bab Button -->
+              <button 
+                type="button"
+                @click="hideBabSidebar = !hideBabSidebar" 
+                class="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#c0ff00] border border-[#c0ff00]/30 text-xs font-bold transition-all shadow-md cursor-pointer ml-auto"
+                :title="hideBabSidebar ? 'Tampilkan Daftar Bab' : 'Sembunyikan Bab (Area Materi Luas)'"
+              >
+                <span class="hidden sm:inline">{{ hideBabSidebar ? 'Buka Daftar Bab' : 'Sembunyikan Bab (Area Luas)' }}</span>
+                <span class="sm:hidden">{{ hideBabSidebar ? 'Buka Bab' : 'Area Luas' }}</span>
+                <i :class="hideBabSidebar ? 'ph-bold ph-sidebar-simple' : 'ph-bold ph-arrows-out-line-horizontal'"></i>
               </button>
             </div>
           </div>
           <!-- Active Subtes Header Banner -->
-          <div class="light-mode-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-indigo-600">
+          <div class="light-mode-card rounded-2xl p-3.5 sm:p-5 flex items-center justify-between border-l-4 border-l-indigo-600">
             <div class="flex items-center gap-3">
               <span class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-600 text-xs font-mono">{{ selectedSubtes.test_component || (['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(selectedSubtes.subtes) ? 'LITERASI' : 'TPS') }}</span>
               <div>
@@ -3101,30 +3134,30 @@
           </div>
         </section>
 
-        <section v-if="currentTab === 'practice'" class="animate-fade-in space-y-6">
+        <section v-if="currentTab === 'practice'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
           <!-- Top Close Bar -->
-          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl font-black">
+          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:p-4 backdrop-blur-xl shadow-xl gap-2">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-lg sm:text-xl font-black shrink-0">
                 <i class="ph-bold ph-brain"></i>
               </div>
-              <div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">Latihan Soal Adaptif</span>
-                <h2 class="text-base md:text-lg font-black text-white">Practice Engine &amp; AI Tutor</h2>
+              <div class="min-w-0">
+                <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-indigo-400 truncate">Latihan Soal Adaptif</span>
+                <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Practice Engine &amp; AI Tutor</h2>
               </div>
             </div>
             <button 
               @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+              class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
               title="Tutup Practice Engine"
             >
               <span>Tutup</span>
-              <i class="ph-bold ph-x text-base"></i>
+              <i class="ph-bold ph-x text-sm sm:text-base"></i>
             </button>
           </div>
           <div class="grid grid-cols-1 gap-6" :class="showAICompanion ? 'lg:grid-cols-3' : ''">
             <!-- Main Interactive Problem Screen -->
-            <div class="light-mode-card rounded-2xl p-6 lg:p-8 flex flex-col justify-between" :class="showAICompanion ? 'lg:col-span-2' : ''">
+            <div class="light-mode-card rounded-2xl p-4 sm:p-6 lg:p-8 flex flex-col justify-between" :class="showAICompanion ? 'lg:col-span-2' : ''">
               <div>
                 <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-6">
                   <h3 class="text-xl font-black font-heading text-slate-900">Practice Engine &amp; AI Tutor</h3>
@@ -3214,25 +3247,25 @@
 
 
         <!-- TAB 6: PARENT PORTAL -->
-        <section v-if="currentTab === 'parent'" class="animate-fade-in space-y-6 pt-24 lg:pt-28 px-3 sm:px-6">
+        <section v-if="currentTab === 'parent'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
           <!-- Top Close & Back Bar -->
-          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 mb-4 backdrop-blur-xl shadow-xl">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl font-black">
+          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:p-4 mb-4 backdrop-blur-xl shadow-xl gap-2">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-lg sm:text-xl font-black shrink-0">
                 <i class="ph-bold ph-users"></i>
               </div>
-              <div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">Portal EduPath Parenting</span>
-                <h2 class="text-base md:text-lg font-black text-white">Parent Portal &amp; Monitoring Belajar</h2>
+              <div class="min-w-0">
+                <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-indigo-400 truncate">Portal EduPath Parenting</span>
+                <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Parent Portal &amp; Monitoring Belajar</h2>
               </div>
             </div>
             <button 
-              @click="currentTab = 'home'" 
-              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+              class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
               title="Tutup Halaman & Kembali"
             >
               <span>Tutup</span>
-              <i class="ph-bold ph-x text-base"></i>
+              <i class="ph-bold ph-x text-sm sm:text-base"></i>
             </button>
           </div>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -3300,25 +3333,25 @@
         </section>
 
         <!-- TAB 7: 2027 AI INTELLIGENCE & PERFORMANCE COCKPIT (Ujian 2027 Simulasi) -->
-        <section v-if="currentTab === 'simulator' || currentTab === 'projection2027'" class="animate-fade-in space-y-6 px-3 sm:px-6">
+        <section v-if="currentTab === 'simulator' || currentTab === 'projection2027'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
           <!-- Top Header Bar -->
-          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-4 backdrop-blur-xl shadow-xl">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xl font-black">
+          <div class="flex items-center justify-between bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:p-4 backdrop-blur-xl shadow-xl gap-2">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-lg sm:text-xl font-black shrink-0">
                 <i class="ph-bold ph-chart-polar"></i>
               </div>
-              <div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Tryout UTBK SNBT 2027</span>
-                <h2 class="text-base md:text-lg font-black text-white">Tryout UTBK 2027 &amp; Proyeksi IRT Adaptif</h2>
+              <div class="min-w-0">
+                <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-purple-400 truncate">Tryout UTBK SNBT 2027</span>
+                <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Tryout UTBK 2027 &amp; Proyeksi IRT Adaptif</h2>
               </div>
             </div>
             <button 
               @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+              class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
               title="Tutup Halaman & Kembali"
             >
               <span>Tutup</span>
-              <i class="ph-bold ph-x text-base"></i>
+              <i class="ph-bold ph-x text-sm sm:text-base"></i>
             </button>
           </div>
 
@@ -3331,10 +3364,10 @@
               <!-- Subtest Selector Bar (Official SNPMB Subtests) -->
               <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3 shadow-lg">
                 <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-white/10">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#c0ff00] animate-pulse"></span>
-                    <span class="text-xs font-black uppercase tracking-wider text-white">Subtes Aktif:</span>
-                    <span class="text-xs font-bold text-[#c0ff00]">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#c0ff00] animate-pulse shrink-0"></span>
+                    <span class="text-xs font-black uppercase tracking-wider text-white shrink-0">Subtes:</span>
+                    <span class="text-xs font-bold text-[#c0ff00] truncate">
                       {{ activeSubtest === 'PU' ? 'Penalaran Umum (PU)' : 
                          activeSubtest === 'PK' ? 'Pengetahuan Kuantitatif (PK)' : 
                          activeSubtest === 'PBM' ? 'Pemahaman Bacaan & Menulis (PBM)' : 
@@ -3343,12 +3376,12 @@
                          activeSubtest === 'LEng' ? 'Literasi Bahasa Inggris' : 'Penalaran Matematika (PM)' }}
                     </span>
                   </div>
-                  <span class="text-[11px] font-mono text-white/60 font-bold">
+                  <span class="text-[11px] font-mono text-white/60 font-bold shrink-0 whitespace-nowrap">
                     {{ currentSubtestQuestions.length }} Soal
                   </span>
                 </div>
 
-                <div class="flex gap-2 overflow-x-auto pb-1">
+                <div class="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scroll-smooth no-scrollbar">
                   <button 
                     v-for="sub in [
                       { id: 'PU', name: 'PU', fullName: 'Penalaran Umum (30)' },
@@ -3374,27 +3407,35 @@
               </div>
 
               <!-- CBT Question Card (Official Paper Style) -->
-              <div v-if="currentCbtQuestion" class="bg-white rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl border border-slate-200">
+              <div v-if="currentCbtQuestion" class="bg-white rounded-2xl p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-slate-200">
                 <!-- Question Header Strip -->
-                <div class="flex items-center justify-between border-b border-slate-200 pb-4">
-                  <div class="flex items-center gap-3">
-                    <span class="px-3.5 py-1.5 rounded-xl bg-slate-900 text-white font-mono text-sm font-black shadow-sm">
-                      SOAL NO. {{ currentCbtQuestion.num || (cbtCurrentIndex + 1) }}
-                    </span>
-                    <span class="text-xs text-slate-500 font-bold">
-                      dari {{ currentSubtestQuestions.length }} Soal
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3 sm:pb-4">
+                  <!-- Row 1 on mobile: Soal No + Total Soal + IRT Badge -->
+                  <div class="flex items-center justify-between sm:justify-start gap-2.5 w-full sm:w-auto">
+                    <div class="flex items-center gap-2">
+                      <span class="px-3 py-1 rounded-xl bg-slate-900 text-white font-mono text-xs sm:text-sm font-black shadow-sm shrink-0">
+                        SOAL NO. {{ currentCbtQuestion.num || (cbtCurrentIndex + 1) }}
+                      </span>
+                      <span class="text-xs text-slate-500 font-bold whitespace-nowrap">
+                        dari {{ currentSubtestQuestions.length }} Soal
+                      </span>
+                    </div>
+                    <span class="sm:hidden px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold font-mono shrink-0">
+                      IRT: +42
                     </span>
                   </div>
 
-                  <!-- Font Size Switcher & IRT Weight (Official CBT Feature) -->
-                  <div class="flex items-center gap-3">
-                    <div class="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 text-xs font-bold text-slate-700">
+                  <!-- Row 2 on mobile: Font Size Switcher & Desktop IRT Weight -->
+                  <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                    <div class="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 text-xs font-bold text-slate-700 w-full sm:w-auto justify-between sm:justify-start">
                       <span class="text-[10px] text-slate-400 px-2 uppercase font-mono">Ukuran:</span>
-                      <button @click="cbtFontSize = 'sm'" :class="cbtFontSize === 'sm' ? 'bg-white shadow text-indigo-600' : 'text-slate-500 hover:text-slate-900'" class="px-2 py-1 rounded cursor-pointer">A-</button>
-                      <button @click="cbtFontSize = 'normal'" :class="cbtFontSize === 'normal' ? 'bg-white shadow text-indigo-600' : 'text-slate-500 hover:text-slate-900'" class="px-2 py-1 rounded cursor-pointer">A</button>
-                      <button @click="cbtFontSize = 'lg'" :class="cbtFontSize === 'lg' ? 'bg-white shadow text-indigo-600' : 'text-slate-500 hover:text-slate-900'" class="px-2 py-1 rounded cursor-pointer">A+</button>
+                      <div class="flex items-center">
+                        <button @click="cbtFontSize = 'sm'" :class="cbtFontSize === 'sm' ? 'bg-white shadow text-indigo-600' : 'text-slate-500 hover:text-slate-900'" class="px-2.5 py-1 rounded cursor-pointer font-bold transition-all">A-</button>
+                        <button @click="cbtFontSize = 'normal'" :class="cbtFontSize === 'normal' ? 'bg-white shadow text-indigo-600' : 'text-slate-500 hover:text-slate-900'" class="px-2.5 py-1 rounded cursor-pointer font-bold transition-all">A</button>
+                        <button @click="cbtFontSize = 'lg'" :class="cbtFontSize === 'lg' ? 'bg-white shadow text-indigo-600' : 'text-slate-500 hover:text-slate-900'" class="px-2.5 py-1 rounded cursor-pointer font-bold transition-all">A+</button>
+                      </div>
                     </div>
-                    <span class="hidden sm:inline-flex px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold font-mono">
+                    <span class="hidden sm:inline-flex px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold font-mono whitespace-nowrap">
                       Bobot IRT: +42
                     </span>
                   </div>
@@ -3413,7 +3454,7 @@
                     v-for="(opt, idx) in currentCbtQuestion.options" 
                     :key="idx"
                     :class="[
-                      'w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4 cursor-pointer outline-none', 
+                      'w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-start gap-3 sm:gap-4 cursor-pointer outline-none', 
                       userAnswersMap[currentCbtQuestion.id] === idx 
                         ? 'bg-indigo-50/80 border-indigo-600 text-slate-900 ring-2 ring-indigo-500/20 shadow-sm' 
                         : 'bg-slate-50/70 border-slate-200 text-slate-800 hover:border-slate-300 hover:bg-slate-100/60'
@@ -3439,15 +3480,16 @@
                 </div>
 
                 <!-- CBT Action Control Toolbar (Official SNPMB Style) -->
-                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5">
-                  <div class="flex items-center gap-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-200 pt-4">
+                  <div class="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto">
                     <button 
                       :disabled="cbtCurrentIndex <= 0" 
                       @click="prevQuestion" 
-                      class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:pointer-events-none text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                      class="px-2 sm:px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:pointer-events-none text-white font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer shadow-sm"
                     >
                       <i class="ph-bold ph-caret-left"></i>
-                      <span>Sebelumnya</span>
+                      <span class="hidden sm:inline">Sebelumnya</span>
+                      <span class="sm:hidden">Sebelum</span>
                     </button>
 
                     <!-- Authentic Yellow Ragu-Ragu Button -->
@@ -3456,26 +3498,27 @@
                       :class="cbtRaguMap[currentCbtQuestion.id] 
                         ? 'bg-amber-400 hover:bg-amber-500 text-black border-amber-500 shadow-md ring-2 ring-amber-400/30' 
                         : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300'"
-                      class="px-4 py-2.5 rounded-xl border font-black text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                      class="px-2 sm:px-4 py-2.5 rounded-xl border font-black text-xs flex items-center justify-center gap-1 transition-all cursor-pointer"
                       title="Tandai soal ini sebagai ragu-ragu"
                     >
                       <i class="ph-bold ph-flag"></i>
-                      <span>{{ cbtRaguMap[currentCbtQuestion.id] ? 'Ditandai Ragu-Ragu' : 'Ragu-Ragu' }}</span>
+                      <span class="truncate">{{ cbtRaguMap[currentCbtQuestion.id] ? 'Ditandai Ragu' : 'Ragu-Ragu' }}</span>
                     </button>
 
                     <button 
                       :disabled="cbtCurrentIndex >= currentSubtestQuestions.length - 1" 
                       @click="nextQuestion" 
-                      class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-30 disabled:pointer-events-none text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                      class="px-2 sm:px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-30 disabled:pointer-events-none text-white font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer shadow-sm"
                     >
-                      <span>Berikutnya</span>
+                      <span class="hidden sm:inline">Berikutnya</span>
+                      <span class="sm:hidden">Lanjut</span>
                       <i class="ph-bold ph-caret-right"></i>
                     </button>
                   </div>
 
                   <button 
                     @click="cbtShowAnalysis = !cbtShowAnalysis" 
-                    class="px-3.5 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    class="w-full sm:w-auto justify-center px-3.5 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <i class="ph-bold ph-brain"></i>
                     <span>{{ cbtShowAnalysis ? 'Sembunyikan Bedah AI' : 'Bedah Solusi AI' }}</span>
