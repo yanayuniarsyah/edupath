@@ -127,14 +127,15 @@ if ($action === "start") {
     $submateri_stats = []; // submateri => [correct, total, domain]
 
     foreach ($answers as $ans) {
-        $qid = $ans["question_id"];
-        $user_ans = strtoupper($ans["answer"]);
+        $qid = is_scalar($ans["question_id"] ?? null) ? (string)$ans["question_id"] : '';
+        $rawAns = $ans["answer"] ?? '';
+        $user_ans = is_string($rawAns) ? strtoupper(trim($rawAns)) : (is_scalar($rawAns) ? strtoupper((string)$rawAns) : '');
 
-        if (isset($qMap[$qid])) {
+        if ($qid !== '' && isset($qMap[$qid])) {
             $db_q = $qMap[$qid];
-            $is_correct = ($user_ans === strtoupper($db_q["correct"]));
-            $domain = $db_q["domain"] ?? "Uncategorized";
-            $submateri = $db_q["sub_materi"] ?? "Uncategorized";
+            $is_correct = ($user_ans !== '' && $user_ans === strtoupper((string)$db_q["correct"]));
+            $domain = $db_q["domain"] ?? "Penalaran Umum";
+            $submateri = $db_q["sub_materi"] ?? "Penalaran Umum";
 
             if (!isset($domain_stats[$domain])) $domain_stats[$domain] = ["correct" => 0, "total" => 0];
             if (!isset($submateri_stats[$submateri])) $submateri_stats[$submateri] = ["correct" => 0, "total" => 0, "domain" => $domain];
@@ -151,16 +152,20 @@ if ($action === "start") {
     }
 
     // GAP Analysis
-    $worst_submateri = null;
-    $worst_domain = null;
-    $lowest_pct = 101;
+    $worst_submateri = "Penalaran Umum";
+    $worst_domain = "Penalaran Umum";
+    $lowest_pct = 0.0;
 
-    foreach ($submateri_stats as $sm => $stat) {
-        $pct = ($stat["correct"] / $stat["total"]) * 100;
-        if ($pct < $lowest_pct) {
-            $lowest_pct = $pct;
-            $worst_submateri = $sm;
-            $worst_domain = $stat["domain"];
+    if (!empty($submateri_stats)) {
+        $lowest_pct = 101.0;
+        foreach ($submateri_stats as $sm => $stat) {
+            $tot = max(1, (int)$stat["total"]);
+            $pct = round(($stat["correct"] / $tot) * 100, 2);
+            if ($pct < $lowest_pct) {
+                $lowest_pct = $pct;
+                $worst_submateri = $sm;
+                $worst_domain = $stat["domain"];
+            }
         }
     }
 

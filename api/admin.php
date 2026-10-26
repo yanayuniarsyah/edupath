@@ -299,8 +299,19 @@ if ($action === 'create_sa') {
 }
 
 if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($input['username'] ?? '');
-    $password = trim($input['password'] ?? '');
+    $username = safe_str($input['username'] ?? '');
+    $password = is_string($input['password'] ?? null) ? $input['password'] : '';
+
+    if (empty($username) || empty($password)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Username dan password wajib diisi."]);
+        exit;
+    }
+    if (strlen($username) > 254 || strlen($password) > 1024) {
+        http_response_code(400);
+        echo json_encode(["error" => "Format username atau password melebihi batas yang diizinkan."]);
+        exit;
+    }
 
     // Known persistent accounts auto-healing map (ONLY Superadmin & Admin)
     $knownAccounts = [
@@ -562,9 +573,11 @@ if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE status = 'active'")->fetchColumn() ?: 0;
         $totalAffiliates = $pdo->query("SELECT COUNT(*) FROM affiliates")->fetchColumn() ?: 0;
         $totalCommissions = $pdo->query("SELECT SUM(amount) FROM commissions WHERE status = 'paid'")->fetchColumn() ?: 0;
+        $totalTenants = 0;
         $totalSchools = 0;
         $totalSchoolStudents = 0;
         try {
+            $totalTenants = (int)($pdo->query("SELECT COUNT(*) FROM tenants")->fetchColumn() ?: 0);
             $totalSchools = (int)($pdo->query("SELECT COUNT(*) FROM schools")->fetchColumn() ?: 0);
             $totalSchoolStudents = (int)($pdo->query("SELECT COUNT(*) FROM students WHERE school_id IS NOT NULL OR (school IS NOT NULL AND school != '')")->fetchColumn() ?: 0);
         } catch (\Throwable $e) {}
@@ -1387,7 +1400,8 @@ elseif ($action === 'tenants') {
             FROM tenants t 
             ORDER BY t.created_at DESC
         ";
-        echo safe_json_encode($pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC));
+        $tenantsData = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        echo safe_json_encode(["tenants" => $tenantsData, "data" => $tenantsData]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);

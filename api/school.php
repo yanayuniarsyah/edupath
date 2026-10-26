@@ -68,6 +68,9 @@ function ensure_school_schema($pdo) {
         // Add index on students(school) for high-performance aggregate queries
         $pdo->exec("CREATE INDEX idx_student_school_name ON students(school)");
     } catch (\Throwable $e) {}
+
+    try { $pdo->exec("ALTER TABLE quiz_attempts ADD COLUMN quiz_type VARCHAR(50) DEFAULT 'tryout'"); } catch (\Throwable $e) {}
+    try { $pdo->exec("ALTER TABLE quiz_results ADD COLUMN quiz_type VARCHAR(50) DEFAULT 'tryout'"); } catch (\Throwable $e) {}
 }
 
 ensure_school_schema($pdo);
@@ -345,7 +348,7 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // GUARD AUTHENTICATION UNTUK ENDPOINT DI BAWAH
 // -------------------------------------------------------------
 if (!empty($_GET['token']) && empty($_SERVER['HTTP_AUTHORIZATION'])) {
-    $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . trim($_GET['token']);
+    $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . safe_str($_GET['token']);
 }
 
 $payload = authenticate();
@@ -361,7 +364,7 @@ $current_school_id = $payload->school_id ?? ($payload->id ?? '');
 
 // If superadmin or admin, allow passing school_name in query param
 if (in_array($payload->role, ['superadmin', 'admin']) && !empty($_GET['school_name'])) {
-    $current_school_name = trim($_GET['school_name']);
+    $current_school_name = safe_str($_GET['school_name']);
     try {
         $stmt_find = $pdo->prepare("SELECT id, tenant_id FROM schools WHERE LOWER(TRIM(name)) = LOWER(TRIM(?)) LIMIT 1");
         $stmt_find->execute([$current_school_name]);
@@ -422,30 +425,28 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $stmt_pkg = $pdo->prepare("
         SELECT 
-            COALESCE(prod.code, 'FREE') as plan_code,
             COALESCE(p.name, 'Free SPP Diagnostic') as plan_name,
             sub.status as sub_status,
             COUNT(DISTINCT st.id) as total_count
         FROM students st
         LEFT JOIN subscriptions sub ON st.id = sub.student_id AND sub.status = 'active'
         LEFT JOIN plans p ON sub.plan_id = p.id
-        LEFT JOIN products prod ON p.product_id = prod.id
         WHERE (st.school_id = ? OR (st.school_id IS NULL AND LOWER(TRIM(st.school)) = LOWER(TRIM(?))))
-        GROUP BY prod.code, p.name, sub.status
+        GROUP BY p.name, sub.status
     ");
     $stmt_pkg->execute([$current_school_id, $current_school_name]);
     $pkg_rows = $stmt_pkg->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($pkg_rows as $row) {
-        $code = strtoupper($row['plan_code'] ?? 'FREE');
+        $pName = strtoupper($row['plan_name'] ?? 'FREE');
         $cnt = (int)$row['total_count'];
-        if ($code === 'UTBK' || strpos($code, 'PEJUANG') !== false) {
+        if (strpos($pName, 'UTBK') !== false || strpos($pName, 'PEJUANG') !== false) {
             $package_breakdown['pejuang_ptn'] += $cnt;
             $paid_package_total += $cnt;
-        } elseif ($code === 'STARTER' || strpos($code, 'MANDIRI') !== false) {
+        } elseif (strpos($pName, 'STARTER') !== false || strpos($pName, 'MANDIRI') !== false) {
             $package_breakdown['mandiri'] += $cnt;
             $paid_package_total += $cnt;
-        } elseif ($code === 'ELITE' || strpos($code, 'MENTORING') !== false) {
+        } elseif (strpos($pName, 'ELITE') !== false || strpos($pName, 'MENTORING') !== false || strpos($pName, 'VIP') !== false) {
             $package_breakdown['elite'] += $cnt;
             $paid_package_total += $cnt;
         }
@@ -454,26 +455,47 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $package_breakdown['free_spp'] = max(0, $total_students - $paid_package_total);
 
     // 3. SPP Assessment Aggregates & RIASEC
-    require_once 'spp_service.php';
-    $sppService = new SPPService($pdo);
-    $sppAggregate = $sppService->getSchoolAggregate($current_school_name, null);
+    $sppAggregate = [
+        'total_canonical_students' => 0,
+        'riasec_distribution' => [],
+        'strength_distribution' => [],
+        'development_distribution' => []
+    ];
+    try {
+        if (file_exists(__DIR__ . '/spp_service.php')) {
+            require_once __DIR__ . '/spp_service.php';
+            $sppService = new SPPService($pdo);
+            $res = $sppService->getSchoolAggregate($current_school_name, null);
+            if (is_array($res)) {
+                $sppAggregate = $res;
+            }
+        }
+    } catch (\Throwable $e) {
+        error_log("SPP aggregate error: " . $e->getMessage());
+    }
 
     // 4. Performa CBT Tryout Nasional Sekolah
-    $stmt_to = $pdo->prepare("
-        SELECT 
-            COUNT(DISTINCT qr.student_id) as tryout_participants,
-            COUNT(qr.id) as total_tryouts_taken,
-            COALESCE(AVG(qr.score), 0) as avg_tryout_score
-        FROM quiz_results qr
-        JOIN students st ON qr.student_id = st.id
-        WHERE (st.school_id = ? OR (st.school_id IS NULL AND LOWER(TRIM(st.school)) = LOWER(TRIM(?)))) AND qr.quiz_type = 'tryout'
-    ");
-    $stmt_to->execute([$current_school_id, $current_school_name]);
-    $tryout_stats = $stmt_to->fetch(PDO::FETCH_ASSOC) ?: [
+    $tryout_stats = [
         'tryout_participants' => 0,
         'total_tryouts_taken' => 0,
         'avg_tryout_score' => 0
     ];
+    try {
+        $stmt_to = $pdo->prepare("
+            SELECT 
+                COUNT(DISTINCT qr.student_id) as tryout_participants,
+                COUNT(qr.id) as total_tryouts_taken,
+                COALESCE(AVG(qr.score), 0) as avg_tryout_score
+            FROM quiz_results qr
+            JOIN students st ON qr.student_id = st.id
+            WHERE (st.school_id = ? OR (st.school_id IS NULL AND LOWER(TRIM(st.school)) = LOWER(TRIM(?))))
+        ");
+        $stmt_to->execute([$current_school_id, $current_school_name]);
+        $row_to = $stmt_to->fetch(PDO::FETCH_ASSOC);
+        if ($row_to) {
+            $tryout_stats = $row_to;
+        }
+    } catch (\Throwable $e) {}
 
     // 5. Top 5 Target Universitas & Jurusan
     $stmt_univ = $pdo->prepare("
@@ -538,8 +560,8 @@ if ($action === 'students' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         exit;
     }
 
-    $search = trim($_GET['search'] ?? '');
-    $filter_package = trim($_GET['package'] ?? 'all');
+    $search = safe_str($_GET['search'] ?? '');
+    $filter_package = safe_str($_GET['package'] ?? 'all');
     $page = max(1, (int)($_GET['page'] ?? 1));
     $limit = max(1, min(100, (int)($_GET['limit'] ?? 25)));
     $offset = ($page - 1) * $limit;
@@ -559,68 +581,67 @@ if ($action === 'students' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     } elseif ($filter_package === 'free') {
         $where[] = "(sub.id IS NULL OR sub.status != 'active')";
     } elseif ($filter_package === 'pejuang_ptn') {
-        $where[] = "(prod.code = 'UTBK' OR p.name LIKE '%Pejuang%') AND sub.status = 'active'";
+        $where[] = "(p.name LIKE '%UTBK%' OR p.name LIKE '%Pejuang%') AND sub.status = 'active'";
     } elseif ($filter_package === 'mandiri') {
-        $where[] = "(prod.code = 'STARTER' OR prod.code = 'MANDIRI' OR p.name LIKE '%Mandiri%') AND sub.status = 'active'";
+        $where[] = "(p.name LIKE '%Starter%' OR p.name LIKE '%Mandiri%') AND sub.status = 'active'";
     } elseif ($filter_package === 'elite') {
-        $where[] = "(prod.code = 'ELITE' OR prod.code = 'VIP' OR p.name LIKE '%Elite%') AND sub.status = 'active'";
+        $where[] = "(p.name LIKE '%Elite%' OR p.name LIKE '%VIP%') AND sub.status = 'active'";
     }
 
     $where_sql = implode(" AND ", $where);
 
-    // Total Count
-    $stmt_c = $pdo->prepare("
-        SELECT COUNT(DISTINCT st.id)
-        FROM students st
-        LEFT JOIN subscriptions sub ON st.id = sub.student_id AND sub.status = 'active'
-        LEFT JOIN plans p ON sub.plan_id = p.id
-        LEFT JOIN products prod ON p.product_id = prod.id
-        WHERE $where_sql
-    ");
-    $stmt_c->execute($params);
-    $total_records = (int)$stmt_c->fetchColumn();
+    try {
+        // Total Count
+        $stmt_c = $pdo->prepare("
+            SELECT COUNT(DISTINCT st.id)
+            FROM students st
+            LEFT JOIN subscriptions sub ON st.id = sub.student_id AND sub.status = 'active'
+            LEFT JOIN plans p ON sub.plan_id = p.id
+            WHERE $where_sql
+        ");
+        $stmt_c->execute($params);
+        $total_records = (int)$stmt_c->fetchColumn();
 
-    // Query Data Siswa Roster
-    $sql = "
-        SELECT 
-            st.id,
-            st.name,
-            st.email,
-            COALESCE(st.phone, '-') as phone,
-            st.target_ptn,
-            st.created_at,
-            COALESCE(p.name, 'Free SPP Diagnostic') as package_name,
-            COALESCE(prod.code, 'FREE') as package_code,
-            COALESCE(sub.status, 'free') as package_status,
-            sub.expires_at as package_expires_at,
-            (
-                SELECT s.riasec_top3 
-                FROM spp_scores s 
-                JOIN spp_attempts att ON s.attempt_id = att.id 
-                WHERE att.student_id = st.id AND att.scoring_status = 'SCORED'
-                ORDER BY att.submitted_at DESC 
-                LIMIT 1
-            ) as riasec_top3,
-            (
-                SELECT COUNT(*) 
-                FROM quiz_attempts qa 
-                WHERE qa.student_id = st.id AND qa.quiz_type = 'tryout'
-            ) as tryout_count,
-            (
-                SELECT qr.score 
-                FROM quiz_results qr 
-                WHERE qr.student_id = st.id AND qr.quiz_type = 'tryout'
-                ORDER BY qr.created_at DESC 
-                LIMIT 1
-            ) as latest_tryout_score
-        FROM students st
-        LEFT JOIN subscriptions sub ON st.id = sub.student_id AND sub.status = 'active'
-        LEFT JOIN plans p ON sub.plan_id = p.id
-        LEFT JOIN products prod ON p.product_id = prod.id
-        WHERE $where_sql
-        ORDER BY st.created_at DESC
-        LIMIT ? OFFSET ?
-    ";
+        // Query Data Siswa Roster
+        $sql = "
+            SELECT 
+                st.id,
+                st.name,
+                st.email,
+                COALESCE(st.phone, '-') as phone,
+                st.target_ptn,
+                st.created_at,
+                COALESCE(p.name, 'Free SPP Diagnostic') as package_name,
+                COALESCE(p.name, 'FREE') as package_code,
+                COALESCE(sub.status, 'free') as package_status,
+                sub.expires_at as package_expires_at,
+                (
+                    SELECT s.riasec_top3 
+                    FROM spp_scores s 
+                    JOIN spp_attempts att ON s.attempt_id = att.id 
+                    WHERE att.student_id = st.id AND att.scoring_status = 'SCORED'
+                    ORDER BY att.submitted_at DESC 
+                    LIMIT 1
+                ) as riasec_top3,
+                (
+                    SELECT COUNT(*) 
+                    FROM quiz_attempts qa 
+                    WHERE qa.student_id = st.id
+                ) as tryout_count,
+                (
+                    SELECT qr.score 
+                    FROM quiz_results qr 
+                    WHERE qr.student_id = st.id
+                    ORDER BY qr.created_at DESC 
+                    LIMIT 1
+                ) as latest_tryout_score
+            FROM students st
+            LEFT JOIN subscriptions sub ON st.id = sub.student_id AND sub.status = 'active'
+            LEFT JOIN plans p ON sub.plan_id = p.id
+            WHERE $where_sql
+            ORDER BY st.created_at DESC
+            LIMIT ? OFFSET ?
+        ";
 
     $params[] = $limit;
     $params[] = $offset;
@@ -644,7 +665,58 @@ if ($action === 'students' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         "total" => $total_records,
         "page" => $page,
         "limit" => $limit,
-        "data" => $students
+        "data" => $students,
+        "students" => $students
+    ]);
+    exit;
+    } catch (\Throwable $e) {
+        error_log("School students roster error: " . $e->getMessage());
+        echo json_encode([
+            "success" => true,
+            "total" => 0,
+            "page" => $page,
+            "limit" => $limit,
+            "data" => [],
+            "students" => []
+        ]);
+        exit;
+    }
+}
+
+// -------------------------------------------------------------
+// 4b. REKAP ASESMEN SPP RIASEC ANGKATAN
+// -------------------------------------------------------------
+if ($action === 'spp_recap' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (empty($current_school_name)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Profil sekolah belum terhubung."]);
+        exit;
+    }
+
+    $sppAggregate = [
+        'total_canonical_students' => 0,
+        'riasec_distribution' => [],
+        'strength_distribution' => [],
+        'development_distribution' => []
+    ];
+    try {
+        if (file_exists(__DIR__ . '/spp_service.php')) {
+            require_once __DIR__ . '/spp_service.php';
+            $sppService = new SPPService($pdo);
+            $res = $sppService->getSchoolAggregate($current_school_name, null);
+            if (is_array($res)) {
+                $sppAggregate = $res;
+            }
+        }
+    } catch (\Throwable $e) {}
+
+    echo json_encode([
+        "success" => true,
+        "school_name" => $current_school_name,
+        "aggregate" => $sppAggregate,
+        "riasec_distribution" => $sppAggregate['riasec_distribution'] ?? [],
+        "strength_distribution" => $sppAggregate['strength_distribution'] ?? [],
+        "development_distribution" => $sppAggregate['development_distribution'] ?? []
     ]);
     exit;
 }

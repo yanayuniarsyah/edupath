@@ -326,6 +326,36 @@ export const api = {
     return Promise.resolve();
   },
 
+  quizStart(data = {}) {
+    return apiFetch('/quiz.php?action=start', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
+  quizSave(attemptId, answers = []) {
+    return apiFetch('/quiz.php?action=save', {
+      method: 'POST',
+      body: JSON.stringify({ attempt_id: attemptId, answers })
+    });
+  },
+
+  submitQuiz(data) {
+    return apiFetch('/quiz.php?action=submit', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
+  getQuizReview(attemptId) {
+    return apiFetch(`/quiz.php?action=review&attempt_id=${encodeURIComponent(attemptId)}`);
+  },
+
+  getQuizHistory(quizType = '') {
+    const q = quizType ? `&quiz_type=${encodeURIComponent(quizType)}` : '';
+    return apiFetch(`/quiz.php?action=history${q}`);
+  },
+
   saveQuizResult(quiz_type, subtes, score, correct, total, duration_sec, answers) {
     return apiFetch('/quiz.php?action=submit', {
       method: 'POST',

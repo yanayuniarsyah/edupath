@@ -15,7 +15,7 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     
     // 3. CHECK ENTITLEMENT
     // Contoh: Jika user ingin akses materi advanced/premium
-    $subtes = $_GET['subtes'] ?? '';
+    $subtes = safe_str($_GET['subtes'] ?? '');
     $isAdvanced = isset($_GET['advanced']) && $_GET['advanced'] == 1;
 
     if ($isAdvanced) {
@@ -33,11 +33,11 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     
     // 4. FETCH RESOURCE
-    $test_component = $_GET['test_component'] ?? '';
-    $topic = $_GET['topic'] ?? '';
+    $test_component = safe_str($_GET['test_component'] ?? '');
+    $topic = safe_str($_GET['topic'] ?? '');
 
-    $education_level = $_GET['education_level'] ?? '';
-    $assessment_type = $_GET['assessment_type'] ?? '';
+    $education_level = safe_str($_GET['education_level'] ?? '');
+    $assessment_type = safe_str($_GET['assessment_type'] ?? '');
 
     $sql = "SELECT id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, file_url, teacher_name, education_level, assessment_type, subject, domain, created_at FROM materials WHERE 1=1";
     $params = [];

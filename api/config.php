@@ -304,3 +304,14 @@ function log_audit(PDO $pdo, ?string $actor_id, ?string $tenant_id, string $acti
         // Silently fail agar aplikasi tidak terganggu jika audit table belum ter‑migrate
     }
 }
+
+// ----------------------------------------------------------------
+// SAFE STRING HELPER — Type-Safe Input Sanitizer
+// Prevents TypeError crashes in PHP 8.2+ when inputs are arrays/objects/null
+// ----------------------------------------------------------------
+function safe_str(mixed $val, string $default = ''): string {
+    if ($val === null || is_array($val) || is_object($val)) {
+        return $default;
+    }
+    return trim((string)$val);
+}

@@ -23,16 +23,21 @@ class RoyaltyRegistry {
      */
     public static function calculateRoyalties(PDO $pdo, ?string $planId, string $grossAmount): array {
         $today = date('Y-m-d');
-        // Match active contracts for this plan OR global contracts
-        $stmt = $pdo->prepare("
-            SELECT * FROM royalty_contracts 
-            WHERE is_active = 1 
-              AND valid_from <= ? 
-              AND (valid_to IS NULL OR valid_to >= ?)
-              AND (plan_id = ? OR plan_id IS NULL)
-        ");
-        $stmt->execute([$today, $today, $planId]);
-        $contracts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $contracts = [];
+        try {
+            // Match active contracts for this plan OR global contracts
+            $stmt = $pdo->prepare("
+                SELECT * FROM royalty_contracts 
+                WHERE is_active = 1 
+                  AND valid_from <= ? 
+                  AND (valid_to IS NULL OR valid_to >= ?)
+                  AND (plan_id = ? OR plan_id IS NULL)
+            ");
+            $stmt->execute([$today, $today, $planId]);
+            $contracts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            $contracts = [];
+        }
 
         $totalRoyalty = '0.00';
         $totalPct     = '0.00';
@@ -71,23 +76,25 @@ class RoyaltyRegistry {
      * Record royalty accruals upon order settlement
      */
     public static function recordAccruals(PDO $pdo, string $orderId, array $matchedContracts): void {
-        $stmt = $pdo->prepare("
-            INSERT INTO royalty_accruals 
-                (id, contract_id, owner_id, order_id, percentage_amount, usage_amount, total_amount, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
-        ");
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO royalty_accruals 
+                    (id, contract_id, owner_id, order_id, percentage_amount, usage_amount, total_amount, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
+            ");
 
-        foreach ($matchedContracts as $mc) {
-            $id = self::mkuuid();
-            $stmt->execute([
-                $id,
-                $mc['contract_id'],
-                $mc['owner_id'],
-                $orderId,
-                $mc['percentage_amount'],
-                $mc['usage_amount'],
-                $mc['total_amount']
-            ]);
-        }
+            foreach ($matchedContracts as $mc) {
+                $id = self::mkuuid();
+                $stmt->execute([
+                    $id,
+                    $mc['contract_id'],
+                    $mc['owner_id'],
+                    $orderId,
+                    $mc['percentage_amount'],
+                    $mc['usage_amount'],
+                    $mc['total_amount']
+                ]);
+            }
+        } catch (\Throwable $e) {}
     }
 }

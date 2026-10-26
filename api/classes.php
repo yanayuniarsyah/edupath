@@ -55,7 +55,7 @@ if ($action === 'rooms') {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $name = trim($input['name'] ?? '');
+        $name = safe_str($input['name'] ?? '');
         $capacity = (int)($input['capacity'] ?? 15);
         $tId = $isSuper ? ($input['tenant_id'] ?? $tenant_id) : $tenant_id;
         if (!$tId) {
@@ -71,8 +71,8 @@ if ($action === 'rooms') {
         echo json_encode(["success" => true, "id" => $id]);
         exit;
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        $id = $input['id'] ?? ($_GET['id'] ?? '');
-        $name = trim($input['name'] ?? '');
+        $id = safe_str($input['id'] ?? ($_GET['id'] ?? ''));
+        $name = safe_str($input['name'] ?? '');
         $capacity = (int)($input['capacity'] ?? 15);
         $isActive = isset($input['is_active']) ? (int)$input['is_active'] : 1;
         $sql = "UPDATE class_rooms SET name = ?, capacity = ?, is_active = ? WHERE id = ?";
@@ -86,7 +86,7 @@ if ($action === 'rooms') {
         echo json_encode(["success" => true]);
         exit;
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        $id = $_GET['id'] ?? '';
+        $id = safe_str($_GET['id'] ?? '');
         $sql = "DELETE FROM class_rooms WHERE id = ?";
         $params = [$id];
         if (!$isSuper) {
@@ -138,8 +138,8 @@ elseif ($action === 'classes') {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $name = trim($input['name'] ?? '');
-        $academic_year = trim($input['academic_year'] ?? date('Y') . '/' . (date('Y') + 1));
+        $name = safe_str($input['name'] ?? '');
+        $academic_year = safe_str($input['academic_year'] ?? (date('Y') . '/' . (date('Y') + 1)));
         $default_room_id = !empty($input['default_room_id']) ? $input['default_room_id'] : (!empty($input['room_id']) ? $input['room_id'] : null);
         $max_capacity = (int)($input['max_capacity'] ?? 15);
         $tId = $isSuper ? ($input['tenant_id'] ?? $tenant_id) : $tenant_id;
@@ -160,9 +160,9 @@ elseif ($action === 'classes') {
         echo json_encode(["success" => true, "id" => $id]);
         exit;
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        $id = $input['id'] ?? ($_GET['id'] ?? '');
-        $name = trim($input['name'] ?? '');
-        $academic_year = trim($input['academic_year'] ?? '');
+        $id = safe_str($input['id'] ?? ($_GET['id'] ?? ''));
+        $name = safe_str($input['name'] ?? '');
+        $academic_year = safe_str($input['academic_year'] ?? '');
         $default_room_id = !empty($input['default_room_id']) ? $input['default_room_id'] : (!empty($input['room_id']) ? $input['room_id'] : null);
         $max_capacity = (int)($input['max_capacity'] ?? 15);
         $status = $input['status'] ?? 'active';
@@ -243,15 +243,30 @@ elseif ($action === 'class_students') {
             exit;
         }
 
+        // Cek Keberadaan Siswa
+        $stdChk = $pdo->prepare("SELECT id FROM students WHERE id = ?");
+        $stdChk->execute([$student_id]);
+        if (!$stdChk->fetch()) {
+            http_response_code(404);
+            echo json_encode(["error" => "Data siswa tidak ditemukan atau belum terdaftar"]);
+            exit;
+        }
+
         $id = gen_uuid();
-        $stmt = $pdo->prepare("
-            INSERT INTO class_students (id, class_id, student_id, joined_at, status)
-            VALUES (?, ?, ?, NOW(), 'active')
-            ON DUPLICATE KEY UPDATE status = 'active'
-        ");
-        $stmt->execute([$id, $class_id, $student_id]);
-        echo json_encode(["success" => true, "message" => "Siswa berhasil ditugaskan ke kelas"]);
-        exit;
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO class_students (id, class_id, student_id, joined_at, status)
+                VALUES (?, ?, ?, NOW(), 'active')
+                ON DUPLICATE KEY UPDATE status = 'active'
+            ");
+            $stmt->execute([$id, $class_id, $student_id]);
+            echo json_encode(["success" => true, "message" => "Siswa berhasil ditugaskan ke kelas"]);
+            exit;
+        } catch (\PDOException $e) {
+            http_response_code(400);
+            echo json_encode(["error" => "Gagal menugaskan siswa ke kelas: " . $e->getMessage()]);
+            exit;
+        }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $student_id = $_GET['student_id'] ?? '';
         $stmt = $pdo->prepare("UPDATE class_students SET status = 'dropped' WHERE class_id = ? AND student_id = ?");

@@ -9,6 +9,33 @@ class SPPService {
         $this->pdo = $pdo;
     }
 
+    private function ensureCertSchema() {
+        static $done = false;
+        if ($done) return;
+        $done = true;
+        try {
+            $this->pdo->exec("
+                CREATE TABLE IF NOT EXISTS `spp_certificates` (
+                    `id` VARCHAR(36) PRIMARY KEY,
+                    `attempt_id` VARCHAR(36) NOT NULL UNIQUE,
+                    `student_id` VARCHAR(36) NOT NULL,
+                    `certificate_number` VARCHAR(100) NOT NULL UNIQUE,
+                    `student_name_snapshot` VARCHAR(150) NOT NULL,
+                    `school_name_snapshot` VARCHAR(150) DEFAULT 'Siswa EduPath',
+                    `riasec_code` VARCHAR(10) NOT NULL,
+                    `learning_style` VARCHAR(100) NOT NULL,
+                    `top_recommendations` JSON NOT NULL,
+                    `issue_date` DATE NOT NULL,
+                    `verification_hash` VARCHAR(64) NOT NULL UNIQUE,
+                    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    INDEX `idx_cert_student` (`student_id`),
+                    INDEX `idx_cert_hash` (`verification_hash`),
+                    INDEX `idx_cert_no` (`certificate_number`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            ");
+        } catch (\Throwable $e) {}
+    }
+
     private function generate_uuid() {
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             mt_rand(0, 0xffff), mt_rand(0, 0xffff),
@@ -246,6 +273,7 @@ class SPPService {
         }
 
         // 2. Cek apakah sertifikat sudah pernah dibuat
+        $this->ensureCertSchema();
         $stmt_cert = $this->pdo->prepare("SELECT * FROM spp_certificates WHERE attempt_id = ?");
         $stmt_cert->execute([$attempt_id]);
         $existing = $stmt_cert->fetch(PDO::FETCH_ASSOC);
@@ -321,9 +349,17 @@ class SPPService {
             return ["valid" => false, "message" => "Nomor atau hash sertifikat wajib disertakan."];
         }
 
-        $stmt = $this->pdo->prepare("SELECT * FROM spp_certificates WHERE certificate_number = ? OR verification_hash = ? OR id = ? LIMIT 1");
-        $stmt->execute([$identifier, $identifier, $identifier]);
-        $cert = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->ensureCertSchema();
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM spp_certificates WHERE certificate_number = ? OR verification_hash = ? OR id = ? LIMIT 1");
+            $stmt->execute([$identifier, $identifier, $identifier]);
+            $cert = $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            return [
+                "valid" => false,
+                "message" => "Sertifikat tidak terdaftar atau layanan sertifikat belum aktif."
+            ];
+        }
 
         if (!$cert) {
             return [

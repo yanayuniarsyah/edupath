@@ -70,7 +70,7 @@ function verify_quiz_entitlement($pdo, $payload, $quiz_type) {
 }
 
 if (($action === 'save' || $action === 'save_answers') && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $attempt_id = trim($input['attempt_id'] ?? '');
+    $attempt_id = safe_str($input['attempt_id'] ?? '');
     $answers = $input['answers'] ?? [];
     if ($attempt_id === '' || !is_array($answers)) {
         http_response_code(400);
@@ -100,14 +100,15 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
         exit;
     }
 
-    $subtes = $input['subtes'] ?? null;
-    $quiz_type = $input['quiz_type'] ?? 'latihan';
+    $subtes = safe_str($input['subtes'] ?? '');
+    if ($subtes === '') $subtes = null;
+    $quiz_type = safe_str($input['quiz_type'] ?? 'latihan');
     verify_quiz_entitlement($pdo, $payload, $quiz_type);
     $limit = $quiz_type === 'tryout' ? 150 : max(1, min(50, (int)($input['limit'] ?? 10)));
 
     $duration_sec = max(60, min(7200, (int)($input['duration_sec'] ?? 900)));
     $expires_at = date('Y-m-d H:i:s', time() + $duration_sec);
-    $attempt_id = trim($input['attempt_id'] ?? '');
+    $attempt_id = safe_str($input['attempt_id'] ?? '');
     if ($attempt_id !== '') {
         try {
             $resume = $pdo->prepare("SELECT id, expires_at FROM quiz_attempts WHERE id = ? AND student_id = ? AND status = 'started'");
@@ -139,8 +140,8 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
         $classification_filter = "classification = 'ASESMEN'";
     }
 
-    $education_level = trim($input['education_level'] ?? ($_GET['education_level'] ?? ''));
-    $assessment_type = trim($input['assessment_type'] ?? ($_GET['assessment_type'] ?? ''));
+    $education_level = safe_str($input['education_level'] ?? ($_GET['education_level'] ?? ''));
+    $assessment_type = safe_str($input['assessment_type'] ?? ($_GET['assessment_type'] ?? ''));
     if (!empty($education_level)) {
         $classification_filter .= " AND (education_level = " . $pdo->quote($education_level) . " OR education_level IS NULL)";
     }
@@ -231,8 +232,8 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
 }
 elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // Backward compatibility for existing Web App
-    $sub_materi_input = $_GET['sub_materi'] ?? $_GET['subtes'] ?? '';
-    $quiz_type = $_GET['quiz_type'] ?? 'latihan';
+    $sub_materi_input = safe_str($_GET['sub_materi'] ?? ($_GET['subtes'] ?? ''));
+    $quiz_type = safe_str($_GET['quiz_type'] ?? 'latihan');
     verify_quiz_entitlement($pdo, $payload, $quiz_type);
     $limit = $quiz_type === 'tryout' ? 150 : max(1, min(50, (int)($_GET['limit'] ?? 10)));
     
@@ -243,8 +244,8 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $classification_filter = "classification = 'ASESMEN'";
     }
 
-    $education_level = trim($_GET['education_level'] ?? '');
-    $assessment_type = trim($_GET['assessment_type'] ?? '');
+    $education_level = safe_str($_GET['education_level'] ?? '');
+    $assessment_type = safe_str($_GET['assessment_type'] ?? '');
     if (!empty($education_level)) {
         $classification_filter .= " AND (education_level = " . $pdo->quote($education_level) . " OR education_level IS NULL)";
     }
@@ -325,18 +326,23 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $raw_answers = $input['answers'] ?? []; 
+    if (!is_array($raw_answers)) {
+        $raw_answers = [];
+    }
     $answers = [];
     foreach ($raw_answers as $k => $v) {
         if (is_array($v) && isset($v['question_id'])) {
             $answers[] = $v;
         } else {
-            $answers[] = ['question_id' => (string)$k, 'answer' => (string)$v];
+            $ansVal = is_string($v) ? $v : (is_scalar($v) ? (string)$v : '');
+            $answers[] = ['question_id' => (string)$k, 'answer' => $ansVal];
         }
     }
-    $quiz_type = $input['quiz_type'] ?? 'latihan';
-    $subtes = $input['subtes'] ?? null;
-    $duration_sec = $input['duration_sec'] ?? 0;
-    $attempt_id = trim($input['attempt_id'] ?? '');
+    $quiz_type = safe_str($input['quiz_type'] ?? 'latihan');
+    $subtes = isset($input['subtes']) ? safe_str($input['subtes']) : null;
+    if ($subtes === '') $subtes = null;
+    $duration_sec = (int)($input['duration_sec'] ?? 0);
+    $attempt_id = safe_str($input['attempt_id'] ?? '');
 
     if ($attempt_id) {
         try {
@@ -412,12 +418,19 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $qMap[$q['id']] = $q;
     }
 
+    $seenQuestions = [];
     foreach ($answers as $ans) {
-        $qid = $ans['question_id'];
-        $user_ans = strtolower($ans['answer']);
+        $qid = is_scalar($ans['question_id'] ?? null) ? (string)$ans['question_id'] : '';
+        if (empty($qid) || isset($seenQuestions[$qid])) {
+            continue; // Deduplicate to prevent score inflation
+        }
+        $seenQuestions[$qid] = true;
+
+        $raw_ans = $ans['answer'] ?? '';
+        $user_ans = is_string($raw_ans) ? strtolower(trim($raw_ans)) : (is_scalar($raw_ans) ? strtolower((string)$raw_ans) : '');
         if (isset($qMap[$qid])) {
             $db_q = $qMap[$qid];
-            $is_correct = ($user_ans === strtolower($db_q['correct']));
+            $is_correct = ($user_ans !== '' && $user_ans === strtolower((string)$db_q['correct']));
             
             if ($is_correct) {
                 $correctCount++;
@@ -440,6 +453,9 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
         }
     }
+    if (!empty($seenQuestions)) {
+        $totalQuestions = count($seenQuestions);
+    }
 
     $id = bin2hex(random_bytes(16));
     $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
@@ -449,8 +465,8 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $ins->execute([$id, $payload->id, $attempt_id ? $attempt_id : null, $quiz_type, $subtes, $totalScore, $correctCount, $totalQuestions, $duration_sec, json_encode($detailedAnswers)]);
         
         if ($attempt_id) {
-            $upd = $pdo->prepare("UPDATE quiz_attempts SET status = 'completed', completed_at = NOW() WHERE id = ?");
-            $upd->execute([$attempt_id]);
+            $upd = $pdo->prepare("UPDATE quiz_attempts SET status = 'completed', completed_at = NOW() WHERE id = ? AND student_id = ?");
+            $upd->execute([$attempt_id, $payload->id]);
         }
     } catch (PDOException $e) {
         // Fallback for Web App backward compatibility if attempt_id column doesn't exist
@@ -468,8 +484,8 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
 }
 elseif (($action === 'review' || $action === 'cbt_review') && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    $attempt_id = trim($_GET['attempt_id'] ?? '');
-    $result_id = trim($_GET['result_id'] ?? '');
+    $attempt_id = safe_str($_GET['attempt_id'] ?? '');
+    $result_id = safe_str($_GET['result_id'] ?? '');
 
     if (empty($attempt_id) && empty($result_id)) {
         http_response_code(400);

@@ -5051,7 +5051,7 @@ const loadPlansAndStaff = async () => {
 
   try {
     const tRes = await api.getAdminTenants().catch(() => []);
-    tenantsList.value = Array.isArray(tRes) ? tRes : [];
+    tenantsList.value = Array.isArray(tRes) ? tRes : (tRes?.tenants || tRes?.data || []);
   } catch (err) { console.error('Gagal fetch tenants', err); }
 };
 
@@ -5759,7 +5759,7 @@ const deleteBranch = async (id) => {
 const fetchTenants = async () => {
   try {
     const res = await api.getAdminTenants().catch(() => []);
-    tenantsList.value = Array.isArray(res) ? res : [];
+    tenantsList.value = Array.isArray(res) ? res : (res?.tenants || res?.data || []);
   } catch (err) {
     console.error('Error load tenants:', err);
   }

@@ -60,20 +60,39 @@ else if ($action === 'create_attempt' && $_SERVER['REQUEST_METHOD'] === 'POST') 
     $service = new SPPService($pdo);
     echo json_encode($service->createAttempt($payload->id));
 }
-else if ($action === 'submit_attempt' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+else if (($action === 'submit_attempt' || $action === 'submit') && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once 'spp_service.php';
     $payload = authenticate();
     if ($payload->role !== 'student') { http_response_code(403); echo json_encode(["error" => "Forbidden"]); exit; }
     
+    $service = new SPPService($pdo);
     $attempt_id = $_GET['id'] ?? ($input['attempt_id'] ?? ($input['id'] ?? ''));
+    if (!$attempt_id) {
+        $newAtt = $service->createAttempt($payload->id);
+        $attempt_id = $newAtt['id'] ?? null;
+    }
     if (!$attempt_id) { http_response_code(400); echo json_encode(["error" => "Attempt ID required"]); exit; }
     
-    $duration = $input['duration_seconds'] ?? ($input['duration'] ?? 0);
-    $responses = $input['responses'] ?? ($input['answers'] ?? []);
+    $duration = $input['duration_seconds'] ?? ($input['duration'] ?? 180);
+    $responses = $input['responses'] ?? ($input['answers'] ?? ($input['riasec_answers'] ?? []));
     
-    $service = new SPPService($pdo);
     $result = $service->submitAttempt($payload->id, $attempt_id, $responses, $duration);
-    echo json_encode($result);
+
+    // Otomatis terbitkan sertifikat digital jika scoring berhasil
+    $cert = null;
+    try {
+        $cert = $service->getOrCreateCertificate($attempt_id, $payload->id);
+    } catch (\Throwable $e) {}
+
+    echo json_encode([
+        "success" => true,
+        "status" => "SCORED",
+        "attempt_id" => $attempt_id,
+        "certificate_number" => $cert['certificate_number'] ?? ($cert['data']['certificate_number'] ?? null),
+        "certificate" => $cert,
+        "result" => $result
+    ]);
+    exit;
 }
 else if ($action === 'get_result' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     require_once 'spp_service.php';
@@ -149,11 +168,11 @@ else if ($action === 'get_certificate' && $_SERVER['REQUEST_METHOD'] === 'GET') 
     }
     echo json_encode($result);
 }
-else if ($action === 'verify_certificate' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+else if (($action === 'verify_certificate' || $action === 'verify') && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // Public endpoint: tidak memerlukan autentikasi JWT agar bisa diakses scan QR
     require_once 'spp_service.php';
     
-    $identifier = $_GET['no'] ?? ($_GET['number'] ?? ($_GET['hash'] ?? ($_GET['id'] ?? '')));
+    $identifier = $_GET['no'] ?? ($_GET['number'] ?? ($_GET['cert_number'] ?? ($_GET['hash'] ?? ($_GET['id'] ?? ''))));
     if (!$identifier) {
         http_response_code(400);
         echo json_encode(["valid" => false, "message" => "Nomor sertifikat atau verification hash wajib disertakan"]);

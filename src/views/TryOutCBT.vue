@@ -250,6 +250,10 @@ export default {
   },
   async mounted() {
     try {
+      const token = sessionStorage.getItem('ep_session_token') || sessionStorage.getItem('token') || localStorage.getItem('token') || localStorage.getItem('auth_token');
+      if (!token) {
+        throw new Error('Guest mode: student token not present');
+      }
       const savedAttemptId = localStorage.getItem('edupath_tryout_attempt_id');
       const attempt = await api.quizStart({ attempt_id: savedAttemptId, quiz_type: 'tryout', limit: 15, duration_sec: 15 * 60 });
       this.attemptId = attempt.attempt_id;
@@ -344,10 +348,14 @@ export default {
       };
       localStorage.setItem(`edupath_tryout_${this.attemptId}`, JSON.stringify(state));
       clearTimeout(this.saveTimer);
-      this.saveTimer = setTimeout(() => api.quizSave(this.attemptId, this.answers.map((answer, index) => ({
-        question_id: this.questions[index]?.id,
-        answer
-      })).filter(item => item.answer)), 500);
+      if (!String(this.attemptId).startsWith('local-to-')) {
+        this.saveTimer = setTimeout(() => {
+          api.quizSave(this.attemptId, this.answers.map((answer, index) => ({
+            question_id: this.questions[index]?.id,
+            answer
+          })).filter(item => item.answer)).catch(() => {});
+        }, 500);
+      }
     },
     finishExam() {
       this.showFinishModal = true;
@@ -358,6 +366,13 @@ export default {
       this.showFinishModal = false;
       clearInterval(this.timerInterval);
       try {
+        if (String(this.attemptId).startsWith('local-to-')) {
+          localStorage.removeItem(`edupath_tryout_${this.attemptId}`);
+          localStorage.removeItem('edupath_tryout_attempt_id');
+          alert("Ujian selesai (Mode Latihan/Demo). Jawaban Anda telah tersimpan.");
+          this.$router.push('/');
+          return;
+        }
         await api.submitQuiz({
           attempt_id: this.attemptId,
           quiz_type: 'tryout',
