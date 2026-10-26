@@ -15,7 +15,7 @@
     <transition name="fade">
       <div 
         v-if="isLoggedIn && mobileSidebarOpen" 
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-30 lg:hidden cursor-pointer"
+        class="fixed inset-0 bg-black/75 backdrop-blur-sm z-40 lg:hidden cursor-pointer"
         @click="mobileSidebarOpen = false"
       ></div>
     </transition>
@@ -23,17 +23,17 @@
     <!-- Sidebar Navigation — auto-hide on desktop -->
     <aside
       v-if="isLoggedIn"
-      class="fixed left-0 top-0 h-screen z-40 flex flex-col backdrop-blur-xl border-r border-white/5 transition-all duration-300 ease-out overflow-hidden text-white shadow-2xl"
-      style="background: linear-gradient(160deg, #0a0f1e 0%, #0d1224 60%, #0a0f1e 100%);"
+      class="fixed inset-y-0 left-0 h-full h-[100dvh] max-h-[100dvh] z-50 flex flex-col backdrop-blur-2xl border-r border-white/10 transition-transform duration-300 ease-out overflow-hidden text-white shadow-2xl"
+      style="background: linear-gradient(160deg, #070c1a 0%, #0d1428 60%, #070c1a 100%);"
       :class="[
-        (sidebarExpanded || mobileSidebarOpen) ? 'w-72 shadow-[20px_0_60px_rgba(0,0,0,0.35)]' : 'w-[72px]',
+        (sidebarExpanded || mobileSidebarOpen) ? 'w-72 max-w-[85vw] shadow-[20px_0_60px_rgba(0,0,0,0.5)]' : 'w-[72px]',
         mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       ]"
       @mouseenter="sidebarExpanded = true"
       @mouseleave="sidebarExpanded = false"
     >
       <!-- Top: Logo + Nav (scrollable) -->
-      <div class="flex flex-col flex-grow min-h-0 overflow-y-auto" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-6 pb-2' : 'p-3 pb-2'">
+      <div class="flex flex-col flex-1 min-h-0 overflow-y-auto" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-4 sm:p-6 pb-2' : 'p-3 pb-2'">
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-2.5 group cursor-pointer shrink-0" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center w-full'" @click="goToHomeTop">
             <div class="w-8 h-8 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base group-hover:rotate-12 transition-all duration-300 shadow-md shadow-[#c0ff00]/20">E</div>
@@ -42,7 +42,7 @@
             </div>
           </div>
           <!-- Close button for mobile -->
-          <button v-show="(sidebarExpanded || mobileSidebarOpen)" @click="mobileSidebarOpen = false" class="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 shrink-0">
+          <button v-show="(sidebarExpanded || mobileSidebarOpen)" @click="mobileSidebarOpen = false" class="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 active:scale-95 shrink-0 cursor-pointer" aria-label="Tutup Menu">
             <i class="ph-bold ph-x text-lg"></i>
           </button>
         </div>
@@ -143,11 +143,15 @@
         </nav>
       </div>
 
-      <!-- Bottom: User + Logout -->
-      <div class="shrink-0 border-t border-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-4 mx-2 mb-2' : 'p-2 mx-1 mb-2'">
-        <div class="flex items-center gap-3 mb-3" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center'">
-          <div class="w-9 h-9 shrink-0 rounded-full bg-[#c0ff00] text-black flex items-center justify-center font-black text-xs border border-[#c0ff00]/40 shadow-[0_0_12px_rgba(192,255,0,0.3)]">
-            <i class="ph-bold ph-user text-lg text-black"></i>
+      <!-- Bottom: User + Logout (Always pinned inside viewport, safe-area aware) -->
+      <div 
+        class="shrink-0 border-t border-white/10 bg-[#060a16]/95 backdrop-blur-xl" 
+        :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-3 sm:p-4' : 'p-2 mb-2'"
+        style="padding-bottom: max(0.875rem, env(safe-area-inset-bottom));"
+      >
+        <div class="flex items-center gap-2.5 sm:gap-3 mb-2.5" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center'">
+          <div class="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-[#c0ff00] to-emerald-400 text-black flex items-center justify-center font-black text-xs border border-[#c0ff00]/40 shadow-[0_0_12px_rgba(192,255,0,0.3)]">
+            <i class="ph-bold ph-user text-base text-black"></i>
           </div>
           <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
             <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ getStudentDisplayName(currentUser) }}</h4>
@@ -177,7 +181,7 @@
             </div>
             <div v-else @click="openPlanSelector" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Lihat Pilihan Paket">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-[#c0ff00]">
-                Status Paket: {{ isPremiumUser ? (currentUser?.plan_name || 'Premium') : 'Trial' }}
+                Status: {{ isPremiumUser ? (currentUser?.plan_name || 'Premium') : 'Trial' }}
               </span>
               <span v-if="!isPremiumUser" class="text-[9px] bg-[#c0ff00]/20 text-[#c0ff00] border border-[#c0ff00]/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-[#c0ff00] group-hover:text-black transition-all">Pilih Paket ⚡</span>
             </div>
@@ -187,10 +191,13 @@
         <button
           @click="logout"
           :title="'Keluar Akun'"
-          :class="['bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl font-bold transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 shrink-0', (sidebarExpanded || mobileSidebarOpen) ? 'w-full py-2.5 text-xs' : 'w-9 h-9 text-sm']"
+          :class="[
+            'bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/35 text-rose-300 hover:text-rose-200 rounded-xl font-bold transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 shrink-0 cursor-pointer shadow-sm', 
+            (sidebarExpanded || mobileSidebarOpen) ? 'w-full py-2.5 text-xs' : 'w-9 h-9 text-sm'
+          ]"
         >
-          <i class="ph-bold ph-sign-out shrink-0 text-base"></i>
-          <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="whitespace-nowrap">Keluar Akun</span>
+          <i class="ph-bold ph-sign-out shrink-0 text-base text-rose-400"></i>
+          <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="whitespace-nowrap font-bold">Keluar Akun</span>
         </button>
       </div>
     </aside>
@@ -452,6 +459,15 @@
           <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-sm">
             <span class="text-amber-400 font-black">🪙 {{ coins }}</span>
           </div>
+          <!-- Avatar Quick Button to open Student Sidebar -->
+          <button 
+            @click="mobileSidebarOpen = true" 
+            class="w-7 h-7 rounded-lg bg-gradient-to-br from-[#c0ff00] to-emerald-400 text-black flex items-center justify-center font-black text-xs border border-[#c0ff00]/40 shadow-sm active:scale-95 transition-all cursor-pointer"
+            title="Buka Menu Akun Siswa"
+            aria-label="Menu Akun Siswa"
+          >
+            <i class="ph-bold ph-user text-sm text-black"></i>
+          </button>
         </div>
       </header>
 
@@ -778,10 +794,10 @@
                       <div class="text-[10px] font-bold text-[#c0ff00] mt-0.5">+{{ simScoreIncrease }} Poin Lonjakan</div>
                     </div>
                     <div class="p-3 sm:p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 text-center min-w-0">
-                      <div class="text-[10px] font-bold text-white/40 uppercase truncate">Target {{ simTargetPtn.name.split(' (')[0] }}</div>
-                      <div class="text-xl sm:text-2xl font-black text-white/80 font-heading mt-1">{{ simTargetPtn.targetScore }}</div>
-                      <div class="text-[10px] font-bold mt-0.5 truncate" :class="simPredictedGain >= simTargetPtn.targetScore ? 'text-[#c0ff00]' : 'text-rose-400'">
-                        {{ simPredictedGain >= simTargetPtn.targetScore ? '✓ Lolos Passing' : `Sisa ${simTargetPtn.targetScore - simPredictedGain} Poin` }}
+                      <div class="text-[10px] font-bold text-white/40 uppercase truncate">Target {{ (simTargetPtn?.name || String(simTargetPtn || '')).split(' (')[0] }}</div>
+                      <div class="text-xl sm:text-2xl font-black text-white/80 font-heading mt-1">{{ simTargetPtn?.targetScore || 700 }}</div>
+                      <div class="text-[10px] font-bold mt-0.5 truncate" :class="(simPredictedGain >= (simTargetPtn?.targetScore || 700)) ? 'text-[#c0ff00]' : 'text-rose-400'">
+                        {{ (simPredictedGain >= (simTargetPtn?.targetScore || 700)) ? '✓ Lolos Passing' : `Sisa ${(simTargetPtn?.targetScore || 700) - simPredictedGain} Poin` }}
                       </div>
                     </div>
                   </div>
@@ -792,7 +808,7 @@
                       <span>⚡</span> Rekomendasi Subtes Prioritas:
                     </div>
                     <p class="text-xs text-white/70 leading-relaxed font-medium">
-                      Fokus pada: <strong class="text-white">{{ simTargetPtn.focus }}</strong> untuk akselerasi skor maksimal di {{ simTargetPtn.name.split(' (')[0] }}.
+                      Fokus pada: <strong class="text-white">{{ simTargetPtn?.focus || 'TPS & Literasi' }}</strong> untuk akselerasi skor maksimal di {{ (simTargetPtn?.name || String(simTargetPtn || '')).split(' (')[0] }}.
                     </p>
                   </div>
                 </div>
@@ -2345,6 +2361,26 @@
                 </button>
               </div>
             </form>
+          </div>
+
+          <!-- Card Sesi Akun / Logout di Tab Pengaturan -->
+          <div class="glass-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-rose-500/20 bg-rose-500/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0">
+                <i class="ph-bold ph-sign-out text-lg"></i>
+              </div>
+              <div>
+                <h4 class="text-sm font-black text-white">Keluar dari Akun</h4>
+                <p class="text-xs text-white/50">Akhiri sesi login siswa pada perangkat ini</p>
+              </div>
+            </div>
+            <button
+              @click="logout"
+              class="px-5 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 hover:text-rose-200 font-bold text-xs transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer shrink-0"
+            >
+              <i class="ph-bold ph-sign-out text-base"></i>
+              <span>Keluar Akun</span>
+            </button>
           </div>
         </section>
 
@@ -5276,8 +5312,10 @@ export default {
             // Update global states based on user data
             currentAbilityScore.value = res.user.total_score || 0;
             streakCount.value = res.user.streak || 0;
-            coins.value = res.user.coins || 0;
-            if (res.user.target_ptn) simTargetPtn.value = res.user.target_ptn;
+            if (res.user.target_ptn) {
+              const matchedPtn = targetPtnList.find(p => p.name === res.user.target_ptn || p.id === res.user.target_ptn || (typeof res.user.target_ptn === 'string' && p.name.toLowerCase().includes(res.user.target_ptn.toLowerCase())));
+              simTargetPtn.value = matchedPtn || (typeof res.user.target_ptn === 'object' ? res.user.target_ptn : { id: 'custom', name: String(res.user.target_ptn), targetScore: 700, focus: 'TPS & Literasi' });
+            }
             
             // Sync profileEditForm
             profileEditForm.value.name = res.user.name || '';
@@ -5476,6 +5514,8 @@ export default {
       isLoggedIn.value = false;
       currentTab.value = 'home';
       sidebarExpanded.value = false;
+      mobileSidebarOpen.value = false;
+      simTargetPtn.value = targetPtnList[0];
       document.body.style.pointerEvents = 'none';
       showToast('Sedang keluar dari akun...');
 
