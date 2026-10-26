@@ -386,17 +386,18 @@
               </div>
 
               <!-- CTA Buttons -->
-              <div class="flex justify-center items-center gap-3 pt-6 sm:pt-10 md:pt-14 relative z-20">
-                <button class="h-8 px-3 sm:px-5 rounded-full border border-[#c0ff00]/40 bg-[#c0ff00]/10 hover:bg-[#c0ff00]/20 text-[#c0ff00] font-bold text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(192,255,0,0.15)] hover:scale-105 hover:shadow-[0_0_20px_rgba(192,255,0,0.3)] active:scale-95 whitespace-nowrap" @click="startLearning">
-                  Mulai Belajar
-                  <i class="ph-bold ph-arrow-right"></i>
+              <div class="flex flex-col sm:flex-row justify-center items-center gap-3 pt-6 sm:pt-10 md:pt-14 relative z-20 w-full max-w-sm sm:max-w-none mx-auto px-4 sm:px-0">
+                <button class="w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8 rounded-xl sm:rounded-2xl border border-[#c0ff00]/60 bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-sm sm:text-base transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.35)] hover:scale-105 active:scale-95 cursor-pointer" @click="startLearning">
+                  <span>Mulai Belajar Sekarang</span>
+                  <i class="ph-bold ph-arrow-right text-base sm:text-lg"></i>
                 </button>
-                <button class="h-8 px-3 sm:px-5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-[11px] sm:text-xs transition-all flex items-center justify-center gap-1.5 hover:scale-105 active:scale-95 whitespace-nowrap" @click="scrollToSection('calculator')">
-                  Hitung Peluang
+                <button class="w-full sm:w-auto h-11 sm:h-12 px-5 sm:px-6 rounded-xl sm:rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 hover:scale-105 active:scale-95 cursor-pointer" @click="scrollToSection('calculator')">
+                  <i class="ph-bold ph-calculator text-base sm:text-lg"></i>
+                  <span>Hitung Peluang PTN</span>
                 </button>
               </div>
 
-              <div class="text-[11px] text-white/40 font-medium pb-2">
+              <div class="text-xs sm:text-sm text-slate-300 font-medium pb-2 text-center">
                 Untuk Siswa SMA &amp; Pejuang Gap Year yang serius meraih PTN impian.
               </div>
             </div>
@@ -439,12 +440,12 @@
 
           <div id="problems" class="section-wrapper space-y-20 scroll-mt-24">
             <!-- Section Heading -->
-            <div class="text-center max-w-3xl mx-auto space-y-4 reveal">
-              <span class="text-white/40 text-sm font-bold uppercase tracking-widest block">TANTANGAN NYATA</span>
-              <h2 class="text-5xl md:text-7xl font-black font-heading text-white leading-tight">
+            <div class="text-center max-w-3xl mx-auto space-y-4 reveal px-2">
+              <span class="text-[#c0ff00] text-xs sm:text-sm font-black uppercase tracking-widest block">TANTANGAN NYATA</span>
+              <h2 class="text-3xl sm:text-5xl md:text-7xl font-black font-heading text-white leading-tight">
                 Belajar Keras<br />Tapi <span style="color: #c0ff00;">Tanpa Arah?</span>
               </h2>
-              <p class="text-lg text-white/50 font-medium leading-relaxed">
+              <p class="text-sm sm:text-lg text-slate-200 font-medium leading-relaxed">
                 Banyak pejuang PTN belajar penuh semangat, tapi tanpa peta yang jelas. Inilah 3 jebakan paling umum.
               </p>
             </div>
@@ -453,33 +454,33 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative items-stretch">
               <!-- Card 1 -->
               <div class="reveal reveal-delay-1 h-full">
-                <div class="bouncy-card group rounded-3xl p-8 pt-16 relative hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full flex flex-col justify-between">
-                  <div class="absolute -top-8 left-8 w-20 h-20 rounded-3xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-3xl shadow-[0_0_30px_rgba(192,255,0,0.4)]">01</div>
+                <div class="bouncy-card group rounded-3xl p-6 sm:p-8 pt-14 sm:pt-16 relative hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full flex flex-col justify-between">
+                  <div class="absolute -top-7 left-6 sm:left-8 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-2xl sm:text-3xl shadow-[0_0_30px_rgba(192,255,0,0.4)]">01</div>
                   <div class="space-y-3 flex-grow">
-                    <h3 class="text-2xl md:text-3xl font-black text-white">Blind Spot Belajar</h3>
-                    <p class="text-white/50 font-medium leading-relaxed">Belajar acak tanpa tahu materi mana yang paling nahan kenaikan skormu. Gak terarah, gak efisien.</p>
+                    <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-white">Blind Spot Belajar</h3>
+                    <p class="text-slate-300 font-normal leading-relaxed text-sm sm:text-base">Belajar acak tanpa tahu materi mana yang paling nahan kenaikan skormu. Gak terarah, gak efisien.</p>
                   </div>
                 </div>
               </div>
 
               <!-- Card 2 -->
               <div class="reveal reveal-delay-2 h-full">
-                <div class="bouncy-card group rounded-3xl p-8 pt-16 relative hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full flex flex-col justify-between">
-                  <div class="absolute -top-8 left-8 w-20 h-20 rounded-3xl bg-white flex items-center justify-center font-black text-black text-3xl">02</div>
+                <div class="bouncy-card group rounded-3xl p-6 sm:p-8 pt-14 sm:pt-16 relative hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full flex flex-col justify-between">
+                  <div class="absolute -top-7 left-6 sm:left-8 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white flex items-center justify-center font-black text-black text-2xl sm:text-3xl">02</div>
                   <div class="space-y-3 flex-grow">
-                    <h3 class="text-2xl md:text-3xl font-black text-white">Hafalan Buta Rumus</h3>
-                    <p class="text-white/50 font-medium leading-relaxed">Hafal rumus mati tanpa ngerti logikanya. Pas ketemu soal HOTS variasi baru — blank total.</p>
+                    <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-white">Hafalan Buta Rumus</h3>
+                    <p class="text-slate-300 font-normal leading-relaxed text-sm sm:text-base">Hafal rumus mati tanpa ngerti logikanya. Pas ketemu soal HOTS variasi baru — blank total.</p>
                   </div>
                 </div>
               </div>
 
               <!-- Card 3 -->
               <div class="reveal reveal-delay-3 h-full">
-                <div class="bouncy-card group rounded-3xl p-8 pt-16 relative hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full flex flex-col justify-between">
-                  <div class="absolute -top-8 left-8 w-20 h-20 rounded-3xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-3xl shadow-[0_0_30px_rgba(192,255,0,0.4)]">03</div>
+                <div class="bouncy-card group rounded-3xl p-6 sm:p-8 pt-14 sm:pt-16 relative hover:-translate-y-4 hover:scale-[1.03] hover:border-[#c0ff00]/50 hover:shadow-[0_20px_50px_-10px_rgba(192,255,0,0.2)] hover:z-20 transition-spring h-full flex flex-col justify-between">
+                  <div class="absolute -top-7 left-6 sm:left-8 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-2xl sm:text-3xl shadow-[0_0_30px_rgba(192,255,0,0.4)]">03</div>
                   <div class="space-y-3 flex-grow">
-                    <h3 class="text-2xl md:text-3xl font-black text-white">Skor Tryout Mandek</h3>
-                    <p class="text-white/50 font-medium leading-relaxed">Latihan terlalu mudah atau susah tanpa kalibrasi IRT. Skor stuck di angka yang sama berbulan-bulan.</p>
+                    <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-white">Skor Tryout Mandek</h3>
+                    <p class="text-slate-300 font-normal leading-relaxed text-sm sm:text-base">Latihan terlalu mudah atau susah tanpa kalibrasi IRT. Skor stuck di angka yang sama berbulan-bulan.</p>
                   </div>
                 </div>
               </div>
@@ -1669,23 +1670,26 @@
 
           <!-- 13. Final CTA — SAMPLE style -->
           <div class="section-wrapper">
-          <div class="text-center py-20 rounded-3xl p-8 space-y-6 relative overflow-hidden" style="background: #121212; border: 1px solid rgba(255,255,255,0.08);">
+          <div class="text-center py-12 sm:py-16 md:py-20 rounded-3xl p-6 sm:p-8 space-y-6 relative overflow-hidden" style="background: #121212; border: 1px solid rgba(255,255,255,0.08);">
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div class="w-80 h-80 rounded-full" style="background: radial-gradient(circle, rgba(192,255,0,0.15) 0%, transparent 70%);"></div>
             </div>
             
-            <h2 class="text-4xl md:text-6xl font-black font-heading text-white tracking-tighter relative z-10 leading-tight">
+            <h2 class="text-3xl sm:text-5xl md:text-6xl font-black font-heading text-white tracking-tighter relative z-10 leading-tight">
               Siap Tembus<br /><span style="color: #c0ff00;">PTN Impianmu?</span>
             </h2>
-            <p class="text-lg text-white/50 max-w-md mx-auto font-medium relative z-10">Daftar sekarang — assessment diagnostic pertamamu gratis, selamanya.</p>
+            <p class="text-base sm:text-lg text-slate-200 max-w-md mx-auto font-medium relative z-10">
+              Daftar sekarang — assessment diagnostic pertamamu gratis, selamanya.
+            </p>
             
 
-            <div class="flex flex-wrap justify-center gap-4 pt-4 relative z-10">
-              <button class="px-10 py-5 rounded-full font-black text-base transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(192,255,0,0.5)]" style="background: #c0ff00; color: #000;" @click="startLearning">
-                Mulai Uji Coba Gratis ⚡
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-3.5 pt-4 relative z-10 w-full max-w-md mx-auto px-4 sm:px-0">
+              <button class="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(192,255,0,0.4)] flex items-center justify-center gap-2 cursor-pointer" style="background: #c0ff00; color: #000;" @click="startLearning">
+                <span>Mulai Uji Coba Gratis</span>
+                <span>⚡</span>
               </button>
-              <button class="px-10 py-5 rounded-full font-bold text-base border border-white/20 bg-white/5 hover:bg-white/10 text-white transition-all" @click="currentTab = 'diagnostic'">
-                Coba Tryout Dulu
+              <button class="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base border border-white/20 bg-white/5 hover:bg-white/10 text-white transition-all flex items-center justify-center cursor-pointer" @click="currentTab = 'diagnostic'">
+                <span>Coba Tryout Dulu</span>
               </button>
             </div>
           </div>
@@ -3907,8 +3911,8 @@
       </div>
     </div>
 
-    <!-- Floating Real-Time Activity Notification (Discreet Social Proof) -->
-    <div v-if="!isLoggedIn && showLiveActivity" class="fixed bottom-6 left-6 z-40 max-w-xs md:max-w-sm glass-card p-3.5 rounded-2xl border-[#c0ff00]/30 shadow-[0_10px_40px_rgba(0,0,0,0.6)] animate-fade-in flex items-center gap-3">
+    <!-- Floating Real-Time Activity Notification (Discreet Social Proof on Desktop only) -->
+    <div v-if="!isLoggedIn && showLiveActivity" class="hidden md:flex fixed bottom-6 left-6 z-40 max-w-xs md:max-w-sm glass-card p-3.5 rounded-2xl border-[#c0ff00]/30 shadow-[0_10px_40px_rgba(0,0,0,0.6)] animate-fade-in items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 border border-[#c0ff00]/30 flex items-center justify-center text-xl shrink-0">
         {{ liveActivityList[currentActivityIdx].icon }}
       </div>

@@ -4,32 +4,37 @@
     <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#c0ff00]/10 blur-[130px] rounded-full pointer-events-none -z-10"></div>
 
     <!-- Mode Switcher: Siswa (Asesmen) vs Sekolah (Insight BK) -->
-    <div class="flex justify-center mb-8">
-      <div class="inline-flex p-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-lg">
+    <div class="flex justify-center mb-8 px-2 w-full">
+      <div class="w-full max-w-lg grid grid-cols-2 p-1.5 rounded-2xl bg-white/[0.08] border border-white/10 backdrop-blur-xl shadow-lg gap-1.5">
         <button
           @click="activeMode = 'student'"
           :class="[
-            'px-5 py-2 rounded-full text-xs md:text-sm font-bold transition-all flex items-center gap-2',
+            'py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center cursor-pointer',
             activeMode === 'student'
               ? 'bg-[#c0ff00] text-black shadow-[0_0_20px_rgba(192,255,0,0.35)]'
-              : 'text-white/60 hover:text-white'
+              : 'text-white/75 hover:text-white hover:bg-white/5'
           ]"
         >
-          <i class="ph-bold ph-student text-base"></i>
-          <span>Untuk Siswa (Asesmen Potensi)</span>
+          <div class="flex items-center gap-1.5">
+            <i class="ph-bold ph-student text-base sm:text-lg"></i>
+            <span>Untuk Siswa</span>
+          </div>
+          <span class="text-[10px] sm:text-xs opacity-75 font-semibold block">(Asesmen Potensi)</span>
         </button>
         <button
           @click="activeMode = 'school'"
           :class="[
-            'px-5 py-2 rounded-full text-xs md:text-sm font-bold transition-all flex items-center gap-2',
+            'py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center cursor-pointer',
             activeMode === 'school'
               ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.35)]'
-              : 'text-white/60 hover:text-white'
+              : 'text-white/75 hover:text-white hover:bg-white/5'
           ]"
         >
-          <i class="ph-bold ph-buildings text-base"></i>
-          <span>Untuk Sekolah & Guru BK</span>
-          <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-black border border-indigo-500/30">Insight & QR</span>
+          <div class="flex items-center gap-1.5">
+            <i class="ph-bold ph-buildings text-base sm:text-lg"></i>
+            <span>Untuk Sekolah</span>
+          </div>
+          <span class="text-[9px] sm:text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-black border border-indigo-500/30">Guru BK</span>
         </button>
       </div>
     </div>
@@ -38,93 +43,93 @@
     <div v-if="activeMode === 'student'" class="space-y-10">
       
       <!-- 1. Header & Positioning -->
-      <div class="text-center max-w-3xl mx-auto space-y-4">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#c0ff00]/40 bg-[#c0ff00]/10 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
+      <div class="text-center max-w-3xl mx-auto space-y-4 px-2">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#c0ff00]/40 bg-[#c0ff00]/10 text-[#c0ff00] text-xs sm:text-sm font-black uppercase tracking-widest">
           <i class="ph-bold ph-compass"></i>
           <span>Student Potential Path (SPP)</span>
         </div>
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black font-heading text-white tracking-tight leading-tight">
+        <h2 class="text-2xl sm:text-4xl md:text-5xl font-black font-heading text-white tracking-tight leading-tight">
           Kenali Potensimu. <br class="hidden sm:inline" />
           <span style="color: #c0ff00;">Pahami Cara Belajarmu.</span> Siapkan Masa Depanmu.
         </h2>
-        <p class="text-sm md:text-base text-white/65 max-w-2xl mx-auto font-medium leading-relaxed">
+        <p class="text-sm sm:text-base text-slate-200 max-w-2xl mx-auto font-medium leading-relaxed">
           Bukan sekadar tes bakat biasa. SPP memetakan 4 dimensi berpikir dan kesiapan belajarmu secara mandiri, gratis, dan terarah untuk menembus PTN impian.
         </p>
 
         <!-- Feature Badges -->
-        <div class="flex flex-wrap items-center justify-center gap-2.5 pt-2">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-xs font-semibold">
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 pt-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/90 text-xs sm:text-sm font-semibold">
             <i class="ph-bold ph-globe text-[#c0ff00]"></i> 100% Online & Mandiri
           </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-xs font-semibold">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/90 text-xs sm:text-sm font-semibold">
             <i class="ph-bold ph-seal-check text-[#c0ff00]"></i> 100% Gratis
           </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-xs font-semibold">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/90 text-xs sm:text-sm font-semibold">
             <i class="ph-bold ph-timer text-[#c0ff00]"></i> Estimasi ±15 Menit
           </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-xs font-semibold">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/90 text-xs sm:text-sm font-semibold">
             <i class="ph-bold ph-graduation-cap text-[#c0ff00]"></i> Khusus SMA/MA/SMK & Gap Year
           </span>
         </div>
       </div>
 
       <!-- 2. ASSESSMENT ENGINE CONTAINER -->
-      <div class="relative rounded-3xl border border-white/15 bg-white/[0.03] backdrop-blur-2xl p-6 md:p-10 shadow-2xl overflow-hidden">
+      <div class="relative rounded-3xl border border-white/15 bg-white/[0.03] backdrop-blur-2xl p-4 sm:p-6 md:p-10 shadow-2xl overflow-hidden">
         
         <!-- STEP A: INTRO / PRE-ASSESSMENT -->
         <div v-if="sppStage === 'intro'" class="space-y-8 max-w-3xl mx-auto text-center py-4">
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-left">
-            <div class="p-4 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-[#c0ff00]/40 transition-all">
-              <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center text-xl mb-3 font-black">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4 text-left">
+            <div class="p-4 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-[#c0ff00]/40 transition-all">
+              <div class="w-11 h-11 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center text-xl mb-3 font-black">
                 <i class="ph-bold ph-brain"></i>
               </div>
-              <h4 class="font-black text-sm text-white mb-1">1. Potential</h4>
-              <p class="text-xs text-white/50 leading-relaxed">Memetakan pola berpikir, logika, & kekuatan naluriahmu.</p>
+              <h4 class="font-black text-base text-white mb-1.5">1. Potential</h4>
+              <p class="text-sm text-slate-300 leading-relaxed font-normal">Memetakan pola berpikir, logika, & kekuatan naluriahmu.</p>
             </div>
 
-            <div class="p-4 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-[#c0ff00]/40 transition-all">
-              <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center text-xl mb-3 font-black">
+            <div class="p-4 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-[#c0ff00]/40 transition-all">
+              <div class="w-11 h-11 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center text-xl mb-3 font-black">
                 <i class="ph-bold ph-heart"></i>
               </div>
-              <h4 class="font-black text-sm text-white mb-1">2. Interest</h4>
-              <p class="text-xs text-white/50 leading-relaxed">Menemukan bidang studi & karir yang paling memicu antusiasmemu.</p>
+              <h4 class="font-black text-base text-white mb-1.5">2. Interest</h4>
+              <p class="text-sm text-slate-300 leading-relaxed font-normal">Menemukan bidang studi & karir yang paling memicu antusiasmemu.</p>
             </div>
 
-            <div class="p-4 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-[#c0ff00]/40 transition-all">
-              <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center text-xl mb-3 font-black">
+            <div class="p-4 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-[#c0ff00]/40 transition-all">
+              <div class="w-11 h-11 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center text-xl mb-3 font-black">
                 <i class="ph-bold ph-books"></i>
               </div>
-              <h4 class="font-black text-sm text-white mb-1">3. Learning</h4>
-              <p class="text-xs text-white/50 leading-relaxed">Kecenderungan gaya belajar (konsep, visual, studi kasus).</p>
+              <h4 class="font-black text-base text-white mb-1.5">3. Learning</h4>
+              <p class="text-sm text-slate-300 leading-relaxed font-normal">Kecenderungan gaya belajar (konsep, visual, studi kasus).</p>
             </div>
 
-            <div class="p-4 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-[#c0ff00]/40 transition-all">
-              <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-xl mb-3 font-black">
+            <div class="p-4 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-[#c0ff00]/40 transition-all">
+              <div class="w-11 h-11 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-xl mb-3 font-black">
                 <i class="ph-bold ph-chart-line-up"></i>
               </div>
-              <h4 class="font-black text-sm text-white mb-1">4. Growth</h4>
-              <p class="text-xs text-white/50 leading-relaxed">Konsistensi, resiliensi (grit), dan determinasi belajarmu.</p>
+              <h4 class="font-black text-base text-white mb-1.5">4. Growth</h4>
+              <p class="text-sm text-slate-300 leading-relaxed font-normal">Konsistensi, resiliensi (grit), dan determinasi belajarmu.</p>
             </div>
           </div>
 
-          <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
+          <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3.5 max-w-md sm:max-w-none mx-auto relative z-10 w-full">
             <button
               type="button"
               @click.prevent="startSppForm"
-              class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#c0ff00] text-black font-black text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(192,255,0,0.45)] flex items-center justify-center gap-2 cursor-pointer relative z-10"
+              class="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-[#c0ff00] text-black font-black text-sm sm:text-base hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(192,255,0,0.4)] flex items-center justify-center gap-2 cursor-pointer relative z-10"
             >
-              <span>Mulai Asesmen SPP Sekarang (Gratis)</span>
+              <span>Mulai Asesmen SPP Gratis</span>
               <i class="ph-bold ph-arrow-right text-lg"></i>
             </button>
             <button
               type="button"
               @click.prevent="loadSampleResult"
-              class="w-full sm:w-auto px-5 py-3 rounded-full bg-white/5 border border-white/20 text-white/80 font-bold text-xs hover:bg-white/10 transition-all cursor-pointer relative z-10"
+              class="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-white/5 border border-white/20 text-white font-bold text-xs sm:text-sm hover:bg-white/10 transition-all cursor-pointer relative z-10 flex items-center justify-center"
             >
-              Lihat Contoh Profil Hasil
+              <span>Lihat Contoh Profil Hasil</span>
             </button>
           </div>
-          <p class="text-[11px] text-white/40 italic">
+          <p class="text-xs text-slate-400 italic leading-relaxed pt-2 max-w-xl mx-auto">
             *SPP merupakan alat eksplorasi diri untuk membantu siswa mengenali kecenderungan minat dan pola belajar. SPP bukan tes IQ, diagnosis psikologis, tes psikologi klinis, penentu jurusan, atau prediksi kelulusan perguruan tinggi.
           </p>
         </div>
@@ -236,13 +241,13 @@
               <button
                 type="button"
                 @click="sppStage = 'intro'"
-                class="px-5 py-2.5 rounded-xl text-xs font-bold text-white/60 hover:text-white"
+                class="px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white/70 hover:text-white"
               >
                 Kembali
               </button>
               <button
                 type="submit"
-                class="px-7 py-3 rounded-full bg-[#c0ff00] text-black font-black text-xs md:text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center gap-2"
+                class="px-5 sm:px-7 py-3 rounded-xl sm:rounded-2xl bg-[#c0ff00] text-black font-black text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center gap-2 cursor-pointer"
               >
                 <span>Masuk ke Soal Asesmen</span>
                 <i class="ph-bold ph-arrow-right text-base"></i>
@@ -340,7 +345,7 @@
               type="button"
               :disabled="isSubmitting"
               @click="nextQuestion"
-              class="px-6 py-2.5 rounded-full bg-[#c0ff00] text-black font-black text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(192,255,0,0.4)] cursor-pointer"
+              class="px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-[#c0ff00] text-black font-black text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(192,255,0,0.4)] cursor-pointer"
             >
               <i v-if="isSubmitting" class="ph-bold ph-spinner animate-spin"></i>
               <span>{{ isSubmitting ? 'Memproses...' : (currentQuestionIdx === questions.length - 1 ? 'Lihat Potential Profile ↵' : 'Lanjut (Enter ↵)') }}</span>
@@ -503,24 +508,24 @@
                 <p class="text-xs md:text-sm text-white/60 leading-relaxed max-w-lg">
                   Tunjukkan profil potensimu ke teman-teman, orang tua, atau guru BK di <strong>{{ studentData.school || 'sekolahmu' }}</strong>. Ajak mereka eksplorasi bareng dan siapkan strategi masuk kampus favorit!
                 </p>
-                <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 pt-2">
                   <button
                     @click="viewOfficialCertificate"
-                    class="px-5 py-2.5 rounded-full bg-emerald-500 text-black font-black text-xs hover:bg-emerald-400 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+                    class="w-full sm:w-auto px-5 py-3 rounded-xl sm:rounded-2xl bg-emerald-500 text-black font-black text-xs sm:text-sm hover:bg-emerald-400 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer"
                   >
                     <i class="ph-bold ph-certificate text-base"></i>
                     <span>{{ certLoading ? 'Memuat...' : 'Sertifikat Resmi SPP' }}</span>
                   </button>
                   <button
                     @click="shareCard"
-                    class="px-5 py-2.5 rounded-full bg-white text-black font-black text-xs hover:bg-[#c0ff00] active:scale-95 transition-all flex items-center gap-2 shadow-lg"
+                    class="w-full sm:w-auto px-5 py-3 rounded-xl sm:rounded-2xl bg-white text-black font-black text-xs sm:text-sm hover:bg-[#c0ff00] active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
                   >
                     <i class="ph-bold ph-share-network text-base"></i>
                     <span>{{ copySuccess ? 'Link Berhasil Disalin!' : 'Bagikan ke Telegram / IG' }}</span>
                   </button>
                   <button
                     @click="retakeAssessment"
-                    class="px-4 py-2.5 rounded-full bg-white/5 border border-white/15 text-white/70 font-bold text-xs hover:text-white transition-all"
+                    class="w-full sm:w-auto px-4 py-2.5 rounded-xl sm:rounded-2xl bg-white/5 border border-white/15 text-white/80 font-bold text-xs sm:text-sm hover:text-white transition-all cursor-pointer"
                   >
                     Ulangi Asesmen
                   </button>
@@ -578,16 +583,16 @@
             </div>
 
             <!-- Big CTA to Academic Readiness Check with Context -->
-            <div class="pt-2">
+            <div class="pt-2 flex justify-center w-full px-2">
               <button
                 @click="handleEduPathCTA"
-                class="px-8 md:px-10 py-4 rounded-full bg-[#c0ff00] text-black font-black text-sm md:text-base hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_35px_rgba(192,255,0,0.6)] inline-flex items-center gap-2 group"
+                class="w-full sm:w-auto px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#c0ff00] text-black font-black text-sm sm:text-base hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_35px_rgba(192,255,0,0.6)] inline-flex items-center justify-center gap-2 group cursor-pointer"
               >
-                <span>Mulai Persiapan Masuk Perguruan Tinggi</span>
-                <i class="ph-bold ph-arrow-right text-xl group-hover:translate-x-1 transition-transform"></i>
+                <span>Mulai Persiapan Masuk PTN</span>
+                <i class="ph-bold ph-arrow-right text-lg sm:text-xl group-hover:translate-x-1 transition-transform"></i>
               </button>
             </div>
-            <p class="text-[11px] text-white/40">
+            <p class="text-xs text-white/50 pt-1">
               Langsung terintegrasi ke kalkulator prediksi peluang & tes diagnostik adaptif EduPath.
             </p>
           </div>
@@ -705,10 +710,10 @@
               <button
                 type="button"
                 @click="downloadBannerKit"
-                class="px-6 py-3 rounded-full bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs md:text-sm hover:scale-105 active:scale-95 transition-all inline-flex items-center gap-2 shadow-lg shadow-[#c0ff00]/25 cursor-pointer"
+                class="w-full sm:w-auto px-6 py-3.5 rounded-xl sm:rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all inline-flex items-center justify-center gap-2 shadow-lg shadow-[#c0ff00]/25 cursor-pointer"
               >
-                <i class="ph-bold ph-download-simple text-base"></i>
-                <span>Download Kit &amp; Template Banner Cetak (.PDF)</span>
+                <i class="ph-bold ph-download-simple text-base sm:text-lg"></i>
+                <span>Download Kit Banner Cetak (.PDF)</span>
               </button>
             </div>
           </div>
