@@ -198,8 +198,8 @@
       <header v-if="!isLoggedIn" class="w-full flex justify-center pt-3 px-3 sm:pt-4 sm:px-4 shrink-0 z-30 fixed top-0 left-0 right-0">
         <div class="glass-pill rounded-full px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.5)] w-full sm:w-[90%] max-w-5xl border border-white/15 gap-2">
           <!-- Hamburger hanya di mobile -->
-          <button @click="toggleMobileSidebar" class="lg:hidden flex-shrink-0 w-8 h-8 rounded-lg bg-white/10 border border-white/15 text-white flex items-center justify-center hover:bg-white/20 transition-all" aria-label="Menu">
-            <i class="ph-bold ph-list text-base"></i>
+          <button @click="toggleMobileSidebar" class="lg:hidden flex-shrink-0 w-9 h-9 rounded-xl bg-white/10 border border-white/15 text-white flex items-center justify-center hover:bg-white/20 active:scale-95 transition-all cursor-pointer" aria-label="Buka Menu Navigasi">
+            <i class="ph-bold ph-list text-lg"></i>
           </button>
 
           <div id="nav-logo" class="flex items-center gap-2.5 group cursor-pointer select-none flex-shrink-0" @click="goToHomeTop">
@@ -299,11 +299,131 @@
           </nav>
 
           <div class="flex items-center gap-2">
-            <button @click="showLoginModal = true" class="h-8 px-3 sm:px-5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-[11px] sm:text-xs transition-all flex items-center justify-center hover:scale-105 active:scale-95 whitespace-nowrap flex-shrink-0">
+            <button @click="showLoginModal = true" class="h-9 px-4 sm:px-5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-xs transition-all flex items-center justify-center hover:scale-105 active:scale-95 whitespace-nowrap flex-shrink-0 cursor-pointer">
               Masuk
             </button>
           </div>
         </div>
+
+        <!-- Public Mobile Navigation Drawer (Logged Out) -->
+        <transition name="fade">
+          <div 
+            v-if="!isLoggedIn && mobileSidebarOpen"
+            class="fixed inset-0 z-50 lg:hidden flex flex-col bg-[#070b14]/98 backdrop-blur-2xl p-5 overflow-y-auto"
+          >
+            <!-- Top Bar: Logo & Close Button -->
+            <div class="flex items-center justify-between pb-4 border-b border-white/10 shrink-0">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base shadow-md shadow-[#c0ff00]/20">E</div>
+                <span class="font-black text-lg tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+              </div>
+              <button 
+                @click="mobileSidebarOpen = false" 
+                class="w-9 h-9 rounded-xl bg-white/10 border border-white/15 text-white flex items-center justify-center hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                aria-label="Tutup Menu"
+              >
+                <i class="ph-bold ph-x text-lg"></i>
+              </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="py-5 space-y-2 flex-grow">
+              <div class="text-[10px] uppercase tracking-wider font-extrabold text-white/40 px-2 pb-1">Navigasi Utama</div>
+              
+              <button 
+                @click="scrollToSection('spp'); mobileSidebarOpen = false" 
+                class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-white font-extrabold text-sm hover:bg-[#c0ff00]/20 transition-all text-left cursor-pointer"
+              >
+                <span class="flex items-center gap-3">
+                  <span class="text-base">🎯</span>
+                  <span>Tes Potensi Siswa (SPP)</span>
+                </span>
+                <span class="text-[10px] font-black bg-[#c0ff00] text-black px-2 py-0.5 rounded-full uppercase">Free</span>
+              </button>
+
+              <button 
+                @click="scrollToSection('calculator'); mobileSidebarOpen = false" 
+                class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
+              >
+                <span class="text-base">🏛️</span>
+                <span>Kalkulator Peluang PTN AI</span>
+              </button>
+
+              <button 
+                @click="scrollToSection('quiz-demo'); mobileSidebarOpen = false" 
+                class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
+              >
+                <span class="text-base">🧪</span>
+                <span>Mini Kuis HOTS (IRT)</span>
+              </button>
+
+              <button 
+                @click="scrollToSection('comparison'); mobileSidebarOpen = false" 
+                class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
+              >
+                <span class="text-base">⚖️</span>
+                <span>Komparasi EduPath vs Bimbel</span>
+              </button>
+
+              <button 
+                @click="scrollToSection('features'); mobileSidebarOpen = false" 
+                class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
+              >
+                <span class="text-base">⚡</span>
+                <span>Fitur Platform</span>
+              </button>
+
+              <button 
+                @click="scrollToSection('testimonials'); mobileSidebarOpen = false" 
+                class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
+              >
+                <span class="text-base">💬</span>
+                <span>Testimoni Pengguna</span>
+              </button>
+
+              <button 
+                @click="scrollToSection('pricing'); mobileSidebarOpen = false" 
+                class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
+              >
+                <span class="flex items-center gap-3">
+                  <span class="text-base">💎</span>
+                  <span>Pilihan Paket &amp; Investasi</span>
+                </span>
+                <span class="text-[10px] font-black text-[#c0ff00] bg-[#c0ff00]/10 border border-[#c0ff00]/30 px-2 py-0.5 rounded-full">Hemat 60%</span>
+              </button>
+
+              <button 
+                @click="scrollToSection('affiliate-section'); mobileSidebarOpen = false" 
+                class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 font-bold text-sm hover:bg-amber-500/20 transition-all text-left cursor-pointer"
+              >
+                <span class="flex items-center gap-3">
+                  <span class="text-base">🤝</span>
+                  <span>Program Afiliasi Mitra</span>
+                </span>
+                <span class="text-[10px] font-black text-amber-400 bg-amber-500/20 px-2 py-0.5 rounded-full">Komisi 20%</span>
+              </button>
+            </div>
+
+            <!-- Bottom Action Buttons in Drawer -->
+            <div class="pt-4 border-t border-white/10 space-y-3 shrink-0">
+              <button 
+                @click="showLoginModal = true; isLoginMode = true; mobileSidebarOpen = false" 
+                class="w-full py-3.5 rounded-2xl border border-white/20 bg-white/10 text-white font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
+              >
+                <i class="ph-bold ph-sign-in text-base"></i>
+                <span>Masuk ke Akun</span>
+              </button>
+
+              <button 
+                @click="showLoginModal = true; isLoginMode = false; mobileSidebarOpen = false" 
+                class="w-full py-3.5 rounded-2xl font-black text-sm text-black flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.3)] active:scale-95 transition-all cursor-pointer"
+                style="background: #c0ff00;"
+              >
+                <span>Daftar Uji Coba Gratis ⚡</span>
+              </button>
+            </div>
+          </div>
+        </transition>
       </header>
 
       <!-- App Header Utility (Only visible on Mobile when Logged In) -->
@@ -404,7 +524,7 @@
           </div>
 
           <!-- Trust Bar — Premium Ticker (Mobile-safe) -->
-          <div class="w-full relative -mt-12 sm:-mt-16 md:-mt-24 mb-12 sm:mb-16 z-10 overflow-hidden" style="transform: rotate(-2deg) scale(1.05);">
+          <div class="w-full relative -mt-4 sm:-mt-14 md:-mt-20 my-8 sm:my-14 z-10 overflow-hidden" style="transform: rotate(-2deg) scale(1.05);">
             <div class="bg-[#c0ff00] text-black py-2.5 sm:py-3 border-y border-[#c0ff00]/30 shadow-[0_10px_40px_rgba(192,255,0,0.15)] overflow-hidden">
               <div class="flex gap-0 animate-marquee whitespace-nowrap" style="width: max-content;">
                 <div class="flex gap-12 items-center px-8 font-black text-sm md:text-base uppercase tracking-widest shrink-0">
@@ -496,26 +616,26 @@
 
           <!-- 3. Dynamic Section: KALKULATOR PREDIKSI SKOR & PELUANG LOLOS PTN AI -->
           <div id="calculator" class="section-wrapper space-y-12 scroll-mt-24 relative">
-            <div class="text-center max-w-3xl mx-auto space-y-3 reveal">
-              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#c0ff00]/30 bg-[#c0ff00]/10 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
+            <div class="text-center max-w-3xl mx-auto space-y-3 reveal px-2">
+              <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#c0ff00]/30 bg-[#c0ff00]/10 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
                 🎯 SIMULASI INTERAKTIF AI
               </span>
-              <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight whitespace-nowrap">Hitung Peluang <span style="color: #c0ff00;">Lolos PTN-mu</span></h2>
-              <p class="text-base md:text-lg text-white/50 font-medium max-w-2xl mx-auto">
+              <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight break-words">Hitung Peluang <span style="color: #c0ff00;">Lolos PTN-mu</span></h2>
+              <p class="text-sm md:text-base text-white/60 font-medium max-w-2xl mx-auto leading-relaxed">
                 Geser slider sesuai kondisimu saat ini. Sistem AI EduPath akan mengkalkulasi proyeksi lonjakan nilai dan peluang kelulusanmu secara real-time!
               </p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch max-w-5xl mx-auto">
               
               <!-- Left: Inputs & Sliders (7 cols) -->
-              <div class="lg:col-span-7 glass-card rounded-3xl p-8 space-y-8 relative overflow-hidden border-white/10">
-                <div class="space-y-4">
-                  <div class="flex items-center justify-between">
-                    <label class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-2">
-                      <span>🏛️</span> Target Universitas &amp; Jurusan (50 PTN Favorit):
+              <div class="lg:col-span-7 glass-card rounded-3xl p-5 sm:p-7 md:p-8 space-y-6 sm:space-y-8 relative overflow-hidden border-white/10">
+                <div class="space-y-3.5 sm:space-y-4">
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <label class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-1.5">
+                      <span>🏛️</span> Target Universitas &amp; Jurusan:
                     </label>
-                    <span class="text-xs font-bold text-[#c0ff00] bg-[#c0ff00]/10 px-2.5 py-0.5 rounded-full border border-[#c0ff00]/30 font-mono">
+                    <span class="inline-flex items-center self-start sm:self-auto text-xs font-bold text-[#c0ff00] bg-[#c0ff00]/10 px-3 py-1 rounded-xl border border-[#c0ff00]/30 font-mono whitespace-nowrap">
                       Target: {{ simTargetPtn.targetScore }} Poin
                     </span>
                   </div>
@@ -524,7 +644,7 @@
                   <div class="relative">
                     <select
                       v-model="simTargetPtn"
-                      class="w-full bg-slate-900/90 border border-white/20 text-white text-xs md:text-sm font-bold py-2.5 px-3.5 pr-8 rounded-xl appearance-none outline-none focus:border-[#c0ff00] transition-colors cursor-pointer shadow-inner"
+                      class="w-full bg-slate-900/90 border border-white/20 text-white text-xs md:text-sm font-bold py-3 px-3.5 pr-8 rounded-xl appearance-none outline-none focus:border-[#c0ff00] transition-colors cursor-pointer shadow-inner"
                     >
                       <option v-for="ptn in targetPtnList" :key="ptn.id" :value="ptn" class="bg-slate-900 text-white font-medium py-1">
                         ⭐ [{{ ptn.targetScore }} Poin] {{ ptn.name }}
@@ -535,18 +655,18 @@
                     </div>
                   </div>
 
-                  <!-- Quick-Pick Tabs for Top 8 High Score PTNs (Optimized for instant, snappy click) -->
-                  <div class="space-y-1.5 pt-1">
+                  <!-- Quick-Pick Tabs for Top 8 High Score PTNs (Mobile-optimized horizontal scroll / desktop grid) -->
+                  <div class="space-y-2 pt-1">
                     <div class="text-[10px] uppercase tracking-wider font-bold text-white/40 flex items-center justify-between">
-                      <span>Pilihan Cepat PTN Terpopuler:</span>
-                      <span class="text-[9px] text-[#c0ff00]">50 Pilihan Lengkap Ada di Dropdown ↑</span>
+                      <span>Pilihan Cepat Terpopuler:</span>
+                      <span class="text-[9px] text-[#c0ff00]">50 Lengkap di Dropdown ↑</span>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div class="flex sm:grid sm:grid-cols-4 gap-2 overflow-x-auto pb-1.5 sm:pb-0 no-scrollbar">
                       <button
                         v-for="ptn in targetPtnList.slice(0, 8)"
                         :key="ptn.id"
                         type="button"
-                        :class="['p-2 rounded-xl text-xs font-bold text-left transition-colors duration-150 border flex flex-col justify-between h-[68px] cursor-pointer',
+                        :class="['p-2.5 rounded-xl text-xs font-bold text-left transition-colors duration-150 border flex flex-col justify-between shrink-0 min-w-[130px] sm:min-w-0 h-[60px] sm:h-[68px] cursor-pointer',
                           simTargetPtn.id === ptn.id
                             ? 'bg-[#c0ff00] text-black border-[#c0ff00] shadow-[0_0_15px_rgba(192,255,0,0.3)]'
                             : 'bg-white/5 text-white/70 border-white/10 hover:border-white/30 hover:bg-white/10'
@@ -563,13 +683,13 @@
                 </div>
 
                 <!-- Slider 1: Skor Tryout Terakhir -->
-                <div class="space-y-3">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-2">
+                <div class="space-y-3 pt-1">
+                  <div class="flex justify-between items-center gap-2">
+                    <span class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-1.5">
                       <span>📊</span> Skor Tryout Terakhir Kamu:
                     </span>
-                    <span class="text-xl font-black font-heading text-white font-mono bg-black/60 px-3 py-1 rounded-xl border border-white/10">
-                      {{ simCurrentScore }} <span class="text-xs text-white/40 font-normal">Poin</span>
+                    <span class="text-base sm:text-xl font-black font-heading text-white font-mono bg-black/60 px-3 py-1 rounded-xl border border-white/10 shrink-0">
+                      {{ simCurrentScore }} <span class="text-[10px] sm:text-xs text-white/40 font-normal">Poin</span>
                     </span>
                   </div>
                   <input
@@ -580,7 +700,7 @@
                     step="5"
                     class="w-full h-2.5 cursor-pointer"
                   />
-                  <div class="flex justify-between text-[11px] font-bold text-white/30">
+                  <div class="flex justify-between text-[10px] sm:text-[11px] font-bold text-white/30">
                     <span>400 (Pemula)</span>
                     <span>550 (Menengah)</span>
                     <span>750 (Master)</span>
@@ -588,13 +708,13 @@
                 </div>
 
                 <!-- Slider 2: Komitmen Belajar Harian -->
-                <div class="space-y-3">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-2">
-                      <span>⏱️</span> Komitmen Belajar per Hari:
+                <div class="space-y-3 pt-1">
+                  <div class="flex justify-between items-center gap-2">
+                    <span class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-1.5">
+                      <span>⏱️</span> Komitmen Belajar Harian:
                     </span>
-                    <span class="text-xl font-black font-heading text-[#c0ff00] font-mono bg-black/60 px-3 py-1 rounded-xl border border-[#c0ff00]/30">
-                      {{ simDailyHours }} <span class="text-xs text-[#c0ff00]/70 font-normal">Jam / Hari</span>
+                    <span class="text-base sm:text-xl font-black font-heading text-[#c0ff00] font-mono bg-black/60 px-3 py-1 rounded-xl border border-[#c0ff00]/30 shrink-0">
+                      {{ simDailyHours }} <span class="text-[10px] sm:text-xs text-[#c0ff00]/70 font-normal">Jam/Hari</span>
                     </span>
                   </div>
                   <input
@@ -605,35 +725,35 @@
                     step="0.5"
                     class="w-full h-2.5 cursor-pointer"
                   />
-                  <div class="flex justify-between text-[11px] font-bold text-white/30">
+                  <div class="flex justify-between text-[10px] sm:text-[11px] font-bold text-white/30">
                     <span>1 Jam (Santai)</span>
                     <span>3 Jam (Disiplin)</span>
-                    <span>6 Jam (Mode Ambis)</span>
+                    <span>6 Jam (Ambis)</span>
                   </div>
                 </div>
               </div>
 
               <!-- Right: Realtime Dynamic AI Result Card (5 cols) -->
-              <div class="lg:col-span-5 rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden border border-white/15 bg-gradient-to-b from-[#141414] to-[#0a0a0a] shadow-2xl">
+              <div class="lg:col-span-5 rounded-3xl p-5 sm:p-7 md:p-8 flex flex-col justify-between relative overflow-hidden border border-white/15 bg-gradient-to-b from-[#141414] to-[#0a0a0a] shadow-2xl">
                 <div class="absolute -right-12 -top-12 w-44 h-44 rounded-full bg-[#c0ff00]/10 blur-3xl pointer-events-none"></div>
 
-                <div class="space-y-6 relative z-10">
-                  <div class="flex items-center justify-between">
+                <div class="space-y-5 sm:space-y-6 relative z-10">
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <span class="text-xs font-black tracking-wider uppercase text-white/50">PROYEKSI ANALITIK AI</span>
-                    <span class="px-3 py-1 rounded-full text-xs font-black border" :class="simChanceStatus.badge">
+                    <span class="inline-flex items-center self-start sm:self-auto px-3 py-1 rounded-xl text-xs font-bold border" :class="simChanceStatus.badge">
                       {{ simChanceStatus.text }}
                     </span>
                   </div>
 
                   <!-- Probability Meter -->
-                  <div class="space-y-1">
+                  <div class="space-y-1.5">
                     <div class="flex justify-between items-end">
                       <span class="text-xs font-bold text-white/60">Peluang Kelulusan:</span>
-                      <span class="text-4xl font-black font-heading tracking-tighter" :style="{ color: simChanceStatus.color }">
+                      <span class="text-3xl sm:text-4xl font-black font-heading tracking-tighter" :style="{ color: simChanceStatus.color }">
                         {{ simChancePercentage }}%
                       </span>
                     </div>
-                    <div class="w-full bg-black/80 rounded-full h-4 p-0.5 border border-white/10 overflow-hidden">
+                    <div class="w-full bg-black/80 rounded-full h-3.5 p-0.5 border border-white/10 overflow-hidden">
                       <div
                         class="h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_15px_rgba(192,255,0,0.5)]"
                         :style="{ width: simChancePercentage + '%', backgroundColor: simChanceStatus.color }"
@@ -642,35 +762,35 @@
                   </div>
 
                   <!-- Score Calculation Matrix -->
-                  <div class="grid grid-cols-2 gap-3 pt-2">
-                    <div class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 text-center">
+                  <div class="grid grid-cols-2 gap-3 pt-1">
+                    <div class="p-3 sm:p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 text-center">
                       <div class="text-[10px] font-bold text-white/40 uppercase">Prediksi Skor AI</div>
-                      <div class="text-2xl font-black text-white font-heading mt-1">{{ simPredictedGain }}</div>
+                      <div class="text-xl sm:text-2xl font-black text-white font-heading mt-1">{{ simPredictedGain }}</div>
                       <div class="text-[10px] font-bold text-[#c0ff00] mt-0.5">+{{ simScoreIncrease }} Poin Lonjakan</div>
                     </div>
-                    <div class="p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 text-center">
-                      <div class="text-[10px] font-bold text-white/40 uppercase">Target {{ simTargetPtn.name }}</div>
-                      <div class="text-2xl font-black text-white/80 font-heading mt-1">{{ simTargetPtn.targetScore }}</div>
-                      <div class="text-[10px] font-bold mt-0.5" :class="simPredictedGain >= simTargetPtn.targetScore ? 'text-[#c0ff00]' : 'text-rose-400'">
-                        {{ simPredictedGain >= simTargetPtn.targetScore ? '✓ Lolos Passing Grade' : `Sisa ${simTargetPtn.targetScore - simPredictedGain} Poin Lagi` }}
+                    <div class="p-3 sm:p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 text-center min-w-0">
+                      <div class="text-[10px] font-bold text-white/40 uppercase truncate">Target {{ simTargetPtn.name.split(' (')[0] }}</div>
+                      <div class="text-xl sm:text-2xl font-black text-white/80 font-heading mt-1">{{ simTargetPtn.targetScore }}</div>
+                      <div class="text-[10px] font-bold mt-0.5 truncate" :class="simPredictedGain >= simTargetPtn.targetScore ? 'text-[#c0ff00]' : 'text-rose-400'">
+                        {{ simPredictedGain >= simTargetPtn.targetScore ? '✓ Lolos Passing' : `Sisa ${simTargetPtn.targetScore - simPredictedGain} Poin` }}
                       </div>
                     </div>
                   </div>
 
                   <!-- AI Subtest Focus Tip -->
-                  <div class="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1.5">
+                  <div class="p-3.5 sm:p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1.5">
                     <div class="flex items-center gap-2 text-xs font-bold text-[#c0ff00]">
                       <span>⚡</span> Rekomendasi Subtes Prioritas:
                     </div>
                     <p class="text-xs text-white/70 leading-relaxed font-medium">
-                      Fokus pada: <strong class="text-white">{{ simTargetPtn.focus }}</strong> untuk akselerasi skor maksimal di {{ simTargetPtn.name }}.
+                      Fokus pada: <strong class="text-white">{{ simTargetPtn.focus }}</strong> untuk akselerasi skor maksimal di {{ simTargetPtn.name.split(' (')[0] }}.
                     </p>
                   </div>
                 </div>
 
-                <div class="pt-6 relative z-10">
+                <div class="pt-5 sm:pt-6 relative z-10">
                   <button
-                    class="w-full py-4 rounded-2xl font-black text-sm text-black transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.3)]"
+                    class="w-full min-h-[50px] py-3.5 sm:py-4 rounded-2xl font-black text-sm text-black transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.3)] cursor-pointer"
                     style="background: #c0ff00;"
                     @click="startLearning"
                   >
@@ -685,58 +805,58 @@
 
           <!-- 4. Dynamic Section: MINI KUIS HOTS INTERAKTIF LANGSUNG DI LANDING PAGE -->
           <div id="quiz-demo" class="section-wrapper space-y-12 scroll-mt-24 relative">
-            <div class="text-center max-w-3xl mx-auto space-y-3 reveal">
-              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-sky-500/30 bg-sky-500/10 text-sky-400 text-xs font-black uppercase tracking-widest">
+            <div class="text-center max-w-3xl mx-auto space-y-3 reveal px-2">
+              <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-sky-500/30 bg-sky-500/10 text-sky-400 text-xs font-black uppercase tracking-widest">
                 🧪 UJI DIAGNOSTIK INSTAN
               </span>
-              <h2 class="text-4xl md:text-6xl font-black font-heading text-white leading-tight">
+              <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight break-words">
                 Coba 1 Soal HOTS &amp; <span style="color: #c0ff00;">Lihat Analisa AI</span>
               </h2>
-              <p class="text-base md:text-lg text-white/50 font-medium max-w-2xl mx-auto">
+              <p class="text-sm md:text-base text-white/60 font-medium max-w-2xl mx-auto leading-relaxed">
                 Buktikan sendiri bagaimana AI EduPath membongkar jebakan dan rumus cepat 30 detik tanpa registrasi.
               </p>
             </div>
 
-            <div class="max-w-4xl mx-auto glass-card rounded-3xl p-8 md:p-10 border-white/15 relative overflow-hidden">
-              <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
-                <!-- Tabs Question Switcher -->
-                <div class="flex flex-wrap gap-2">
+            <div class="max-w-4xl mx-auto glass-card rounded-3xl p-5 sm:p-8 md:p-10 border-white/15 relative overflow-hidden">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4 sm:pb-6 mb-4 sm:mb-6">
+                <!-- Tabs Question Switcher (Segmented Control on mobile) -->
+                <div class="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-white/[0.06] border border-white/10 w-full sm:w-auto">
                   <button
                     v-for="(q, idx) in miniQuizQuestions"
                     :key="idx"
-                    :class="['px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2',
+                    :class="['px-2.5 sm:px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer',
                       miniQuizActiveIdx === idx
-                        ? 'bg-[#c0ff00] text-black shadow-[0_0_20px_rgba(192,255,0,0.3)]'
-                        : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+                        ? 'bg-[#c0ff00] text-black shadow-[0_0_15px_rgba(192,255,0,0.3)]'
+                        : 'text-white/60 hover:text-white hover:bg-white/10'
                     ]"
                     @click="miniQuizActiveIdx = idx; miniQuizUserAnswer = null; miniQuizShowExplanation = false;"
                   >
-                    <span>{{ q.icon }}</span>
-                    <span>Soal {{ idx + 1 }}: {{ q.category }}</span>
+                    <span class="text-xs sm:text-sm">{{ q.icon }}</span>
+                    <span class="truncate">Soal {{ idx + 1 }}</span>
                   </button>
                 </div>
 
-                <div class="text-xs font-bold text-[#c0ff00] flex items-center gap-1.5">
-                  <span>✦</span> Bobot Skor IRT: <strong>+{{ miniQuizQuestions[miniQuizActiveIdx].irtScore }} Poin</strong>
+                <div class="inline-flex items-center gap-1.5 self-start sm:self-auto px-2.5 py-1 rounded-xl bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-mono font-bold whitespace-nowrap">
+                  <span>✦</span> Bobot Skor IRT: <strong class="text-white">+{{ miniQuizQuestions[miniQuizActiveIdx].irtScore }} Poin</strong>
                 </div>
               </div>
 
               <!-- Active Question -->
-              <div class="space-y-6">
-                <div class="space-y-2">
-                  <span class="text-xs font-black uppercase tracking-wider text-white/40 block">PERTANYAAN #{{ miniQuizActiveIdx + 1 }}</span>
-                  <h3 class="text-lg md:text-2xl font-bold text-white leading-relaxed">
+              <div class="space-y-5 sm:space-y-6">
+                <div class="space-y-1.5 sm:space-y-2">
+                  <span class="text-xs font-black uppercase tracking-wider text-white/40 block">PERTANYAAN #{{ miniQuizActiveIdx + 1 }}: {{ miniQuizQuestions[miniQuizActiveIdx].category }}</span>
+                  <h3 class="text-base sm:text-xl md:text-2xl font-bold text-white leading-relaxed">
                     {{ miniQuizQuestions[miniQuizActiveIdx].question }}
                   </h3>
                 </div>
 
                 <!-- Options -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   <button
                     v-for="(opt, oIdx) in miniQuizQuestions[miniQuizActiveIdx].options"
                     :key="oIdx"
                     :disabled="miniQuizShowExplanation"
-                    :class="['p-4 rounded-2xl text-left text-sm font-semibold transition-all border flex items-center justify-between group',
+                    :class="['min-h-[50px] p-3.5 sm:p-4 rounded-2xl text-left text-xs sm:text-sm font-semibold transition-all border flex items-center justify-between group cursor-pointer active:scale-98',
                       miniQuizUserAnswer === oIdx
                         ? (opt.isCorrect 
                             ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
@@ -747,28 +867,28 @@
                     ]"
                     @click="selectMiniQuizOption(oIdx)"
                   >
-                    <span class="flex-grow">{{ opt.text }}</span>
-                    <span v-if="miniQuizUserAnswer === oIdx" class="text-lg shrink-0 ml-2">
+                    <span class="flex-grow pr-2">{{ opt.text }}</span>
+                    <span v-if="miniQuizUserAnswer === oIdx" class="text-base sm:text-lg shrink-0">
                       {{ opt.isCorrect ? '✅' : '❌' }}
                     </span>
                   </button>
                 </div>
 
                 <!-- AI Breakdown Card (Shows up after answering) -->
-                <div v-if="miniQuizShowExplanation" class="mt-6 p-6 rounded-2xl bg-black/60 border border-[#c0ff00]/30 space-y-4 animate-fade-in">
-                  <div class="flex items-center justify-between">
+                <div v-if="miniQuizShowExplanation" class="mt-4 sm:mt-6 p-4 sm:p-6 rounded-2xl bg-black/60 border border-[#c0ff00]/30 space-y-3.5 sm:space-y-4 animate-fade-in">
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
-                      <div class="w-8 h-8 rounded-full bg-[#c0ff00] text-black flex items-center justify-center font-black text-sm">AI</div>
-                      <span class="text-sm font-black text-white">Analisis Logika &amp; Trik AI EduPath</span>
+                      <div class="w-7 h-7 rounded-full bg-[#c0ff00] text-black flex items-center justify-center font-black text-xs">AI</div>
+                      <span class="text-xs sm:text-sm font-black text-white">Analisis Logika &amp; Trik AI EduPath</span>
                     </div>
-                    <span class="text-xs font-bold" :class="miniQuizQuestions[miniQuizActiveIdx].options[miniQuizUserAnswer]?.isCorrect ? 'text-[#c0ff00]' : 'text-amber-400'">
+                    <span class="text-xs font-bold self-start sm:self-auto" :class="miniQuizQuestions[miniQuizActiveIdx].options[miniQuizUserAnswer]?.isCorrect ? 'text-[#c0ff00]' : 'text-amber-400'">
                       {{ miniQuizQuestions[miniQuizActiveIdx].options[miniQuizUserAnswer]?.isCorrect ? '🎉 Jawaban Tepat! +Bobot IRT Tercapai' : '💡 Belum Tepat! Simak Trik Cepat Berikut:' }}
                     </span>
                   </div>
 
                   <div class="space-y-3 text-xs md:text-sm text-white/80 leading-relaxed">
                     <p><strong>📖 Pembahasan Konseptual:</strong> {{ miniQuizQuestions[miniQuizActiveIdx].explanation }}</p>
-                    <div class="p-3.5 rounded-xl bg-[#c0ff00]/10 border border-[#c0ff00]/20 text-[#c0ff00] font-medium flex items-start gap-2.5">
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-[#c0ff00]/10 border border-[#c0ff00]/20 text-[#c0ff00] font-medium flex items-start gap-2.5">
                       <span class="text-base shrink-0">⚡</span>
                       <span><strong>Trik Kilat EduPath:</strong> {{ miniQuizQuestions[miniQuizActiveIdx].trick }}</span>
                     </div>
@@ -776,7 +896,7 @@
 
                   <div class="flex justify-end pt-2">
                     <button
-                      class="px-5 py-2.5 rounded-xl bg-white text-black font-black text-xs hover:bg-[#c0ff00] transition-all flex items-center gap-2"
+                      class="px-5 py-3 rounded-xl bg-white text-black font-black text-xs hover:bg-[#c0ff00] transition-all flex items-center gap-2 cursor-pointer shadow-md"
                       @click="nextMiniQuiz"
                     >
                       <span>Coba Soal Berikutnya</span>
@@ -794,14 +914,14 @@
 
           <!-- 5. Dynamic Section: HEAD-TO-HEAD COMPARISON MATRIX -->
           <div id="comparison" class="section-wrapper space-y-12 scroll-mt-24 relative">
-            <div class="text-center max-w-4xl mx-auto space-y-3 reveal">
-              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-400 text-xs font-black uppercase tracking-widest">
+            <div class="text-center max-w-4xl mx-auto space-y-3 reveal px-2">
+              <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-400 text-xs font-black uppercase tracking-widest">
                 ⚖️ PERBANDINGAN STRATEGIS
               </span>
-              <h2 class="text-3xl md:text-5xl font-black font-heading text-white leading-tight">
+              <h2 class="text-2xl sm:text-3xl md:text-5xl font-black font-heading text-white leading-snug">
                 Bimbel Biasa vs <span class="text-sky-400">Aplikasi Video Massal</span> vs <span style="color: #c0ff00;">EduPath.ai</span>
               </h2>
-              <p class="text-base md:text-lg text-white/60 font-medium max-w-3xl mx-auto">
+              <p class="text-sm md:text-base text-white/60 font-medium max-w-3xl mx-auto leading-relaxed">
                 Bandingkan secara objektif antara bimbel tatap muka konvensional, aplikasi video rekaman satu arah, dan teknologi Adaptive Learning Path EduPath.
               </p>
             </div>
@@ -810,12 +930,12 @@
             <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               
               <!-- Card 1: Bimbel Konvensional -->
-              <div class="glass-card rounded-3xl p-7 md:p-8 space-y-6 border-rose-500/25 bg-rose-950/[0.08] hover:border-rose-500/40 transition-all flex flex-col justify-between">
+              <div class="glass-card rounded-3xl p-5 sm:p-7 md:p-8 space-y-6 border-rose-500/25 bg-rose-950/[0.08] hover:border-rose-500/40 transition-all flex flex-col justify-between">
                 <div class="space-y-5">
                   <div class="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
                       <span class="text-[11px] font-black text-rose-400 uppercase tracking-wider block">METODE LAMA 🏫</span>
-                      <h3 class="text-xl md:text-2xl font-black text-white">Bimbel Konvensional</h3>
+                      <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white">Bimbel Konvensional</h3>
                       <p class="text-[11px] text-white/40 font-medium">Tatap Muka &amp; Kelas Massal</p>
                     </div>
                     <div class="text-3xl shrink-0">❌</div>
@@ -853,12 +973,12 @@
               </div>
 
               <!-- Card 2: Aplikasi Video Massal (Bimbel Video Online) -->
-              <div class="glass-card rounded-3xl p-7 md:p-8 space-y-6 border-sky-500/30 bg-sky-950/[0.12] hover:border-sky-500/50 transition-all flex flex-col justify-between">
+              <div class="glass-card rounded-3xl p-5 sm:p-7 md:p-8 space-y-6 border-sky-500/30 bg-sky-950/[0.12] hover:border-sky-500/50 transition-all flex flex-col justify-between">
                 <div class="space-y-5">
                   <div class="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
                       <span class="text-[11px] font-black text-sky-400 uppercase tracking-wider block">VIDEO ON-DEMAND 📱</span>
-                      <h3 class="text-xl md:text-2xl font-black text-white">Aplikasi Video Massal</h3>
+                      <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white">Aplikasi Video Massal</h3>
                       <p class="text-[11px] text-sky-400/70 font-medium">Bimbel Online &amp; Video Rekaman</p>
                     </div>
                     <div class="text-3xl shrink-0">📺</div>
@@ -896,7 +1016,7 @@
               </div>
 
               <!-- Card 3: EduPath.ai Adaptive -->
-              <div class="rounded-3xl p-7 md:p-8 space-y-6 border-2 border-[#c0ff00] bg-[#10160a] shadow-[0_0_50px_rgba(192,255,0,0.18)] relative flex flex-col justify-between lg:scale-105 lg:-translate-y-2 z-10">
+              <div class="rounded-3xl p-5 sm:p-7 md:p-8 space-y-6 border-2 border-[#c0ff00] bg-[#10160a] shadow-[0_0_50px_rgba(192,255,0,0.18)] relative flex flex-col justify-between lg:scale-105 lg:-translate-y-2 z-10">
                 <span class="absolute top-0 right-0 bg-[#c0ff00] text-black text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider">
                   Pilihan Cerdas Pejuang PTN ⚡
                 </span>
@@ -905,7 +1025,7 @@
                   <div class="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
                       <span class="text-[11px] font-black text-[#c0ff00] uppercase tracking-wider block">TEKNOLOGI AI 2026 🚀</span>
-                      <h3 class="text-xl md:text-2xl font-black text-white">EduPath.ai Adaptive</h3>
+                      <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white">EduPath.ai Adaptive</h3>
                       <p class="text-[11px] text-[#c0ff00]/70 font-medium">Dynamic Learning Path &amp; AI Tutor 24/7</p>
                     </div>
                     <div class="text-3xl shrink-0">⚡</div>
@@ -937,11 +1057,11 @@
 
                 <div class="space-y-3 pt-2">
                   <button
-                    class="w-full py-3.5 md:py-4 rounded-2xl font-black text-xs md:text-sm text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(192,255,0,0.4)]"
+                    class="w-full min-h-[50px] py-3.5 md:py-4 rounded-2xl font-black text-xs md:text-sm text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(192,255,0,0.4)] flex items-center justify-center gap-2 cursor-pointer"
                     style="background: #c0ff00;"
                     @click="startLearning"
                   >
-                    Mulai Jalur Belajar Adaptif ⚡
+                    <span>Mulai Jalur Belajar Adaptif ⚡</span>
                   </button>
                 </div>
               </div>
@@ -1410,56 +1530,60 @@
           </div>
 
           <!-- 11. Dynamic Section: PRICING WITH BILLING TOGGLE -->
-          <div id="pricing" class="section-wrapper space-y-12 scroll-mt-24"><div class="text-center max-w-4xl xl:max-w-5xl mx-auto space-y-4 reveal">
+          <div id="pricing" class="section-wrapper space-y-12 scroll-mt-24">
+            <div class="text-center max-w-4xl xl:max-w-5xl mx-auto space-y-4 reveal px-2">
               <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
                 💎 INVESTASI LEHER KE ATAS • BEBAS RISIKO
               </span>
-              <h2 class="text-4xl md:text-6xl font-black font-heading text-white leading-tight">
-                Investasi Terbaik <br />
+              <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight break-words">
+                Investasi Terbaik <br class="hidden sm:inline" />
                 <span style="color: #c0ff00;">Menembus PTN Impian</span>
               </h2>
-              <p class="text-sm md:text-base text-white/60 leading-relaxed font-medium flex flex-col gap-1"><span>Bimbel konvensional memungut Rp 15–30 juta untuk metode satu buku yang sama bagi semua murid.</span><span>Di EduPath, Anda berinvestasi pada kecerdasan AI adaptif yang melatih langsung titik lemah spesifik Anda.</span></p>
+              <p class="text-sm md:text-base text-white/60 leading-relaxed font-medium flex flex-col gap-1 max-w-2xl mx-auto">
+                <span>Bimbel konvensional memungut Rp 15–30 juta untuk metode satu buku yang sama bagi semua murid.</span>
+                <span>Di EduPath, Anda berinvestasi pada kecerdasan AI adaptif yang melatih langsung titik lemah spesifik Anda.</span>
+              </p>
               
-              <!-- Interactive Billing Cycle Toggle with 40% DISC Badge -->
-              <div class="pt-2">
-                <div class="inline-flex items-center p-1.5 rounded-full bg-white/5 border border-white/15 backdrop-blur-md shadow-xl">
+              <!-- Interactive Billing Cycle Toggle with 50/50 balanced layout on mobile -->
+              <div class="pt-2 flex justify-center">
+                <div class="grid grid-cols-2 p-1.5 rounded-2xl bg-white/5 border border-white/15 backdrop-blur-md shadow-xl w-full max-w-sm sm:max-w-md">
                   <button
-                    :class="['px-5 py-2.5 rounded-full text-xs font-black transition-all', !isAnnualBilling ? 'bg-white text-black shadow-lg' : 'text-white/60 hover:text-white']"
+                    :class="['py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center cursor-pointer', !isAnnualBilling ? 'bg-white text-black shadow-lg' : 'text-white/60 hover:text-white']"
                     @click="isAnnualBilling = false"
                   >
                     Bayar Bulanan
                   </button>
                   <button
-                    :class="['px-6 py-2.5 rounded-full text-xs font-black transition-all flex items-center gap-2', isAnnualBilling ? 'bg-[#c0ff00] text-black shadow-[0_0_25px_rgba(192,255,0,0.5)]' : 'text-white/60 hover:text-white']"
+                    :class="['py-2.5 px-3 rounded-xl text-xs font-black transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 cursor-pointer', isAnnualBilling ? 'bg-[#c0ff00] text-black shadow-[0_0_20px_rgba(192,255,0,0.4)]' : 'text-white/60 hover:text-white']"
                     @click="isAnnualBilling = true"
                   >
-                    <span>Bayar Tahunan</span>
-                    <span class="bg-black text-[#c0ff00] text-[10px] px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">HEMAT HINGGA 60% OFF 🔥</span>
+                    <span class="whitespace-nowrap">Bayar Tahunan</span>
+                    <span :class="['text-[9px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider whitespace-nowrap', isAnnualBilling ? 'bg-black text-[#c0ff00]' : 'bg-[#c0ff00]/20 text-[#c0ff00]']">Hemat 60% 🔥</span>
                   </button>
                 </div>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto items-stretch">
               <!-- Dynamic Plans -->
               <div 
                 v-for="(product, idx) in displayProducts" 
                 :key="product.id"
                 :class="[
-                  'glass-card rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative z-10',
+                  'glass-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 relative z-10',
                   idx % 3 === 0 ? 'border border-white/10 hover:border-white/20 bg-white/[0.02] hover:bg-white/[0.04]' : '',
-                  idx % 3 === 1 ? 'border-2 border-[#c0ff00] scale-105 shadow-2xl hover:shadow-[0_0_50px_rgba(192,255,0,0.25)]' : '',
+                  idx % 3 === 1 ? 'border-2 border-[#c0ff00] sm:scale-105 shadow-2xl hover:shadow-[0_0_50px_rgba(192,255,0,0.25)]' : '',
                   idx % 3 === 2 ? 'border border-purple-500/30 bg-purple-950/[0.08] hover:border-purple-500/50' : ''
                 ]"
                 :style="idx % 3 === 1 ? 'background: linear-gradient(180deg, #0d1626 0%, #080d16 100%);' : ''"
               >
                  <!-- Ribbon for Middle item -->
-                 <div v-if="idx % 3 === 1" class="absolute top-0 right-0 bg-[#c0ff00] text-black text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider shadow-md">
-                   👑 PILIHAN UTAMA PEJUANG PTN
+                 <div v-if="idx % 3 === 1" class="absolute top-0 right-0 bg-[#c0ff00] text-black text-[10px] font-black px-3.5 py-1 rounded-bl-2xl uppercase tracking-wider shadow-md">
+                   👑 PILIHAN UTAMA
                  </div>
 
                  <!-- Title and Desc -->
-                 <div class="space-y-5">
+                 <div class="space-y-4 sm:space-y-5">
                    <div class="flex justify-between items-center">
                      <span :class="[
                        'text-xs font-bold uppercase tracking-wider block',
@@ -1472,9 +1596,9 @@
                    </div>
                    
                    <div>
-                     <h3 class="text-2xl font-black text-white font-heading">{{ product.name }}</h3>
+                     <h3 class="text-xl sm:text-2xl font-black text-white font-heading">{{ product.name }}</h3>
                      <p :class="[
-                       'text-xs mt-1',
+                       'text-xs mt-1 leading-relaxed',
                        idx % 3 === 1 ? 'text-white/60' : 'text-white/50'
                      ]">{{ product.description }}</p>
                    </div>
@@ -1495,7 +1619,7 @@
                      </div>
                      <div class="flex items-baseline gap-1">
                        <span :class="[
-                         'text-4xl sm:text-5xl font-black font-heading',
+                         'text-3xl sm:text-5xl font-black font-heading',
                          idx % 3 === 1 ? 'text-[#c0ff00]' : 'text-white'
                        ]">Rp {{ isAnnualBilling ? Math.round(product.activePlan.price / 12 / 1000).toLocaleString('id-ID') : Math.round(product.activePlan.price / 1000).toLocaleString('id-ID') }}k</span>
                        <span :class="[
@@ -1513,7 +1637,7 @@
 
                    <!-- Value Stack -->
                    <ul :class="[
-                     'space-y-3.5 text-xs md:text-sm font-medium pt-2',
+                     'space-y-3 text-xs md:text-sm font-medium pt-2',
                      idx % 3 === 1 ? 'text-white' : 'text-white/80'
                    ]">
                      <li v-for="(feat, fIdx) in product.featuresList" :key="fIdx" class="flex items-start gap-2.5">
@@ -1526,11 +1650,11 @@
                  </div>
 
                  <!-- Action Button -->
-                 <div class="pt-8" v-if="product.activePlan">
+                 <div class="pt-6 sm:pt-8" v-if="product.activePlan">
                    <button 
                      :class="[
-                       'w-full py-3.5 rounded-xl text-xs md:text-sm font-black transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-95 flex items-center justify-center gap-2',
-                       idx % 3 === 1 ? 'bg-[#c0ff00] text-black hover:scale-105 hover:shadow-[0_0_35px_rgba(192,255,0,0.6)] py-4' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/15'
+                       'w-full min-h-[50px] py-3.5 rounded-2xl text-xs md:text-sm font-black transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-95 flex items-center justify-center gap-2 cursor-pointer',
+                       idx % 3 === 1 ? 'bg-[#c0ff00] text-black hover:scale-105 hover:shadow-[0_0_35px_rgba(192,255,0,0.6)] py-4' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/20'
                      ]"
                      @click="purchasePlan(product.name, product.activePlan.price)"
                    >
@@ -1584,18 +1708,18 @@
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
                   <i class="ph-bold ph-hand-coins"></i> PROGRAM KEMITRAAN &amp; AFILIASI EDUPATH
                 </div>
-                <h2 class="text-3xl sm:text-5xl font-black font-heading text-white tracking-tight leading-tight">
-                  Raih Komisi <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">20% Pembelian Paket</span><br class="hidden sm:inline">+ <span class="text-emerald-400">10% Recurring</span> Tiap Perpanjangan
+                <h2 class="text-2xl sm:text-4xl md:text-5xl font-black font-heading text-white tracking-tight leading-tight">
+                  Raih Komisi <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">20% Pembelian Paket</span> <br class="hidden sm:inline">+ <span class="text-emerald-400">10% Recurring</span> Tiap Perpanjangan
                 </h2>
-                <p class="text-white/70 text-sm sm:text-base leading-relaxed">
+                <p class="text-white/70 text-xs sm:text-base leading-relaxed">
                   Dapatkan penghasilan berkelanjutan dengan merekomendasikan platform belajar adaptif &amp; simulasi UTBK EduPath kepada rekan pejuang PTN dan komunitas belajar. Tracking komisi transparan secara real-time, pencairan terjadwal langsung ke rekening Anda.
                 </p>
                 <div class="flex flex-wrap justify-center gap-3 pt-2">
-                  <button v-if="!isLoggedIn || affiliateData?.status === 'not_joined'" @click="showAffiliateRegisterModal = true" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_35px_rgba(245,158,11,0.5)] flex items-center gap-2">
-                    <i class="ph-bold ph-rocket"></i> Daftar Jadi Mitra (Gratis)
+                  <button v-if="!isLoggedIn || affiliateData?.status === 'not_joined'" @click="showAffiliateRegisterModal = true" class="w-full sm:w-auto min-h-[50px] px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_35px_rgba(245,158,11,0.5)] flex items-center justify-center gap-2 active:scale-98">
+                    <i class="ph-bold ph-rocket text-base"></i> Daftar Jadi Mitra (Gratis)
                   </button>
-                  <button v-else @click="activeAffiliateTab = 'rujukan'; currentTab = 'affiliate'" class="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-black text-sm transition-all border border-white/20 flex items-center gap-2">
-                    <i class="ph-bold ph-chart-line-up"></i> Lihat Dashboard Afiliasi
+                  <button v-else @click="activeAffiliateTab = 'rujukan'; currentTab = 'affiliate'" class="w-full sm:w-auto min-h-[50px] px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-black text-sm transition-all border border-white/20 flex items-center justify-center gap-2 active:scale-98">
+                    <i class="ph-bold ph-chart-line-up text-base"></i> Lihat Dashboard Afiliasi
                   </button>
                 </div>
               </div>
@@ -1684,11 +1808,11 @@
             
 
             <div class="flex flex-col sm:flex-row justify-center items-center gap-3.5 pt-4 relative z-10 w-full max-w-md mx-auto px-4 sm:px-0">
-              <button class="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(192,255,0,0.4)] flex items-center justify-center gap-2 cursor-pointer" style="background: #c0ff00; color: #000;" @click="startLearning">
+              <button class="w-full sm:w-auto min-h-[50px] px-8 py-3.5 sm:py-4 rounded-2xl font-black text-sm sm:text-base transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(192,255,0,0.4)] flex items-center justify-center gap-2 cursor-pointer" style="background: #c0ff00; color: #000;" @click="startLearning">
                 <span>Mulai Uji Coba Gratis</span>
                 <span>⚡</span>
               </button>
-              <button class="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base border border-white/20 bg-white/5 hover:bg-white/10 text-white transition-all flex items-center justify-center cursor-pointer" @click="currentTab = 'diagnostic'">
+              <button class="w-full sm:w-auto min-h-[50px] px-6 py-3.5 sm:py-4 rounded-2xl font-bold text-sm sm:text-base border border-white/20 bg-white/5 hover:bg-white/10 text-white transition-all flex items-center justify-center cursor-pointer active:scale-95" @click="currentTab = 'diagnostic'">
                 <span>Coba Tryout Dulu</span>
               </button>
             </div>
