@@ -21,25 +21,37 @@ if (!empty($_SERVER['DOCUMENT_ROOT'])) {
 load_env(dirname(dirname(__DIR__)) . '/.env');
 
 // ----------------------------------------------------------------
-$allowed_origins_raw = env('ALLOWED_ORIGINS', 'http://localhost:5173');
-$allowed_origins     = array_map('trim', explode(',', $allowed_origins_raw));
+// CORS HARDENING — Strict origin validation
+// ----------------------------------------------------------------
+$allowed_origins_raw = env('ALLOWED_ORIGINS', 'http://localhost:5173,http://localhost:8000,http://127.0.0.1:5173,http://127.0.0.1:8000');
+$allowed_origins     = array_filter(array_map('trim', explode(',', $allowed_origins_raw)));
 $request_origin      = trim($_SERVER['HTTP_ORIGIN'] ?? '');
 
+$is_origin_allowed = false;
 if ($request_origin !== '') {
-    $origin_host = parse_url($request_origin, PHP_URL_HOST) ?? '';
-    if (in_array($request_origin, $allowed_origins, true) || 
-        str_ends_with($origin_host, 'edupath.co.id') ||
-        str_ends_with($origin_host, 'elyana.biz.id') ||
-        str_contains($origin_host, 'localhost') ||
-        str_contains($origin_host, '127.0.0.1')) {
-        header("Access-Control-Allow-Origin: $request_origin");
-        header('Vary: Origin');
+    $origin_parts  = parse_url($request_origin);
+    $origin_scheme = strtolower($origin_parts['scheme'] ?? '');
+    $origin_host   = strtolower($origin_parts['host'] ?? '');
+
+    if (in_array($request_origin, $allowed_origins, true)) {
+        $is_origin_allowed = true;
+    } elseif (in_array($origin_scheme, ['http', 'https'], true)) {
+        if ($origin_host === 'edupath.co.id' || str_ends_with($origin_host, '.edupath.co.id') ||
+            $origin_host === 'elyana.biz.id' || str_ends_with($origin_host, '.elyana.biz.id') ||
+            $origin_host === 'localhost' || $origin_host === '127.0.0.1') {
+            $is_origin_allowed = true;
+        }
     }
 }
 
+if ($is_origin_allowed) {
+    header("Access-Control-Allow-Origin: $request_origin");
+    header("Access-Control-Allow-Credentials: true");
+    header('Vary: Origin');
+}
+
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token");
-header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token, X-Requested-With");
 
 // Handle preflight requests
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -107,13 +119,16 @@ try {
         $pdo = new PDO($dsnFallback, $db_user, $db_pass, $pdo_options);
     } catch (PDOException $eFallback) {
         http_response_code(500);
-        echo json_encode([
+        $errResponse = [
             "success" => false,
-            "error" => "Koneksi database gagal. Periksa kredensial MySQL di .env hosting.",
-            "detail" => $eFallback->getMessage(),
-            "host_tried" => $primaryHost,
-            "fallback_tried" => $fallbackHost
-        ]);
+            "error" => "Koneksi database gagal. Silakan hubungi administrator sistem."
+        ];
+        if (env('APP_ENV') === 'development' || env('APP_DEBUG') === 'true') {
+            $errResponse["detail"] = $eFallback->getMessage();
+            $errResponse["host_tried"] = $primaryHost;
+            $errResponse["fallback_tried"] = $fallbackHost;
+        }
+        echo json_encode($errResponse);
         exit;
     }
 }

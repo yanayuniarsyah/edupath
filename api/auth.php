@@ -183,20 +183,7 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // Auto-heal UAT student account if credentials match
-    if ($email === 'student@uat.edupath.local' && $password === 'EduPathStudent01!2026') {
-        try {
-            $uId = 'uat-u-student';
-            $stuId = 'uat-r-student';
-            $hPass = password_hash('EduPathStudent01!2026', PASSWORD_BCRYPT);
-            $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$uId', '$email', '$hPass', 1) ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
-            $pdo->exec("INSERT INTO students (id, name, email, password, tenant_id, is_active) VALUES ('$stuId', 'UAT Student', '$email', '$hPass', 'uat-tenant-01', 1) ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
-            $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('ur-uat-stu', '$uId', 'uat-tenant-01', 'student', '$stuId') ON DUPLICATE KEY UPDATE role='student'");
-            reset_rate_limit($pdo, 'login');
-        } catch (\Throwable $e) {}
-    }
-
-    // Ensure schools table exists for join and auto-heal
+    // Ensure schools table exists for join
     try {
         $pdo->exec("
             CREATE TABLE IF NOT EXISTS schools (
@@ -218,44 +205,6 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         try { $pdo->exec("ALTER TABLE schools CONVERT TO CHARACTER SET utf8mb4"); } catch (\Throwable $e) {}
     } catch (\Throwable $e) {}
-
-    // Auto-heal Demo / UAT School BK account (SMANSA Ciamis)
-    if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'bk@smansaciamis.sch.id', 'smansaciamis']) && ($password === 'EduPathSchool01!2026' || $password === 'smansa123')) {
-        try {
-            $uId = 'uat-u-school-smansa';
-            $schId = 'uat-r-school-smansa';
-            $hPass = password_hash('EduPathSchool01!2026', PASSWORD_BCRYPT);
-            $schName = 'SMANSA Ciamis';
-            $pdo->exec("INSERT INTO schools (id, name, slug, npsn, city, bk_name, bk_phone, bk_email, estimated_students) 
-                        VALUES ('$schId', '$schName', 'smansa-ciamis', '20211567', 'Kabupaten Ciamis', 'Dra. H. Nuraeni, M.Pd', '081223344556', 'bk.smansaciamis@edupath.co.id', 350) 
-                        ON DUPLICATE KEY UPDATE name='$schName', bk_name='Dra. H. Nuraeni, M.Pd', bk_email='bk.smansaciamis@edupath.co.id'");
-            $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) 
-                        VALUES ('$uId', '$email', '$hPass', 1) 
-                        ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
-            $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
-                        VALUES ('ur-uat-sch-smansa', '$uId', 'default_tenant', 'school_bk', '$schId') 
-                        ON DUPLICATE KEY UPDATE role='school_bk', reference_id='$schId', tenant_id='default_tenant'");
-            reset_rate_limit($pdo, 'login');
-            reset_rate_limit($pdo, 'school_login');
-        } catch (\Throwable $e) {}
-    }
-
-    // Auto-heal Demo / UAT Affiliate account
-    if (strtolower($email) === 'affiliate@uat.edupath.local' && in_array($password, ['EduPathAffiliate01!2026', 'EduPathStudent01!2026', 'admin123'])) {
-        try {
-            $uId = 'uat-u-affiliate';
-            $affId = 'uat-r-affiliate';
-            $hPass = password_hash('EduPathAffiliate01!2026', PASSWORD_BCRYPT);
-            $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$uId', '$email', '$hPass', 1) ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
-            $pdo->exec("INSERT INTO affiliates (id, tenant_id, user_id, referral_code, name, email, commission_rate, balance, status) 
-                        VALUES ('$affId', 'uat-tenant-01', '$uId', 'UATAFF2026', 'Mitra Afiliasi UAT', '$email', 10.0, 500000.0, 'active') 
-                        ON DUPLICATE KEY UPDATE user_id='$uId', status='active'");
-            $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
-                        VALUES ('ur-uat-aff', '$uId', 'uat-tenant-01', 'affiliate', '$affId') 
-                        ON DUPLICATE KEY UPDATE role='affiliate', reference_id='$affId'");
-            reset_rate_limit($pdo, 'login');
-        } catch (\Throwable $e) {}
-    }
 
     // Ensure affiliates columns exist for backward-compatibility
     try {
@@ -317,18 +266,8 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user) {
         $candidates = array_filter([$user['user_password'] ?? '', $user['student_password'] ?? '', $user['admin_password'] ?? '']);
         foreach ($candidates as $stored_hash) {
-            if (password_verify($password, $stored_hash) || $stored_hash === $password || $stored_hash === md5($password)) {
+            if (password_verify($password, $stored_hash)) {
                 $password_matched = true;
-                // Auto-upgrade legacy plaintext/MD5 hash into Bcrypt
-                if (!password_verify($password, $stored_hash)) {
-                    $new_hash = password_hash($password, PASSWORD_BCRYPT);
-                    try {
-                        $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$new_hash, $user['user_id']]);
-                        if (!empty($user['student_id']) && $user['role'] === 'student') {
-                            $pdo->prepare("UPDATE students SET password = ? WHERE id = ?")->execute([$new_hash, $user['student_id']]);
-                        }
-                    } catch (\Throwable $e) {}
-                }
                 break;
             }
         }

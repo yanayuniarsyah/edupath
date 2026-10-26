@@ -13,23 +13,23 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // 2. INITIALIZE ENTITLEMENT SERVICE
     $entitlementService = new EntitlementService($pdo);
     
-    // 3. CHECK ENTITLEMENT
-    // Contoh: Jika user ingin akses materi advanced/premium
+    // 3. CHECK ENTITLEMENT (Server-side Role & Subscription Enforcement)
     $subtes = safe_str($_GET['subtes'] ?? '');
     $isAdvanced = isset($_GET['advanced']) && $_GET['advanced'] == 1;
 
-    if ($isAdvanced) {
-        if (!$entitlementService->hasEntitlement($payload->id, $payload->tenant_id, 'premium_materials')) {
-            http_response_code(403);
-            echo json_encode([
-                "success" => false,
-                "error" => [
-                    "code" => "FORBIDDEN_ENTITLEMENT",
-                    "message" => "Anda tidak memiliki akses ke materi premium ini. Silakan upgrade paket Anda."
-                ]
-            ]);
-            exit;
-        }
+    $isStaff = in_array($payload->role, ['superadmin', 'admin', 'teacher', 'school_bk'], true);
+    $hasPremiumAccess = $isStaff || $entitlementService->hasEntitlement($payload->id, $payload->tenant_id ?? '', 'premium_materials');
+
+    if ($isAdvanced && !$hasPremiumAccess) {
+        http_response_code(403);
+        echo json_encode([
+            "success" => false,
+            "error" => [
+                "code" => "FORBIDDEN_ENTITLEMENT",
+                "message" => "Anda tidak memiliki akses ke materi premium ini. Silakan upgrade paket Anda."
+            ]
+        ]);
+        exit;
     }
     
     // 4. FETCH RESOURCE
@@ -39,7 +39,7 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $education_level = safe_str($_GET['education_level'] ?? '');
     $assessment_type = safe_str($_GET['assessment_type'] ?? '');
 
-    $sql = "SELECT id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, file_url, teacher_name, education_level, assessment_type, subject, domain, created_at FROM materials WHERE 1=1";
+    $sql = "SELECT id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, file_url, teacher_name, education_level, assessment_type, subject, domain, created_at FROM materials WHERE (is_active = 1 OR is_active IS NULL)";
     $params = [];
     if ($subtes) {
         $sql .= " AND (subtest = ? OR subtest LIKE ?)";

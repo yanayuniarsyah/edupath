@@ -263,9 +263,9 @@ function safe_json_encode($data) {
 }
 
 if ($action === 'create_sa') {
-    if (php_sapi_name() !== 'cli' && defined('APP_ENV') && APP_ENV === 'production') {
+    if (php_sapi_name() !== 'cli') {
         http_response_code(403);
-        echo json_encode(["error" => "Forbidden. Action create_sa dinonaktifkan di production."]);
+        echo json_encode(["error" => "Forbidden. Action create_sa hanya dapat dijalankan via terminal CLI."]);
         exit;
     }
     try {
@@ -313,15 +313,6 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Known persistent accounts auto-healing map (ONLY Superadmin & Admin)
-    $knownAccounts = [
-        'superadmin@uat.edupath.local' => ['pass' => 'EduPathSuperAdmin01!2026', 'role' => 'superadmin', 'name' => 'UAT Super Admin', 'tenant' => null],
-        'superadmin'                   => ['pass' => 'EduPathSuperAdmin01!2026', 'role' => 'superadmin', 'name' => 'UAT Super Admin', 'tenant' => null],
-        'admin.uat@edupath.id'         => ['pass' => 'admin123',                 'role' => 'superadmin', 'name' => 'Admin UAT',         'tenant' => null],
-        'admin'                        => ['pass' => 'admin123',                 'role' => 'superadmin', 'name' => 'Main Admin',        'tenant' => null],
-        'admin@uat.edupath.local'      => ['pass' => 'EduPathAdmin01!2026',      'role' => 'admin',      'name' => 'UAT Tenant Admin',   'tenant' => 'uat-tenant-01'],
-    ];
-
     $usernamePrefix = $username . '@%';
 
     // Query role for this identity if exists
@@ -338,7 +329,7 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // 1. Fast Path: Cek kredensial langsung dari database (HANYA admin & superadmin)
+    // 1. Cek kredensial langsung dari database (HANYA admin & superadmin aktif)
     $admin = null;
     try {
         $stmt = $pdo->prepare("
@@ -363,80 +354,27 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $isValid = false;
-    $needsRehash = false;
     if ($admin) {
         $candidates = array_filter([$admin['user_password'] ?? '', $admin['admin_password'] ?? '']);
         foreach ($candidates as $stored) {
             if (password_verify($password, $stored)) {
                 $isValid = true;
                 break;
-            } elseif ($password === $stored || md5($password) === $stored) {
-                $isValid = true;
-                $needsRehash = true;
-                break;
             }
-        }
-    }
-
-    // 2. Fallback Auto-heal: Hanya jika di lingkungan non-production (development/testing)
-    if (!$isValid && defined('APP_ENV') && APP_ENV !== 'production' && isset($knownAccounts[$username]) && $password === $knownAccounts[$username]['pass']) {
-        $acc = $knownAccounts[$username];
-        $hPass = password_hash($acc['pass'], PASSWORD_BCRYPT);
-        $uId = 'u-' . md5($username);
-        $refId = 'r-' . md5($username);
-        
-        try {
-            if ($acc['tenant']) {
-                $pdo->exec("INSERT INTO tenants (id, name, slug, is_active) VALUES ('{$acc['tenant']}', 'UAT EduPath Tenant', 'uat-edupath', 1) ON DUPLICATE KEY UPDATE is_active=1");
-            }
-            $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$uId', '$username', '$hPass', 1) ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
-            if ($acc['role'] !== 'superadmin' || $username === 'admin') {
-                $tVal = $acc['tenant'] ? "'{$acc['tenant']}'" : "NULL";
-                $pdo->exec("INSERT INTO admins (id, tenant_id, username, password, name) VALUES ('$refId', $tVal, '$username', '$hPass', '{$acc['name']}') ON DUPLICATE KEY UPDATE password='$hPass'");
-            }
-            $tValRole = $acc['tenant'] ? "'{$acc['tenant']}'" : "NULL";
-            $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('ur-$uId', '$uId', $tValRole, '{$acc['role']}', '$refId') ON DUPLICATE KEY UPDATE role='{$acc['role']}'");
-        } catch (\Throwable $e) {}
-
-        // Ambil ulang data setelah auto-heal
-        $stmt->execute([$username, $username, $usernamePrefix, $usernamePrefix]);
-        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($admin) {
-            $isValid = true;
         }
     }
 
     if ($isValid) {
-        if (in_array($admin['role'], ['admin', 'teacher']) && isset($admin['tenant_active']) && (int)$admin['tenant_active'] === 0) {
+        if ($admin['role'] === 'admin' && isset($admin['tenant_active']) && (int)$admin['tenant_active'] === 0) {
             http_response_code(403);
             echo json_encode(["error" => "Tenant anda telah dinonaktifkan."]);
             exit;
         }
 
-        // Auto-upgrade ke bcrypt hash hanya jika password sebelumnya berupa plain text atau md5
-        if ($needsRehash) {
-            $newHash = password_hash($password, PASSWORD_BCRYPT);
-            if (!empty($admin['user_id'])) {
-                try { $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$newHash, $admin['user_id']]); } catch (\Throwable $e) {}
-            }
-            if (!empty($admin['admin_id'])) {
-                try { $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?")->execute([$newHash, $admin['admin_id']]); } catch (\Throwable $e) {}
-            }
-        }
-
-        // STRICT ELEVATION: Akun admin root/superadmin wajib mendapatkan peran superadmin
-        $lowerUser = strtolower($username);
-        $isSuper = ($admin['role'] === 'superadmin' 
-            || in_array($lowerUser, ['admin', 'superadmin', 'admin.uat@edupath.id', 'superadmin@uat.edupath.local']) 
-            || str_starts_with($lowerUser, 'superadmin')
-            || str_starts_with($lowerUser, 'root'));
-
+        // RBAC: Peran ditentukan murni dari tabel user_roles database
+        $isSuper = ($admin['role'] === 'superadmin');
         if ($isSuper) {
-            $admin['role'] = 'superadmin';
             $admin['tenant_id'] = null; // Superadmin operates cross-tenant with universal access
-            try {
-                $pdo->prepare("UPDATE user_roles SET role = 'superadmin', tenant_id = NULL WHERE user_id = ?")->execute([$admin['user_id']]);
-            } catch (\Throwable $e) {}
         } else {
             $admin['role'] = 'admin';
         }

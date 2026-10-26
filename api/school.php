@@ -233,11 +233,6 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = strtolower(trim($input['email'] ?? ''));
         $password = $input['password'] ?? '';
 
-        if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'bk@smansaciamis.sch.id', 'smansaciamis'])) {
-            reset_rate_limit($pdo, 'school_login');
-            reset_rate_limit($pdo, 'login');
-        }
-
         if (!check_rate_limit($pdo, 'school_login', 30, 15)) {
             http_response_code(429);
             echo json_encode(["error" => "Terlalu banyak percobaan login. Coba lagi dalam beberapa saat."]);
@@ -248,29 +243,6 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             http_response_code(400);
             echo json_encode(["error" => "Email dan password wajib diisi."]);
             exit;
-        }
-
-        // Auto-heal Demo School account (SMANSA Ciamis)
-        if (in_array(strtolower($email), ['bk.smansaciamis@edupath.co.id', 'bk@smansaciamis.sch.id', 'smansaciamis']) && ($password === 'EduPathSchool01!2026' || $password === 'smansa123')) {
-            try {
-                $uId = 'uat-u-school-smansa';
-                $schId = 'uat-r-school-smansa';
-                $hPass = password_hash('EduPathSchool01!2026', PASSWORD_BCRYPT);
-                $schName = 'SMANSA Ciamis';
-                $pdo->exec("INSERT INTO schools (id, name, slug, npsn, city, bk_name, bk_phone, bk_email, estimated_students) 
-                            VALUES ('$schId', '$schName', 'smansa-ciamis', '20211567', 'Kabupaten Ciamis', 'Dra. H. Nuraeni, M.Pd', '081223344556', 'bk.smansaciamis@edupath.co.id', 350) 
-                            ON DUPLICATE KEY UPDATE name='$schName', bk_name='Dra. H. Nuraeni, M.Pd', bk_email='bk.smansaciamis@edupath.co.id'");
-                $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) 
-                            VALUES ('$uId', '$email', '$hPass', 1) 
-                            ON DUPLICATE KEY UPDATE password='$hPass', is_active=1");
-                $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
-                            VALUES ('ur-uat-sch-smansa', '$uId', 'default_tenant', 'school_bk', '$schId') 
-                            ON DUPLICATE KEY UPDATE role='school_bk', reference_id='$schId', tenant_id='default_tenant'");
-                reset_rate_limit($pdo, 'school_login');
-                reset_rate_limit($pdo, 'login');
-            } catch (\Throwable $e) {
-                error_log("Auto-heal school failed: " . $e->getMessage());
-            }
         }
 
         $stmt = $pdo->prepare("
@@ -288,15 +260,8 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         $isPassValid = false;
-        if ($user) {
-            if (password_verify($password, $user['user_password'])) {
-                $isPassValid = true;
-            } elseif ($password === $user['user_password'] || md5($password) === $user['user_password']) {
-                $isPassValid = true;
-                try {
-                    $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([password_hash($password, PASSWORD_BCRYPT), $user['user_id']]);
-                } catch (\Throwable $e) {}
-            }
+        if ($user && !empty($user['user_password'])) {
+            $isPassValid = password_verify($password, $user['user_password']);
         }
 
         if (!$user || !$isPassValid) {
