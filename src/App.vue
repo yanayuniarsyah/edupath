@@ -1476,60 +1476,69 @@
           </div>
 
           <!-- 10. Demonstration / Product Preview -->
-          <div id="preview" class="section-wrapper space-y-12 scroll-mt-24 relative overflow-visible">
+          <div id="preview" class="section-wrapper space-y-6 sm:space-y-12 scroll-mt-24 relative overflow-visible px-4 sm:px-0">
             <div class="text-center max-w-xl mx-auto space-y-2 reveal">
-              <span class="text-[#c0ff00] text-sm font-bold uppercase tracking-widest block">TAMPILAN INTERFACE</span>
-              <h2 class="text-4xl md:text-6xl font-black font-heading text-white">Eksplorasi Dashboard</h2>
+              <span class="text-[#c0ff00] text-xs sm:text-sm font-bold uppercase tracking-widest block">// TAMPILAN INTERFACE</span>
+              <h2 class="text-2xl sm:text-4xl md:text-5xl font-black font-heading text-white leading-tight">Eksplorasi Dashboard</h2>
+              <p class="text-xs sm:text-sm text-white/50 max-w-md mx-auto">Pantau kesiapan UTBK, grafik probabilitas kelulusan, dan rekomendasi AI dalam satu tampilan presisi.</p>
             </div>
 
             <div class="relative max-w-4xl mx-auto">
-              <div class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-25 animate-pulse"></div>
+              <div class="absolute -inset-1 bg-gradient-to-r from-[#c0ff00]/20 via-emerald-500/20 to-teal-500/20 rounded-3xl blur-xl opacity-30"></div>
               
-              <div class="absolute -right-6 top-1/4 bg-slate-950/90 border border-slate-805 p-3 rounded-xl shadow-2xl hidden md:flex items-center gap-3 z-20 animate-[bounce_3s_infinite]">
-                <span class="text-lg">💎</span>
+              <div class="absolute -right-4 top-1/4 bg-slate-950/90 border border-white/10 p-3 rounded-2xl shadow-2xl hidden md:flex items-center gap-3 z-20 animate-[bounce_3s_infinite]">
+                <span class="text-xl">💎</span>
                 <div>
-                  <div class="text-[10px] text-slate-550 font-bold uppercase">Skor Tryout</div>
+                  <div class="text-[10px] text-white/40 font-bold uppercase tracking-wider">Skor Tryout</div>
                   <div class="text-xs md:text-sm font-bold text-white">780 Poin</div>
                 </div>
               </div>
-              <div class="absolute -left-6 bottom-1/4 bg-slate-955/90 border border-slate-800 p-3 rounded-xl shadow-2xl hidden md:flex items-center gap-3 z-20 animate-[bounce_4s_infinite]">
-                <span class="text-lg">🎯</span>
+              <div class="absolute -left-4 bottom-1/4 bg-slate-950/90 border border-white/10 p-3 rounded-2xl shadow-2xl hidden md:flex items-center gap-3 z-20 animate-[bounce_4s_infinite]">
+                <span class="text-xl">🎯</span>
                 <div>
-                  <div class="text-[10px] text-slate-550 font-bold uppercase">Rekomendasi AI</div>
+                  <div class="text-[10px] text-white/40 font-bold uppercase tracking-wider">Rekomendasi AI</div>
                   <div class="text-xs md:text-sm font-bold text-white">Fokus: Geometri</div>
                 </div>
               </div>
 
-              <div class="relative bg-slate-955 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden aspect-video">
-                <div class="h-8 bg-slate-900 border-b border-slate-850 flex items-center px-4 gap-2">
+              <!-- Dashboard Preview Container (Mobile-flexible, no aspect-video clipping) -->
+              <div class="relative bg-[#0c1222] rounded-2xl sm:rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                <div class="h-9 bg-slate-900/90 border-b border-white/10 flex items-center px-4 gap-2">
                   <div class="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
                   <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></div>
                   <div class="w-2.5 h-2.5 rounded-full bg-green-500/80"></div>
-                  <div class="ml-4 text-[9px] text-slate-500 font-mono uppercase tracking-widest">EDUPATH.AI/DASHBOARD</div>
+                  <div class="ml-3 text-[9px] text-white/40 font-mono uppercase tracking-widest truncate">edupath.ai/dashboard</div>
                 </div>
                 
-                <div class="p-6 h-full flex flex-col justify-between relative bg-cover bg-center" style="background-image: linear-gradient(rgba(3,7,18,0.9), rgba(3,7,18,0.95)), url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&auto=format&fit=crop&q=60');">
-                  <div class="flex justify-between items-start">
+                <div class="p-4 sm:p-6 md:p-8 flex flex-col justify-between gap-4 sm:gap-6 relative bg-cover bg-center" style="background-image: linear-gradient(rgba(10,15,29,0.94), rgba(10,15,29,0.98)), url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&auto=format&fit=crop&q=60');">
+                  <!-- Top row -->
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                       <span class="text-[9px] text-[#c0ff00] font-bold uppercase tracking-wider block">PROGRES BELAJAR</span>
-                      <h4 class="text-base font-bold text-white">Peluang Kelulusan Kedokteran UI</h4>
+                      <h4 class="text-sm sm:text-base md:text-lg font-black text-white">Peluang Kelulusan Kedokteran UI</h4>
                     </div>
-                    <span class="text-xs font-bold text-[#c0ff00] bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">82.4% Sukses</span>
+                    <span class="self-start sm:self-auto text-[11px] sm:text-xs font-bold text-[#c0ff00] bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-xl shrink-0">
+                      82.4% Sukses
+                    </span>
                   </div>
 
-                  <div class="space-y-3">
-                    <div class="w-full bg-slate-900 rounded-full h-3 border border-slate-800 overflow-hidden">
-                      <div class="bg-gradient-to-r from-primary to-secondary h-full rounded-full" style="width: 82%;"></div>
+                  <!-- Progress Bar & Score Matrix -->
+                  <div class="space-y-2">
+                    <div class="w-full bg-white/10 rounded-full h-3 border border-white/10 overflow-hidden p-0.5">
+                      <div class="bg-gradient-to-r from-[#c0ff00] to-emerald-400 h-full rounded-full transition-all" style="width: 82%;"></div>
                     </div>
-                    <div class="flex justify-between text-[10px] text-slate-400 font-medium">
-                      <span>Estimasi Skor: 648 / 720 Target</span>
-                      <span>Sisa 72 Poin Lagi</span>
+                    <div class="flex justify-between text-[10px] sm:text-xs text-white/60 font-medium font-mono">
+                      <span>Estimasi Skor: <strong class="text-white">648</strong> / 720 Target</span>
+                      <span class="text-[#c0ff00] font-bold">Sisa 72 Poin Lagi</span>
                     </div>
                   </div>
 
-                  <div class="flex items-center gap-3 bg-slate-900/60 border border-slate-800 p-3 rounded-xl">
-                    <span class="text-lg">🤖</span>
-                    <p class="text-xs text-slate-350 font-light leading-relaxed"><strong>AI Tutor:</strong> "Siswa Mandiri telah meningkatkan kemampuan Aljabar Dasar sebesar 15% minggu ini. Pertahankan streak Anda!"</p>
+                  <!-- AI Tutor Coach Box -->
+                  <div class="flex items-start gap-3 bg-white/[0.04] border border-white/10 p-3 sm:p-4 rounded-xl sm:rounded-2xl backdrop-blur-md">
+                    <span class="text-xl sm:text-2xl shrink-0">🤖</span>
+                    <p class="text-[11px] sm:text-xs text-slate-200 font-normal leading-relaxed">
+                      <strong class="text-white font-bold">AI Tutor:</strong> "Siswa Mandiri telah meningkatkan kemampuan Aljabar Dasar sebesar 15% minggu ini. Pertahankan streak belajar Anda!"
+                    </p>
                   </div>
                 </div>
               </div>
