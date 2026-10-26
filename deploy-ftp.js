@@ -135,16 +135,7 @@ async function deploy() {
     }
 
     const filesToUpload = [
-        ".htaccess", 
-        "install_db.php", 
-        "create_uat_accounts.php", 
-        "create_uat_v2.php",
-        "schema_dump.json", 
-        "import_tryout_questions.php", 
-        "update_questions_schema.php", 
-        "update_aff_schema.php",
-        "tryout_data.txt",
-        "test_db.php"
+        ".htaccess"
     ];
 
     try {
