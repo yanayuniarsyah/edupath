@@ -3079,12 +3079,11 @@
                   @click="selectBab(bab)"
                 >
                   <span class="text-slate-900">{{ bab.judul }}</span>
-                  <span class="text-[10px] text-indigo-600 font-mono font-semibold">{{ bab.microLesson.duration }}</span>
                 </button>
               </div>
             </div>
 
-            <!-- Content Area: Teori Singkat -> Micro Lesson -> Quick Quiz -->
+            <!-- Content Area: Teori Singkat -> Formula Praktis -->
             <div :class="hideBabSidebar ? 'lg:col-span-4' : 'lg:col-span-3'" class="space-y-6 transition-all duration-300">
               <div v-if="selectedBab" class="light-mode-card rounded-2xl p-6 lg:p-8 space-y-6">
                 <!-- 1. HEADER & TEORI SINGKAT MATERI UTBK -->
@@ -3113,55 +3112,20 @@
                   </div>
                 </div>
 
-                <!-- 2. MICRO LESSON (Video / Flashcard & Trik) -->
-                <div class="space-y-4 border-b border-slate-200 pb-6">
+                <!-- 2. FORMULA PRAKTIS -->
+                <div class="space-y-4">
                   <div class="flex items-center justify-between">
                     <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-md text-xs font-black text-emerald-700 uppercase tracking-wider">
-                      MICRO LESSON &amp; TRIK CEPAT ({{ selectedBab.microLesson.duration }})
+                      Formula Praktis:
                     </div>
-                    <span class="text-xs text-slate-400 font-mono font-bold">{{ selectedBab.microLesson.type }}</span>
                   </div>
 
-                  <h4 class="text-lg font-black text-slate-900">{{ selectedBab.microLesson.title }}</h4>
+                  <h4 v-if="selectedBab.microLesson && selectedBab.microLesson.title" class="text-lg font-black text-slate-900">{{ selectedBab.microLesson.title }}</h4>
 
-                  <!-- Micro lesson summary card -->
+                  <!-- Formula Praktis summary card -->
                   <div class="p-4 bg-emerald-50/70 border border-emerald-200 rounded-2xl">
-                    <span class="text-xs font-bold text-emerald-800 block mb-1">Trik Cepat / Formula Praktis:</span>
-                    <p class="text-sm text-slate-800 font-medium leading-relaxed">
-                      {{ selectedBab.microLesson.summary }}
-                    </p>
-                  </div>
-                </div>
-
-                <!-- 3. QUICK QUIZ -->
-                <div class="bg-slate-50 border border-slate-200 p-6 rounded-2xl space-y-4">
-                  <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-200 text-xs font-bold text-amber-800 rounded-md">
-                    MINI QUIZ UJI PEMAHAMAN
-                  </div>
-                  <h5 class="text-base md:text-lg font-bold text-slate-900 leading-relaxed">{{ selectedBab.microLesson.quiz.question }}</h5>
-                  
-                  <div class="grid grid-cols-1 gap-2.5">
-                    <button 
-                      v-for="(opt, idx) in selectedBab.microLesson.quiz.options"
-                      :key="idx"
-                      :class="['w-full text-left px-4 py-3 rounded-xl border text-sm font-semibold transition-all outline-none', 
-                        selectedLessonQuizAns === idx
-                          ? (showLessonQuizFeedback && idx === selectedBab.microLesson.quiz.answer ? 'bg-emerald-50 border-emerald-500 text-emerald-900' : 'bg-rose-50 border-rose-500 text-rose-900')
-                          : (showLessonQuizFeedback && idx === selectedBab.microLesson.quiz.answer ? 'bg-emerald-50 border-emerald-500 text-emerald-900' : 'bg-white border-slate-200 text-slate-800 hover:border-slate-300')
-                      ]"
-                      @click="selectLessonQuizOption(idx)"
-                    >
-                      <span class="inline-block w-6 h-6 rounded-lg bg-slate-100 border border-slate-200 text-center leading-6 text-xs font-black text-slate-600 mr-2.5">{{ String.fromCharCode(65 + idx) }}</span>
-                      {{ opt }}
-                    </button>
-                  </div>
-
-                  <div v-if="showLessonQuizFeedback" class="mt-4 p-3.5 bg-white border border-slate-200 rounded-xl text-sm">
-                    <p v-if="selectedLessonQuizAns === selectedBab.microLesson.quiz.answer" class="text-emerald-700 font-bold">
-                      ✓ Jawaban Benar! Anda mendapatkan +10 Coins.
-                    </p>
-                    <p v-else class="text-rose-600 font-bold">
-                      ✕ Kurang tepat. Petunjuk: <span class="font-normal text-slate-600">{{ selectedBab.microLesson.quiz.hint }}</span>
+                    <p class="text-sm text-slate-800 font-medium leading-relaxed whitespace-pre-line">
+                      {{ selectedBab.formula_praktis || (selectedBab.microLesson && selectedBab.microLesson.summary) || 'Formula praktis belum ditambahkan.' }}
                     </p>
                   </div>
                 </div>

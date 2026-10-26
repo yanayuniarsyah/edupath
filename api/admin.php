@@ -50,6 +50,7 @@ function ensure_admin_schema($pdo) {
         "ALTER TABLE materials ADD COLUMN assessment_type VARCHAR(50) DEFAULT 'SNBT'",
         "ALTER TABLE materials ADD COLUMN subject VARCHAR(100) NULL",
         "ALTER TABLE materials ADD COLUMN domain VARCHAR(100) NULL",
+        "ALTER TABLE materials ADD COLUMN formula_praktis TEXT NULL",
         "ALTER TABLE materials ADD COLUMN is_active TINYINT(1) DEFAULT 1"
     ];
     foreach ($materialCols as $sql) {
@@ -2107,6 +2108,7 @@ elseif ($action === 'materials') {
             $teacher_name = $tStmt->fetchColumn() ?: ($payload->name ?? 'Guru / Tutor');
         }
         $file_url = trim($input['file_url'] ?? '');
+        $formula_praktis = trim($input['formula_praktis'] ?? '');
         $education_level = $input['education_level'] ?? 'SMA';
         $assessment_type = $input['assessment_type'] ?? 'SNBT';
         $subject = $input['subject'] ?? null;
@@ -2116,19 +2118,19 @@ elseif ($action === 'materials') {
         try {
             try {
                 $stmt = $pdo->prepare("
-                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, leaf_id, title, content, teacher_name, teacher_id, file_url, is_active, education_level, assessment_type, subject, domain)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, leaf_id, title, content, formula_praktis, teacher_name, teacher_id, file_url, is_active, education_level, assessment_type, subject, domain)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 $stmt->execute([
-                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active, $education_level, $assessment_type, $subject, $domain
+                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $formula_praktis, $teacher_name, $teacher_id, $file_url, $is_active, $education_level, $assessment_type, $subject, $domain
                 ]);
             } catch (\PDOException $colErr) {
                 $stmt = $pdo->prepare("
-                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, title, content, teacher_name, teacher_id, file_url, is_active, education_level, assessment_type, subject, domain)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, title, content, formula_praktis, teacher_name, teacher_id, file_url, is_active, education_level, assessment_type, subject, domain)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 $stmt->execute([
-                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active, $education_level, $assessment_type, $subject, $domain
+                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $formula_praktis, $teacher_name, $teacher_id, $file_url, $is_active, $education_level, $assessment_type, $subject, $domain
                 ]);
             }
             echo json_encode(["success" => true, "id" => $id]);
@@ -2166,6 +2168,7 @@ elseif ($action === 'materials') {
         $leaf_id = !empty($input['leaf_id']) ? trim($input['leaf_id']) : null;
         $title = trim($input['title'] ?? 'Materi Belajar');
         $content = $input['content'] ?? '';
+        $formula_praktis = trim($input['formula_praktis'] ?? '');
         $teacher_name = trim($input['teacher_name'] ?? '');
         $teacher_id = trim($input['teacher_id'] ?? '');
         if ($payload->role === 'teacher') {
@@ -2186,24 +2189,24 @@ elseif ($action === 'materials') {
             try {
                 $stmt = $pdo->prepare("
                     UPDATE materials SET
-                        exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, leaf_id=?, title=?, content=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?,
+                        exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, leaf_id=?, title=?, content=?, formula_praktis=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?,
                         education_level=?, assessment_type=?, subject=?, domain=?
                     WHERE id=?
                 ");
                 $stmt->execute([
-                    $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active,
+                    $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $formula_praktis, $teacher_name, $teacher_id, $file_url, $is_active,
                     $education_level, $assessment_type, $subject, $domain,
                     $id
                 ]);
             } catch (\PDOException $colErr) {
                 $stmt = $pdo->prepare("
                     UPDATE materials SET
-                        exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, title=?, content=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?,
+                        exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, title=?, content=?, formula_praktis=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?,
                         education_level=?, assessment_type=?, subject=?, domain=?
                     WHERE id=?
                 ");
                 $stmt->execute([
-                    $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $teacher_name, $teacher_id, $file_url, $is_active,
+                    $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $formula_praktis, $teacher_name, $teacher_id, $file_url, $is_active,
                     $education_level, $assessment_type, $subject, $domain,
                     $id
                 ]);

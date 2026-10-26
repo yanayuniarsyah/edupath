@@ -39,7 +39,7 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $education_level = safe_str($_GET['education_level'] ?? '');
     $assessment_type = safe_str($_GET['assessment_type'] ?? '');
 
-    $sql = "SELECT id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, file_url, teacher_name, education_level, assessment_type, subject, domain, created_at FROM materials WHERE (is_active = 1 OR is_active IS NULL)";
+    $sql = "SELECT id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, formula_praktis, file_url, teacher_name, education_level, assessment_type, subject, domain, created_at FROM materials WHERE (is_active = 1 OR is_active IS NULL)";
     $params = [];
     if ($subtes) {
         $sql .= " AND (subtest = ? OR subtest LIKE ?)";

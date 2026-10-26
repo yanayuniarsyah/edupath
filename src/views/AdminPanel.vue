@@ -3607,8 +3607,8 @@
             <div>
               <label for="q_usage_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Penggunaan</label>
               <select id="q_usage_select" name="usage_type" v-model="qForm.usage_type" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-                <option value="latihan" class="bg-[#0d1427] text-white">Latihan Harian</option>
-                <option value="tryout" class="bg-[#0d1427] text-white">Tryout Resmi</option>
+                <option value="latihan" class="bg-[#0d1427] text-white">Latihan</option>
+                <option value="tryout" class="bg-[#0d1427] text-white">Tryout</option>
                 <option value="diagnostik" class="bg-[#0d1427] text-white">Diagnostik</option>
               </select>
             </div>
@@ -3776,6 +3776,24 @@
               </div>
               <input id="m_file_url_input" name="file_url" aria-label="URL File / Lampiran" v-model="mForm.file_url" type="text" placeholder="URL File / Lampiran (otomatis terisi)" class="mt-1.5 w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none font-mono" />
             </div>
+          </div>
+
+          <!-- Formula Praktis -->
+          <div class="space-y-1.5 pt-1">
+            <label for="m_formula_praktis" class="block text-[10px] font-bold text-white/50 uppercase tracking-wider flex items-center justify-between">
+              <span>Formula Praktis:</span>
+              <span class="text-[#c0ff00] text-[10px] font-semibold flex items-center gap-1">
+                <i class="ph-bold ph-lightning"></i> Trik cepat, formula kilat &amp; cara ringkas
+              </span>
+            </label>
+            <textarea
+              id="m_formula_praktis"
+              name="formula_praktis"
+              v-model="mForm.formula_praktis"
+              rows="3"
+              placeholder="Tuliskan formula praktis atau trik cepat di sini... (Contoh: Rumus eliminasi 2 premis: P → Q dan Q → R maka P → R)"
+              class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium resize-y"
+            ></textarea>
           </div>
 
           <!-- WYSIWYG Word-Like Rich Text Editor -->
@@ -4893,7 +4911,8 @@ const mForm = reactive({
   indicator: '',
   leaf_id: '',
   teacher_name: '',
-  file_url: ''
+  file_url: '',
+  formula_praktis: ''
 });
 
 // Cascading helpers for Material Form
@@ -4983,6 +5002,7 @@ const openMaterialModal = (m = null) => {
       leaf_id: m.leaf_id || '',
       teacher_name: m.teacher_name || '',
       file_url: m.file_url || '',
+      formula_praktis: m.formula_praktis || '',
       title: m.title || '',
       content: m.content || ''
     });
@@ -5003,6 +5023,7 @@ const openMaterialModal = (m = null) => {
       teacher_name: myTeacherName,
       teacher_id: myTeacherId,
       file_url: '',
+      formula_praktis: '',
       title: '',
       content: ''
     });
