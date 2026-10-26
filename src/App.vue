@@ -1392,24 +1392,24 @@
           </div>
 
           <!-- 9. Dynamic Section: FILTERABLE TESTIMONIALS -->
-          <div id="testimonials" class="section-wrapper space-y-12 scroll-mt-24">
-            <div class="text-center max-w-xl mx-auto space-y-2 reveal">
-              <span class="text-[#c0ff00] text-sm font-bold uppercase tracking-widest block">FEEDBACK PENGGUNA AWAL</span>
-              <h2 class="text-4xl md:text-6xl font-black font-heading text-white">Apa Kata Pengguna Beta EduPath</h2>
-              <p class="text-sm text-white/50">Kesan pertama dari teman-teman yang mencoba EduPath lebih awal:</p>
+          <div id="testimonials" class="section-wrapper space-y-8 sm:space-y-12 scroll-mt-24">
+            <div class="text-center max-w-xl mx-auto space-y-2 reveal px-4">
+              <span class="text-[#c0ff00] text-xs sm:text-sm font-bold uppercase tracking-widest block">// FEEDBACK PENGGUNA AWAL</span>
+              <h2 class="text-2xl sm:text-4xl md:text-5xl font-black font-heading text-white leading-tight">Apa Kata Pengguna Beta EduPath</h2>
+              <p class="text-xs sm:text-sm text-white/50">Kesan pertama dari teman-teman yang mencoba EduPath lebih awal:</p>
             </div>
 
             <!-- Filter Buttons -->
-            <div class="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+            <div class="flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-2xl mx-auto px-4">
               <button
                 v-for="flt in [
-                  { id: 'all', name: 'Semua Pengguna (3)' },
+                  { id: 'all', name: 'Semua (3)' },
                   { id: 'health', name: '🩺 Saintek' },
                   { id: 'engineering', name: '💻 Teknik & MIPA' },
                   { id: 'soshum', name: '💼 Soshum' }
                 ]"
                 :key="flt.id"
-                :class="['px-4 py-2 rounded-full text-xs font-black transition-all border',
+                :class="['px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-full text-xs font-bold transition-all border cursor-pointer active:scale-95',
                   testimonialFilter === flt.id
                     ? 'bg-[#c0ff00] text-black border-[#c0ff00] shadow-[0_0_20px_rgba(192,255,0,0.3)]'
                     : 'bg-white/5 text-white/60 border-white/10 hover:border-white/30 hover:bg-white/10'
@@ -1421,49 +1421,56 @@
             </div>
 
             <!-- Testimonial Cards Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto items-stretch px-4 sm:px-0">
               <div
                 v-for="(t, idx) in filteredTestimonials"
                 :key="t.name"
-                class="glass-card rounded-[2rem] p-8 relative overflow-hidden group flex flex-col justify-between animate-fade-in"
+                class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 relative overflow-hidden group flex flex-col justify-between border border-white/10"
               >
-                <div class="absolute -right-6 -top-6 text-9xl text-white/5 font-black font-serif italic">“</div>
+                <div class="absolute -right-4 -top-6 text-8xl text-white/[0.03] font-black font-serif italic pointer-events-none select-none">“</div>
                 
                 <div class="space-y-4 relative z-10">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-2xl border border-white/10">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl shrink-0 shadow-inner">
                         {{ t.avatar }}
                       </div>
-                      <div>
-                        <h4 class="font-black text-white text-base">{{ t.name }}</h4>
-                        <p class="font-bold text-[#c0ff00] text-xs">{{ t.school }}</p>
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <h4 class="font-black text-white text-sm sm:text-base">{{ t.name }}</h4>
+                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#c0ff00]/15 text-[#c0ff00] border border-[#c0ff00]/30 shrink-0">
+                            Verified Beta
+                          </span>
+                        </div>
+                        <p class="text-white/60 text-xs font-medium">{{ t.school }}</p>
                       </div>
                     </div>
-                    <span class="px-3 py-1 rounded-full text-[10px] font-black bg-white/10 text-white border border-white/20">
-                      {{ t.badge }}
+                    <span class="px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold bg-white/5 text-white/70 border border-white/10 shrink-0 hidden sm:inline-block">
+                      {{ t.clusterLabel }}
                     </span>
                   </div>
 
                   <!-- Target indicator -->
-                  <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/60 border border-white/10 text-xs font-mono">
-                    <span class="text-white/40">Target: <strong>{{ t.target }}</strong></span>
-                    <span class="text-[#c0ff00]">·</span>
-                    <span class="text-[#c0ff00] font-bold">{{ t.badge }}</span>
+                  <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs w-auto">
+                    <span class="text-white/40 text-[11px] font-mono uppercase tracking-wider">Target:</span>
+                    <span class="text-[#c0ff00] font-bold text-xs">{{ t.target }}</span>
                   </div>
 
-                  <p class="text-slate-200 font-medium text-sm md:text-base leading-relaxed">
+                  <p class="text-slate-200 font-normal text-xs sm:text-sm md:text-base leading-relaxed">
                     "{{ t.text }}"
                   </p>
                 </div>
 
-                <div class="pt-4 mt-4 border-t border-white/5 flex justify-between items-center text-[11px] text-white/40 font-mono">
-                  <span>Pengguna Beta EduPath</span>
-                  <span class="text-white/30">Kesan Awal</span>
+                <div class="pt-3 mt-4 border-t border-white/10 flex justify-between items-center text-[11px] text-white/40 font-mono">
+                  <span class="flex items-center gap-1.5 text-white/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]"></span>
+                    <span>Early Tester Feedback</span>
+                  </span>
+                  <span class="text-white/30 text-[10px]">UTBK 2026/2027</span>
                 </div>
               </div>
             </div>
-            <p class="text-center text-[11px] text-white/40 italic pt-3 max-w-2xl mx-auto">
+            <p class="text-center text-[10px] sm:text-[11px] text-white/40 italic pt-2 max-w-2xl mx-auto px-4">
               *Catatan: Ini adalah kesan awal dari pengguna yang mencoba EduPath pada tahap beta. EduPath saat ini masih dalam pengembangan aktif dan belum memiliki data kelulusan resmi.
             </p>
           </div>
@@ -4838,28 +4845,31 @@ export default {
     const testimonialsList = [
       {
         name: 'Rafi A.',
-        school: 'Siswa Kelas 12 — Pengguna Beta',
+        school: 'Siswa Kelas 12 SMA',
         avatar: '📚',
         cluster: 'health',
-        target: 'Saintek / Kedokteran',
+        clusterLabel: 'Saintek',
+        target: 'Saintek / Kedokteran UI',
         badge: 'Pengguna Beta',
         text: 'Baru coba EduPath beberapa minggu dan udah kerasa bedanya. Fitur diagnostik blind spot-nya bikin aku tahu persis topik mana yang harus aku fokus duluan. Belajar jadi lebih terarah!'
       },
       {
         name: 'Dimas P.',
-        school: 'Gap Year — Pengguna Beta',
+        school: 'Alumni / Pejuang Gap Year',
         avatar: '🎯',
         cluster: 'engineering',
-        target: 'Teknik Informatika',
+        clusterLabel: 'Teknik',
+        target: 'Teknik Informatika ITB',
         badge: 'Pengguna Beta',
         text: 'Latihan soalnya berbeda dari platform lain. Gak cuma asal kerjain soal, tapi ada analisis otomatis setelah TO. Aku jadi paham kenapa jawaban aku salah, bukan cuma lihat kunci.'
       },
       {
         name: 'Nadia R.',
-        school: 'Siswa Kelas 12 — Pengguna Beta',
+        school: 'Siswa Kelas 12 SMA',
         avatar: '✨',
         cluster: 'soshum',
-        target: 'Soshum / Ekonomi',
+        clusterLabel: 'Soshum',
+        target: 'Akuntansi / FEB UGM',
         badge: 'Pengguna Beta',
         text: 'Fitur laporan mingguan ke Telegram orang tua keren banget. Orang tua jadi bisa pantau perkembangan belajarku tanpa harus nanya-nanya terus. Akhirnya belajar tenang!'
       }
