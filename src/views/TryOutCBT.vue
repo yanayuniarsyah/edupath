@@ -1,23 +1,23 @@
 <template>
   <div class="min-h-screen bg-[#f0f2f5] font-['Arial','Helvetica',sans-serif] text-slate-800 flex flex-col">
     <!-- Header -->
-    <header class="bg-[#024a86] text-white shadow-md z-10">
-      <div class="px-4 py-3 flex items-center justify-between border-b border-white/10">
-        <div class="flex items-center gap-4">
-          <button @click="$router.push('/')" title="Kembali ke Dashboard" class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg flex items-center gap-2 transition-all font-bold text-xs sm:text-sm shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    <header class="bg-[#024a86] text-white shadow-md z-10 shrink-0">
+      <div class="px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-b border-white/10 gap-2">
+        <div class="flex items-center gap-2.5 sm:gap-4 min-w-0">
+          <button @click="$router.push('/')" title="Kembali ke Dashboard" class="px-2.5 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg flex items-center gap-1.5 transition-all font-bold text-xs sm:text-sm shadow-sm shrink-0 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             <span class="hidden sm:inline">Kembali ke Dashboard</span>
-            <span class="sm:hidden">Kembali</span>
+            <span class="sm:hidden">Keluar</span>
           </button>
-          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center font-bold text-[#024a86] text-lg shrink-0">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full flex items-center justify-center font-black text-[#024a86] text-sm sm:text-lg shrink-0">
             SN
           </div>
-          <div>
-            <h1 class="text-lg md:text-xl font-bold uppercase tracking-wide leading-tight">Ujian CBT SNPMB</h1>
-            <p class="text-xs text-blue-200">Seleksi Nasional Penerimaan Mahasiswa Baru</p>
+          <div class="min-w-0">
+            <h1 class="text-xs sm:text-base md:text-xl font-bold uppercase tracking-wide leading-tight truncate">Ujian CBT SNPMB</h1>
+            <p class="text-[10px] sm:text-xs text-blue-200 truncate">Seleksi Nasional Penerimaan Mahasiswa Baru</p>
           </div>
         </div>
-        <div class="hidden md:flex items-center gap-4 text-right">
+        <div class="hidden md:flex items-center gap-4 text-right shrink-0">
           <div>
             <p class="text-sm font-semibold">Siswa Tryout 01</p>
             <p class="text-xs text-blue-200">Nomor Peserta: 2026-001-002-3</p>
@@ -28,18 +28,19 @@
         </div>
       </div>
       <!-- Sub-header: Mata Ujian & Timer -->
-      <div class="bg-[#013b6b] px-4 py-2 flex items-center justify-between text-sm shadow-inner">
-        <div class="font-semibold uppercase tracking-wider flex items-center gap-2">
-          Subtes: <span class="bg-[#facc15] text-black px-2 py-0.5 rounded font-bold">{{ currentQuestion.subtest || currentQuestion.sub_materi || 'Tes Potensi Skolastik' }}</span>
+      <div class="bg-[#013b6b] px-3 sm:px-4 py-2 flex items-center justify-between text-xs sm:text-sm shadow-inner gap-2">
+        <div class="font-semibold uppercase tracking-wider flex items-center gap-1.5 sm:gap-2 min-w-0">
+          <span class="hidden sm:inline">Subtes:</span>
+          <span class="bg-[#facc15] text-black px-2 py-0.5 rounded font-bold text-[10px] sm:text-xs truncate max-w-[140px] sm:max-w-none">{{ currentQuestion.subtest || currentQuestion.sub_materi || 'Tes Potensi Skolastik' }}</span>
         </div>
-        <div class="flex items-center gap-4">
-          <button @click="showQuestionList = true" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded font-bold text-xs uppercase flex items-center gap-2 transition-colors border border-blue-400 shadow">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path></svg>
-            Daftar Soal
+        <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+          <button @click="showQuestionList = true" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded font-bold text-[10px] sm:text-xs uppercase flex items-center gap-1 sm:gap-2 transition-colors border border-blue-400 shadow cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path></svg>
+            <span>Daftar Soal</span>
           </button>
-          <div class="flex items-center gap-2 font-bold text-lg">
-            <span class="text-xs uppercase font-normal text-blue-200 hidden sm:inline">Sisa Waktu:</span>
-            <span class="bg-red-600 px-3 py-1 rounded text-white tracking-widest font-mono">
+          <div class="flex items-center gap-1.5 sm:gap-2 font-bold text-sm sm:text-lg">
+            <span class="text-[10px] sm:text-xs uppercase font-normal text-blue-200 hidden sm:inline">Sisa Waktu:</span>
+            <span class="bg-red-600 px-2 sm:px-3 py-0.5 sm:py-1 rounded text-white tracking-widest font-mono text-xs sm:text-base">
               {{ formattedTime }}
             </span>
           </div>
@@ -48,7 +49,7 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-grow flex w-full max-w-[1000px] mx-auto p-2 lg:p-4 h-[calc(100vh-120px)]">
+    <main class="flex-grow flex w-full max-w-[1000px] mx-auto p-2 lg:p-4 min-h-0">
       
       <!-- Loading State -->
         <div v-if="isLoading" class="flex-grow flex items-center justify-center">
@@ -60,29 +61,29 @@
 
         <!-- Question Area -->
         <div v-else class="flex-grow bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col relative overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-          <div class="font-bold text-lg md:text-xl text-slate-800">SOAL NO. <span class="text-2xl ml-1 font-black text-[#024a86]">{{ activeIndex + 1 }}</span></div>
-          <div class="text-sm text-gray-600 font-bold flex items-center">
-            Ukuran Teks: 
-            <button type="button" class="cursor-pointer border border-gray-300 rounded px-2 py-0.5 ml-1.5 hover:bg-gray-200 text-sm font-semibold transition-colors" :class="fontSize === 'text-base' ? 'bg-[#024a86] text-white border-[#024a86]' : 'bg-white text-gray-700'" @click="fontSize = 'text-base'">A-</button>
-            <button type="button" class="cursor-pointer border border-gray-300 rounded px-2.5 py-0.5 ml-1 hover:bg-gray-200 text-base font-bold transition-colors" :class="fontSize === 'text-lg' ? 'bg-[#024a86] text-white border-[#024a86]' : 'bg-white text-gray-700'" @click="fontSize = 'text-lg'">A</button>
-            <button type="button" class="cursor-pointer border border-gray-300 rounded px-3 py-0.5 ml-1 hover:bg-gray-200 text-lg font-black transition-colors" :class="fontSize === 'text-xl' ? 'bg-[#024a86] text-white border-[#024a86]' : 'bg-white text-gray-700'" @click="fontSize = 'text-xl'">A+</button>
+          <div class="px-3.5 sm:px-6 py-2.5 sm:py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center gap-2 shrink-0">
+          <div class="font-bold text-sm sm:text-lg md:text-xl text-slate-800">SOAL NO. <span class="text-lg sm:text-2xl ml-1 font-black text-[#024a86]">{{ activeIndex + 1 }}</span></div>
+          <div class="text-xs sm:text-sm text-gray-600 font-bold flex items-center">
+            <span class="hidden sm:inline mr-1">Ukuran Teks:</span>
+            <button type="button" class="cursor-pointer border border-gray-300 rounded px-2 py-0.5 ml-1 hover:bg-gray-200 text-xs sm:text-sm font-semibold transition-colors" :class="fontSize === 'text-base' ? 'bg-[#024a86] text-white border-[#024a86]' : 'bg-white text-gray-700'" @click="fontSize = 'text-base'">A-</button>
+            <button type="button" class="cursor-pointer border border-gray-300 rounded px-2 sm:px-2.5 py-0.5 ml-1 hover:bg-gray-200 text-xs sm:text-base font-bold transition-colors" :class="fontSize === 'text-lg' ? 'bg-[#024a86] text-white border-[#024a86]' : 'bg-white text-gray-700'" @click="fontSize = 'text-lg'">A</button>
+            <button type="button" class="cursor-pointer border border-gray-300 rounded px-2.5 sm:px-3 py-0.5 ml-1 hover:bg-gray-200 text-sm sm:text-lg font-black transition-colors" :class="fontSize === 'text-xl' ? 'bg-[#024a86] text-white border-[#024a86]' : 'bg-white text-gray-700'" @click="fontSize = 'text-xl'">A+</button>
           </div>
         </div>
 
         <!-- Scrollable Question Area -->
-        <div class="flex-grow overflow-y-auto p-6 md:p-10 font-sans" :class="fontSize">
-          <div class="mb-8 leading-relaxed text-justify text-slate-900 font-medium question-body" v-html="currentQuestion.text"></div>
+        <div class="flex-grow overflow-y-auto p-3.5 sm:p-6 md:p-10 font-sans" :class="fontSize">
+          <div class="mb-6 sm:mb-8 leading-relaxed text-justify text-slate-900 font-medium question-body" v-html="currentQuestion.text"></div>
 
           <!-- Options -->
-          <div class="space-y-4">
+          <div class="space-y-3 sm:space-y-4">
             <label 
               v-for="(option, idx) in currentQuestion.options" 
               :key="idx"
-              class="flex items-start gap-4 p-3 rounded-lg border-2 cursor-pointer transition-colors"
+              class="flex items-start gap-3 sm:gap-4 p-2.5 sm:p-3 rounded-lg border-2 cursor-pointer transition-colors"
               :class="answers[activeIndex] === option.id ? 'border-[#024a86] bg-blue-50' : 'border-transparent hover:bg-gray-50'"
             >
-              <div class="relative flex items-center justify-center w-8 h-8 rounded-full border-2 mt-0.5 shrink-0"
+              <div class="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 mt-0.5 shrink-0 text-xs sm:text-sm"
                    :class="answers[activeIndex] === option.id ? 'border-[#024a86] bg-[#024a86] text-white' : 'border-gray-400 text-gray-600'">
                 <input 
                   type="radio" 
@@ -94,46 +95,50 @@
                 >
                 <span class="font-bold">{{ option.id }}</span>
               </div>
-              <div class="pt-1.5 leading-relaxed flex-grow" v-html="option.text"></div>
+              <div class="pt-1 leading-relaxed flex-grow text-xs sm:text-sm" v-html="option.text"></div>
             </label>
           </div>
         </div>
 
         <!-- Navigation Footer -->
-        <div class="bg-gray-100 border-t border-gray-300 p-4 flex flex-wrap items-center justify-between gap-3">
-          <button 
-            @click="prevQuestion"
-            :disabled="activeIndex === 0"
-            class="px-5 py-2.5 bg-white border border-gray-400 text-gray-700 font-bold rounded shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed uppercase flex items-center gap-2 transition-colors"
-          >
-            ← Soal Sebelumnya
-          </button>
-
-          <label :for="'doubt_' + activeIndex" class="flex items-center gap-2 cursor-pointer px-5 py-2.5 bg-[#facc15] text-yellow-900 border border-yellow-500 font-bold rounded shadow-sm hover:bg-yellow-500 uppercase transition-colors">
-            <input 
-              type="checkbox" 
-              :id="'doubt_' + activeIndex"
-              :name="'doubt_' + activeIndex"
-              v-model="doubt[activeIndex]"
-              class="w-5 h-5 accent-yellow-600 cursor-pointer"
+        <div class="bg-gray-100 border-t border-gray-300 p-2.5 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 shrink-0">
+          <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+            <button 
+              @click="prevQuestion"
+              :disabled="activeIndex === 0"
+              class="px-3 sm:px-5 py-2 sm:py-2.5 bg-white border border-gray-400 text-gray-700 font-bold rounded text-xs sm:text-sm shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
-            <span>Ragu-Ragu</span>
-          </label>
+              <span>← Sebelumnya</span>
+            </button>
 
-          <button 
-            v-if="activeIndex < questions.length - 1"
-            @click="nextQuestion"
-            class="px-5 py-2.5 bg-[#024a86] border border-[#013b6b] text-white font-bold rounded shadow-sm hover:bg-[#013b6b] uppercase flex items-center gap-2 transition-colors"
-          >
-            Soal Selanjutnya →
-          </button>
-          <button 
-            v-else
-            @click="finishExam"
-            class="px-6 py-2.5 bg-green-600 border border-green-700 text-white font-bold rounded shadow-sm hover:bg-green-700 uppercase flex items-center gap-2 transition-colors"
-          >
-            Selesai Ujian
-          </button>
+            <label :for="'doubt_' + activeIndex" class="flex items-center justify-center gap-1.5 cursor-pointer px-3 sm:px-5 py-2 sm:py-2.5 bg-[#facc15] text-yellow-900 border border-yellow-500 font-bold rounded text-xs sm:text-sm shadow-sm hover:bg-yellow-500 uppercase transition-colors">
+              <input 
+                type="checkbox" 
+                :id="'doubt_' + activeIndex"
+                :name="'doubt_' + activeIndex"
+                v-model="doubt[activeIndex]"
+                class="w-4 h-4 sm:w-5 sm:h-5 accent-yellow-600 cursor-pointer"
+              >
+              <span>Ragu-Ragu</span>
+            </label>
+          </div>
+
+          <div class="w-full sm:w-auto">
+            <button 
+              v-if="activeIndex < questions.length - 1"
+              @click="nextQuestion"
+              class="w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 bg-[#024a86] border border-[#013b6b] text-white font-bold rounded text-xs sm:text-sm shadow-sm hover:bg-[#013b6b] uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <span>Selanjutnya →</span>
+            </button>
+            <button 
+              v-else
+              @click="finishExam"
+              class="w-full sm:w-auto px-5 sm:px-6 py-2 sm:py-2.5 bg-green-600 border border-green-700 text-white font-bold rounded text-xs sm:text-sm shadow-sm hover:bg-green-700 uppercase flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <span>Selesai Ujian</span>
+            </button>
+          </div>
         </div>
       </div>
     </main>

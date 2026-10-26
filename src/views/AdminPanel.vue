@@ -135,10 +135,28 @@
   <!-- ===== MAIN ADMIN DASHBOARD ===== -->
   <div v-else class="flex h-screen bg-[#070b14] font-body overflow-hidden text-white">
 
+    <!-- Backdrop Overlay for Mobile Drawer -->
+    <transition
+      enter-active-class="transition-opacity duration-300"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-300"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="sidebarOpen"
+        class="fixed inset-0 bg-black/75 backdrop-blur-sm z-40 lg:hidden cursor-pointer"
+        @click="sidebarOpen = false"
+      ></div>
+    </transition>
+
     <!-- ===== SIDEBAR ===== -->
     <aside
-      class="flex flex-col h-full shrink-0 transition-all duration-300 ease-out overflow-hidden border-r border-white/10 shadow-2xl"
-      :class="sidebarOpen ? 'w-60' : 'w-[64px]'"
+      class="fixed inset-y-0 left-0 z-50 lg:static lg:z-auto flex flex-col h-full shrink-0 transition-transform lg:transition-all duration-300 ease-out overflow-hidden border-r border-white/10 shadow-2xl"
+      :class="[
+        sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-[64px]'
+      ]"
       style="background: linear-gradient(160deg, #050a18 0%, #0d1224 60%, #050a18 100%);"
     >
       <!-- Logo -->
@@ -151,12 +169,12 @@
       </div>
 
       <!-- Nav -->
-      <nav class="flex flex-col gap-1 p-2.5 flex-grow overflow-y-auto">
+      <nav class="flex flex-col gap-1 p-2.5 flex-grow overflow-y-auto no-scrollbar">
         <button
           v-for="item in navItems" :key="item.id"
-          @click="activeTab = item.id"
+          @click="selectNavTab(item.id)"
           :title="item.label"
-          :class="['flex items-center rounded-xl text-xs font-bold transition-all text-left group relative',
+          :class="['flex items-center rounded-xl text-xs font-bold transition-all text-left group relative cursor-pointer',
             sidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center px-0 py-2.5',
             activeTab === item.id
               ? 'bg-[#c0ff00]/15 border border-[#c0ff00]/40 text-[#c0ff00]'
@@ -183,7 +201,7 @@
         <button
           @click="doLogout"
           :title="'Keluar'"
-          :class="['bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl font-bold transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 text-xs',
+          :class="['bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 rounded-xl font-bold transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 text-xs cursor-pointer',
             sidebarOpen ? 'w-full py-2' : 'w-9 h-9 text-sm'
           ]"
         >
@@ -197,24 +215,24 @@
     <div class="flex flex-col flex-grow min-w-0 overflow-hidden">
 
       <!-- Top Bar -->
-      <header class="flex items-center justify-between px-6 py-3 bg-[#0b1329]/95 backdrop-blur-md border-b border-white/10 shrink-0">
-        <div class="flex items-center gap-3">
-          <button @click="sidebarOpen = !sidebarOpen" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors text-white/80">
+      <header class="flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3 bg-[#0b1329]/95 backdrop-blur-md border-b border-white/10 shrink-0">
+        <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <button @click="sidebarOpen = !sidebarOpen" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors text-white/80 shrink-0 cursor-pointer" title="Menu Sidebar">
             <i class="ph-bold ph-list text-base"></i>
           </button>
-          <h1 class="text-sm font-black text-white tracking-wide uppercase">{{ currentNavItem?.label }}</h1>
+          <h1 class="text-xs sm:text-sm font-black text-white tracking-wide uppercase truncate">{{ currentNavItem?.label }}</h1>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div class="inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] sm:text-xs font-bold">
+            <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             Aktif
           </div>
-          <div class="text-xs text-white/50 font-medium">{{ new Date().toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }) }}</div>
+          <div class="text-[10px] sm:text-xs text-white/50 font-medium hidden sm:block">{{ new Date().toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }) }}</div>
         </div>
       </header>
 
       <!-- Page Content -->
-      <main class="flex-grow overflow-y-auto p-4">
+      <main class="flex-grow overflow-y-auto p-3 sm:p-4 md:p-6">
 
         <!-- ===== TAB: OVERVIEW ===== -->
         <div v-if="activeTab === 'overview'" class="space-y-4 animate-fade-in">
@@ -3954,7 +3972,7 @@ const router = useRouter()
 // ── Data ──
 const isAuthenticated = ref(false);
 const isLoggingOut = ref(false);
-const sidebarOpen = ref(true);
+const sidebarOpen = ref(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
 const initialTab = () => {
   const stored = sessionStorage.getItem('admin_active_tab');
   const role = sessionStorage.getItem('admin_role') || localStorage.getItem('user_role') || '';
@@ -3964,6 +3982,13 @@ const initialTab = () => {
   return stored || 'overview';
 };
 const activeTab = ref(initialTab());
+
+const selectNavTab = (tabId) => {
+  activeTab.value = tabId;
+  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+    sidebarOpen.value = false;
+  }
+};
 
 // Sorting state
 const sortKey = ref('');

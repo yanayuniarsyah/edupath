@@ -108,10 +108,28 @@
   <!-- GATE 2: AUTHENTICATED DASHBOARD WITH SIDEBAR NAVIGATION        -->
   <!-- ============================================================== -->
   <div v-else class="flex h-screen bg-[#070b14] font-body overflow-hidden text-white select-none">
-    <!-- ===== SIDEBAR (POSISINYA ADA DI SAMPING SEPERTI ADMIN/GURU) ===== -->
+    <!-- Backdrop Overlay for Mobile Drawer -->
+    <transition
+      enter-active-class="transition-opacity duration-300"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-300"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="sidebarOpen"
+        class="fixed inset-0 bg-black/75 backdrop-blur-sm z-40 lg:hidden cursor-pointer"
+        @click="sidebarOpen = false"
+      ></div>
+    </transition>
+
+    <!-- ===== SIDEBAR (SLIDE-OVER DRAWER ON MOBILE, STATIC ON DESKTOP) ===== -->
     <aside
-      class="flex flex-col h-full shrink-0 transition-all duration-300 ease-out overflow-hidden border-r border-white/10 shadow-2xl relative z-30"
-      :class="sidebarOpen ? 'w-64' : 'w-[72px]'"
+      class="fixed inset-y-0 left-0 z-50 lg:static lg:z-auto flex flex-col h-full shrink-0 transition-transform lg:transition-all duration-300 ease-out overflow-hidden border-r border-white/10 shadow-2xl"
+      :class="[
+        sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-[72px]'
+      ]"
       style="background: linear-gradient(160deg, #050a18 0%, #0d1224 60%, #050a18 100%);"
     >
       <!-- Logo Header with Collapser -->
@@ -140,7 +158,7 @@
       <nav class="flex flex-col gap-1 p-2.5 flex-grow overflow-y-auto no-scrollbar">
         <button
           v-for="item in navItems" :key="item.id"
-          @click="activeTab = item.id"
+          @click="selectNavTab(item.id)"
           :title="item.label"
           :class="[
             'flex items-center rounded-xl text-xs font-bold transition-all text-left group relative cursor-pointer',
@@ -235,47 +253,47 @@
       </header>
 
       <!-- Scrollable Tab Content Area -->
-      <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+      <div class="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-6">
 
         <!-- ========================================================== -->
         <!-- VIEW 1: RINGKASAN & KPI EKSEKUTIF                          -->
         <!-- ========================================================== -->
-        <div v-if="activeTab === 'analytics'" class="space-y-6">
+        <div v-if="activeTab === 'analytics'" class="space-y-4 sm:space-y-6">
 
           <!-- ✨ Banner Gambar Dashboard Sekolah (Gambar 2.jpeg Identik dengan Dashboard Siswa) -->
-          <div class="glass-card rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
-            <img src="/2.jpeg" onerror="this.src='/1.jpeg';" alt="EduPath School Banner" class="w-full h-48 md:h-60 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+          <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
+            <img src="/2.jpeg" onerror="this.src='/1.jpeg';" alt="EduPath School Banner" class="w-full h-32 sm:h-44 md:h-56 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
             <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-90 z-10"></div>
           </div>
 
           <!-- ✨ Text & Tombol Greeting Info Sekolah -->
-          <div class="glass-card rounded-3xl p-6 md:p-8 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
             <!-- Left: Avatar & School Info -->
-            <div class="flex items-start md:items-center gap-4 flex-1 min-w-0">
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#c0ff00]/25 via-emerald-500/15 to-transparent border border-[#c0ff00]/40 shadow-[0_0_25px_rgba(192,255,0,0.3)] flex items-center justify-center shrink-0 backdrop-blur-md">
-                <i class="ph-bold ph-buildings text-2xl text-[#c0ff00]"></i>
+            <div class="flex items-start sm:items-center gap-3.5 sm:gap-4 flex-1 min-w-0">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#c0ff00]/25 via-emerald-500/15 to-transparent border border-[#c0ff00]/40 shadow-[0_0_25px_rgba(192,255,0,0.3)] flex items-center justify-center shrink-0 backdrop-blur-md">
+                <i class="ph-bold ph-buildings text-xl sm:text-2xl text-[#c0ff00]"></i>
               </div>
-              <div class="space-y-1.5 min-w-0">
+              <div class="space-y-1 sm:space-y-1.5 min-w-0">
                 <div class="flex items-center gap-2">
                   <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
-                  <p class="text-[#c0ff00] font-black text-xs tracking-widest uppercase">Portal Analitik Mitra EduPath</p>
+                  <p class="text-[#c0ff00] font-black text-[10px] sm:text-xs tracking-widest uppercase">Portal Analitik Mitra EduPath</p>
                 </div>
-                <h2 class="text-2xl md:text-3xl font-black text-white tracking-tight">Selamat Datang, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ schoolData?.name || 'Sekolah Mitra' }}</span></h2>
-                <p class="text-white/70 text-xs md:text-sm font-medium">Koordinator BK: <strong class="text-white">{{ schoolData?.bk_name || 'Bapak/Ibu Guru BK' }}</strong> · Pantau pemetaan minat bakat Holland RIASEC &amp; kesiapan SNBT siswa secara real-time.</p>
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight">Selamat Datang, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ schoolData?.name || 'Sekolah Mitra' }}</span></h2>
+                <p class="text-white/70 text-xs sm:text-sm font-medium leading-relaxed">Koordinator BK: <strong class="text-white">{{ schoolData?.bk_name || 'Bapak/Ibu Guru BK' }}</strong> · Pantau pemetaan minat bakat Holland RIASEC &amp; kesiapan SNBT siswa secara real-time.</p>
               </div>
             </div>
 
             <!-- Right: Shortcut Actions -->
-            <div class="flex flex-wrap items-center gap-3 shrink-0">
-              <button @click="copyShareLink" class="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
+            <div class="grid grid-cols-1 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 shrink-0 w-full lg:w-auto">
+              <button @click="copyShareLink" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
                 <i :class="['ph-bold text-base', copiedLink ? 'ph-check' : 'ph-link-simple']"></i>
                 <span>{{ copiedLink ? 'Tautan Tersalin!' : 'Bagikan Link SPP' }}</span>
               </button>
-              <button @click="openQrModal = true" class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
+              <button @click="openQrModal = true" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
                 <i class="ph-bold ph-qr-code text-base text-[#c0ff00]"></i>
                 <span>QR Code</span>
               </button>
-              <button @click="activeTab = 'students'" class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
+              <button @click="activeTab = 'students'" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
                 <i class="ph-bold ph-users-three text-base text-white/70"></i>
                 <span>Roster Siswa</span>
               </button>
@@ -1024,8 +1042,16 @@ const loginForm = ref({
 });
 
 // ── State Layout & Sidebar (Matching AdminPanel.vue) ──
-const sidebarOpen = ref(true);
+const sidebarOpen = ref(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
 const activeTab = ref('analytics'); // 'analytics' | 'packages' | 'students' | 'riasec' | 'ptn' | 'broadcast'
+
+const selectNavTab = (tabId) => {
+  activeTab.value = tabId;
+  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+    sidebarOpen.value = false;
+  }
+};
+
 const schoolData = ref(null);
 const dataLoading = ref(false);
 const copiedLink = ref(false);
