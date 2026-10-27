@@ -957,7 +957,12 @@
                     </td>
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ (studentPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-4 py-3">
-                      <div class="font-bold text-white text-sm leading-snug">{{ s.name }}</div>
+                      <div class="font-bold text-white text-sm leading-snug flex items-center gap-1.5 flex-wrap">
+                        <span>{{ s.name }}</span>
+                        <span v-if="s.is_affiliate > 0" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 border border-amber-500/30 text-amber-300">
+                          <i class="ph-bold ph-handshake"></i> Mitra Afiliasi
+                        </span>
+                      </div>
                       <div class="text-white/50 font-medium text-xs mt-0.5">{{ s.email }}</div>
                       <div v-if="s.phone" class="text-emerald-400 font-mono text-[10px] flex items-center gap-1 mt-0.5">
                         <i class="ph-bold ph-whatsapp-logo"></i> {{ s.phone }}
@@ -3104,6 +3109,31 @@
           <div>
             <label for="aff_form_email" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Mitra</label>
             <input id="aff_form_email" name="email" v-model="affiliateForm.email" :disabled="isEditingAffiliate" required type="email" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
+          </div>
+          <div>
+            <label for="aff_form_pass" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">
+              {{ isEditingAffiliate ? 'Password Baru (Opsional)' : 'Password Akun (Opsional)' }}
+            </label>
+            <div class="relative">
+              <input 
+                id="aff_form_pass" 
+                name="password" 
+                v-model="affiliateForm.password" 
+                :type="showAffiliatePassword ? 'text' : 'password'" 
+                :placeholder="isEditingAffiliate ? 'Kosongkan jika tidak ingin mengubah password' : 'Default: MitraEduPath2026!'" 
+                class="w-full p-2.5 pr-9 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" 
+                autocomplete="new-password"
+              />
+              <button 
+                type="button" 
+                @click="showAffiliatePassword = !showAffiliatePassword" 
+                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer"
+                title="Lihat / Sembunyikan Password"
+              >
+                <i class="ph-bold" :class="showAffiliatePassword ? 'ph-eye-slash' : 'ph-eye'"></i>
+              </button>
+            </div>
+            <p v-if="isEditingAffiliate" class="text-[10px] text-white/40 mt-1">Kosongkan jika tidak ingin mengubah password.</p>
           </div>
           <div>
             <label for="aff_form_ref" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kode Referral</label>
@@ -5434,7 +5464,8 @@ const isLoadingCommissions = ref(false);
 const isLoadingPayouts = ref(false);
 const showAffiliateModal = ref(false);
 const isEditingAffiliate = ref(false);
-const affiliateForm = reactive({ id: null, tenant_id: '', email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '' });
+const showAffiliatePassword = ref(false);
+const affiliateForm = reactive({ id: null, tenant_id: '', email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '', password: '' });
 const showRejectPayoutModal = ref(false);
 const selectedPayoutToReject = ref(null);
 const rejectReason = ref('');
@@ -5512,13 +5543,15 @@ const loadAdminPayouts = async () => {
 
 const openCreateAffiliateModal = () => {
   isEditingAffiliate.value = false;
+  showAffiliatePassword.value = false;
   const defTenant = isSuperadmin.value ? (tenantsList.value?.[0]?.id || '') : (currentAdminTenant.value || '');
-  Object.assign(affiliateForm, { id: null, tenant_id: defTenant, email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '' });
+  Object.assign(affiliateForm, { id: null, tenant_id: defTenant, email: '', name: '', referral_code: '', commission_rate: 20.0, bank_name: '', bank_account: '', bank_owner: '', password: '' });
   showAffiliateModal.value = true;
 };
 
 const openEditAffiliateModal = (aff) => {
   isEditingAffiliate.value = true;
+  showAffiliatePassword.value = false;
   Object.assign(affiliateForm, {
     id: aff.id,
     tenant_id: aff.tenant_id || tenantsList.value?.[0]?.id || '',
@@ -5528,7 +5561,8 @@ const openEditAffiliateModal = (aff) => {
     commission_rate: aff.commission_rate || 20.0,
     bank_name: aff.bank_name || '',
     bank_account: aff.bank_account || '',
-    bank_owner: aff.bank_owner || ''
+    bank_owner: aff.bank_owner || '',
+    password: ''
   });
   showAffiliateModal.value = true;
 };

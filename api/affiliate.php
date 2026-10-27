@@ -282,34 +282,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $pdo->prepare("INSERT INTO affiliates (id, user_id, tenant_id, referral_code, commission_rate, bank_name, bank_account, bank_owner, name, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$id, $user_id, $tenant_id, $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner, $name, $reg_email]);
         
-        // Update user_roles so role is affiliate (not student)
-        $pdo->prepare("UPDATE user_roles SET role = 'affiliate', reference_id = ? WHERE user_id = ?")->execute([$id, $user_id]);
-        
-        // Remove dummy student record only if they have no active orders or quiz records
-        try {
-            $hasActivity = false;
-            $stmtAct = $pdo->prepare("SELECT 1 FROM orders WHERE student_id = ? OR student_id = ? LIMIT 1");
-            $stmtAct->execute([$user_id, $payload->id]);
-            if ($stmtAct->fetch()) $hasActivity = true;
-            if (!$hasActivity) {
-                $stmtAct = $pdo->prepare("SELECT 1 FROM quiz_results WHERE student_id = ? OR student_id = ? LIMIT 1");
-                $stmtAct->execute([$user_id, $payload->id]);
-                if ($stmtAct->fetch()) $hasActivity = true;
-            }
-            if (!$hasActivity) {
-                $pdo->prepare("DELETE FROM students WHERE id = ? OR id = ? OR email = (SELECT identity_key FROM users WHERE id = ?)")->execute([$user_id, $payload->id, $user_id]);
-            }
-        } catch (\Throwable $e) {}
+        // Tambahkan role affiliate ke user_roles tanpa menghapus role student yang sudah ada
+        $ur_id = 'ur-' . substr(bin2hex(random_bytes(8)), 0, 10);
+        $pdo->prepare("
+            INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) 
+            VALUES (?, ?, ?, 'affiliate', ?) 
+            ON DUPLICATE KEY UPDATE reference_id = VALUES(reference_id)
+        ")->execute([$ur_id, $user_id, $tenant_id, $id]);
 
-        // Generate updated JWT token with role 'affiliate'
+        // Generate updated JWT token yang tetap mempertahankan identitas siswa dan hak afiliasi
         $uEmail = $reg_email;
+        $activeRole = $payload->role ?: 'student';
 
         $newToken = generate_jwt([
             'user_id' => $user_id,
-            'id' => $id,
-            'role' => 'affiliate',
+            'id' => $payload->id ?: $user_id,
+            'student_id' => $payload->id ?: $user_id,
+            'affiliate_id' => $id,
+            'role' => $activeRole,
             'tenant_id' => $tenant_id,
-            'name' => $name
+            'name' => $name,
+            'is_affiliate' => true
         ]);
 
         echo json_encode([

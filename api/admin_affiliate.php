@@ -516,10 +516,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
             if ($user) {
                 $user_id = $user['id'];
+                if (!empty($input['password']) && strlen(trim($input['password'])) >= 6) {
+                    $newPass = password_hash(trim($input['password']), PASSWORD_BCRYPT);
+                    $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$newPass, $user_id]);
+                }
             } else {
                 $user_id = bin2hex(random_bytes(16));
                 $user_id = substr($user_id,0,8).'-'.substr($user_id,8,4).'-'.substr($user_id,12,4).'-'.substr($user_id,16,4).'-'.substr($user_id,20,12);
-                $defPass = password_hash('MitraEduPath2026!', PASSWORD_BCRYPT);
+                $rawPass = (!empty($input['password']) && strlen(trim($input['password'])) >= 6) ? trim($input['password']) : 'MitraEduPath2026!';
+                $defPass = password_hash($rawPass, PASSWORD_BCRYPT);
                 $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1)")->execute([$user_id, $email, $defPass]);
             }
 
@@ -546,7 +551,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $stmtAff->execute([$aff_id, $user_id, $aff_tenant_id, $referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner]);
 
             $ur_id = 'ur-' . substr(bin2hex(random_bytes(8)), 0, 10);
-            $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'affiliate', ?) ON DUPLICATE KEY UPDATE role = 'affiliate', reference_id = VALUES(reference_id)")
+            $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'affiliate', ?) ON DUPLICATE KEY UPDATE reference_id = VALUES(reference_id)")
                 ->execute([$ur_id, $user_id, $aff_tenant_id, $aff_id]);
 
             $pdo->commit();
@@ -563,9 +568,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $bank_account = trim($input['bank_account'] ?? '');
         $bank_owner = trim($input['bank_owner'] ?? '');
         $aff_tenant_id = array_key_exists('tenant_id', $input) ? (!empty($input['tenant_id']) ? $input['tenant_id'] : null) : false;
+        $password = trim($input['password'] ?? '');
 
         if (empty($id) || empty($referral_code)) {
             http_response_code(400); echo json_encode(["error" => "ID dan kode referral wajib"]); exit;
+        }
+
+        if (!empty($password) && strlen($password) < 6) {
+            http_response_code(400); echo json_encode(["error" => "Password baru minimal 6 karakter"]); exit;
         }
 
         if ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
@@ -588,6 +598,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $stmt = $pdo->prepare("UPDATE affiliates SET referral_code = ?, commission_rate = ?, bank_name = ?, bank_account = ?, bank_owner = ? WHERE id = ?");
                 $stmt->execute([$referral_code, $commission_rate, $bank_name, $bank_account, $bank_owner, $id]);
             }
+
+            // Update password jika disertakan
+            if (!empty($password)) {
+                $hash = password_hash($password, PASSWORD_BCRYPT);
+                $stmtAffUser = $pdo->prepare("SELECT user_id, email FROM affiliates WHERE id = ?");
+                $stmtAffUser->execute([$id]);
+                $affRow = $stmtAffUser->fetch(PDO::FETCH_ASSOC);
+                if ($affRow) {
+                    if (!empty($affRow['user_id'])) {
+                        $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$hash, $affRow['user_id']]);
+                    }
+                    if (!empty($affRow['email'])) {
+                        try {
+                            $pdo->prepare("UPDATE students SET password = ? WHERE email = ?")->execute([$hash, $affRow['email']]);
+                        } catch (\Throwable $e) {}
+                    }
+                }
+            }
+
             echo json_encode(["success" => true]);
         } catch (PDOException $e) {
             http_response_code(500); echo json_encode(["error" => "Gagal update afiliasi"]);

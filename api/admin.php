@@ -906,28 +906,55 @@ elseif ($action === 'students') {
         if (!in_array('phone', $stCols)) $pdo->exec("ALTER TABLE students ADD COLUMN phone VARCHAR(50) NULL AFTER target_ptn");
     } catch (\Throwable $e) {}
 
+    // Self-healing: jika ada akun siswa yang hilang rolenya di user_roles (misal saat join affiliate sebelumnya), sinkronkan kembali
+    try {
+        $pdo->exec("
+            INSERT IGNORE INTO user_roles (id, user_id, tenant_id, role, reference_id)
+            SELECT UUID(), u.id, COALESCE(s.tenant_id, 'default-tenant'), 'student', s.id
+            FROM students s
+            JOIN users u ON u.identity_key = s.email
+            LEFT JOIN user_roles ur ON ur.user_id = u.id AND ur.role = 'student'
+            WHERE ur.id IS NULL
+        ");
+    } catch (\Throwable $e) {}
+
+    // Self-healing: jika ada affiliate yang merupakan siswa namun data di tabel students sempat terhapus, pulihkan kembali ke tabel students
+    try {
+        $pdo->exec("
+            INSERT IGNORE INTO students (id, tenant_id, name, email, plan, is_active, created_at)
+            SELECT a.user_id, COALESCE(a.tenant_id, 'default-tenant'), COALESCE(NULLIF(a.name,''), u.identity_key, 'Siswa Mitra'), u.identity_key, 'free', 1, a.created_at
+            FROM affiliates a
+            JOIN users u ON a.user_id = u.id
+            WHERE u.identity_key NOT IN (SELECT email FROM students WHERE email IS NOT NULL AND email != '')
+              AND (
+                  a.user_id IN (SELECT student_id FROM orders) OR
+                  a.user_id IN (SELECT student_id FROM subscriptions) OR
+                  a.user_id IN (SELECT student_id FROM quiz_results) OR
+                  a.user_id IN (SELECT student_id FROM quiz_attempts)
+              )
+        ");
+    } catch (\Throwable $e) {}
+
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if ($payload->role === 'superadmin' || empty($payload->tenant_id)) {
             $stmt = $pdo->query("
                 SELECT s.id, s.name, s.email, s.plan, s.is_active, s.created_at, s.tenant_id,
                        s.school, s.school_id, s.target_ptn, s.phone,
-                       t.name as tenant_name
+                       t.name as tenant_name,
+                       (SELECT COUNT(*) FROM affiliates a WHERE a.email = s.email OR a.user_id IN (SELECT u.id FROM users u WHERE u.identity_key = s.email)) as is_affiliate
                 FROM students s 
                 LEFT JOIN tenants t ON s.tenant_id = t.id
-                WHERE s.id NOT IN (SELECT reference_id FROM user_roles WHERE role = 'affiliate')
-                  AND s.email NOT IN (SELECT u.identity_key FROM affiliates a JOIN users u ON a.user_id = u.id)
                 ORDER BY s.created_at DESC
             ");
         } else {
             $stmt = $pdo->prepare("
                 SELECT s.id, s.name, s.email, s.plan, s.is_active, s.created_at, s.tenant_id,
                        s.school, s.school_id, s.target_ptn, s.phone,
-                       t.name as tenant_name
+                       t.name as tenant_name,
+                       (SELECT COUNT(*) FROM affiliates a WHERE a.email = s.email OR a.user_id IN (SELECT u.id FROM users u WHERE u.identity_key = s.email)) as is_affiliate
                 FROM students s 
                 LEFT JOIN tenants t ON s.tenant_id = t.id
                 WHERE s.tenant_id = ?
-                  AND s.id NOT IN (SELECT reference_id FROM user_roles WHERE role = 'affiliate')
-                  AND s.email NOT IN (SELECT u.identity_key FROM affiliates a JOIN users u ON a.user_id = u.id)
                 ORDER BY s.created_at DESC
             ");
             $stmt->execute([$payload->tenant_id]);
