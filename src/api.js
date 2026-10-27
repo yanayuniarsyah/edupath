@@ -465,6 +465,15 @@ export const api = {
   deleteAdminMaterial(id) {
     return apiFetch(`/admin.php?action=materials&id=${id}`, { method: 'DELETE' });
   },
+  bulkDeleteAdmin(type, ids = []) {
+    return apiFetch('/admin.php?action=bulk_delete', {
+      method: 'POST',
+      body: JSON.stringify({ type, ids })
+    });
+  },
+  bulkDelete(type, ids = []) {
+    return this.bulkDeleteAdmin(type, ids);
+  },
   uploadAdminMaterialFile(formData) {
     const token = sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token') || localStorage.getItem('auth_token') || '';
     const csrfToken = sessionStorage.getItem('ep_admin_csrf') || '';

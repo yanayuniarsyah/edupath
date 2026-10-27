@@ -329,6 +329,9 @@
               <table class="w-full text-xs">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="w-10 px-3 py-3 text-center">
+                      <input type="checkbox" :checked="isAllSelected(filteredBranches)" @change="toggleSelectAll(filteredBranches)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </th>
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Nama Cabang</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Kode / Slug</th>
@@ -342,9 +345,12 @@
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-if="filteredBranches.length === 0">
-                    <td colspan="9" class="py-8 text-center text-white/40 font-medium">Belum ada cabang terdaftar atau tidak sesuai filter</td>
+                    <td colspan="10" class="py-8 text-center text-white/40 font-medium">Belum ada cabang terdaftar atau tidak sesuai filter</td>
                   </tr>
                   <tr v-for="(b, idx) in filteredBranches" :key="b.id" class="hover:bg-white/5 transition-colors">
+                    <td class="w-10 px-3 py-3 text-center" @click.stop>
+                      <input type="checkbox" :value="b.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </td>
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ idx + 1 }}</td>
                     <td class="px-4 py-3">
                       <div class="font-bold text-white text-sm flex items-center gap-1.5">
@@ -456,6 +462,9 @@
               <table class="w-full text-xs">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="w-10 px-3 py-3 text-center">
+                      <input type="checkbox" :checked="isAllSelected(filteredAdminSchools)" @change="toggleSelectAll(filteredAdminSchools)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </th>
                     <th class="text-center px-3 py-3 font-black uppercase tracking-wider w-10">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Nama Sekolah &amp; NPSN</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Wilayah</th>
@@ -468,7 +477,7 @@
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-if="filteredAdminSchools.length === 0">
-                    <td colspan="8" class="py-10 text-center text-white/40 font-medium">
+                    <td colspan="9" class="py-10 text-center text-white/40 font-medium">
                       <div class="flex flex-col items-center justify-center gap-2">
                         <i class="ph-bold ph-graduation-cap text-3xl text-white/20"></i>
                         <span>Belum ada sekolah mitra terdaftar atau tidak sesuai kata kunci</span>
@@ -476,6 +485,9 @@
                     </td>
                   </tr>
                   <tr v-for="(s, idx) in filteredAdminSchools" :key="s.id" class="hover:bg-white/5 transition-colors">
+                    <td class="w-10 px-3 py-3 text-center" @click.stop>
+                      <input type="checkbox" :value="s.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </td>
                     <td class="px-3 py-3 text-center text-white/50 font-bold text-xs">{{ idx + 1 }}</td>
                     <td class="px-4 py-3">
                       <div class="font-bold text-white text-sm flex items-center gap-1.5">
@@ -724,6 +736,9 @@
               <table class="w-full text-left text-xs">
                 <thead>
                   <tr class="border-b border-white/10 text-white/40 text-[10px] uppercase font-bold tracking-wider bg-black/10">
+                    <th class="w-10 px-3 py-2.5 text-center">
+                      <input type="checkbox" :checked="isAllSelected(offlineClasses)" @change="toggleSelectAll(offlineClasses)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </th>
                     <th class="px-4 py-2.5">Nama Kelas</th>
                     <th class="px-3 py-2.5">Jenjang</th>
                     <th class="px-3 py-2.5">Ruang Kelas</th>
@@ -735,6 +750,9 @@
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="cls in offlineClasses" :key="cls.id" class="hover:bg-white/5 transition-colors">
+                    <td class="w-10 px-3 py-3 text-center" @click.stop>
+                      <input type="checkbox" :value="cls.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </td>
                     <td class="px-4 py-3">
                       <div class="font-bold text-white">{{ cls.name }}</div>
                       <div class="text-[10px] text-white/40">{{ cls.tenant_name || 'Cabang Utama' }}</div>
@@ -825,6 +843,9 @@
               <table class="w-full text-xs">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="w-10 px-3 py-3 text-center">
+                      <input type="checkbox" :checked="isAllSelected(pagedOrders, 'orders')" @change="toggleSelectAll(pagedOrders, 'orders')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Order ID</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Siswa</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Paket</th>
@@ -836,6 +857,9 @@
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="o in pagedOrders" :key="o.order_id || o.id" class="hover:bg-white/5 transition-colors">
+                    <td class="w-10 px-3 py-3 text-center" @click.stop>
+                      <input type="checkbox" :value="o.order_id || o.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </td>
                     <td class="px-4 py-3 font-mono text-white/60 text-xs">{{ o.order_id || o.id }}</td>
                     <td class="px-4 py-3">
                       <div class="font-bold text-white text-sm leading-snug">{{ o.student_name || '-' }}</div>
@@ -912,6 +936,9 @@
               <table class="w-full text-xs">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="w-10 px-3 py-3 text-center">
+                      <input type="checkbox" :checked="isAllSelected(pagedStudents)" @change="toggleSelectAll(pagedStudents)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </th>
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Siswa <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Asal Sekolah &amp; Target PTN</th>
@@ -922,9 +949,12 @@
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-if="filteredStudents.length === 0">
-                    <td colspan="6" class="py-8 text-center text-white/40 font-medium">Belum ada data siswa atau tidak sesuai filter</td>
+                    <td colspan="7" class="py-8 text-center text-white/40 font-medium">Belum ada data siswa atau tidak sesuai filter</td>
                   </tr>
                   <tr v-for="(s, index) in pagedStudents" :key="s.id" class="hover:bg-white/5 transition-colors">
+                    <td class="w-10 px-3 py-3 text-center" @click.stop>
+                      <input type="checkbox" :value="s.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </td>
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ (studentPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-4 py-3">
                       <div class="font-bold text-white text-sm leading-snug">{{ s.name }}</div>
@@ -1075,6 +1105,9 @@
               <table class="w-full text-xs">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="w-10 px-3 py-3 text-center">
+                      <input type="checkbox" :checked="isAllSelected(pagedQuestions, 'questions')" @change="toggleSelectAll(pagedQuestions, 'questions')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </th>
                     <th class="text-center px-3 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider w-5/12 cursor-pointer hover:text-white" @click="setSort('question')">Pertanyaan <i v-if="sortKey === 'question'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('test_component')">Komponen & Subtes <i v-if="sortKey === 'test_component'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
@@ -1087,6 +1120,9 @@
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="(q, index) in pagedQuestions" :key="q.id" class="hover:bg-white/5 transition-colors">
+                    <td class="w-10 px-3 py-3 text-center" @click.stop>
+                      <input type="checkbox" :value="q.id" v-model="selectedIds" :disabled="!canSelectRow(q, 'questions')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed" />
+                    </td>
                     <td class="px-3 py-3 text-center text-white/50 font-bold">{{ (questionPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-4 py-3">
                       <div class="line-clamp-2 text-sm text-white/90 font-medium leading-relaxed" :title="stripHtml(q.question)">
@@ -1183,6 +1219,9 @@
               <table class="w-full text-xs">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="w-10 px-3 py-3 text-center">
+                      <input type="checkbox" :checked="isAllSelected(pagedMaterials, 'materials')" @change="toggleSelectAll(pagedMaterials, 'materials')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </th>
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('title')">Judul Materi <i v-if="sortKey === 'title'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('sub_materi')">Sub Materi <i v-if="sortKey === 'sub_materi'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
@@ -1193,6 +1232,9 @@
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="(m, index) in pagedMaterials" :key="m.id" class="hover:bg-white/5 transition-colors">
+                    <td class="w-10 px-3 py-3 text-center" @click.stop>
+                      <input type="checkbox" :value="m.id" v-model="selectedIds" :disabled="!canSelectRow(m, 'materials')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed" />
+                    </td>
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ (materialPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-4 py-3 font-bold text-white text-sm leading-snug">{{ m.title }}</td>
                     <td class="px-4 py-3 font-bold text-white/80 text-xs">{{ m.sub_materi }}</td>
@@ -1250,6 +1292,9 @@
               <table class="w-full text-xs">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="w-10 px-3 py-3 text-center">
+                      <input type="checkbox" :checked="isAllSelected(pagedPlans)" @change="toggleSelectAll(pagedPlans)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </th>
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama Paket <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('price')">Harga Resmi <i v-if="sortKey === 'price'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
@@ -1260,6 +1305,9 @@
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-for="(p, index) in pagedPlans" :key="p.id" class="hover:bg-white/5 transition-colors">
+                    <td class="w-10 px-3 py-3 text-center" @click.stop>
+                      <input type="checkbox" :value="p.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </td>
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ (planPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-4 py-3 font-bold text-white text-sm leading-snug">{{ p.name }}</td>
                     <td class="px-4 py-3 font-bold text-emerald-400 font-mono text-sm">Rp {{ Number(p.price || 0).toLocaleString('id-ID') }}</td>
@@ -1755,6 +1803,9 @@
               <table class="w-full text-xs">
                 <thead>
                   <tr class="bg-black/40 text-white/60 border-b border-white/10">
+                    <th class="w-10 px-3 py-3 text-center">
+                      <input type="checkbox" :checked="isAllSelected(filteredAffiliates)" @change="toggleSelectAll(filteredAffiliates)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </th>
                     <th class="py-3 px-4 text-left font-bold">Mitra</th>
                     <th class="py-3 px-4 text-left font-bold">Cabang</th>
                     <th class="py-3 px-4 text-left font-bold">Kode Referral</th>
@@ -1765,12 +1816,15 @@
                 </thead>
                 <tbody>
                   <tr v-if="isLoadingAffiliates">
-                    <td colspan="6" class="py-6 text-center text-white/40 font-medium text-xs">Memuat data mitra...</td>
+                    <td colspan="7" class="py-6 text-center text-white/40 font-medium text-xs">Memuat data mitra...</td>
                   </tr>
                   <tr v-else-if="filteredAffiliates.length === 0">
-                    <td colspan="6" class="py-6 text-center text-white/40 font-medium text-xs">Belum ada mitra afiliasi atau tidak sesuai filter</td>
+                    <td colspan="7" class="py-6 text-center text-white/40 font-medium text-xs">Belum ada mitra afiliasi atau tidak sesuai filter</td>
                   </tr>
                   <tr v-for="aff in filteredAffiliates" :key="aff.id" class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td class="w-10 px-3 py-3 text-center" @click.stop>
+                      <input type="checkbox" :value="aff.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </td>
                     <td class="py-3 px-4">
                       <div class="font-bold text-white text-sm leading-snug">{{ aff.affiliate_name || aff.identity_key }}</div>
                       <div class="text-xs text-white/50">{{ aff.email || aff.identity_key }}</div>
@@ -2254,6 +2308,9 @@
               <table class="w-full text-xs">
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
+                    <th class="w-10 px-3 py-3 text-center">
+                      <input type="checkbox" :checked="isAllSelected(filteredStaffMembers, 'staff')" @change="toggleSelectAll(filteredStaffMembers, 'staff')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                    </th>
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('username')">Username <i v-if="sortKey === 'username'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
@@ -2265,9 +2322,12 @@
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-if="filteredStaffMembers.length === 0">
-                    <td colspan="7" class="py-8 text-center text-white/40 font-medium">Belum ada data staff atau tidak sesuai filter</td>
+                    <td colspan="8" class="py-8 text-center text-white/40 font-medium">Belum ada data staff atau tidak sesuai filter</td>
                   </tr>
                   <tr v-for="(s, index) in filteredStaffMembers" :key="s.id" class="hover:bg-white/5 transition-colors">
+                    <td class="w-10 px-3 py-3 text-center" @click.stop>
+                      <input type="checkbox" :value="s.id" v-model="selectedIds" :disabled="!canSelectRow(s, 'staff')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed" />
+                    </td>
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ index + 1 }}</td>
                     <td class="px-4 py-3 font-bold text-white text-sm leading-snug">{{ s.username }}</td>
                     <td class="px-4 py-3 font-bold text-white/80 text-xs">{{ s.name || '-' }}</td>
@@ -3975,6 +4035,33 @@
         </button>
       </div>
     </div>
+
+    <!-- Floating Bulk Actions Toolbar -->
+    <transition enter-active-class="transform transition ease-out duration-200" enter-from-class="translate-y-12 opacity-0" enter-to-class="translate-y-0 opacity-100" leave-active-class="transform transition ease-in duration-150" leave-from-class="translate-y-0 opacity-100" leave-to-class="translate-y-12 opacity-0">
+      <div v-if="selectedIds.length > 0" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0e1726]/95 border border-[#c0ff00]/40 shadow-2xl backdrop-blur-xl ring-1 ring-[#c0ff00]/20 text-white animate-fade-in">
+        <div class="flex items-center gap-2">
+          <span class="flex h-3 w-3 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c0ff00] opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-[#c0ff00]"></span>
+          </span>
+          <span class="text-xs font-bold font-mono">
+            <strong class="text-[#c0ff00] font-black text-sm">{{ selectedIds.length }}</strong> data terpilih
+          </span>
+        </div>
+
+        <div class="h-4 w-px bg-white/20 mx-1"></div>
+
+        <button @click="executeBulkDelete" :disabled="isBulkDeleting" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-black inline-flex items-center gap-1.5 transition-all shadow-lg shadow-rose-900/40 cursor-pointer disabled:opacity-50 disabled:pointer-events-none active:scale-95">
+          <i class="ph-bold" :class="isBulkDeleting ? 'ph-spinner animate-spin' : 'ph-trash'"></i>
+          <span>{{ isBulkDeleting ? 'Menghapus...' : `Hapus Terpilih (${selectedIds.length})` }}</span>
+        </button>
+
+        <button @click="clearSelection" :disabled="isBulkDeleting" class="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white/80 hover:text-white rounded-xl text-xs font-bold inline-flex items-center gap-1 transition-all cursor-pointer disabled:opacity-50">
+          <i class="ph-bold ph-x"></i>
+          <span>Batal</span>
+        </button>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -4011,6 +4098,104 @@ const selectNavTab = (tabId) => {
 // Sorting state
 const sortKey = ref('');
 const sortOrder = ref('asc');
+
+// ── Multi-Select & Bulk Deletion State ──
+const selectedIds = ref([]);
+const isBulkDeleting = ref(false);
+
+const getItemId = (item, context = '') => {
+  if (!item) return '';
+  if (context === 'orders' || context === 'transactions') return item.order_id || item.id;
+  return item.id;
+};
+
+const canSelectStaff = (s) => {
+  if (!s) return false;
+  if (s.username === 'admin' || s.role === 'superadmin') return false;
+  if (currentAdminUser.value && (s.id === currentAdminUser.value.id || s.id === currentAdminUser.value.reference_id || s.username === currentAdminUser.value.username)) return false;
+  return true;
+};
+
+const canSelectRow = (item, context = '') => {
+  if (!item) return false;
+  if (context === 'questions') return canManageQuestion(item);
+  if (context === 'materials') return canManageMaterial(item);
+  if (context === 'staff') return canSelectStaff(item);
+  return true;
+};
+
+const isAllSelected = (items, context = '') => {
+  if (!Array.isArray(items) || items.length === 0) return false;
+  const selectable = items.filter(it => canSelectRow(it, context));
+  if (selectable.length === 0) return false;
+  return selectable.every(it => selectedIds.value.includes(getItemId(it, context)));
+};
+
+const toggleSelectAll = (items, context = '') => {
+  if (!Array.isArray(items) || items.length === 0) return;
+  const selectable = items.filter(it => canSelectRow(it, context));
+  if (selectable.length === 0) return;
+  const allSelected = selectable.every(it => selectedIds.value.includes(getItemId(it, context)));
+  if (allSelected) {
+    const selectableIds = selectable.map(it => getItemId(it, context));
+    selectedIds.value = selectedIds.value.filter(id => !selectableIds.includes(id));
+  } else {
+    const newIds = new Set(selectedIds.value);
+    selectable.forEach(it => newIds.add(getItemId(it, context)));
+    selectedIds.value = Array.from(newIds);
+  }
+};
+
+const clearSelection = () => {
+  selectedIds.value = [];
+};
+
+watch(activeTab, () => {
+  selectedIds.value = [];
+});
+
+const executeBulkDelete = async () => {
+  if (selectedIds.value.length === 0) return;
+
+  const tabConfig = {
+    questions: { type: 'questions', label: 'soal', refresh: async () => { await fetchQuestions(); fetchDashboard(); } },
+    materials: { type: 'materials', label: 'materi', refresh: async () => { await fetchMaterials(); } },
+    students: { type: 'students', label: 'siswa', refresh: async () => { await fetchStudents(); } },
+    transactions: { type: 'orders', label: 'transaksi', refresh: async () => { await fetchAdminOrders(); } },
+    packages: { type: 'plans', label: 'paket belajar', refresh: async () => { await loadPlansAndStaff(); } },
+    schools: { type: 'schools', label: 'sekolah mitra', refresh: async () => { await fetchSchools(); } },
+    classes: { type: 'classes', label: 'kelas rombel', refresh: async () => { await fetchOfflineClasses(); } },
+    affiliates: { type: 'affiliates', label: 'mitra afiliasi', refresh: async () => { await loadAdminAffiliates(); } },
+    staff: { type: 'staff', label: 'staf & guru', refresh: async () => { await loadPlansAndStaff(); } },
+    branches: { type: 'branches', label: 'cabang', refresh: async () => { await fetchTenants(); } }
+  };
+
+  const config = tabConfig[activeTab.value];
+  if (!config) {
+    alert("Operasi hapus masal belum didukung pada tab ini.");
+    return;
+  }
+
+  const count = selectedIds.value.length;
+  if (!confirm(`Yakin ingin menghapus ${count} data ${config.label} yang dipilih secara permanen / masal? Tindakan ini tidak dapat dibatalkan.`)) {
+    return;
+  }
+
+  isBulkDeleting.value = true;
+  try {
+    const res = await api.bulkDelete(config.type, selectedIds.value);
+    alert(res?.message || `Berhasil menghapus ${count} data ${config.label}`);
+    selectedIds.value = [];
+    if (typeof config.refresh === 'function') {
+      await config.refresh();
+    }
+  } catch (err) {
+    console.error("Bulk delete error:", err);
+    alert(err?.message || "Gagal melakukan penghapusan masal");
+  } finally {
+    isBulkDeleting.value = false;
+  }
+};
 
 const setSort = (key) => {
   if (sortKey.value === key) {

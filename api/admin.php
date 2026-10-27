@@ -428,6 +428,320 @@ if (!in_array($payload->role, ['admin', 'superadmin', 'teacher', 'affiliate'])) 
     exit;
 }
 
+if ($action === 'bulk_delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $postData = !empty($input) ? $input : (json_decode(file_get_contents('php://input'), true) ?: []);
+    $type = $postData['type'] ?? '';
+    $ids = $postData['ids'] ?? [];
+
+    if (empty($type) || !is_array($ids) || empty($ids)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Parameter type dan array ids wajib disertakan"]);
+        exit;
+    }
+
+    $ids = array_values(array_unique(array_filter(array_map('strval', $ids), fn($v) => trim($v) !== '')));
+    if (empty($ids)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Daftar ID tidak valid atau kosong"]);
+        exit;
+    }
+
+    if (count($ids) > 500) {
+        $ids = array_slice($ids, 0, 500);
+    }
+
+    $deletedCount = 0;
+
+    try {
+        $pdo->beginTransaction();
+
+        switch ($type) {
+            case 'questions':
+                if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+                    $pdo->rollBack();
+                    http_response_code(403);
+                    echo json_encode(["error" => "Akses ditolak"]);
+                    exit;
+                }
+                if ($payload->role === 'teacher') {
+                    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                    $chkStmt = $pdo->prepare("SELECT id FROM questions WHERE id IN ($placeholders) AND (teacher_id = ? OR teacher_id = ? OR teacher_id IS NULL OR teacher_id = '')");
+                    $params = array_merge($ids, [$payload->user_id, $payload->id]);
+                    $chkStmt->execute($params);
+                    $allowedIds = $chkStmt->fetchAll(PDO::FETCH_COLUMN);
+                    if (empty($allowedIds)) {
+                        $pdo->rollBack();
+                        http_response_code(403);
+                        echo json_encode(["error" => "Anda tidak memiliki wewenang untuk menghapus soal-soal ini"]);
+                        exit;
+                    }
+                    $ids = $allowedIds;
+                }
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                $delStmt = $pdo->prepare("DELETE FROM questions WHERE id IN ($placeholders)");
+                $delStmt->execute($ids);
+                $deletedCount = $delStmt->rowCount();
+                break;
+
+            case 'materials':
+                if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+                    $pdo->rollBack();
+                    http_response_code(403);
+                    echo json_encode(["error" => "Akses ditolak"]);
+                    exit;
+                }
+                if ($payload->role === 'teacher') {
+                    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                    $chkStmt = $pdo->prepare("SELECT id FROM materials WHERE id IN ($placeholders) AND (teacher_id = ? OR teacher_id = ? OR teacher_id IS NULL OR teacher_id = '')");
+                    $params = array_merge($ids, [$payload->user_id, $payload->id]);
+                    $chkStmt->execute($params);
+                    $allowedIds = $chkStmt->fetchAll(PDO::FETCH_COLUMN);
+                    if (empty($allowedIds)) {
+                        $pdo->rollBack();
+                        http_response_code(403);
+                        echo json_encode(["error" => "Anda tidak memiliki wewenang untuk menghapus materi-materi ini"]);
+                        exit;
+                    }
+                    $ids = $allowedIds;
+                }
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                $delStmt = $pdo->prepare("DELETE FROM materials WHERE id IN ($placeholders)");
+                $delStmt->execute($ids);
+                $deletedCount = $delStmt->rowCount();
+                break;
+
+            case 'students':
+                if (!in_array($payload->role, ['superadmin', 'admin'])) {
+                    $pdo->rollBack();
+                    http_response_code(403);
+                    echo json_encode(["error" => "Akses ditolak"]);
+                    exit;
+                }
+                foreach ($ids as $sId) {
+                    $stmtS = $pdo->prepare("SELECT email FROM students WHERE id = ?");
+                    $stmtS->execute([$sId]);
+                    $email = $stmtS->fetchColumn();
+
+                    try { $pdo->prepare("DELETE FROM financial_ledger WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?) OR order_id IN (SELECT order_id FROM orders WHERE student_id = ?)")->execute([$sId, $sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM royalty_accruals WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?) OR order_id IN (SELECT order_id FROM orders WHERE student_id = ?)")->execute([$sId, $sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM commissions WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?) OR order_id IN (SELECT order_id FROM orders WHERE student_id = ?)")->execute([$sId, $sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM payments WHERE order_id IN (SELECT id FROM orders WHERE student_id = ?) OR order_id IN (SELECT order_id FROM orders WHERE student_id = ?)")->execute([$sId, $sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM invoices WHERE student_id = ? OR order_id IN (SELECT id FROM orders WHERE student_id = ?) OR order_id IN (SELECT order_id FROM orders WHERE student_id = ?)")->execute([$sId, $sId, $sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM orders WHERE student_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM subscriptions WHERE student_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+
+                    try { $pdo->prepare("DELETE FROM spp_scores WHERE attempt_id IN (SELECT id FROM spp_attempts WHERE student_id = ?)")->execute([$sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM spp_attempts WHERE student_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+
+                    try { $pdo->prepare("DELETE FROM quiz_results WHERE student_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM quiz_attempts WHERE student_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM progress WHERE student_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM entitlements WHERE student_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+
+                    try { $pdo->prepare("DELETE FROM refresh_tokens WHERE student_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM device_tokens WHERE student_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM class_students WHERE student_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+
+                    $pdo->prepare("DELETE FROM students WHERE id = ?")->execute([$sId]);
+                    try { $pdo->prepare("DELETE FROM user_roles WHERE reference_id = ?")->execute([$sId]); } catch (\Throwable $e) {}
+                    if ($email) {
+                        try { $pdo->prepare("DELETE FROM users WHERE identity_key = ?")->execute([$email]); } catch (\Throwable $e) {}
+                    }
+                    $deletedCount++;
+                }
+                break;
+
+            case 'orders':
+            case 'transactions':
+                if ($payload->role !== 'superadmin') {
+                    $pdo->rollBack();
+                    http_response_code(403);
+                    echo json_encode(["error" => "Hanya Super Admin yang berhak menghapus data transaksi"]);
+                    exit;
+                }
+                foreach ($ids as $orderId) {
+                    try { $pdo->prepare("DELETE FROM financial_ledger WHERE order_id = ? OR order_id IN (SELECT id FROM orders WHERE order_id = ? OR id = ?)")->execute([$orderId, $orderId, $orderId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM royalty_accruals WHERE order_id = ? OR order_id IN (SELECT id FROM orders WHERE order_id = ? OR id = ?)")->execute([$orderId, $orderId, $orderId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM commissions WHERE order_id = ? OR order_id IN (SELECT id FROM orders WHERE order_id = ? OR id = ?)")->execute([$orderId, $orderId, $orderId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM payments WHERE order_id = ? OR order_id IN (SELECT id FROM orders WHERE order_id = ? OR id = ?)")->execute([$orderId, $orderId, $orderId]); } catch (\Throwable $e) {}
+                    try { $pdo->prepare("DELETE FROM invoices WHERE order_id = ? OR order_id IN (SELECT id FROM orders WHERE order_id = ? OR id = ?)")->execute([$orderId, $orderId, $orderId]); } catch (\Throwable $e) {}
+                    $pdo->prepare("DELETE FROM orders WHERE order_id = ? OR id = ?")->execute([$orderId, $orderId]);
+                    $deletedCount++;
+                }
+                break;
+
+            case 'plans':
+            case 'packages':
+                if (!in_array($payload->role, ['superadmin', 'admin'])) {
+                    $pdo->rollBack();
+                    http_response_code(403);
+                    echo json_encode(["error" => "Akses ditolak"]);
+                    exit;
+                }
+                foreach ($ids as $pId) {
+                    $chkOrders = $pdo->prepare("SELECT COUNT(*) FROM orders WHERE plan_id = ?");
+                    $chkOrders->execute([$pId]);
+                    $hasOrders = $chkOrders->fetchColumn() > 0;
+
+                    $chkSubs = $pdo->prepare("SELECT COUNT(*) FROM subscriptions WHERE plan_id = ?");
+                    $chkSubs->execute([$pId]);
+                    $hasSubs = $chkSubs->fetchColumn() > 0;
+
+                    if ($hasOrders || $hasSubs) {
+                        $pdo->prepare("UPDATE plans SET is_active = 0, is_archived = 1 WHERE id = ?")->execute([$pId]);
+                    } else {
+                        try { $pdo->prepare("DELETE FROM plan_entitlements WHERE plan_id = ?")->execute([$pId]); } catch (\Throwable $e) {}
+                        $pdo->prepare("DELETE FROM plans WHERE id = ?")->execute([$pId]);
+                    }
+                    $deletedCount++;
+                }
+                break;
+
+            case 'schools':
+                if (!in_array($payload->role, ['superadmin', 'admin'])) {
+                    $pdo->rollBack();
+                    http_response_code(403);
+                    echo json_encode(["error" => "Akses ditolak"]);
+                    exit;
+                }
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                $delSchools = $pdo->prepare("DELETE FROM schools WHERE id IN ($placeholders)");
+                $delSchools->execute($ids);
+                $deletedCount = $delSchools->rowCount();
+                try {
+                    $pdo->prepare("DELETE FROM user_roles WHERE reference_id IN ($placeholders) AND role = 'school_bk'")->execute($ids);
+                } catch (\Throwable $e) {}
+                break;
+
+            case 'affiliates':
+                if (!in_array($payload->role, ['superadmin', 'admin'])) {
+                    $pdo->rollBack();
+                    http_response_code(403);
+                    echo json_encode(["error" => "Akses ditolak"]);
+                    exit;
+                }
+                if ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+                    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                    $chk = $pdo->prepare("SELECT id FROM affiliates WHERE id IN ($placeholders) AND tenant_id = ?");
+                    $params = array_merge($ids, [$payload->tenant_id]);
+                    $chk->execute($params);
+                    $ids = $chk->fetchAll(PDO::FETCH_COLUMN);
+                    if (empty($ids)) {
+                        $pdo->rollBack();
+                        http_response_code(403);
+                        echo json_encode(["error" => "Anda hanya dapat menghapus mitra pada cabang Anda"]);
+                        exit;
+                    }
+                }
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                $delAff = $pdo->prepare("DELETE FROM affiliates WHERE id IN ($placeholders)");
+                $delAff->execute($ids);
+                $deletedCount = $delAff->rowCount();
+                break;
+
+            case 'staff':
+                if (!in_array($payload->role, ['superadmin', 'admin'])) {
+                    $pdo->rollBack();
+                    http_response_code(403);
+                    echo json_encode(["error" => "Akses ditolak"]);
+                    exit;
+                }
+                foreach ($ids as $stId) {
+                    $chk = $pdo->prepare("
+                        SELECT a.id, a.username, ur.role, ur.tenant_id, u.id as user_id 
+                        FROM admins a 
+                        LEFT JOIN user_roles ur ON a.id = ur.reference_id 
+                        LEFT JOIN users u ON a.id = u.reference_id OR a.username = u.identity_key 
+                        WHERE a.id = ?
+                    ");
+                    $chk->execute([$stId]);
+                    $staffInfo = $chk->fetch(PDO::FETCH_ASSOC);
+
+                    if (!$staffInfo) continue;
+                    if ($staffInfo['role'] === 'superadmin' || $staffInfo['id'] === $payload->id || (!empty($staffInfo['user_id']) && $staffInfo['user_id'] === $payload->user_id)) {
+                        continue;
+                    }
+                    if ($payload->role !== 'superadmin') {
+                        if ($staffInfo['tenant_id'] !== $payload->tenant_id || $staffInfo['role'] !== 'teacher') {
+                            continue;
+                        }
+                    }
+
+                    $pdo->prepare("DELETE FROM admins WHERE id = ?")->execute([$stId]);
+                    $pdo->prepare("DELETE FROM user_roles WHERE reference_id = ?")->execute([$stId]);
+                    if (!empty($staffInfo['user_id'])) {
+                        $pdo->prepare("DELETE FROM users WHERE id = ?")->execute([$staffInfo['user_id']]);
+                    }
+                    $deletedCount++;
+                }
+                break;
+
+            case 'classes':
+            case 'offline_classes':
+                if (!in_array($payload->role, ['superadmin', 'admin'])) {
+                    $pdo->rollBack();
+                    http_response_code(403);
+                    echo json_encode(["error" => "Hanya Administrator yang dapat mengelola kelas rombel"]);
+                    exit;
+                }
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                $sql = "UPDATE classes SET status = 'archived' WHERE id IN ($placeholders)";
+                $params = $ids;
+                if ($payload->role !== 'superadmin' && !empty($payload->tenant_id)) {
+                    $sql .= " AND tenant_id = ?";
+                    $params[] = $payload->tenant_id;
+                }
+                $stmtCls = $pdo->prepare($sql);
+                $stmtCls->execute($params);
+                $deletedCount = $stmtCls->rowCount();
+                break;
+
+            case 'branches':
+            case 'tenants':
+                if ($payload->role !== 'superadmin') {
+                    $pdo->rollBack();
+                    http_response_code(403);
+                    echo json_encode(["error" => "Hanya Super Admin yang berhak menghapus cabang"]);
+                    exit;
+                }
+                foreach ($ids as $bId) {
+                    $studentCount = $pdo->prepare("SELECT COUNT(*) FROM students WHERE tenant_id = ?");
+                    $studentCount->execute([$bId]);
+                    $hasStudents = ((int)$studentCount->fetchColumn()) > 0;
+
+                    $staffCount = $pdo->prepare("SELECT COUNT(*) FROM user_roles WHERE tenant_id = ?");
+                    $staffCount->execute([$bId]);
+                    $hasStaff = ((int)$staffCount->fetchColumn()) > 0;
+
+                    if ($hasStudents || $hasStaff) {
+                        $pdo->prepare("UPDATE tenants SET is_active = 0 WHERE id = ?")->execute([$bId]);
+                    } else {
+                        $pdo->prepare("DELETE FROM tenants WHERE id = ?")->execute([$bId]);
+                    }
+                    $deletedCount++;
+                }
+                break;
+
+            default:
+                $pdo->rollBack();
+                http_response_code(400);
+                echo json_encode(["error" => "Tipe data tidak didukung untuk hapus masal: " . htmlspecialchars($type)]);
+                exit;
+        }
+
+        $pdo->commit();
+        echo json_encode(["success" => true, "deleted_count" => $deletedCount, "message" => "Berhasil menghapus {$deletedCount} data terpilih"]);
+        exit;
+    } catch (\Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal memproses hapus masal: " . $e->getMessage()]);
+        exit;
+    }
+}
+
 if (($action === 'me' || $action === 'profile') && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.display_name, ur.role, ur.tenant_id, ur.reference_id, 
