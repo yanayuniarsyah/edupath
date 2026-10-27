@@ -10,11 +10,16 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/api/config.php';
 
-$materialsJsonPath = __DIR__ . '/scratch/materials_ready.json';
-$questionsJsonPath = __DIR__ . '/scratch/questions_ready.json';
+$materialsJsonPath = file_exists(__DIR__ . '/api/database/seeds/kitab_materials_ready.json') 
+    ? __DIR__ . '/api/database/seeds/kitab_materials_ready.json' 
+    : __DIR__ . '/scratch/materials_ready.json';
+
+$questionsJsonPath = file_exists(__DIR__ . '/api/database/seeds/kitab_questions_ready.json') 
+    ? __DIR__ . '/api/database/seeds/kitab_questions_ready.json' 
+    : __DIR__ . '/scratch/questions_ready.json';
 
 if (!file_exists($materialsJsonPath) || !file_exists($questionsJsonPath)) {
-    die("File JSON materi atau soal di direktori scratch belum lengkap.\n");
+    die("File JSON materi atau soal belum ditemukan di api/database/seeds/ atau scratch/.\n");
 }
 
 $materials = json_decode(file_get_contents($materialsJsonPath), true);
@@ -31,6 +36,13 @@ echo "========================================================\n";
 echo "Total materi yang akan diproses: " . count($materials) . "\n";
 echo "Total soal yang akan diproses   : " . count($questions) . "\n\n";
 
+// Pastikan kolom dan struktur tabel up-to-date
+try {
+    $pdo->exec("ALTER TABLE materials ADD COLUMN IF NOT EXISTS formula_praktis TEXT NULL");
+} catch (Exception $e) {
+    try { $pdo->exec("ALTER TABLE materials ADD COLUMN formula_praktis TEXT NULL"); } catch (Exception $e2) {}
+}
+
 $materialsInserted = 0;
 $materialsUpdated = 0;
 $questionsInserted = 0;
@@ -45,12 +57,12 @@ try {
     $checkMatStmt = $pdo->prepare("SELECT id FROM materials WHERE title = ? AND subtes = ?");
     $insertMatStmt = $pdo->prepare("
         INSERT INTO materials (
-            subtes, title, content, exam, test_component, 
+            subtes, title, content, formula_praktis, exam, test_component, 
             subtest, sub_materi, topic, subtopic, skill, indicator, 
             teacher_name, file_url, is_active, education_level, 
             assessment_type, subject, domain
         ) VALUES (
-            ?, ?, ?, ?, ?, 
+            ?, ?, ?, ?, ?, ?, 
             ?, ?, ?, ?, ?, ?, 
             ?, ?, ?, ?, 
             ?, ?, ?
@@ -58,7 +70,7 @@ try {
     ");
     $updateMatStmt = $pdo->prepare("
         UPDATE materials SET 
-            content = ?, exam = ?, test_component = ?, subtest = ?, 
+            content = ?, formula_praktis = ?, exam = ?, test_component = ?, subtest = ?, 
             sub_materi = ?, topic = ?, subtopic = ?, skill = ?, indicator = ?, 
             teacher_name = ?, file_url = ?, is_active = ?, education_level = ?, 
             assessment_type = ?, subject = ?, domain = ?
@@ -72,6 +84,7 @@ try {
         $subtes = trunc($m['subtes'], 100);
         $title = trunc($m['title'], 250);
         $content = $m['content'];
+        $formula = $m['formula_praktis'] ?? 'Kuasai konsep kunci dan metode analisis cepat untuk subtes ini.';
         $exam = trunc($m['exam'], 50);
         $comp = trunc($m['test_component'], 50);
         $subtest = trunc($m['subtest'], 100);
@@ -90,7 +103,7 @@ try {
 
         if ($existing) {
             $updateMatStmt->execute([
-                $content, $exam, $comp, $subtest,
+                $content, $formula, $exam, $comp, $subtest,
                 $sub_materi, $topic, $subtopic, $skill, $indicator,
                 $teacher, $file_url, $active, $ed_level,
                 $ass_type, $subject, $domain,
@@ -99,7 +112,7 @@ try {
             $materialsUpdated++;
         } else {
             $insertMatStmt->execute([
-                $subtes, $title, $content, $exam, $comp,
+                $subtes, $title, $content, $formula, $exam, $comp,
                 $subtest, $sub_materi, $topic, $subtopic, $skill, $indicator,
                 $teacher, $file_url, $active, $ed_level,
                 $ass_type, $subject, $domain

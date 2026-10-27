@@ -3104,11 +3104,17 @@
                   </div>
                   <h3 class="text-2xl font-black font-heading text-slate-900">{{ selectedBab.judul }}</h3>
                   
-                  <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                  <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
                     <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Ringkasan Konsep Dasar:</h5>
-                    <p class="text-sm text-slate-700 leading-relaxed font-normal">
+                    <p class="text-sm text-slate-700 leading-relaxed font-normal whitespace-pre-line">
                       {{ selectedBab.teoriSingkat }}
                     </p>
+                    <div v-if="selectedBab.file_url" class="pt-3 flex flex-wrap items-center gap-2.5 border-t border-slate-200/60 mt-3">
+                      <a :href="selectedBab.file_url" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition-all shadow-md">
+                        <i class="ph-bold" :class="selectedBab.file_url.includes('youtu') ? 'ph-youtube-logo text-base' : 'ph-pencil-simple-line text-base'"></i>
+                        <span>{{ selectedBab.file_url.includes('youtu') ? 'Tonton Video Penjelasan Materi' : 'Buka Latihan Soal Mandiri' }}</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
 
@@ -5331,6 +5337,57 @@ export default {
       }
     };
 
+    const fetchMaterialsFromDb = async () => {
+      try {
+        const res = await api.getMaterials();
+        const serverList = Array.isArray(res) ? res : (res?.materials || []);
+        if (serverList.length > 0 && materiUtbk.value) {
+          serverList.forEach(m => {
+            const subName = (m.subtest || m.subtes || '').toLowerCase();
+            const targetSub = materiUtbk.value.find(s => {
+              const sName = (s.subtest || s.name || '').toLowerCase();
+              return sName === subName ||
+                (subName.includes('penalaran umum') && s.code === 'PU') ||
+                (subName.includes('kuantitatif') && s.code === 'PK') ||
+                (subName.includes('bacaan') && s.code === 'PBM') ||
+                (subName.includes('pemahaman umum') && s.code === 'PPU') ||
+                (subName.includes('indonesia') && s.code === 'LBI') ||
+                (subName.includes('inggris') && s.code === 'LBE') ||
+                (subName.includes('matematika') && s.code === 'PM');
+            });
+            if (targetSub) {
+              if (!targetSub.babList) targetSub.babList = [];
+              const exists = targetSub.babList.some(b => b.judul === m.title || b.id === `db_${m.id}`);
+              if (!exists) {
+                targetSub.babList.push({
+                  id: `db_${m.id}`,
+                  topic: m.topic || m.title,
+                  subtopic: m.subtopic || m.title,
+                  skill: m.skill || `Pemahaman ${m.title}`,
+                  indicator: m.indicator || `Mampu menganalisis ${m.title}`,
+                  judul: m.title,
+                  teoriSingkat: m.content || m.title,
+                  formula_praktis: m.formula_praktis || 'Fokus pada konsep kunci dan trik pembahasannya.',
+                  file_url: m.file_url || '',
+                  microLesson: {
+                    title: `Trik & Konsep: ${m.title}`,
+                    duration: '5 Menit',
+                    type: 'Modul Belajar',
+                    summary: (m.content || '').slice(0, 200).replace(/\n/g, ' ') + '...'
+                  }
+                });
+              }
+            }
+          });
+          if (selectedSubtes.value && selectedSubtes.value.babList && selectedSubtes.value.babList.length && !selectedBab.value) {
+            selectedBab.value = selectedSubtes.value.babList[0];
+          }
+        }
+      } catch (e) {
+        console.warn("Using offline/default MATERI_UTBK fallback", e);
+      }
+    };
+
     onMounted(async () => {
       // Capture affiliate referral code
       const params = new URLSearchParams(window.location.search);
@@ -5351,6 +5408,7 @@ export default {
       }
       fetchPlans();
       checkAuth();
+      fetchMaterialsFromDb();
       try {
         const schools = await api.getPublicSchools().catch(() => []);
         publicSchoolsList.value = Array.isArray(schools) ? schools : (schools?.schools || []);

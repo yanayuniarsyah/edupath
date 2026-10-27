@@ -7,8 +7,9 @@ require_once 'EntitlementService.php';
 $action = $_GET['action'] ?? '';
 
 if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    // 1. AUTHENTICATE
-    $payload = authenticate();
+    // 1. AUTHENTICATE (Optional for general material reading)
+    $token = get_token();
+    $payload = $token ? verify_jwt($token) : null;
     
     // 2. INITIALIZE ENTITLEMENT SERVICE
     $entitlementService = new EntitlementService($pdo);
@@ -17,8 +18,8 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $subtes = safe_str($_GET['subtes'] ?? '');
     $isAdvanced = isset($_GET['advanced']) && $_GET['advanced'] == 1;
 
-    $isStaff = in_array($payload->role, ['superadmin', 'admin', 'teacher', 'school_bk'], true);
-    $hasPremiumAccess = $isStaff || $entitlementService->hasEntitlement($payload->id, $payload->tenant_id ?? '', 'premium_materials');
+    $isStaff = $payload && in_array($payload->role, ['superadmin', 'admin', 'teacher', 'school_bk'], true);
+    $hasPremiumAccess = $isStaff || ($payload && $entitlementService->hasEntitlement($payload->id, $payload->tenant_id ?? '', 'premium_materials'));
 
     if ($isAdvanced && !$hasPremiumAccess) {
         http_response_code(403);
@@ -64,12 +65,35 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     $sql .= " ORDER BY created_at DESC";
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    
-    // 5. STANDARD RESPONSE (Direct array for backward compatibility and test suite)
-    $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode($materials);
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode($materials);
+    } catch (PDOException $e) {
+        // If column formula_praktis or other new column is missing, attempt auto-repair and retry once
+        if (strpos($e->getMessage(), 'Unknown column') !== false || strpos($e->getMessage(), 'formula_praktis') !== false) {
+            try {
+                $pdo->exec("ALTER TABLE materials ADD COLUMN formula_praktis TEXT NULL");
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($params);
+                $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                echo json_encode($materials);
+                exit;
+            } catch (Exception $subEx) {}
+        }
+        
+        // Fallback: query without formula_praktis if still failing
+        try {
+            $fallbackSql = str_replace(", formula_praktis", "", $sql);
+            $stmt = $pdo->prepare($fallbackSql);
+            $stmt->execute($params);
+            $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($materials);
+        } catch (Exception $finalEx) {
+            echo json_encode([]);
+        }
+    }
 } else {
     http_response_code(404);
     echo json_encode([
