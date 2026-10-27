@@ -3035,6 +3035,37 @@
               </button>
             </div>
           </div>
+
+          <!-- Subtest Navigation Tabs (Horizontal Scrollable Pills) -->
+          <div class="bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:p-4 backdrop-blur-xl shadow-xl space-y-2">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00]">Pilih Komponen & Subtes UTBK:</span>
+              <span class="text-[10px] font-bold text-white/60 font-mono">{{ materiUtbk.length }} Subtes &bull; {{ materiUtbk.reduce((acc, s) => acc + (s.babList ? s.babList.length : 0), 0) }} Bab Terstruktur</span>
+            </div>
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+              <button
+                v-for="sub in materiUtbk"
+                :key="sub.id"
+                @click="selectSubtes(sub)"
+                :class="[
+                  'px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 shrink-0 cursor-pointer shadow-md',
+                  selectedSubtes && (selectedSubtes.id === sub.id || selectedSubtes.code === sub.code)
+                    ? 'bg-[#c0ff00] text-black font-black shadow-[0_0_15px_rgba(192,255,0,0.35)] scale-[1.02]'
+                    : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
+                ]"
+              >
+                <span>{{ sub.icon || '📚' }}</span>
+                <span>{{ sub.subtest }}</span>
+                <span 
+                  class="text-[10px] px-2 py-0.5 rounded-full font-mono font-black"
+                  :class="selectedSubtes && (selectedSubtes.id === sub.id || selectedSubtes.code === sub.code) ? 'bg-black/20 text-black' : 'bg-black/40 text-[#c0ff00]'"
+                >
+                  {{ sub.babList ? sub.babList.length : 0 }} Bab
+                </span>
+              </button>
+            </div>
+          </div>
+
           <!-- Active Subtes Header Banner -->
           <div class="light-mode-card rounded-2xl p-3.5 sm:p-5 flex items-center justify-between border-l-4 border-l-indigo-600">
             <div class="flex items-center gap-3">
@@ -5566,7 +5597,7 @@ export default {
     };
 
     const materiSubMenuOpen = ref(false);
-    const premiumTabs = ['diagnostic', 'learning', 'simulator', 'studyroom'];
+    const premiumTabs = ['simulator', 'studyroom'];
 
     const handleTabClick = (tabId) => {
       const adminTarget = adminTabs.find(t => t.id === tabId);
@@ -5612,11 +5643,6 @@ export default {
       if (!isLoggedIn.value) {
         showLoginModal.value = true;
         showToast('Silakan Masuk Akun untuk mengakses fitur ini!');
-        return;
-      }
-      if (!isPremiumUser.value) {
-        showToast('Fitur ini khusus pengguna Premium. Silakan pilih paket belajar Anda.');
-        openPlanSelector();
         return;
       }
       currentTab.value = 'learning';

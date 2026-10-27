@@ -2418,6 +2418,63 @@ elseif ($action === 'materials') {
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($materials) && (!isset($_GET['subtest']) || $_GET['subtest'] === 'all')) {
+            $totalCount = (int)$pdo->query("SELECT COUNT(*) FROM materials")->fetchColumn();
+            if ($totalCount === 0) {
+                $seedFile = __DIR__ . '/database/seeds/kitab_materials_ready.json';
+                if (file_exists($seedFile)) {
+                    $raw = file_get_contents($seedFile);
+                    $items = json_decode($raw, true);
+                    if (is_array($items) && count($items) > 0) {
+                        $insertStmt = $pdo->prepare("
+                            INSERT INTO materials (
+                                id, subtes, title, content, formula_praktis, exam, test_component,
+                                subtest, sub_materi, topic, subtopic, skill, indicator,
+                                teacher_name, file_url, is_active, education_level,
+                                assessment_type, subject, domain
+                            ) VALUES (
+                                ?, ?, ?, ?, ?, ?, ?,
+                                ?, ?, ?, ?, ?, ?,
+                                ?, ?, ?, ?,
+                                ?, ?, ?
+                            )
+                        ");
+                        foreach ($items as $m) {
+                            $id = $m['id'] ?? bin2hex(random_bytes(16));
+                            $subtes = mb_substr($m['subtes'] ?? '', 0, 100, 'UTF-8');
+                            $title = mb_substr($m['title'] ?? '', 0, 250, 'UTF-8');
+                            $content = $m['content'] ?? '';
+                            $formula = $m['formula_praktis'] ?? 'Kuasai konsep kunci dan metode analisis cepat untuk subtes ini.';
+                            $exam = mb_substr($m['exam'] ?? 'SNBT', 0, 50, 'UTF-8');
+                            $comp = mb_substr($m['test_component'] ?? 'TPS', 0, 50, 'UTF-8');
+                            $subtest = mb_substr($m['subtest'] ?? '', 0, 100, 'UTF-8');
+                            $sub_materi = mb_substr($m['sub_materi'] ?? '', 0, 150, 'UTF-8');
+                            $topic = mb_substr($m['topic'] ?? '', 0, 150, 'UTF-8');
+                            $subtopic = mb_substr($m['subtopic'] ?? '', 0, 150, 'UTF-8');
+                            $skill = mb_substr($m['skill'] ?? '', 0, 250, 'UTF-8');
+                            $indicator = mb_substr($m['indicator'] ?? '', 0, 250, 'UTF-8');
+                            $teacher = mb_substr($m['teacher_name'] ?? 'Tim EduPath', 0, 150, 'UTF-8');
+                            $file_url = mb_substr($m['file_url'] ?? '', 0, 500, 'UTF-8');
+                            $active = isset($m['is_active']) ? (int)$m['is_active'] : 1;
+                            $ed_level = mb_substr($m['education_level'] ?? 'SMA', 0, 50, 'UTF-8');
+                            $ass_type = mb_substr($m['assessment_type'] ?? 'SNBT', 0, 50, 'UTF-8');
+                            $subject = mb_substr($m['subject'] ?? '', 0, 100, 'UTF-8');
+                            $domain = mb_substr($m['domain'] ?? '', 0, 100, 'UTF-8');
+
+                            $insertStmt->execute([
+                                $id, $subtes, $title, $content, $formula, $exam, $comp,
+                                $subtest, $sub_materi, $topic, $subtopic, $skill, $indicator,
+                                $teacher, $file_url, $active, $ed_level,
+                                $ass_type, $subject, $domain
+                            ]);
+                        }
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute($params);
+                        $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    }
+                }
+            }
+        }
         echo safe_json_encode(["materials" => $materials]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
