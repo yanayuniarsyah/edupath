@@ -1,176 +1,227 @@
 <template>
-  <div class="edupath-rich-editor bg-[#0b1324] border border-white/10 rounded-2xl overflow-hidden flex flex-col text-white">
-    <!-- Header / Top Bar -->
-    <div class="p-2.5 bg-black/40 border-b border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
-      <!-- Left: Title & Mode Toggle -->
-      <div class="flex items-center gap-2">
-        <span class="font-black text-xs uppercase tracking-wider text-white flex items-center gap-1.5">
-          <i class="ph-bold ph-note-pencil text-[#c0ff00]"></i> {{ title || 'Editor EduPath' }}
-        </span>
-
-        <div class="flex items-center bg-black/50 p-0.5 rounded-lg border border-white/10 ml-2">
-          <button
-            type="button"
-            @click="activeView = 'editor'"
-            class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
-            :class="activeView === 'editor' ? 'bg-[#c0ff00] text-black shadow-sm' : 'text-white/60 hover:text-white'"
-          >
-            <i class="ph-bold ph-pencil-simple"></i> Editor
-          </button>
-          <button
-            type="button"
-            @click="activeView = 'preview'"
-            class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
-            :class="activeView === 'preview' ? 'bg-[#c0ff00] text-black shadow-sm' : 'text-white/60 hover:text-white'"
-          >
-            <i class="ph-bold ph-eye"></i> Preview
-          </button>
-        </div>
-      </div>
-
-      <!-- Right: Autosave Status & Word Counter -->
-      <div class="flex items-center gap-3">
-        <!-- Draft restore alert -->
-        <button
-          v-if="hasRecoverableDraft"
-          type="button"
-          @click="restoreDraft"
-          class="text-[10px] font-black text-amber-300 hover:text-amber-200 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded flex items-center gap-1 transition-all cursor-pointer"
-        >
-          <i class="ph-bold ph-clock-counter-clockwise"></i> Pulihkan Draft
-        </button>
-
-        <!-- Autosave Status Badge -->
-        <div class="flex items-center gap-1.5 text-[11px]">
-          <span
-            class="w-2 h-2 rounded-full"
-            :class="{
-              'bg-emerald-400': saveStatus === 'saved',
-              'bg-amber-400 animate-ping': saveStatus === 'saving',
-              'bg-rose-400': saveStatus === 'error'
-            }"
-          ></span>
-          <span class="text-[10px] font-medium text-white/60" title="Draft tersimpan otomatis di penyimpanan browser. Klik tombol 'Simpan Materi' di bawah untuk menyimpan permanen ke database server.">
-            <template v-if="saveStatus === 'saved'">Draft Lokal ({{ lastSavedTime || 'Otomatis' }})</template>
-            <template v-else-if="saveStatus === 'saving'">Menyimpan draft...</template>
-            <template v-else-if="saveStatus === 'error'">Draft Gagal</template>
+  <div class="edupath-rich-editor bg-[#0b1324] border border-white/10 rounded-2xl flex flex-col text-white relative">
+    <!-- Sticky Control Panel (Always visible when scrolling down modal or content) -->
+    <div class="sticky top-0 z-30 bg-[#090f1e]/98 backdrop-blur-md rounded-t-2xl border-b border-white/10 shadow-lg transition-all">
+      <!-- Header / Top Bar -->
+      <div class="p-2.5 border-b border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <!-- Left: Title & Mode Toggle -->
+        <div class="flex items-center gap-2">
+          <span class="font-black text-xs uppercase tracking-wider text-white flex items-center gap-1.5">
+            <i class="ph-bold ph-note-pencil text-[#c0ff00]"></i> {{ title || 'Editor EduPath' }}
           </span>
+
+          <div class="flex items-center bg-black/50 p-0.5 rounded-lg border border-white/10 ml-2">
+            <button
+              type="button"
+              @click="activeView = 'editor'"
+              class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+              :class="activeView === 'editor' ? 'bg-[#c0ff00] text-black shadow-sm' : 'text-white/60 hover:text-white'"
+            >
+              <i class="ph-bold ph-pencil-simple"></i> Editor
+            </button>
+            <button
+              type="button"
+              @click="activeView = 'preview'"
+              class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+              :class="activeView === 'preview' ? 'bg-[#c0ff00] text-black shadow-sm' : 'text-white/60 hover:text-white'"
+            >
+              <i class="ph-bold ph-eye"></i> Preview
+            </button>
+          </div>
         </div>
 
-        <!-- Word & Char Counter -->
-        <div class="text-[10px] text-white/40 font-mono hidden sm:inline">
-          {{ wordCount }} kata | {{ charCount }} karakter
+        <!-- Right: Autosave Status & Word Counter -->
+        <div class="flex items-center gap-3">
+          <!-- Draft restore alert -->
+          <button
+            v-if="hasRecoverableDraft"
+            type="button"
+            @click="restoreDraft"
+            class="text-[10px] font-black text-amber-300 hover:text-amber-200 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded flex items-center gap-1 transition-all cursor-pointer"
+          >
+            <i class="ph-bold ph-clock-counter-clockwise"></i> Pulihkan Draft
+          </button>
+
+          <!-- Autosave Status Badge -->
+          <div class="flex items-center gap-1.5 text-[11px]">
+            <span
+              class="w-2 h-2 rounded-full"
+              :class="{
+                'bg-emerald-400': saveStatus === 'saved',
+                'bg-amber-400 animate-ping': saveStatus === 'saving',
+                'bg-rose-400': saveStatus === 'error'
+              }"
+            ></span>
+            <span class="text-[10px] font-medium text-white/60" title="Draft tersimpan otomatis di penyimpanan browser. Klik tombol 'Simpan Materi' di bawah untuk menyimpan permanen ke database server.">
+              <template v-if="saveStatus === 'saved'">Draft Lokal ({{ lastSavedTime || 'Otomatis' }})</template>
+              <template v-else-if="saveStatus === 'saving'">Menyimpan draft...</template>
+              <template v-else-if="saveStatus === 'error'">Draft Gagal</template>
+            </span>
+          </div>
+
+          <!-- Word & Char Counter -->
+          <div class="text-[10px] text-white/40 font-mono hidden sm:inline">
+            {{ wordCount }} kata | {{ charCount }} karakter
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Word Paste Cleaned Notice -->
-    <div v-if="showPasteNotice" class="bg-indigo-500/20 border-b border-indigo-500/30 px-4 py-1.5 text-[11px] text-indigo-300 flex items-center justify-between animate-fade-in">
-      <span class="flex items-center gap-1.5">
-        <i class="ph-bold ph-check-circle"></i> Teks dari Microsoft Word berhasil dibersihkan dan disesuaikan secara otomatis.
-      </span>
-      <button type="button" @click="showPasteNotice = false" class="text-white/60 hover:text-white cursor-pointer">&times;</button>
-    </div>
+      <!-- Word Paste Cleaned Notice -->
+      <div v-if="showPasteNotice" class="bg-indigo-500/20 border-b border-indigo-500/30 px-4 py-1.5 text-[11px] text-indigo-300 flex items-center justify-between animate-fade-in">
+        <span class="flex items-center gap-1.5">
+          <i class="ph-bold ph-check-circle"></i> Teks dari Microsoft Word berhasil dibersihkan dan disesuaikan secara otomatis.
+        </span>
+        <button type="button" @click="showPasteNotice = false" class="text-white/60 hover:text-white cursor-pointer">&times;</button>
+      </div>
 
-    <!-- Toolbar (Only in Editor Mode) -->
-    <div v-if="activeView === 'editor'" class="p-2 bg-black/30 border-b border-white/10 flex flex-wrap items-center gap-1.5 text-xs select-none">
-      <!-- Undo / Redo -->
-      <button type="button" @click="exec('undo')" title="Undo (Ctrl+Z)" class="tool-btn"><i class="ph-bold ph-arrow-u-up-left"></i></button>
-      <button type="button" @click="exec('redo')" title="Redo (Ctrl+Y)" class="tool-btn"><i class="ph-bold ph-arrow-u-up-right"></i></button>
+      <!-- Toolbar (Only in Editor Mode) -->
+      <div v-if="activeView === 'editor'" class="p-2 bg-black/40 flex flex-wrap items-center gap-1.5 text-xs select-none">
+        <!-- Undo / Redo -->
+        <button type="button" @mousedown.prevent @click="exec('undo')" title="Undo (Ctrl+Z)" class="tool-btn"><i class="ph-bold ph-arrow-u-up-left"></i></button>
+        <button type="button" @mousedown.prevent @click="exec('redo')" title="Redo (Ctrl+Y)" class="tool-btn"><i class="ph-bold ph-arrow-u-up-right"></i></button>
 
-      <span class="divider"></span>
+        <span class="divider"></span>
 
-      <!-- Heading / Paragraph Selector -->
-      <select @change="applyFormatBlock($event)" class="tool-select" title="Gaya Teks">
-        <option value="p">Paragraf Normal</option>
-        <option value="h1">Judul Utama (H1)</option>
-        <option value="h2">Subjudul Bab (H2)</option>
-        <option value="h3">Subseksi (H3)</option>
-        <option value="h4">Topik Kecil (H4)</option>
-      </select>
+        <!-- Quick 1-Click Heading Buttons: H1 Judul, H2 Sub Judul, H3, P (Preserves selection via @mousedown.prevent) -->
+        <div class="flex items-center gap-1 bg-black/50 p-0.5 rounded-lg border border-white/10">
+          <button
+            type="button"
+            @mousedown.prevent
+            @click="applyHeading('h1')"
+            title="Judul Utama (H1)"
+            class="px-2 py-1 rounded text-[11px] font-black text-white/80 hover:text-white hover:bg-white/10 cursor-pointer flex items-center gap-1 transition-colors"
+          >
+            <span class="font-mono text-xs font-black">H1</span>
+            <span class="text-[10px] hidden md:inline">Judul</span>
+          </button>
+          <button
+            type="button"
+            @mousedown.prevent
+            @click="applyHeading('h2')"
+            title="Beri Efek Sub Judul (H2)"
+            class="px-2 py-1 rounded text-[11px] font-black text-[#c0ff00] bg-[#c0ff00]/15 hover:bg-[#c0ff00]/25 border border-[#c0ff00]/30 cursor-pointer flex items-center gap-1 transition-colors shadow-sm"
+          >
+            <span class="font-mono text-xs font-black">H2</span>
+            <span class="text-[10px] font-bold">Sub Judul</span>
+          </button>
+          <button
+            type="button"
+            @mousedown.prevent
+            @click="applyHeading('h3')"
+            title="Subseksi (H3)"
+            class="px-1.5 py-1 rounded text-[11px] font-bold text-white/70 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
+          >
+            <span class="font-mono text-xs">H3</span>
+          </button>
+          <button
+            type="button"
+            @mousedown.prevent
+            @click="applyHeading('p')"
+            title="Paragraf Normal (P)"
+            class="px-1.5 py-1 rounded text-[11px] font-bold text-white/40 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
+          >
+            <span class="text-[10px]">Normal</span>
+          </button>
+        </div>
 
-      <span class="divider"></span>
-
-      <!-- Font Styles -->
-      <button type="button" @click="exec('bold')" title="Tebal (Bold, Ctrl+B)" class="tool-btn"><i class="ph-bold ph-text-b"></i></button>
-      <button type="button" @click="exec('italic')" title="Miring (Italic, Ctrl+I)" class="tool-btn"><i class="ph-bold ph-text-italic"></i></button>
-      <button type="button" @click="exec('underline')" title="Garis Bawah (Underline, Ctrl+U)" class="tool-btn"><i class="ph-bold ph-text-underline"></i></button>
-      <button type="button" @click="exec('strikeThrough')" title="Coret (Strikethrough)" class="tool-btn"><i class="ph-bold ph-text-strikethrough"></i></button>
-      
-      <!-- Pangkat Cepat (Superscript) & Indeks Bawah Cepat (Subscript) -->
-      <button type="button" @click="exec('superscript')" title="Pangkat Cepat (Superscript, x²)" class="tool-btn font-bold font-mono text-[11px] px-1.5 hover:text-[#c0ff00]">x²</button>
-      <button type="button" @click="exec('subscript')" title="Indeks Bawah Cepat (Subscript, x₂)" class="tool-btn font-bold font-mono text-[11px] px-1.5 hover:text-[#c0ff00]">x₂</button>
-
-      <span class="divider"></span>
-
-      <!-- Alignment -->
-      <button type="button" @click="exec('justifyLeft')" title="Rata Kiri" class="tool-btn"><i class="ph-bold ph-text-align-left"></i></button>
-      <button type="button" @click="exec('justifyCenter')" title="Rata Tengah" class="tool-btn"><i class="ph-bold ph-text-align-center"></i></button>
-      <button type="button" @click="exec('justifyRight')" title="Rata Kanan" class="tool-btn"><i class="ph-bold ph-text-align-right"></i></button>
-      <button type="button" @click="exec('justifyFull')" title="Rata Kiri-Kanan" class="tool-btn"><i class="ph-bold ph-text-align-justify"></i></button>
-
-      <span class="divider"></span>
-
-      <!-- Lists & Indent -->
-      <button type="button" @click="exec('insertUnorderedList')" title="Daftar Poin (Bullet)" class="tool-btn"><i class="ph-bold ph-list-bullets"></i></button>
-      <button type="button" @click="exec('insertOrderedList')" title="Daftar Angka (Numbering)" class="tool-btn"><i class="ph-bold ph-list-numbers"></i></button>
-      <button type="button" @click="exec('outdent')" title="Kurangi Indentasi" class="tool-btn"><i class="ph-bold ph-text-outdent"></i></button>
-      <button type="button" @click="exec('indent')" title="Tambah Indentasi" class="tool-btn"><i class="ph-bold ph-text-indent"></i></button>
-
-      <span class="divider"></span>
-
-      <!-- Advanced Inserts: Table, Image, Math, Callouts, Link -->
-      <button type="button" @click="showTableModal = true" title="Sisipkan Tabel" class="tool-btn text-indigo-300 hover:text-white">
-        <i class="ph-bold ph-table"></i> Tabel
-      </button>
-
-      <button type="button" @click="showImageModal = true" title="Sisipkan Gambar (Upload Media)" class="tool-btn text-emerald-300 hover:text-white">
-        <i class="ph-bold ph-image"></i> Gambar
-      </button>
-
-      <button type="button" @click="showMathModal = true" title="Sisipkan Rumus Matematika (KaTeX)" class="tool-btn text-[#c0ff00] hover:text-white">
-        <span class="font-serif font-bold text-xs italic">∑</span> Rumus
-      </button>
-
-      <!-- Special Callout Blocks -->
-      <div class="relative inline-block">
-        <button
-          type="button"
-          @click="showCalloutDropdown = !showCalloutDropdown"
-          class="tool-btn text-amber-300 hover:text-white flex items-center gap-1"
-          title="Sisipkan Blok Penjelas (Definisi, Catatan, Tips, Contoh, Peringatan)"
+        <!-- Heading / Paragraph Selector Dropdown -->
+        <select 
+          @mousedown="saveCurrentSelection"
+          @change="applyFormatBlock($event)" 
+          class="tool-select" 
+          title="Pilihan Gaya Teks"
         >
-          <i class="ph-bold ph-cube"></i> Blok Khusus <i class="ph-bold ph-caret-down text-[9px]"></i>
+          <option value="p">Gaya: Normal</option>
+          <option value="h1">Judul Utama (H1)</option>
+          <option value="h2">Subjudul Bab (H2)</option>
+          <option value="h3">Subseksi (H3)</option>
+          <option value="h4">Topik Kecil (H4)</option>
+        </select>
+
+        <span class="divider"></span>
+
+        <!-- Font Styles -->
+        <button type="button" @mousedown.prevent @click="exec('bold')" title="Tebal (Bold, Ctrl+B)" class="tool-btn"><i class="ph-bold ph-text-b"></i></button>
+        <button type="button" @mousedown.prevent @click="exec('italic')" title="Miring (Italic, Ctrl+I)" class="tool-btn"><i class="ph-bold ph-text-italic"></i></button>
+        <button type="button" @mousedown.prevent @click="exec('underline')" title="Garis Bawah (Underline, Ctrl+U)" class="tool-btn"><i class="ph-bold ph-text-underline"></i></button>
+        <button type="button" @mousedown.prevent @click="exec('strikeThrough')" title="Coret (Strikethrough)" class="tool-btn"><i class="ph-bold ph-text-strikethrough"></i></button>
+        
+        <!-- Pangkat Cepat (Superscript) & Indeks Bawah Cepat (Subscript) -->
+        <button type="button" @mousedown.prevent @click="exec('superscript')" title="Pangkat Cepat (Superscript, x²)" class="tool-btn font-bold font-mono text-[11px] px-1.5 hover:text-[#c0ff00]">x²</button>
+        <button type="button" @mousedown.prevent @click="exec('subscript')" title="Indeks Bawah Cepat (Subscript, x₂)" class="tool-btn font-bold font-mono text-[11px] px-1.5 hover:text-[#c0ff00]">x₂</button>
+
+        <span class="divider"></span>
+
+        <!-- Alignment -->
+        <button type="button" @mousedown.prevent @click="exec('justifyLeft')" title="Rata Kiri" class="tool-btn"><i class="ph-bold ph-text-align-left"></i></button>
+        <button type="button" @mousedown.prevent @click="exec('justifyCenter')" title="Rata Tengah" class="tool-btn"><i class="ph-bold ph-text-align-center"></i></button>
+        <button type="button" @mousedown.prevent @click="exec('justifyRight')" title="Rata Kanan" class="tool-btn"><i class="ph-bold ph-text-align-right"></i></button>
+        <button type="button" @mousedown.prevent @click="exec('justifyFull')" title="Rata Kiri-Kanan" class="tool-btn"><i class="ph-bold ph-text-align-justify"></i></button>
+
+        <span class="divider"></span>
+
+        <!-- Lists & Indent -->
+        <button type="button" @mousedown.prevent @click="exec('insertUnorderedList')" title="Daftar Poin (Bullet)" class="tool-btn"><i class="ph-bold ph-list-bullets"></i></button>
+        <button type="button" @mousedown.prevent @click="exec('insertOrderedList')" title="Daftar Angka (Numbering)" class="tool-btn"><i class="ph-bold ph-list-numbers"></i></button>
+        <button type="button" @mousedown.prevent @click="exec('outdent')" title="Kurangi Indentasi" class="tool-btn"><i class="ph-bold ph-text-outdent"></i></button>
+        <button type="button" @mousedown.prevent @click="exec('indent')" title="Tambah Indentasi" class="tool-btn"><i class="ph-bold ph-text-indent"></i></button>
+
+        <span class="divider"></span>
+
+        <!-- Advanced Inserts: Table, Image, Math, Callouts, Link -->
+        <button type="button" @mousedown.prevent @click="showTableModal = true" title="Sisipkan Tabel" class="tool-btn text-indigo-300 hover:text-white">
+          <i class="ph-bold ph-table"></i> Tabel
         </button>
 
-        <div
-          v-if="showCalloutDropdown"
-          class="absolute left-0 top-full mt-1 w-48 bg-[#0e1726] border border-white/15 rounded-xl shadow-2xl py-1 z-30 animate-fade-in"
-        >
-          <button type="button" @click="insertCallout('definition')" class="callout-opt text-cyan-300 hover:bg-cyan-500/10">
-            <i class="ph-bold ph-book-open"></i> Definisi Konsep
+        <button type="button" @mousedown.prevent @click="showImageModal = true" title="Sisipkan Gambar (Upload Media)" class="tool-btn text-emerald-300 hover:text-white">
+          <i class="ph-bold ph-image"></i> Gambar
+        </button>
+
+        <button type="button" @mousedown.prevent @click="showMathModal = true" title="Sisipkan Rumus Matematika (KaTeX)" class="tool-btn text-[#c0ff00] hover:text-white">
+          <span class="font-serif font-bold text-xs italic">∑</span> Rumus
+        </button>
+
+        <!-- Special Callout Blocks -->
+        <div class="relative inline-block">
+          <button
+            type="button"
+            @mousedown.prevent
+            @click="showCalloutDropdown = !showCalloutDropdown"
+            class="tool-btn text-amber-300 hover:text-white flex items-center gap-1"
+            title="Sisipkan Blok Penjelas (Definisi, Catatan, Tips, Contoh, Peringatan)"
+          >
+            <i class="ph-bold ph-cube"></i> Blok Khusus <i class="ph-bold ph-caret-down text-[9px]"></i>
           </button>
-          <button type="button" @click="insertCallout('note')" class="callout-opt text-indigo-300 hover:bg-indigo-500/10">
-            <i class="ph-bold ph-info"></i> Catatan Materi
-          </button>
-          <button type="button" @click="insertCallout('tip')" class="callout-opt text-emerald-300 hover:bg-emerald-500/10">
-            <i class="ph-bold ph-lightbulb"></i> Tips & Trik Cepat
-          </button>
-          <button type="button" @click="insertCallout('example')" class="callout-opt text-amber-300 hover:bg-amber-500/10">
-            <i class="ph-bold ph-lightning"></i> Contoh Soal
-          </button>
-          <button type="button" @click="insertCallout('warning')" class="callout-opt text-rose-300 hover:bg-rose-500/10">
-            <i class="ph-bold ph-warning"></i> Peringatan / Jebakan
-          </button>
+
+          <div
+            v-if="showCalloutDropdown"
+            class="absolute left-0 top-full mt-1 w-48 bg-[#0e1726] border border-white/15 rounded-xl shadow-2xl py-1 z-30 animate-fade-in"
+          >
+            <button type="button" @mousedown.prevent @click="insertCallout('definition')" class="callout-opt text-cyan-300 hover:bg-cyan-500/10">
+              <i class="ph-bold ph-book-open"></i> Definisi Konsep
+            </button>
+            <button type="button" @mousedown.prevent @click="insertCallout('note')" class="callout-opt text-indigo-300 hover:bg-indigo-500/10">
+              <i class="ph-bold ph-info"></i> Catatan Materi
+            </button>
+            <button type="button" @mousedown.prevent @click="insertCallout('tip')" class="callout-opt text-emerald-300 hover:bg-emerald-500/10">
+              <i class="ph-bold ph-lightbulb"></i> Tips & Trik Cepat
+            </button>
+            <button type="button" @mousedown.prevent @click="insertCallout('example')" class="callout-opt text-amber-300 hover:bg-amber-500/10">
+              <i class="ph-bold ph-lightning"></i> Contoh Soal
+            </button>
+            <button type="button" @mousedown.prevent @click="insertCallout('warning')" class="callout-opt text-rose-300 hover:bg-rose-500/10">
+              <i class="ph-bold ph-warning"></i> Peringatan / Jebakan
+            </button>
+          </div>
         </div>
+
+        <span class="divider"></span>
+
+        <!-- Link & Divider -->
+        <button type="button" @mousedown.prevent @click="openLinkModal" title="Sisipkan Tautan" class="tool-btn"><i class="ph-bold ph-link"></i></button>
+        <button type="button" @mousedown.prevent @click="insertSectionBreak" title="Batas Bagian / Bab Baru" class="tool-btn"><i class="ph-bold ph-columns"></i> Seksi Baru</button>
+        <button type="button" @mousedown.prevent @click="exec('removeFormat')" title="Hapus Format" class="tool-btn text-white/40 hover:text-white"><i class="ph-bold ph-text-strikethrough"></i> Reset</button>
       </div>
-
-      <span class="divider"></span>
-
-      <!-- Link & Divider -->
-      <button type="button" @click="openLinkModal" title="Sisipkan Tautan" class="tool-btn"><i class="ph-bold ph-link"></i></button>
-      <button type="button" @click="insertSectionBreak" title="Batas Bagian / Bab Baru" class="tool-btn"><i class="ph-bold ph-columns"></i> Seksi Baru</button>
-      <button type="button" @click="exec('removeFormat')" title="Hapus Format" class="tool-btn text-white/40 hover:text-white"><i class="ph-bold ph-text-strikethrough"></i> Reset</button>
     </div>
 
     <!-- Main Content Area: Editor vs Preview -->
@@ -183,6 +234,10 @@
         @input="onContentInput"
         @paste="handlePaste"
         @click="handleEditorClick"
+        @mouseup="saveCurrentSelection"
+        @keyup="saveCurrentSelection"
+        @select="saveCurrentSelection"
+        @focus="saveCurrentSelection"
         class="edupath-prose flex-grow p-5 overflow-y-auto focus:outline-none text-slate-100 text-sm leading-relaxed"
         :style="{ minHeight: minHeight || '320px' }"
         :data-placeholder="placeholder || 'Mulai tulis materi pembelajaran atau butir soal di sini... (Mendukung rumus KaTeX, tabel, gambar, atau teks dari Word)'"
@@ -560,6 +615,13 @@ const linkUrl = ref('');
 const linkText = ref('');
 const savedSelection = ref(null);
 
+const saveCurrentSelection = () => {
+  const sel = window.getSelection();
+  if (sel && sel.getRangeAt && sel.rangeCount > 0) {
+    savedSelection.value = sel.getRangeAt(0).cloneRange();
+  }
+};
+
 const showCalloutDropdown = ref(false);
 
 // Formatting Execution
@@ -571,9 +633,60 @@ const exec = (command, value = null) => {
   onContentInput();
 };
 
+const applyHeading = (tag) => {
+  if (editorEl.value) {
+    editorEl.value.focus();
+  }
+  
+  // 1. Restore saved selection if current selection is lost or collapsed
+  const sel = window.getSelection();
+  if ((!sel || sel.rangeCount === 0 || sel.isCollapsed) && savedSelection.value) {
+    try {
+      sel.removeAllRanges();
+      sel.addRange(savedSelection.value);
+    } catch (e) {}
+  }
+
+  const activeSel = window.getSelection();
+  const selectedText = activeSel ? activeSel.toString() : '';
+
+  let success = false;
+  try {
+    success = document.execCommand('formatBlock', false, `<${tag}>`);
+  } catch (e) {}
+  if (!success) {
+    try {
+      success = document.execCommand('formatBlock', false, tag);
+    } catch (e) {}
+  }
+
+  // 2. Fallback: Wrap directly with DOM element if formatBlock didn't work and text was selected
+  if (!success && activeSel && activeSel.rangeCount > 0 && selectedText) {
+    try {
+      const range = activeSel.getRangeAt(0);
+      const headingNode = document.createElement(tag);
+      headingNode.textContent = selectedText;
+      range.deleteContents();
+      range.insertNode(headingNode);
+
+      const newRange = document.createRange();
+      newRange.setStartAfter(headingNode);
+      newRange.collapse(true);
+      activeSel.removeAllRanges();
+      activeSel.addRange(newRange);
+      success = true;
+    } catch (err) {
+      console.warn("DOM heading wrap error:", err);
+    }
+  }
+
+  onContentInput();
+  saveCurrentSelection();
+};
+
 const applyFormatBlock = (event) => {
-  const tag = event.target.value;
-  exec('formatBlock', `<${tag}>`);
+  const tag = event?.target?.value || event;
+  if (tag) applyHeading(tag);
 };
 
 // Word Cleaner / Sanitizer
@@ -935,12 +1048,6 @@ const insertSectionBreak = () => {
 };
 
 // Link Modal
-const saveCurrentSelection = () => {
-  const sel = window.getSelection();
-  if (sel.getRangeAt && sel.rangeCount) {
-    savedSelection.value = sel.getRangeAt(0);
-  }
-};
 
 const openLinkModal = () => {
   saveCurrentSelection();

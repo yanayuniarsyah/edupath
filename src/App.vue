@@ -5023,7 +5023,23 @@ export default {
       showToast(`Target diperbarui ke ${selectedUniversity.value.name} (Skor: ${selectedUniversity.value.targetScore})`);
     };
 
-    const currentTab = ref('home');
+    const getInitialTab = () => {
+      try {
+        const hash = window.location.hash || '';
+        if (hash.includes('tab=')) {
+          const match = hash.match(/tab=([a-zA-Z0-9_]+)/);
+          if (match && match[1]) return match[1];
+        }
+      } catch (e) {}
+
+      const stored = sessionStorage.getItem('ep_active_tab');
+      if (stored && stored !== 'home') return stored;
+
+      const token = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
+      return token ? 'dashboard' : 'home';
+    };
+
+    const currentTab = ref(getInitialTab());
     const isStudentPreviewMode = ref(false);
 
     const studentTabs = [
@@ -5122,6 +5138,9 @@ export default {
     };
 
     watch(currentTab, (newTab) => {
+      try {
+        sessionStorage.setItem('ep_active_tab', newTab);
+      } catch (e) {}
       const tabInfo = tabs.value.find(t => t.id === newTab);
       if (tabInfo) {
         document.title = `${tabInfo.label} | EduPath`;
@@ -5326,8 +5345,11 @@ export default {
             profileEditForm.value.target_ptn = res.user.target_ptn || '';
             profileEditForm.value.phone = res.user.phone || '';
 
-            if (currentTab.value === 'home') {
+            const savedTab = sessionStorage.getItem('ep_active_tab');
+            if (!savedTab && currentTab.value === 'home') {
               currentTab.value = 'dashboard';
+            } else if (savedTab && currentTab.value !== savedTab) {
+              currentTab.value = savedTab;
             }
 
             // SMART REDIRECT: Guru BK / Perwakilan Sekolah Mitra
@@ -5992,17 +6014,47 @@ export default {
     const selectedSubtes = ref(MATERI_UTBK[0]);
     const selectedBab = ref(MATERI_UTBK[0].babList[0]);
 
+    const restoreSavedMaterial = () => {
+      try {
+        const savedSub = sessionStorage.getItem('ep_selected_subtes');
+        const savedBab = sessionStorage.getItem('ep_selected_bab');
+        if (savedSub && materiUtbk.value) {
+          const targetSub = materiUtbk.value.find(s => s.id === savedSub || s.code === savedSub || s.subtes === savedSub);
+          if (targetSub) {
+            selectedSubtes.value = targetSub;
+            if (savedBab && targetSub.babList) {
+              const targetBab = targetSub.babList.find(b => b.id === savedBab || b.judul === savedBab);
+              if (targetBab) {
+                selectedBab.value = targetBab;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+    };
+
+    restoreSavedMaterial();
+
     const selectSubtes = (subtes) => {
       selectedSubtes.value = subtes;
       selectedBab.value = subtes.babList[0];
       selectedLessonQuizAns.value = null;
       showLessonQuizFeedback.value = false;
+      try {
+        sessionStorage.setItem('ep_selected_subtes', subtes.id || subtes.code || subtes.subtes);
+        if (subtes.babList && subtes.babList[0]) {
+          sessionStorage.setItem('ep_selected_bab', subtes.babList[0].id || subtes.babList[0].judul);
+        }
+      } catch (e) {}
     };
 
     const selectBab = (bab) => {
       selectedBab.value = bab;
       selectedLessonQuizAns.value = null;
       showLessonQuizFeedback.value = false;
+      try {
+        sessionStorage.setItem('ep_selected_bab', bab.id || bab.judul);
+      } catch (e) {}
     };
 
     const microLessons = ref(MICRO_LESSONS);
@@ -6360,6 +6412,7 @@ export default {
       // Scroll Reveal Observer
       initScrollReveal();
       initNeuralCanvas();
+      restoreSavedMaterial();
       
       if (isLoggedIn.value) {
         fetchAffiliateData();

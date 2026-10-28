@@ -1208,9 +1208,68 @@
             </button>
           </div>
 
-          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
-            <div class="p-2.5 border-b border-white/10 flex gap-2 bg-black/20">
-              <input id="m_search_input" name="m_search" aria-label="Cari materi" v-model="mSearch" type="text" placeholder="Cari materi..." class="flex-grow px-3 py-1.5 text-[11px] text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50" />
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+            <div class="p-3 border-b border-white/10 flex flex-wrap items-center gap-2.5 bg-black/20">
+              <div class="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/10 shrink-0">
+                <button
+                  type="button"
+                  @click="teacherMaterialFilter = 'all'"
+                  :class="teacherMaterialFilter === 'all' ? 'bg-[#c0ff00] text-black font-black' : 'text-white/60 hover:text-white font-bold'"
+                  class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer"
+                >
+                  Semua Materi
+                </button>
+                <button
+                  type="button"
+                  @click="teacherMaterialFilter = 'mine'"
+                  :class="teacherMaterialFilter === 'mine' ? 'bg-[#c0ff00] text-black font-black' : 'text-white/60 hover:text-white font-bold'"
+                  class="px-3 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <span>👨‍🏫 Materi Saya</span>
+                </button>
+              </div>
+
+              <input id="m_search_input" name="m_search" aria-label="Cari materi / topik / guru" v-model="mSearch" type="text" placeholder="Cari materi / topik / guru..." class="flex-grow min-w-[180px] px-3.5 py-2 text-xs text-white placeholder-white/40 bg-black/40 border border-white/10 rounded-xl outline-none focus:border-[#c0ff00]/50 transition-colors" />
+
+              <select id="m_sub_materi_select" name="m_sub_materi" aria-label="Semua Komponen & Subtes" v-model="mSubMateri" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
+                <option value="all" class="bg-[#0d1427]">Semua Komponen & Subtes</option>
+                <optgroup label="Komponen: TPS" class="bg-[#0d1427] font-bold text-[#c0ff00]">
+                  <option value="Penalaran Umum" class="bg-[#0d1427]">Penalaran Umum (PU)</option>
+                  <option value="Pengetahuan & Pemahaman Umum" class="bg-[#0d1427]">Pengetahuan & Pemahaman Umum (PPU)</option>
+                  <option value="Pemahaman Bacaan & Menulis" class="bg-[#0d1427]">Pemahaman Bacaan & Menulis (PBM)</option>
+                  <option value="Pengetahuan Kuantitatif" class="bg-[#0d1427]">Pengetahuan Kuantitatif (PK)</option>
+                </optgroup>
+                <optgroup label="Komponen: TES LITERASI" class="bg-[#0d1427] font-bold text-sky-400">
+                  <option value="Literasi Bahasa Indonesia" class="bg-[#0d1427]">Literasi Bahasa Indonesia (LBI)</option>
+                  <option value="Literasi Bahasa Inggris" class="bg-[#0d1427]">Literasi Bahasa Inggris (LBE)</option>
+                  <option value="Penalaran Matematika" class="bg-[#0d1427]">Penalaran Matematika (PM)</option>
+                </optgroup>
+                <optgroup label="Topik Resmi SNBT" class="bg-[#0d1427] font-bold text-indigo-400">
+                  <option value="Induktif" class="bg-[#0d1427]">Topik: Induktif</option>
+                  <option value="Deduktif" class="bg-[#0d1427]">Topik: Deduktif</option>
+                  <option value="Kuantitatif" class="bg-[#0d1427]">Topik: Kuantitatif</option>
+                  <option value="Kosakata" class="bg-[#0d1427]">Topik: Kosakata</option>
+                  <option value="Makna Kontekstual" class="bg-[#0d1427]">Topik: Makna Kontekstual</option>
+                  <option value="Hubungan Informasi" class="bg-[#0d1427]">Topik: Hubungan Informasi</option>
+                  <option value="Pemahaman Bacaan" class="bg-[#0d1427]">Topik: Pemahaman Bacaan</option>
+                  <option value="Menulis" class="bg-[#0d1427]">Topik: Menulis</option>
+                  <option value="Bilangan" class="bg-[#0d1427]">Topik: Bilangan</option>
+                  <option value="Aljabar" class="bg-[#0d1427]">Topik: Aljabar</option>
+                  <option value="Geometri" class="bg-[#0d1427]">Topik: Geometri</option>
+                  <option value="Statistika" class="bg-[#0d1427]">Topik: Statistika</option>
+                  <option value="Perbandingan" class="bg-[#0d1427]">Topik: Perbandingan</option>
+                  <option value="Pemahaman" class="bg-[#0d1427]">Topik: Pemahaman (LBI)</option>
+                  <option value="Analisis" class="bg-[#0d1427]">Topik: Analisis (LBI)</option>
+                  <option value="Evaluasi" class="bg-[#0d1427]">Topik: Evaluasi (LBI)</option>
+                  <option value="Integrasi Informasi" class="bg-[#0d1427]">Topik: Integrasi Informasi</option>
+                  <option value="Vocabulary" class="bg-[#0d1427]">Topik: Vocabulary (LBE)</option>
+                  <option value="Reading Comprehension" class="bg-[#0d1427]">Topik: Reading Comprehension</option>
+                  <option value="Text Analysis" class="bg-[#0d1427]">Topik: Text Analysis</option>
+                  <option value="Critical Reading" class="bg-[#0d1427]">Topik: Critical Reading</option>
+                  <option value="Data & Ketidakpastian" class="bg-[#0d1427]">Topik: Data & Ketidakpastian</option>
+                  <option value="Problem Solving" class="bg-[#0d1427]">Topik: Problem Solving</option>
+                </optgroup>
+              </select>
             </div>
             
             <div v-if="materialsLoading" class="p-6 text-center text-white/40">
@@ -3616,7 +3675,7 @@
     <!-- Question Modal -->
     <div v-if="showQuestionModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
-        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-20">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-40">
           <div class="flex items-center gap-2">
             <i class="ph-bold ph-plus-circle text-[#c0ff00] text-lg"></i>
             <h3 class="font-black text-sm text-white">{{ isEditingQuestion ? 'Edit Soal Ujian / Latihan' : 'Tambah Soal Baru' }}</h3>
@@ -3798,7 +3857,7 @@
     <!-- Material Modal -->
     <div v-if="showMaterialModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
-        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-20">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-40">
           <div class="flex items-center gap-2">
             <i class="ph-bold ph-note-pencil text-[#c0ff00] text-lg"></i>
             <h3 class="font-black text-sm text-white">{{ isEditingMaterial ? 'Edit Materi Pembelajaran' : 'Tambah Materi Baru' }}</h3>
@@ -5115,6 +5174,7 @@ const deleteQuestion = async (id) => {
 
 // ── Materials ──
 const mSearch = ref('');
+const mSubMateri = ref('all');
 const serverMaterials = ref([]);
 const materialsLoading = ref(false);
 const materialsFetchError = ref(null);
@@ -5195,13 +5255,25 @@ const filteredMaterials = computed(() => {
   if (teacherMaterialFilter.value === 'mine') {
     list = list.filter(m => canManageMaterial(m));
   }
+  if (mSubMateri.value && mSubMateri.value !== 'all') {
+    const target = mSubMateri.value.toLowerCase();
+    list = list.filter(m => {
+      const comp = (m.test_component || '').toLowerCase();
+      const sub = (m.subtest || m.sub_materi || '').toLowerCase();
+      const top = (m.topic || '').toLowerCase();
+      return sub.includes(target) || comp.includes(target) || top.includes(target);
+    });
+  }
   if (mSearch.value) {
     const s = mSearch.value.toLowerCase();
     list = list.filter(m => 
       (m.title && m.title.toLowerCase().includes(s)) || 
       (m.sub_materi && m.sub_materi.toLowerCase().includes(s)) ||
       (m.subtest && m.subtest.toLowerCase().includes(s)) ||
-      (m.topic && m.topic.toLowerCase().includes(s))
+      (m.topic && m.topic.toLowerCase().includes(s)) ||
+      (m.subtopic && m.subtopic.toLowerCase().includes(s)) ||
+      (m.indicator && m.indicator.toLowerCase().includes(s)) ||
+      (m.teacher_name && m.teacher_name.toLowerCase().includes(s))
     );
   }
   return doSort(list);
