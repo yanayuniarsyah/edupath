@@ -3137,9 +3137,12 @@
                   
                   <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
                     <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Ringkasan Konsep Dasar:</h5>
-                    <p class="text-sm text-slate-700 leading-relaxed font-normal whitespace-pre-line">
-                      {{ selectedBab.teoriSingkat }}
-                    </p>
+                    <div 
+                      v-if="selectedBab.teoriSingkat"
+                      class="edupath-prose text-sm text-slate-800 leading-relaxed font-normal"
+                      v-html="renderMaterialHtml(selectedBab.teoriSingkat)"
+                    ></div>
+                    <p v-else class="text-sm text-slate-500 italic">Konten materi belum ditambahkan.</p>
                     <div v-if="selectedBab.file_url" class="pt-3 flex flex-wrap items-center gap-2.5 border-t border-slate-200/60 mt-3">
                       <a :href="selectedBab.file_url" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition-all shadow-md">
                         <i class="ph-bold" :class="selectedBab.file_url.includes('youtu') ? 'ph-youtube-logo text-base' : 'ph-pencil-simple-line text-base'"></i>
@@ -3161,9 +3164,10 @@
 
                   <!-- Formula Praktis summary card -->
                   <div class="p-4 bg-emerald-50/70 border border-emerald-200 rounded-2xl">
-                    <p class="text-sm text-slate-800 font-medium leading-relaxed whitespace-pre-line">
-                      {{ selectedBab.formula_praktis || (selectedBab.microLesson && selectedBab.microLesson.summary) || 'Formula praktis belum ditambahkan.' }}
-                    </p>
+                    <div 
+                      class="edupath-prose text-sm text-slate-800 font-medium leading-relaxed"
+                      v-html="renderMaterialHtml(selectedBab.formula_praktis || (selectedBab.microLesson && selectedBab.microLesson.summary) || 'Formula praktis belum ditambahkan.')"
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -5390,6 +5394,31 @@ export default {
       }
     };
 
+    const renderMaterialHtml = (raw) => {
+      if (!raw) return '';
+      const str = String(raw).trim();
+      
+      // If content already contains HTML block tags, return as-is
+      const hasHtml = /<\/?(h[1-6]|p|div|ul|ol|li|table|blockquote|span|strong|b|em|i|br)\b/i.test(str);
+      if (hasHtml) {
+        return str;
+      }
+
+      // Convert Markdown/plain text into clean HTML
+      let formatted = str
+        .replace(/^### (.*$)/gim, '<h3 class="text-base font-bold text-slate-800 mt-4 mb-1.5">$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2 class="text-lg font-extrabold text-indigo-700 mt-5 mb-2">$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1 class="text-xl font-black text-slate-900 border-b border-slate-200 pb-1 mt-6 mb-2">$1</h1>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-bold text-slate-900">$1</strong>')
+        .replace(/\*(.*?)\*/gim, '<em class="italic">$1</em>')
+        .replace(/^\s*[-*]\s+(.*$)/gim, '<li class="ml-4 list-disc text-slate-700">$1</li>')
+        .replace(/^\s*(\d+)\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-700">$2</li>')
+        .replace(/\n\n+/g, '</p><p class="mb-3 text-slate-700 leading-relaxed">')
+        .replace(/\n/g, '<br>');
+
+      return `<div class="prose-content"><p class="mb-3 text-slate-700 leading-relaxed">${formatted}</p></div>`;
+    };
+
     const fetchMaterialsFromDb = async () => {
       try {
         const res = await api.getMaterials();
@@ -5410,30 +5439,74 @@ export default {
             });
             if (targetSub) {
               if (!targetSub.babList) targetSub.babList = [];
-              const exists = targetSub.babList.some(b => b.judul === m.title || b.id === `db_${m.id}`);
-              if (!exists) {
+
+              const existingBab = targetSub.babList.find(b => 
+                b.id === `db_${m.id}` || 
+                b.id === m.id || 
+                b.db_id === m.id ||
+                (b.judul && m.title && b.judul.trim().toLowerCase() === m.title.trim().toLowerCase())
+              );
+
+              const summaryText = (m.formula_praktis || m.content || '')
+                .replace(/<[^>]*>/g, '')
+                .slice(0, 200)
+                .replace(/\n/g, ' ') + '...';
+
+              if (existingBab) {
+                // Update in-place so active screen updates reactively
+                existingBab.id = existingBab.id || `db_${m.id}`;
+                existingBab.db_id = m.id;
+                existingBab.judul = m.title;
+                existingBab.topic = m.topic || existingBab.topic || m.title;
+                existingBab.subtopic = m.subtopic || existingBab.subtopic || m.title;
+                existingBab.skill = m.skill || existingBab.skill || `Pemahaman ${m.title}`;
+                existingBab.indicator = m.indicator || existingBab.indicator || `Mampu menganalisis ${m.title}`;
+                existingBab.teoriSingkat = m.content || m.title;
+                existingBab.content = m.content || m.title;
+                existingBab.formula_praktis = m.formula_praktis || existingBab.formula_praktis || 'Fokus pada konsep kunci dan trik pembahasannya.';
+                existingBab.file_url = m.file_url || existingBab.file_url || '';
+                if (!existingBab.microLesson) existingBab.microLesson = {};
+                existingBab.microLesson.title = `Trik & Konsep: ${m.title}`;
+                existingBab.microLesson.summary = summaryText;
+              } else {
                 targetSub.babList.push({
                   id: `db_${m.id}`,
+                  db_id: m.id,
                   topic: m.topic || m.title,
                   subtopic: m.subtopic || m.title,
                   skill: m.skill || `Pemahaman ${m.title}`,
                   indicator: m.indicator || `Mampu menganalisis ${m.title}`,
                   judul: m.title,
                   teoriSingkat: m.content || m.title,
+                  content: m.content || m.title,
                   formula_praktis: m.formula_praktis || 'Fokus pada konsep kunci dan trik pembahasannya.',
                   file_url: m.file_url || '',
                   microLesson: {
                     title: `Trik & Konsep: ${m.title}`,
                     duration: '5 Menit',
                     type: 'Modul Belajar',
-                    summary: (m.content || '').slice(0, 200).replace(/\n/g, ' ') + '...'
+                    summary: summaryText
                   }
                 });
               }
             }
           });
-          if (selectedSubtes.value && selectedSubtes.value.babList && selectedSubtes.value.babList.length && !selectedBab.value) {
-            selectedBab.value = selectedSubtes.value.babList[0];
+
+          // Sync selectedBab so currently displayed chapter updates reactively
+          if (selectedSubtes.value && selectedSubtes.value.babList && selectedSubtes.value.babList.length) {
+            if (selectedBab.value) {
+              const activeId = selectedBab.value.id || selectedBab.value.db_id;
+              const activeJudul = selectedBab.value.judul?.trim()?.toLowerCase();
+              const matched = selectedSubtes.value.babList.find(b => 
+                (activeId && (b.id === activeId || b.db_id === activeId)) ||
+                (activeJudul && b.judul?.trim()?.toLowerCase() === activeJudul)
+              );
+              if (matched) {
+                selectedBab.value = matched;
+              }
+            } else {
+              selectedBab.value = selectedSubtes.value.babList[0];
+            }
           }
         }
       } catch (e) {
@@ -6541,6 +6614,7 @@ export default {
       selectedBab,
       selectSubtes,
       selectBab,
+      renderMaterialHtml,
       microLessons,
       selectedLesson,
       selectedLessonQuizAns,

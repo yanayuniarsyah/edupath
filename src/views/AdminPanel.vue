@@ -3957,6 +3957,7 @@
           <div class="space-y-1 pt-1">
             <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Konten Materi (Rich Text & Word-Like Editor)</label>
             <MaterialRichEditor
+              ref="materialEditorRef"
               v-model="mForm.content"
               :material-id="mForm.id"
               :leaf-id="mForm.leaf_id"
@@ -5180,6 +5181,7 @@ const materialsLoading = ref(false);
 const materialsFetchError = ref(null);
 const showMaterialModal = ref(false);
 const isEditingMaterial = ref(false);
+const materialEditorRef = ref(null);
 
 const mForm = reactive({
   id: null,
@@ -5336,13 +5338,34 @@ const closeMaterialModal = () => showMaterialModal.value = false;
 const saveMaterial = async () => {
   isSaving.value = true;
   try {
+    // Pastikan konten terkini dari editor tersinkronkan
+    if (materialEditorRef.value && typeof materialEditorRef.value.getContent === 'function') {
+      const liveContent = materialEditorRef.value.getContent();
+      if (liveContent) {
+        mForm.content = liveContent;
+      }
+    }
+
     if (isEditingMaterial.value) {
       await api.updateAdminMaterial(mForm.id, mForm);
     } else {
       await api.createAdminMaterial(mForm);
     }
+
+    // Invalidate client cache agar update langsung tampak
+    if (typeof api.invalidateCache === 'function') {
+      api.invalidateCache('/materials.php');
+    }
+    // Bersihkan draft tersimpan
+    if (materialEditorRef.value && typeof materialEditorRef.value.clearDraft === 'function') {
+      materialEditorRef.value.clearDraft();
+    }
+    try {
+      localStorage.removeItem(`edupath_editor_draft_${mForm.id || 'new'}`);
+    } catch (e) {}
+
     closeMaterialModal();
-    fetchMaterials(true);
+    await fetchMaterials(true);
   } catch (err) {
     alert(`Gagal menyimpan materi: ${err.message || 'Terjadi kendala pada server'}`);
   } finally {

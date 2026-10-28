@@ -58,6 +58,7 @@ function ensure_and_seed_materials($pdo, $force = false) {
 
                     foreach ($items as $m) {
                         $data = [
+                            'id' => $m['id'] ?? (function_exists('random_bytes') ? bin2hex(random_bytes(16)) : uniqid('mat_', true)),
                             'title' => mb_substr($m['title'] ?? '', 0, 250, 'UTF-8'),
                             'content' => $m['content'] ?? '',
                             'subtest' => mb_substr($m['subtest'] ?? $m['subtes'] ?? '', 0, 100, 'UTF-8'),

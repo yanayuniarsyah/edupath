@@ -30,7 +30,6 @@ const _inflight = new Map(); // key → Promise (request deduplication)
 const CACHE_TTL = {
   // Data statis / jarang berubah → cache lebih lama
   '/plans.php':                       5 * 60 * 1000,  // 5 menit
-  '/materials.php?action=list':       3 * 60 * 1000,  // 3 menit
   '/spp.php?action=data':             5 * 60 * 1000,  // 5 menit
   // Data profil user → cache pendek (30 detik) agar perubahan cepat terasa
   '/auth.php?action=me':              30 * 1000,       // 30 detik
@@ -456,16 +455,26 @@ export const api = {
   getAdminMaterials() {
     return apiFetch('/admin.php?action=materials');
   },
-  createAdminMaterial(data) {
-    return apiFetch('/admin.php?action=materials', { method: 'POST', body: JSON.stringify(data) });
+  async createAdminMaterial(data) {
+    const res = await apiFetch('/admin.php?action=materials', { method: 'POST', body: JSON.stringify(data) });
+    invalidateCache('/materials.php');
+    return res;
   },
-  updateAdminMaterial(id, data) {
-    return apiFetch('/admin.php?action=materials', { method: 'PUT', body: JSON.stringify({ id, ...data }) });
+  async updateAdminMaterial(id, data) {
+    const res = await apiFetch('/admin.php?action=materials', { method: 'PUT', body: JSON.stringify({ id, ...data }) });
+    invalidateCache('/materials.php');
+    return res;
   },
-  deleteAdminMaterial(id) {
-    return apiFetch(`/admin.php?action=materials&id=${id}`, { method: 'DELETE' });
+  async deleteAdminMaterial(id) {
+    const res = await apiFetch(`/admin.php?action=materials&id=${id}`, { method: 'DELETE' });
+    invalidateCache('/materials.php');
+    return res;
+  },
+  invalidateCache(pattern) {
+    invalidateCache(pattern);
   },
   bulkDeleteAdmin(type, ids = []) {
+    if (type === 'materials') invalidateCache('/materials.php');
     return apiFetch('/admin.php?action=bulk_delete', {
       method: 'POST',
       body: JSON.stringify({ type, ids })

@@ -232,6 +232,7 @@
         ref="editorEl"
         contenteditable="true"
         @input="onContentInput"
+        @blur="onContentInput"
         @paste="handlePaste"
         @click="handleEditorClick"
         @mouseup="saveCurrentSelection"
@@ -643,40 +644,72 @@ const applyHeading = (tag) => {
   if ((!sel || sel.rangeCount === 0 || sel.isCollapsed) && savedSelection.value) {
     try {
       sel.removeAllRanges();
-      sel.addRange(savedSelection.value);
+      sel.addRange(savedSelection.value.cloneRange());
     } catch (e) {}
   }
 
   const activeSel = window.getSelection();
-  const selectedText = activeSel ? activeSel.toString() : '';
+  if (!activeSel || activeSel.rangeCount === 0) return;
 
-  let success = false;
-  try {
-    success = document.execCommand('formatBlock', false, `<${tag}>`);
-  } catch (e) {}
-  if (!success) {
-    try {
-      success = document.execCommand('formatBlock', false, tag);
-    } catch (e) {}
-  }
+  const range = activeSel.getRangeAt(0);
+  let selectedText = activeSel.toString();
+  const targetTag = (tag || 'h2').toLowerCase();
 
-  // 2. Fallback: Wrap directly with DOM element if formatBlock didn't work and text was selected
-  if (!success && activeSel && activeSel.rangeCount > 0 && selectedText) {
-    try {
-      const range = activeSel.getRangeAt(0);
-      const headingNode = document.createElement(tag);
-      headingNode.textContent = selectedText;
-      range.deleteContents();
-      range.insertNode(headingNode);
+  // If text was selected by the user
+  if (selectedText && selectedText.trim().length > 0) {
+    // Clean any leading markdown hashes like '### ' or '## ' or '# '
+    const cleanText = selectedText.replace(/^[#\s]+/, '').trim();
+    
+    // Check if the selection's parent container is ALREADY this heading tag
+    let parentEl = range.commonAncestorContainer;
+    if (parentEl.nodeType === Node.TEXT_NODE) parentEl = parentEl.parentElement;
+    
+    if (parentEl && parentEl.tagName && parentEl.tagName.toLowerCase() === targetTag && parentEl !== editorEl.value) {
+      // Toggle back to normal paragraph
+      const p = document.createElement('p');
+      p.innerHTML = parentEl.innerHTML;
+      parentEl.parentNode.replaceChild(p, parentEl);
+    } else {
+      // Create new Heading DOM element
+      const headingNode = document.createElement(targetTag);
+      headingNode.textContent = cleanText || selectedText;
+      
+      // If the selection spans an entire parent block element (like <p>), replace the block
+      let blockParent = range.commonAncestorContainer;
+      while (blockParent && blockParent.parentElement !== editorEl.value && blockParent !== editorEl.value) {
+        blockParent = blockParent.parentElement;
+      }
+      
+      if (blockParent && blockParent !== editorEl.value && ['P', 'DIV', 'H1', 'H2', 'H3', 'H4'].includes(blockParent.tagName) && blockParent.textContent.trim() === selectedText.trim()) {
+        blockParent.parentNode.replaceChild(headingNode, blockParent);
+      } else {
+        range.deleteContents();
+        range.insertNode(headingNode);
+      }
+
+      // Add a trailing line break if heading is at end so user can type on next line
+      if (!headingNode.nextSibling) {
+        const nextP = document.createElement('p');
+        nextP.innerHTML = '<br>';
+        headingNode.parentNode.appendChild(nextP);
+      }
 
       const newRange = document.createRange();
       newRange.setStartAfter(headingNode);
       newRange.collapse(true);
       activeSel.removeAllRanges();
       activeSel.addRange(newRange);
-      success = true;
-    } catch (err) {
-      console.warn("DOM heading wrap error:", err);
+    }
+  } else {
+    // No text selected, cursor is inside a block: try execCommand formatBlock or convert block
+    let success = false;
+    try {
+      success = document.execCommand('formatBlock', false, `<${targetTag}>`);
+    } catch (e) {}
+    if (!success) {
+      try {
+        success = document.execCommand('formatBlock', false, targetTag);
+      } catch (e) {}
     }
   }
 
@@ -1187,6 +1220,18 @@ onMounted(() => {
     updateCounts();
   }
   checkRecoverableDraft();
+});
+
+const clearDraft = () => {
+  try {
+    localStorage.removeItem(draftStorageKey.value);
+    hasRecoverableDraft.value = false;
+  } catch (e) {}
+};
+
+defineExpose({
+  clearDraft,
+  getContent: () => editorEl.value?.innerHTML || ''
 });
 </script>
 
