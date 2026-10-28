@@ -50,10 +50,10 @@
               'bg-rose-400': saveStatus === 'error'
             }"
           ></span>
-          <span class="text-[10px] font-medium text-white/60">
-            <template v-if="saveStatus === 'saved'">Tersimpan ({{ lastSavedTime || 'Otomatis' }})</template>
-            <template v-else-if="saveStatus === 'saving'">Menyimpan...</template>
-            <template v-else-if="saveStatus === 'error'">Gagal Simpan</template>
+          <span class="text-[10px] font-medium text-white/60" title="Draft tersimpan otomatis di penyimpanan browser. Klik tombol 'Simpan Materi' di bawah untuk menyimpan permanen ke database server.">
+            <template v-if="saveStatus === 'saved'">Draft Lokal ({{ lastSavedTime || 'Otomatis' }})</template>
+            <template v-else-if="saveStatus === 'saving'">Menyimpan draft...</template>
+            <template v-else-if="saveStatus === 'error'">Draft Gagal</template>
           </span>
         </div>
 

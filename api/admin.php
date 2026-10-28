@@ -2393,6 +2393,7 @@ elseif ($action === 'questions') {
     }
 }
 elseif ($action === 'materials') {
+    ensure_admin_schema($pdo);
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $subtest = $_GET['subtest'] ?? $_GET['sub_materi'] ?? '';
         $test_component = $_GET['test_component'] ?? '';
@@ -2476,7 +2477,7 @@ elseif ($action === 'materials') {
             }
         }
         echo safe_json_encode(["materials" => $materials]);
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($input['id'])) {
         if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
             http_response_code(403);
             echo json_encode(["error" => "Staff only"]);
@@ -2535,7 +2536,7 @@ elseif ($action === 'materials') {
         } catch (PDOException $e) {
             http_response_code(500); echo json_encode(["error" => "Gagal menyimpan materi", "details" => $e->getMessage()]);
         }
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT' || ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($input['id']))) {
         if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
             http_response_code(403);
             echo json_encode(["error" => "Staff only"]);

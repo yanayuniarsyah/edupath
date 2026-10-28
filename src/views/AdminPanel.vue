@@ -5259,7 +5259,7 @@ const saveMaterial = async () => {
     closeMaterialModal();
     fetchMaterials();
   } catch (err) {
-    alert("Gagal menyimpan materi");
+    alert(`Gagal menyimpan materi: ${err.message || 'Terjadi kendala pada server'}`);
   } finally {
     isSaving.value = false;
   }
@@ -5271,7 +5271,7 @@ const deleteMaterial = async (id) => {
     await api.deleteAdminMaterial(id);
     fetchMaterials();
   } catch (err) {
-    alert("Gagal menghapus materi");
+    alert(`Gagal menghapus materi: ${err.message || 'Terjadi kendala pada server'}`);
   }
 };
 
