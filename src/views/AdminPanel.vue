@@ -1217,6 +1217,14 @@
               <i class="ph-bold ph-spinner animate-spin text-xl mb-1"></i>
               <p class="text-[10px]">Memuat materi...</p>
             </div>
+            <div v-else-if="materialsFetchError" class="p-6 text-center text-rose-400 bg-rose-500/10 rounded-xl border border-rose-500/20 m-3">
+              <i class="ph-bold ph-warning-circle text-2xl mb-1 inline-block"></i>
+              <p class="text-xs font-bold text-rose-300">Gagal Memuat Materi</p>
+              <p class="text-[11px] text-white/60 mt-1 mb-3">{{ materialsFetchError }}</p>
+              <button @click="fetchMaterials(true)" class="px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/30 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-colors">
+                <i class="ph-bold ph-arrow-clockwise"></i> Coba Lagi
+              </button>
+            </div>
             <div v-else-if="filteredMaterials.length === 0" class="p-6 text-center text-white/40">
               <p class="text-[10px]">Tidak ada materi yang ditemukan.</p>
             </div>
@@ -5109,6 +5117,7 @@ const deleteQuestion = async (id) => {
 const mSearch = ref('');
 const serverMaterials = ref([]);
 const materialsLoading = ref(false);
+const materialsFetchError = ref(null);
 const showMaterialModal = ref(false);
 const isEditingMaterial = ref(false);
 
@@ -5165,13 +5174,17 @@ const onMTopicChange = () => {
   mForm.subtopic = topObj?.subtopics?.[0] || '';
 };
 
-const fetchMaterials = async () => {
-  materialsLoading.value = true;
+const fetchMaterials = async (forceRefresh = false) => {
+  if (serverMaterials.value.length === 0 || forceRefresh) {
+    materialsLoading.value = true;
+  }
+  materialsFetchError.value = null;
   try {
     const res = await api.getAdminMaterials();
     serverMaterials.value = res.materials || (Array.isArray(res) ? res : []);
   } catch (err) {
     console.error("Gagal memuat materi", err);
+    materialsFetchError.value = err.message || "Gagal memuat data materi dari server.";
   } finally {
     materialsLoading.value = false;
   }
@@ -5257,7 +5270,7 @@ const saveMaterial = async () => {
       await api.createAdminMaterial(mForm);
     }
     closeMaterialModal();
-    fetchMaterials();
+    fetchMaterials(true);
   } catch (err) {
     alert(`Gagal menyimpan materi: ${err.message || 'Terjadi kendala pada server'}`);
   } finally {
@@ -5269,7 +5282,7 @@ const deleteMaterial = async (id) => {
   if (!confirm('Yakin ingin menghapus materi ini?')) return;
   try {
     await api.deleteAdminMaterial(id);
-    fetchMaterials();
+    fetchMaterials(true);
   } catch (err) {
     alert(`Gagal menghapus materi: ${err.message || 'Terjadi kendala pada server'}`);
   }
