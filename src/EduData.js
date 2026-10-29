@@ -293,12 +293,6 @@ export const SKILL_MAP = {
     'Literasi Bahasa Indonesia': ['Pemahaman', 'Analisis', 'Evaluasi', 'Integrasi Informasi'],
     'Literasi Bahasa Inggris': ['Vocabulary', 'Reading Comprehension', 'Text Analysis', 'Critical Reading'],
     'Penalaran Matematika': ['Bilangan', 'Aljabar', 'Geometri', 'Data & Ketidakpastian', 'Problem Solving']
-  },
-  // Backward compatibility alias for legacy components
-  Literasi: {
-    'Bahasa Indonesia': ['Pemahaman', 'Analisis', 'Evaluasi', 'Integrasi Informasi'],
-    'Bahasa Inggris': ['Vocabulary', 'Reading Comprehension', 'Text Analysis', 'Critical Reading'],
-    'Penalaran Matematika': ['Bilangan', 'Aljabar', 'Geometri', 'Data & Ketidakpastian', 'Problem Solving']
   }
 };
 

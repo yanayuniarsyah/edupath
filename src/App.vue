@@ -2564,13 +2564,13 @@
                       {{ category }}
                     </h4>
                     <div class="space-y-3">
-                      <div v-for="skill in skills" :key="skill" class="space-y-1.5">
+                      <div v-for="(subskills, subtest) in skills" :key="subtest" class="space-y-1.5">
                         <div class="flex justify-between text-[11px] font-bold">
-                          <span class="text-white/80">{{ skill }}</span>
-                          <span class="font-mono font-black" :style="{ color: getSkillColor(getSkillMastery(skill)) }">{{ getSkillMastery(skill) }}%</span>
+                          <span class="text-white/80">{{ subtest }}</span>
+                          <span class="font-mono font-black" :style="{ color: getSkillColor(getSkillMastery(subtest)) }">{{ getSkillMastery(subtest) }}%</span>
                         </div>
                         <div class="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
-                          <div class="h-full rounded-full transition-all duration-700 ease-out" :style="{ width: getSkillMastery(skill) + '%', backgroundColor: getSkillColor(getSkillMastery(skill)), boxShadow: `0 0 10px ${getSkillColor(getSkillMastery(skill))}` }"></div>
+                          <div class="h-full rounded-full transition-all duration-700 ease-out" :style="{ width: getSkillMastery(subtest) + '%', backgroundColor: getSkillColor(getSkillMastery(subtest)), boxShadow: `0 0 10px ${getSkillColor(getSkillMastery(subtest))}` }"></div>
                         </div>
                       </div>
                     </div>
@@ -4969,8 +4969,15 @@ export default {
     // Pricing Billing Toggle
     const isAnnualBilling = ref(true);
 
-    // Skill mastery
+    // Skill mastery (Subtes Resmi SNBT & Topik Spesifik)
     const skillMastery = ref({
+      'Penalaran Umum': 78,
+      'Pengetahuan & Pemahaman Umum': 74,
+      'Pemahaman Bacaan & Menulis': 82,
+      'Pengetahuan Kuantitatif': 65,
+      'Literasi Bahasa Indonesia': 85,
+      'Literasi Bahasa Inggris': 72,
+      'Penalaran Matematika': 68,
       'Operasi Aljabar': 85,
       'Persamaan Linear': 78,
       'Faktorisasi': 70,
@@ -4983,7 +4990,6 @@ export default {
       'Statistika Data': 75,
       'Logika Deduktif': 82,
       'Logika Induktif': 68,
-      'Penalaran Kuantitatif': 45,
       'Problem Solving': 58,
       'Analisis Grafik': 70,
       'Pemahaman Paragraf': 88,
