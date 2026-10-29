@@ -3022,64 +3022,57 @@
                 </div>
               </div>
 
-              <!-- Toggle Sembunyikan Bab Button -->
-              <button 
-                type="button"
-                @click="hideBabSidebar = !hideBabSidebar" 
-                class="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#c0ff00] border border-[#c0ff00]/30 text-xs font-bold transition-all shadow-md cursor-pointer ml-auto"
-                :title="hideBabSidebar ? 'Tampilkan Daftar Bab' : 'Sembunyikan Bab (Area Materi Luas)'"
-              >
-                <span class="hidden sm:inline">{{ hideBabSidebar ? 'Buka Daftar Bab' : 'Sembunyikan Bab (Area Luas)' }}</span>
-                <span class="sm:hidden">{{ hideBabSidebar ? 'Buka Bab' : 'Area Luas' }}</span>
-                <i :class="hideBabSidebar ? 'ph-bold ph-sidebar-simple' : 'ph-bold ph-arrows-out-line-horizontal'"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Subtest Navigation Tabs (Horizontal Scrollable Pills) -->
-          <div class="bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:p-4 backdrop-blur-xl shadow-xl space-y-2">
-            <div class="flex items-center justify-between px-1">
-              <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00]">Pilih Komponen & Subtes UTBK:</span>
-              <span class="text-[10px] font-bold text-white/60 font-mono">{{ materiUtbk.length }} Subtes &bull; {{ materiUtbk.reduce((acc, s) => acc + (s.babList ? s.babList.length : 0), 0) }} Bab Terstruktur</span>
-            </div>
-            <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
-              <button
-                v-for="sub in materiUtbk"
-                :key="sub.id"
-                @click="selectSubtes(sub)"
-                :class="[
-                  'px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 shrink-0 cursor-pointer shadow-md',
-                  selectedSubtes && (selectedSubtes.id === sub.id || selectedSubtes.code === sub.code)
-                    ? 'bg-[#c0ff00] text-black font-black shadow-[0_0_15px_rgba(192,255,0,0.35)] scale-[1.02]'
-                    : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
-                ]"
-              >
-                <span>{{ sub.icon || '📚' }}</span>
-                <span>{{ sub.subtest }}</span>
-                <span 
-                  class="text-[10px] px-2 py-0.5 rounded-full font-mono font-black"
-                  :class="selectedSubtes && (selectedSubtes.id === sub.id || selectedSubtes.code === sub.code) ? 'bg-black/20 text-black' : 'bg-black/40 text-[#c0ff00]'"
-                >
-                  {{ sub.babList ? sub.babList.length : 0 }} Bab
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Active Subtes Header Banner -->
-          <div class="light-mode-card rounded-2xl p-3.5 sm:p-5 flex items-center justify-between border-l-4 border-l-indigo-600">
-            <div class="flex items-center gap-3">
-              <span class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center font-bold text-indigo-600 text-xs font-mono">{{ selectedSubtes.test_component || (['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(selectedSubtes.subtes) ? 'LITERASI' : 'TPS') }}</span>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] text-indigo-600 font-black uppercase tracking-widest">SNBT 2026</span>
-                  <span class="text-slate-300">•</span>
-                  <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{{ selectedSubtes.test_component || (['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(selectedSubtes.subtes) ? 'TES LITERASI' : 'TPS') }}</span>
+              <!-- Actions: Dropdown Subtes & Toggle Sembunyikan Bab -->
+              <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap ml-auto">
+                <!-- Dropdown Pilih Komponen & Subtes UTBK -->
+                <div class="relative flex items-center">
+                  <span class="absolute left-2.5 text-xs pointer-events-none select-none">
+                    {{ selectedSubtes?.icon || '📚' }}
+                  </span>
+                  <select 
+                    id="subtest-select"
+                    :value="selectedSubtes ? (selectedSubtes.id || selectedSubtes.code || selectedSubtes.subtest || selectedSubtes.subtes) : ''"
+                    @change="onSubtestDropdownChange($event)"
+                    aria-label="Pilih Komponen & Subtes UTBK"
+                    class="pl-7 pr-8 py-1.5 sm:py-2 bg-slate-800/90 hover:bg-slate-800 text-white font-bold text-xs rounded-xl border border-white/20 focus:border-[#c0ff00] focus:ring-1 focus:ring-[#c0ff00] outline-none transition-all shadow-md cursor-pointer appearance-none max-w-[210px] sm:max-w-xs truncate"
+                  >
+                    <optgroup label="Tes Potensi Skolastik (TPS)" class="bg-slate-900 text-slate-100 font-bold">
+                      <option 
+                        v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TPS' || !['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtest || m.subtes)))" 
+                        :key="sub.id" 
+                        :value="sub.id || sub.code || sub.subtest || sub.subtes"
+                        class="bg-slate-900 text-white py-1"
+                      >
+                        {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
+                      </option>
+                    </optgroup>
+                    <optgroup label="Tes Literasi" class="bg-slate-900 text-slate-100 font-bold">
+                      <option 
+                        v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtest || m.subtes)))" 
+                        :key="sub.id" 
+                        :value="sub.id || sub.code || sub.subtest || sub.subtes"
+                        class="bg-slate-900 text-white py-1"
+                      >
+                        {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
+                      </option>
+                    </optgroup>
+                  </select>
+                  <i class="ph-bold ph-caret-down text-white/50 text-xs absolute right-2.5 pointer-events-none"></i>
                 </div>
-                <h3 class="text-lg font-black font-heading text-slate-900">{{ selectedSubtes.subtes }}</h3>
+
+                <!-- Toggle Sembunyikan Bab Button -->
+                <button 
+                  type="button"
+                  @click="hideBabSidebar = !hideBabSidebar" 
+                  class="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#c0ff00] border border-[#c0ff00]/30 text-xs font-bold transition-all shadow-md cursor-pointer whitespace-nowrap shrink-0"
+                  :title="hideBabSidebar ? 'Tampilkan Daftar Bab' : 'Sembunyikan Bab (Area Materi Luas)'"
+                >
+                  <span class="hidden sm:inline">{{ hideBabSidebar ? 'Buka Daftar Bab' : 'Sembunyikan Bab (Area Luas)' }}</span>
+                  <span class="sm:hidden">{{ hideBabSidebar ? 'Buka Bab' : 'Area Luas' }}</span>
+                  <i :class="hideBabSidebar ? 'ph-bold ph-sidebar-simple' : 'ph-bold ph-arrows-out-line-horizontal'"></i>
+                </button>
               </div>
             </div>
-            <p class="text-xs text-slate-500 font-medium hidden md:block max-w-md text-right">{{ selectedSubtes.deskripsi }}</p>
           </div>
 
           <!-- Description & Bab List -->
@@ -6114,11 +6107,22 @@ export default {
       selectedLessonQuizAns.value = null;
       showLessonQuizFeedback.value = false;
       try {
-        sessionStorage.setItem('ep_selected_subtes', subtes.id || subtes.code || subtes.subtes);
+        sessionStorage.setItem('ep_selected_subtes', subtes.id || subtes.code || subtes.subtes || subtes.subtest);
         if (subtes.babList && subtes.babList[0]) {
           sessionStorage.setItem('ep_selected_bab', subtes.babList[0].id || subtes.babList[0].judul);
         }
       } catch (e) {}
+    };
+
+    const onSubtestDropdownChange = (event) => {
+      const val = event.target.value;
+      if (!val || !materiUtbk.value) return;
+      const target = materiUtbk.value.find(s => 
+        s.id === val || s.code === val || s.subtest === val || s.subtes === val
+      );
+      if (target) {
+        selectSubtes(target);
+      }
     };
 
     const selectBab = (bab) => {
@@ -6613,6 +6617,7 @@ export default {
       selectedSubtes,
       selectedBab,
       selectSubtes,
+      onSubtestDropdownChange,
       selectBab,
       renderMaterialHtml,
       microLessons,
