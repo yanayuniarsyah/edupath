@@ -3104,7 +3104,7 @@
                   :key="bab.id"
                   :class="['w-full text-left px-3.5 py-3 rounded-xl border text-xs font-bold transition-all outline-none flex flex-col gap-1', 
                     selectedBab && selectedBab.id === bab.id 
-                      ? 'bg-indigo-50 border-indigo-400 text-indigo-900 shadow-[0_8px_32px_rgba(0,0,0,0.3)]' 
+                      ? 'bg-emerald-50 border-emerald-400 text-emerald-950 shadow-[0_8px_32px_rgba(0,0,0,0.15)]' 
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-100'
                   ]"
                   @click="selectBab(bab)"
@@ -3120,7 +3120,7 @@
                 <!-- 1. HEADER & TEORI SINGKAT MATERI UTBK -->
                 <div class="space-y-4 border-b border-slate-200 pb-6">
                   <div class="flex flex-wrap items-center gap-2">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-md text-xs font-black text-indigo-600 uppercase tracking-wider">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-md text-xs font-black text-emerald-700 uppercase tracking-wider">
                       <i class="ph-bold ph-tree-structure"></i> SNBT &bull; {{ selectedSubtes.subtes }}
                     </span>
                     <span v-if="selectedBab.topic" class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-xs font-bold text-blue-700">
@@ -5407,7 +5407,7 @@ export default {
       // Convert Markdown/plain text into clean HTML
       let formatted = str
         .replace(/^### (.*$)/gim, '<h3 class="text-base font-bold text-slate-800 mt-4 mb-1.5">$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2 class="text-lg font-extrabold text-indigo-700 mt-5 mb-2">$1</h2>')
+        .replace(/^## (.*$)/gim, '<h2 class="text-lg font-black text-emerald-600 mt-5 mb-2">$1</h2>')
         .replace(/^# (.*$)/gim, '<h1 class="text-xl font-black text-slate-900 border-b border-slate-200 pb-1 mt-6 mb-2">$1</h1>')
         .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-bold text-slate-900">$1</strong>')
         .replace(/\*(.*?)\*/gim, '<em class="italic">$1</em>')

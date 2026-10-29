@@ -3864,7 +3864,17 @@
           </div>
           <button @click="closeMaterialModal" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
         </div>
-        <form @submit.prevent="saveMaterial" class="p-5 space-y-4">
+
+        <!-- Success Alert when saved while staying inside modal -->
+        <div v-if="saveSuccessNotice" class="mx-5 mt-4 p-3 bg-emerald-500/15 border border-emerald-500/30 rounded-xl text-emerald-300 text-xs font-bold flex items-center justify-between animate-fade-in shadow-lg">
+          <div class="flex items-center gap-2">
+            <i class="ph-bold ph-check-circle text-base text-emerald-400"></i>
+            <span>Materi berhasil disimpan! Anda tetap berada di halaman edit materi ini untuk melanjutkan.</span>
+          </div>
+          <button type="button" @click="saveSuccessNotice = false" class="text-white/40 hover:text-white cursor-pointer">&times;</button>
+        </div>
+
+        <form @submit.prevent="saveMaterial(false)" class="p-5 space-y-4">
           <!-- Judul Materi -->
           <div>
             <label for="m_title_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Judul Materi</label>
@@ -3967,12 +3977,24 @@
             />
           </div>
 
-          <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
-            <button type="button" @click="closeMaterialModal" class="px-4 py-2 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors cursor-pointer">Batal</button>
-            <button type="submit" :disabled="isSaving" class="px-6 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer">
-              <i v-if="isSaving" class="ph-bold ph-spinner animate-spin"></i>
-              <span>{{ isSaving ? 'Menyimpan...' : 'Simpan Materi' }}</span>
-            </button>
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-white/10">
+            <span v-if="saveSuccessNotice" class="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+              <i class="ph-bold ph-check"></i> Perubahan berhasil disimpan
+            </span>
+            <span v-else class="text-[11px] text-white/40">Klik "Simpan Materi" untuk menyimpan tanpa keluar dari halaman ini.</span>
+            
+            <div class="flex items-center gap-2">
+              <button type="button" @click="closeMaterialModal" class="px-4 py-2 text-xs font-bold text-white/60 hover:text-white rounded-lg transition-colors cursor-pointer">
+                Tutup
+              </button>
+              <button type="button" :disabled="isSaving" @click="saveMaterial(true)" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer">
+                <span>Simpan &amp; Tutup</span>
+              </button>
+              <button type="submit" :disabled="isSaving" class="px-6 py-2 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black rounded-lg transition-all shadow-md shadow-[#c0ff00]/20 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer">
+                <i v-if="isSaving" class="ph-bold ph-spinner animate-spin"></i>
+                <span>{{ isSaving ? 'Menyimpan...' : 'Simpan Materi' }}</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -5182,6 +5204,7 @@ const materialsFetchError = ref(null);
 const showMaterialModal = ref(false);
 const isEditingMaterial = ref(false);
 const materialEditorRef = ref(null);
+const saveSuccessNotice = ref(false);
 
 const mForm = reactive({
   id: null,
@@ -5284,6 +5307,7 @@ const pagedMaterials = computed(() => paginate(filteredMaterials.value, material
 const materialTotalPages = computed(() => totalPages(filteredMaterials.value));
 
 const openMaterialModal = (m = null) => {
+  saveSuccessNotice.value = false;
   if (m) {
     isEditingMaterial.value = true;
     let comp = m.test_component || '';
@@ -5333,10 +5357,14 @@ const openMaterialModal = (m = null) => {
   showMaterialModal.value = true;
 };
 
-const closeMaterialModal = () => showMaterialModal.value = false;
+const closeMaterialModal = () => {
+  showMaterialModal.value = false;
+  saveSuccessNotice.value = false;
+};
 
-const saveMaterial = async () => {
+const saveMaterial = async (andClose = false) => {
   isSaving.value = true;
+  saveSuccessNotice.value = false;
   try {
     // Pastikan konten terkini dari editor tersinkronkan
     if (materialEditorRef.value && typeof materialEditorRef.value.getContent === 'function') {
@@ -5346,10 +5374,15 @@ const saveMaterial = async () => {
       }
     }
 
+    let saveRes;
     if (isEditingMaterial.value) {
-      await api.updateAdminMaterial(mForm.id, mForm);
+      saveRes = await api.updateAdminMaterial(mForm.id, mForm);
     } else {
-      await api.createAdminMaterial(mForm);
+      saveRes = await api.createAdminMaterial(mForm);
+      if (saveRes && saveRes.id) {
+        mForm.id = saveRes.id;
+        isEditingMaterial.value = true;
+      }
     }
 
     // Invalidate client cache agar update langsung tampak
@@ -5364,8 +5397,17 @@ const saveMaterial = async () => {
       localStorage.removeItem(`edupath_editor_draft_${mForm.id || 'new'}`);
     } catch (e) {}
 
-    closeMaterialModal();
     await fetchMaterials(true);
+
+    if (andClose) {
+      closeMaterialModal();
+    } else {
+      // Tetap di materi tersebut, tampilkan konfirmasi tersimpan
+      saveSuccessNotice.value = true;
+      setTimeout(() => {
+        saveSuccessNotice.value = false;
+      }, 5000);
+    }
   } catch (err) {
     alert(`Gagal menyimpan materi: ${err.message || 'Terjadi kendala pada server'}`);
   } finally {
