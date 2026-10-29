@@ -11,9 +11,16 @@
  * @return void
  */
 function load_env(string $path = ''): void {
+    static $loaded = [];
+
     if (empty($path)) {
         $path = __DIR__ . '/.env';
     }
+
+    if (isset($loaded[$path])) {
+        return;
+    }
+    $loaded[$path] = true;
 
     if (!file_exists($path) || !is_readable($path)) {
         // .env tidak wajib ada — server bisa set env via server config (cPanel, etc)

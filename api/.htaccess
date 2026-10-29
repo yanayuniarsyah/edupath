@@ -16,3 +16,8 @@
 <FilesMatch "(^\.|\.env|\.sql$|\.bak$|^backup_.*\.php$|^seed_.*\.php$|^test_.*\.php$|^extreme_.*\.php$|^mock_.*\.php$|^smoke_.*\.php$|^migrate.*\.php$|^create_.*\.php$|^run_.*\.php$)">
   Require all denied
 </FilesMatch>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE application/json text/plain text/html
+  Header append Vary Accept-Encoding
+</IfModule>

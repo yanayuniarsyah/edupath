@@ -4796,7 +4796,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, defineAsyncComponent } from 'vue';
 import { 
   SKILL_MAP, 
   TARGET_UNIVERSITIES, 
@@ -4807,7 +4807,8 @@ import {
 } from './EduData.js';
 import api from './api';
 import { initNeuralCanvas } from './neuralCanvas';
-import StudentPotentialPath from './components/StudentPotentialPath.vue';
+
+const StudentPotentialPath = defineAsyncComponent(() => import('./components/StudentPotentialPath.vue'));
 
 export default {
   name: 'App',

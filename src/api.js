@@ -31,6 +31,8 @@ const CACHE_TTL = {
   // Data statis / jarang berubah → cache lebih lama
   '/plans.php':                       5 * 60 * 1000,  // 5 menit
   '/spp.php?action=data':             5 * 60 * 1000,  // 5 menit
+  '/materials.php':                   3 * 60 * 1000,  // 3 menit (instan antar subtes, di-invalidate otomatis saat ada mutasi materi)
+  '/school.php?action=public_list':  10 * 60 * 1000,  // 10 menit (daftar sekolah mitra registrasi)
   // Data profil user → cache pendek (30 detik) agar perubahan cepat terasa
   '/auth.php?action=me':              30 * 1000,       // 30 detik
 };

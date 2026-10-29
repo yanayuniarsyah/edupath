@@ -2,7 +2,6 @@ import { createApp } from 'vue'
 import RootApp from './RootApp.vue'
 import router from './router/index.js'
 import './index.css'
-import 'katex/dist/katex.min.css'
 
 // ----------------------------------------------------------------
 // Analytics Tracker & Safe Wrapper (GA4 / Meta Pixel)
