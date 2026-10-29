@@ -10,11 +10,11 @@
             <span class="sm:hidden">Keluar</span>
           </button>
           <div class="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full flex items-center justify-center font-black text-[#024a86] text-sm sm:text-lg shrink-0">
-            SN
+            {{ cbtBadge }}
           </div>
           <div class="min-w-0">
-            <h1 class="text-xs sm:text-base md:text-xl font-bold uppercase tracking-wide leading-tight truncate">Ujian CBT SNPMB</h1>
-            <p class="text-[10px] sm:text-xs text-blue-200 truncate">Seleksi Nasional Penerimaan Mahasiswa Baru</p>
+            <h1 class="text-xs sm:text-base md:text-xl font-bold uppercase tracking-wide leading-tight truncate">{{ cbtTitle }}</h1>
+            <p class="text-[10px] sm:text-xs text-blue-200 truncate">{{ cbtSubtitle }}</p>
           </div>
         </div>
         <div class="hidden md:flex items-center gap-4 text-right shrink-0">
@@ -30,8 +30,8 @@
       <!-- Sub-header: Mata Ujian & Timer -->
       <div class="bg-[#013b6b] px-3 sm:px-4 py-2 flex items-center justify-between text-xs sm:text-sm shadow-inner gap-2">
         <div class="font-semibold uppercase tracking-wider flex items-center gap-1.5 sm:gap-2 min-w-0">
-          <span class="hidden sm:inline">Subtes:</span>
-          <span class="bg-[#facc15] text-black px-2 py-0.5 rounded font-bold text-[10px] sm:text-xs truncate max-w-[140px] sm:max-w-none">{{ currentQuestion.subtest || currentQuestion.sub_materi || 'Tes Potensi Skolastik' }}</span>
+          <span class="hidden sm:inline">Mata Uji:</span>
+          <span class="bg-[#facc15] text-black px-2 py-0.5 rounded font-bold text-[10px] sm:text-xs truncate max-w-[140px] sm:max-w-none">{{ currentQuestion.subtest || currentQuestion.sub_materi || 'Tes Akademik' }}</span>
         </div>
         <div class="flex items-center gap-2 sm:gap-4 shrink-0">
           <button @click="showQuestionList = true" class="bg-blue-600 hover:bg-blue-500 text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded font-bold text-[10px] sm:text-xs uppercase flex items-center gap-1 sm:gap-2 transition-colors border border-blue-400 shadow cursor-pointer">
@@ -51,13 +51,25 @@
     <!-- Main Content Area -->
     <main class="flex-grow flex w-full max-w-[1000px] mx-auto p-2 lg:p-4 min-h-0">
       
-      <!-- Loading State -->
-        <div v-if="isLoading" class="flex-grow flex items-center justify-center">
-          <div class="text-center">
-            <i class="ph-bold ph-spinner animate-spin text-4xl text-blue-600 mb-4"></i>
-            <h2 class="text-xl font-bold text-gray-700">Menyiapkan Soal Try Out CBT...</h2>
-          </div>
+      <!-- Insufficient Bank Error State (No Silent Substitution) -->
+      <div v-if="insufficientBankError" class="flex-grow flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-xl border border-rose-200 p-6 text-center space-y-4">
+          <div class="w-16 h-16 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto text-3xl font-black">!</div>
+          <h2 class="text-lg font-black text-slate-800">Paket Asesmen Belum Siap</h2>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">{{ insufficientBankError }}</p>
+          <button @click="$router.push('/')" class="w-full py-2.5 px-4 bg-[#024a86] hover:bg-[#023b6b] text-white font-bold text-sm rounded-xl transition-all shadow-md">
+            Kembali ke Dashboard Siswa
+          </button>
         </div>
+      </div>
+
+      <!-- Loading State -->
+      <div v-else-if="isLoading" class="flex-grow flex items-center justify-center">
+        <div class="text-center">
+          <i class="ph-bold ph-spinner animate-spin text-4xl text-blue-600 mb-4"></i>
+          <h2 class="text-xl font-bold text-gray-700">Menyiapkan Soal Try Out CBT...</h2>
+        </div>
+      </div>
 
         <!-- Question Area -->
         <div v-else class="flex-grow bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col relative overflow-hidden">
@@ -225,13 +237,20 @@ export default {
       answers: [],
       doubt: [],
       timeLeft: 15 * 60,
+      totalDurationSec: 15 * 60,
       attemptId: null,
       saveTimer: null,
       submitting: false,
       timerInterval: null,
       showFinishModal: false,
       questions: [],
-      isLoading: true
+      isLoading: true,
+      assessmentType: 'SNBT',
+      track: 'umum',
+      cbtTitle: 'Ujian CBT SNPMB',
+      cbtSubtitle: 'Seleksi Nasional Penerimaan Mahasiswa Baru',
+      cbtBadge: 'SN',
+      insufficientBankError: null
     }
   },
   computed: {
@@ -259,15 +278,50 @@ export default {
       if (!token) {
         throw new Error('Guest mode: student token not present');
       }
-      const savedAttemptId = localStorage.getItem('edupath_tryout_attempt_id');
-      const attempt = await api.quizStart({ attempt_id: savedAttemptId, quiz_type: 'tryout', limit: 15, duration_sec: 15 * 60 });
+
+      // Resolve assessment program and track from query parameters
+      const urlParams = new URLSearchParams(window.location.search || window.location.hash.split('?')[1] || '');
+      this.assessmentType = (urlParams.get('assessment_type') || this.$route?.query?.assessment_type || 'SNBT').toUpperCase();
+      this.track = (urlParams.get('track') || this.$route?.query?.track || 'umum').toLowerCase();
+
+      if (this.assessmentType === 'TKA') {
+        if (this.track === 'saintek') {
+          this.cbtTitle = 'Ujian CBT TKA SMA — SAINTEK';
+          this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik Bidang Sains & Teknologi';
+          this.cbtBadge = 'TK';
+          this.totalDurationSec = 90 * 60;
+        } else if (this.track === 'soshum') {
+          this.cbtTitle = 'Ujian CBT TKA SMA — SOSHUM';
+          this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik Bidang Sosial & Humaniora';
+          this.cbtBadge = 'TK';
+          this.totalDurationSec = 90 * 60;
+        } else {
+          this.cbtTitle = 'Ujian CBT TKA SMA';
+          this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik SMA';
+          this.cbtBadge = 'TK';
+          this.totalDurationSec = 90 * 60;
+        }
+        this.timeLeft = this.totalDurationSec;
+      }
+
+      const savedAttemptId = localStorage.getItem(`edupath_tryout_attempt_id_${this.assessmentType}_${this.track}`) || localStorage.getItem('edupath_tryout_attempt_id');
+      const attempt = await api.quizStart({ 
+        attempt_id: savedAttemptId, 
+        quiz_type: 'tryout', 
+        assessment_type: this.assessmentType,
+        track: this.track,
+        limit: this.assessmentType === 'TKA' ? 80 : 15, 
+        duration_sec: this.totalDurationSec 
+      });
+
       this.attemptId = attempt.attempt_id;
+      localStorage.setItem(`edupath_tryout_attempt_id_${this.assessmentType}_${this.track}`, this.attemptId);
       localStorage.setItem('edupath_tryout_attempt_id', this.attemptId);
       const dbQuestions = attempt.questions || [];
       if (dbQuestions.length > 0) {
         this.questions = dbQuestions.map(q => ({
           id: q.id,
-          subtest: q.sub_materi || q.subtes || 'Tes Skolastik',
+          subtest: q.sub_materi || q.subtes || 'Tes Akademik',
           text: q.question,
           options: [
             { id: 'A', text: q.option_a },
@@ -281,7 +335,14 @@ export default {
         throw new Error('No questions returned from API');
       }
     } catch (e) {
-      console.warn('Tryout API fallback to HOTS_DIAGNOSTIC_BANK', e);
+      // Guard against silent substitution (Constraint 5): Never fallback to SNBT when TKA fails
+      if (this.assessmentType === 'TKA') {
+        this.insufficientBankError = e.message || 'Bank soal TKA untuk peminatan ini belum mencukupi kuota simulasi. Silakan kembali ke dashboard atau hubungi koordinator akademik.';
+        this.questions = [];
+        return;
+      }
+
+      console.warn('Tryout API fallback to HOTS_DIAGNOSTIC_BANK for SNBT only', e);
       this.attemptId = 'local-to-' + Date.now();
       this.questions = HOTS_DIAGNOSTIC_BANK.map((q, idx) => ({
         id: q.id || (idx + 1),
@@ -294,16 +355,18 @@ export default {
       }));
     } finally {
       this.isLoading = false;
-      this.answers = new Array(this.questions.length).fill(null);
-      this.doubt = new Array(this.questions.length).fill(false);
-      const saved = localStorage.getItem(`edupath_tryout_${this.attemptId}`);
-      if (saved) {
-        const state = JSON.parse(saved);
-        this.answers = state.answers || this.answers;
-        this.doubt = state.doubt || this.doubt;
-        if (state.expiresAt) this.timeLeft = Math.max(0, Math.floor((new Date(state.expiresAt).getTime() - Date.now()) / 1000));
+      if (!this.insufficientBankError && this.questions.length > 0) {
+        this.answers = new Array(this.questions.length).fill(null);
+        this.doubt = new Array(this.questions.length).fill(false);
+        const saved = localStorage.getItem(`edupath_tryout_${this.attemptId}`);
+        if (saved) {
+          const state = JSON.parse(saved);
+          this.answers = state.answers || this.answers;
+          this.doubt = state.doubt || this.doubt;
+          if (state.expiresAt) this.timeLeft = Math.max(0, Math.floor((new Date(state.expiresAt).getTime() - Date.now()) / 1000));
+        }
+        this.startTimer();
       }
-      this.startTimer();
     }
   },
   beforeUnmount() {
@@ -381,10 +444,13 @@ export default {
         await api.submitQuiz({
           attempt_id: this.attemptId,
           quiz_type: 'tryout',
+          assessment_type: this.assessmentType,
+          track: this.track,
           answers: this.answers.map((answer, index) => ({ question_id: this.questions[index]?.id, answer })).filter(item => item.answer),
-          duration_sec: 15 * 60 - this.timeLeft
+          duration_sec: Math.max(0, this.totalDurationSec - this.timeLeft)
         });
         localStorage.removeItem(`edupath_tryout_${this.attemptId}`);
+        localStorage.removeItem(`edupath_tryout_attempt_id_${this.assessmentType}_${this.track}`);
         localStorage.removeItem('edupath_tryout_attempt_id');
         alert("Ujian selesai. Jawaban Anda telah disimpan.");
         this.$router.push('/');

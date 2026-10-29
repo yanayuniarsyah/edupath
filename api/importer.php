@@ -14,12 +14,18 @@ if (!$payload || $payload->role !== 'superadmin') {
 $action = $_GET['action'] ?? '';
 
 if ($action === 'template') {
-    // Return CSV Template
+    // Return CSV Template (supports ?type=TKA or default SNBT)
+    $type = strtoupper($_GET['type'] ?? 'SNBT');
     header('Content-Type: text/csv');
-    header('Content-Disposition: attachment; filename="template_impor_soal.csv"');
+    header('Content-Disposition: attachment; filename="template_impor_soal_' . strtolower($type) . '.csv"');
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['sub_materi', 'classification', 'cognitive_demand', 'difficulty', 'question', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct', 'explanation', 'source_type', 'rights_status', 'source_name', 'source_year', 'source_reference']);
-    fputcsv($out, ['Penalaran Umum', 'LATIHAN', 'C3', 'medium', 'Berapa 1+1?', '1', '2', '3', '4', '5', 'B', 'Karena 1+1=2', 'author_created', 'unknown', '', '', '']);
+    if ($type === 'TKA') {
+        fputcsv($out, ['education_level', 'assessment_type', 'track', 'subject', 'sub_materi', 'classification', 'cognitive_demand', 'difficulty', 'question', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct', 'explanation', 'source_type', 'rights_status', 'source_name', 'source_year', 'source_reference']);
+        fputcsv($out, ['SMA', 'TKA', 'saintek', 'Fisika', 'Kinematika', 'TRYOUT', 'C4', 'medium', 'Sebuah partikel bergerak lurus beraturan...', '10 m/s', '20 m/s', '30 m/s', '40 m/s', '50 m/s', 'B', 'Berdasarkan rumus v = s/t...', 'author_created', 'unknown', 'Simulasi TKA Fisika', '2026', '']);
+    } else {
+        fputcsv($out, ['sub_materi', 'classification', 'cognitive_demand', 'difficulty', 'question', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct', 'explanation', 'source_type', 'rights_status', 'source_name', 'source_year', 'source_reference']);
+        fputcsv($out, ['Penalaran Umum', 'LATIHAN', 'C3', 'medium', 'Berapa 1+1?', '1', '2', '3', '4', '5', 'B', 'Karena 1+1=2', 'author_created', 'unknown', '', '', '']);
+    }
     fclose($out);
     exit;
 }
@@ -44,60 +50,71 @@ if ($action === 'upload' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (\Throwable $e) {}
 
     try {
+        $stmt = $pdo->prepare("INSERT INTO question_imports_staging (id, batch_id, tenant_id, education_level, assessment_type, track, subject, domain, sub_materi, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, status, error_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    } catch (\Throwable $e) {
         $stmt = $pdo->prepare("INSERT INTO question_imports_staging (id, batch_id, tenant_id, sub_materi, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, status, error_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    }
 
-        foreach ($data as $row) {
-            $id = bin2hex(random_bytes(16));
-            $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
-            
-            $sub_materi = $row['sub_materi'] ?? '';
-            $classification = strtoupper($row['classification'] ?? 'LATIHAN');
-            $cognitive_demand = $row['cognitive_demand'] ?? null;
-            $difficulty = $row['difficulty'] ?? 'medium';
-            $question = $row['question'] ?? '';
-            $option_a = $row['option_a'] ?? '';
-            $option_b = $row['option_b'] ?? '';
-            $option_c = $row['option_c'] ?? '';
-            $option_d = $row['option_d'] ?? '';
-            $option_e = $row['option_e'] ?? null;
-            $correct = strtoupper($row['correct'] ?? '');
-            $explanation = $row['explanation'] ?? null;
-            $source_type = $row['source_type'] ?? 'author_created';
-            $rights_status = $row['rights_status'] ?? 'unknown';
-            $source_name = $row['source_name'] ?? null;
-            $source_year = !empty($row['source_year']) ? (int)$row['source_year'] : null;
-            $source_reference = $row['source_reference'] ?? null;
+    foreach ($data as $row) {
+        $id = bin2hex(random_bytes(16));
+        $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
+        
+        $sub_materi = $row['sub_materi'] ?? '';
+        $classification = strtoupper($row['classification'] ?? 'LATIHAN');
+        $cognitive_demand = $row['cognitive_demand'] ?? null;
+        $difficulty = $row['difficulty'] ?? 'medium';
+        $question = $row['question'] ?? '';
+        $option_a = $row['option_a'] ?? '';
+        $option_b = $row['option_b'] ?? '';
+        $option_c = $row['option_c'] ?? '';
+        $option_d = $row['option_d'] ?? '';
+        $option_e = $row['option_e'] ?? null;
+        $correct = strtoupper($row['correct'] ?? '');
+        $explanation = $row['explanation'] ?? null;
+        $source_type = $row['source_type'] ?? 'author_created';
+        $rights_status = $row['rights_status'] ?? 'unknown';
+        $source_name = $row['source_name'] ?? null;
+        $source_year = !empty($row['source_year']) ? (int)$row['source_year'] : null;
+        $source_reference = $row['source_reference'] ?? null;
 
-            $status = 'pending';
-            $error_message = '';
+        $education_level = $row['education_level'] ?? 'SMA';
+        $assessment_type = strtoupper($row['assessment_type'] ?? 'SNBT');
+        $track = strtolower($row['track'] ?? 'umum');
+        $subject = $row['subject'] ?? ($sub_materi ?: 'Penalaran Umum');
+        $domain = $row['domain'] ?? null;
 
-            if (empty($question) || empty($option_a) || empty($option_b) || empty($correct) || empty($sub_materi)) {
-                $status = 'error';
-                $error_message = 'Data wajib (sub_materi, soal, opsi A/B, kunci) kosong';
-            } elseif (!in_array($correct, ['A', 'B', 'C', 'D', 'E'])) {
-                $status = 'error';
-                $error_message = 'Kunci jawaban harus A/B/C/D/E';
-            } elseif (!in_array($classification, ['LATIHAN', 'TRYOUT', 'ASESMEN'])) {
-                $status = 'error';
-                $error_message = 'Classification harus LATIHAN, TRYOUT, atau ASESMEN';
-            }
+        $status = 'pending';
+        $error_message = '';
 
-            $stmt->execute([
-                $id, $batch_id, $tenant_id, $sub_materi, $classification, $difficulty, $question, $option_a, $option_b, $option_c, $option_d, $option_e, $correct, $explanation, $cognitive_demand, $source_type, $rights_status, $source_name, $source_year, $source_reference, $status, $error_message
-            ]);
-
-            if ($status === 'error') {
-                $error_count++;
-            } else {
-                $success_count++;
-            }
+        if (empty($question) || empty($option_a) || empty($option_b) || empty($correct) || (empty($sub_materi) && empty($subject))) {
+            $status = 'error';
+            $error_message = 'Data wajib (sub_materi/subject, soal, opsi A/B, kunci) kosong';
+        } elseif (!in_array($correct, ['A', 'B', 'C', 'D', 'E'])) {
+            $status = 'error';
+            $error_message = 'Kunci jawaban harus A/B/C/D/E';
+        } elseif (!in_array($classification, ['LATIHAN', 'TRYOUT', 'ASESMEN'])) {
+            $status = 'error';
+            $error_message = 'Classification harus LATIHAN, TRYOUT, atau ASESMEN';
         }
 
-        echo json_encode(["success" => true, "batch_id" => $batch_id, "success_count" => $success_count, "error_count" => $error_count]);
-    } catch (\Throwable $e) {
-        http_response_code(500);
-        echo json_encode(["error" => "Upload staging error: " . $e->getMessage()]);
+        try {
+            $stmt->execute([
+                $id, $batch_id, $tenant_id, $education_level, $assessment_type, $track, $subject, $domain, $sub_materi ?: $subject, $classification, $difficulty, $question, $option_a, $option_b, $option_c, $option_d, $option_e, $correct, $explanation, $cognitive_demand, $source_type, $rights_status, $source_name, $source_year, $source_reference, $status, $error_message
+            ]);
+        } catch (\Throwable $e) {
+            $stmt->execute([
+                $id, $batch_id, $tenant_id, $sub_materi ?: $subject, $classification, $difficulty, $question, $option_a, $option_b, $option_c, $option_d, $option_e, $correct, $explanation, $cognitive_demand, $source_type, $rights_status, $source_name, $source_year, $source_reference, $status, $error_message
+            ]);
+        }
+
+        if ($status === 'error') {
+            $error_count++;
+        } else {
+            $success_count++;
+        }
     }
+
+    echo json_encode(["success" => true, "batch_id" => $batch_id, "success_count" => $success_count, "error_count" => $error_count]);
 }
 elseif ($action === 'preview' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $batch_id = $_GET['batch_id'] ?? '';
@@ -137,12 +154,31 @@ elseif ($action === 'commit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
         
-        $insertStmt = $pdo->prepare("INSERT INTO questions (id, subtes, sub_materi, bab, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, is_active, is_qc_passed, education_level, assessment_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, 'SMA', 'SNBT')");
+        try {
+            $insertStmt = $pdo->prepare("INSERT INTO questions (id, subtes, sub_materi, bab, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, is_active, is_qc_passed, education_level, assessment_type, track, subject, domain) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, ?, ?, ?, ?, ?)");
+            $hasExtendedCols = true;
+        } catch (\Throwable $e) {
+            $insertStmt = $pdo->prepare("INSERT INTO questions (id, subtes, sub_materi, bab, classification, difficulty, question, option_a, option_b, option_c, option_d, option_e, correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference, is_active, is_qc_passed, education_level, assessment_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, ?, ?)");
+            $hasExtendedCols = false;
+        }
         
         foreach ($rows as $row) {
-            $insertStmt->execute([
-                $row['id'], $row['sub_materi'], $row['sub_materi'], $row['sub_materi'], $row['classification'], $row['difficulty'], $row['question'], $row['option_a'], $row['option_b'], $row['option_c'], $row['option_d'], $row['option_e'], $row['correct'], $row['explanation'], $row['cognitive_demand'], $row['source_type'], $row['rights_status'], $row['source_name'], $row['source_year'], $row['source_reference']
-            ]);
+            $edLevel = $row['education_level'] ?? 'SMA';
+            $assType = $row['assessment_type'] ?? 'SNBT';
+            $track = $row['track'] ?? 'umum';
+            $subject = $row['subject'] ?? ($row['sub_materi'] ?? 'Penalaran Umum');
+            $domain = $row['domain'] ?? null;
+            $subMateri = !empty($row['sub_materi']) ? $row['sub_materi'] : $subject;
+
+            if ($hasExtendedCols) {
+                $insertStmt->execute([
+                    $row['id'], $subMateri, $subMateri, $subMateri, $row['classification'], $row['difficulty'], $row['question'], $row['option_a'], $row['option_b'], $row['option_c'], $row['option_d'], $row['option_e'], $row['correct'], $row['explanation'], $row['cognitive_demand'], $row['source_type'], $row['rights_status'], $row['source_name'], $row['source_year'], $row['source_reference'], $edLevel, $assType, $track, $subject, $domain
+                ]);
+            } else {
+                $insertStmt->execute([
+                    $row['id'], $subMateri, $subMateri, $subMateri, $row['classification'], $row['difficulty'], $row['question'], $row['option_a'], $row['option_b'], $row['option_c'], $row['option_d'], $row['option_e'], $row['correct'], $row['explanation'], $row['cognitive_demand'], $row['source_type'], $row['rights_status'], $row['source_name'], $row['source_year'], $row['source_reference'], $edLevel, $assType
+                ]);
+            }
         }
         
         $pdo->prepare("DELETE FROM question_imports_staging WHERE batch_id = ?")->execute([$batch_id]);

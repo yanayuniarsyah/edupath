@@ -439,18 +439,23 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         error_log("SPP aggregate error: " . $e->getMessage());
     }
 
-    // 4. Performa CBT Tryout Nasional Sekolah
+    // 4. Performa CBT Tryout Nasional Sekolah (SNBT & TKA terisolasi)
     $tryout_stats = [
         'tryout_participants' => 0,
         'total_tryouts_taken' => 0,
-        'avg_tryout_score' => 0
+        'avg_tryout_score' => 0,
+        'avg_snbt_score' => 0,
+        'avg_tka_score' => 0,
+        'tka_tryouts_taken' => 0
     ];
     try {
         $stmt_to = $pdo->prepare("
             SELECT 
                 COUNT(DISTINCT qr.student_id) as tryout_participants,
                 COUNT(qr.id) as total_tryouts_taken,
-                COALESCE(AVG(qr.score), 0) as avg_tryout_score
+                COALESCE(AVG(CASE WHEN qr.assessment_type = 'SNBT' OR qr.assessment_type IS NULL THEN qr.score END), 0) as avg_snbt_score,
+                COALESCE(AVG(CASE WHEN qr.assessment_type = 'TKA' THEN qr.score END), 0) as avg_tka_score,
+                COUNT(CASE WHEN qr.assessment_type = 'TKA' THEN 1 END) as tka_tryouts_taken
             FROM quiz_results qr
             JOIN students st ON qr.student_id = st.id
             WHERE (st.school_id = ? OR (st.school_id IS NULL AND LOWER(TRIM(st.school)) = LOWER(TRIM(?))))
@@ -458,9 +463,27 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt_to->execute([$current_school_id, $current_school_name]);
         $row_to = $stmt_to->fetch(PDO::FETCH_ASSOC);
         if ($row_to) {
-            $tryout_stats = $row_to;
+            $tryout_stats['tryout_participants'] = (int)$row_to['tryout_participants'];
+            $tryout_stats['total_tryouts_taken'] = (int)$row_to['total_tryouts_taken'];
+            $tryout_stats['avg_snbt_score'] = round((float)$row_to['avg_snbt_score'], 1);
+            $tryout_stats['avg_tryout_score'] = $tryout_stats['avg_snbt_score']; // backward-compatible alias
+            $tryout_stats['avg_tka_score'] = round((float)$row_to['avg_tka_score'], 1);
+            $tryout_stats['tka_tryouts_taken'] = (int)$row_to['tka_tryouts_taken'];
         }
-    } catch (\Throwable $e) {}
+    } catch (\Throwable $e) {
+        // Fallback query if assessment_type column not present yet
+        try {
+            $stmt_fallback = $pdo->prepare("SELECT COUNT(DISTINCT qr.student_id) as tryout_participants, COUNT(qr.id) as total_tryouts_taken, COALESCE(AVG(qr.score), 0) as avg_tryout_score FROM quiz_results qr JOIN students st ON qr.student_id = st.id WHERE (st.school_id = ? OR (st.school_id IS NULL AND LOWER(TRIM(st.school)) = LOWER(TRIM(?))))");
+            $stmt_fallback->execute([$current_school_id, $current_school_name]);
+            $row_fb = $stmt_fallback->fetch(PDO::FETCH_ASSOC);
+            if ($row_fb) {
+                $tryout_stats['tryout_participants'] = (int)$row_fb['tryout_participants'];
+                $tryout_stats['total_tryouts_taken'] = (int)$row_fb['total_tryouts_taken'];
+                $tryout_stats['avg_tryout_score'] = round((float)$row_fb['avg_tryout_score'], 1);
+                $tryout_stats['avg_snbt_score'] = $tryout_stats['avg_tryout_score'];
+            }
+        } catch (\Throwable $e2) {}
+    }
 
     // 5. Top 5 Target Universitas & Jurusan
     $stmt_univ = $pdo->prepare("

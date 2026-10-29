@@ -14,9 +14,56 @@ if (!in_array($payload->role, ['student', 'admin', 'superadmin', 'teacher', 'gur
     exit;
 }
 
-require_once 'EntitlementService.php';
+// ============================================================================
+// ASSESSMENT BLUEPRINTS REGISTRY (Configurable, Versionable)
+// ============================================================================
+$ASSESSMENT_BLUEPRINTS = [
+    'SNBT' => [
+        'umum' => [
+            'name' => 'UTBK SNBT Resmi',
+            'duration_sec' => 11700,
+            'default_limit' => 150,
+            'distribution' => [
+                'Penalaran Umum' => 30,
+                'Pengetahuan Dan Pemahaman Umum' => 20,
+                'Pemahaman Bacaan Dan Menulis' => 20,
+                'Pengetahuan Kuantitatif' => 20,
+                'Literasi Dalam Bahasa Indonesia' => 20,
+                'Literasi Dalam Bahasa Inggris' => 20,
+                'Penalaran Matematika' => 20
+            ],
+            'scoring_strategy' => 'irt_sum'
+        ]
+    ],
+    'TKA' => [
+        'saintek' => [
+            'name' => 'TKA SMA Saintek (Simulasi Seleksi Mandiri & Ujian Sekolah)',
+            'duration_sec' => 5400, // 90 menit (configurable)
+            'default_limit' => 80,
+            'distribution' => [
+                'Matematika IPA' => 20,
+                'Fisika' => 20,
+                'Kimia' => 20,
+                'Biologi' => 20
+            ],
+            'scoring_strategy' => 'standard_raw'
+        ],
+        'soshum' => [
+            'name' => 'TKA SMA Soshum (Simulasi Seleksi Mandiri & Ujian Sekolah)',
+            'duration_sec' => 5400, // 90 menit (configurable)
+            'default_limit' => 80,
+            'distribution' => [
+                'Sosiologi' => 20,
+                'Ekonomi' => 20,
+                'Geografi' => 20,
+                'Sejarah' => 20
+            ],
+            'scoring_strategy' => 'standard_raw'
+        ]
+    ]
+];
 
-function verify_quiz_entitlement($pdo, $payload, $quiz_type) {
+function verify_quiz_entitlement($pdo, $payload, $quiz_type, $assessment_type = 'SNBT', $track = 'umum') {
     if ($payload->role !== 'student' || strtolower($quiz_type) !== 'tryout') {
         return true;
     }
@@ -26,6 +73,13 @@ function verify_quiz_entitlement($pdo, $payload, $quiz_type) {
     
     $hasTryout = $entitlementService->hasEntitlement($payload->id, $tenant_id, 'tryout_unlimited')
               || $entitlementService->hasEntitlement($payload->id, $tenant_id, 'premium_assessments');
+
+    if ($assessment_type === 'TKA') {
+        $hasTryout = $hasTryout 
+                  || $entitlementService->hasEntitlement($payload->id, $tenant_id, 'tka_unlimited')
+                  || ($track === 'saintek' && $entitlementService->hasEntitlement($payload->id, $tenant_id, 'tka_saintek'))
+                  || ($track === 'soshum' && $entitlementService->hasEntitlement($payload->id, $tenant_id, 'tka_soshum'));
+    }
               
     if (!$hasTryout) {
         // Auto-heal check if student has active subscription or paid plan record
@@ -61,7 +115,7 @@ function verify_quiz_entitlement($pdo, $payload, $quiz_type) {
         http_response_code(403);
         echo json_encode([
             "success" => false,
-            "error" => "Paket Berlangganan Diperlukan. Fitur CBT Tryout Nasional berbobot IRT hanya tersedia untuk pengguna Pro Member.",
+            "error" => "Paket Berlangganan Diperlukan. Fitur CBT Tryout ($assessment_type) hanya tersedia untuk pengguna Pro Member.",
             "code" => "ENTITLEMENT_REQUIRED"
         ]);
         exit;
@@ -103,12 +157,36 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
     $subtes = safe_str($input['subtes'] ?? '');
     if ($subtes === '') $subtes = null;
     $quiz_type = safe_str($input['quiz_type'] ?? 'latihan');
-    verify_quiz_entitlement($pdo, $payload, $quiz_type);
-    $limit = $quiz_type === 'tryout' ? 150 : max(1, min(50, (int)($input['limit'] ?? 10)));
+    $education_level = safe_str($input['education_level'] ?? ($_GET['education_level'] ?? 'SMA'));
+    if (empty($education_level)) $education_level = 'SMA';
+    $assessment_type = strtoupper(safe_str($input['assessment_type'] ?? ($_GET['assessment_type'] ?? 'SNBT')));
+    if (empty($assessment_type)) $assessment_type = 'SNBT';
+    $track = strtolower(safe_str($input['track'] ?? ($_GET['track'] ?? 'umum')));
+    if (empty($track)) $track = 'umum';
+    $package_id = safe_str($input['package_id'] ?? ($_GET['package_id'] ?? null));
 
-    $duration_sec = max(60, min(7200, (int)($input['duration_sec'] ?? 900)));
+    // Validation: Supported Assessment Types & Tracks
+    if (!in_array($assessment_type, ['SNBT', 'TKA', 'AKM', 'TKS'])) {
+        http_response_code(400);
+        echo json_encode(["error" => "Tipe asesmen tidak didukung: $assessment_type"]);
+        exit;
+    }
+    if ($assessment_type === 'TKA' && !in_array($track, ['saintek', 'soshum', 'umum'])) {
+        http_response_code(400);
+        echo json_encode(["error" => "Track TKA tidak valid. Pilih 'saintek' atau 'soshum'."]);
+        exit;
+    }
+
+    verify_quiz_entitlement($pdo, $payload, $quiz_type, $assessment_type, $track);
+
+    $blueprint = $ASSESSMENT_BLUEPRINTS[$assessment_type][$track] ?? null;
+    $default_limit = $blueprint['default_limit'] ?? ($quiz_type === 'tryout' ? 150 : 10);
+    $limit = $quiz_type === 'tryout' ? $default_limit : max(1, min(50, (int)($input['limit'] ?? 10)));
+    $default_duration = $blueprint['duration_sec'] ?? ($quiz_type === 'tryout' ? 7200 : 900);
+    $duration_sec = max(60, min(14400, (int)($input['duration_sec'] ?? $default_duration)));
     $expires_at = date('Y-m-d H:i:s', time() + $duration_sec);
     $attempt_id = safe_str($input['attempt_id'] ?? '');
+
     if ($attempt_id !== '') {
         try {
             $resume = $pdo->prepare("SELECT id, expires_at FROM quiz_attempts WHERE id = ? AND student_id = ? AND status = 'started'");
@@ -124,11 +202,16 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
         $attempt_id = bin2hex(random_bytes(16));
         $attempt_id = substr($attempt_id,0,8).'-'.substr($attempt_id,8,4).'-'.substr($attempt_id,12,4).'-'.substr($attempt_id,16,4).'-'.substr($attempt_id,20,12);
         try {
-            $stmt = $pdo->prepare("INSERT INTO quiz_attempts (id, student_id, quiz_type, subtes, status, expires_at) VALUES (?, ?, ?, ?, 'started', ?)");
-            $stmt->execute([$attempt_id, $payload->id, $quiz_type, $subtes, $expires_at]);
+            $stmt = $pdo->prepare("INSERT INTO quiz_attempts (id, student_id, quiz_type, assessment_type, track, package_id, subtes, status, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'started', ?)");
+            $stmt->execute([$attempt_id, $payload->id, $quiz_type, $assessment_type, $track, $package_id, $subtes, $expires_at]);
         } catch (PDOException $e) {
-            $stmt = $pdo->prepare("INSERT INTO quiz_attempts (id, student_id, quiz_type, subtes, status) VALUES (?, ?, ?, ?, 'started')");
-            $stmt->execute([$attempt_id, $payload->id, $quiz_type, $subtes]);
+            try {
+                $stmt = $pdo->prepare("INSERT INTO quiz_attempts (id, student_id, quiz_type, subtes, status, expires_at) VALUES (?, ?, ?, ?, 'started', ?)");
+                $stmt->execute([$attempt_id, $payload->id, $quiz_type, $subtes, $expires_at]);
+            } catch (PDOException $e2) {
+                $stmt = $pdo->prepare("INSERT INTO quiz_attempts (id, student_id, quiz_type, subtes, status) VALUES (?, ?, ?, ?, 'started')");
+                $stmt->execute([$attempt_id, $payload->id, $quiz_type, $subtes]);
+            }
         }
     }
 
@@ -140,8 +223,6 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
         $classification_filter = "classification = 'ASESMEN'";
     }
 
-    $education_level = safe_str($input['education_level'] ?? ($_GET['education_level'] ?? ''));
-    $assessment_type = safe_str($input['assessment_type'] ?? ($_GET['assessment_type'] ?? ''));
     if (!empty($education_level)) {
         $classification_filter .= " AND (education_level = " . $pdo->quote($education_level) . " OR education_level IS NULL)";
     }
@@ -150,14 +231,48 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
     }
 
     if ($subtes) {
-        $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi = ? OR subtes = ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
-        $stmt->execute([$subtes, $subtes]);
+        $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi = ? OR subtes = ? OR subject = ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+        $stmt->execute([$subtes, $subtes, $subtes]);
         $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($questions) {
             shuffle($questions);
             if (count($questions) > (int)$limit) {
                 $questions = array_slice($questions, 0, (int)$limit);
             }
+        }
+    } elseif ($assessment_type === 'TKA') {
+        // TKA Question Blueprint Engine
+        $distribution = $blueprint['distribution'] ?? [];
+        $questions = [];
+        $available_by_subject = [];
+        foreach ($distribution as $sub_name => $sub_limit) {
+            $stmt = $pdo->prepare("SELECT id, COALESCE(subject, sub_materi, subtes) AS subtes, COALESCE(subject, sub_materi, subtes) AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (subject LIKE ? OR sub_materi LIKE ? OR subtes LIKE ?) AND (track = ? OR track = 'umum' OR track IS NULL) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+            $stmt->execute(["%" . $sub_name . "%", "%" . $sub_name . "%", "%" . $sub_name . "%", $track]);
+            $fetched = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $available_by_subject[$sub_name] = count($fetched);
+            if ($fetched) {
+                shuffle($fetched);
+                if (count($fetched) > $sub_limit) {
+                    $fetched = array_slice($fetched, 0, $sub_limit);
+                }
+                $questions = array_merge($questions, $fetched);
+            }
+        }
+
+        // STRICT GUARD (Constraint 5): Never silently substitute SNBT questions when TKA questions are unavailable
+        if (empty($questions)) {
+            http_response_code(422);
+            echo json_encode([
+                "success" => false,
+                "error" => "Bank soal TKA ($track) belum mencukupi untuk memulai ujian.",
+                "code" => "INSUFFICIENT_QUESTION_BANK",
+                "details" => [
+                    "assessment_type" => "TKA",
+                    "track" => $track,
+                    "available_by_subject" => $available_by_subject
+                ]
+            ]);
+            exit;
         }
     } else {
         if (strtolower($quiz_type) === 'tryout') {
@@ -212,9 +327,9 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
         }
     }
 
-    // Resilient fallback: If no questions found matching exact filters, get any active questions without ORDER BY RAND
-    if (empty($questions)) {
-        $stmt = $pdo->query("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1");
+    // Resilient fallback for legacy SNBT only — NEVER executed for TKA or non-SNBT
+    if (empty($questions) && $assessment_type === 'SNBT') {
+        $stmt = $pdo->query("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND (assessment_type = 'SNBT' OR assessment_type IS NULL)");
         $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($questions) {
             shuffle($questions);
@@ -227,9 +342,12 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
     echo json_encode([
         "attempt_id" => $attempt_id,
         "expires_at" => $expires_at,
+        "assessment_type" => $assessment_type,
+        "track" => $track,
         "questions" => $questions
     ]);
 }
+
 elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // Backward compatibility for existing Web App
     $sub_materi_input = safe_str($_GET['sub_materi'] ?? ($_GET['subtes'] ?? ''));
@@ -344,9 +462,13 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $duration_sec = (int)($input['duration_sec'] ?? 0);
     $attempt_id = safe_str($input['attempt_id'] ?? '');
 
+    $assessment_type = safe_str($input['assessment_type'] ?? 'SNBT');
+    $track = safe_str($input['track'] ?? 'umum');
+    $package_id = safe_str($input['package_id'] ?? null);
+
     if ($attempt_id) {
         try {
-            $lock = $pdo->prepare("SELECT status, expires_at FROM quiz_attempts WHERE id = ? AND student_id = ? FOR UPDATE");
+            $lock = $pdo->prepare("SELECT status, expires_at, assessment_type, track, package_id FROM quiz_attempts WHERE id = ? AND student_id = ? FOR UPDATE");
             $lock->execute([$attempt_id, $payload->id]);
             $attempt = $lock->fetch();
             if (!$attempt) {
@@ -354,12 +476,25 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode(["error" => "Attempt tidak ditemukan."]);
                 exit;
             }
+            if (!empty($attempt['assessment_type'])) $assessment_type = $attempt['assessment_type'];
+            if (!empty($attempt['track'])) $track = $attempt['track'];
+            if (!empty($attempt['package_id'])) $package_id = $attempt['package_id'];
+
             if ($attempt['status'] === 'completed') {
                 $check = $pdo->prepare("SELECT score, correct, total, id as result_id FROM quiz_results WHERE attempt_id = ? AND student_id = ?");
                 $check->execute([$attempt_id, $payload->id]);
                 $existingResult = $check->fetch();
                 if ($existingResult) {
-                    echo json_encode(["success" => true, "score" => (float)$existingResult['score'], "correct" => (int)$existingResult['correct'], "total" => (int)$existingResult['total'], "result_id" => $existingResult['result_id']]);
+                    echo json_encode([
+                        "success" => true,
+                        "score" => (float)$existingResult['score'],
+                        "correct" => (int)$existingResult['correct'],
+                        "total" => (int)$existingResult['total'],
+                        "result_id" => $existingResult['result_id'],
+                        "assessment_type" => $assessment_type,
+                        "track" => $track,
+                        "message" => "Hasil sudah tersimpan (Idempotent response)"
+                    ]);
                     exit;
                 }
             }
@@ -376,23 +511,23 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check idempotency if attempt_id is provided
     if ($attempt_id) {
         try {
-            // Check if already completed
             $check = $pdo->prepare("SELECT score, correct, total, id as result_id FROM quiz_results WHERE attempt_id = ? AND student_id = ?");
             $check->execute([$attempt_id, $payload->id]);
             $existingResult = $check->fetch();
             if ($existingResult) {
-                // Idempotent return
                 echo json_encode([
                     "success" => true,
                     "score" => (float)$existingResult['score'],
                     "correct" => (int)$existingResult['correct'],
                     "total" => (int)$existingResult['total'],
                     "result_id" => $existingResult['result_id'],
+                    "assessment_type" => $assessment_type,
+                    "track" => $track,
                     "message" => "Hasil sudah tersimpan (Idempotent response)"
                 ]);
                 exit;
             }
-        } catch (PDOException $e) { /* Migration not run yet, column might not exist */ }
+        } catch (PDOException $e) { /* Migration not run yet */ }
     }
 
     $correctCount = 0;
@@ -408,7 +543,6 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $qIds = array_column($answers, 'question_id');
     $idList = $qIds;
     $inQuery = implode(',', array_fill(0, count($qIds), '?'));
-    // Calculate final scores based on classical properties if available (we keep legacy irt_score field fallback for now if it exists, or just use 1)
     $stmt = $pdo->prepare("SELECT id, correct, irt_score, sub_materi AS subtes, bab FROM questions WHERE id IN ($inQuery)");
     $stmt->execute($idList);
     $questionsDb = $stmt->fetchAll();
@@ -437,12 +571,17 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $qWeight = ((float)($db_q['irt_score'] ?? 0) > 0) ? (float)$db_q['irt_score'] : 1.0;
                 $totalScore += $qWeight;
                 
-                // Update Progress
+                // Update Progress with assessment context
                 if ($db_q['bab']) {
-                    $upd = $pdo->prepare("INSERT INTO progress (id, student_id, subtes, bab, score, mastery) VALUES (?, ?, ?, ?, ?, 1) ON DUPLICATE KEY UPDATE score = score + ?, mastery = mastery + 1, last_study = NOW()");
                     $uuid = bin2hex(random_bytes(16));
                     $uuid = substr($uuid,0,8).'-'.substr($uuid,8,4).'-'.substr($uuid,12,4).'-'.substr($uuid,16,4).'-'.substr($uuid,20,12);
-                    $upd->execute([$uuid, $payload->id, $db_q['subtes'], $db_q['bab'], $qWeight, $qWeight]);
+                    try {
+                        $upd = $pdo->prepare("INSERT INTO progress (id, student_id, subtes, assessment_type, track, subject, bab, score, mastery) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1) ON DUPLICATE KEY UPDATE score = score + ?, mastery = mastery + 1, last_study = NOW()");
+                        $upd->execute([$uuid, $payload->id, $db_q['subtes'], $assessment_type, $track, $db_q['subtes'], $db_q['bab'], $qWeight, $qWeight]);
+                    } catch (PDOException $e) {
+                        $upd = $pdo->prepare("INSERT INTO progress (id, student_id, subtes, bab, score, mastery) VALUES (?, ?, ?, ?, ?, 1) ON DUPLICATE KEY UPDATE score = score + ?, mastery = mastery + 1, last_study = NOW()");
+                        $upd->execute([$uuid, $payload->id, $db_q['subtes'], $db_q['bab'], $qWeight, $qWeight]);
+                    }
                 }
             }
 
@@ -457,21 +596,30 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $totalQuestions = count($seenQuestions);
     }
 
+    // Scoring Strategy: If TKA, compute standard percentage score (0 - 100)
+    if ($assessment_type === 'TKA') {
+        $totalScore = $totalQuestions > 0 ? round(($correctCount / $totalQuestions) * 100, 2) : 0.0;
+    }
+
     $id = bin2hex(random_bytes(16));
     $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
     
     try {
-        $ins = $pdo->prepare("INSERT INTO quiz_results (id, student_id, attempt_id, quiz_type, subtes, score, correct, total, duration_sec, answers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $ins->execute([$id, $payload->id, $attempt_id ? $attempt_id : null, $quiz_type, $subtes, $totalScore, $correctCount, $totalQuestions, $duration_sec, json_encode($detailedAnswers)]);
+        $ins = $pdo->prepare("INSERT INTO quiz_results (id, student_id, attempt_id, quiz_type, assessment_type, track, package_id, subtes, score, correct, total, duration_sec, answers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $ins->execute([$id, $payload->id, $attempt_id ? $attempt_id : null, $quiz_type, $assessment_type, $track, $package_id, $subtes, $totalScore, $correctCount, $totalQuestions, $duration_sec, json_encode($detailedAnswers)]);
         
         if ($attempt_id) {
             $upd = $pdo->prepare("UPDATE quiz_attempts SET status = 'completed', completed_at = NOW() WHERE id = ? AND student_id = ?");
             $upd->execute([$attempt_id, $payload->id]);
         }
     } catch (PDOException $e) {
-        // Fallback for Web App backward compatibility if attempt_id column doesn't exist
-        $ins = $pdo->prepare("INSERT INTO quiz_results (id, student_id, quiz_type, subtes, score, correct, total, duration_sec, answers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $ins->execute([$id, $payload->id, $quiz_type, $subtes, $totalScore, $correctCount, $totalQuestions, $duration_sec, json_encode($detailedAnswers)]);
+        // Fallback for Web App backward compatibility if columns don't exist
+        $ins = $pdo->prepare("INSERT INTO quiz_results (id, student_id, attempt_id, quiz_type, subtes, score, correct, total, duration_sec, answers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $ins->execute([$id, $payload->id, $attempt_id ? $attempt_id : null, $quiz_type, $subtes, $totalScore, $correctCount, $totalQuestions, $duration_sec, json_encode($detailedAnswers)]);
+        if ($attempt_id) {
+            $upd = $pdo->prepare("UPDATE quiz_attempts SET status = 'completed', completed_at = NOW() WHERE id = ? AND student_id = ?");
+            $upd->execute([$attempt_id, $payload->id]);
+        }
     }
 
     echo json_encode([
@@ -479,7 +627,12 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         "score" => $totalScore,
         "correct" => $correctCount,
         "total" => $totalQuestions,
+        "assessment_type" => $assessment_type,
+        "track" => $track,
         "result_id" => $id,
+        "message" => "Hasil berhasil disimpan"
+    ]);
+}
         "message" => "Hasil berhasil disimpan"
     ]);
 }
@@ -550,6 +703,8 @@ elseif (($action === 'review' || $action === 'cbt_review') && $_SERVER['REQUEST_
         "correct" => (int)$result['correct'],
         "total" => (int)$result['total'],
         "quiz_type" => $result['quiz_type'],
+        "assessment_type" => $result['assessment_type'] ?? 'SNBT',
+        "track" => $result['track'] ?? 'umum',
         "subtes" => $result['subtes'],
         "questions" => $questionsData
     ]);
