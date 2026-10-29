@@ -177,8 +177,9 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $education_level = safe_str($_GET['education_level'] ?? '');
     $assessment_type = safe_str($_GET['assessment_type'] ?? '');
+    $track = safe_str($_GET['track'] ?? '');
 
-    $sql = "SELECT id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, formula_praktis, file_url, teacher_name, education_level, assessment_type, subject, domain, created_at FROM materials WHERE (is_active = 1 OR is_active IS NULL)";
+    $sql = "SELECT id, exam, test_component, subtest, topic, subtopic, skill, indicator, title, content, formula_praktis, file_url, teacher_name, education_level, assessment_type, track, subject, domain, created_at FROM materials WHERE (is_active = 1 OR is_active IS NULL)";
     $params = [];
     if ($subtes) {
         $sql .= " AND (subtest = ? OR subtest LIKE ?)";
@@ -200,6 +201,10 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     if ($assessment_type && $assessment_type !== 'all') {
         $sql .= " AND (assessment_type = ? OR assessment_type IS NULL)";
         $params[] = $assessment_type;
+    }
+    if ($track && $track !== 'all') {
+        $sql .= " AND (track = ? OR track IS NULL)";
+        $params[] = $track;
     }
     $sql .= " ORDER BY created_at DESC";
 

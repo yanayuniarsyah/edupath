@@ -104,7 +104,7 @@
               <!-- Group TPS -->
               <div class="px-2 pt-1 pb-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/80">TPS (Skolastik)</div>
               <button
-                v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TPS' || !['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtes)))"
+                v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TPS' || (!m.test_component && ['Penalaran Umum', 'Pengetahuan Kuantitatif', 'Pengetahuan & Pemahaman Umum', 'Pemahaman Bacaan & Menulis'].includes(m.subtes || m.subtest))))"
                 :key="subtes.id"
                 :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
                   currentTab === 'learning' && selectedSubtes?.id === subtes.id
@@ -123,7 +123,7 @@
               <!-- Group TES LITERASI -->
               <div class="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase tracking-wider text-sky-400/80">TES LITERASI</div>
               <button
-                v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtes)))"
+                v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtes || m.subtest)))"
                 :key="subtes.id"
                 :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
                   currentTab === 'learning' && selectedSubtes?.id === subtes.id
@@ -138,6 +138,48 @@
                 </div>
                 <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
               </button>
+
+              <!-- Group TKA SAINTEK -->
+              <template v-if="materiUtbk.some(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtes || m.subtest))">
+                <div class="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/80">TKA SAINTEK</div>
+                <button
+                  v-for="subtes in materiUtbk.filter(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtes || m.subtest))"
+                  :key="subtes.id"
+                  :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
+                    currentTab === 'learning' && selectedSubtes?.id === subtes.id
+                      ? 'bg-emerald-400/15 text-emerald-400 font-bold border border-emerald-400/30'
+                      : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
+                  ]"
+                  @click.stop="selectSubtesFromSidebar(subtes)"
+                >
+                  <div class="flex items-center gap-2 overflow-hidden">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400/70 shrink-0"></span>
+                    <span class="truncate">{{ subtes.subtes }}</span>
+                  </div>
+                  <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                </button>
+              </template>
+
+              <!-- Group TKA SOSHUM -->
+              <template v-if="materiUtbk.some(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtes || m.subtest))">
+                <div class="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase tracking-wider text-amber-400/80">TKA SOSHUM</div>
+                <button
+                  v-for="subtes in materiUtbk.filter(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtes || m.subtest))"
+                  :key="subtes.id"
+                  :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
+                    currentTab === 'learning' && selectedSubtes?.id === subtes.id
+                      ? 'bg-amber-400/15 text-amber-400 font-bold border border-amber-400/30'
+                      : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
+                  ]"
+                  @click.stop="selectSubtesFromSidebar(subtes)"
+                >
+                  <div class="flex items-center gap-2 overflow-hidden">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400/70 shrink-0"></span>
+                    <span class="truncate">{{ subtes.subtes }}</span>
+                  </div>
+                  <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                </button>
+              </template>
             </div>
           </template>
         </nav>
@@ -3025,7 +3067,7 @@
                 >
                   <optgroup label="Tes Potensi Skolastik (TPS)" class="bg-slate-900 text-slate-100 font-bold">
                     <option 
-                      v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TPS' || !['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtest || m.subtes)))" 
+                      v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TPS' || (!m.test_component && ['Penalaran Umum', 'Pengetahuan Kuantitatif', 'Pengetahuan & Pemahaman Umum', 'Pemahaman Bacaan & Menulis'].includes(m.subtest || m.subtes))))" 
                       :key="sub.id" 
                       :value="sub.id || sub.code || sub.subtest || sub.subtes"
                       class="bg-slate-900 text-white py-1"
@@ -3036,6 +3078,26 @@
                   <optgroup label="Tes Literasi" class="bg-slate-900 text-slate-100 font-bold">
                     <option 
                       v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtest || m.subtes)))" 
+                      :key="sub.id" 
+                      :value="sub.id || sub.code || sub.subtest || sub.subtes"
+                      class="bg-slate-900 text-white py-1"
+                    >
+                      {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
+                    </option>
+                  </optgroup>
+                  <optgroup v-if="(materiUtbk || []).some(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtest || m.subtes))" label="TKA Saintek (IPA)" class="bg-slate-900 text-emerald-400 font-bold">
+                    <option 
+                      v-for="sub in (materiUtbk || []).filter(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtest || m.subtes))" 
+                      :key="sub.id" 
+                      :value="sub.id || sub.code || sub.subtest || sub.subtes"
+                      class="bg-slate-900 text-white py-1"
+                    >
+                      {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
+                    </option>
+                  </optgroup>
+                  <optgroup v-if="(materiUtbk || []).some(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtest || m.subtes))" label="TKA Soshum (IPS)" class="bg-slate-900 text-amber-400 font-bold">
+                    <option 
+                      v-for="sub in (materiUtbk || []).filter(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtest || m.subtes))" 
                       :key="sub.id" 
                       :value="sub.id || sub.code || sub.subtest || sub.subtes"
                       class="bg-slate-900 text-white py-1"
@@ -5524,7 +5586,7 @@ export default {
         if (serverList.length > 0 && materiUtbk.value) {
           serverList.forEach(m => {
             const subName = (m.subtest || m.subtes || '').toLowerCase();
-            const targetSub = materiUtbk.value.find(s => {
+            let targetSub = materiUtbk.value.find(s => {
               const sName = (s.subtest || s.name || '').toLowerCase();
               return sName === subName ||
                 (subName.includes('penalaran umum') && s.code === 'PU') ||
@@ -5535,6 +5597,27 @@ export default {
                 (subName.includes('inggris') && s.code === 'LBE') ||
                 (subName.includes('matematika') && s.code === 'PM');
             });
+
+            if (!targetSub && subName) {
+              const rawSub = m.subtest || m.subtes || 'TKA';
+              const aType = (m.assessment_type || 'TKA').toUpperCase();
+              const trk = (m.track || (['sosiologi', 'ekonomi', 'geografi', 'sejarah'].includes(rawSub.toLowerCase()) ? 'soshum' : 'saintek')).toLowerCase();
+              const comp = aType === 'TKA' ? `TKA ${trk.toUpperCase()}` : (m.test_component || 'UMUM');
+              targetSub = {
+                id: `sub_${rawSub.toLowerCase().replace(/[^a-z0-9]/g, '_')}`,
+                code: rawSub.slice(0, 4).toUpperCase(),
+                name: rawSub,
+                subtes: rawSub,
+                subtest: rawSub,
+                test_component: comp,
+                assessment_type: aType,
+                track: trk,
+                icon: aType === 'TKA' ? (trk === 'saintek' ? '🔬' : '📚') : '📘',
+                babList: []
+              };
+              materiUtbk.value.push(targetSub);
+            }
+
             if (targetSub) {
               if (!targetSub.babList) targetSub.babList = [];
 

@@ -1,6 +1,119 @@
 // ============================================================================
-// EduPath Master Content Architecture & Question Taxonomy (SNBT Standar Resmi)
+// EduPath Master Content Architecture & Question Taxonomy (SNBT & TKA Standar)
 // ============================================================================
+
+export const TKA_TAXONOMY = {
+  saintek: {
+    name: 'TKA Saintek',
+    components: [
+      {
+        id: 'tka_saintek',
+        name: 'TKA SAINTEK',
+        label: 'TKA Saintek (Sains & Teknologi)',
+        subtests: [
+          {
+            id: 'mat_ipa',
+            name: 'Matematika IPA',
+            topics: [
+              { name: 'Aljabar & Fungsi', subtopics: ['Persamaan & Pertidaksamaan', 'Fungsi Komposisi & Invers', 'Matriks & Vektor'] },
+              { name: 'Trigonometri', subtopics: ['Identitas Trigonometri', 'Persamaan Trigonometri', 'Aturan Sinus & Kosinus'] },
+              { name: 'Kalkulus', subtopics: ['Limit Fungsi', 'Turunan (Diferensial)', 'Integral'] },
+              { name: 'Geometri & Dimensi Tiga', subtopics: ['Jarak Titik, Garis, Bidang', 'Sudut Antar Garis/Bidang', 'Irisan Kerucut'] },
+              { name: 'Statistika & Peluang', subtopics: ['Ukuran Pemusatan & Penyebaran', 'Kombinatorika & Peluang Kejadian'] }
+            ]
+          },
+          {
+            id: 'fisika',
+            name: 'Fisika',
+            topics: [
+              { name: 'Mekanika & Kinematika', subtopics: ['Gerak Lurus & Parabola', 'Hukum Newton tentang Gerak', 'Usaha & Energi', 'Momentum & Impuls'] },
+              { name: 'Fluida & Termodinamika', subtopics: ['Fluida Statis & Dinamis', 'Suhu, Kalor & Perpindahan', 'Hukum Termodinamika'] },
+              { name: 'Gelombang & Optik', subtopics: ['Gelombang Mekanik & Bunyi', 'Optik Geometri & Alat Optik', 'Gelombang Elektromagnetik'] },
+              { name: 'Listrik & Magnet', subtopics: ['Elektrostatika & Hukum Coulomb', 'Rangkaian Arus Searah & Bolak-balik', 'Medan & Induksi Magnetik'] },
+              { name: 'Fisika Modern', subtopics: ['Teori Relativitas Khusus', 'Fisika Kuantum & Efek Fotolistrik', 'Fisika Inti & Radioaktivitas'] }
+            ]
+          },
+          {
+            id: 'kimia',
+            name: 'Kimia',
+            topics: [
+              { name: 'Struktur Atom & Tabel Periodik', subtopics: ['Konfigurasi Elektron & Sifat Keperiodikan', 'Ikatan Kimia & Bentuk Molekul'] },
+              { name: 'Stoikiometri & Reaksi Kimia', subtopics: ['Konsep Mol & Perhitungan Kimia', 'Hukum Dasar Kimia'] },
+              { name: 'Termokimia & Kinetika', subtopics: ['Entalpi & Hukum Hess', 'Laju Reaksi & Faktor yang Mempengaruhi', 'Kesetimbangan Kimia'] },
+              { name: 'Larutan & Elektrokimia', subtopics: ['Asam-Basa & pH', 'Larutan Penyangga & Hidrolisis', 'Sifat Koligatif', 'Redoks & Sel Elektrokimia'] },
+              { name: 'Kimia Organik & Makromolekul', subtopics: ['Hidrokarbon & Gugus Fungsi', 'Polimer, Karbohidrat & Protein'] }
+            ]
+          },
+          {
+            id: 'biologi',
+            name: 'Biologi',
+            topics: [
+              { name: 'Biologi Sel & Molekuler', subtopics: ['Struktur & Fungsi Organel', 'Metabolisme: Enzim, Respirasi & Fotosintesis', 'Sintesis Protein & Pembelahan Sel'] },
+              { name: 'Fisiologi Tumbuhan & Hewan', subtopics: ['Jaringan & Organ Tumbuhan', 'Sistem Organ Manusia: Sirkulasi, Respirasi, Ekskresi, Saraf'] },
+              { name: 'Genetika & Hereditas', subtopics: ['Hukum Mendel & Pola Hereditas', 'Mutasi Genetik & Rekayasa Genetika'] },
+              { name: 'Ekologi & Keanekaragaman', subtopics: ['Prinsip Ekosistem & Aliran Energi', 'Keanekaragaman Hayati & Konservasi', 'Dampak Pencemaran Lingkungan'] },
+              { name: 'Evolusi & Bioteknologi', subtopics: ['Mekanisme & Teori Evolusi', 'Bioteknologi Konvensional & Modern'] }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  soshum: {
+    name: 'TKA Soshum',
+    components: [
+      {
+        id: 'tka_soshum',
+        name: 'TKA SOSHUM',
+        label: 'TKA Soshum (Sosial & Humaniora)',
+        subtests: [
+          {
+            id: 'sosiologi',
+            name: 'Sosiologi',
+            topics: [
+              { name: 'Interaksi & Nilai Sosial', subtopics: ['Bentuk Interaksi Sosial', 'Nilai & Norma Sosial', 'Sosialisasi & Kepribadian'] },
+              { name: 'Struktur & Diferensiasi Sosial', subtopics: ['Stratifikasi Sosial', 'Diferensiasi Sosial', 'Mobilitas Sosial'] },
+              { name: 'Konflik & Integrasi Sosial', subtopics: ['Akar Konflik Sosial', 'Penyelesaian Konflik & Akomodasi', 'Integrasi & Reintegrasi Sosial'] },
+              { name: 'Perubahan Sosial & Globalisasi', subtopics: ['Teori & Faktor Perubahan Sosial', 'Dampak Globalisasi & Modernisasi', 'Kearifan Lokal & Komunitas'] }
+            ]
+          },
+          {
+            id: 'ekonomi',
+            name: 'Ekonomi',
+            topics: [
+              { name: 'Konsep Dasar & Mekanisme Pasar', subtopics: ['Kelangkaan & Biaya Peluang', 'Permintaan, Penawaran & Elastisitas', 'Struktur Pasar'] },
+              { name: 'Ekonomi Makro & Kebijakan', subtopics: ['Pendapatan Nasional', 'Inflasi & Indeks Harga', 'Kebijakan Fiskal & Moneter'] },
+              { name: 'Lembaga Keuangan & Bank', subtopics: ['Bank Sentral & OJK', 'Pasar Modal & Asuransi', 'Koperasi & BUMN'] },
+              { name: 'Ekonomi Internasional', subtopics: ['Perdagangan Internasional', 'Neraca Pembayaran & Kurs Valas', 'Kerjasama Ekonomi Internasional'] },
+              { name: 'Akuntansi Dasar', subtopics: ['Persamaan Dasar Akuntansi', 'Jurnal Umum & Buku Besar', 'Laporan Keuangan Perusahaan Jasa & Dagang'] }
+            ]
+          },
+          {
+            id: 'geografi',
+            name: 'Geografi',
+            topics: [
+              { name: 'Dasar Geografi & Pemetaan', subtopics: ['Prinsip & Pendekatan Geografi', 'Peta, Penginderaan Jauh & SIG'] },
+              { name: 'Dinamika Geosfer', subtopics: ['Litosfer: Tektonisme, Vulkanisme & Seisme', 'Atmosfer: Cuaca & Iklim', 'Hidrosfer: Siklus Air & Perairan Darat/Laut'] },
+              { name: 'Biosfer & Antroposfer', subtopics: ['Persebaran Flora & Fauna', 'Dinamika Penduduk & Masalah Kependudukan'] },
+              { name: 'Wilayah & Tata Ruang', subtopics: ['Pola Keruangan Desa-Kota', 'Interaksi Wilayah & Pusat Pertumbuhan', 'Mitigasi Bencana Alam'] }
+            ]
+          },
+          {
+            id: 'sejarah',
+            name: 'Sejarah',
+            topics: [
+              { name: 'Metodologi & Sumber Sejarah', subtopics: ['Konsep Berpikir Kronologis & Sinkronik', 'Heuristik & Kritik Sumber Sejarah'] },
+              { name: 'Nusantara Kuno & Kolonial', subtopics: ['Kerajaan Hindu-Buddha & Islam', 'Masuknya Bangsa Barat & Perlawanan Daerah', 'Politik Etis & Pergerakan Nasional'] },
+              { name: 'Kemerdekaan & Revolusi', subtopics: ['Masa Pendudukan Jepang', 'Proklamasi 17 Agustus 1945', 'Perjuangan Fisik & Diplomasi Mempertahankan RI'] },
+              { name: 'Indonesia Modern & Kontemporer', subtopics: ['Demokrasi Liberal & Terpimpin', 'Orde Baru & Dinamika Pembangunan', 'Era Reformasi hingga Sekarang'] },
+              { name: 'Sejarah Dunia & Hubungan Antarbangsa', subtopics: ['Perang Dunia I & II', 'Perang Dingin & Gerakan Non-Blok', 'Organisasi Regional & Global (PBB, ASEAN)'] }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+};
 
 export const SNBT_TAXONOMY = {
   exam: 'SNBT',

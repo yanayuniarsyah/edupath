@@ -1054,10 +1054,30 @@
                 </button>
               </div>
 
+              <!-- Filter Program Ujian (SNBT vs TKA) -->
+              <select id="q_assessment_select" v-model="qAssessmentFilter" aria-label="Filter Program Ujian" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
+                <option value="all" class="bg-[#0d1427]">Semua Program</option>
+                <option value="SNBT" class="bg-[#0d1427]">📘 SNBT / SNPMB (Umum)</option>
+                <option value="TKA_saintek" class="bg-[#0d1427]">🔬 TKA SMA — Saintek</option>
+                <option value="TKA_soshum" class="bg-[#0d1427]">📚 TKA SMA — Soshum</option>
+              </select>
+
               <input id="q_search_input" name="q_search" aria-label="Cari soal / materi / topik" v-model="qSearch" type="text" placeholder="Cari soal / materi / topik..." class="flex-grow min-w-[180px] px-3.5 py-2 text-xs text-white placeholder-white/40 bg-black/40 border border-white/10 rounded-xl outline-none focus:border-[#c0ff00]/50 transition-colors" />
 
               <select id="q_sub_materi_select" name="q_sub_materi" aria-label="Semua Komponen & Subtes" v-model="qSubMateri" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
                 <option value="all" class="bg-[#0d1427]">Semua Komponen & Subtes</option>
+                <optgroup label="TKA Saintek (IPA)" class="bg-[#0d1427] font-bold text-emerald-400">
+                  <option value="Matematika IPA" class="bg-[#0d1427]">Matematika IPA</option>
+                  <option value="Fisika" class="bg-[#0d1427]">Fisika</option>
+                  <option value="Kimia" class="bg-[#0d1427]">Kimia</option>
+                  <option value="Biologi" class="bg-[#0d1427]">Biologi</option>
+                </optgroup>
+                <optgroup label="TKA Soshum (IPS)" class="bg-[#0d1427] font-bold text-amber-400">
+                  <option value="Sosiologi" class="bg-[#0d1427]">Sosiologi</option>
+                  <option value="Ekonomi" class="bg-[#0d1427]">Ekonomi</option>
+                  <option value="Geografi" class="bg-[#0d1427]">Geografi</option>
+                  <option value="Sejarah" class="bg-[#0d1427]">Sejarah</option>
+                </optgroup>
                 <optgroup label="Komponen: TPS" class="bg-[#0d1427] font-bold text-[#c0ff00]">
                   <option value="Penalaran Umum" class="bg-[#0d1427]">Penalaran Umum (PU)</option>
                   <option value="Pengetahuan & Pemahaman Umum" class="bg-[#0d1427]">Pengetahuan & Pemahaman Umum (PPU)</option>
@@ -1104,7 +1124,7 @@
             <div v-else-if="filteredQuestions.length === 0" class="p-8 text-center text-white/40">
               <i class="ph-bold ph-books text-3xl mb-2 text-white/20"></i>
               <p class="text-xs font-bold text-white/60">Tidak ada soal yang ditemukan.</p>
-              <p class="text-[11px] text-white/40 mt-1">Coba sesuaikan kata kunci pencarian atau filter guru/subtes.</p>
+              <p class="text-[11px] text-white/40 mt-1">Coba sesuaikan kata kunci pencarian atau filter program/subtes.</p>
             </div>
             <div v-else class="overflow-x-auto">
               <table class="w-full text-xs">
@@ -1115,7 +1135,7 @@
                     </th>
                     <th class="text-center px-3 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider w-5/12 cursor-pointer hover:text-white" @click="setSort('question')">Pertanyaan <i v-if="sortKey === 'question'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('test_component')">Komponen & Subtes <i v-if="sortKey === 'test_component'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('test_component')">Program & Subtes <i v-if="sortKey === 'test_component'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('topic')">Topik & Subtopik <i v-if="sortKey === 'topic'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('skill')">Skill / Kompetensi <i v-if="sortKey === 'skill'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('question_type')">Tipe & Level <i v-if="sortKey === 'question_type'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
@@ -1143,8 +1163,16 @@
                       </div>
                     </td>
                     <td class="px-3 py-3">
-                      <div class="flex flex-col gap-1">
-                        <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00]">{{ q.test_component || 'TPS' }}</span>
+                      <div class="flex flex-col gap-1 items-start">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                          <span v-if="(q.assessment_type || q.exam) === 'TKA'" class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider" :class="(q.track || '').toLowerCase() === 'soshum' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'">
+                            TKA {{ (q.track || 'saintek').toUpperCase() }}
+                          </span>
+                          <span v-else class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                            SNBT
+                          </span>
+                          <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00]">{{ q.test_component || 'TPS' }}</span>
+                        </div>
                         <span class="font-bold text-white text-xs">{{ q.subtest || q.sub_materi || q.subtes }}</span>
                       </div>
                     </td>
@@ -1234,10 +1262,30 @@
                 </button>
               </div>
 
+              <!-- Filter Program Ujian (SNBT vs TKA) -->
+              <select id="m_assessment_select" v-model="mAssessmentFilter" aria-label="Filter Program Ujian Materi" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
+                <option value="all" class="bg-[#0d1427]">Semua Program</option>
+                <option value="SNBT" class="bg-[#0d1427]">📘 SNBT / SNPMB (Umum)</option>
+                <option value="TKA_saintek" class="bg-[#0d1427]">🔬 TKA SMA — Saintek</option>
+                <option value="TKA_soshum" class="bg-[#0d1427]">📚 TKA SMA — Soshum</option>
+              </select>
+
               <input id="m_search_input" name="m_search" aria-label="Cari materi / topik / guru" v-model="mSearch" type="text" placeholder="Cari materi / topik / guru..." class="flex-grow min-w-[180px] px-3.5 py-2 text-xs text-white placeholder-white/40 bg-black/40 border border-white/10 rounded-xl outline-none focus:border-[#c0ff00]/50 transition-colors" />
 
               <select id="m_sub_materi_select" name="m_sub_materi" aria-label="Semua Komponen & Subtes" v-model="mSubMateri" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
                 <option value="all" class="bg-[#0d1427]">Semua Komponen & Subtes</option>
+                <optgroup label="TKA Saintek (IPA)" class="bg-[#0d1427] font-bold text-emerald-400">
+                  <option value="Matematika IPA" class="bg-[#0d1427]">Matematika IPA</option>
+                  <option value="Fisika" class="bg-[#0d1427]">Fisika</option>
+                  <option value="Kimia" class="bg-[#0d1427]">Kimia</option>
+                  <option value="Biologi" class="bg-[#0d1427]">Biologi</option>
+                </optgroup>
+                <optgroup label="TKA Soshum (IPS)" class="bg-[#0d1427] font-bold text-amber-400">
+                  <option value="Sosiologi" class="bg-[#0d1427]">Sosiologi</option>
+                  <option value="Ekonomi" class="bg-[#0d1427]">Ekonomi</option>
+                  <option value="Geografi" class="bg-[#0d1427]">Geografi</option>
+                  <option value="Sejarah" class="bg-[#0d1427]">Sejarah</option>
+                </optgroup>
                 <optgroup label="Komponen: TPS" class="bg-[#0d1427] font-bold text-[#c0ff00]">
                   <option value="Penalaran Umum" class="bg-[#0d1427]">Penalaran Umum (PU)</option>
                   <option value="Pengetahuan & Pemahaman Umum" class="bg-[#0d1427]">Pengetahuan & Pemahaman Umum (PPU)</option>
@@ -1301,7 +1349,7 @@
                     </th>
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('title')">Judul Materi <i v-if="sortKey === 'title'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('sub_materi')">Sub Materi <i v-if="sortKey === 'sub_materi'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('sub_materi')">Program & Subtes <i v-if="sortKey === 'sub_materi'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('teacher_name')">Guru / PJ <i v-if="sortKey === 'teacher_name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
@@ -1314,7 +1362,19 @@
                     </td>
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ (materialPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-4 py-3 font-bold text-white text-sm leading-snug">{{ m.title }}</td>
-                    <td class="px-4 py-3 font-bold text-white/80 text-xs">{{ m.sub_materi }}</td>
+                    <td class="px-4 py-3">
+                      <div class="flex items-center gap-1.5 flex-wrap mb-1">
+                        <span v-if="(m.assessment_type || m.exam) === 'TKA'" class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider" :class="(m.track || '').toLowerCase() === 'soshum' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'">
+                          TKA {{ (m.track || 'saintek').toUpperCase() }}
+                        </span>
+                        <span v-else class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                          SNBT
+                        </span>
+                        <span v-if="m.test_component" class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00]">{{ m.test_component }}</span>
+                      </div>
+                      <div class="font-bold text-white/90 text-xs">{{ m.sub_materi || m.subtest }}</div>
+                      <div v-if="m.topic" class="text-[11px] text-white/50 mt-0.5 font-medium">Topik: {{ m.topic }}</div>
+                    </td>
                     <td class="px-4 py-3 font-medium text-white/60 text-xs">{{ m.teacher_name || '-' }}</td>
                     <td class="px-4 py-3">
                       <span class="px-2.5 py-1 rounded-md font-bold text-xs inline-flex items-center gap-1" :class="m.is_active != 0 ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/15 border border-rose-500/30 text-rose-400'">
@@ -3688,38 +3748,49 @@
           <button @click="closeQuestionModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <form @submit.prevent="saveQuestion" class="p-5 space-y-4">
-          <!-- Row 1: Ujian & Komponen -->
+          <!-- Row 1: Program Ujian & Peminatan / Track -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label for="q_exam_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Ujian</label>
-              <input id="q_exam_input" name="exam" v-model="qForm.exam" readonly class="w-full p-2.5 text-xs text-white/70 bg-black/40 border border-white/10 rounded-lg outline-none cursor-not-allowed font-medium" />
+              <label for="q_assessment_type_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Program Ujian</label>
+              <select id="q_assessment_type_select" name="assessment_type" v-model="qForm.assessment_type" @change="onQProgramChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option value="SNBT" class="bg-[#0d1427] text-white">SNBT / SNPMB (Seleksi Nasional Mahasiswa Baru)</option>
+                <option value="TKA" class="bg-[#0d1427] text-white">TKA SMA (Tes Kemampuan Akademik SMA)</option>
+              </select>
             </div>
+            <div>
+              <label for="q_track_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peminatan / Track</label>
+              <select id="q_track_select" name="track" v-model="qForm.track" @change="onQTrackChange" :disabled="qForm.assessment_type === 'SNBT'" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                <option value="umum" v-if="qForm.assessment_type === 'SNBT'" class="bg-[#0d1427] text-white">Umum (Semua Jurusan)</option>
+                <option value="saintek" class="bg-[#0d1427] text-white">Saintek (IPA: Matematika, Fisika, Kimia, Biologi)</option>
+                <option value="soshum" class="bg-[#0d1427] text-white">Soshum (IPS: Sosiologi, Ekonomi, Geografi, Sejarah)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 2: Komponen & Subtes -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="q_component_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Komponen Ujian</label>
               <select id="q_component_select" name="test_component" v-model="qForm.test_component" @change="onQComponentChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="c in qAvailableComponents" :key="c.name" :value="c.name" class="bg-[#0d1427] text-white">{{ c.label || c.name }}</option>
               </select>
             </div>
-          </div>
-
-          <!-- Row 2: Subtes & Topik -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label for="q_subtest_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes</label>
+              <label for="q_subtest_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">{{ qForm.assessment_type === 'TKA' ? 'Mata Pelajaran' : 'Subtes' }}</label>
               <select id="q_subtest_select" name="subtest" v-model="qForm.subtest" @change="onQSubtestChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="s in qAvailableSubtests" :key="s.name" :value="s.name" class="bg-[#0d1427] text-white">{{ s.name }}</option>
               </select>
             </div>
+          </div>
+
+          <!-- Row 3: Topik & Subtopik -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label for="q_topic_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Topik</label>
+              <label for="q_topic_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Topik / Bab</label>
               <select id="q_topic_select" name="topic" v-model="qForm.topic" @change="onQTopicChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="t in qAvailableTopics" :key="t.name" :value="t.name" class="bg-[#0d1427] text-white">{{ t.name }}</option>
               </select>
             </div>
-          </div>
-
-          <!-- Row 3: Subtopik & Skill -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="q_subtopic_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtopik</label>
               <input id="q_subtopic_input" name="subtopic" v-model="qForm.subtopic" list="qSubtopicDatalist" placeholder="e.g. Pola Bilangan..." class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
@@ -3727,6 +3798,10 @@
                 <option v-for="st in (qCurrentTopicObj?.subtopics || [])" :key="st" :value="st"></option>
               </datalist>
             </div>
+          </div>
+
+          <!-- Row 4: Skill & Indikator -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="q_skill_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Skill / Kompetensi</label>
               <input id="q_skill_input" name="skill" v-model="qForm.skill" list="qSkillDatalist" placeholder="e.g. Identifikasi Pola..." class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
@@ -3734,10 +3809,6 @@
                 <option v-for="sk in (qCurrentTopicObj?.skills || [])" :key="sk" :value="sk"></option>
               </datalist>
             </div>
-          </div>
-
-          <!-- Row 4: Indikator & Tipe Soal -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="q_indicator_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Indikator Soal</label>
               <input id="q_indicator_input" name="indicator" v-model="qForm.indicator" list="qIndicatorDatalist" placeholder="e.g. Menentukan pola berikutnya..." class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
@@ -3745,15 +3816,17 @@
                 <option v-for="ind in (qCurrentTopicObj?.indicators || [])" :key="ind" :value="ind"></option>
               </datalist>
             </div>
-            <div>
-              <label for="q_type_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tipe Soal</label>
-              <select id="q_type_select" name="question_type" v-model="qForm.question_type" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-                <option value="multiple_choice" class="bg-[#0d1427] text-white">Pilihan Ganda (A-E)</option>
-                <option value="complex_mcq" class="bg-[#0d1427] text-white">Pilihan Ganda Kompleks</option>
-                <option value="short_answer" class="bg-[#0d1427] text-white">Isian Singkat</option>
-                <option value="true_false" class="bg-[#0d1427] text-white">Pernyataan Benar / Salah</option>
-              </select>
-            </div>
+          </div>
+
+          <!-- Row 5: Tipe Soal -->
+          <div>
+            <label for="q_type_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tipe Soal</label>
+            <select id="q_type_select" name="question_type" v-model="qForm.question_type" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+              <option value="multiple_choice" class="bg-[#0d1427] text-white">Pilihan Ganda (A-E)</option>
+              <option value="complex_mcq" class="bg-[#0d1427] text-white">Pilihan Ganda Kompleks</option>
+              <option value="short_answer" class="bg-[#0d1427] text-white">Isian Singkat</option>
+              <option value="true_false" class="bg-[#0d1427] text-white">Pernyataan Benar / Salah</option>
+            </select>
           </div>
 
           <!-- Row 5: Kesulitan, Penggunaan, Kognitif & QC -->
@@ -3880,6 +3953,25 @@
         </div>
 
         <form @submit.prevent="saveMaterial(false)" class="p-5 space-y-4">
+          <!-- Program Ujian & Peminatan / Track -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label for="m_assessment_type_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Program Ujian</label>
+              <select id="m_assessment_type_select" name="assessment_type" v-model="mForm.assessment_type" @change="onMProgramChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option value="SNBT" class="bg-[#0d1427] text-white">SNBT / SNPMB (Seleksi Nasional Mahasiswa Baru)</option>
+                <option value="TKA" class="bg-[#0d1427] text-white">TKA SMA (Tes Kemampuan Akademik SMA)</option>
+              </select>
+            </div>
+            <div>
+              <label for="m_track_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peminatan / Track</label>
+              <select id="m_track_select" name="track" v-model="mForm.track" @change="onMTrackChange" :disabled="mForm.assessment_type === 'SNBT'" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                <option value="umum" v-if="mForm.assessment_type === 'SNBT'" class="bg-[#0d1427] text-white">Umum (Semua Jurusan)</option>
+                <option value="saintek" class="bg-[#0d1427] text-white">Saintek (IPA: Matematika, Fisika, Kimia, Biologi)</option>
+                <option value="soshum" class="bg-[#0d1427] text-white">Soshum (IPS: Sosiologi, Ekonomi, Geografi, Sejarah)</option>
+              </select>
+            </div>
+          </div>
+
           <!-- Judul Materi -->
           <div>
             <label for="m_title_input" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Judul Materi</label>
@@ -3895,7 +3987,7 @@
               </select>
             </div>
             <div>
-              <label for="m_subtest_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Subtes</label>
+              <label for="m_subtest_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">{{ mForm.assessment_type === 'TKA' ? 'Mata Pelajaran' : 'Subtes' }}</label>
               <select id="m_subtest_select" name="subtest" v-model="mForm.subtest" @change="onMSubtestChange" required class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
                 <option v-for="s in mAvailableSubtests" :key="s.name" :value="s.name" class="bg-[#0d1427] text-white">{{ s.name }}</option>
               </select>
@@ -4194,7 +4286,7 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api';
-import { SNBT_TAXONOMY } from '../EduData.js';
+import { SNBT_TAXONOMY, TKA_TAXONOMY } from '../EduData.js';
 import MaterialRichEditor from '../components/MaterialRichEditor.vue';
 
 const router = useRouter()
@@ -5034,8 +5126,12 @@ const questionsLoading = ref(false);
 const showQuestionModal = ref(false);
 const isEditingQuestion = ref(false);
 
+const qAssessmentFilter = ref('all');
+
 const qForm = reactive({
   id: null,
+  assessment_type: 'SNBT',
+  track: 'umum',
   exam: 'SNBT',
   test_component: 'TPS',
   subtest: 'Penalaran Umum',
@@ -5061,22 +5157,47 @@ const qForm = reactive({
   explanation: ''
 });
 
-// Cascading helpers for Question Form
-const qAvailableComponents = computed(() => SNBT_TAXONOMY?.components || []);
+// Cascading helpers for Question Form (TKA vs SNBT)
+const qAvailableComponents = computed(() => {
+  if (qForm.assessment_type === 'TKA') {
+    const t = qForm.track || 'saintek';
+    return TKA_TAXONOMY[t]?.components || [];
+  }
+  return SNBT_TAXONOMY?.components || [];
+});
 
 const qAvailableSubtests = computed(() => {
   const comp = qAvailableComponents.value.find(c => c.name === qForm.test_component);
-  return comp ? comp.subtests : [];
+  return comp ? comp.subtests : (qAvailableComponents.value[0]?.subtests || []);
 });
 
 const qAvailableTopics = computed(() => {
   const sub = qAvailableSubtests.value.find(s => s.name === qForm.subtest);
-  return sub ? sub.topics : [];
+  return sub ? sub.topics : (qAvailableSubtests.value[0]?.topics || []);
 });
 
 const qCurrentTopicObj = computed(() => {
-  return qAvailableTopics.value.find(t => t.name === qForm.topic) || null;
+  return qAvailableTopics.value.find(t => t.name === qForm.topic) || qAvailableTopics.value[0] || null;
 });
+
+const onQProgramChange = () => {
+  if (qForm.assessment_type === 'SNBT') {
+    qForm.track = 'umum';
+    qForm.exam = 'SNBT';
+  } else {
+    if (!qForm.track || qForm.track === 'umum') qForm.track = 'saintek';
+    qForm.exam = 'TKA';
+  }
+  const firstComp = qAvailableComponents.value[0]?.name || '';
+  qForm.test_component = firstComp;
+  onQComponentChange();
+};
+
+const onQTrackChange = () => {
+  const firstComp = qAvailableComponents.value[0]?.name || '';
+  qForm.test_component = firstComp;
+  onQComponentChange();
+};
 
 const onQComponentChange = () => {
   const firstSub = qAvailableSubtests.value[0]?.name || '';
@@ -5094,8 +5215,8 @@ const onQSubtestChange = () => {
 const onQTopicChange = () => {
   const topObj = qCurrentTopicObj.value;
   qForm.subtopic = topObj?.subtopics?.[0] || '';
-  qForm.skill = topObj?.skills?.[0] || '';
-  qForm.indicator = topObj?.indicators?.[0] || '';
+  qForm.skill = topObj?.skills?.[0] || (topObj?.name ? `Kompetensi ${topObj.name}` : '');
+  qForm.indicator = topObj?.indicators?.[0] || (qForm.subtopic ? `Mampu menyelesaikan soal ${qForm.subtopic}` : '');
 };
 
 const fetchQuestions = async () => {
@@ -5114,6 +5235,15 @@ const filteredQuestions = computed(() => {
   let list = serverQuestions.value;
   if (teacherQuestionFilter.value === 'mine') {
     list = list.filter(q => canManageQuestion(q));
+  }
+  if (qAssessmentFilter.value && qAssessmentFilter.value !== 'all') {
+    if (qAssessmentFilter.value === 'SNBT') {
+      list = list.filter(q => (!q.assessment_type || q.assessment_type.toUpperCase() === 'SNBT'));
+    } else if (qAssessmentFilter.value === 'TKA_saintek') {
+      list = list.filter(q => q.assessment_type && q.assessment_type.toUpperCase() === 'TKA' && (!q.track || q.track.toLowerCase() === 'saintek'));
+    } else if (qAssessmentFilter.value === 'TKA_soshum') {
+      list = list.filter(q => q.assessment_type && q.assessment_type.toUpperCase() === 'TKA' && q.track && q.track.toLowerCase() === 'soshum');
+    }
   }
   if (qSubMateri.value && qSubMateri.value !== 'all') {
     const sM = qSubMateri.value.toLowerCase();
@@ -5141,15 +5271,23 @@ const questionTotalPages = computed(() => totalPages(filteredQuestions.value));
 const openQuestionModal = (q = null) => {
   if (q) {
     isEditingQuestion.value = true;
+    const aType = (q.assessment_type || q.exam || 'SNBT').toUpperCase();
+    const trk = (q.track || (aType === 'TKA' ? 'saintek' : 'umum')).toLowerCase();
     let comp = q.test_component || '';
-    const sub = q.subtest || q.sub_materi || 'Penalaran Umum';
+    const sub = q.subtest || q.sub_materi || (aType === 'TKA' ? (trk === 'soshum' ? 'Sosiologi' : 'Matematika IPA') : 'Penalaran Umum');
     if (!comp) {
-      const isLiterasi = ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(sub);
-      comp = isLiterasi ? 'TES LITERASI' : 'TPS';
+      if (aType === 'TKA') {
+        comp = trk === 'soshum' ? 'TKA SOSHUM' : 'TKA SAINTEK';
+      } else {
+        const isLiterasi = ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(sub);
+        comp = isLiterasi ? 'TES LITERASI' : 'TPS';
+      }
     }
     Object.assign(qForm, {
       ...q,
-      exam: q.exam || 'SNBT',
+      assessment_type: aType,
+      track: trk,
+      exam: aType === 'TKA' ? 'TKA' : 'SNBT',
       test_component: comp,
       subtest: sub,
       sub_materi: sub,
@@ -5166,6 +5304,8 @@ const openQuestionModal = (q = null) => {
     isEditingQuestion.value = false;
     Object.assign(qForm, {
       id: null,
+      assessment_type: 'SNBT',
+      track: 'umum',
       exam: 'SNBT',
       test_component: 'TPS',
       subtest: 'Penalaran Umum',
@@ -5236,8 +5376,12 @@ const isEditingMaterial = ref(false);
 const materialEditorRef = ref(null);
 const saveSuccessNotice = ref(false);
 
+const mAssessmentFilter = ref('all');
+
 const mForm = reactive({
   id: null,
+  assessment_type: 'SNBT',
+  track: 'umum',
   title: '',
   content: '',
   exam: 'SNBT',
@@ -5254,22 +5398,47 @@ const mForm = reactive({
   formula_praktis: ''
 });
 
-// Cascading helpers for Material Form
-const mAvailableComponents = computed(() => SNBT_TAXONOMY?.components || []);
+// Cascading helpers for Material Form (TKA vs SNBT)
+const mAvailableComponents = computed(() => {
+  if (mForm.assessment_type === 'TKA') {
+    const t = mForm.track || 'saintek';
+    return TKA_TAXONOMY[t]?.components || [];
+  }
+  return SNBT_TAXONOMY?.components || [];
+});
 
 const mAvailableSubtests = computed(() => {
   const comp = mAvailableComponents.value.find(c => c.name === mForm.test_component);
-  return comp ? comp.subtests : [];
+  return comp ? comp.subtests : (mAvailableComponents.value[0]?.subtests || []);
 });
 
 const mAvailableTopics = computed(() => {
   const sub = mAvailableSubtests.value.find(s => s.name === mForm.subtest);
-  return sub ? sub.topics : [];
+  return sub ? sub.topics : (mAvailableSubtests.value[0]?.topics || []);
 });
 
 const mCurrentTopicObj = computed(() => {
-  return mAvailableTopics.value.find(t => t.name === mForm.topic) || null;
+  return mAvailableTopics.value.find(t => t.name === mForm.topic) || mAvailableTopics.value[0] || null;
 });
+
+const onMProgramChange = () => {
+  if (mForm.assessment_type === 'SNBT') {
+    mForm.track = 'umum';
+    mForm.exam = 'SNBT';
+  } else {
+    if (!mForm.track || mForm.track === 'umum') mForm.track = 'saintek';
+    mForm.exam = 'TKA';
+  }
+  const firstComp = mAvailableComponents.value[0]?.name || '';
+  mForm.test_component = firstComp;
+  onMComponentChange();
+};
+
+const onMTrackChange = () => {
+  const firstComp = mAvailableComponents.value[0]?.name || '';
+  mForm.test_component = firstComp;
+  onMComponentChange();
+};
 
 const onMComponentChange = () => {
   const firstSub = mAvailableSubtests.value[0]?.name || '';
@@ -5310,6 +5479,15 @@ const filteredMaterials = computed(() => {
   if (teacherMaterialFilter.value === 'mine') {
     list = list.filter(m => canManageMaterial(m));
   }
+  if (mAssessmentFilter.value && mAssessmentFilter.value !== 'all') {
+    if (mAssessmentFilter.value === 'SNBT') {
+      list = list.filter(m => (!m.assessment_type || m.assessment_type.toUpperCase() === 'SNBT'));
+    } else if (mAssessmentFilter.value === 'TKA_saintek') {
+      list = list.filter(m => m.assessment_type && m.assessment_type.toUpperCase() === 'TKA' && (!m.track || m.track.toLowerCase() === 'saintek'));
+    } else if (mAssessmentFilter.value === 'TKA_soshum') {
+      list = list.filter(m => m.assessment_type && m.assessment_type.toUpperCase() === 'TKA' && m.track && m.track.toLowerCase() === 'soshum');
+    }
+  }
   if (mSubMateri.value && mSubMateri.value !== 'all') {
     const target = mSubMateri.value.toLowerCase();
     list = list.filter(m => {
@@ -5340,15 +5518,23 @@ const openMaterialModal = (m = null) => {
   saveSuccessNotice.value = false;
   if (m) {
     isEditingMaterial.value = true;
+    const aType = (m.assessment_type || m.exam || 'SNBT').toUpperCase();
+    const trk = (m.track || (aType === 'TKA' ? 'saintek' : 'umum')).toLowerCase();
     let comp = m.test_component || '';
-    const sub = m.subtest || m.sub_materi || 'Penalaran Umum';
+    const sub = m.subtest || m.sub_materi || (aType === 'TKA' ? (trk === 'soshum' ? 'Sosiologi' : 'Matematika IPA') : 'Penalaran Umum');
     if (!comp) {
-      const isLiterasi = ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(sub);
-      comp = isLiterasi ? 'TES LITERASI' : 'TPS';
+      if (aType === 'TKA') {
+        comp = trk === 'soshum' ? 'TKA SOSHUM' : 'TKA SAINTEK';
+      } else {
+        const isLiterasi = ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(sub);
+        comp = isLiterasi ? 'TES LITERASI' : 'TPS';
+      }
     }
     Object.assign(mForm, {
       ...m,
-      exam: m.exam || 'SNBT',
+      assessment_type: aType,
+      track: trk,
+      exam: aType === 'TKA' ? 'TKA' : 'SNBT',
       test_component: comp,
       subtest: sub,
       sub_materi: sub,
@@ -5368,6 +5554,8 @@ const openMaterialModal = (m = null) => {
     const myTeacherId = isTeacher.value ? (currentAdminUser.value?.id || currentUserId.value || '') : '';
     Object.assign(mForm, {
       id: null,
+      assessment_type: 'SNBT',
+      track: 'umum',
       exam: 'SNBT',
       test_component: 'TPS',
       subtest: 'Penalaran Umum',

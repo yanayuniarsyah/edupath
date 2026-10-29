@@ -410,8 +410,13 @@ export const api = {
       body: JSON.stringify({ attempt_id: attemptId, answers })
     });
   },
-  getMaterials(subtes = '') {
-    return apiFetch(`/materials.php?action=list&subtes=${subtes}`);
+  getMaterials(subtes = '', assessment_type = '', track = '') {
+    const params = [];
+    if (subtes && subtes !== 'all') params.push(`subtes=${encodeURIComponent(subtes)}`);
+    if (assessment_type && assessment_type !== 'all') params.push(`assessment_type=${encodeURIComponent(assessment_type)}`);
+    if (track && track !== 'all') params.push(`track=${encodeURIComponent(track)}`);
+    const q = params.length > 0 ? '&' + params.join('&') : '';
+    return apiFetch(`/materials.php?action=list${q}`);
   },
 
   // ── Admin Endpoints ──
@@ -440,8 +445,11 @@ export const api = {
   deleteAdminStudent(id) {
     return apiFetch(`/admin.php?action=students&id=${id}`, { method: 'DELETE' });
   },
-  getAdminQuestions(page = 1, subtes = '') {
-    return apiFetch(`/admin.php?action=questions&page=${page}&subtes=${subtes}`);
+  getAdminQuestions(page = 1, subtes = '', assessment_type = '', track = '') {
+    let url = `/admin.php?action=questions&page=${page}&subtes=${encodeURIComponent(subtes)}`;
+    if (assessment_type && assessment_type !== 'all') url += `&assessment_type=${encodeURIComponent(assessment_type)}`;
+    if (track && track !== 'all') url += `&track=${encodeURIComponent(track)}`;
+    return apiFetch(url);
   },
   createAdminQuestion(data) {
     return apiFetch('/admin.php?action=questions', { method: 'POST', body: JSON.stringify(data) });
@@ -452,8 +460,14 @@ export const api = {
   deleteAdminQuestion(id) {
     return apiFetch(`/admin.php?action=questions&id=${id}`, { method: 'DELETE' });
   },
-  getAdminMaterials() {
-    return apiFetch('/admin.php?action=materials');
+  getAdminMaterials(subtes = '', assessment_type = '', track = '') {
+    let url = '/admin.php?action=materials';
+    const params = [];
+    if (subtes && subtes !== 'all') params.push(`subtes=${encodeURIComponent(subtes)}`);
+    if (assessment_type && assessment_type !== 'all') params.push(`assessment_type=${encodeURIComponent(assessment_type)}`);
+    if (track && track !== 'all') params.push(`track=${encodeURIComponent(track)}`);
+    if (params.length > 0) url += '&' + params.join('&');
+    return apiFetch(url);
   },
   async createAdminMaterial(data) {
     const res = await apiFetch('/admin.php?action=materials', { method: 'POST', body: JSON.stringify(data) });

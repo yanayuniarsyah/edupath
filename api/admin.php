@@ -2213,6 +2213,8 @@ elseif ($action === 'questions') {
         $subtest = $_GET['subtest'] ?? $_GET['sub_materi'] ?? '';
         $test_component = $_GET['test_component'] ?? '';
         $topic = $_GET['topic'] ?? '';
+        $assessment_type = $_GET['assessment_type'] ?? '';
+        $track = $_GET['track'] ?? '';
 
         $sql = "SELECT * FROM questions WHERE 1=1";
         $params = [];
@@ -2229,6 +2231,14 @@ elseif ($action === 'questions') {
             $sql .= " AND topic = ?";
             $params[] = $topic;
         }
+        if ($assessment_type && $assessment_type !== 'all') {
+            $sql .= " AND (assessment_type = ? OR assessment_type IS NULL)";
+            $params[] = $assessment_type;
+        }
+        if ($track && $track !== 'all') {
+            $sql .= " AND (track = ? OR track IS NULL)";
+            $params[] = $track;
+        }
         $sql .= " ORDER BY created_at DESC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
@@ -2242,10 +2252,17 @@ elseif ($action === 'questions') {
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
         
-        $exam = $input['exam'] ?? 'SNBT';
+        $assessment_type = strtoupper($input['assessment_type'] ?? $input['exam'] ?? 'SNBT');
+        $track = strtolower($input['track'] ?? 'umum');
+        if ($assessment_type === 'SNBT') {
+            $track = 'umum';
+        }
+        $exam = $assessment_type === 'TKA' ? 'TKA' : ($input['exam'] ?? 'SNBT');
         $subtest = $input['subtest'] ?? $input['sub_materi'] ?? $input['subtes'] ?? 'Penalaran Umum';
         $test_component = $input['test_component'] ?? (
-            (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+            $assessment_type === 'TKA' ? ('TKA ' . strtoupper($track)) : (
+                (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+            )
         );
         $topic = $input['topic'] ?? $input['bab'] ?? null;
         $subtopic = $input['subtopic'] ?? null;
@@ -2265,9 +2282,8 @@ elseif ($action === 'questions') {
         }
 
         $education_level = $input['education_level'] ?? 'SMA';
-        $assessment_type = $input['assessment_type'] ?? 'SNBT';
-        $subject = $input['subject'] ?? null;
-        $domain = $input['domain'] ?? null;
+        $subject = $input['subject'] ?? $subtest ?? null;
+        $domain = $input['domain'] ?? $topic ?? null;
 
         try {
             $stmt = $pdo->prepare("
@@ -2275,12 +2291,12 @@ elseif ($action === 'questions') {
                     id, exam, test_component, subtest, topic, subtopic, skill, indicator, question_type,
                     subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e,
                     correct, explanation, cognitive_demand, source_type, rights_status, source_name, source_year, source_reference,
-                    is_qc_passed, classification, teacher_name, teacher_id, education_level, assessment_type, subject, domain
+                    is_qc_passed, classification, teacher_name, teacher_id, education_level, assessment_type, track, subject, domain
                 ) VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )
             ");
             $stmt->execute([
@@ -2291,7 +2307,7 @@ elseif ($action === 'questions') {
                 $input['cognitive_demand'] ?? null, $input['source_type'] ?? 'author_created', $input['rights_status'] ?? 'unknown',
                 $input['source_name'] ?? null, $input['source_year'] ?? null, $input['source_reference'] ?? null,
                 $is_qc_passed, $classification, $teacher_name, $teacher_id,
-                $education_level, $assessment_type, $subject, $domain
+                $education_level, $assessment_type, $track, $subject, $domain
             ]);
             echo json_encode(["success" => true, "id" => $id]);
         } catch (PDOException $e) {
@@ -2316,10 +2332,17 @@ elseif ($action === 'questions') {
             }
         }
 
-        $exam = $input['exam'] ?? 'SNBT';
+        $assessment_type = strtoupper($input['assessment_type'] ?? $input['exam'] ?? 'SNBT');
+        $track = strtolower($input['track'] ?? 'umum');
+        if ($assessment_type === 'SNBT') {
+            $track = 'umum';
+        }
+        $exam = $assessment_type === 'TKA' ? 'TKA' : ($input['exam'] ?? 'SNBT');
         $subtest = $input['subtest'] ?? $input['sub_materi'] ?? $input['subtes'] ?? 'Penalaran Umum';
         $test_component = $input['test_component'] ?? (
-            (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+            $assessment_type === 'TKA' ? ('TKA ' . strtoupper($track)) : (
+                (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+            )
         );
         $topic = $input['topic'] ?? $input['bab'] ?? null;
         $subtopic = $input['subtopic'] ?? null;
@@ -2339,9 +2362,8 @@ elseif ($action === 'questions') {
         }
 
         $education_level = $input['education_level'] ?? 'SMA';
-        $assessment_type = $input['assessment_type'] ?? 'SNBT';
-        $subject = $input['subject'] ?? null;
-        $domain = $input['domain'] ?? null;
+        $subject = $input['subject'] ?? $subtest ?? null;
+        $domain = $input['domain'] ?? $topic ?? null;
 
         try {
             $stmt = $pdo->prepare("
@@ -2350,7 +2372,7 @@ elseif ($action === 'questions') {
                     subtes=?, sub_materi=?, bab=?, difficulty=?, question=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?,
                     correct=?, explanation=?, cognitive_demand=?, source_type=?, rights_status=?, source_name=?, source_year=?, source_reference=?,
                     is_qc_passed=?, classification=?, teacher_name=?, teacher_id=?,
-                    education_level=?, assessment_type=?, subject=?, domain=?
+                    education_level=?, assessment_type=?, track=?, subject=?, domain=?
                 WHERE id=?
             ");
             $stmt->execute([
@@ -2361,7 +2383,7 @@ elseif ($action === 'questions') {
                 $input['cognitive_demand'] ?? null, $input['source_type'] ?? 'author_created', $input['rights_status'] ?? 'unknown',
                 $input['source_name'] ?? null, $input['source_year'] ?? null, $input['source_reference'] ?? null,
                 $is_qc_passed, $classification, $teacher_name, $teacher_id,
-                $education_level, $assessment_type, $subject, $domain,
+                $education_level, $assessment_type, $track, $subject, $domain,
                 $id
             ]);
             echo json_encode(["success" => true]);
@@ -2398,6 +2420,8 @@ elseif ($action === 'materials') {
         $subtest = $_GET['subtest'] ?? $_GET['sub_materi'] ?? '';
         $test_component = $_GET['test_component'] ?? '';
         $topic = $_GET['topic'] ?? '';
+        $assessment_type = $_GET['assessment_type'] ?? '';
+        $track = $_GET['track'] ?? '';
 
         $sql = "SELECT * FROM materials WHERE 1=1";
         $params = [];
@@ -2414,6 +2438,14 @@ elseif ($action === 'materials') {
         if ($topic && $topic !== 'all') {
             $sql .= " AND topic = ?";
             $params[] = $topic;
+        }
+        if ($assessment_type && $assessment_type !== 'all') {
+            $sql .= " AND (assessment_type = ? OR assessment_type IS NULL)";
+            $params[] = $assessment_type;
+        }
+        if ($track && $track !== 'all') {
+            $sql .= " AND (track = ? OR track IS NULL)";
+            $params[] = $track;
         }
         $sql .= " ORDER BY created_at DESC";
 
@@ -2504,10 +2536,17 @@ elseif ($action === 'materials') {
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
 
-        $exam = $input['exam'] ?? 'SNBT';
+        $assessment_type = strtoupper($input['assessment_type'] ?? $input['exam'] ?? 'SNBT');
+        $track = strtolower($input['track'] ?? 'umum');
+        if ($assessment_type === 'SNBT') {
+            $track = 'umum';
+        }
+        $exam = $assessment_type === 'TKA' ? 'TKA' : ($input['exam'] ?? 'SNBT');
         $subtest = $input['subtest'] ?? $input['sub_materi'] ?? 'Penalaran Umum';
         $test_component = $input['test_component'] ?? (
-            (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+            $assessment_type === 'TKA' ? ('TKA ' . strtoupper($track)) : (
+                (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+            )
         );
         $topic = $input['topic'] ?? null;
         $subtopic = $input['subtopic'] ?? null;
@@ -2527,27 +2566,26 @@ elseif ($action === 'materials') {
         $file_url = trim($input['file_url'] ?? '');
         $formula_praktis = trim($input['formula_praktis'] ?? '');
         $education_level = $input['education_level'] ?? 'SMA';
-        $assessment_type = $input['assessment_type'] ?? 'SNBT';
-        $subject = $input['subject'] ?? null;
-        $domain = $input['domain'] ?? null;
+        $subject = $input['subject'] ?? $subtest ?? null;
+        $domain = $input['domain'] ?? $topic ?? null;
         $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
 
         try {
             try {
                 $stmt = $pdo->prepare("
-                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, leaf_id, title, content, formula_praktis, teacher_name, teacher_id, file_url, is_active, education_level, assessment_type, subject, domain)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, leaf_id, title, content, formula_praktis, teacher_name, teacher_id, file_url, is_active, education_level, assessment_type, track, subject, domain)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 $stmt->execute([
-                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $formula_praktis, $teacher_name, $teacher_id, $file_url, $is_active, $education_level, $assessment_type, $subject, $domain
+                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $formula_praktis, $teacher_name, $teacher_id, $file_url, $is_active, $education_level, $assessment_type, $track, $subject, $domain
                 ]);
             } catch (\PDOException $colErr) {
                 $stmt = $pdo->prepare("
-                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, title, content, formula_praktis, teacher_name, teacher_id, file_url, is_active, education_level, assessment_type, subject, domain)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO materials (id, exam, test_component, subtest, sub_materi, topic, subtopic, skill, indicator, title, content, formula_praktis, teacher_name, teacher_id, file_url, is_active, education_level, assessment_type, track, subject, domain)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 $stmt->execute([
-                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $formula_praktis, $teacher_name, $teacher_id, $file_url, $is_active, $education_level, $assessment_type, $subject, $domain
+                    $id, $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $formula_praktis, $teacher_name, $teacher_id, $file_url, $is_active, $education_level, $assessment_type, $track, $subject, $domain
                 ]);
             }
             echo json_encode(["success" => true, "id" => $id]);
@@ -2573,10 +2611,17 @@ elseif ($action === 'materials') {
             }
         }
 
-        $exam = $input['exam'] ?? 'SNBT';
+        $assessment_type = strtoupper($input['assessment_type'] ?? $input['exam'] ?? 'SNBT');
+        $track = strtolower($input['track'] ?? 'umum');
+        if ($assessment_type === 'SNBT') {
+            $track = 'umum';
+        }
+        $exam = $assessment_type === 'TKA' ? 'TKA' : ($input['exam'] ?? 'SNBT');
         $subtest = $input['subtest'] ?? $input['sub_materi'] ?? 'Penalaran Umum';
         $test_component = $input['test_component'] ?? (
-            (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+            $assessment_type === 'TKA' ? ('TKA ' . strtoupper($track)) : (
+                (stripos($subtest, 'Literasi') !== false || stripos($subtest, 'Matematika') !== false) ? 'TES LITERASI' : 'TPS'
+            )
         );
         $topic = $input['topic'] ?? null;
         $subtopic = $input['subtopic'] ?? null;
@@ -2598,33 +2643,32 @@ elseif ($action === 'materials') {
         $is_active = isset($input['is_active']) ? (int)$input['is_active'] : 1;
 
         $education_level = $input['education_level'] ?? 'SMA';
-        $assessment_type = $input['assessment_type'] ?? 'SNBT';
-        $subject = $input['subject'] ?? null;
-        $domain = $input['domain'] ?? null;
+        $subject = $input['subject'] ?? $subtest ?? null;
+        $domain = $input['domain'] ?? $topic ?? null;
 
         try {
             try {
                 $stmt = $pdo->prepare("
                     UPDATE materials SET
                         exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, leaf_id=?, title=?, content=?, formula_praktis=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?,
-                        education_level=?, assessment_type=?, subject=?, domain=?
+                        education_level=?, assessment_type=?, track=?, subject=?, domain=?
                     WHERE id=?
                 ");
                 $stmt->execute([
                     $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $leaf_id, $title, $content, $formula_praktis, $teacher_name, $teacher_id, $file_url, $is_active,
-                    $education_level, $assessment_type, $subject, $domain,
+                    $education_level, $assessment_type, $track, $subject, $domain,
                     $id
                 ]);
             } catch (\PDOException $colErr) {
                 $stmt = $pdo->prepare("
                     UPDATE materials SET
                         exam=?, test_component=?, subtest=?, sub_materi=?, topic=?, subtopic=?, skill=?, indicator=?, title=?, content=?, formula_praktis=?, teacher_name=?, teacher_id=?, file_url=?, is_active=?,
-                        education_level=?, assessment_type=?, subject=?, domain=?
+                        education_level=?, assessment_type=?, track=?, subject=?, domain=?
                     WHERE id=?
                 ");
                 $stmt->execute([
                     $exam, $test_component, $subtest, $subtest, $topic, $subtopic, $skill, $indicator, $title, $content, $formula_praktis, $teacher_name, $teacher_id, $file_url, $is_active,
-                    $education_level, $assessment_type, $subject, $domain,
+                    $education_level, $assessment_type, $track, $subject, $domain,
                     $id
                 ]);
             }
