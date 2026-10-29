@@ -312,7 +312,8 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // -------------------------------------------------------------
 // GUARD AUTHENTICATION UNTUK ENDPOINT DI BAWAH
 // -------------------------------------------------------------
-if (!empty($_GET['token']) && empty($_SERVER['HTTP_AUTHORIZATION'])) {
+// Security Hardening: Only allow GET parameter token on standalone export download
+if (!empty($_GET['token']) && empty($_SERVER['HTTP_AUTHORIZATION']) && ($action === 'export')) {
     $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . safe_str($_GET['token']);
 }
 
@@ -748,16 +749,26 @@ if ($action === 'export' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     // UTF-8 BOM for Excel compatibility
     fputs($output, "\xEF\xBB\xBF");
 
+    // Anti-CSV Formula Injection Sanitizer
+    $sanitize_csv = function($val) {
+        if ($val === null) return '';
+        $str = (string)$val;
+        if (in_array(substr($str, 0, 1), ['=', '+', '-', '@', "\t", "\r"], true)) {
+            return "'" . $str;
+        }
+        return $str;
+    };
+
     fputcsv($output, ['Nama Siswa', 'Email', 'No. WhatsApp', 'Target PTN / Jurusan', 'Program / Paket EduPath', 'Status Paket', 'Masa Aktif Paket', 'Tanggal Bergabung']);
 
     foreach ($rows as $r) {
         fputcsv($output, [
-            $r['name'],
-            $r['email'],
-            $r['phone'],
-            $r['target_ptn'],
-            $r['package_name'],
-            strtoupper($r['package_status']),
+            $sanitize_csv($r['name']),
+            $sanitize_csv($r['email']),
+            $sanitize_csv($r['phone']),
+            $sanitize_csv($r['target_ptn']),
+            $sanitize_csv($r['package_name']),
+            $sanitize_csv(strtoupper($r['package_status'])),
             $r['package_expires_at'] ? date('d-m-Y', strtotime($r['package_expires_at'])) : '-',
             date('d-m-Y H:i', strtotime($r['created_at']))
         ]);

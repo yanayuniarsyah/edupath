@@ -6584,6 +6584,10 @@ const downloadCSV = (filename, rows) => {
     return row.map(val => {
       if (val === null || val === undefined) return '""';
       let text = String(val).replace(/"/g, '""');
+      // Anti-CSV Formula Injection Sanitization
+      if (/^[=+\-@\t\r]/.test(text)) {
+        text = "'" + text;
+      }
       return `"${text}"`;
     }).join(',');
   };

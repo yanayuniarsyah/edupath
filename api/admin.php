@@ -300,6 +300,12 @@ if ($action === 'create_sa') {
 }
 
 if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!check_rate_limit($pdo, 'admin_login', 5, 15)) {
+        http_response_code(429);
+        echo json_encode(["error" => "Terlalu banyak percobaan login admin. Coba lagi dalam 15 menit."]);
+        exit;
+    }
+
     $username = safe_str($input['username'] ?? '');
     $password = is_string($input['password'] ?? null) ? $input['password'] : '';
 

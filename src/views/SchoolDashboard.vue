@@ -1446,10 +1446,25 @@ function copyBroadcastText() {
 }
 
 async function exportCsv() {
-  const token = sessionStorage.getItem('school_token') || '';
-  const sName = schoolData.value?.name || '';
-  const url = `/api/school.php?action=export&token=${encodeURIComponent(token)}&school_name=${encodeURIComponent(sName)}`;
-  window.open(url, '_blank');
+  try {
+    const token = sessionStorage.getItem('school_token') || sessionStorage.getItem('ep_session_token') || localStorage.getItem('token') || '';
+    const sName = schoolData.value?.name || '';
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`/api/school.php?action=export&school_name=${encodeURIComponent(sName)}`, { headers });
+    if (!res.ok) throw new Error('Gagal mengekspor data');
+    const blob = await res.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `rekap_siswa_${(sName || 'sekolah').toLowerCase().replace(/[^a-z0-9]/g, '_')}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (err) {
+    alert(err.message || 'Gagal download data rekap');
+  }
 }
 
 function getPackageBadgeClass(code) {
