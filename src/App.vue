@@ -1644,35 +1644,55 @@
                      ]">{{ product.description }}</p>
                    </div>
 
-                   <!-- Price Framing -->
+                   <!-- Price Framing dengan Sistem Coret -->
                    <div v-if="product.activePlan" :class="[
                      'p-4 rounded-2xl space-y-1',
                      idx % 3 === 0 ? 'bg-white/[0.03] border border-white/10' : '',
                      idx % 3 === 1 ? 'bg-[#c0ff00]/10 border border-[#c0ff00]/30' : '',
                      idx % 3 === 2 ? 'bg-purple-900/20 border border-purple-500/30' : ''
                    ]">
-                     <div v-if="isAnnualBilling && product.activePlan.discount > 0" class="flex items-center gap-2">
-                       <span class="text-xs text-white/40 line-through">Rp {{ Number(idx === 0 ? 180000 : idx === 1 ? 480000 : 980000).toLocaleString('id-ID') }}</span>
-                       <span :class="[
-                         'text-[10px] font-black px-2 py-0.5 rounded-full uppercase',
-                         idx % 3 === 1 ? 'bg-[#c0ff00] text-black' : 'text-emerald-400 bg-emerald-500/10'
-                       ]">Hemat {{ product.activePlan.discount }}%</span>
+                     <!-- Jika Bayar Tahunan (Sistem Coret) -->
+                     <div v-if="isAnnualBilling" class="space-y-1">
+                       <div class="flex items-center gap-2">
+                         <span class="text-xs sm:text-sm text-white/40 line-through font-mono">Rp {{ Number(product.monthlyBasePrice || 180000).toLocaleString('id-ID') }}</span>
+                         <span :class="[
+                           'text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider',
+                           idx % 3 === 1 ? 'bg-[#c0ff00] text-black shadow-sm' : 'text-emerald-400 bg-emerald-500/15 border border-emerald-500/30'
+                         ]">Diskon {{ product.annualDiscount || 40 }}%</span>
+                       </div>
+                       <div class="flex items-baseline gap-1">
+                         <span :class="[
+                           'text-3xl sm:text-5xl font-black font-heading',
+                           idx % 3 === 1 ? 'text-[#c0ff00]' : 'text-white'
+                         ]">Rp {{ Math.round((product.annualMonthlyEquivalent || (product.activePlan.price / 12)) / 1000).toLocaleString('id-ID') }}k</span>
+                         <span :class="[
+                           'font-bold text-xs',
+                           idx % 3 === 1 ? 'text-white/60' : 'text-white/50'
+                         ]">/bulan</span>
+                       </div>
+                       <div class="text-[10px] text-white/60 pt-1 font-medium">
+                         Ditagih tahunan Rp {{ Number(product.activePlan.price).toLocaleString('id-ID') }} /tahun (Diskon {{ product.annualDiscount || 40 }}% dibayar per tahun)
+                       </div>
                      </div>
-                     <div class="flex items-baseline gap-1">
-                       <span :class="[
-                         'text-3xl sm:text-5xl font-black font-heading',
-                         idx % 3 === 1 ? 'text-[#c0ff00]' : 'text-white'
-                       ]">Rp {{ isAnnualBilling ? Math.round(product.activePlan.price / 12 / 1000).toLocaleString('id-ID') : Math.round(product.activePlan.price / 1000).toLocaleString('id-ID') }}k</span>
-                       <span :class="[
-                         'font-bold text-xs',
-                         idx % 3 === 1 ? 'text-white/60' : 'text-white/50'
-                       ]">/bulan</span>
-                     </div>
-                     <div v-if="isAnnualBilling" class="text-[10px] text-white/50 pt-1 font-medium">
-                       Ditagih tahunan Rp {{ Number(product.activePlan.price).toLocaleString('id-ID') }} /tahun
-                     </div>
-                     <div v-else class="text-[10px] text-white/40 pt-1 font-medium">
-                       Ditagih bulanan, fleksibel tanpa komitmen
+
+                     <!-- Jika Bayar Bulanan -->
+                     <div v-else class="space-y-1">
+                       <div class="flex items-baseline gap-1">
+                         <span :class="[
+                           'text-3xl sm:text-5xl font-black font-heading',
+                           idx % 3 === 1 ? 'text-[#c0ff00]' : 'text-white'
+                         ]">Rp {{ Math.round(product.activePlan.price / 1000).toLocaleString('id-ID') }}k</span>
+                         <span :class="[
+                           'font-bold text-xs',
+                           idx % 3 === 1 ? 'text-white/60' : 'text-white/50'
+                         ]">/bulan</span>
+                       </div>
+                       <div class="text-[10px] text-white/50 pt-1 font-medium">
+                         Ditagih bulanan, fleksibel tanpa komitmen
+                       </div>
+                       <div class="text-[10px] text-[#c0ff00] font-bold pt-0.5 cursor-pointer hover:underline" @click="isAnnualBilling = true">
+                         Hemat {{ product.annualDiscount || 40 }}% jadi Rp {{ Math.round((product.annualMonthlyEquivalent || (product.monthlyBasePrice * 0.6)) / 1000) }}k/bln jika bayar per tahun &rarr;
+                       </div>
                      </div>
                    </div>
 
@@ -2962,9 +2982,36 @@
         <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
           <!-- Top Navigation Toolbar (Sleek, Compact, 1-Baris Toolbar) -->
           <div class="bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:px-4 sm:py-2.5 backdrop-blur-xl shadow-xl flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
-            <!-- Left Side: Subtest Dropdown Selector -->
-            <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-wrap xs:flex-nowrap">
-              <!-- Subtest Selector Dropdown -->
+            <!-- Left Side: Focus Pomodoro Timer (Menggantikan Menu Pulldown Sub Tes) -->
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="flex items-center gap-1.5 bg-black/40 border border-white/10 px-2.5 py-1.5 rounded-xl shadow-inner">
+                <span class="w-2 h-2 rounded-full" :class="timerActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'"></span>
+                <span class="text-[10px] uppercase font-black tracking-wider text-indigo-300 hidden md:inline">
+                  {{ isBreak ? '☕ Break' : '🎯 Fokus' }}
+                </span>
+                <span class="font-mono font-black text-xs text-white tracking-wider px-0.5">{{ formattedTime }}</span>
+                <button 
+                  @click="toggleTimer"
+                  :class="['px-2 py-0.5 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1 shadow-sm active:scale-95', 
+                    timerActive ? 'bg-amber-500 text-black hover:bg-amber-400' : 'bg-[#c0ff00] text-black hover:bg-[#b0ef00]']"
+                  :title="timerActive ? 'Jeda Pomodoro' : 'Mulai Sesi Fokus'"
+                >
+                  <i :class="timerActive ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
+                  <span class="hidden sm:inline">{{ timerActive ? 'Jeda' : 'Fokus' }}</span>
+                </button>
+                <button 
+                  @click="resetTimer"
+                  class="p-1 text-white/40 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  title="Reset Timer Pomodoro"
+                >
+                  <i class="ph-bold ph-arrows-counter-clockwise text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Side: Pulldown Menu Sub Tes (Disamping Buka/Sembunyikan Bab) + Buka/Sembunyikan Bab + Tutup Button -->
+            <div class="flex items-center gap-2 ml-auto shrink-0 flex-wrap sm:flex-nowrap">
+              <!-- Subtest Selector Dropdown (Disamping Buka/Sembunyikan Bab) -->
               <div class="relative flex items-center min-w-0">
                 <span class="absolute left-2.5 text-xs pointer-events-none select-none">
                   {{ selectedSubtes?.icon || '📚' }}
@@ -2974,7 +3021,7 @@
                   :value="selectedSubtes ? (selectedSubtes.id || selectedSubtes.code || selectedSubtes.subtest || selectedSubtes.subtes) : ''"
                   @change="onSubtestDropdownChange($event)"
                   aria-label="Pilih Komponen & Subtes UTBK"
-                  class="pl-7 pr-7 py-2 bg-slate-800/90 hover:bg-slate-800 text-[#c0ff00] font-black text-xs rounded-xl border border-white/20 focus:border-[#c0ff00] focus:ring-1 focus:ring-[#c0ff00] outline-none transition-all shadow-sm cursor-pointer appearance-none max-w-[210px] sm:max-w-xs truncate"
+                  class="pl-7 pr-7 py-2 bg-slate-800/90 hover:bg-slate-800 text-[#c0ff00] font-black text-xs rounded-xl border border-white/20 focus:border-[#c0ff00] focus:ring-1 focus:ring-[#c0ff00] outline-none transition-all shadow-sm cursor-pointer appearance-none max-w-[190px] sm:max-w-xs truncate"
                 >
                   <optgroup label="Tes Potensi Skolastik (TPS)" class="bg-slate-900 text-slate-100 font-bold">
                     <option 
@@ -2998,34 +3045,6 @@
                   </optgroup>
                 </select>
                 <i class="ph-bold ph-caret-down text-white/50 text-xs absolute right-2.5 pointer-events-none"></i>
-              </div>
-            </div>
-
-            <!-- Right Side: Focus Pomodoro Timer + Sidebar Toggle + Tutup Button -->
-            <div class="flex items-center gap-2 ml-auto shrink-0">
-              <!-- Compact Focus Pomodoro Timer -->
-              <div class="flex items-center gap-1.5 bg-black/40 border border-white/10 px-2.5 py-1.5 rounded-xl shadow-inner">
-                <span class="w-2 h-2 rounded-full" :class="timerActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'"></span>
-                <span class="text-[10px] uppercase font-black tracking-wider text-indigo-300 hidden md:inline">
-                  {{ isBreak ? '☕ Break' : '🎯 Fokus' }}
-                </span>
-                <span class="font-mono font-black text-xs text-white tracking-wider px-0.5">{{ formattedTime }}</span>
-                <button 
-                  @click="toggleTimer"
-                  :class="['px-2 py-0.5 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1 shadow-sm active:scale-95', 
-                    timerActive ? 'bg-amber-500 text-black hover:bg-amber-400' : 'bg-[#c0ff00] text-black hover:bg-[#b0ef00]']"
-                  :title="timerActive ? 'Jeda Pomodoro' : 'Mulai Sesi Fokus'"
-                >
-                  <i :class="timerActive ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
-                  <span class="hidden sm:inline">{{ timerActive ? 'Jeda' : 'Fokus' }}</span>
-                </button>
-                <button 
-                  @click="resetTimer"
-                  class="p-1 text-white/40 hover:text-white rounded-lg transition-colors cursor-pointer"
-                  title="Reset Timer Pomodoro"
-                >
-                  <i class="ph-bold ph-arrows-counter-clockwise text-xs"></i>
-                </button>
               </div>
 
               <!-- Toggle Sembunyikan Bab Button -->
@@ -3832,7 +3851,7 @@
             </button>
             <span class="text-xs font-bold flex items-center gap-1.5" :class="isAnnualBilling ? 'text-[#c0ff00]' : 'text-white/50'">
               <span>Tahunan</span>
-              <span class="text-[10px] bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 px-1.5 py-0.5 rounded-full font-black uppercase">Hemat 30%</span>
+              <span class="text-[10px] bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 px-1.5 py-0.5 rounded-full font-black uppercase">Hemat s.d 60%</span>
             </span>
           </div>
         </div>
@@ -3856,20 +3875,45 @@
               <!-- Plan Header -->
               <div class="flex justify-between items-center mb-2">
                 <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00]">{{ product.code || 'PAKET' }}</span>
-                <span v-if="product.activePlan?.discount > 0" class="text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                  Diskon {{ product.activePlan.discount }}%
+                <span v-if="isAnnualBilling" class="text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase">
+                  Diskon {{ product.annualDiscount || 40 }}%
                 </span>
               </div>
               <h3 class="text-xl font-black text-white">{{ product.name }}</h3>
               <p class="text-xs text-white/50 mt-1 min-h-[32px]">{{ product.description }}</p>
 
-              <!-- Price -->
+              <!-- Price Framing dengan Sistem Coret -->
               <div class="my-5 pb-4 border-b border-white/10" v-if="product.activePlan">
-                <div class="flex items-baseline gap-1">
-                  <span class="text-3xl font-black font-heading text-white">
-                    Rp {{ (product.activePlan.price / 1000).toLocaleString('id-ID') }}k
-                  </span>
-                  <span class="text-xs text-white/50 font-bold">/{{ product.activePlan.billing_cycle === 'yearly' ? 'thn' : 'bln' }}</span>
+                <!-- Jika Bayar Tahunan -->
+                <div v-if="isAnnualBilling" class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-white/40 line-through font-mono">Rp {{ Number(product.monthlyBasePrice || 180000).toLocaleString('id-ID') }}</span>
+                    <span class="text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase">
+                      Diskon {{ product.annualDiscount || 40 }}%
+                    </span>
+                  </div>
+                  <div class="flex items-baseline gap-1">
+                    <span class="text-3xl font-black font-heading text-white">
+                      Rp {{ Math.round((product.annualMonthlyEquivalent || (product.activePlan.price / 12)) / 1000).toLocaleString('id-ID') }}k
+                    </span>
+                    <span class="text-xs text-white/50 font-bold">/bulan</span>
+                  </div>
+                  <div class="text-[10px] text-white/50 font-medium pt-0.5">
+                    Ditagih Rp {{ Number(product.annualTotalPrice || product.activePlan.price).toLocaleString('id-ID') }} /tahun (Diskon {{ product.annualDiscount || 40 }}% dibayar per tahun)
+                  </div>
+                </div>
+
+                <!-- Jika Bayar Bulanan -->
+                <div v-else class="space-y-1">
+                  <div class="flex items-baseline gap-1">
+                    <span class="text-3xl font-black font-heading text-white">
+                      Rp {{ Math.round(product.activePlan.price / 1000).toLocaleString('id-ID') }}k
+                    </span>
+                    <span class="text-xs text-white/50 font-bold">/bulan</span>
+                  </div>
+                  <div class="text-[10px] text-white/40 font-medium pt-0.5">
+                    Ditagih bulanan, fleksibel tanpa komitmen
+                  </div>
                 </div>
               </div>
 
@@ -5247,24 +5291,30 @@ export default {
           activePlan = prod.plans.find(p => p.billing_cycle === cycle || (cycle === 'yearly' && p.billing_cycle === 'annual'));
         }
 
+        const monthlyPlan = prod.plans?.find(p => p.billing_cycle === 'monthly');
+        const yearlyPlan = prod.plans?.find(p => p.billing_cycle === 'yearly' || p.billing_cycle === 'annual');
+
+        const fallbackMonthly = (idx === 0 || prod.code === 'MANDIRI' || prod.code === 'STARTER') ? 180000 : ((idx === 1 || prod.code === 'UTBK') ? 480000 : 980000);
+        const monthlyBasePrice = monthlyPlan ? Number(monthlyPlan.price) : fallbackMonthly;
+        const discountPct = yearlyPlan?.discount ? Number(yearlyPlan.discount) : ((idx === 0 || prod.code === 'MANDIRI' || prod.code === 'STARTER') ? 40 : ((idx === 1 || prod.code === 'UTBK') ? 60 : 30));
+        const annualTotalPrice = yearlyPlan ? Number(yearlyPlan.price) : Math.round(monthlyBasePrice * 12 * (1 - discountPct / 100));
+        const annualMonthlyEquivalent = Math.round(annualTotalPrice / 12);
+
         // If no matching plan found for the current billing cycle, dynamically derive it
         if (!activePlan && prod.plans && prod.plans.length > 0) {
           const base = prod.plans[0];
-          const discountPct = (idx === 0 || prod.code === 'MANDIRI') ? 40 : ((idx === 1 || prod.code === 'UTBK') ? 60 : 30);
-          const monthlyPrice = (idx === 0 || prod.code === 'MANDIRI') ? 180000 : ((idx === 1 || prod.code === 'UTBK') ? 480000 : 980000);
-          
           if (isAnnualBilling.value) {
             activePlan = {
               ...base,
               billing_cycle: 'yearly',
-              price: Math.round(monthlyPrice * 12 * (1 - discountPct / 100)),
+              price: annualTotalPrice,
               discount: discountPct
             };
           } else {
             activePlan = {
               ...base,
               billing_cycle: 'monthly',
-              price: monthlyPrice,
+              price: monthlyBasePrice,
               discount: 0
             };
           }
@@ -5285,7 +5335,11 @@ export default {
         return {
           ...prod,
           activePlan,
-          featuresList
+          featuresList,
+          monthlyBasePrice,
+          annualMonthlyEquivalent,
+          annualDiscount: discountPct,
+          annualTotalPrice
         };
       });
     });

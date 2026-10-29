@@ -118,35 +118,47 @@
       leave-to-class="opacity-0"
     >
       <div
-        v-if="sidebarOpen"
+        v-if="mobileSidebarOpen"
         class="fixed inset-0 bg-black/75 backdrop-blur-sm z-40 lg:hidden cursor-pointer"
-        @click="sidebarOpen = false"
+        @click="mobileSidebarOpen = false"
       ></div>
     </transition>
 
-    <!-- ===== SIDEBAR (SLIDE-OVER DRAWER ON MOBILE, STATIC ON DESKTOP) ===== -->
+    <!-- ===== SIDEBAR NAVIGATION — AUTO-HIDE ON DESKTOP (MATCHING STUDENT SIDE MENU) ===== -->
     <aside
-      class="fixed inset-y-0 left-0 z-50 lg:static lg:z-auto flex flex-col h-full shrink-0 transition-transform lg:transition-all duration-300 ease-out overflow-hidden border-r border-white/10 shadow-2xl"
-      :class="[
-        sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-[72px]'
-      ]"
+      class="fixed inset-y-0 left-0 h-full h-[100dvh] max-h-[100dvh] z-50 flex flex-col backdrop-blur-2xl border-r border-white/10 transition-transform duration-300 ease-out overflow-hidden text-white shadow-2xl"
       style="background: linear-gradient(160deg, #050a18 0%, #0d1224 60%, #050a18 100%);"
+      :class="[
+        (sidebarExpanded || mobileSidebarOpen) ? 'w-64 max-w-[85vw] shadow-[20px_0_60px_rgba(0,0,0,0.5)]' : 'w-[72px]',
+        mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      ]"
+      @mouseenter="sidebarExpanded = true"
+      @mouseleave="sidebarExpanded = false"
     >
-      <!-- Logo Header with Collapser -->
+      <!-- Logo Header -->
       <div
-        class="flex items-center gap-3 px-4 py-4 border-b border-white/10 shrink-0 cursor-pointer select-none group"
-        @click="sidebarOpen = !sidebarOpen"
-        :title="sidebarOpen ? 'Ciutkan Sidebar' : 'Perluas Sidebar'"
+        class="flex items-center gap-3 px-4 py-4 border-b border-white/10 shrink-0 select-none group"
+        :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center'"
       >
         <div class="w-9 h-9 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20 group-hover:scale-105 transition-transform">E</div>
-        <div v-show="sidebarOpen" class="min-w-0">
+        <div v-show="sidebarExpanded || mobileSidebarOpen" class="min-w-0">
           <span class="font-black text-lg tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           <p class="text-[10px] text-[#c0ff00] font-black uppercase tracking-widest whitespace-nowrap">Portal Guru BK &amp; Sekolah</p>
         </div>
+        <!-- Close button for mobile -->
+        <button
+          v-show="sidebarExpanded || mobileSidebarOpen"
+          @click="mobileSidebarOpen = false"
+          class="lg:hidden ml-auto w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+          aria-label="Tutup Menu"
+          title="Tutup Menu"
+        >
+          <i class="ph-bold ph-x text-sm"></i>
+        </button>
       </div>
 
       <!-- School Identity Badge in Sidebar -->
-      <div v-show="sidebarOpen" class="p-3 mx-2.5 my-2.5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md flex items-center gap-2.5">
+      <div v-show="sidebarExpanded || mobileSidebarOpen" class="p-3 mx-2.5 my-2.5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md flex items-center gap-2.5">
         <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></div>
         <div class="min-w-0 flex-1">
           <span class="text-xs font-black text-white block truncate">{{ schoolData?.name || 'Sekolah Mitra' }}</span>
@@ -162,15 +174,15 @@
           :title="item.label"
           :class="[
             'flex items-center rounded-xl text-xs font-bold transition-all text-left group relative cursor-pointer',
-            sidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center px-0 py-2.5',
+            (sidebarExpanded || mobileSidebarOpen) ? 'gap-3 px-3 py-2.5' : 'justify-center px-0 py-2.5',
             activeTab === item.id
               ? 'bg-[#c0ff00]/15 border border-[#c0ff00]/40 text-[#c0ff00]'
               : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
           ]"
         >
           <i :class="['ph-bold text-base shrink-0', item.icon, activeTab === item.id ? 'text-[#c0ff00]' : 'text-white/50 group-hover:text-white']"></i>
-          <span v-show="sidebarOpen" class="truncate flex-1">{{ item.label }}</span>
-          <span v-if="sidebarOpen && item.badge" :class="item.badgeClass || 'px-1.5 py-0.5 rounded text-[10px] font-black bg-white/10 text-white/70'">
+          <span v-show="sidebarExpanded || mobileSidebarOpen" class="truncate flex-1">{{ item.label }}</span>
+          <span v-if="(sidebarExpanded || mobileSidebarOpen) && item.badge" :class="item.badgeClass || 'px-1.5 py-0.5 rounded text-[10px] font-black bg-white/10 text-white/70'">
             {{ item.badge }}
           </span>
         </button>
@@ -178,7 +190,7 @@
 
       <!-- Sidebar Bottom Profile & Logout -->
       <div class="p-3 border-t border-white/10 shrink-0 bg-white/[0.02]">
-        <div v-show="sidebarOpen" class="mb-2.5 px-1">
+        <div v-show="sidebarExpanded || mobileSidebarOpen" class="mb-2.5 px-1">
           <span class="text-xs font-bold text-white block truncate">{{ schoolData?.bk_name || 'Guru BK' }}</span>
           <span class="text-[10px] text-emerald-400 uppercase font-black tracking-wider block">Koordinator BK &bull; {{ schoolData?.name || 'Sekolah' }}</span>
           <span class="text-[10px] text-white/50 block truncate">{{ schoolData?.bk_email }}</span>
@@ -186,23 +198,23 @@
         <button
           @click="handleLogout"
           class="w-full py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
-          :title="sidebarOpen ? 'Keluar dari Portal' : 'Keluar'"
+          :title="(sidebarExpanded || mobileSidebarOpen) ? 'Keluar dari Portal' : 'Keluar'"
         >
           <i class="ph-bold ph-sign-out text-sm"></i>
-          <span v-show="sidebarOpen">Keluar Portal</span>
+          <span v-show="sidebarExpanded || mobileSidebarOpen">Keluar Portal</span>
         </button>
       </div>
     </aside>
 
     <!-- ===== MAIN CONTENT VIEWPORT (RIGHT SIDE) ===== -->
-    <main class="flex-1 flex flex-col h-full min-w-0 overflow-hidden bg-[#070b14]">
+    <main class="flex-1 flex flex-col h-full min-w-0 overflow-hidden bg-[#070b14] lg:ml-[72px]">
       <!-- Topbar Header -->
       <header class="h-16 border-b border-white/10 px-4 sm:px-6 flex items-center justify-between gap-4 shrink-0 bg-[#050a18]/80 backdrop-blur-md z-20">
         <!-- Left: Mobile Sidebar Toggle + Breadcrumb -->
         <div class="flex items-center gap-3 min-w-0">
           <button
-            @click="sidebarOpen = !sidebarOpen"
-            class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all cursor-pointer"
+            @click="mobileSidebarOpen = !mobileSidebarOpen"
+            class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all cursor-pointer lg:hidden"
             title="Buka / Tutup Menu Samping"
           >
             <i class="ph-bold ph-list text-lg"></i>
@@ -1041,15 +1053,14 @@ const loginForm = ref({
   password: ''
 });
 
-// ── State Layout & Sidebar (Matching AdminPanel.vue) ──
-const sidebarOpen = ref(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
+// ── State Layout & Sidebar (Auto-Hide on Desktop, Matching Student Sidebar) ──
+const sidebarExpanded = ref(false);
+const mobileSidebarOpen = ref(false);
 const activeTab = ref('analytics'); // 'analytics' | 'packages' | 'students' | 'riasec' | 'ptn' | 'broadcast'
 
 const selectNavTab = (tabId) => {
   activeTab.value = tabId;
-  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-    sidebarOpen.value = false;
-  }
+  mobileSidebarOpen.value = false;
 };
 
 const schoolData = ref(null);
