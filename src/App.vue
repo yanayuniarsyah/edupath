@@ -2960,118 +2960,97 @@
 
         <!-- TAB 3: MATERI UTBK & MICRO-LESSONS -->
         <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
-          <!-- Top Close & Back Bar -->
-          <div class="bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:p-4 backdrop-blur-xl shadow-xl flex flex-col gap-3">
-            <!-- Top Row: Icon, Title, and Tutup Button (Always in view!) -->
-            <div class="flex items-center justify-between gap-3 w-full">
-              <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] border border-[#c0ff00]/30 flex items-center justify-center text-lg sm:text-xl font-black shrink-0">
-                  <i class="ph-bold ph-books"></i>
-                </div>
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[#c0ff00]">Modul Pembelajaran Mandiri</span>
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-[9px] sm:text-[10px] font-bold text-emerald-400 rounded-full whitespace-nowrap shrink-0">
-                      <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
-                      {{ onlineStudents }} Pejuang Online
-                    </span>
-                  </div>
-                  <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Materi &amp; Drill Soal UTBK 2027</h2>
-                </div>
-              </div>
-
-              <!-- Tutup button: always on top right -->
+          <!-- Top Navigation Toolbar (Sleek, Compact, 1-Baris Toolbar) -->
+          <div class="bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:px-4 sm:py-2.5 backdrop-blur-xl shadow-xl flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
+            <!-- Left Side: Back/Tutup Button + Subtest Dropdown Selector -->
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-wrap xs:flex-nowrap">
+              <!-- Back Button -->
               <button 
                 @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
-                title="Tutup Halaman & Kembali"
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-sm cursor-pointer shrink-0"
+                title="Tutup & Kembali ke Dashboard"
               >
-                <span>Tutup</span>
-                <i class="ph-bold ph-x text-sm sm:text-base"></i>
+                <i class="ph-bold ph-arrow-left text-sm"></i>
+                <span class="hidden sm:inline">Tutup</span>
               </button>
+
+              <div class="h-5 w-px bg-white/15 hidden sm:block"></div>
+
+              <!-- Subtest Selector Dropdown -->
+              <div class="relative flex items-center min-w-0">
+                <span class="absolute left-2.5 text-xs pointer-events-none select-none">
+                  {{ selectedSubtes?.icon || '📚' }}
+                </span>
+                <select 
+                  id="subtest-select"
+                  :value="selectedSubtes ? (selectedSubtes.id || selectedSubtes.code || selectedSubtes.subtest || selectedSubtes.subtes) : ''"
+                  @change="onSubtestDropdownChange($event)"
+                  aria-label="Pilih Komponen & Subtes UTBK"
+                  class="pl-7 pr-7 py-2 bg-slate-800/90 hover:bg-slate-800 text-[#c0ff00] font-black text-xs rounded-xl border border-white/20 focus:border-[#c0ff00] focus:ring-1 focus:ring-[#c0ff00] outline-none transition-all shadow-sm cursor-pointer appearance-none max-w-[210px] sm:max-w-xs truncate"
+                >
+                  <optgroup label="Tes Potensi Skolastik (TPS)" class="bg-slate-900 text-slate-100 font-bold">
+                    <option 
+                      v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TPS' || !['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtest || m.subtes)))" 
+                      :key="sub.id" 
+                      :value="sub.id || sub.code || sub.subtest || sub.subtes"
+                      class="bg-slate-900 text-white py-1"
+                    >
+                      {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
+                    </option>
+                  </optgroup>
+                  <optgroup label="Tes Literasi" class="bg-slate-900 text-slate-100 font-bold">
+                    <option 
+                      v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtest || m.subtes)))" 
+                      :key="sub.id" 
+                      :value="sub.id || sub.code || sub.subtest || sub.subtes"
+                      class="bg-slate-900 text-white py-1"
+                    >
+                      {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
+                    </option>
+                  </optgroup>
+                </select>
+                <i class="ph-bold ph-caret-down text-white/50 text-xs absolute right-2.5 pointer-events-none"></i>
+              </div>
             </div>
 
-            <!-- Bottom Row: Pomodoro Timer & Sembunyikan Bab Toggle -->
-            <div class="flex items-center justify-between gap-2 pt-2.5 border-t border-white/10 w-full flex-wrap sm:flex-nowrap">
-              <!-- Focus Pomodoro Timer -->
-              <div class="flex items-center gap-2 bg-black/40 border border-white/10 px-2.5 sm:px-3 py-1.5 rounded-xl shadow-inner">
-                <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full" :class="timerActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'"></span>
-                  <span class="text-[9px] sm:text-[10px] uppercase font-black tracking-wider text-indigo-300 hidden xs:inline sm:inline">
-                    {{ isBreak ? '☕ Break' : '🎯 Fokus' }}
-                  </span>
-                  <span class="font-mono font-black text-xs sm:text-sm md:text-base text-white tracking-widest px-0.5 sm:px-1">{{ formattedTime }}</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <button 
-                    @click="toggleTimer"
-                    :class="['px-2 sm:px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1 shadow-sm active:scale-95', 
-                      timerActive ? 'bg-amber-500 text-black hover:bg-amber-400' : 'bg-[#c0ff00] text-black hover:bg-[#b0ef00]']"
-                    :title="timerActive ? 'Jeda Pomodoro' : 'Mulai Sesi Fokus'"
-                  >
-                    <i :class="timerActive ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
-                    <span class="hidden sm:inline">{{ timerActive ? 'Jeda' : 'Fokus' }}</span>
-                  </button>
-                  <button 
-                    @click="resetTimer"
-                    class="p-1 text-white/50 hover:text-white rounded-lg transition-colors cursor-pointer"
-                    title="Reset Timer Pomodoro"
-                  >
-                    <i class="ph-bold ph-arrows-counter-clockwise text-xs"></i>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Actions: Dropdown Subtes & Toggle Sembunyikan Bab -->
-              <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap ml-auto">
-                <!-- Dropdown Pilih Komponen & Subtes UTBK -->
-                <div class="relative flex items-center">
-                  <span class="absolute left-2.5 text-xs pointer-events-none select-none">
-                    {{ selectedSubtes?.icon || '📚' }}
-                  </span>
-                  <select 
-                    id="subtest-select"
-                    :value="selectedSubtes ? (selectedSubtes.id || selectedSubtes.code || selectedSubtes.subtest || selectedSubtes.subtes) : ''"
-                    @change="onSubtestDropdownChange($event)"
-                    aria-label="Pilih Komponen & Subtes UTBK"
-                    class="pl-7 pr-8 py-1.5 sm:py-2 bg-slate-800/90 hover:bg-slate-800 text-white font-bold text-xs rounded-xl border border-white/20 focus:border-[#c0ff00] focus:ring-1 focus:ring-[#c0ff00] outline-none transition-all shadow-md cursor-pointer appearance-none max-w-[210px] sm:max-w-xs truncate"
-                  >
-                    <optgroup label="Tes Potensi Skolastik (TPS)" class="bg-slate-900 text-slate-100 font-bold">
-                      <option 
-                        v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TPS' || !['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtest || m.subtes)))" 
-                        :key="sub.id" 
-                        :value="sub.id || sub.code || sub.subtest || sub.subtes"
-                        class="bg-slate-900 text-white py-1"
-                      >
-                        {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
-                      </option>
-                    </optgroup>
-                    <optgroup label="Tes Literasi" class="bg-slate-900 text-slate-100 font-bold">
-                      <option 
-                        v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtest || m.subtes)))" 
-                        :key="sub.id" 
-                        :value="sub.id || sub.code || sub.subtest || sub.subtes"
-                        class="bg-slate-900 text-white py-1"
-                      >
-                        {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
-                      </option>
-                    </optgroup>
-                  </select>
-                  <i class="ph-bold ph-caret-down text-white/50 text-xs absolute right-2.5 pointer-events-none"></i>
-                </div>
-
-                <!-- Toggle Sembunyikan Bab Button -->
+            <!-- Right Side: Focus Pomodoro Timer + Sidebar Toggle -->
+            <div class="flex items-center gap-2 ml-auto shrink-0">
+              <!-- Compact Focus Pomodoro Timer -->
+              <div class="flex items-center gap-1.5 bg-black/40 border border-white/10 px-2.5 py-1.5 rounded-xl shadow-inner">
+                <span class="w-2 h-2 rounded-full" :class="timerActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'"></span>
+                <span class="text-[10px] uppercase font-black tracking-wider text-indigo-300 hidden md:inline">
+                  {{ isBreak ? '☕ Break' : '🎯 Fokus' }}
+                </span>
+                <span class="font-mono font-black text-xs text-white tracking-wider px-0.5">{{ formattedTime }}</span>
                 <button 
-                  type="button"
-                  @click="hideBabSidebar = !hideBabSidebar" 
-                  class="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#c0ff00] border border-[#c0ff00]/30 text-xs font-bold transition-all shadow-md cursor-pointer whitespace-nowrap shrink-0"
-                  :title="hideBabSidebar ? 'Tampilkan Daftar Bab' : 'Sembunyikan Bab (Area Materi Luas)'"
+                  @click="toggleTimer"
+                  :class="['px-2 py-0.5 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1 shadow-sm active:scale-95', 
+                    timerActive ? 'bg-amber-500 text-black hover:bg-amber-400' : 'bg-[#c0ff00] text-black hover:bg-[#b0ef00]']"
+                  :title="timerActive ? 'Jeda Pomodoro' : 'Mulai Sesi Fokus'"
                 >
-                  <span class="hidden sm:inline">{{ hideBabSidebar ? 'Buka Daftar Bab' : 'Sembunyikan Bab (Area Luas)' }}</span>
-                  <span class="sm:hidden">{{ hideBabSidebar ? 'Buka Bab' : 'Area Luas' }}</span>
-                  <i :class="hideBabSidebar ? 'ph-bold ph-sidebar-simple' : 'ph-bold ph-arrows-out-line-horizontal'"></i>
+                  <i :class="timerActive ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
+                  <span class="hidden sm:inline">{{ timerActive ? 'Jeda' : 'Fokus' }}</span>
+                </button>
+                <button 
+                  @click="resetTimer"
+                  class="p-1 text-white/40 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  title="Reset Timer Pomodoro"
+                >
+                  <i class="ph-bold ph-arrows-counter-clockwise text-xs"></i>
                 </button>
               </div>
+
+              <!-- Toggle Sembunyikan Bab Button -->
+              <button 
+                type="button"
+                @click="hideBabSidebar = !hideBabSidebar" 
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#c0ff00] border border-[#c0ff00]/30 text-xs font-bold transition-all shadow-md cursor-pointer whitespace-nowrap shrink-0"
+                :title="hideBabSidebar ? 'Tampilkan Daftar Bab' : 'Sembunyikan Bab (Area Materi Luas)'"
+              >
+                <i :class="hideBabSidebar ? 'ph-bold ph-sidebar-simple' : 'ph-bold ph-arrows-out-line-horizontal'"></i>
+                <span class="hidden sm:inline">{{ hideBabSidebar ? 'Buka Daftar Bab' : 'Sembunyikan Bab' }}</span>
+                <span class="sm:hidden">{{ hideBabSidebar ? 'Buka Bab' : 'Luas' }}</span>
+              </button>
             </div>
           </div>
 
