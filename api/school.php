@@ -525,6 +525,9 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             "free_diagnostic_students" => $package_breakdown['free_spp'],
             "tryout_participants" => (int)$tryout_stats['tryout_participants'],
             "average_tryout_score" => round((float)($tryout_stats['avg_tryout_score'] ?? 0), 1),
+            "avg_snbt_score" => round((float)($tryout_stats['avg_snbt_score'] ?? 0), 1),
+            "avg_tka_score" => round((float)($tryout_stats['avg_tka_score'] ?? 0), 1),
+            "tka_tryouts_taken" => (int)($tryout_stats['tka_tryouts_taken'] ?? 0),
             "spp_completed_students" => $sppAggregate['total_canonical_students'] ?? 0
         ],
         "package_breakdown" => $package_breakdown,

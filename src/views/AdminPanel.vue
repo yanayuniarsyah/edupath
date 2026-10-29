@@ -6644,12 +6644,16 @@ const exportQuestionsCSV = () => {
     alert("Belum ada data bank soal untuk diekspor");
     return;
   }
-  const headers = ["ID", "Sub Materi", "Tingkat Kesulitan", "Pertanyaan", "Opsi A", "Opsi B", "Opsi C", "Opsi D", "Opsi E", "Kunci Jawaban", "Status QC", "Level Kognitif"];
+  const headers = ["ID", "Program", "Peminatan", "Komponen", "Sub Materi", "Topik", "Tingkat Kesulitan", "Pertanyaan", "Opsi A", "Opsi B", "Opsi C", "Opsi D", "Opsi E", "Kunci Jawaban", "Status QC", "Level Kognitif"];
   const rows = [headers];
   serverQuestions.value.forEach(q => {
     rows.push([
       q.id,
-      q.sub_materi || q.subtes,
+      q.assessment_type || q.exam || 'SNBT',
+      q.track || 'umum',
+      q.test_component || 'TPS',
+      q.sub_materi || q.subtest,
+      q.topic || '',
       q.difficulty || 'medium',
       q.question,
       q.option_a,

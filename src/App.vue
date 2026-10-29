@@ -3470,6 +3470,85 @@
             </button>
           </div>
 
+          <!-- Official CBT Exam Launcher Hub (SNBT vs TKA SMA Saintek vs TKA SMA Soshum) -->
+          <div class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-white/10 shadow-2xl bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-slate-950 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-[#c0ff00] block">Simulasi Ujian Resmi CBT EduPath</span>
+                <h3 class="text-base sm:text-lg font-black text-white">Pilih Program Simulasi Ujian CBT</h3>
+              </div>
+              <span class="text-xs text-white/50 font-medium">Sistem CBT resmi dengan timer ketat &amp; analitik IRT</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Card 1: SNBT / SNPMB -->
+              <div class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-sky-500/30 hover:border-sky-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30">SNBT / SNPMB</span>
+                    <span class="text-[10px] font-mono text-white/50">195 Menit</span>
+                  </div>
+                  <h4 class="text-sm font-black text-white group-hover:text-sky-300 transition-colors">UTBK SNBT 2027</h4>
+                  <p class="text-[11px] text-white/60 leading-relaxed">
+                    Tes Potensi Skolastik (PU, PK, PBM, PPU) &amp; Tes Literasi (Indo, Inggris, MTK).
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  @click="window.location.hash = '#/tryout?assessment_type=SNBT'"
+                  class="mt-4 w-full py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-sky-500/20 active:scale-95 cursor-pointer"
+                >
+                  <i class="ph-bold ph-play-circle text-base"></i>
+                  <span>Mulai CBT SNBT</span>
+                </button>
+              </div>
+
+              <!-- Card 2: TKA Saintek -->
+              <div class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-emerald-500/30 hover:border-emerald-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">TKA SMA IPA</span>
+                    <span class="text-[10px] font-mono text-white/50">90 Menit</span>
+                  </div>
+                  <h4 class="text-sm font-black text-white group-hover:text-emerald-300 transition-colors">TKA Saintek</h4>
+                  <p class="text-[11px] text-white/60 leading-relaxed">
+                    Matematika IPA, Fisika, Kimia, dan Biologi untuk Ujian Mandiri PTN &amp; Ujian Sekolah.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  @click="window.location.hash = '#/tryout?assessment_type=TKA&track=saintek'"
+                  class="mt-4 w-full py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer"
+                >
+                  <i class="ph-bold ph-play-circle text-base"></i>
+                  <span>Mulai CBT Saintek</span>
+                </button>
+              </div>
+
+              <!-- Card 3: TKA Soshum -->
+              <div class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-amber-500/30 hover:border-amber-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">TKA SMA IPS</span>
+                    <span class="text-[10px] font-mono text-white/50">90 Menit</span>
+                  </div>
+                  <h4 class="text-sm font-black text-white group-hover:text-amber-300 transition-colors">TKA Soshum</h4>
+                  <p class="text-[11px] text-white/60 leading-relaxed">
+                    Sosiologi, Ekonomi, Geografi, dan Sejarah untuk Ujian Mandiri PTN &amp; Ujian Sekolah.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  @click="window.location.hash = '#/tryout?assessment_type=TKA&track=soshum'"
+                  class="mt-4 w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer"
+                >
+                  <i class="ph-bold ph-play-circle text-base"></i>
+                  <span>Mulai CBT Soshum</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Main CBT Exam Simulation Grid (Official SNPMB Interface) -->
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             

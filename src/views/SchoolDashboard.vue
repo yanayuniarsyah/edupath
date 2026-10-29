@@ -337,19 +337,25 @@
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
               <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Peserta Tryout</span>
               <div class="text-2xl font-black text-sky-400 mt-1">{{ kpis?.tryout_participants || 0 }}</div>
-              <span class="text-[10px] text-sky-300 font-semibold mt-1 block">Simulasi CBT SNBT</span>
+              <span class="text-[10px] text-sky-300 font-semibold mt-1 block">SNBT &amp; TKA SMA</span>
             </div>
 
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
-              <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Rata-rata Skor</span>
-              <div class="text-2xl font-black text-amber-400 mt-1">{{ kpis?.average_tryout_score || 0 }}</div>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Rata-rata Skor</span>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">SNBT</span>
+              </div>
+              <div class="text-2xl font-black text-amber-400 mt-1">{{ kpis?.avg_snbt_score || kpis?.average_tryout_score || 0 }}</div>
               <span class="text-[10px] text-amber-300 font-semibold mt-1 block">Skala SNBT 0 - 1000</span>
             </div>
 
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
-              <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Selesai SPP</span>
-              <div class="text-2xl font-black text-purple-400 mt-1">{{ kpis?.spp_completed_students || 0 }}</div>
-              <span class="text-[10px] text-purple-300 font-semibold mt-1 block">Rapor Minat Lengkap</span>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Skor Rerata TKA</span>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">TKA SMA</span>
+              </div>
+              <div class="text-2xl font-black text-[#c0ff00] mt-1">{{ kpis?.avg_tka_score || 0 }}%</div>
+              <span class="text-[10px] text-white/60 font-semibold mt-1 block">{{ kpis?.tka_tryouts_taken || 0 }} sesi (IPA/IPS)</span>
             </div>
           </div>
 
