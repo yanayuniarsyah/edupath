@@ -1203,9 +1203,14 @@
         <div v-if="activeTab === 'materials'" class="space-y-4 animate-fade-in">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-black text-white uppercase tracking-wider">{{ isTeacher ? 'Materi yang Saya Ajar' : 'Manajemen Materi Belajar' }}</h2>
-            <button @click="openMaterialModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
-              <i class="ph-bold ph-plus"></i> Tambah Materi
-            </button>
+            <div class="flex items-center gap-2">
+              <a href="/#/learning" target="_blank" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold rounded-lg border border-white/15 transition-colors flex items-center gap-1.5 cursor-pointer" title="Buka Modul Materi di Tampilan Siswa">
+                <i class="ph-bold ph-eye"></i> Pratinjau Siswa
+              </a>
+              <button @click="openMaterialModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
+                <i class="ph-bold ph-plus"></i> Tambah Materi
+              </button>
+            </div>
           </div>
 
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden shadow-xl">
@@ -2712,7 +2717,7 @@
             <i class="ph-bold ph-chalkboard-teacher text-[#c0ff00]"></i>
             <span>{{ classForm.id ? 'Ubah Rombel Offline' : 'Buat Kelas Offline Baru' }}</span>
           </h3>
-          <button @click="showClassModal = false" class="text-white/40 hover:text-white"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showClassModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
@@ -2780,7 +2785,7 @@
             <i class="ph-bold ph-door text-sky-400"></i>
             <span>Tambah Ruang Belajar</span>
           </h3>
-          <button @click="showRoomModal = false" class="text-white/40 hover:text-white"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showRoomModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
@@ -2824,7 +2829,7 @@
             </h3>
             <p class="text-[10px] text-white/40">Kapasitas: {{ selectedClassStudentsList.length }} / {{ selectedClassForStudents?.max_capacity }} Siswa</p>
           </div>
-          <button @click="showManageStudentsModal = false" class="text-white/40 hover:text-white"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showManageStudentsModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
 
         <!-- Form Tambah Siswa ke Kelas -->
@@ -2886,7 +2891,7 @@
               {{ activeBapSession?.class_name }} • Tanggal: {{ activeBapSession?.session_date }} ({{ (activeBapSession?.start_time || '').slice(0, 5) }}–{{ (activeBapSession?.end_time || '').slice(0, 5) }}) • Ruang: {{ activeBapSession?.room_name || 'Offline' }}
             </p>
           </div>
-          <button @click="showBapModal = false" class="text-white/40 hover:text-white"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showBapModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
 
         <div class="flex-grow overflow-y-auto p-4 sm:p-6 space-y-5">
@@ -3002,7 +3007,7 @@
             <span class="text-[10px] text-white/40">
               ✅ {{ telegramBlastStatuses.filter(s => s.status === 'sent').length }} / {{ telegramBlastStatuses.length }} terkirim
             </span>
-            <button @click="showTelegramBlastModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+            <button @click="showTelegramBlastModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
           </div>
         </div>
         <div class="p-3 space-y-2">
@@ -3032,7 +3037,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
           <h3 class="font-black text-sm text-white">Tambah Transaksi Manual / Offline</h3>
-          <button @click="showOrderModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showOrderModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <form @submit.prevent="saveManualOrder" class="p-4 space-y-3">
           <div>
@@ -3076,7 +3081,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-xs shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between">
           <h3 class="font-black text-sm text-white">Ubah Status Transaksi</h3>
-          <button @click="showOrderStatusModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showOrderStatusModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <div class="p-4 space-y-3">
           <div>
@@ -3107,7 +3112,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-xs shadow-2xl animate-fade-in text-white overflow-hidden">
         <div class="p-4 border-b border-white/10 flex items-center justify-between">
           <h3 class="font-black text-sm text-white">Cairkan Komisi</h3>
-          <button @click="closePayoutModal" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="closePayoutModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <div class="p-4 space-y-3">
           <div class="bg-amber-500/10 text-amber-300 p-2.5 rounded-lg text-[10px] font-medium border border-amber-500/20">
@@ -3141,7 +3146,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-xs shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between">
           <h3 class="font-black text-sm text-white">Tolak Permintaan Payout</h3>
-          <button @click="showRejectPayoutModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showRejectPayoutModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <div class="p-4 space-y-3">
           <div>
@@ -3163,7 +3168,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
           <h3 class="font-black text-sm text-white">{{ isEditingAffiliate ? 'Edit Mitra Afiliasi' : 'Tambah Mitra Afiliasi' }}</h3>
-          <button @click="showAffiliateModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showAffiliateModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <form @submit.prevent="saveAffiliate" class="p-4 space-y-3">
           <div v-if="isSuperadmin && tenantsList.length > 0">
@@ -3305,7 +3310,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
           <h3 class="font-black text-sm text-white">{{ isEditingStudent ? 'Edit Siswa' : 'Tambah Siswa Baru' }}</h3>
-          <button @click="showStudentModal = false" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showStudentModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <form @submit.prevent="saveStudent" class="p-4 space-y-3">
           <div>
@@ -3378,7 +3383,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
           <h3 class="font-black text-sm text-white">{{ isEditingPlan ? 'Edit Paket' : 'Tambah Paket Baru' }}</h3>
-          <button @click="closePlanModal" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="closePlanModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <form @submit.prevent="savePlan" class="p-4 space-y-3">
           <div>
@@ -3423,7 +3428,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
           <h3 class="font-black text-sm text-white">{{ isEditingStaff ? (isSuperadmin ? 'Edit Staff' : 'Edit Guru / Tutor') : (isSuperadmin ? 'Tambah Staff Baru' : 'Tambah Guru / Tutor Baru') }}</h3>
-          <button @click="closeStaffModal" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="closeStaffModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <form @submit.prevent="saveStaff" class="p-4 space-y-3">
           <div>
@@ -3471,7 +3476,7 @@
             <i class="ph-bold ph-buildings text-[#c0ff00]"></i>
             {{ isEditingBranch ? 'Edit Master Cabang' : 'Tambah Cabang Baru' }}
           </h3>
-          <button @click="showBranchModal = false" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showBranchModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <form @submit.prevent="saveBranch" class="p-4 space-y-3">
           <div>
@@ -3527,7 +3532,7 @@
             <i class="ph-bold ph-graduation-cap text-[#c0ff00]"></i>
             {{ isEditingSchool ? 'Edit Data Sekolah Mitra' : 'Tambah Sekolah Mitra Baru' }}
           </h3>
-          <button @click="showSchoolModal = false" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showSchoolModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <form @submit.prevent="saveSchool" class="p-4 space-y-3.5">
           <!-- Row 1: Nama & NPSN -->
@@ -3637,7 +3642,7 @@
               <p class="text-[10px] text-white/50">{{ selectedSchoolForReferral.name }}</p>
             </div>
           </div>
-          <button @click="showSchoolReferralModal = false" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="showSchoolReferralModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
 
         <p class="text-xs text-white/70 leading-relaxed">
@@ -3680,7 +3685,7 @@
             <i class="ph-bold ph-plus-circle text-[#c0ff00] text-lg"></i>
             <h3 class="font-black text-sm text-white">{{ isEditingQuestion ? 'Edit Soal Ujian / Latihan' : 'Tambah Soal Baru' }}</h3>
           </div>
-          <button @click="closeQuestionModal" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="closeQuestionModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <form @submit.prevent="saveQuestion" class="p-5 space-y-4">
           <!-- Row 1: Ujian & Komponen -->
@@ -3862,7 +3867,7 @@
             <i class="ph-bold ph-note-pencil text-[#c0ff00] text-lg"></i>
             <h3 class="font-black text-sm text-white">{{ isEditingMaterial ? 'Edit Materi Pembelajaran' : 'Tambah Materi Baru' }}</h3>
           </div>
-          <button @click="closeMaterialModal" class="text-white/40 hover:text-white transition-colors cursor-pointer"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="closeMaterialModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
 
         <!-- Success Alert when saved while staying inside modal -->
@@ -4011,7 +4016,7 @@
               👨‍🏫 {{ selectedQuestionForPreview.teacher_name }}
             </span>
           </div>
-          <button @click="closeQuestionPreview" class="text-white/40 hover:text-white transition-colors"><i class="ph-bold ph-x text-base"></i></button>
+          <button @click="closeQuestionPreview" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
         <div class="p-6 space-y-6">
           <div class="space-y-2">
@@ -4200,9 +4205,12 @@ const isLoggingOut = ref(false);
 const sidebarOpen = ref(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
 const initialTab = () => {
   const stored = sessionStorage.getItem('admin_active_tab');
-  const role = sessionStorage.getItem('admin_role') || localStorage.getItem('user_role') || '';
+  const role = (sessionStorage.getItem('admin_role') || localStorage.getItem('user_role') || '').toLowerCase();
   if (['affiliate', 'afiliator'].includes(role)) {
     return (['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts', 'settings'].includes(stored)) ? stored : 'affiliate_dashboard';
+  }
+  if (['teacher', 'guru', 'tutor'].includes(role)) {
+    return (['materials', 'questions', 'teacher_hub', 'settings'].includes(stored)) ? stored : 'materials';
   }
   return stored || 'overview';
 };
@@ -4496,7 +4504,8 @@ const navItems = computed(() => {
 
   const isT = isTeacher.value;
   const isSuper = isSuperadmin.value || currentRole.value === 'superadmin' || currentRole.value === 'super_admin';
-  const role = currentRole.value || 'admin';
+  const role = (currentRole.value || 'admin').toLowerCase();
+  const effectiveRole = isT ? 'teacher' : (isAffiliate.value ? 'affiliate' : role);
 
   const items = [
     { id: 'overview',        label: 'Dashboard',             icon: 'ph-squares-four',      roles: ['superadmin', 'admin', 'teacher'] },
@@ -4517,7 +4526,7 @@ const navItems = computed(() => {
   ];
 
   if (isSuper) return items;
-  return items.filter(item => !item.roles || item.roles.includes(role));
+  return items.filter(item => !item.roles || item.roles.includes(effectiveRole) || (isT && item.roles.includes('teacher')));
 });
 
 const currentNavItem = computed(() => navItems.value.find(item => item.id === activeTab.value));
@@ -4549,19 +4558,31 @@ const closeQuestionPreview = () => {
 };
 
 const canManageQuestion = (q) => {
+  if (!q) return false;
   if (isSuperadmin.value || currentRole.value === 'admin') return true;
   if (isTeacher.value) {
     if (!q.teacher_id && !q.teacher_name) return true;
-    return q.teacher_id === currentUserId.value || (currentAdminUser.value?.name && q.teacher_name === currentAdminUser.value.name);
+    const myId = currentUserId.value || currentAdminUser.value?.id || currentAdminUser.value?.reference_id || '';
+    const myName = (currentAdminUser.value?.name || '').toLowerCase().trim();
+    const qTeacherName = (q.teacher_name || '').toLowerCase().trim();
+    if (myId && (q.teacher_id === myId || q.teacher_id === currentUserId.value)) return true;
+    if (myName && qTeacherName && (qTeacherName === myName || qTeacherName.includes(myName) || myName.includes(qTeacherName))) return true;
+    return false;
   }
   return false;
 };
 
 const canManageMaterial = (m) => {
+  if (!m) return false;
   if (isSuperadmin.value || currentRole.value === 'admin') return true;
   if (isTeacher.value) {
     if (!m.teacher_id && !m.teacher_name) return true;
-    return m.teacher_id === currentUserId.value || (currentAdminUser.value?.name && m.teacher_name === currentAdminUser.value.name);
+    const myId = currentUserId.value || currentAdminUser.value?.id || currentAdminUser.value?.reference_id || '';
+    const myName = (currentAdminUser.value?.name || '').toLowerCase().trim();
+    const mTeacherName = (m.teacher_name || '').toLowerCase().trim();
+    if (myId && (m.teacher_id === myId || m.teacher_id === currentUserId.value)) return true;
+    if (myName && mTeacherName && (mTeacherName === myName || mTeacherName.includes(myName) || myName.includes(mTeacherName))) return true;
+    return false;
   }
   return false;
 };
@@ -4613,8 +4634,8 @@ const loadRoleData = () => {
     loadMyAffiliateData();
     loadAffiliateSettings();
   } else if (isTeacher.value) {
-    if (!['questions', 'materials', 'teacher_hub', 'settings'].includes(activeTab.value)) {
-      activeTab.value = 'questions';
+    if (!['materials', 'questions', 'teacher_hub', 'settings'].includes(activeTab.value)) {
+      activeTab.value = 'materials';
     }
     fetchQuestions();
     fetchMaterials();

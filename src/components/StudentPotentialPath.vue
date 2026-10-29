@@ -848,8 +848,8 @@
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
             <span class="text-xs font-black uppercase tracking-wider text-emerald-400 font-mono">Official Certificate of Assessment</span>
           </div>
-          <button @click="showCertModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-base">
-            <i class="ph-bold ph-x"></i>
+          <button @click="showCertModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
+            <i class="ph-bold ph-x text-sm"></i>
           </button>
         </div>
 

@@ -42,8 +42,8 @@
             </div>
           </div>
           <!-- Close button for mobile -->
-          <button v-show="(sidebarExpanded || mobileSidebarOpen)" @click="mobileSidebarOpen = false" class="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 active:scale-95 shrink-0 cursor-pointer" aria-label="Tutup Menu">
-            <i class="ph-bold ph-x text-lg"></i>
+          <button v-show="(sidebarExpanded || mobileSidebarOpen)" @click="mobileSidebarOpen = false" class="lg:hidden w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" aria-label="Tutup Menu" title="Tutup Menu">
+            <i class="ph-bold ph-x text-sm"></i>
           </button>
         </div>
         <p v-show="(sidebarExpanded || mobileSidebarOpen)" class="text-xs text-white/40 font-semibold mb-3 uppercase tracking-wider whitespace-nowrap shrink-0">Adaptive Learning Platform</p>
@@ -107,7 +107,7 @@
                 v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TPS' || !['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtes)))"
                 :key="subtes.id"
                 :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
-                  currentTab === 'learning' && selectedSubtes.id === subtes.id
+                  currentTab === 'learning' && selectedSubtes?.id === subtes.id
                     ? 'bg-[#c0ff00]/15 text-[#c0ff00] font-bold border border-[#c0ff00]/30'
                     : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
                 ]"
@@ -126,7 +126,7 @@
                 v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtes)))"
                 :key="subtes.id"
                 :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
-                  currentTab === 'learning' && selectedSubtes.id === subtes.id
+                  currentTab === 'learning' && selectedSubtes?.id === subtes.id
                     ? 'bg-sky-400/15 text-sky-400 font-bold border border-sky-400/30'
                     : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
                 ]"
@@ -2761,10 +2761,10 @@
               <!-- Tutup button visible immediately on top right for mobile -->
               <button 
                 @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="sm:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 text-xs font-bold transition-all shadow-md shrink-0 ml-2 cursor-pointer"
+                class="sm:hidden w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm shrink-0 ml-2 cursor-pointer"
                 title="Tutup Halaman & Kembali"
+                aria-label="Tutup"
               >
-                <span>Tutup</span>
                 <i class="ph-bold ph-x text-sm"></i>
               </button>
             </div>
@@ -2782,11 +2782,11 @@
               </button>
               <button 
                 @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
+                class="hidden sm:flex w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
                 title="Tutup Halaman & Kembali"
+                aria-label="Tutup"
               >
-                <span>Tutup</span>
-                <i class="ph-bold ph-x text-base"></i>
+                <i class="ph-bold ph-x text-sm"></i>
               </button>
             </div>
           </div>
@@ -2932,11 +2932,11 @@
                   <button 
                     type="button"
                     @click="showIrtInfo = false" 
-                    class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-colors flex items-center gap-1 cursor-pointer"
+                    class="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 hover:border-rose-300 flex items-center justify-center transition-all cursor-pointer shrink-0"
                     title="Tutup Kotak IRT"
+                    aria-label="Tutup Kotak IRT"
                   >
-                    <span>Tutup</span>
-                    <i class="ph-bold ph-x"></i>
+                    <i class="ph-bold ph-x text-sm"></i>
                   </button>
                 </div>
                 <div class="space-y-3">
@@ -2964,14 +2964,14 @@
           <div class="bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:px-4 sm:py-2.5 backdrop-blur-xl shadow-xl flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
             <!-- Left Side: Back/Tutup Button + Subtest Dropdown Selector -->
             <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-wrap xs:flex-nowrap">
-              <!-- Back Button -->
+              <!-- Tutup Button -->
               <button 
                 @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-sm cursor-pointer shrink-0"
+                class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
                 title="Tutup & Kembali ke Dashboard"
+                aria-label="Tutup"
               >
-                <i class="ph-bold ph-arrow-left text-sm"></i>
-                <span class="hidden sm:inline">Tutup</span>
+                <i class="ph-bold ph-x text-sm"></i>
               </button>
 
               <div class="h-5 w-px bg-white/15 hidden sm:block"></div>
@@ -3072,7 +3072,7 @@
               </div>
               <div class="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
                 <button 
-                  v-for="bab in selectedSubtes.babList" 
+                  v-for="bab in (selectedSubtes?.babList || [])" 
                   :key="bab.id"
                   :class="['w-full text-left px-3.5 py-3 rounded-xl border text-xs font-bold transition-all outline-none flex flex-col gap-1', 
                     selectedBab && selectedBab.id === bab.id 
@@ -3093,7 +3093,7 @@
                 <div class="space-y-4 border-b border-slate-200 pb-6">
                   <div class="flex flex-wrap items-center gap-2">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-md text-xs font-black text-emerald-700 uppercase tracking-wider">
-                      <i class="ph-bold ph-tree-structure"></i> SNBT &bull; {{ selectedSubtes.subtes }}
+                      <i class="ph-bold ph-tree-structure"></i> SNBT &bull; {{ selectedSubtes?.subtest || selectedSubtes?.subtes || '' }}
                     </span>
                     <span v-if="selectedBab.topic" class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-xs font-bold text-blue-700">
                       Topik: {{ selectedBab.topic }}
@@ -3161,11 +3161,11 @@
             </div>
             <button 
               @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
+              class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
               title="Tutup Practice Engine"
+              aria-label="Tutup Practice Engine"
             >
-              <span>Tutup</span>
-              <i class="ph-bold ph-x text-sm sm:text-base"></i>
+              <i class="ph-bold ph-x text-sm"></i>
             </button>
           </div>
           <div class="grid grid-cols-1 gap-6" :class="showAICompanion ? 'lg:grid-cols-3' : ''">
@@ -3274,11 +3274,11 @@
             </div>
             <button 
               @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
+              class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
               title="Tutup Halaman & Kembali"
+              aria-label="Tutup"
             >
-              <span>Tutup</span>
-              <i class="ph-bold ph-x text-sm sm:text-base"></i>
+              <i class="ph-bold ph-x text-sm"></i>
             </button>
           </div>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -3360,11 +3360,11 @@
             </div>
             <button 
               @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white hover:text-rose-300 border border-white/15 hover:border-rose-500/30 text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
+              class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
               title="Tutup Halaman & Kembali"
+              aria-label="Tutup"
             >
-              <span>Tutup</span>
-              <i class="ph-bold ph-x text-sm sm:text-base"></i>
+              <i class="ph-bold ph-x text-sm"></i>
             </button>
           </div>
 
@@ -3784,8 +3784,8 @@
       <div class="absolute inset-0 bg-black/80 backdrop-blur-md" @click="showPlanSelectorModal = false"></div>
       <div class="relative bg-[#090f1e] border border-white/15 rounded-3xl w-full max-w-4xl p-6 sm:p-8 shadow-2xl animate-fade-in text-white max-h-[90vh] overflow-y-auto">
         <!-- Close button -->
-        <button @click="showPlanSelectorModal = false" class="!absolute top-5 right-5 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-white/10 text-base cursor-pointer">
-          ✕
+        <button @click="showPlanSelectorModal = false" class="!absolute top-5 right-5 z-20 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer" title="Tutup" aria-label="Tutup">
+          <i class="ph-bold ph-x text-sm"></i>
         </button>
 
         <!-- Header -->
@@ -3890,8 +3890,8 @@
       <div class="relative bg-slate-900 border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-fade-in text-white">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-xl font-black font-heading">Invoice Pembelian</h2>
-          <button @click="closeCheckoutModal" class="text-white/50 hover:text-white transition-colors">
-            <i class="ph-bold ph-x text-xl"></i>
+          <button @click="closeCheckoutModal" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
+            <i class="ph-bold ph-x text-sm"></i>
           </button>
         </div>
         
@@ -3957,8 +3957,8 @@
     <div v-if="showLoginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-fade-in">
       <div class="glass-card max-w-sm w-full p-8 rounded-3xl space-y-6 relative border-primary/30">
         <!-- Close button -->
-        <button @click="showLoginModal = false" class="!absolute top-5 right-5 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-transparent hover:border-rose-500/30 text-sm">
-          <i class="ph-bold ph-x"></i>
+        <button @click="showLoginModal = false" class="!absolute top-5 right-5 z-50 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer" title="Tutup" aria-label="Tutup">
+          <i class="ph-bold ph-x text-sm"></i>
         </button>
 
         <!-- Logo & Header (Consistent with Admin Portal) -->
@@ -4119,7 +4119,9 @@
         </div>
         <p class="text-[11px] text-white/60 truncate font-medium mt-0.5">{{ liveActivityList[currentActivityIdx].desc }}</p>
       </div>
-      <button @click="showLiveActivity = false" class="text-white/30 hover:text-white text-xs p-1" title="Tutup">✕</button>
+      <button @click="showLiveActivity = false" class="w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 flex items-center justify-center transition-all cursor-pointer shrink-0 ml-1" title="Tutup" aria-label="Tutup">
+        <i class="ph-bold ph-x text-xs"></i>
+      </button>
     </div>
 
     <!-- Modal: Syarat & Ketentuan (Terms & Conditions) -->
@@ -4135,7 +4137,9 @@
               <p class="text-xs text-white/50">EduPath Platform Pembelajaran Digital • Terakhir diperbarui: 1 Oktober 2026</p>
             </div>
           </div>
-          <button @click="showTermsModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition-colors">✕</button>
+          <button @click="showTermsModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
         </div>
 
         <div class="space-y-4 text-xs md:text-sm text-white/75 leading-relaxed">
@@ -4268,7 +4272,9 @@
               <p class="text-xs text-white/50">Komitmen keamanan data siswa, orang tua, dan sekolah di EduPath</p>
             </div>
           </div>
-          <button @click="showPrivacyModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition-colors">✕</button>
+          <button @click="showPrivacyModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
         </div>
 
         <div class="space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
@@ -4322,7 +4328,9 @@
               <p class="text-xs text-white/50">Transparansi model latihan IRT dan estimasi kesiapan belajar</p>
             </div>
           </div>
-          <button @click="showDisclaimerModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition-colors">✕</button>
+          <button @click="showDisclaimerModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
         </div>
 
         <div class="space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
@@ -4373,7 +4381,9 @@
               <p class="text-xs text-white/50">Membantu orang tua memantau perkembangan belajar anak tanpa rasa cemas</p>
             </div>
           </div>
-          <button @click="showParentConsentModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition-colors">✕</button>
+          <button @click="showParentConsentModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
         </div>
 
         <div class="space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
@@ -4423,7 +4433,9 @@
               <p class="text-xs text-white/50">Layanan resmi operasional dan legalitas EduPath</p>
             </div>
           </div>
-          <button @click="showContactModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition-colors">✕</button>
+          <button @click="showContactModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
         </div>
 
         <div class="space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
@@ -4531,7 +4543,9 @@
             <i class="ph-bold ph-hand-coins text-amber-400"></i>
             Daftar Mitra Afiliasi
           </h3>
-          <button @click="showAffiliateRegisterModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm transition-colors">✕</button>
+          <button @click="showAffiliateRegisterModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
         </div>
         <div class="p-6">
           <form @submit.prevent="registerAffiliate" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
@@ -5012,6 +5026,18 @@ export default {
           const match = hash.match(/tab=([a-zA-Z0-9_]+)/);
           if (match && match[1]) return match[1];
         }
+        if (hash === '#/learning' || hash.startsWith('#/learning') || hash === '#/materi' || hash.startsWith('#/materi')) {
+          return 'learning';
+        }
+        if (hash === '#/diagnostic' || hash.startsWith('#/diagnostic')) {
+          return 'diagnostic';
+        }
+        if (hash === '#/simulator' || hash.startsWith('#/simulator')) {
+          return 'simulator';
+        }
+        if (hash === '#/dashboard' || hash.startsWith('#/dashboard')) {
+          return 'dashboard';
+        }
       } catch (e) {}
 
       const stored = sessionStorage.getItem('ep_active_tab');
@@ -5358,7 +5384,13 @@ export default {
               return;
             }
 
-            if (['admin', 'superadmin', 'teacher', 'guru', 'tutor'].includes(res.user.role) && !isStudentPreviewMode.value) {
+            const currentHash = window.location.hash || '';
+            const isExplicitContentRoute = currentHash === '#/learning' || currentHash.startsWith('#/learning') || currentHash === '#/materi' || currentHash.startsWith('#/materi');
+            if (isExplicitContentRoute) {
+              isStudentPreviewMode.value = true;
+            }
+
+            if (['admin', 'superadmin', 'teacher', 'guru', 'tutor'].includes(res.user.role) && !isStudentPreviewMode.value && !isExplicitContentRoute) {
               sessionStorage.setItem('admin_token', token);
               sessionStorage.setItem('admin_role', res.user.role);
               window.location.hash = '#/admin';
@@ -5578,7 +5610,7 @@ export default {
         }
 
         // 3. Guru & Tutor Bimbel (non-admin)
-        if (['teacher', 'tutor'].includes(res.user?.role)) {
+        if (['teacher', 'guru', 'tutor'].includes(res.user?.role)) {
           sessionStorage.setItem('admin_token', res.token);
           sessionStorage.setItem('admin_role', res.user.role);
           sessionStorage.setItem('ep_user', JSON.stringify(res.user));

@@ -8,7 +8,7 @@ $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true);
 
 $payload = authenticate();
-if (!in_array($payload->role, ['student', 'admin', 'superadmin', 'teacher'])) {
+if (!in_array($payload->role, ['student', 'admin', 'superadmin', 'teacher', 'guru', 'tutor'])) {
     http_response_code(403);
     echo json_encode(["error" => "Akses tidak diizinkan"]);
     exit;

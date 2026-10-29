@@ -24,6 +24,14 @@ const routes = [
     component: () => import('../App.vue'),
   },
   {
+    path: '/learning',
+    component: () => import('../App.vue'),
+  },
+  {
+    path: '/materi',
+    component: () => import('../App.vue'),
+  },
+  {
     path: '/spp',
     component: () => import('../App.vue'),
   },

@@ -420,9 +420,10 @@ if ($action === 'logout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Untuk rute di bawah ini, wajib login sebagai superadmin, admin, teacher, atau affiliate
+// Untuk rute di bawah ini, wajib login sebagai superadmin, admin, teacher (guru/tutor), atau affiliate
 $payload = authenticate();
-if (!in_array($payload->role, ['admin', 'superadmin', 'teacher', 'affiliate'])) {
+$isTeacherRole = in_array($payload->role, ['teacher', 'guru', 'tutor'], true);
+if (!in_array($payload->role, ['admin', 'superadmin', 'teacher', 'guru', 'tutor', 'affiliate'], true)) {
     http_response_code(403);
     echo json_encode(["error" => "Forbidden"]);
     exit;
@@ -457,13 +458,13 @@ if ($action === 'bulk_delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         switch ($type) {
             case 'questions':
-                if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+                if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'], true)) {
                     $pdo->rollBack();
                     http_response_code(403);
                     echo json_encode(["error" => "Akses ditolak"]);
                     exit;
                 }
-                if ($payload->role === 'teacher') {
+                if ($isTeacherRole) {
                     $placeholders = implode(',', array_fill(0, count($ids), '?'));
                     $chkStmt = $pdo->prepare("SELECT id FROM questions WHERE id IN ($placeholders) AND (teacher_id = ? OR teacher_id = ? OR teacher_id IS NULL OR teacher_id = '')");
                     $params = array_merge($ids, [$payload->user_id, $payload->id]);
@@ -484,13 +485,13 @@ if ($action === 'bulk_delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'materials':
-                if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+                if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'], true)) {
                     $pdo->rollBack();
                     http_response_code(403);
                     echo json_encode(["error" => "Akses ditolak"]);
                     exit;
                 }
-                if ($payload->role === 'teacher') {
+                if ($isTeacherRole) {
                     $placeholders = implode(',', array_fill(0, count($ids), '?'));
                     $chkStmt = $pdo->prepare("SELECT id FROM materials WHERE id IN ($placeholders) AND (teacher_id = ? OR teacher_id = ? OR teacher_id IS NULL OR teacher_id = '')");
                     $params = array_merge($ids, [$payload->user_id, $payload->id]);
@@ -760,7 +761,7 @@ if (($action === 'me' || $action === 'profile') && $_SERVER['REQUEST_METHOD'] ==
 
     $defaultName = 'Administrator';
     if ($payload->role === 'superadmin') $defaultName = 'Super Administrator';
-    elseif ($payload->role === 'teacher') $defaultName = 'Guru / Tutor';
+    elseif ($isTeacherRole) $defaultName = 'Guru / Tutor';
     elseif (!empty($adminUser['tenant_name'])) $defaultName = 'Admin ' . $adminUser['tenant_name'];
 
     $cleanName = trim($adminUser['name'] ?? '');
@@ -783,7 +784,7 @@ if (($action === 'me' || $action === 'profile') && $_SERVER['REQUEST_METHOD'] ==
 }
 
 if ($action === 'stats' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    if ($payload->role === 'teacher') {
+    if ($isTeacherRole) {
         $tenant_id = $payload->tenant_id;
         $totalStudents = 0;
         $activeStudents = 0;
@@ -1273,7 +1274,7 @@ elseif ($action === 'students') {
     }
 }
 elseif ($action === 'orders') {
-    if ($payload->role === 'teacher') {
+    if ($isTeacherRole) {
         http_response_code(403);
         echo json_encode(["error" => "Guru tidak memiliki izin akses ke transaksi pembayaran"]);
         exit;
@@ -2048,7 +2049,7 @@ elseif ($action === 'products') {
     }
 }
 elseif ($action === 'plans') {
-    if ($payload->role === 'teacher') {
+    if ($isTeacherRole) {
         http_response_code(403);
         echo json_encode(["error" => "Guru tidak memiliki izin akses ke Manajemen Paket"]);
         exit;
@@ -2233,7 +2234,7 @@ elseif ($action === 'questions') {
         $stmt->execute($params);
         echo safe_json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'], true)) {
             http_response_code(403);
             echo json_encode(["error" => "Akses ditolak"]);
             exit;
@@ -2256,7 +2257,7 @@ elseif ($action === 'questions') {
         $classification = strtoupper($input['usage_type'] ?? $input['classification'] ?? 'LATIHAN');
         $teacher_name = trim($input['teacher_name'] ?? '');
         $teacher_id = trim($input['teacher_id'] ?? '');
-        if ($payload->role === 'teacher') {
+        if ($isTeacherRole) {
             $teacher_id = $payload->user_id ?? $payload->id;
             $tStmt = $pdo->prepare("SELECT name FROM admins WHERE id = ? OR username = ?");
             $tStmt->execute([$payload->id, $payload->id]);
@@ -2297,14 +2298,14 @@ elseif ($action === 'questions') {
             http_response_code(500); echo json_encode(["error" => "Gagal menyimpan soal", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'], true)) {
             http_response_code(403);
             echo json_encode(["error" => "Akses ditolak"]);
             exit;
         }
         $id = $input['id'] ?? '';
 
-        if ($payload->role === 'teacher') {
+        if ($isTeacherRole) {
             $chk = $pdo->prepare("SELECT teacher_id, teacher_name FROM questions WHERE id = ?");
             $chk->execute([$id]);
             $qOwner = $chk->fetch(PDO::FETCH_ASSOC);
@@ -2330,7 +2331,7 @@ elseif ($action === 'questions') {
         $classification = strtoupper($input['usage_type'] ?? $input['classification'] ?? 'LATIHAN');
         $teacher_name = trim($input['teacher_name'] ?? '');
         $teacher_id = trim($input['teacher_id'] ?? '');
-        if ($payload->role === 'teacher') {
+        if ($isTeacherRole) {
             $teacher_id = $payload->user_id ?? $payload->id;
             $tStmt = $pdo->prepare("SELECT name FROM admins WHERE id = ? OR username = ?");
             $tStmt->execute([$payload->id, $payload->id]);
@@ -2368,13 +2369,13 @@ elseif ($action === 'questions') {
             http_response_code(500); echo json_encode(["error" => "Gagal update soal", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'], true)) {
             http_response_code(403);
             echo json_encode(["error" => "Akses ditolak"]);
             exit;
         }
         $id = $_GET['id'] ?? '';
-        if ($payload->role === 'teacher') {
+        if ($isTeacherRole) {
             $chk = $pdo->prepare("SELECT teacher_id, teacher_name FROM questions WHERE id = ?");
             $chk->execute([$id]);
             $qOwner = $chk->fetch(PDO::FETCH_ASSOC);
@@ -2495,7 +2496,7 @@ elseif ($action === 'materials') {
         }
         echo safe_json_encode(["materials" => $materials]);
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($input['id'])) {
-        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'], true)) {
             http_response_code(403);
             echo json_encode(["error" => "Staff only"]);
             exit;
@@ -2517,7 +2518,7 @@ elseif ($action === 'materials') {
         $content = $input['content'] ?? '';
         $teacher_name = trim($input['teacher_name'] ?? '');
         $teacher_id = trim($input['teacher_id'] ?? '');
-        if ($payload->role === 'teacher') {
+        if ($isTeacherRole) {
             $teacher_id = $payload->user_id ?? $payload->id;
             $tStmt = $pdo->prepare("SELECT name FROM admins WHERE id = ? OR username = ?");
             $tStmt->execute([$payload->id, $payload->id]);
@@ -2554,14 +2555,14 @@ elseif ($action === 'materials') {
             http_response_code(500); echo json_encode(["error" => "Gagal menyimpan materi", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT' || ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($input['id']))) {
-        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'], true)) {
             http_response_code(403);
             echo json_encode(["error" => "Staff only"]);
             exit;
         }
         $id = $input['id'] ?? '';
 
-        if ($payload->role === 'teacher') {
+        if ($isTeacherRole) {
             $chk = $pdo->prepare("SELECT teacher_id, teacher_name FROM materials WHERE id = ?");
             $chk->execute([$id]);
             $mOwner = $chk->fetch(PDO::FETCH_ASSOC);
@@ -2587,7 +2588,7 @@ elseif ($action === 'materials') {
         $formula_praktis = trim($input['formula_praktis'] ?? '');
         $teacher_name = trim($input['teacher_name'] ?? '');
         $teacher_id = trim($input['teacher_id'] ?? '');
-        if ($payload->role === 'teacher') {
+        if ($isTeacherRole) {
             $teacher_id = $payload->user_id ?? $payload->id;
             $tStmt = $pdo->prepare("SELECT name FROM admins WHERE id = ? OR username = ?");
             $tStmt->execute([$payload->id, $payload->id]);
@@ -2632,13 +2633,13 @@ elseif ($action === 'materials') {
             http_response_code(500); echo json_encode(["error" => "Gagal update materi", "details" => $e->getMessage()]);
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+        if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'], true)) {
             http_response_code(403);
             echo json_encode(["error" => "Staff only"]);
             exit;
         }
         $id = $_GET['id'] ?? '';
-        if ($payload->role === 'teacher') {
+        if ($isTeacherRole) {
             $chk = $pdo->prepare("SELECT teacher_id, teacher_name FROM materials WHERE id = ?");
             $chk->execute([$id]);
             $mOwner = $chk->fetch(PDO::FETCH_ASSOC);
@@ -2657,7 +2658,7 @@ elseif ($action === 'materials') {
     }
 }
 elseif (in_array($action, ['upload_material_file', 'upload_material_image']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+    if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'], true)) {
         http_response_code(403);
         echo json_encode(["error" => "Hanya Pengajar atau Administrator yang berhak mengunggah materi"]);
         exit;

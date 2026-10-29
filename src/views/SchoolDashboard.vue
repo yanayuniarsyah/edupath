@@ -930,8 +930,8 @@
     <div v-if="openQrModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="openQrModal = false"></div>
       <div class="relative z-10 w-full max-w-sm p-6 rounded-3xl bg-[#090e1f] border border-white/15 text-center shadow-2xl">
-        <button @click="openQrModal = false" class="absolute top-4 right-4 text-white/40 hover:text-white cursor-pointer">
-          <i class="ph-bold ph-x text-lg"></i>
+        <button @click="openQrModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer absolute top-4 right-4" title="Tutup">
+          <i class="ph-bold ph-x text-sm"></i>
         </button>
         <div class="w-10 h-10 rounded-2xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center mx-auto mb-3">
           <i class="ph-bold ph-qr-code text-xl"></i>
@@ -970,8 +970,8 @@
               <span class="text-[10px] text-white/50">{{ selectedStudent.email }}</span>
             </div>
           </div>
-          <button @click="selectedStudent = null" class="text-white/40 hover:text-white cursor-pointer">
-            <i class="ph-bold ph-x text-lg"></i>
+          <button @click="selectedStudent = null" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup">
+            <i class="ph-bold ph-x text-sm"></i>
           </button>
         </div>
 

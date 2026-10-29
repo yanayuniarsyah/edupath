@@ -127,7 +127,7 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $subtes = safe_str($_GET['subtes'] ?? '');
     $isAdvanced = isset($_GET['advanced']) && $_GET['advanced'] == 1;
 
-    $isStaff = $payload && in_array($payload->role, ['superadmin', 'admin', 'teacher', 'school_bk'], true);
+    $isStaff = $payload && in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor', 'school_bk'], true);
     $hasPremiumAccess = $isStaff || ($payload && $entitlementService->hasEntitlement($payload->id, $payload->tenant_id ?? '', 'premium_materials'));
 
     if ($isAdvanced && !$hasPremiumAccess) {

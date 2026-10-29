@@ -9,7 +9,7 @@ $input = json_decode(file_get_contents('php://input'), true) ?: [];
 
 // 1. Otorisasi Token
 $payload = authenticate();
-if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'])) {
     http_response_code(403);
     echo json_encode(["error" => "Akses khusus staf internal (Admin Cabang, Superadmin, dan Guru)."]);
     exit;
@@ -492,7 +492,7 @@ elseif ($action === 'attendance') {
 // 6. PORTAL GURU DATA (teacher_hub)
 // ========================================================
 elseif ($action === 'teacher_hub') {
-    $myTeacherId = $payload->role === 'teacher' ? ($payload->user_id ?? $payload->id) : ($input['teacher_id'] ?? $payload->id);
+    $myTeacherId = in_array($payload->role, ['teacher', 'guru', 'tutor']) ? ($payload->user_id ?? $payload->id) : ($input['teacher_id'] ?? $payload->id);
 
     // Ambil sesi mengajar guru ini
     $sesStmt = $pdo->prepare("
