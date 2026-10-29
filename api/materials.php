@@ -125,21 +125,50 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     
     // 3. CHECK ENTITLEMENT (Server-side Role & Subscription Enforcement)
     $subtes = safe_str($_GET['subtes'] ?? '');
-    $isAdvanced = isset($_GET['advanced']) && $_GET['advanced'] == 1;
 
-    $isStaff = $payload && in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor', 'school_bk'], true);
-    $hasPremiumAccess = $isStaff || ($payload && $entitlementService->hasEntitlement($payload->id, $payload->tenant_id ?? '', 'premium_materials'));
+    $isStaff = $payload && in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor', 'school_bk', 'affiliate'], true);
+    $hasPremiumAccess = $isStaff;
+    if (!$isStaff && $payload && $payload->role === 'student') {
+        $hasPremiumAccess = $entitlementService->hasEntitlement($payload->id, $payload->tenant_id ?? 'default_tenant', 'premium_materials');
+        if (!$hasPremiumAccess) {
+            try {
+                $stmt = $pdo->prepare("
+                    SELECT s.plan, sub.id as sub_id, sub.expires_at 
+                    FROM students s 
+                    LEFT JOIN subscriptions sub ON s.id = sub.student_id AND sub.status = 'active' AND (sub.expires_at IS NULL OR sub.expires_at > NOW())
+                    WHERE s.id = ?
+                ");
+                $stmt->execute([$payload->id]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $plan_name = strtolower($row['plan'] ?? '');
+                
+                $is_paid = !empty($row['sub_id']);
+                if (!$is_paid && $plan_name !== 'free' && $plan_name !== 'trial' && $plan_name !== '') {
+                    foreach (['pejuang', 'mandiri', 'elite', 'utbk', 'premium', 'starter', 'utama', 'pro'] as $k) {
+                        if (strpos($plan_name, $k) !== false) {
+                            $is_paid = true;
+                            break;
+                        }
+                    }
+                }
+                if ($is_paid) {
+                    $entitlementService->grantEntitlement($payload->id, 'premium_materials', $row['sub_id'] ?? null, $row['expires_at'] ?? null);
+                    $hasPremiumAccess = true;
+                }
+            } catch (\Throwable $e) {}
+        }
 
-    if ($isAdvanced && !$hasPremiumAccess) {
-        http_response_code(403);
-        echo json_encode([
-            "success" => false,
-            "error" => [
-                "code" => "FORBIDDEN_ENTITLEMENT",
-                "message" => "Anda tidak memiliki akses ke materi premium ini. Silakan upgrade paket Anda."
-            ]
-        ]);
-        exit;
+        if (!$hasPremiumAccess) {
+            http_response_code(403);
+            echo json_encode([
+                "success" => false,
+                "error" => [
+                    "code" => "FORBIDDEN_ENTITLEMENT",
+                    "message" => "Fitur Materi Belajar khusus pengguna Premium. Silakan pilih paket belajar Anda."
+                ]
+            ]);
+            exit;
+        }
     }
     
     // 4. FETCH RESOURCE

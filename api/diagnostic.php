@@ -1,6 +1,69 @@
 <?php
 require_once "config.php";
 require_once "jwt.php";
+require_once "EntitlementService.php";
+
+function verify_diagnostic_access($pdo) {
+    $token = get_token();
+    if (!$token) {
+        http_response_code(401);
+        echo json_encode(["success" => false, "error" => "Silakan login terlebih dahulu untuk mengakses Diagnostic Assessment."]);
+        exit;
+    }
+    $payload = verify_jwt($token);
+    if (!$payload) {
+        http_response_code(401);
+        echo json_encode(["success" => false, "error" => "Sesi Anda telah kedaluwarsa. Silakan masuk kembali."]);
+        exit;
+    }
+    if (in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor', 'school_bk', 'affiliate'], true)) {
+        return $payload;
+    }
+    
+    $entitlementService = new EntitlementService($pdo);
+    $tenant_id = $payload->tenant_id ?? 'default_tenant';
+    $hasAccess = $entitlementService->hasEntitlement($payload->id, $tenant_id, 'diagnostic_assessment')
+              || $entitlementService->hasEntitlement($payload->id, $tenant_id, 'premium_assessments');
+              
+    if (!$hasAccess) {
+        try {
+            $stmt = $pdo->prepare("
+                SELECT s.plan, sub.id as sub_id, sub.expires_at 
+                FROM students s 
+                LEFT JOIN subscriptions sub ON s.id = sub.student_id AND sub.status = 'active' AND (sub.expires_at IS NULL OR sub.expires_at > NOW())
+                WHERE s.id = ?
+            ");
+            $stmt->execute([$payload->id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $plan_name = strtolower($row['plan'] ?? '');
+            
+            $is_paid = !empty($row['sub_id']);
+            if (!$is_paid && $plan_name !== 'free' && $plan_name !== 'trial' && $plan_name !== '') {
+                foreach (['pejuang', 'mandiri', 'elite', 'utbk', 'premium', 'starter', 'utama', 'pro'] as $k) {
+                    if (strpos($plan_name, $k) !== false) {
+                        $is_paid = true;
+                        break;
+                    }
+                }
+            }
+            if ($is_paid) {
+                $entitlementService->grantEntitlement($payload->id, 'diagnostic_assessment', $row['sub_id'] ?? null, $row['expires_at'] ?? null);
+                $hasAccess = true;
+            }
+        } catch (\Throwable $e) {}
+    }
+    
+    if (!$hasAccess) {
+        http_response_code(403);
+        echo json_encode([
+            "success" => false,
+            "error" => "Fitur Diagnostic Assessment khusus pengguna Premium. Silakan pilih paket belajar Anda.",
+            "code" => "ENTITLEMENT_REQUIRED"
+        ]);
+        exit;
+    }
+    return $payload;
+}
 
 $mkuuid = function() {
     return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
@@ -55,6 +118,7 @@ ensure_diagnostic_schema($pdo);
 $action = $_GET["action"] ?? "";
 
 if ($action === "start") {
+    $payload = verify_diagnostic_access($pdo);
     try {
         // Fetch diagnostic questions covering key domains
         $domains = ["Penalaran Umum", "Pengetahuan Kuantitatif", "Pemahaman Bacaan & Menulis", "Penalaran Matematika", "Literasi Bahasa Indonesia", "Literasi Bahasa Inggris"];
@@ -96,7 +160,7 @@ if ($action === "start") {
         echo json_encode(["error" => "Failed to load diagnostic test: " . $e->getMessage()]);
     }
 } elseif ($action === "submit" && $_SERVER["REQUEST_METHOD"] === "POST") {
-    $payload = authenticate();
+    $payload = verify_diagnostic_access($pdo);
     $input = json_decode(file_get_contents("php://input"), true);
     $answers = $input["answers"] ?? []; // [{ question_id: "...", answer: "A" }]
 

@@ -2962,20 +2962,8 @@
         <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
           <!-- Top Navigation Toolbar (Sleek, Compact, 1-Baris Toolbar) -->
           <div class="bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:px-4 sm:py-2.5 backdrop-blur-xl shadow-xl flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
-            <!-- Left Side: Back/Tutup Button + Subtest Dropdown Selector -->
+            <!-- Left Side: Subtest Dropdown Selector -->
             <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-wrap xs:flex-nowrap">
-              <!-- Tutup Button -->
-              <button 
-                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
-                title="Tutup & Kembali ke Dashboard"
-                aria-label="Tutup"
-              >
-                <i class="ph-bold ph-x text-sm"></i>
-              </button>
-
-              <div class="h-5 w-px bg-white/15 hidden sm:block"></div>
-
               <!-- Subtest Selector Dropdown -->
               <div class="relative flex items-center min-w-0">
                 <span class="absolute left-2.5 text-xs pointer-events-none select-none">
@@ -3013,7 +3001,7 @@
               </div>
             </div>
 
-            <!-- Right Side: Focus Pomodoro Timer + Sidebar Toggle -->
+            <!-- Right Side: Focus Pomodoro Timer + Sidebar Toggle + Tutup Button -->
             <div class="flex items-center gap-2 ml-auto shrink-0">
               <!-- Compact Focus Pomodoro Timer -->
               <div class="flex items-center gap-1.5 bg-black/40 border border-white/10 px-2.5 py-1.5 rounded-xl shadow-inner">
@@ -3050,6 +3038,19 @@
                 <i :class="hideBabSidebar ? 'ph-bold ph-sidebar-simple' : 'ph-bold ph-arrows-out-line-horizontal'"></i>
                 <span class="hidden sm:inline">{{ hideBabSidebar ? 'Buka Daftar Bab' : 'Sembunyikan Bab' }}</span>
                 <span class="sm:hidden">{{ hideBabSidebar ? 'Buka Bab' : 'Luas' }}</span>
+              </button>
+
+              <div class="h-5 w-px bg-white/15"></div>
+
+              <!-- Tutup Button (Kanan Atas) -->
+              <button 
+                type="button"
+                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+                class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
+                title="Tutup & Kembali ke Dashboard"
+                aria-label="Tutup Materi"
+              >
+                <i class="ph-bold ph-x text-sm"></i>
               </button>
             </div>
           </div>
@@ -3142,6 +3143,26 @@
                     ></div>
                   </div>
                 </div>
+              </div>
+
+              <!-- Fallback Empty State (Never Blank) -->
+              <div v-else class="light-mode-card rounded-2xl p-8 sm:p-12 text-center space-y-4">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl shadow-sm">
+                  <i class="ph-bold ph-book-open"></i>
+                </div>
+                <div class="space-y-1">
+                  <h4 class="text-base font-black text-slate-800">Pilih Bab untuk Membaca Materi</h4>
+                  <p class="text-xs text-slate-500 max-w-sm mx-auto">Silakan pilih bab materi dari panel sebelah kiri untuk membaca teori dan formula praktis.</p>
+                </div>
+                <button 
+                  v-if="(selectedSubtes?.babList || []).length > 0"
+                  type="button"
+                  @click="selectBab(selectedSubtes.babList[0])"
+                  class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  <i class="ph-bold ph-arrow-right"></i>
+                  <span>Buka Bab Pertama ({{ selectedSubtes.babList[0].judul }})</span>
+                </button>
               </div>
             </div>
           </div>
@@ -5146,6 +5167,12 @@ export default {
     };
 
     watch(currentTab, (newTab) => {
+      if (['simulator', 'studyroom', 'learning', 'diagnostic'].includes(newTab) && isLoggedIn.value && !isPremiumUser.value && !isStaff.value) {
+        showToast('Fitur ini khusus pengguna Premium. Silakan pilih paket belajar Anda.');
+        currentTab.value = 'dashboard';
+        openPlanSelector();
+        return;
+      }
       try {
         sessionStorage.setItem('ep_active_tab', newTab);
       } catch (e) {}
@@ -5353,11 +5380,18 @@ export default {
             profileEditForm.value.target_ptn = res.user.target_ptn || '';
             profileEditForm.value.phone = res.user.phone || '';
 
-            const savedTab = sessionStorage.getItem('ep_active_tab');
-            if (!savedTab && currentTab.value === 'home') {
-              currentTab.value = 'dashboard';
-            } else if (savedTab && currentTab.value !== savedTab) {
-              currentTab.value = savedTab;
+            const currentHash = window.location.hash || '';
+            const isExplicitContentRoute = currentHash === '#/learning' || currentHash.startsWith('#/learning') || currentHash === '#/materi' || currentHash.startsWith('#/materi');
+            if (isExplicitContentRoute) {
+              isStudentPreviewMode.value = true;
+              currentTab.value = 'learning';
+            } else {
+              const savedTab = sessionStorage.getItem('ep_active_tab');
+              if (!savedTab && currentTab.value === 'home') {
+                currentTab.value = 'dashboard';
+              } else if (savedTab && currentTab.value !== savedTab) {
+                currentTab.value = savedTab;
+              }
             }
 
             // SMART REDIRECT: Guru BK / Perwakilan Sekolah Mitra
@@ -5384,17 +5418,17 @@ export default {
               return;
             }
 
-            const currentHash = window.location.hash || '';
-            const isExplicitContentRoute = currentHash === '#/learning' || currentHash.startsWith('#/learning') || currentHash === '#/materi' || currentHash.startsWith('#/materi');
-            if (isExplicitContentRoute) {
-              isStudentPreviewMode.value = true;
-            }
-
-            if (['admin', 'superadmin', 'teacher', 'guru', 'tutor'].includes(res.user.role) && !isStudentPreviewMode.value && !isExplicitContentRoute) {
+            const userRoleLower = (res.user.role || '').toLowerCase();
+            if (['admin', 'superadmin', 'teacher', 'guru', 'tutor'].includes(userRoleLower) && !isStudentPreviewMode.value && !isExplicitContentRoute) {
               sessionStorage.setItem('admin_token', token);
               sessionStorage.setItem('admin_role', res.user.role);
               window.location.hash = '#/admin';
               return;
+            }
+
+            // Guard trial student from staying on premium tabs
+            if (['simulator', 'studyroom', 'learning', 'diagnostic'].includes(currentTab.value) && !res.user.is_premium && !['admin', 'superadmin', 'teacher', 'guru', 'tutor'].includes(userRoleLower)) {
+              currentTab.value = 'dashboard';
             }
           }
         } catch (e) {
@@ -5702,7 +5736,7 @@ export default {
     };
 
     const materiSubMenuOpen = ref(false);
-    const premiumTabs = ['simulator', 'studyroom'];
+    const premiumTabs = ['simulator', 'studyroom', 'learning', 'diagnostic'];
 
     const handleTabClick = (tabId) => {
       const adminTarget = adminTabs.find(t => t.id === tabId);
@@ -5733,7 +5767,7 @@ export default {
         showToast('Silakan Masuk Akun untuk mengakses modul ini!');
         return;
       }
-      if (premiumTabs.includes(tabId) && !isPremiumUser.value) {
+      if (premiumTabs.includes(tabId) && !isPremiumUser.value && !isStaff.value) {
         showToast('Fitur ini khusus pengguna Premium. Silakan pilih paket belajar Anda.');
         openPlanSelector();
         return;
@@ -5748,6 +5782,11 @@ export default {
       if (!isLoggedIn.value) {
         showLoginModal.value = true;
         showToast('Silakan Masuk Akun untuk mengakses fitur ini!');
+        return;
+      }
+      if (!isPremiumUser.value && !isStaff.value) {
+        showToast('Fitur Materi khusus pengguna Premium. Silakan pilih paket belajar Anda.');
+        openPlanSelector();
         return;
       }
       currentTab.value = 'learning';
@@ -6016,6 +6055,16 @@ export default {
     const currentDiagQuestion = computed(() => diagnosticQuestions.value[diagnosticIdx.value] || {});
 
     const startDiagnostic = async () => {
+      if (!isLoggedIn.value) {
+        showLoginModal.value = true;
+        showToast('Silakan Masuk Akun terlebih dahulu.');
+        return;
+      }
+      if (!isPremiumUser.value && !isStaff.value) {
+        showToast('Fitur Diagnostic Assessment khusus pengguna Premium. Silakan pilih paket belajar Anda.');
+        openPlanSelector();
+        return;
+      }
       try {
         const res = await api.startDiagnostic();
         if (res?.data && res.data.length > 0) {

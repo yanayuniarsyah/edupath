@@ -4450,6 +4450,14 @@ const getStoredAdminUser = () => {
 };
 const currentAdminUser = ref(getStoredAdminUser());
 
+const currentUserId = computed(() => {
+  return currentAdminUser.value?.id ||
+         currentAdminUser.value?.user_id ||
+         currentAdminUser.value?.reference_id ||
+         extractUserIdFromToken(sessionStorage.getItem('admin_token') || sessionStorage.getItem('ep_admin_token') || localStorage.getItem('auth_token')) ||
+         '';
+});
+
 const currentAdminTenant = computed(() => {
   return currentAdminUser.value?.tenant_id ||
          sessionStorage.getItem('admin_tenant_id') ||
@@ -4466,8 +4474,8 @@ const isSuperadmin = computed(() => {
   return false;
 });
 
-const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes(currentRole.value));
-const isAffiliate = computed(() => ['affiliate', 'afiliator'].includes(currentRole.value));
+const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes((currentRole.value || '').toLowerCase().trim()));
+const isAffiliate = computed(() => ['affiliate', 'afiliator'].includes((currentRole.value || '').toLowerCase().trim()));
 
 const getAdminDisplayName = () => {
   const u = currentAdminUser.value;
@@ -4559,13 +4567,13 @@ const closeQuestionPreview = () => {
 
 const canManageQuestion = (q) => {
   if (!q) return false;
-  if (isSuperadmin.value || currentRole.value === 'admin') return true;
+  if (isSuperadmin.value || (currentRole.value || '').toLowerCase() === 'admin') return true;
   if (isTeacher.value) {
     if (!q.teacher_id && !q.teacher_name) return true;
     const myId = currentUserId.value || currentAdminUser.value?.id || currentAdminUser.value?.reference_id || '';
     const myName = (currentAdminUser.value?.name || '').toLowerCase().trim();
     const qTeacherName = (q.teacher_name || '').toLowerCase().trim();
-    if (myId && (q.teacher_id === myId || q.teacher_id === currentUserId.value)) return true;
+    if (myId && q.teacher_id && String(q.teacher_id) === String(myId)) return true;
     if (myName && qTeacherName && (qTeacherName === myName || qTeacherName.includes(myName) || myName.includes(qTeacherName))) return true;
     return false;
   }
@@ -4574,13 +4582,13 @@ const canManageQuestion = (q) => {
 
 const canManageMaterial = (m) => {
   if (!m) return false;
-  if (isSuperadmin.value || currentRole.value === 'admin') return true;
+  if (isSuperadmin.value || (currentRole.value || '').toLowerCase() === 'admin') return true;
   if (isTeacher.value) {
     if (!m.teacher_id && !m.teacher_name) return true;
     const myId = currentUserId.value || currentAdminUser.value?.id || currentAdminUser.value?.reference_id || '';
     const myName = (currentAdminUser.value?.name || '').toLowerCase().trim();
     const mTeacherName = (m.teacher_name || '').toLowerCase().trim();
-    if (myId && (m.teacher_id === myId || m.teacher_id === currentUserId.value)) return true;
+    if (myId && m.teacher_id && String(m.teacher_id) === String(myId)) return true;
     if (myName && mTeacherName && (mTeacherName === myName || mTeacherName.includes(myName) || myName.includes(mTeacherName))) return true;
     return false;
   }
@@ -4750,11 +4758,12 @@ onMounted(async () => {
   } else if (mainToken) {
     try {
       const profile = await api.getProfile();
-      if (['admin', 'superadmin', 'teacher', 'affiliate'].includes(profile?.user?.role)) {
+      const r = (profile?.user?.role || '').toLowerCase();
+      if (['admin', 'superadmin', 'teacher', 'guru', 'tutor', 'affiliate'].includes(r)) {
         sessionStorage.setItem('admin_token', mainToken);
-        currentRole.value = profile.user.role;
-        localStorage.setItem('user_role', profile.user.role);
-        sessionStorage.setItem('admin_role', profile.user.role);
+        currentRole.value = r;
+        localStorage.setItem('user_role', r);
+        sessionStorage.setItem('admin_role', r);
         isAuthenticated.value = true;
         loadRoleData();
       }
