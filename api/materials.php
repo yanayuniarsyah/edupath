@@ -44,6 +44,11 @@ function ensure_and_seed_materials($pdo, $force = false) {
     } catch (\Throwable $e) {
         try { $pdo->exec("ALTER TABLE materials ADD COLUMN formula_praktis TEXT NULL"); } catch (\Throwable $e2) {}
     }
+    try {
+        $pdo->exec("ALTER TABLE materials ADD COLUMN IF NOT EXISTS track VARCHAR(50) DEFAULT 'umum' AFTER assessment_type");
+    } catch (\Throwable $e) {
+        try { $pdo->exec("ALTER TABLE materials ADD COLUMN track VARCHAR(50) DEFAULT 'umum'"); } catch (\Throwable $e2) {}
+    }
 
     try {
         $count = (int)$pdo->query("SELECT COUNT(*) FROM materials")->fetchColumn();

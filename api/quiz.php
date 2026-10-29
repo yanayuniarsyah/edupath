@@ -532,68 +532,75 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $correctCount = 0;
     $totalScore = 0;
-    $totalQuestions = count($answers);
     $detailedAnswers = [];
 
-    if (empty($answers)) {
-        echo json_encode(["success" => true, "score" => 0, "correct" => 0, "total" => 0]);
-        exit;
+    $clientTotal = (int)($input['total_questions'] ?? ($input['total'] ?? 0));
+    $blueprint = $ASSESSMENT_BLUEPRINTS[$assessment_type][$track] ?? null;
+
+    if ($clientTotal > 0) {
+        $totalQuestions = $clientTotal;
+    } elseif ($assessment_type === 'TKA' && isset($blueprint['default_limit'])) {
+        $totalQuestions = (int)$blueprint['default_limit'];
+    } else {
+        $totalQuestions = is_array($answers) ? count($answers) : 0;
     }
 
-    $qIds = array_column($answers, 'question_id');
-    $idList = $qIds;
-    $inQuery = implode(',', array_fill(0, count($qIds), '?'));
-    $stmt = $pdo->prepare("SELECT id, correct, irt_score, sub_materi AS subtes, bab FROM questions WHERE id IN ($inQuery)");
-    $stmt->execute($idList);
-    $questionsDb = $stmt->fetchAll();
+    if (!empty($answers)) {
+        $qIds = array_column($answers, 'question_id');
+        $idList = $qIds;
+        $inQuery = implode(',', array_fill(0, count($qIds), '?'));
+        $stmt = $pdo->prepare("SELECT id, correct, irt_score, sub_materi AS subtes, bab FROM questions WHERE id IN ($inQuery)");
+        $stmt->execute($idList);
+        $questionsDb = $stmt->fetchAll();
 
-    $qMap = [];
-    foreach ($questionsDb as $q) {
-        $qMap[$q['id']] = $q;
-    }
-
-    $seenQuestions = [];
-    foreach ($answers as $ans) {
-        $qid = is_scalar($ans['question_id'] ?? null) ? (string)$ans['question_id'] : '';
-        if (empty($qid) || isset($seenQuestions[$qid])) {
-            continue; // Deduplicate to prevent score inflation
+        $qMap = [];
+        foreach ($questionsDb as $q) {
+            $qMap[$q['id']] = $q;
         }
-        $seenQuestions[$qid] = true;
 
-        $raw_ans = $ans['answer'] ?? '';
-        $user_ans = is_string($raw_ans) ? strtolower(trim($raw_ans)) : (is_scalar($raw_ans) ? strtolower((string)$raw_ans) : '');
-        if (isset($qMap[$qid])) {
-            $db_q = $qMap[$qid];
-            $is_correct = ($user_ans !== '' && $user_ans === strtolower((string)$db_q['correct']));
-            
-            if ($is_correct) {
-                $correctCount++;
-                $qWeight = ((float)($db_q['irt_score'] ?? 0) > 0) ? (float)$db_q['irt_score'] : 1.0;
-                $totalScore += $qWeight;
+        $seenQuestions = [];
+        foreach ($answers as $ans) {
+            $qid = is_scalar($ans['question_id'] ?? null) ? (string)$ans['question_id'] : '';
+            if (empty($qid) || isset($seenQuestions[$qid])) {
+                continue; // Deduplicate to prevent score inflation
+            }
+            $seenQuestions[$qid] = true;
+
+            $raw_ans = $ans['answer'] ?? '';
+            $user_ans = is_string($raw_ans) ? strtolower(trim($raw_ans)) : (is_scalar($raw_ans) ? strtolower((string)$raw_ans) : '');
+            if (isset($qMap[$qid])) {
+                $db_q = $qMap[$qid];
+                $is_correct = ($user_ans !== '' && $user_ans === strtolower((string)$db_q['correct']));
                 
-                // Update Progress with assessment context
-                if ($db_q['bab']) {
-                    $uuid = bin2hex(random_bytes(16));
-                    $uuid = substr($uuid,0,8).'-'.substr($uuid,8,4).'-'.substr($uuid,12,4).'-'.substr($uuid,16,4).'-'.substr($uuid,20,12);
-                    try {
-                        $upd = $pdo->prepare("INSERT INTO progress (id, student_id, subtes, assessment_type, track, subject, bab, score, mastery) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1) ON DUPLICATE KEY UPDATE score = score + ?, mastery = mastery + 1, last_study = NOW()");
-                        $upd->execute([$uuid, $payload->id, $db_q['subtes'], $assessment_type, $track, $db_q['subtes'], $db_q['bab'], $qWeight, $qWeight]);
-                    } catch (PDOException $e) {
-                        $upd = $pdo->prepare("INSERT INTO progress (id, student_id, subtes, bab, score, mastery) VALUES (?, ?, ?, ?, ?, 1) ON DUPLICATE KEY UPDATE score = score + ?, mastery = mastery + 1, last_study = NOW()");
-                        $upd->execute([$uuid, $payload->id, $db_q['subtes'], $db_q['bab'], $qWeight, $qWeight]);
+                if ($is_correct) {
+                    $correctCount++;
+                    $qWeight = ((float)($db_q['irt_score'] ?? 0) > 0) ? (float)$db_q['irt_score'] : 1.0;
+                    $totalScore += $qWeight;
+                    
+                    // Update Progress with assessment context
+                    if ($db_q['bab']) {
+                        $uuid = bin2hex(random_bytes(16));
+                        $uuid = substr($uuid,0,8).'-'.substr($uuid,8,4).'-'.substr($uuid,12,4).'-'.substr($uuid,16,4).'-'.substr($uuid,20,12);
+                        try {
+                            $upd = $pdo->prepare("INSERT INTO progress (id, student_id, subtes, assessment_type, track, subject, bab, score, mastery) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1) ON DUPLICATE KEY UPDATE score = score + ?, mastery = mastery + 1, last_study = NOW()");
+                            $upd->execute([$uuid, $payload->id, $db_q['subtes'], $assessment_type, $track, $db_q['subtes'], $db_q['bab'], $qWeight, $qWeight]);
+                        } catch (PDOException $e) {
+                            $upd = $pdo->prepare("INSERT INTO progress (id, student_id, subtes, bab, score, mastery) VALUES (?, ?, ?, ?, ?, 1) ON DUPLICATE KEY UPDATE score = score + ?, mastery = mastery + 1, last_study = NOW()");
+                            $upd->execute([$uuid, $payload->id, $db_q['subtes'], $db_q['bab'], $qWeight, $qWeight]);
+                        }
                     }
                 }
-            }
 
-            $detailedAnswers[] = [
-                "question_id" => $qid,
-                "user_answer" => $user_ans,
-                "is_correct" => $is_correct
-            ];
+                $detailedAnswers[] = [
+                    "question_id" => $qid,
+                    "user_answer" => $user_ans,
+                    "is_correct" => $is_correct
+                ];
+            }
         }
-    }
-    if (!empty($seenQuestions)) {
-        $totalQuestions = count($seenQuestions);
+        if ($clientTotal <= 0 && $assessment_type !== 'TKA' && !empty($seenQuestions)) {
+            $totalQuestions = count($seenQuestions);
+        }
     }
 
     // Scoring Strategy: If TKA, compute standard percentage score (0 - 100)
@@ -630,9 +637,6 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         "assessment_type" => $assessment_type,
         "track" => $track,
         "result_id" => $id,
-        "message" => "Hasil berhasil disimpan"
-    ]);
-}
         "message" => "Hasil berhasil disimpan"
     ]);
 }

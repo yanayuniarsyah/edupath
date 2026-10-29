@@ -51,15 +51,20 @@
     <!-- Main Content Area -->
     <main class="flex-grow flex w-full max-w-[1000px] mx-auto p-2 lg:p-4 min-h-0">
       
-      <!-- Insufficient Bank Error State (No Silent Substitution) -->
-      <div v-if="insufficientBankError" class="flex-grow flex items-center justify-center p-4">
+      <!-- Insufficient Bank Error / Entitlement Error State -->
+      <div v-if="insufficientBankError || entitlementError" class="flex-grow flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white rounded-2xl shadow-xl border border-rose-200 p-6 text-center space-y-4">
           <div class="w-16 h-16 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto text-3xl font-black">!</div>
-          <h2 class="text-lg font-black text-slate-800">Paket Asesmen Belum Siap</h2>
-          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">{{ insufficientBankError }}</p>
-          <button @click="$router.push('/')" class="w-full py-2.5 px-4 bg-[#024a86] hover:bg-[#023b6b] text-white font-bold text-sm rounded-xl transition-all shadow-md">
-            Kembali ke Dashboard Siswa
-          </button>
+          <h2 class="text-lg font-black text-slate-800">{{ entitlementError ? 'Akses Khusus Pro Member' : 'Paket Asesmen Belum Siap' }}</h2>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">{{ entitlementError || insufficientBankError }}</p>
+          <div class="flex flex-col gap-2 pt-2">
+            <button v-if="entitlementError" @click="$router.push('/#plans')" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-all shadow-md cursor-pointer">
+              Pilih Paket Pro Member
+            </button>
+            <button @click="$router.push('/')" class="w-full py-2.5 px-4 bg-[#024a86] hover:bg-[#023b6b] text-white font-bold text-sm rounded-xl transition-all shadow-md cursor-pointer">
+              Kembali ke Dashboard Siswa
+            </button>
+          </div>
         </div>
       </div>
 
@@ -250,7 +255,8 @@ export default {
       cbtTitle: 'Ujian CBT SNPMB',
       cbtSubtitle: 'Seleksi Nasional Penerimaan Mahasiswa Baru',
       cbtBadge: 'SN',
-      insufficientBankError: null
+      insufficientBankError: null,
+      entitlementError: null
     }
   },
   computed: {
@@ -335,6 +341,12 @@ export default {
         throw new Error('No questions returned from API');
       }
     } catch (e) {
+      if (e.message?.includes('Paket Berlangganan') || e.message?.includes('Pro Member') || e.code === 'ENTITLEMENT_REQUIRED') {
+        this.entitlementError = e.message;
+        this.questions = [];
+        return;
+      }
+
       // Guard against silent substitution (Constraint 5): Never fallback to SNBT when TKA fails
       if (this.assessmentType === 'TKA') {
         this.insufficientBankError = e.message || 'Bank soal TKA untuk peminatan ini belum mencukupi kuota simulasi. Silakan kembali ke dashboard atau hubungi koordinator akademik.';
@@ -355,7 +367,7 @@ export default {
       }));
     } finally {
       this.isLoading = false;
-      if (!this.insufficientBankError && this.questions.length > 0) {
+      if (!this.insufficientBankError && !this.entitlementError && this.questions.length > 0) {
         this.answers = new Array(this.questions.length).fill(null);
         this.doubt = new Array(this.questions.length).fill(false);
         const saved = localStorage.getItem(`edupath_tryout_${this.attemptId}`);
@@ -446,6 +458,7 @@ export default {
           quiz_type: 'tryout',
           assessment_type: this.assessmentType,
           track: this.track,
+          total_questions: this.questions.length,
           answers: this.answers.map((answer, index) => ({ question_id: this.questions[index]?.id, answer })).filter(item => item.answer),
           duration_sec: Math.max(0, this.totalDurationSec - this.timeLeft)
         });
