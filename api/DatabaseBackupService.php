@@ -58,10 +58,12 @@ class DatabaseBackupService {
 
         $now = date('Y-m-d H:i:s');
         $filename = $customFilename ?? ('edupath_backup_' . date('Y-m-d_His') . '.sql');
-        $cleanFilename = basename($filename);
-        if (!str_ends_with($cleanFilename, '.sql')) {
-            $cleanFilename .= '.sql';
+        $baseName = pathinfo(basename($filename), PATHINFO_FILENAME);
+        $cleanBase = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $baseName);
+        if (empty($cleanBase)) {
+            $cleanBase = 'edupath_backup_' . date('Y-m-d_His');
         }
+        $cleanFilename = $cleanBase . '.sql';
 
         // 1. Dapatkan daftar tabel
         $tables = [];

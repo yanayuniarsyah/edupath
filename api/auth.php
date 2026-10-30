@@ -468,7 +468,9 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 } catch (\Throwable $e) {
     http_response_code(500);
     error_log("Auth login error: " . $e->getMessage());
-    echo json_encode(["error" => "Terjadi kendala saat login: " . $e->getMessage()]);
+    $isDev = (defined('APP_ENV') && APP_ENV === 'development');
+    $errMsg = $isDev ? ("Terjadi kendala saat login: " . $e->getMessage()) : "Terjadi kendala internal server saat memproses login.";
+    echo json_encode(["error" => $errMsg]);
     exit;
 }
 }

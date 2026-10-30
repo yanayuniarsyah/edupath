@@ -245,6 +245,242 @@ function ensure_core_schema_sync($pdo) {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
     } catch (\Throwable $e) {}
+
+    try {
+        // 7. academic_programs table (PRD v1.1 Unified Catalog)
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS academic_programs (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                code VARCHAR(50) NOT NULL UNIQUE,
+                name VARCHAR(100) NOT NULL,
+                description TEXT NULL,
+                target_level ENUM('SD', 'SMP', 'SMA', 'ALUMNI') NOT NULL DEFAULT 'SMA',
+                subject_config JSON NULL,
+                status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        $pdo->exec("
+            INSERT IGNORE INTO academic_programs (id, code, name, description, target_level, status) VALUES
+            ('prog-tka-sd', 'TKA_SD', 'TKA SD', 'Program Tes Kemampuan Akademik tingkat SD', 'SD', 'active'),
+            ('prog-tka-smp', 'TKA_SMP', 'TKA SMP', 'Program Tes Kemampuan Akademik tingkat SMP', 'SMP', 'active'),
+            ('prog-tka-sma', 'TKA_SMA', 'TKA SMA', 'Program Tes Kemampuan Akademik tingkat SMA', 'SMA', 'active'),
+            ('prog-snpmb-utbk', 'SNPMB_UTBK', 'SNPMB/UTBK', 'Persiapan Seleksi Nasional Berdasarkan Tes PTN', 'SMA', 'active'),
+            ('prog-snpmb-alumni', 'SNPMB_ALUMNI', 'SNPMB Alumni', 'Program intensif alumni/gap year', 'ALUMNI', 'active');
+        ");
+    } catch (\Throwable $e) {}
+
+    try {
+        // 8. plans catalog extensions (PRD v1.1 Unified Catalog)
+        $planCols = $pdo->query("DESCRIBE plans")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('academic_program', $planCols)) {
+            $pdo->exec("ALTER TABLE plans ADD COLUMN academic_program VARCHAR(50) NOT NULL DEFAULT 'SNPMB/UTBK' AFTER tenant_id");
+        }
+        if (!in_array('delivery_mode', $planCols)) {
+            $pdo->exec("ALTER TABLE plans ADD COLUMN delivery_mode ENUM('online', 'offline', 'hybrid') NOT NULL DEFAULT 'online' AFTER academic_program");
+        }
+        if (!in_array('package_code', $planCols)) {
+            $pdo->exec("ALTER TABLE plans ADD COLUMN package_code VARCHAR(50) NULL AFTER delivery_mode");
+        }
+        if (!in_array('components', $planCols)) {
+            $pdo->exec("ALTER TABLE plans ADD COLUMN components JSON NULL AFTER features");
+        }
+        if (!in_array('base_price', $planCols)) {
+            $pdo->exec("ALTER TABLE plans ADD COLUMN base_price DECIMAL(15,2) NULL AFTER price");
+            $pdo->exec("UPDATE plans SET base_price = price WHERE base_price IS NULL");
+        }
+    } catch (\Throwable $e) {}
+
+    try {
+        // 9. orders snapshot & upgrade audit (PRD v1.1 Phase 2)
+        $orderCols = $pdo->query("DESCRIBE orders")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('order_type', $orderCols)) {
+            $pdo->exec("ALTER TABLE orders ADD COLUMN order_type ENUM('new_purchase', 'upgrade', 'renewal') NOT NULL DEFAULT 'new_purchase' AFTER is_renewal");
+        }
+        if (!in_array('package_version', $orderCols)) {
+            $pdo->exec("ALTER TABLE orders ADD COLUMN package_version INT NOT NULL DEFAULT 1 AFTER billing_cycle_snapshot");
+        }
+        if (!in_array('purchase_snapshot', $orderCols)) {
+            $pdo->exec("ALTER TABLE orders ADD COLUMN purchase_snapshot JSON NULL AFTER package_version");
+        }
+        if (!in_array('upgrade_from_order_id', $orderCols)) {
+            $pdo->exec("ALTER TABLE orders ADD COLUMN upgrade_from_order_id VARCHAR(36) NULL AFTER purchase_snapshot");
+        }
+
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS upgrade_audit_logs (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                student_id VARCHAR(36) NOT NULL,
+                tenant_id VARCHAR(36) NULL,
+                from_order_id VARCHAR(36) NULL,
+                from_plan_id VARCHAR(36) NULL,
+                to_order_id VARCHAR(36) NOT NULL,
+                to_plan_id VARCHAR(36) NOT NULL,
+                from_plan_name VARCHAR(150) NULL,
+                to_plan_name VARCHAR(150) NOT NULL,
+                upgrade_price_paid DECIMAL(15,2) NOT NULL,
+                previous_expires_at DATETIME NULL,
+                new_expires_at DATETIME NULL,
+                metadata JSON NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                KEY ual_student_fk (student_id),
+                KEY ual_to_order_fk (to_order_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
+
+    try {
+        // 10. class_offerings & makeup_requests (PRD v1.1 Phase 3 Offline Class Domain)
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS class_offerings (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                tenant_id VARCHAR(36) NOT NULL,
+                program_id VARCHAR(36) NULL,
+                academic_program VARCHAR(50) NOT NULL DEFAULT 'SNPMB/UTBK',
+                plan_id VARCHAR(36) NULL,
+                class_id VARCHAR(36) NULL,
+                name VARCHAR(150) NOT NULL,
+                renewal_mode ENUM('new_enrollment', 'extend_existing') NOT NULL DEFAULT 'new_enrollment',
+                max_capacity INT NOT NULL DEFAULT 15,
+                registration_open_at DATETIME NULL,
+                registration_close_at DATETIME NULL,
+                status ENUM('draft', 'open', 'closed', 'in_progress', 'completed') NOT NULL DEFAULT 'open',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                KEY co_tenant_fk (tenant_id),
+                KEY co_class_fk (class_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS makeup_requests (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                student_id VARCHAR(36) NOT NULL,
+                origin_session_id VARCHAR(36) NOT NULL,
+                target_session_id VARCHAR(36) NOT NULL,
+                reason TEXT NOT NULL,
+                status ENUM('pending', 'approved', 'rejected', 'attended') NOT NULL DEFAULT 'pending',
+                approved_by VARCHAR(36) NULL,
+                approved_at DATETIME NULL,
+                notes TEXT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                KEY mr_student_fk (student_id),
+                KEY mr_orig_ses_fk (origin_session_id),
+                KEY mr_targ_ses_fk (target_session_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+
+        // 11. partner_profiles & partner_assignments (PRD v1.1 Phase 4 Dual Partner Operating Models)
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS partner_profiles (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                partner_type ENUM('tenant', 'scoped_operator') NOT NULL,
+                name VARCHAR(255) NOT NULL,
+                code VARCHAR(50) NOT NULL UNIQUE,
+                tenant_id VARCHAR(36) NULL,
+                user_id VARCHAR(36) NULL,
+                contact_email VARCHAR(150) NULL,
+                contact_phone VARCHAR(50) NULL,
+                status ENUM('active', 'suspended', 'terminated') NOT NULL DEFAULT 'active',
+                revenue_share_pct DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+                notes TEXT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                KEY pp_type_idx (partner_type),
+                KEY pp_tenant_idx (tenant_id),
+                KEY pp_status_idx (status)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS partner_assignments (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                partner_id VARCHAR(36) NOT NULL,
+                operator_user_id VARCHAR(36) NULL,
+                tenant_id VARCHAR(36) NULL,
+                location VARCHAR(255) NULL,
+                offering_id VARCHAR(36) NULL,
+                class_id VARCHAR(36) NULL,
+                session_id VARCHAR(36) NULL,
+                start_date DATE NOT NULL,
+                end_date DATE NULL,
+                status ENUM('active', 'revoked', 'expired') NOT NULL DEFAULT 'active',
+                revoked_at DATETIME NULL,
+                revoked_by VARCHAR(36) NULL,
+                revocation_reason TEXT NULL,
+                created_by VARCHAR(36) NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                KEY pa_partner_idx (partner_id),
+                KEY pa_operator_idx (operator_user_id),
+                KEY pa_tenant_idx (tenant_id),
+                KEY pa_offering_idx (offering_id),
+                KEY pa_class_idx (class_id),
+                KEY pa_status_idx (status)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS partner_assignment_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                assignment_id VARCHAR(36) NOT NULL,
+                action VARCHAR(50) NOT NULL,
+                actor_id VARCHAR(36) NOT NULL,
+                metadata JSON NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                KEY pal_assign_idx (assignment_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+
+        // 12. renewal_policies & renewal_records (PRD v1.1 Phase 5 Configurable Cohort Renewal)
+        $csCols = [
+            "ALTER TABLE `class_students` ADD COLUMN `valid_until` DATE NULL AFTER `joined_at`",
+            "ALTER TABLE `class_students` ADD COLUMN `offering_id` VARCHAR(36) NULL AFTER `valid_until`",
+            "ALTER TABLE `class_students` ADD COLUMN `renewal_reference_id` VARCHAR(36) NULL AFTER `offering_id`"
+        ];
+        foreach ($csCols as $colSql) {
+            try { $pdo->exec($colSql); } catch (\Throwable $e) {}
+        }
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS renewal_policies (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                offering_id VARCHAR(36) NOT NULL,
+                renewal_mode ENUM('new_enrollment', 'extend_existing') NOT NULL DEFAULT 'new_enrollment',
+                renewal_price DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+                extension_days INT NOT NULL DEFAULT 30,
+                allowed_cohort_change TINYINT(1) NOT NULL DEFAULT 1,
+                eligibility_rule VARCHAR(100) NOT NULL DEFAULT 'active_or_grace',
+                open_at DATETIME NULL,
+                close_at DATETIME NULL,
+                policy_version VARCHAR(20) NOT NULL DEFAULT 'v1.0',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                KEY rp_offering_idx (offering_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS renewal_records (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                original_enrollment_id VARCHAR(36) NOT NULL,
+                new_enrollment_id VARCHAR(36) NULL,
+                student_id VARCHAR(36) NOT NULL,
+                offering_id VARCHAR(36) NOT NULL,
+                renewal_mode ENUM('new_enrollment', 'extend_existing') NOT NULL,
+                previous_class_id VARCHAR(36) NOT NULL,
+                new_class_id VARCHAR(36) NOT NULL,
+                previous_end_date DATE NULL,
+                new_end_date DATE NOT NULL,
+                price_paid DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+                order_id VARCHAR(36) NULL,
+                status ENUM('pending', 'active', 'completed', 'cancelled') NOT NULL DEFAULT 'active',
+                metadata JSON NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                KEY rr_orig_idx (original_enrollment_id),
+                KEY rr_new_idx (new_enrollment_id),
+                KEY rr_stu_idx (student_id),
+                KEY rr_off_idx (offering_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+    } catch (\Throwable $e) {}
 }
 ensure_core_schema_sync($pdo);
 

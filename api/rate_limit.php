@@ -3,23 +3,48 @@
 require_once 'config.php';
 
 /**
+ * Checks if an IP address belongs to Cloudflare's published IPv4 CIDR ranges
+ */
+function is_cloudflare_ip(string $ip): bool {
+    $cfRanges = [
+        '173.245.48.0/20', '103.21.244.0/22', '103.22.200.0/22', '103.31.4.0/22',
+        '141.101.64.0/18', '108.162.192.0/18', '190.93.240.0/20', '188.114.96.0/20',
+        '197.234.240.0/22', '198.41.128.0/17', '162.158.0.0/15', '104.16.0.0/13',
+        '104.24.0.0/14', '172.64.0.0/13', '131.0.72.0/22'
+    ];
+    $longIp = ip2long($ip);
+    if ($longIp === false) return false;
+
+    foreach ($cfRanges as $cidr) {
+        [$subnet, $bits] = explode('/', $cidr);
+        $subnetLong = ip2long($subnet);
+        $mask = -1 << (32 - (int)$bits);
+        if (($longIp & $mask) === ($subnetLong & $mask)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Resolves the true client IP address taking into account Cloudflare,
  * reverse proxies, and load balancers.
  */
 function get_client_ip() {
     $remote = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 
-    // If Cloudflare connecting IP is provided, validate format
-    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+    // Only trust reverse proxy headers if request came from loopback or internal private proxy
+    $isLocalProxy = in_array($remote, ['127.0.0.1', '::1', 'localhost']) || 
+                    filter_var($remote, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
+    $isTrustedCfProxy = is_cloudflare_ip($remote);
+
+    // If Cloudflare connecting IP is provided, only trust if received from trusted proxy or Cloudflare IP
+    if (($isLocalProxy || $isTrustedCfProxy) && !empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
         $cfIp = trim($_SERVER['HTTP_CF_CONNECTING_IP']);
         if (filter_var($cfIp, FILTER_VALIDATE_IP)) {
             return $cfIp;
         }
     }
-
-    // Only trust X-Forwarded-For if request came from loopback or internal proxy
-    $isLocalProxy = in_array($remote, ['127.0.0.1', '::1', 'localhost']) || 
-                    filter_var($remote, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
 
     if ($isLocalProxy && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
         $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);

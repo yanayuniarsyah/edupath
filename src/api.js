@@ -30,6 +30,7 @@ const _inflight = new Map(); // key → Promise (request deduplication)
 const CACHE_TTL = {
   // Data statis / jarang berubah → cache lebih lama
   '/plans.php':                       5 * 60 * 1000,  // 5 menit
+  '/programs.php':                   10 * 60 * 1000,  // 10 menit (master academic programs)
   '/spp.php?action=data':             5 * 60 * 1000,  // 5 menit
   '/materials.php':                   3 * 60 * 1000,  // 3 menit (instan antar subtes, di-invalidate otomatis saat ada mutasi materi)
   '/school.php?action=public_list':  10 * 60 * 1000,  // 10 menit (daftar sekolah mitra registrasi)
@@ -262,13 +263,20 @@ export async function apiFetch(endpoint, options = {}) {
 }
 
 export const api = {
-  // ── Plans ──
+  // ── Programs & Plans (PRD v1.1 Shared Catalog) ──
   /**
-   * Retrieve list of available subscription plans.
-   * Uses the cached endpoint '/plans.php' with TTL defined in CACHE_TTL.
+   * Retrieve master academic programs (TKA SD, SMP, SMA, SNPMB/UTBK, Alumni).
    */
-  getPlans() {
-    return apiFetch('/plans.php');
+  getPrograms() {
+    return apiFetch('/programs.php');
+  },
+  /**
+   * Retrieve list of available subscription packages/plans with optional filters.
+   * @param {Object} params - { program, delivery_mode, tenant_id }
+   */
+  getPlans(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return apiFetch(`/plans.php${qs ? '?' + qs : ''}`);
   },
   // ── Auth Siswa ──
   async login(email, password) {
@@ -375,11 +383,30 @@ export const api = {
     });
   },
 
-  // ── Payment ──
-  checkout(plan_id) {
+  // ── Payment & Full-Price Upgrade (PRD v1.1 Phase 2) ──
+  checkout(plan_id, options = {}) {
     return apiFetch('/payment.php?action=create', {
       method: 'POST',
-      body: JSON.stringify({ plan_id })
+      body: JSON.stringify({ plan_id, ...options })
+    });
+  },
+
+  checkUpgradeEligibility(target_plan_id) {
+    return apiFetch(`/payment.php?action=upgrade_eligibility&target_plan_id=${encodeURIComponent(target_plan_id)}`);
+  },
+
+  getPurchaseHistory() {
+    return apiFetch('/payment.php?action=purchase_history');
+  },
+
+  upgradeCheckout(target_plan_id, upgrade_from_order_id = null) {
+    return apiFetch('/payment.php?action=create', {
+      method: 'POST',
+      body: JSON.stringify({
+        plan_id: target_plan_id,
+        order_type: 'upgrade',
+        upgrade_from_order_id
+      })
     });
   },
 
@@ -627,6 +654,97 @@ export const api = {
   getEwsReport(classId = '') {
     const q = classId ? `&class_id=${encodeURIComponent(classId)}` : '';
     return apiFetch(`/classes.php?action=ews_report${q}`);
+  },
+
+  // ── Offline Offerings, Student Portal & Makeup Requests (PRD v1.1 Phase 3) ──
+  getOfferings(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/classes.php?action=offerings${q ? '&' + q : ''}`);
+  },
+  createOffering(data) {
+    return apiFetch('/classes.php?action=offerings', { method: 'POST', body: JSON.stringify(data) });
+  },
+  getMyClasses() {
+    return apiFetch('/classes.php?action=my_classes');
+  },
+  getMySessions(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/classes.php?action=my_sessions${q ? '&' + q : ''}`);
+  },
+  getMyAttendance() {
+    return apiFetch('/classes.php?action=my_attendance');
+  },
+  getMakeupRequests(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/classes.php?action=makeup_requests${q ? '&' + q : ''}`);
+  },
+  submitMakeupRequest(data) {
+    return apiFetch('/classes.php?action=makeup_requests', { method: 'POST', body: JSON.stringify(data) });
+  },
+  approveMakeupRequest(id, decision, notes = '') {
+    return apiFetch('/classes.php?action=approve_makeup_request', {
+      method: 'POST',
+      body: JSON.stringify({ id, decision, notes })
+    });
+  },
+
+  // ── Dual Partner Operating Models (PRD v1.1 Phase 4: AC-08, AC-09, AC-10) ──
+  getPartners(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/partners.php?action=list${q ? '&' + q : ''}`);
+  },
+  createPartner(data) {
+    return apiFetch('/partners.php?action=create', { method: 'POST', body: JSON.stringify(data) });
+  },
+  updatePartner(id, data) {
+    return apiFetch('/partners.php?action=update', { method: 'PUT', body: JSON.stringify({ id, ...data }) });
+  },
+  getPartnerAssignments(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/partners.php?action=assignments${q ? '&' + q : ''}`);
+  },
+  createPartnerAssignment(data) {
+    return apiFetch('/partners.php?action=create_assignment', { method: 'POST', body: JSON.stringify(data) });
+  },
+  revokePartnerAssignment(id, reason = '') {
+    return apiFetch('/partners.php?action=revoke_assignment', {
+      method: 'POST',
+      body: JSON.stringify({ id, reason })
+    });
+  },
+  getMyPartnerAssignments() {
+    return apiFetch('/partners.php?action=my_assignments');
+  },
+
+  // ── Configurable Cohort Renewal (PRD v1.1 Phase 5: AC-11, AC-12, AC-13) ──
+  getRenewalPolicies(offeringId = '') {
+    const q = offeringId ? `&offering_id=${encodeURIComponent(offeringId)}` : '';
+    return apiFetch(`/classes.php?action=renewal_policies${q}`);
+  },
+  saveRenewalPolicy(data) {
+    return apiFetch('/classes.php?action=renewal_policies', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  getRenewalOptions(enrollmentId) {
+    return apiFetch(`/classes.php?action=renewal_options&enrollment_id=${encodeURIComponent(enrollmentId)}`);
+  },
+  renewEnrollment(data) {
+    return apiFetch('/classes.php?action=renew_enrollment', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  getRenewalHistory(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/classes.php?action=renewal_history${q ? '&' + q : ''}`);
+  },
+
+  // ── Unified Academic Engine & Student Progress (PRD v1.1 Phase 6: AC-16, AC-17) ──
+  getUnifiedProgress(studentId = '') {
+    const q = studentId ? `&student_id=${encodeURIComponent(studentId)}` : '';
+    return apiFetch(`/progress.php?action=unified${q}`);
   },
 
   // ── School & Guru BK Management ──

@@ -2743,6 +2743,11 @@ elseif (in_array($action, ['upload_material_file', 'upload_material_image']) && 
     if (!is_dir($targetDir)) {
         mkdir($targetDir, 0755, true);
     }
+    // Defense-in-depth: Ensure .htaccess script execution blocker exists in uploads root
+    $uploadsHtaccess = dirname(__DIR__) . '/uploads/.htaccess';
+    if (!file_exists($uploadsHtaccess)) {
+        @file_put_contents($uploadsHtaccess, "Options -Indexes -ExecCGI\nRemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phar\nSetHandler default-handler\n<FilesMatch \"(?i)\\.(php|phtml|phar|cgi|pl|py|asp|jsp|sh|bash|env|config)$\">\n  Require all denied\n</FilesMatch>\n");
+    }
     $safeName = time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
     $dest = $targetDir . '/' . $safeName;
     if (move_uploaded_file($file['tmp_name'], $dest)) {

@@ -3,15 +3,24 @@
 // Modul Manajemen Kelas Offline, Ruangan, Penjadwalan, Reschedule/Inval & Rekap Kehadiran
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/jwt.php';
+require_once __DIR__ . '/PartnerService.php';
 
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true) ?: [];
 
 // 1. Otorisasi Token
 $payload = authenticate();
-if (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor'])) {
+$allowedStudentActions = [
+    'my_classes', 'my_sessions', 'my_attendance', 'makeup_requests',
+    'renewal_options', 'renew_enrollment', 'renewal_history'
+];
+if ($payload->role === 'student' && !in_array($action, $allowedStudentActions)) {
     http_response_code(403);
     echo json_encode(["error" => "Akses khusus staf internal (Admin Cabang, Superadmin, dan Guru)."]);
+    exit;
+} elseif (!in_array($payload->role, ['superadmin', 'admin', 'teacher', 'guru', 'tutor', 'operator', 'student'])) {
+    http_response_code(403);
+    echo json_encode(["error" => "Akses tidak diizinkan."]);
     exit;
 }
 
@@ -224,45 +233,95 @@ elseif ($action === 'class_students') {
         exit;
     }
 
+    // AC-08/AC-18: Enforce tenant boundary for branch admin
+    if (!$isSuper) {
+        $stmtTenantChk = $pdo->prepare("SELECT id FROM classes WHERE id = ? AND tenant_id = ? LIMIT 1");
+        $stmtTenantChk->execute([$class_id, $tenant_id]);
+        if (!$stmtTenantChk->fetch()) {
+            http_response_code(403);
+            echo json_encode(["error" => "Forbidden: Anda tidak berwenang mengelola siswa di rombel cabang lain"]);
+            exit;
+        }
+    }
+
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $student_id = $input['student_id'] ?? '';
         if (!$student_id) {
             http_response_code(400); echo json_encode(["error" => "Student ID wajib disertakan"]); exit;
         }
 
-        // Cek Kuota Kelas Maksimal
-        $qChk = $pdo->prepare("
-            SELECT c.max_capacity, (SELECT COUNT(*) FROM class_students WHERE class_id = c.id AND status = 'active') as current_count
-            FROM classes c WHERE c.id = ?
-        ");
-        $qChk->execute([$class_id]);
-        $cls = $qChk->fetch(PDO::FETCH_ASSOC);
-        if ($cls && $cls['current_count'] >= $cls['max_capacity']) {
-            http_response_code(409);
-            echo json_encode(["error" => "Kapasitas kelas telah penuh (Maksimal {$cls['max_capacity']} siswa)"]);
-            exit;
-        }
-
-        // Cek Keberadaan Siswa
-        $stdChk = $pdo->prepare("SELECT id FROM students WHERE id = ?");
-        $stdChk->execute([$student_id]);
-        if (!$stdChk->fetch()) {
-            http_response_code(404);
-            echo json_encode(["error" => "Data siswa tidak ditemukan atau belum terdaftar"]);
-            exit;
-        }
-
-        $id = gen_uuid();
         try {
+            $pdo->beginTransaction();
+
+            // AC-14: Atomic validation of capacity across cohort AND all scheduled sessions
+            $qChk = $pdo->prepare("
+                SELECT c.max_capacity, (SELECT COUNT(*) FROM class_students WHERE class_id = c.id AND status = 'active') as current_count
+                FROM classes c WHERE c.id = ? FOR UPDATE
+            ");
+            $qChk->execute([$class_id]);
+            $cls = $qChk->fetch(PDO::FETCH_ASSOC);
+            if ($cls && $cls['current_count'] >= $cls['max_capacity']) {
+                $pdo->rollBack();
+                http_response_code(409);
+                echo json_encode(["error" => "Kapasitas kelas telah penuh (Maksimal {$cls['max_capacity']} siswa)"]);
+                exit;
+            }
+
+            // Cek Keberadaan Siswa
+            $stdChk = $pdo->prepare("SELECT id FROM students WHERE id = ?");
+            $stdChk->execute([$student_id]);
+            if (!$stdChk->fetch()) {
+                $pdo->rollBack();
+                http_response_code(404);
+                echo json_encode(["error" => "Data siswa tidak ditemukan atau belum terdaftar"]);
+                exit;
+            }
+
+            // AC-14: Validate capacity of ALL scheduled sessions in this class atomically
+            $qSessions = $pdo->prepare("
+                SELECT cs.id, cs.session_date, cs.start_time, cr.capacity as room_capacity,
+                       (SELECT COUNT(*) FROM session_attendances sa WHERE sa.session_id = cs.id) as current_occupancy
+                FROM class_sessions cs
+                JOIN class_rooms cr ON cs.room_id = cr.id
+                WHERE cs.class_id = ? AND cs.status = 'scheduled'
+                FOR UPDATE
+            ");
+            $qSessions->execute([$class_id]);
+            $sessions = $qSessions->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($sessions as $ses) {
+                if ($ses['current_occupancy'] >= $ses['room_capacity']) {
+                    $pdo->rollBack();
+                    http_response_code(409);
+                    echo json_encode([
+                        "error" => "Kapasitas ruangan penuh pada sesi {$ses['session_date']} ({$ses['start_time']}). Penugasan dibatalkan untuk mencegah overbooking (AC-14 all_sessions atomic check)."
+                    ]);
+                    exit;
+                }
+            }
+
+            $id = gen_uuid();
             $stmt = $pdo->prepare("
-                INSERT INTO class_students (id, class_id, student_id, joined_at, status)
-                VALUES (?, ?, ?, NOW(), 'active')
-                ON DUPLICATE KEY UPDATE status = 'active'
+                INSERT INTO class_students (id, class_id, student_id, joined_at, confirmed_at, status)
+                VALUES (?, ?, ?, NOW(), NOW(), 'active')
+                ON DUPLICATE KEY UPDATE status = 'active', confirmed_at = NOW()
             ");
             $stmt->execute([$id, $class_id, $student_id]);
-            echo json_encode(["success" => true, "message" => "Siswa berhasil ditugaskan ke kelas"]);
+
+            // Auto-provision attendance records for scheduled sessions so roster is immediately visible
+            foreach ($sessions as $ses) {
+                $att_id = gen_uuid();
+                $pdo->prepare("
+                    INSERT IGNORE INTO session_attendances (id, session_id, student_id, attendance_status)
+                    VALUES (?, ?, ?, 'absent')
+                ")->execute([$att_id, $ses['id'], $student_id]);
+            }
+
+            $pdo->commit();
+            echo json_encode(["success" => true, "message" => "Siswa berhasil ditugaskan ke kelas dan seluruh jadwal sesi tervalidasi aman"]);
             exit;
         } catch (\PDOException $e) {
+            $pdo->rollBack();
             http_response_code(400);
             echo json_encode(["error" => "Gagal menugaskan siswa ke kelas: " . $e->getMessage()]);
             exit;
@@ -338,6 +397,17 @@ elseif ($action === 'sessions') {
             http_response_code(400); echo json_encode(["error" => "Seluruh kolom sesi kelas wajib diisi"]); exit;
         }
 
+        // AC-08/AC-18: Enforce tenant boundary on session creation/rescheduling
+        if (!$isSuper) {
+            $stmtTenantChk = $pdo->prepare("SELECT id FROM classes WHERE id = ? AND tenant_id = ? LIMIT 1");
+            $stmtTenantChk->execute([$class_id, $tenant_id]);
+            if (!$stmtTenantChk->fetch()) {
+                http_response_code(403);
+                echo json_encode(["error" => "Forbidden: Anda tidak berwenang mengelola sesi pada rombel cabang lain"]);
+                exit;
+            }
+        }
+
         // --- CONFLICT DETECTION ENGINE (TOCTOU PROOF) ---
         // Kunci atomik: pastikan ruangan dan guru tidak bentrok
         $conflictQuery = "
@@ -394,6 +464,33 @@ elseif ($action === 'attendance') {
     $session_id = $_GET['session_id'] ?? ($input['session_id'] ?? '');
     if (!$session_id) {
         http_response_code(400); echo json_encode(["error" => "Session ID wajib disertakan"]); exit;
+    }
+
+    // AC-08/AC-18: Strict Tenant Isolation Check for Branch Staff / Admin
+    if (!$isSuper && in_array($payload->role, ['admin', 'teacher', 'guru', 'tutor'], true)) {
+        $stmtSesTenant = $pdo->prepare("
+            SELECT c.tenant_id 
+            FROM class_sessions ses 
+            JOIN classes c ON ses.class_id = c.id 
+            WHERE ses.id = ? LIMIT 1
+        ");
+        $stmtSesTenant->execute([$session_id]);
+        $sesTenantId = $stmtSesTenant->fetchColumn();
+        if ($sesTenantId && !empty($tenant_id) && $sesTenantId !== $tenant_id) {
+            http_response_code(403);
+            echo json_encode(["error" => "Forbidden: Anda tidak berwenang mengakses atau mengubah presensi sesi cabang lain."]);
+            exit;
+        }
+    }
+
+    // AC-09: Scoped Operator hanya dapat mengakses/mengisi presensi sesi yang ditugaskan secara aktif
+    if ($payload->role === 'operator') {
+        $operatorUid = $payload->user_id ?? ($payload->id ?? null);
+        if (!PartnerService::hasActiveAssignment($pdo, $operatorUid, 'session', $session_id, $tenant_id)) {
+            http_response_code(403);
+            echo json_encode(["error" => "AC09_FORBIDDEN: Anda tidak memiliki penugasan aktif untuk sesi ini"]);
+            exit;
+        }
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -582,9 +679,783 @@ elseif ($action === 'ews_report') {
     }
     $sql .= " GROUP BY s.id, c.id HAVING (attendance_percentage < 75.0 OR absent_count >= 3) ORDER BY attendance_percentage ASC";
 
+}
+
+// ========================================================
+// 8. CLASS OFFERINGS MANAGEMENT (PRD v1.1 E2, AC-11)
+// ========================================================
+elseif ($action === 'offerings') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $prog_id = $_GET['program_id'] ?? '';
+        $r_mode  = $_GET['renewal_mode'] ?? '';
+        $sql = "
+            SELECT co.*, c.name as class_name, ap.name as program_name, p.name as plan_name, t.name as tenant_name,
+                   (SELECT COUNT(*) FROM class_students cs WHERE cs.class_id = co.class_id AND cs.status = 'active') as enrolled_count
+            FROM class_offerings co
+            LEFT JOIN classes c ON co.class_id = c.id
+            LEFT JOIN academic_programs ap ON co.academic_program = ap.code OR co.program_id = ap.id
+            LEFT JOIN plans p ON co.plan_id = p.id
+            LEFT JOIN tenants t ON co.tenant_id = t.id
+            WHERE 1=1
+        ";
+        $params = [];
+        if (!$isSuper && $payload->role !== 'student') {
+            $sql .= " AND co.tenant_id = ?";
+            $params[] = $tenant_id;
+        }
+        if ($prog_id) {
+            $sql .= " AND (co.program_id = ? OR co.academic_program = ?)";
+            $params[] = $prog_id;
+            $params[] = $prog_id;
+        }
+        if ($r_mode) {
+            $sql .= " AND co.renewal_mode = ?";
+            $params[] = $r_mode;
+        }
+        $sql .= " ORDER BY co.created_at DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        echo json_encode(["success" => true, "offerings" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+        exit;
+    }
+
+    if (!in_array($payload->role, ['superadmin', 'admin'])) {
+        http_response_code(403);
+        echo json_encode(["error" => "Hanya Administrator yang dapat mengelola penawaran kelas offline."]);
+        exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $name = safe_str($input['name'] ?? '');
+        $program_id = safe_str($input['program_id'] ?? '');
+        $academic_program = safe_str($input['academic_program'] ?? 'SNPMB/UTBK');
+        $plan_id = safe_str($input['plan_id'] ?? '');
+        $class_id = safe_str($input['class_id'] ?? '');
+        $renewal_mode = in_array($input['renewal_mode'] ?? '', ['new_enrollment', 'extend_existing']) ? $input['renewal_mode'] : 'new_enrollment';
+        $max_capacity = (int)($input['max_capacity'] ?? 15);
+        $reg_open = !empty($input['registration_open_at']) ? $input['registration_open_at'] : null;
+        $reg_close = !empty($input['registration_close_at']) ? $input['registration_close_at'] : null;
+        $tId = $isSuper ? ($input['tenant_id'] ?? $tenant_id) : $tenant_id;
+
+        if (!$name) {
+            http_response_code(400); echo json_encode(["error" => "Nama penawaran wajib diisi"]); exit;
+        }
+
+        // AC-08/AC-18: If class_id specified, verify it belongs to administrator's tenant
+        if (!$isSuper && !empty($class_id)) {
+            $stmtClassTenant = $pdo->prepare("SELECT id FROM classes WHERE id = ? AND tenant_id = ? LIMIT 1");
+            $stmtClassTenant->execute([$class_id, $tenant_id]);
+            if (!$stmtClassTenant->fetch()) {
+                http_response_code(403);
+                echo json_encode(["error" => "Forbidden: Kelas rombel yang dipilih tidak berada di bawah cabang/tenant Anda"]);
+                exit;
+            }
+        }
+
+        $id = gen_uuid();
+        $stmt = $pdo->prepare("
+            INSERT INTO class_offerings 
+              (id, tenant_id, program_id, academic_program, plan_id, class_id, name, renewal_mode, max_capacity, registration_open_at, registration_close_at, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open')
+        ");
+        $stmt->execute([$id, $tId, $program_id ?: null, $academic_program, $plan_id ?: null, $class_id ?: null, $name, $renewal_mode, $max_capacity, $reg_open, $reg_close]);
+
+        if ($class_id) {
+            $pdo->prepare("UPDATE classes SET offering_id = ? WHERE id = ?")->execute([$id, $class_id]);
+        }
+
+        echo json_encode(["success" => true, "id" => $id, "message" => "Offering kelas berhasil dibuat"]);
+        exit;
+    }
+}
+
+// ========================================================
+// 9. MAKEUP SESSIONS & QUOTA MANAGEMENT (PRD v1.1 E7, AC-15)
+// ========================================================
+elseif ($action === 'makeup_requests') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $sql = "
+            SELECT mr.*, s.name as student_name, s.email as student_email,
+                   os.session_date as origin_date, os.start_time as origin_time, os.subject as origin_subject,
+                   ts.session_date as target_date, ts.start_time as target_time, ts.subject as target_subject,
+                   tr.name as target_room_name,
+                   c.name as class_name
+            FROM makeup_requests mr
+            JOIN students s ON mr.student_id = s.id
+            JOIN class_sessions os ON mr.origin_session_id = os.id
+            JOIN class_sessions ts ON mr.target_session_id = ts.id
+            JOIN class_rooms tr ON ts.room_id = tr.id
+            JOIN classes c ON os.class_id = c.id
+            WHERE 1=1
+        ";
+        $params = [];
+        if ($payload->role === 'student') {
+            $sql .= " AND mr.student_id = ?";
+            $params[] = $payload->id;
+        } elseif (!$isSuper) {
+            $sql .= " AND c.tenant_id = ?";
+            $params[] = $tenant_id;
+        }
+        $sql .= " ORDER BY mr.created_at DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        echo json_encode(["success" => true, "makeup_requests" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+        exit;
+    }
+
+    // Submit Makeup Request (Siswa atau Admin)
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $student_id = ($payload->role === 'student') ? $payload->id : safe_str($input['student_id'] ?? '');
+        $origin_session_id = safe_str($input['origin_session_id'] ?? '');
+        $target_session_id = safe_str($input['target_session_id'] ?? '');
+        $reason = safe_str($input['reason'] ?? '');
+
+        if (!$student_id || !$origin_session_id || !$target_session_id || !$reason) {
+            http_response_code(400);
+            echo json_encode(["error" => "student_id, origin_session_id, target_session_id, dan reason wajib disertakan."]);
+            exit;
+        }
+
+        // AC-15: Validasi Siswa benar-benar terdaftar di rombel sesi asal
+        $stmt_enr_check = $pdo->prepare("
+            SELECT cs.id 
+            FROM class_students cs
+            JOIN class_sessions ses ON cs.class_id = ses.class_id
+            WHERE cs.student_id = ? AND ses.id = ? AND cs.status = 'active'
+            LIMIT 1
+        ");
+        $stmt_enr_check->execute([$student_id, $origin_session_id]);
+        if (!$stmt_enr_check->fetch()) {
+            http_response_code(403);
+            echo json_encode(["error" => "Anda tidak terdaftar aktif di rombel kelas untuk sesi asal tersebut."]);
+            exit;
+        }
+
+        // AC-15: Quota Check (Maksimal 2 pengajuan makeup per periode 90 hari)
+        $stmt_quota = $pdo->prepare("
+            SELECT COUNT(*) FROM makeup_requests 
+            WHERE student_id = ? AND status IN ('pending', 'approved', 'attended') 
+              AND created_at > DATE_SUB(NOW(), INTERVAL 90 DAY)
+        ");
+        $stmt_quota->execute([$student_id]);
+        $used_quota = (int)$stmt_quota->fetchColumn();
+        if ($used_quota >= 2) {
+            http_response_code(409);
+            echo json_encode(["error" => "Batas kuota pengajuan makeup telah tercapai (Maksimal 2 pengajuan per periode - AC-15)."]);
+            exit;
+        }
+
+        // AC-15: Target Session Capacity Check
+        $stmt_target_cap = $pdo->prepare("
+            SELECT cs.id, cs.session_date, cs.start_time, cr.capacity as room_capacity,
+                   (SELECT COUNT(*) FROM session_attendances WHERE session_id = cs.id) as current_occupancy
+            FROM class_sessions cs
+            JOIN class_rooms cr ON cs.room_id = cr.id
+            WHERE cs.id = ?
+        ");
+        $stmt_target_cap->execute([$target_session_id]);
+        $target_ses = $stmt_target_cap->fetch(PDO::FETCH_ASSOC);
+
+        if (!$target_ses) {
+            http_response_code(404);
+            echo json_encode(["error" => "Sesi pengganti tidak ditemukan."]);
+            exit;
+        }
+
+        if ($target_ses['current_occupancy'] >= $target_ses['room_capacity']) {
+            http_response_code(409);
+            echo json_encode(["error" => "Kapasitas ruangan pada sesi pengganti telah penuh (AC-15)."]);
+            exit;
+        }
+
+        $id = gen_uuid();
+        $pdo->prepare("
+            INSERT INTO makeup_requests (id, student_id, origin_session_id, target_session_id, reason, status)
+            VALUES (?, ?, ?, ?, ?, 'pending')
+        ")->execute([$id, $student_id, $origin_session_id, $target_session_id, $reason]);
+
+        echo json_encode([
+            "success" => true,
+            "id" => $id,
+            "message" => "Pengajuan makeup sesi berhasil diajukan dan menunggu persetujuan (Sisa kuota: " . (1 - $used_quota) . ")."
+        ]);
+        exit;
+    }
+}
+
+elseif ($action === 'approve_makeup_request') {
+    if (!in_array($payload->role, ['superadmin', 'admin', 'teacher'])) {
+        http_response_code(403);
+        echo json_encode(["error" => "Hanya staf internal yang berwenang menyetujui jadwal makeup."]);
+        exit;
+    }
+
+    $request_id = safe_str($input['request_id'] ?? ($input['id'] ?? ''));
+    $decision = safe_str($input['decision'] ?? 'approved'); // 'approved' or 'rejected'
+    $notes = safe_str($input['notes'] ?? '');
+
+    $stmt_req = $pdo->prepare("
+        SELECT mr.*, c.tenant_id as class_tenant_id 
+        FROM makeup_requests mr
+        JOIN class_sessions cs ON mr.target_session_id = cs.id
+        JOIN classes c ON cs.class_id = c.id
+        WHERE mr.id = ?
+    ");
+    $stmt_req->execute([$request_id]);
+    $req = $stmt_req->fetch(PDO::FETCH_ASSOC);
+
+    if (!$req || $req['status'] !== 'pending') {
+        http_response_code(400);
+        echo json_encode(["error" => "Pengajuan makeup tidak ditemukan atau sudah diproses."]);
+        exit;
+    }
+
+    // AC-08/AC-18: Strict tenant boundary check for branch admin
+    if (!$isSuper && !empty($tenant_id) && $req['class_tenant_id'] !== $tenant_id) {
+        http_response_code(403);
+        echo json_encode(["error" => "Forbidden: Anda tidak berwenang memproses permohonan makeup untuk cabang/tenant lain."]);
+        exit;
+    }
+
+    if ($decision === 'approved') {
+        try {
+            $pdo->beginTransaction();
+
+            // Pessimistic lock on target session capacity
+            $stmt_lock = $pdo->prepare("
+                SELECT cs.id, cr.capacity, (SELECT COUNT(*) FROM session_attendances WHERE session_id = cs.id) as current_occupancy
+                FROM class_sessions cs
+                JOIN class_rooms cr ON cs.room_id = cr.id
+                WHERE cs.id = ? FOR UPDATE
+            ");
+            $stmt_lock->execute([$req['target_session_id']]);
+            $cap_row = $stmt_lock->fetch(PDO::FETCH_ASSOC);
+
+            if ($cap_row && $cap_row['current_occupancy'] >= $cap_row['capacity']) {
+                $pdo->rollBack();
+                http_response_code(409);
+                echo json_encode(["error" => "Kapasitas sesi pengganti telah penuh saat persetujuan diproses."]);
+                exit;
+            }
+
+            $pdo->prepare("
+                UPDATE makeup_requests 
+                SET status = 'approved', approved_by = ?, approved_at = NOW(), notes = ?
+                WHERE id = ?
+            ")->execute([$payload->id, $notes, $request_id]);
+
+            // Add student as makeup guest in target session
+            $att_id = gen_uuid();
+            $pdo->prepare("
+                INSERT INTO session_attendances (id, session_id, student_id, attendance_status, is_makeup_guest)
+                VALUES (?, ?, ?, 'absent', 1)
+                ON DUPLICATE KEY UPDATE is_makeup_guest = 1
+            ")->execute([$att_id, $req['target_session_id'], $req['student_id']]);
+
+            $pdo->commit();
+            echo json_encode(["success" => true, "message" => "Pengajuan makeup berhasil disetujui."]);
+            exit;
+        } catch (\PDOException $e) {
+            $pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(["error" => "Gagal memproses persetujuan makeup: " . $e->getMessage()]);
+            exit;
+        }
+    } else {
+        $pdo->prepare("
+            UPDATE makeup_requests 
+            SET status = 'rejected', approved_by = ?, approved_at = NOW(), notes = ?
+            WHERE id = ?
+        ")->execute([$payload->id, $notes, $request_id]);
+        echo json_encode(["success" => true, "message" => "Pengajuan makeup ditolak."]);
+        exit;
+    }
+}
+
+// ========================================================
+// 10. STUDENT OFFLINE PORTAL VIEWS
+// ========================================================
+elseif ($action === 'my_classes') {
+    if ($payload->role !== 'student') { http_response_code(403); exit; }
+    $stmt = $pdo->prepare("
+        SELECT c.*, cr.name as room_name, t.name as tenant_name, cs.joined_at, cs.confirmed_at
+        FROM class_students cs
+        JOIN classes c ON cs.class_id = c.id
+        LEFT JOIN class_rooms cr ON c.default_room_id = cr.id
+        LEFT JOIN tenants t ON c.tenant_id = t.id
+        WHERE cs.student_id = ? AND cs.status = 'active'
+    ");
+    $stmt->execute([$payload->id]);
+    echo json_encode(["success" => true, "classes" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    exit;
+}
+
+elseif ($action === 'my_sessions') {
+    if ($payload->role !== 'student') { http_response_code(403); exit; }
+    $stmt = $pdo->prepare("
+        SELECT ses.*, cr.name as room_name, c.name as class_name, sa.attendance_status, sa.check_in_time, sa.is_makeup_guest
+        FROM class_students cs
+        JOIN class_sessions ses ON cs.class_id = ses.class_id
+        LEFT JOIN class_rooms cr ON ses.room_id = cr.id
+        LEFT JOIN classes c ON ses.class_id = c.id
+        LEFT JOIN session_attendances sa ON sa.session_id = ses.id AND sa.student_id = ?
+        WHERE cs.student_id = ? AND cs.status = 'active'
+        ORDER BY ses.session_date ASC, ses.start_time ASC
+    ");
+    $stmt->execute([$payload->id, $payload->id]);
+    echo json_encode(["success" => true, "sessions" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    exit;
+}
+
+elseif ($action === 'my_attendance') {
+    if ($payload->role !== 'student') { http_response_code(403); exit; }
+    $stmt = $pdo->prepare("
+        SELECT sa.*, ses.session_date, ses.start_time, ses.end_time, ses.subject, c.name as class_name
+        FROM session_attendances sa
+        JOIN class_sessions ses ON sa.session_id = ses.id
+        JOIN classes c ON ses.class_id = c.id
+        WHERE sa.student_id = ?
+        ORDER BY ses.session_date DESC
+    ");
+    $stmt->execute([$payload->id]);
+    $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $total = count($records);
+    $present = count(array_filter($records, fn($r) => in_array($r['attendance_status'], ['present', 'late'])));
+    $rate = $total > 0 ? round(($present / $total) * 100, 1) : 100.0;
+
+    echo json_encode([
+        "success" => true,
+        "summary" => [
+            "total_sessions" => $total,
+            "attended" => $present,
+            "attendance_rate" => $rate
+        ],
+        "records" => $records
+    ]);
+    exit;
+}
+
+// ==============================================================================
+// 10. CONFIGURABLE COHORT RENEWAL (PRD v1.1 Phase 5: AC-11, AC-12, AC-13)
+// ==============================================================================
+elseif ($action === 'renewal_policies') {
+    if (!in_array($payload->role, ['superadmin', 'admin'])) {
+        http_response_code(403);
+        echo json_encode(["error" => "Forbidden: Admin only"]);
+        exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $offering_id = safe_str($_GET['offering_id'] ?? '');
+        $sql = "SELECT rp.*, co.name as offering_name, co.renewal_mode as offering_renewal_mode
+                FROM renewal_policies rp
+                JOIN class_offerings co ON rp.offering_id = co.id
+                WHERE 1=1";
+        $params = [];
+        if (!empty($offering_id)) {
+            $sql .= " AND rp.offering_id = ?";
+            $params[] = $offering_id;
+        }
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        echo json_encode(["success" => true, "policies" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+        exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $offering_id = safe_str($input['offering_id'] ?? '');
+        $renewal_mode = safe_str($input['renewal_mode'] ?? 'new_enrollment');
+        $renewal_price = floatval($input['renewal_price'] ?? 0.0);
+        $extension_days = intval($input['extension_days'] ?? 30);
+        $allowed_cohort_change = isset($input['allowed_cohort_change']) ? (int)$input['allowed_cohort_change'] : 1;
+        $eligibility_rule = safe_str($input['eligibility_rule'] ?? 'active_or_grace');
+        $open_at = !empty($input['open_at']) ? safe_str($input['open_at']) : null;
+        $close_at = !empty($input['close_at']) ? safe_str($input['close_at']) : null;
+
+        if (empty($offering_id)) {
+            http_response_code(400);
+            echo json_encode(["error" => "offering_id diperlukan"]);
+            exit;
+        }
+
+        if (!in_array($renewal_mode, ['new_enrollment', 'extend_existing'], true)) {
+            http_response_code(400);
+            echo json_encode(["error" => "renewal_mode harus 'new_enrollment' atau 'extend_existing'"]);
+            exit;
+        }
+
+        $id = gen_uuid();
+        $stmt = $pdo->prepare("
+            INSERT INTO renewal_policies (
+                id, offering_id, renewal_mode, renewal_price, extension_days,
+                allowed_cohort_change, eligibility_rule, open_at, close_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                renewal_mode = VALUES(renewal_mode),
+                renewal_price = VALUES(renewal_price),
+                extension_days = VALUES(extension_days),
+                allowed_cohort_change = VALUES(allowed_cohort_change),
+                eligibility_rule = VALUES(eligibility_rule),
+                open_at = VALUES(open_at),
+                close_at = VALUES(close_at)
+        ");
+        $stmt->execute([
+            $id, $offering_id, $renewal_mode, $renewal_price, $extension_days,
+            $allowed_cohort_change, $eligibility_rule, $open_at, $close_at
+        ]);
+
+        // Sinkronkan ke class_offerings.renewal_mode (AC-11)
+        $pdo->prepare("UPDATE class_offerings SET renewal_mode = ? WHERE id = ?")->execute([$renewal_mode, $offering_id]);
+
+        echo json_encode(["success" => true, "message" => "Kebijakan renewal berhasil disimpan"]);
+        exit;
+    }
+}
+
+elseif ($action === 'renewal_options') {
+    $enrollment_id = safe_str($_GET['enrollment_id'] ?? ($input['enrollment_id'] ?? ''));
+    if (empty($enrollment_id)) {
+        http_response_code(400);
+        echo json_encode(["error" => "enrollment_id diperlukan"]);
+        exit;
+    }
+
+    $stmt = $pdo->prepare("
+        SELECT cs.*, c.name as class_name, c.tenant_id, c.max_capacity,
+               co.id as offering_id, co.name as offering_name, co.renewal_mode as offering_renewal_mode
+        FROM class_students cs
+        JOIN classes c ON cs.class_id = c.id
+        LEFT JOIN class_offerings co ON cs.offering_id = co.id OR c.id = co.class_id
+        WHERE cs.id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$enrollment_id]);
+    $enrollment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$enrollment) {
+        http_response_code(404);
+        echo json_encode(["error" => "Data enrollment tidak ditemukan"]);
+        exit;
+    }
+
+    // Student authorization
+    if ($payload->role === 'student' && $enrollment['student_id'] !== $payload->id) {
+        http_response_code(403);
+        echo json_encode(["error" => "Forbidden: Bukan enrollment Anda"]);
+        exit;
+    }
+
+    // Ambil renewal policy jika ada
+    $stmtPol = $pdo->prepare("SELECT * FROM renewal_policies WHERE offering_id = ? LIMIT 1");
+    $stmtPol->execute([$enrollment['offering_id'] ?? '']);
+    $policy = $stmtPol->fetch(PDO::FETCH_ASSOC);
+
+    $renewalMode = $policy['renewal_mode'] ?? ($enrollment['offering_renewal_mode'] ?? 'new_enrollment');
+    $renewalPrice = floatval($policy['renewal_price'] ?? 0.0);
+    $extensionDays = intval($policy['extension_days'] ?? 30);
+    $allowChangeCohort = (bool)($policy['allowed_cohort_change'] ?? 1);
+
+    // Ambil cohort alternatif jika allowed
+    $availableCohorts = [];
+    if ($allowChangeCohort && !empty($enrollment['offering_id'])) {
+        $stmtC = $pdo->prepare("
+            SELECT c.id, c.name, c.max_capacity,
+                   (SELECT COUNT(*) FROM class_students WHERE class_id = c.id AND status = 'active') as active_students
+            FROM classes c
+            JOIN class_offerings co ON co.class_id = c.id
+            WHERE co.id = ? AND c.status = 'active'
+        ");
+        $stmtC->execute([$enrollment['offering_id']]);
+        $availableCohorts = $stmtC->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    echo json_encode([
+        "success" => true,
+        "enrollment" => $enrollment,
+        "policy" => [
+            "renewal_mode" => $renewalMode,
+            "renewal_price" => $renewalPrice,
+            "extension_days" => $extensionDays,
+            "allowed_cohort_change" => $allowChangeCohort
+        ],
+        "available_cohorts" => $availableCohorts
+    ]);
+    exit;
+}
+
+elseif ($action === 'renew_enrollment') {
+    $enrollment_id = safe_str($input['enrollment_id'] ?? '');
+    $target_class_id = safe_str($input['target_class_id'] ?? '');
+    $order_id = safe_str($input['order_id'] ?? '');
+
+    if (empty($enrollment_id)) {
+        http_response_code(400);
+        echo json_encode(["error" => "enrollment_id diperlukan"]);
+        exit;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        $stmt = $pdo->prepare("
+            SELECT cs.*, c.name as class_name, c.tenant_id,
+                   co.id as offering_id, co.renewal_mode as offering_renewal_mode
+            FROM class_students cs
+            JOIN classes c ON cs.class_id = c.id
+            LEFT JOIN class_offerings co ON cs.offering_id = co.id OR c.id = co.class_id
+            WHERE cs.id = ?
+            FOR UPDATE
+        ");
+        $stmt->execute([$enrollment_id]);
+        $enrollment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$enrollment) {
+            $pdo->rollBack();
+            http_response_code(404);
+            echo json_encode(["error" => "Data enrollment tidak ditemukan"]);
+            exit;
+        }
+
+        if ($payload->role === 'student' && $enrollment['student_id'] !== $payload->id) {
+            $pdo->rollBack();
+            http_response_code(403);
+            echo json_encode(["error" => "Forbidden: Anda hanya berwenang memperpanjang enrollment Anda sendiri"]);
+            exit;
+        }
+
+        if ($enrollment['status'] !== 'active') {
+            $pdo->rollBack();
+            http_response_code(400);
+            echo json_encode(["error" => "Hanya enrollment berstatus aktif yang dapat diperpanjang"]);
+            exit;
+        }
+
+        // Ambil renewal policy
+        $stmtPol = $pdo->prepare("SELECT * FROM renewal_policies WHERE offering_id = ? LIMIT 1");
+        $stmtPol->execute([$enrollment['offering_id'] ?? '']);
+        $policy = $stmtPol->fetch(PDO::FETCH_ASSOC);
+
+        $renewalMode = $policy['renewal_mode'] ?? ($enrollment['offering_renewal_mode'] ?? 'new_enrollment');
+        $extensionDays = intval($policy['extension_days'] ?? 30);
+        $renewalPrice = floatval($policy['renewal_price'] ?? 0.0);
+        $studentId = $enrollment['student_id'];
+        $offeringId = $enrollment['offering_id'] ?? $enrollment['class_id'];
+        $prevClassId = $enrollment['class_id'];
+        $newClassId = !empty($target_class_id) ? $target_class_id : $prevClassId;
+        $prevEndDate = $enrollment['valid_until'];
+
+        // AC-11/AC-12: Validasi perpindahan cohort & batas tenant
+        if (!empty($target_class_id) && $target_class_id !== $prevClassId) {
+            if ($policy && isset($policy['allowed_cohort_change']) && !(int)$policy['allowed_cohort_change']) {
+                $pdo->rollBack();
+                http_response_code(403);
+                echo json_encode(["error" => "Kebijakan offering ini tidak mengizinkan perpindahan rombel (cohort change not allowed)."]);
+                exit;
+            }
+
+            // Validasi target class berada di tenant yang sama dan aktif
+            $stmtTargetChk = $pdo->prepare("SELECT id, tenant_id, status FROM classes WHERE id = ?");
+            $stmtTargetChk->execute([$target_class_id]);
+            $targetClassRow = $stmtTargetChk->fetch(PDO::FETCH_ASSOC);
+
+            if (!$targetClassRow || $targetClassRow['status'] !== 'active') {
+                $pdo->rollBack();
+                http_response_code(400);
+                echo json_encode(["error" => "Rombel tujuan tidak aktif atau tidak ditemukan."]);
+                exit;
+            }
+
+            if ($targetClassRow['tenant_id'] !== $enrollment['tenant_id']) {
+                $pdo->rollBack();
+                http_response_code(403);
+                echo json_encode(["error" => "Forbidden: Rombel tujuan berada di cabang/tenant yang berbeda."]);
+                exit;
+            }
+        }
+
+        $renewalRecordId = gen_uuid();
+
+        if ($renewalMode === 'new_enrollment') {
+            // AC-12: Mode 1 (new_enrollment) -> membuat enrollment baru di class_students
+            // Validasi kapasitas all_sessions rombel tujuan
+            $capStmt = $pdo->prepare("SELECT max_capacity FROM classes WHERE id = ? FOR UPDATE");
+            $capStmt->execute([$newClassId]);
+            $maxCap = intval($capStmt->fetchColumn() ?: 15);
+
+            $curCountStmt = $pdo->prepare("SELECT COUNT(*) FROM class_students WHERE class_id = ? AND status = 'active'");
+            $curCountStmt->execute([$newClassId]);
+            $curCount = intval($curCountStmt->fetchColumn());
+
+            if ($curCount >= $maxCap) {
+                $pdo->rollBack();
+                http_response_code(409);
+                echo json_encode(["error" => "Kapasitas rombel tujuan sudah penuh"]);
+                exit;
+            }
+
+            $newEnrollmentId = gen_uuid();
+            $newEndDate = date('Y-m-d', strtotime("+$extensionDays days"));
+
+            $insertNew = $pdo->prepare("
+                INSERT INTO class_students (
+                    id, class_id, student_id, joined_at, valid_until,
+                    offering_id, renewal_reference_id, status
+                ) VALUES (?, ?, ?, NOW(), ?, ?, ?, 'active')
+            ");
+            $insertNew->execute([
+                $newEnrollmentId,
+                $newClassId,
+                $studentId,
+                $newEndDate,
+                $offeringId,
+                $enrollment_id
+            ]);
+
+            // Enrollment lama tetap ada sebagai histori, diubah statusnya menjadi 'completed'
+            $pdo->prepare("UPDATE class_students SET status = 'completed' WHERE id = ?")->execute([$enrollment_id]);
+
+            // Catat ke renewal_records (AC-12)
+            $stmtRec = $pdo->prepare("
+                INSERT INTO renewal_records (
+                    id, original_enrollment_id, new_enrollment_id, student_id, offering_id,
+                    renewal_mode, previous_class_id, new_class_id, previous_end_date, new_end_date,
+                    price_paid, order_id, status
+                ) VALUES (?, ?, ?, ?, ?, 'new_enrollment', ?, ?, ?, ?, ?, ?, 'active')
+            ");
+            $stmtRec->execute([
+                $renewalRecordId,
+                $enrollment_id,
+                $newEnrollmentId,
+                $studentId,
+                $offeringId,
+                $prevClassId,
+                $newClassId,
+                $prevEndDate,
+                $newEndDate,
+                $renewalPrice,
+                $order_id ?: null
+            ]);
+
+            $pdo->commit();
+            log_audit($pdo, $studentId, $enrollment['tenant_id'], 'cohort_renewal_new_enrollment', $newEnrollmentId, [
+                'original_enrollment_id' => $enrollment_id,
+                'target_class_id' => $newClassId
+            ]);
+
+            echo json_encode([
+                "success" => true,
+                "message" => "Enrollment baru berhasil dibuat melalui alur renewal (AC-12)",
+                "data" => [
+                    "renewal_mode" => "new_enrollment",
+                    "original_enrollment_id" => $enrollment_id,
+                    "new_enrollment_id" => $newEnrollmentId,
+                    "valid_until" => $newEndDate,
+                    "class_id" => $newClassId
+                ]
+            ]);
+            exit;
+
+        } else {
+            // AC-13: Mode 2 (extend_existing) -> memperpanjang enrollment yang ada & menyimpan histori
+            $baseDate = !empty($prevEndDate) && (strtotime($prevEndDate) > time()) ? $prevEndDate : date('Y-m-d');
+            $newEndDate = date('Y-m-d', strtotime("$baseDate +$extensionDays days"));
+
+            $updateExisting = $pdo->prepare("
+                UPDATE class_students
+                SET valid_until = ?, status = 'active'
+                WHERE id = ?
+            ");
+            $updateExisting->execute([$newEndDate, $enrollment_id]);
+
+            // Catat record histori perpanjangan tanpa menimpa histori sesi/presensi lama (AC-13)
+            $stmtRec = $pdo->prepare("
+                INSERT INTO renewal_records (
+                    id, original_enrollment_id, new_enrollment_id, student_id, offering_id,
+                    renewal_mode, previous_class_id, new_class_id, previous_end_date, new_end_date,
+                    price_paid, order_id, status
+                ) VALUES (?, ?, NULL, ?, ?, 'extend_existing', ?, ?, ?, ?, ?, ?, 'active')
+            ");
+            $stmtRec->execute([
+                $renewalRecordId,
+                $enrollment_id,
+                $studentId,
+                $offeringId,
+                $prevClassId,
+                $prevClassId,
+                $prevEndDate,
+                $newEndDate,
+                $renewalPrice,
+                $order_id ?: null
+            ]);
+
+            $pdo->commit();
+            log_audit($pdo, $studentId, $enrollment['tenant_id'], 'cohort_renewal_extend_existing', $enrollment_id, [
+                'previous_end_date' => $prevEndDate,
+                'new_end_date' => $newEndDate
+            ]);
+
+            echo json_encode([
+                "success" => true,
+                "message" => "Enrollment berhasil diperpanjang dengan pencatatan histori renewal (AC-13)",
+                "data" => [
+                    "renewal_mode" => "extend_existing",
+                    "enrollment_id" => $enrollment_id,
+                    "previous_end_date" => $prevEndDate,
+                    "new_end_date" => $newEndDate
+                ]
+            ]);
+            exit;
+        }
+
+    } catch (\Throwable $e) {
+        $pdo->rollBack();
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal memproses perpanjangan: " . $e->getMessage()]);
+        exit;
+    }
+}
+
+elseif ($action === 'renewal_history') {
+    $student_id = safe_str($_GET['student_id'] ?? '');
+    $enrollment_id = safe_str($_GET['enrollment_id'] ?? '');
+
+    if ($payload->role === 'student') {
+        $student_id = $payload->id;
+    }
+
+    $sql = "
+        SELECT rr.*,
+               c1.name as previous_class_name,
+               c2.name as new_class_name,
+               co.name as offering_name,
+               s.name as student_name
+        FROM renewal_records rr
+        LEFT JOIN classes c1 ON rr.previous_class_id = c1.id
+        LEFT JOIN classes c2 ON rr.new_class_id = c2.id
+        LEFT JOIN class_offerings co ON rr.offering_id = co.id
+        LEFT JOIN students s ON rr.student_id = s.id
+        WHERE 1=1
+    ";
+    $params = [];
+
+    if (!empty($student_id)) {
+        $sql .= " AND rr.student_id = ?";
+        $params[] = $student_id;
+    }
+
+    if (!empty($enrollment_id)) {
+        $sql .= " AND (rr.original_enrollment_id = ? OR rr.new_enrollment_id = ?)";
+        $params[] = $enrollment_id;
+        $params[] = $enrollment_id;
+    }
+
+    $sql .= " ORDER BY rr.created_at DESC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-    echo json_encode(["at_risk_students" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode(["success" => true, "history" => $history]);
     exit;
 }
 

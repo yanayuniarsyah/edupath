@@ -10,6 +10,127 @@ require_once 'RoyaltyRegistry.php';
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true);
 
+// ---------------------------------------------------------------------------
+// 0a. UPGRADE ELIGIBILITY CHECK (PRD v1.1 B2 & D3)
+// Enforces AC-04, AC-05: Returns full price of target plan without proration
+// ---------------------------------------------------------------------------
+if ($action === 'upgrade_eligibility' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $payload = authenticate();
+    if ($payload->role !== 'student') {
+        http_response_code(403);
+        echo json_encode(["success" => false, "error" => ["code" => "FORBIDDEN", "message" => "Hanya siswa yang dapat mengecek eligibility upgrade."]]);
+        exit;
+    }
+
+    $target_plan_id = safe_str($_GET['target_plan_id'] ?? '');
+    if (empty($target_plan_id)) {
+        http_response_code(400);
+        echo json_encode(["success" => false, "error" => ["code" => "MISSING_PARAM", "message" => "target_plan_id wajib diisi."]]);
+        exit;
+    }
+
+    // Lookup student's current active subscription
+    $stmt_active = $pdo->prepare("
+        SELECT s.id, s.plan_id, s.plan_name_snapshot, s.expires_at, p.delivery_mode, p.price as current_price, o.id as order_id
+        FROM subscriptions s
+        LEFT JOIN plans p ON s.plan_id = p.id
+        LEFT JOIN orders o ON (s.payment_reference = o.order_id OR s.payment_reference = o.id)
+        WHERE s.student_id = ? AND s.status = 'active' AND (s.expires_at IS NULL OR s.expires_at > NOW())
+        ORDER BY s.expires_at DESC
+        LIMIT 1
+    ");
+    $stmt_active->execute([$payload->id]);
+    $current = $stmt_active->fetch(PDO::FETCH_ASSOC);
+
+    // Lookup target plan
+    $stmt_target = $pdo->prepare("
+        SELECT id, name, price, discount, duration, features, components, academic_program, delivery_mode, version
+        FROM plans
+        WHERE id = ? AND is_active = 1 AND is_archived = 0
+    ");
+    $stmt_target->execute([$target_plan_id]);
+    $target = $stmt_target->fetch(PDO::FETCH_ASSOC);
+
+    if (!$target) {
+        http_response_code(404);
+        echo json_encode(["success" => false, "error" => ["code" => "PLAN_NOT_FOUND", "message" => "Paket tujuan upgrade tidak ditemukan."]]);
+        exit;
+    }
+
+    $is_same_plan = ($current && $current['plan_id'] === $target['id']);
+    $full_price = (float)$target['price'];
+
+    echo json_encode([
+        "success" => true,
+        "data" => [
+            "eligible"           => !$is_same_plan,
+            "current_plan"       => $current ? [
+                "id"             => $current['plan_id'],
+                "name"           => $current['plan_name_snapshot'] ?? 'Paket Aktif',
+                "delivery_mode"  => $current['delivery_mode'] ?? 'online',
+                "expires_at"     => $current['expires_at'],
+                "order_id"       => $current['order_id'] ?? null
+            ] : null,
+            "target_plan"        => [
+                "id"             => $target['id'],
+                "name"           => $target['name'],
+                "delivery_mode"  => $target['delivery_mode'] ?? 'online',
+                "academic_program" => $target['academic_program'] ?? 'SNPMB/UTBK',
+                "duration"       => (int)$target['duration'],
+                "full_price"     => $full_price
+            ],
+            "upgrade_price"      => $full_price,
+            "has_proration"      => false,
+            "proration_discount" => 0,
+            "policy_rule"        => "PRD_V1.1_B2_FULL_PRICE",
+            "message"            => "Upgrade menghasilkan pembelian baru pada harga penuh paket tujuan tanpa pemotongan sisa masa aktif (PRD v1.1 B2). Masa aktif paket lama tetap berlaku secara independen."
+        ]
+    ]);
+    exit;
+}
+
+// ---------------------------------------------------------------------------
+// 0b. PURCHASE HISTORY & UPGRADE LOGS (PRD v1.1 D2, D3)
+// ---------------------------------------------------------------------------
+if ($action === 'purchase_history' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $payload = authenticate();
+    if ($payload->role !== 'student') {
+        http_response_code(403);
+        echo json_encode(["success" => false, "error" => ["code" => "FORBIDDEN", "message" => "Hanya siswa yang dapat mengakses riwayat pembelian."]]);
+        exit;
+    }
+
+    $stmt_orders = $pdo->prepare("
+        SELECT id, order_id, plan_name, amount, status, order_type, package_version, purchase_snapshot, upgrade_from_order_id, created_at, paid_at
+        FROM orders
+        WHERE student_id = ?
+        ORDER BY created_at DESC
+    ");
+    $stmt_orders->execute([$payload->id]);
+    $orders = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($orders as &$ord) {
+        if (!empty($ord['purchase_snapshot']) && is_string($ord['purchase_snapshot'])) {
+            $ord['purchase_snapshot'] = json_decode($ord['purchase_snapshot'], true);
+        }
+    }
+
+    $stmt_upgrades = $pdo->prepare("
+        SELECT * FROM upgrade_audit_logs WHERE student_id = ? ORDER BY created_at DESC
+    ");
+    $stmt_upgrades->execute([$payload->id]);
+    $upgrades = $stmt_upgrades->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode([
+        "success" => true,
+        "data" => [
+            "orders"   => $orders,
+            "upgrades" => $upgrades
+        ]
+    ]);
+    exit;
+}
+
 if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $payload = authenticate();
     if ($payload->role !== 'student') {
@@ -24,6 +145,10 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $plan_id = $input['plan_id'] ?? '';
+    $order_type = in_array($input['order_type'] ?? '', ['new_purchase', 'upgrade', 'renewal']) 
+        ? $input['order_type'] 
+        : 'new_purchase';
+    $upgrade_from_order_id = $input['upgrade_from_order_id'] ?? null;
 
     // -----------------------------------------------------------------------
     // CANONICAL TENANT DERIVATION (Phase 1 — preserved)
@@ -85,8 +210,27 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt_first->execute([$payload->id]);
       $is_renewal = (bool) $stmt_first->fetch();
 
+    if ($order_type === 'upgrade') {
+        if (!empty($upgrade_from_order_id)) {
+            // IDOR Protection: Validate that upgrade_from_order_id belongs to this authenticated student
+            $stmt_val = $pdo->prepare("SELECT id FROM orders WHERE (id = ? OR order_id = ?) AND student_id = ? AND status = 'paid' LIMIT 1");
+            $stmt_val->execute([$upgrade_from_order_id, $upgrade_from_order_id, $payload->id]);
+            $upgrade_from_order_id = $stmt_val->fetchColumn() ?: null;
+        }
+        if (empty($upgrade_from_order_id)) {
+            $stmt_prev = $pdo->prepare("SELECT id FROM orders WHERE student_id = ? AND status = 'paid' ORDER BY paid_at DESC, created_at DESC LIMIT 1");
+            $stmt_prev->execute([$payload->id]);
+            $upgrade_from_order_id = $stmt_prev->fetchColumn() ?: null;
+        }
+    }
+
     // 2. Lookup plan scoped to student's tenant (cross-tenant access blocked at DB level or global plans)
-    $stmt = $pdo->prepare("SELECT id, name, price, discount, duration, features, billing_cycle FROM plans WHERE (id = ? OR name = ?) AND (tenant_id = ? OR tenant_id IS NULL)");
+    $stmt = $pdo->prepare("
+        SELECT id, name, price, discount, duration, features, billing_cycle,
+               academic_program, delivery_mode, package_code, components, version 
+        FROM plans 
+        WHERE (id = ? OR name = ?) AND (tenant_id = ? OR tenant_id IS NULL)
+    ");
     $stmt->execute([$plan_id, $plan_id, $student_tenant_id]);
     $plan = $stmt->fetch();
 
@@ -230,10 +374,28 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $invoice_id  = $mkuuid();
             $payment_id  = $mkuuid();
 
+            // Snapshot komponen produk untuk integritas riwayat transaksi (PRD v1.1 C5)
+            $purchase_snapshot = json_encode([
+                'package_id'            => $plan['id'],
+                'package_name'          => $plan['name'],
+                'package_code'          => $plan['package_code'] ?? null,
+                'package_version'       => (int)($plan['version'] ?? 1),
+                'academic_program'      => $plan['academic_program'] ?? 'SNPMB/UTBK',
+                'delivery_mode'         => $plan['delivery_mode'] ?? 'online',
+                'duration_value'        => (int)($plan['duration'] ?? 30),
+                'duration_unit'         => 'days',
+                'components'            => $plan['components'] ?? null,
+                'features'              => $plan['features'] ?? null,
+                'base_price'            => $plan['price'],
+                'order_type'            => $order_type,
+                'upgrade_from_order_id' => $upgrade_from_order_id,
+                'snapshot_at'           => date('c')
+            ]);
+
             $pdo->prepare("
                 INSERT INTO orders
-                  (id, tenant_id, plan_id, order_id, student_id, affiliate_id, channel, branch_tenant_id, school_id, community_id, is_renewal, plan_name, amount, gateway_fee, royalty_fee, distributable_pool, rule_snapshot, status, snap_token, billing_cycle_snapshot)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
+                  (id, tenant_id, plan_id, order_id, student_id, affiliate_id, channel, branch_tenant_id, school_id, community_id, is_renewal, plan_name, amount, gateway_fee, royalty_fee, distributable_pool, rule_snapshot, status, snap_token, billing_cycle_snapshot, order_type, package_version, purchase_snapshot, upgrade_from_order_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?)
             ")->execute([
                 $order_id,
                 $student_tenant_id,   // canonical — from authenticated student
@@ -253,7 +415,11 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $splitResult['distributable_pool'],
                 $rule_snapshot,
                 $snap_token,
-                $plan['billing_cycle'] ?? 'one-time'
+                $plan['billing_cycle'] ?? 'one-time',
+                $order_type,
+                (int)($plan['version'] ?? 1),
+                $purchase_snapshot,
+                $upgrade_from_order_id
             ]);
 
             // b. Create immutable Commercial Invoice snapshot
@@ -380,7 +546,8 @@ elseif (($action === 'webhook' || $action === 'notification') && $_SERVER['REQUE
 
         // 3. LOCK ORDER — pessimistic lock; also read tenant_id for downstream tenant propagation
         $stmt = $pdo->prepare("
-            SELECT id, tenant_id, student_id, plan_id, plan_name, amount, affiliate_id, status
+            SELECT id, tenant_id, student_id, plan_id, plan_name, amount, affiliate_id, status,
+                   order_type, package_version, upgrade_from_order_id
             FROM orders WHERE order_id = ? FOR UPDATE
         ");
         $stmt->execute([$order_id]);
@@ -519,29 +686,79 @@ elseif (($action === 'webhook' || $action === 'notification') && $_SERVER['REQUE
             $stmt_check_sub->execute([$order_id, $order['id']]);
             $existing_sub = $stmt_check_sub->fetch();
             $subscription_id = null;
+            $is_upgrade_order = (($order['order_type'] ?? '') === 'upgrade');
 
-            if ($existing_sub) {
+            if ($existing_sub && !$is_upgrade_order) {
                 $subscription_id = $existing_sub['id'];
                 $pdo->prepare("UPDATE subscriptions SET status = 'active' WHERE id = ?")
                     ->execute([$subscription_id]);
             } else {
                 $subscription_id = $mkuuid();
 
-                // Dukungan perpanjangan kumulatif: jika masih ada masa aktif, tambahkan dari tanggal expired terakhir
-                $stmt_active_sub = $pdo->prepare("
-                    SELECT expires_at FROM subscriptions
-                    WHERE student_id = ? AND status = 'active' AND expires_at > NOW()
-                    ORDER BY expires_at DESC
-                    LIMIT 1
-                ");
-                $stmt_active_sub->execute([$order['student_id']]);
-                $last_active = $stmt_active_sub->fetch();
-
-                if ($last_active && strtotime($last_active['expires_at']) > time()) {
-                    $base_time = strtotime($last_active['expires_at']);
-                    $expires_at = date('Y-m-d H:i:s', $base_time + ($duration_days * 86400));
-                } else {
+                if ($is_upgrade_order) {
+                    // AC-06: Upgrade menghasilkan periode sendiri tanpa membatalkan masa aktif paket lama
                     $expires_at = date('Y-m-d H:i:s', time() + ($duration_days * 86400));
+
+                    // Audit trail upgrade
+                    $prev_order_id = $order['upgrade_from_order_id'] ?? null;
+                    $prev_plan_id = null;
+                    $prev_plan_name = null;
+                    $prev_expires_at = null;
+
+                    if ($prev_order_id) {
+                        $stmt_prev_sub = $pdo->prepare("
+                            SELECT s.plan_id, s.plan_name_snapshot, s.expires_at 
+                            FROM subscriptions s
+                            JOIN orders o ON (s.payment_reference = o.order_id OR s.payment_reference = o.id)
+                            WHERE o.id = ? OR o.order_id = ?
+                            ORDER BY s.expires_at DESC LIMIT 1
+                        ");
+                        $stmt_prev_sub->execute([$prev_order_id, $prev_order_id]);
+                        $prev_sub = $stmt_prev_sub->fetch();
+                        if ($prev_sub) {
+                            $prev_plan_id = $prev_sub['plan_id'];
+                            $prev_plan_name = $prev_sub['plan_name_snapshot'];
+                            $prev_expires_at = $prev_sub['expires_at'];
+                        }
+                    }
+
+                    $ual_id = $mkuuid();
+                    $pdo->prepare("
+                        INSERT INTO upgrade_audit_logs 
+                          (id, student_id, tenant_id, from_order_id, from_plan_id, to_order_id, to_plan_id, from_plan_name, to_plan_name, upgrade_price_paid, previous_expires_at, new_expires_at, metadata)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ")->execute([
+                        $ual_id,
+                        $order['student_id'],
+                        $order['tenant_id'],
+                        $prev_order_id,
+                        $prev_plan_id,
+                        $order['id'],
+                        $order['plan_id'],
+                        $prev_plan_name,
+                        $order['plan_name'],
+                        $order['amount'],
+                        $prev_expires_at,
+                        $expires_at,
+                        json_encode(['package_version' => $order['package_version'] ?? 1, 'order_ref' => $order_id])
+                    ]);
+                } else {
+                    // Dukungan perpanjangan kumulatif: jika masih ada masa aktif, tambahkan dari tanggal expired terakhir
+                    $stmt_active_sub = $pdo->prepare("
+                        SELECT expires_at FROM subscriptions
+                        WHERE student_id = ? AND status = 'active' AND expires_at > NOW()
+                        ORDER BY expires_at DESC
+                        LIMIT 1
+                    ");
+                    $stmt_active_sub->execute([$order['student_id']]);
+                    $last_active = $stmt_active_sub->fetch();
+
+                    if ($last_active && strtotime($last_active['expires_at']) > time()) {
+                        $base_time = strtotime($last_active['expires_at']);
+                        $expires_at = date('Y-m-d H:i:s', $base_time + ($duration_days * 86400));
+                    } else {
+                        $expires_at = date('Y-m-d H:i:s', time() + ($duration_days * 86400));
+                    }
                 }
 
                 // P1-A: include tenant_id derived from order.tenant_id, ensure not null
@@ -564,7 +781,6 @@ elseif (($action === 'webhook' || $action === 'notification') && $_SERVER['REQUE
                         $expires_at,
                         $order['plan_name'],
                     ]);
-
 
                 $pdo->prepare("UPDATE orders SET subscription_id = ? WHERE order_id = ?")
                     ->execute([$subscription_id, $order_id]);
