@@ -527,7 +527,7 @@
         <section v-if="currentTab === 'home'" id="landing-top" class="animate-fade-in pt-20 md:pt-24 pb-16 relative w-full">
           
           <!-- Hero Section -->
-          <div class="hero-bg -mt-[80px] md:-mt-[96px] min-h-[100svh] md:min-h-[115vh] flex flex-col justify-end pt-[150px] sm:pt-[200px] md:pt-[280px] lg:pt-[380px] pb-20 md:pb-32 relative z-0 overflow-hidden">
+          <div class="hero-bg -mt-[80px] md:-mt-[96px] min-h-[100svh] flex flex-col justify-center pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-14 md:pb-16 relative z-0 overflow-hidden">
             <!-- Dynamic Ambient Pulsing Aura Behind Headline -->
             <div class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[680px] h-[260px] sm:h-[380px] rounded-full bg-gradient-to-tr from-[#c0ff00]/15 via-cyan-500/10 to-[#c0ff00]/10 blur-[110px] animate-pulse-slow -z-10"></div>
 
@@ -543,10 +543,10 @@
             </div>
 
             <!-- Inner container: TERIKAT ke viewport -->
-            <div class="w-full max-w-4xl mx-auto px-5 sm:px-8 text-center space-y-4 relative z-10" style="box-sizing: border-box;">
+            <div class="w-full max-w-4xl mx-auto px-4 sm:px-8 text-center space-y-3.5 sm:space-y-4 relative z-10" style="box-sizing: border-box;">
 
               <!-- Live Platform Status Pill -->
-              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/15 hover:border-[#c0ff00]/40 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.3)] text-xs font-semibold text-white/90 transition-all duration-300 cursor-default select-none group/status mb-1">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/15 hover:border-[#c0ff00]/40 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.3)] text-xs font-semibold text-white/90 transition-all duration-300 cursor-default select-none group/status mb-0.5">
                 <span class="relative flex h-2 w-2">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c0ff00] opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-[#c0ff00]"></span>
@@ -557,8 +557,8 @@
               </div>
 
               <!-- Punchy Headline Multi-Program -->
-              <h1 class="font-black font-heading leading-[1.1] text-white tracking-tight flex flex-col justify-center"
-                  style="font-size: clamp(1.8rem, 7vw, 3.75rem); min-height: clamp(90px, 20vw, 140px);">
+              <h1 class="font-black font-heading leading-[1.12] text-white tracking-tight flex flex-col justify-center px-1"
+                  style="font-size: clamp(1.45rem, 6.2vw, 3.75rem); min-height: clamp(72px, 16vw, 140px);">
                 <span>Bimbel Adaptif Terpadu</span>
                 <transition name="fade-word" mode="out-in">
                   <span :key="currentWordIdx" style="display: block; word-break: break-word;">
@@ -568,26 +568,26 @@
               </h1>
 
               <!-- Academic Program Badges Under Hero (Interactive & Glowing on Hover) -->
-              <div class="flex flex-wrap items-center justify-center gap-2 pt-1 select-none">
-                <button @click="scrollToSection('pricing')" class="px-3 py-1.5 rounded-full text-[11px] font-black bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(245,158,11,0.35)] transition-all duration-300 cursor-pointer flex items-center gap-1.5" title="Lihat Paket Bimbel TKA SD">
+              <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2 pt-0.5 max-w-sm sm:max-w-none mx-auto w-full px-1 sm:px-0 select-none">
+                <button @click="scrollToSection('pricing')" class="px-2.5 sm:px-3 py-1.5 rounded-full text-[10.5px] sm:text-[11px] font-black bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(245,158,11,0.35)] transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5" title="Lihat Paket Bimbel TKA SD">
                   <span>🎒 TKA SD</span>
                   <span class="text-[9px] opacity-75 font-semibold">(Kelas 4–6)</span>
                 </button>
-                <button @click="scrollToSection('pricing')" class="px-3 py-1.5 rounded-full text-[11px] font-black bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:border-cyan-400 hover:bg-cyan-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(6,182,212,0.35)] transition-all duration-300 cursor-pointer flex items-center gap-1.5" title="Lihat Paket Bimbel TKA SMP">
+                <button @click="scrollToSection('pricing')" class="px-2.5 sm:px-3 py-1.5 rounded-full text-[10.5px] sm:text-[11px] font-black bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:border-cyan-400 hover:bg-cyan-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(6,182,212,0.35)] transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5" title="Lihat Paket Bimbel TKA SMP">
                   <span>📚 TKA SMP</span>
                   <span class="text-[9px] opacity-75 font-semibold">(Kelas 7–9)</span>
                 </button>
-                <button @click="scrollToSection('pricing')" class="px-3 py-1.5 rounded-full text-[11px] font-black bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 hover:border-indigo-400 hover:bg-indigo-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(99,102,241,0.35)] transition-all duration-300 cursor-pointer flex items-center gap-1.5" title="Lihat Paket Bimbel TKA SMA">
+                <button @click="scrollToSection('pricing')" class="px-2.5 sm:px-3 py-1.5 rounded-full text-[10.5px] sm:text-[11px] font-black bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 hover:border-indigo-400 hover:bg-indigo-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(99,102,241,0.35)] transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5" title="Lihat Paket Bimbel TKA SMA">
                   <span>🔬 TKA SMA</span>
                   <span class="text-[9px] opacity-75 font-semibold">(Kelas 10–12)</span>
                 </button>
-                <button @click="scrollToSection('pricing')" class="px-3 py-1.5 rounded-full text-[11px] font-black bg-blue-500/15 text-blue-300 border border-blue-500/30 hover:border-blue-400 hover:bg-blue-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.35)] transition-all duration-300 cursor-pointer flex items-center gap-1.5" title="Lihat Paket SNPMB & Pejuang PTN">
+                <button @click="scrollToSection('pricing')" class="px-2.5 sm:px-3 py-1.5 rounded-full text-[10.5px] sm:text-[11px] font-black bg-blue-500/15 text-blue-300 border border-blue-500/30 hover:border-blue-400 hover:bg-blue-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.35)] transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5" title="Lihat Paket SNPMB & Pejuang PTN">
                   <span>🎓 SNPMB &amp; Pejuang PTN</span>
                 </button>
               </div>
 
               <!-- CTA Buttons with Sheen Sweep & Dynamic Micro-interactions -->
-              <div class="flex flex-col sm:flex-row justify-center items-center gap-3 pt-4 sm:pt-6 md:pt-8 relative z-20 w-full max-w-sm sm:max-w-none mx-auto px-4 sm:px-0">
+              <div class="flex flex-col sm:flex-row justify-center items-center gap-2.5 sm:gap-3 pt-2.5 sm:pt-6 md:pt-8 relative z-20 w-full max-w-xs sm:max-w-none mx-auto px-1 sm:px-0">
                 <button class="relative group/btn overflow-hidden w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8 rounded-xl sm:rounded-2xl border border-[#c0ff00]/60 bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-sm sm:text-base transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.35)] hover:shadow-[0_0_40px_rgba(192,255,0,0.7)] hover:scale-105 active:scale-95 cursor-pointer select-none" @click="startLearning">
                   <!-- Animated Light Sheen Sweep across CTA button on Hover -->
                   <span class="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none"></span>
@@ -601,14 +601,14 @@
               </div>
 
               <!-- Methods Line with Live Mode Badges -->
-              <div class="text-xs sm:text-sm text-slate-300 font-medium pb-2 text-center flex flex-wrap items-center justify-center gap-2">
+              <div class="text-[11px] sm:text-xs md:text-sm text-slate-300 font-medium pb-1 sm:pb-2 text-center flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
                 <span class="text-white/60">Pilihan metode belajar:</span>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-xs font-bold">
+                <span class="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-[10.5px] sm:text-xs font-bold">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                   Full Online 24/7
                 </span>
                 <span class="text-white/30">•</span>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-[#c0ff00]/10 border border-[#c0ff00]/25 text-[#c0ff00] text-xs font-bold">
+                <span class="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 rounded-lg bg-[#c0ff00]/10 border border-[#c0ff00]/25 text-[#c0ff00] text-[10.5px] sm:text-xs font-bold">
                   <i class="ph-bold ph-buildings text-[11px]"></i>
                   Hybrid Tatap Muka Cabang
                 </span>
@@ -617,7 +617,7 @@
           </div>
 
           <!-- Trust Bar — Premium Ticker (Mobile-safe) -->
-          <div class="w-full relative -mt-4 sm:-mt-14 md:-mt-20 my-8 sm:my-14 z-10 overflow-hidden" style="transform: rotate(-2deg) scale(1.05);">
+          <div class="w-full relative mt-4 sm:-mt-14 md:-mt-20 my-6 sm:my-14 z-10 overflow-hidden" style="transform: rotate(-2deg) scale(1.05);">
             <div class="bg-[#c0ff00] text-black py-2.5 sm:py-3 border-y border-[#c0ff00]/30 shadow-[0_10px_40px_rgba(192,255,0,0.15)] overflow-hidden">
               <div class="flex gap-0 animate-marquee whitespace-nowrap" style="width: max-content;">
                 <div class="flex gap-12 items-center px-8 font-black text-sm md:text-base uppercase tracking-widest shrink-0">
@@ -7065,7 +7065,7 @@ export default {
     };
 
     const rotatingWords = [
-      'AI Adaptif & Tutor Berpengalaman.',
+      'AI Adaptif & Tutor Senior.',
       'Jalur Belajar Adaptif AI.',
       'Lolos Masuk Sekolah Favorit.',
       'Tembus Kuota SNBP & PTN Top.',
