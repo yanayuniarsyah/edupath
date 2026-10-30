@@ -36,9 +36,12 @@
       <div class="flex flex-col flex-1 min-h-0 overflow-y-auto" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-4 sm:p-6 pb-2' : 'p-3 pb-2'">
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-2.5 group cursor-pointer shrink-0" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center w-full'" @click="goToHomeTop">
-            <div class="w-8 h-8 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base leading-none group-hover:rotate-12 transition-all duration-300 shadow-md shadow-[#c0ff00]/20 select-none">E</div>
+            <div class="relative w-8 h-8 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base leading-none shadow-md shadow-[#c0ff00]/20 group-hover:shadow-[0_0_25px_rgba(192,255,0,0.85)] group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 ease-out select-none overflow-hidden">
+              <span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none"></span>
+              <span class="relative z-10">E</span>
+            </div>
             <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="min-w-0">
-              <span class="font-black text-xl tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+              <span class="font-black text-xl tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00] group-hover:drop-shadow-[0_0_12px_rgba(192,255,0,0.9)] transition-all">.ai</span></span>
             </div>
           </div>
           <!-- Close button for mobile -->
@@ -258,9 +261,13 @@
             <i class="ph-bold ph-list text-lg"></i>
           </button>
 
-          <div id="nav-logo" class="flex items-center gap-2.5 group cursor-pointer select-none flex-shrink-0" @click="goToHomeTop">
-            <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base leading-none group-hover:rotate-12 transition-all duration-300 shadow-md shadow-[#c0ff00]/20 select-none">E</div>
-            <span class="font-black text-lg sm:text-xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+          <div id="nav-logo" class="flex items-center gap-2.5 group cursor-pointer select-none flex-shrink-0" @click="goToHomeTop" title="EduPath.ai — Beranda">
+            <div class="relative w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base leading-none shadow-[0_0_15px_rgba(192,255,0,0.3)] group-hover:shadow-[0_0_35px_rgba(192,255,0,0.9)] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 ease-out select-none overflow-hidden">
+              <!-- Animated Light Sheen Sweep across Logo Box on Hover -->
+              <span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none"></span>
+              <span class="relative z-10 group-hover:scale-105 transition-transform duration-200">E</span>
+            </div>
+            <span class="font-black text-lg sm:text-xl tracking-tight text-white group-hover:text-white transition-all duration-300">EduPath<span class="text-[#c0ff00] group-hover:drop-shadow-[0_0_12px_rgba(192,255,0,0.95)] transition-all duration-300">.ai</span></span>
           </div>
 
           <nav class="hidden lg:flex items-center gap-6 text-xs font-semibold text-white/75">
@@ -521,43 +528,90 @@
           
           <!-- Hero Section -->
           <div class="hero-bg -mt-[80px] md:-mt-[96px] min-h-[100svh] md:min-h-[115vh] flex flex-col justify-end pt-[150px] sm:pt-[200px] md:pt-[280px] lg:pt-[380px] pb-20 md:pb-32 relative z-0 overflow-hidden">
+            <!-- Dynamic Ambient Pulsing Aura Behind Headline -->
+            <div class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[680px] h-[260px] sm:h-[380px] rounded-full bg-gradient-to-tr from-[#c0ff00]/15 via-cyan-500/10 to-[#c0ff00]/10 blur-[110px] animate-pulse-slow -z-10"></div>
+
+            <!-- Floating Smart AI Metric Chip (Desktop Right) -->
+            <div class="hidden xl:flex absolute right-8 top-1/2 -translate-y-1/2 p-3.5 rounded-2xl glass-card border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.5)] items-center gap-3 animate-float-delayed backdrop-blur-xl group hover:border-[#c0ff00]/40 transition-all select-none">
+              <div class="w-9 h-9 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-300 text-lg shrink-0 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                <i class="ph-bold ph-graduation-cap"></i>
+              </div>
+              <div class="text-left">
+                <div class="text-[10px] text-white/50 uppercase font-black tracking-wider">Multi-Program</div>
+                <div class="text-xs font-black text-white flex items-center gap-1.5">SD • SMP • SMA <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-[#c0ff00]/20 text-[#c0ff00] font-bold border border-[#c0ff00]/30">2026/2027</span></div>
+              </div>
+            </div>
+
             <!-- Inner container: TERIKAT ke viewport -->
-            <div class="w-full max-w-4xl mx-auto px-5 sm:px-8 text-center space-y-4" style="box-sizing: border-box;">
+            <div class="w-full max-w-4xl mx-auto px-5 sm:px-8 text-center space-y-4 relative z-10" style="box-sizing: border-box;">
+
+              <!-- Live Platform Status Pill -->
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/15 hover:border-[#c0ff00]/40 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.3)] text-xs font-semibold text-white/90 transition-all duration-300 cursor-default select-none group/status mb-1">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c0ff00] opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-[#c0ff00]"></span>
+                </span>
+                <span class="text-white/80 text-[11px] font-medium tracking-wide">Platform Bimbel Adaptif AI</span>
+                <span class="text-white/30 text-[10px]">•</span>
+                <span class="text-[#c0ff00] text-[11px] font-bold tracking-wider uppercase group-hover/status:drop-shadow-[0_0_8px_rgba(192,255,0,0.8)] transition-all">Live Diagnostic IRT</span>
+              </div>
 
               <!-- Punchy Headline Multi-Program -->
               <h1 class="font-black font-heading leading-[1.1] text-white tracking-tight flex flex-col justify-center"
                   style="font-size: clamp(1.8rem, 7vw, 3.75rem); min-height: clamp(90px, 20vw, 140px);">
                 <span>Bimbel Adaptif Terpadu</span>
-                <span class="text-xs sm:text-base md:text-lg font-bold text-white/80 uppercase tracking-widest mt-1">SD • SMP • SMA • SNPMB</span>
                 <transition name="fade-word" mode="out-in">
                   <span :key="currentWordIdx" style="display: block; word-break: break-word;">
-                    dengan <span style="color: #c0ff00; font-style: italic;">{{ rotatingWords[currentWordIdx] }}</span>
+                    dengan <span style="color: #c0ff00; font-style: italic; text-shadow: 0 0 20px rgba(192,255,0,0.45);">{{ rotatingWords[currentWordIdx] }}</span>
                   </span>
                 </transition>
               </h1>
 
-              <!-- Academic Program Badges Under Hero -->
-              <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 pt-1">
-                <span class="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black bg-amber-500/15 text-amber-300 border border-amber-500/30">🎒 TKA SD (Kelas 4–6)</span>
-                <span class="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">📚 TKA SMP (Kelas 7–9)</span>
-                <span class="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">🔬 TKA SMA (Kelas 10–12)</span>
-                <span class="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black bg-blue-500/15 text-blue-300 border border-blue-500/30">🎓 SNPMB &amp; Pejuang PTN</span>
+              <!-- Academic Program Badges Under Hero (Interactive & Glowing on Hover) -->
+              <div class="flex flex-wrap items-center justify-center gap-2 pt-1 select-none">
+                <button @click="scrollToSection('pricing')" class="px-3 py-1.5 rounded-full text-[11px] font-black bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(245,158,11,0.35)] transition-all duration-300 cursor-pointer flex items-center gap-1.5" title="Lihat Paket Bimbel TKA SD">
+                  <span>🎒 TKA SD</span>
+                  <span class="text-[9px] opacity-75 font-semibold">(Kelas 4–6)</span>
+                </button>
+                <button @click="scrollToSection('pricing')" class="px-3 py-1.5 rounded-full text-[11px] font-black bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:border-cyan-400 hover:bg-cyan-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(6,182,212,0.35)] transition-all duration-300 cursor-pointer flex items-center gap-1.5" title="Lihat Paket Bimbel TKA SMP">
+                  <span>📚 TKA SMP</span>
+                  <span class="text-[9px] opacity-75 font-semibold">(Kelas 7–9)</span>
+                </button>
+                <button @click="scrollToSection('pricing')" class="px-3 py-1.5 rounded-full text-[11px] font-black bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 hover:border-indigo-400 hover:bg-indigo-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(99,102,241,0.35)] transition-all duration-300 cursor-pointer flex items-center gap-1.5" title="Lihat Paket Bimbel TKA SMA">
+                  <span>🔬 TKA SMA</span>
+                  <span class="text-[9px] opacity-75 font-semibold">(Kelas 10–12)</span>
+                </button>
+                <button @click="scrollToSection('pricing')" class="px-3 py-1.5 rounded-full text-[11px] font-black bg-blue-500/15 text-blue-300 border border-blue-500/30 hover:border-blue-400 hover:bg-blue-500/25 hover:scale-105 active:scale-95 shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.35)] transition-all duration-300 cursor-pointer flex items-center gap-1.5" title="Lihat Paket SNPMB & Pejuang PTN">
+                  <span>🎓 SNPMB &amp; Pejuang PTN</span>
+                </button>
               </div>
 
-              <!-- CTA Buttons -->
+              <!-- CTA Buttons with Sheen Sweep & Dynamic Micro-interactions -->
               <div class="flex flex-col sm:flex-row justify-center items-center gap-3 pt-4 sm:pt-6 md:pt-8 relative z-20 w-full max-w-sm sm:max-w-none mx-auto px-4 sm:px-0">
-                <button class="w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8 rounded-xl sm:rounded-2xl border border-[#c0ff00]/60 bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-sm sm:text-base transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.35)] hover:scale-105 active:scale-95 cursor-pointer" @click="startLearning">
-                  <span>Mulai Belajar Sekarang</span>
-                  <i class="ph-bold ph-arrow-right text-base sm:text-lg"></i>
+                <button class="relative group/btn overflow-hidden w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8 rounded-xl sm:rounded-2xl border border-[#c0ff00]/60 bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-sm sm:text-base transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.35)] hover:shadow-[0_0_40px_rgba(192,255,0,0.7)] hover:scale-105 active:scale-95 cursor-pointer select-none" @click="startLearning">
+                  <!-- Animated Light Sheen Sweep across CTA button on Hover -->
+                  <span class="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none"></span>
+                  <span class="relative z-10">Mulai Belajar Sekarang</span>
+                  <i class="ph-bold ph-arrow-right text-base sm:text-lg relative z-10 group-hover/btn:translate-x-1.5 transition-transform duration-300"></i>
                 </button>
-                <button class="w-full sm:w-auto h-11 sm:h-12 px-5 sm:px-6 rounded-xl sm:rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 hover:scale-105 active:scale-95 cursor-pointer" @click="scrollToSection('calculator')">
+                <button class="w-full sm:w-auto h-11 sm:h-12 px-5 sm:px-6 rounded-xl sm:rounded-2xl border border-white/20 hover:border-[#c0ff00]/60 bg-white/5 hover:bg-[#c0ff00]/10 text-white hover:text-[#c0ff00] font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 hover:scale-105 active:scale-95 cursor-pointer shadow-sm hover:shadow-[0_0_20px_rgba(192,255,0,0.2)] select-none" @click="scrollToSection('calculator')">
                   <i class="ph-bold ph-calculator text-base sm:text-lg"></i>
                   <span>Hitung Peluang Lolos</span>
                 </button>
               </div>
 
-              <div class="text-xs sm:text-sm text-slate-300 font-medium pb-2 text-center">
-                Pilihan metode <strong>Full Online 24/7</strong> atau <strong>Hybrid Tatap Muka</strong> di sentra bimbel cabang.
+              <!-- Methods Line with Live Mode Badges -->
+              <div class="text-xs sm:text-sm text-slate-300 font-medium pb-2 text-center flex flex-wrap items-center justify-center gap-2">
+                <span class="text-white/60">Pilihan metode belajar:</span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-xs font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Full Online 24/7
+                </span>
+                <span class="text-white/30">•</span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-[#c0ff00]/10 border border-[#c0ff00]/25 text-[#c0ff00] text-xs font-bold">
+                  <i class="ph-bold ph-buildings text-[11px]"></i>
+                  Hybrid Tatap Muka Cabang
+                </span>
               </div>
             </div>
           </div>
