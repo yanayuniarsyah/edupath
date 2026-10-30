@@ -4213,7 +4213,7 @@
               <span class="font-black text-white text-lg tracking-tight">EduPath<span style="color: #c0ff00;">.ai</span></span>
             </div>
             <p class="text-xs text-white/60 leading-relaxed">
-              Platform teknologi belajar adaptif, diagnostic test IRT, dan persiapan SNBT terukur.
+              Platform teknologi belajar adaptif AI &amp; bimbel terpadu untuk jenjang SD, SMP, SMA, dan persiapan tembus PTN.
             </p>
             <div class="pt-2 border-t border-white/5">
               <div class="text-[11px] font-bold text-white/70 uppercase tracking-wider">Entitas Resmi:</div>
@@ -6105,7 +6105,7 @@ export default {
       if (tabInfo) {
         document.title = `${tabInfo.label} | EduPath`;
       } else {
-        document.title = 'EduPath - Platform Belajar Adaptif & Persiapan SNBT Terukur';
+        document.title = 'EduPath — Bimbel Adaptif Terpadu SD, SMP, SMA & SNPMB';
       }
       initScrollReveal();
     });
@@ -7011,6 +7011,7 @@ export default {
     };
 
     const rotatingWords = [
+      'AI Adaptif & Tutor Berpengalaman.',
       'Jalur Belajar Adaptif AI.',
       'Lolos Masuk Sekolah Favorit.',
       'Tembus Kuota SNBP & PTN Top.',
