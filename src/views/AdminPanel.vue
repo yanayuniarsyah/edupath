@@ -2516,7 +2516,7 @@
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('username')">Username <i v-if="sortKey === 'username'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Cabang</th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Asal Cabang</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('role')">Peran (Role) <i v-if="sortKey === 'role'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Status</th>
                     <th class="text-right px-4 py-3 font-black uppercase tracking-wider">Aksi</th>
@@ -2842,7 +2842,7 @@
             <i class="ph-bold ph-chalkboard-teacher text-[#c0ff00]"></i>
             <span>{{ classForm.id ? 'Ubah Rombel Offline' : 'Buat Kelas Offline Baru' }}</span>
           </h3>
-          <button @click="showClassModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showClassModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
@@ -2910,7 +2910,7 @@
             <i class="ph-bold ph-door text-sky-400"></i>
             <span>Tambah Ruang Belajar</span>
           </h3>
-          <button @click="showRoomModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showRoomModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
@@ -2954,7 +2954,7 @@
             </h3>
             <p class="text-[10px] text-white/40">Kapasitas: {{ selectedClassStudentsList.length }} / {{ selectedClassForStudents?.max_capacity }} Siswa</p>
           </div>
-          <button @click="showManageStudentsModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showManageStudentsModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
 
         <!-- Form Tambah Siswa ke Kelas -->
@@ -3017,8 +3017,8 @@
               Konfigurasi hari & jam rutin belajar, lalu generate otomatis seluruh sesi pertemuan kalender tanpa benturan.
             </p>
           </div>
-          <button @click="showRecurringScheduleModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup">
-            <i class="ph-bold ph-x text-sm"></i>
+          <button @click="showRecurringScheduleModal = false" class="modal-close-btn" title="Tutup">
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -3296,7 +3296,7 @@
               {{ activeBapSession?.class_name }} • Tanggal: {{ activeBapSession?.session_date }} ({{ (activeBapSession?.start_time || '').slice(0, 5) }}–{{ (activeBapSession?.end_time || '').slice(0, 5) }}) • Ruang: {{ activeBapSession?.room_name || 'Offline' }}
             </p>
           </div>
-          <button @click="showBapModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showBapModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
 
         <div class="flex-grow overflow-y-auto p-4 sm:p-6 space-y-5">
@@ -3412,7 +3412,7 @@
             <span class="text-[10px] text-white/40">
               ✅ {{ telegramBlastStatuses.filter(s => s.status === 'sent').length }} / {{ telegramBlastStatuses.length }} terkirim
             </span>
-            <button @click="showTelegramBlastModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+            <button @click="showTelegramBlastModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
           </div>
         </div>
         <div class="p-3 space-y-2">
@@ -3442,7 +3442,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
           <h3 class="font-black text-sm text-white">Tambah Transaksi Manual / Offline</h3>
-          <button @click="showOrderModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showOrderModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <form @submit.prevent="saveManualOrder" class="p-4 space-y-3">
           <div>
@@ -3486,7 +3486,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-xs shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between">
           <h3 class="font-black text-sm text-white">Ubah Status Transaksi</h3>
-          <button @click="showOrderStatusModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showOrderStatusModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <div class="p-4 space-y-3">
           <div>
@@ -3517,7 +3517,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-xs shadow-2xl animate-fade-in text-white overflow-hidden">
         <div class="p-4 border-b border-white/10 flex items-center justify-between">
           <h3 class="font-black text-sm text-white">Cairkan Komisi</h3>
-          <button @click="closePayoutModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="closePayoutModal" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <div class="p-4 space-y-3">
           <div class="bg-amber-500/10 text-amber-300 p-2.5 rounded-lg text-[10px] font-medium border border-amber-500/20">
@@ -3551,7 +3551,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-xs shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between">
           <h3 class="font-black text-sm text-white">Tolak Permintaan Payout</h3>
-          <button @click="showRejectPayoutModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showRejectPayoutModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <div class="p-4 space-y-3">
           <div>
@@ -3573,7 +3573,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
           <h3 class="font-black text-sm text-white">{{ isEditingAffiliate ? 'Edit Mitra Afiliasi' : 'Tambah Mitra Afiliasi' }}</h3>
-          <button @click="showAffiliateModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showAffiliateModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <form @submit.prevent="saveAffiliate" class="p-4 space-y-3">
           <div v-if="isSuperadmin && tenantsList.length > 0">
@@ -3652,8 +3652,8 @@
             <i class="ph-bold ph-wallet text-amber-400 text-lg"></i>
             <h3 class="font-black text-sm text-white">Tarik Saldo Komisi</h3>
           </div>
-          <button @click="showPayoutRequestModal = false" class="text-white/40 hover:text-white transition-colors cursor-pointer">
-            <i class="ph-bold ph-x text-base"></i>
+          <button @click="showPayoutRequestModal = false" class="modal-close-btn" title="Tutup">
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -3715,7 +3715,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
           <h3 class="font-black text-sm text-white">{{ isEditingStudent ? 'Edit Siswa' : 'Tambah Siswa Baru' }}</h3>
-          <button @click="showStudentModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showStudentModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <form @submit.prevent="saveStudent" class="p-4 space-y-3">
           <div>
@@ -3788,7 +3788,7 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
           <h3 class="font-black text-sm text-white">{{ isEditingPlan ? 'Edit Paket' : 'Tambah Paket Baru' }}</h3>
-          <button @click="closePlanModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="closePlanModal" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <form @submit.prevent="savePlan" class="p-4 space-y-3">
           <div>
@@ -3853,19 +3853,31 @@
       <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in text-white">
         <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0d1427] z-10">
           <h3 class="font-black text-sm text-white">{{ isEditingStaff ? (isSuperadmin ? 'Edit Staff' : 'Edit Guru / Tutor') : (isSuperadmin ? 'Tambah Staff Baru' : 'Tambah Guru / Tutor Baru') }}</h3>
-          <button @click="closeStaffModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="closeStaffModal" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <form @submit.prevent="saveStaff" class="p-4 space-y-3">
           <div>
             <label for="staff_form_username" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email (sebagai Username)</label>
             <input id="staff_form_username" name="username" v-model="sForm.username" :disabled="isEditingStaff && sForm.username === 'admin'" required type="text" :placeholder="isSuperadmin ? 'nama@bimbel.com' : 'email.guru@bimbel.com'" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50" />
           </div>
-          <div v-if="isSuperadmin && tenantsList.length > 0">
-            <label for="staff_form_tenant" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cabang / Lembaga Bimbel (Opsional)</label>
-            <select id="staff_form_tenant" name="tenant_id" v-model="sForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-              <option value="" class="bg-[#0d1427] text-white">-- Semua Cabang (Pusat) --</option>
-              <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
-            </select>
+          <div>
+            <label for="staff_form_tenant" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="ph-bold ph-buildings text-[#c0ff00]"></i> Asal Cabang
+            </label>
+            <div v-if="isSuperadmin">
+              <select id="staff_form_tenant" name="tenant_id" v-model="sForm.tenant_id" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option value="" class="bg-[#0d1427] text-white">-- Semua Cabang (Pusat) --</option>
+                <option v-for="t in tenantsList" :key="t.id" :value="t.id" class="bg-[#0d1427] text-white">{{ t.name }}</option>
+              </select>
+              <p class="text-[9px] text-white/40 mt-1">Pilih cabang penempatan guru/staf ini (atau Pusat jika global).</p>
+            </div>
+            <div v-else class="w-full p-2.5 text-xs text-white bg-white/5 border border-white/10 rounded-lg font-medium flex items-center justify-between">
+              <span class="flex items-center gap-2 text-white">
+                <i class="ph-bold ph-buildings text-indigo-400 text-sm"></i>
+                <span class="font-bold">{{ sForm.tenant_name || currentAdminUser?.tenant_name || 'Cabang Terdaftar' }}</span>
+              </span>
+              <span class="text-[9px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded font-mono font-bold">Cabang Anda</span>
+            </div>
           </div>
           <div>
             <label for="staff_form_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Lengkap Guru / Tutor</label>
@@ -3901,7 +3913,7 @@
             <i class="ph-bold ph-buildings text-[#c0ff00]"></i>
             {{ isEditingBranch ? 'Edit Master Cabang' : 'Tambah Cabang Baru' }}
           </h3>
-          <button @click="showBranchModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showBranchModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <form @submit.prevent="saveBranch" class="p-4 space-y-3">
           <div>
@@ -3957,7 +3969,7 @@
             <i class="ph-bold ph-graduation-cap text-[#c0ff00]"></i>
             {{ isEditingSchool ? 'Edit Data Sekolah Mitra' : 'Tambah Sekolah Mitra Baru' }}
           </h3>
-          <button @click="showSchoolModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showSchoolModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <form @submit.prevent="saveSchool" class="p-4 space-y-3.5">
           <!-- Row 1: Nama & NPSN -->
@@ -4067,7 +4079,7 @@
               <p class="text-[10px] text-white/50">{{ selectedSchoolForReferral.name }}</p>
             </div>
           </div>
-          <button @click="showSchoolReferralModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="showSchoolReferralModal = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
 
         <p class="text-xs text-white/70 leading-relaxed">
@@ -4110,7 +4122,7 @@
             <i class="ph-bold ph-plus-circle text-[#c0ff00] text-lg"></i>
             <h3 class="font-black text-sm text-white">{{ isEditingQuestion ? 'Edit Soal Ujian / Latihan' : 'Tambah Soal Baru' }}</h3>
           </div>
-          <button @click="closeQuestionModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="closeQuestionModal" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <form @submit.prevent="saveQuestion" class="p-5 space-y-4">
           <!-- Row 1: Program Ujian & Peminatan / Track -->
@@ -4362,7 +4374,7 @@
             <i class="ph-bold ph-note-pencil text-[#c0ff00] text-lg"></i>
             <h3 class="font-black text-sm text-white">{{ isEditingMaterial ? 'Edit Materi Pembelajaran' : 'Tambah Materi Baru' }}</h3>
           </div>
-          <button @click="closeMaterialModal" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="closeMaterialModal" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
 
         <!-- Success Alert when saved while staying inside modal -->
@@ -4534,7 +4546,7 @@
               👨‍🏫 {{ selectedQuestionForPreview.teacher_name }}
             </span>
           </div>
-          <button @click="closeQuestionPreview" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup"><i class="ph-bold ph-x text-sm"></i></button>
+          <button @click="closeQuestionPreview" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
         <div class="p-6 space-y-6">
           <div class="space-y-2">
@@ -4583,8 +4595,8 @@
               <p class="text-[10px] text-amber-300/80">Tindakan ini akan menimpa data database aktif saat ini</p>
             </div>
           </div>
-          <button @click="closeRestoreModal" class="text-white/40 hover:text-white transition-colors">
-            <i class="ph-bold ph-x text-base"></i>
+          <button @click="closeRestoreModal" class="modal-close-btn" title="Tutup">
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -6880,17 +6892,23 @@ const filteredStaffMembers = computed(() => {
 
 const showStaffModal = ref(false);
 const isEditingStaff = ref(false);
-const sForm = reactive({ id: null, tenant_id: '', username: '', name: '', role: 'teacher', password: '' });
+const sForm = reactive({ id: null, tenant_id: '', tenant_name: '', username: '', name: '', role: 'teacher', password: '' });
 
 const openStaffModal = (s = null) => {
+  if (isSuperadmin.value && (!tenantsList.value || tenantsList.value.length === 0)) {
+    fetchTenants();
+  }
   const myTenant = currentAdminUser.value?.tenant_id || tenantsList.value?.[0]?.id || '';
+  const myTenantName = currentAdminUser.value?.tenant_name || tenantsList.value?.find(t => t.id === myTenant)?.name || (myTenant ? 'Cabang Terdaftar' : 'Semua Cabang (Pusat)');
   if (s) {
     isEditingStaff.value = true;
-    Object.assign(sForm, { ...s, password: '', tenant_id: s.tenant_id || myTenant });
+    const staffTenantId = s.tenant_id || myTenant;
+    const staffTenantName = s.tenant_name || tenantsList.value?.find(t => t.id === staffTenantId)?.name || (staffTenantId ? 'Cabang Terdaftar' : 'Semua Cabang (Pusat)');
+    Object.assign(sForm, { ...s, password: '', tenant_id: staffTenantId, tenant_name: staffTenantName });
     if (!isSuperadmin.value) sForm.role = 'teacher';
   } else {
     isEditingStaff.value = false;
-    Object.assign(sForm, { id: null, tenant_id: myTenant, username: '', name: '', role: 'teacher', password: '' });
+    Object.assign(sForm, { id: null, tenant_id: myTenant, tenant_name: myTenantName, username: '', name: '', role: 'teacher', password: '' });
   }
   showStaffModal.value = true;
 };

@@ -478,39 +478,52 @@ input[type=range]::-moz-range-thumb:hover {
    UNIVERSAL MODAL CLOSE BUTTON & CLICK HITBOXES
    ===================================================== */
 .modal-close-btn,
+button[title="Tutup"],
 .glass-card > .modal-close-btn,
 .glass-card > button.modal-close-btn {
-  position: absolute !important;
-  z-index: 9999 !important;
   pointer-events: auto !important;
   touch-action: manipulation;
   cursor: pointer !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px !important;
-  min-height: 32px !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
   border-radius: 9999px !important;
-  transition: all 0.15s ease-in-out !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
   user-select: none !important;
+  flex-shrink: 0 !important;
 }
 
-.modal-close-btn:hover {
-  transform: scale(1.08) !important;
+.modal-close-btn.absolute,
+.modal-close-btn[class*="top-"],
+.glass-card > .modal-close-btn,
+.glass-card > button.modal-close-btn {
+  position: absolute !important;
+  z-index: 9999 !important;
 }
 
-.modal-close-btn:active {
+.modal-close-btn:hover,
+button[title="Tutup"]:hover {
+  transform: scale(1.1) !important;
+}
+
+.modal-close-btn:active,
+button[title="Tutup"]:active {
   transform: scale(0.92) !important;
 }
 
 .modal-close-btn i,
-.modal-close-btn svg {
+.modal-close-btn svg,
+button[title="Tutup"] i,
+button[title="Tutup"] svg {
   pointer-events: none !important;
   display: inline-block !important;
-  font-size: 14px !important;
+  font-size: 18px !important;
   line-height: 1 !important;
+  font-weight: 800 !important;
 }
 
 /* =====================================================

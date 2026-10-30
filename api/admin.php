@@ -2781,13 +2781,7 @@ elseif ($action === 'staff') {
             }
         } else {
             // Superadmin (Bisa memilih cabang atau default pusat)
-            if (empty($tenant_id)) {
-                $tenant_id = $input['tenant_id'] ?? '';
-                if (empty($tenant_id)) {
-                    $tFirst = $pdo->query("SELECT id FROM tenants WHERE is_active = 1 LIMIT 1")->fetchColumn();
-                    $tenant_id = $tFirst ?: null;
-                }
-            }
+            $tenant_id = !empty($input['tenant_id']) ? $input['tenant_id'] : null;
             if (!in_array($role, ['admin', 'teacher'])) $role = 'teacher';
         }
 
@@ -2845,8 +2839,10 @@ elseif ($action === 'staff') {
         
         $tenant_id = $payload->role === 'superadmin' ? null : $payload->tenant_id;
         $scope = '';
+        $userRoleScope = '';
         if ($payload->role !== 'superadmin') {
             $scope = $tenant_id ? " AND ur.tenant_id = ?" : " AND ur.tenant_id IS NULL";
+            $userRoleScope = $tenant_id ? " AND tenant_id = ?" : " AND tenant_id IS NULL";
         }
         try {
             $stmt = $pdo->prepare("UPDATE admins a JOIN user_roles ur ON ur.reference_id = a.id SET a.name = ? WHERE a.id = ? AND ur.role != 'superadmin' $scope");
@@ -2854,7 +2850,7 @@ elseif ($action === 'staff') {
             if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
             $stmt->execute($params);
 
-            $stmt = $pdo->prepare("UPDATE user_roles SET role = ? WHERE reference_id = ? AND role != 'superadmin' $scope");
+            $stmt = $pdo->prepare("UPDATE user_roles SET role = ? WHERE reference_id = ? AND role != 'superadmin' $userRoleScope");
             $params = [$role, $id];
             if ($payload->role !== 'superadmin' && $tenant_id) $params[] = $tenant_id;
             $stmt->execute($params);
