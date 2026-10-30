@@ -4329,11 +4329,11 @@
         <button
           type="button"
           @click.stop="showPlanSelectorModal = false"
-          class="modal-close-btn top-5 right-5 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer"
+          class="modal-close-btn absolute top-5 right-5"
           title="Tutup"
           aria-label="Tutup"
         >
-          <i class="ph-bold ph-x text-sm pointer-events-none"></i>
+          <i class="ph-bold ph-x"></i>
         </button>
 
         <!-- Header -->
@@ -4657,11 +4657,11 @@
           <button
             type="button"
             @click.stop="closeCheckoutModal"
-            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn absolute top-4 right-4"
             title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
         
@@ -4730,11 +4730,11 @@
         <button
           type="button"
           @click.stop="showLoginModal = false"
-          class="modal-close-btn top-3.5 right-3.5 sm:top-4 sm:right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer z-50 shrink-0"
+          class="modal-close-btn absolute top-3.5 right-3.5 sm:top-4 sm:right-4 z-50"
           title="Tutup"
           aria-label="Tutup"
         >
-          <i class="ph-bold ph-x text-sm pointer-events-none"></i>
+          <i class="ph-bold ph-x"></i>
         </button>
 
         <!-- Logo & Header (Compact to maximize usable form height) -->
@@ -4978,11 +4978,11 @@
           <button
             type="button"
             @click.stop="showTermsModal = false"
-            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn absolute top-4 right-4"
             title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -5119,11 +5119,11 @@
           <button
             type="button"
             @click.stop="showPrivacyModal = false"
-            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn absolute top-4 right-4"
             title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -5181,11 +5181,11 @@
           <button
             type="button"
             @click.stop="showDisclaimerModal = false"
-            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn absolute top-4 right-4"
             title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -5240,11 +5240,11 @@
           <button
             type="button"
             @click.stop="showParentConsentModal = false"
-            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn absolute top-4 right-4"
             title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -5298,11 +5298,11 @@
           <button
             type="button"
             @click.stop="showContactModal = false"
-            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn absolute top-4 right-4"
             title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -5419,11 +5419,11 @@
           <button
             type="button"
             @click.stop="showAffiliateRegisterModal = false"
-            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn absolute top-4 right-4"
             title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
         <div class="edupath-modal-body">

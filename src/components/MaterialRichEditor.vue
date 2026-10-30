@@ -71,7 +71,7 @@
         <span class="flex items-center gap-1.5">
           <i class="ph-bold ph-check-circle"></i> Teks dari Microsoft Word berhasil dibersihkan dan disesuaikan secara otomatis.
         </span>
-        <button type="button" @click="showPasteNotice = false" class="text-white/60 hover:text-white cursor-pointer">&times;</button>
+        <button type="button" @click="showPasteNotice = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
       </div>
 
       <!-- Toolbar (Only in Editor Mode) -->
@@ -296,8 +296,8 @@
           <h4 class="font-black text-sm flex items-center gap-2 text-indigo-300">
             <i class="ph-bold ph-table"></i> Buat Tabel Baru
           </h4>
-          <button type="button" @click.stop="showTableModal = false" class="modal-close-btn top-4 right-4 w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 flex items-center justify-center transition-all cursor-pointer">
-            <i class="ph-bold ph-x text-xs pointer-events-none"></i>
+          <button type="button" @click.stop="showTableModal = false" class="modal-close-btn absolute top-4 right-4" title="Tutup">
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -331,8 +331,8 @@
           <h4 class="font-black text-sm flex items-center gap-2 text-emerald-300">
             <i class="ph-bold ph-image"></i> Sisipkan Gambar Materi
           </h4>
-          <button type="button" @click.stop="showImageModal = false" class="modal-close-btn top-4 right-4 w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 flex items-center justify-center transition-all cursor-pointer">
-            <i class="ph-bold ph-x text-xs pointer-events-none"></i>
+          <button type="button" @click.stop="showImageModal = false" class="modal-close-btn absolute top-4 right-4" title="Tutup">
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -407,8 +407,8 @@
               <p class="text-[10px] text-white/50">Mendukung penulisan pangkat, akar, pecahan, matriks, kalkulus, dan simbol kompleks</p>
             </div>
           </div>
-          <button type="button" @click.stop="showMathModal = false" class="modal-close-btn top-4 right-4 w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 flex items-center justify-center transition-all cursor-pointer">
-            <i class="ph-bold ph-x text-xs pointer-events-none"></i>
+          <button type="button" @click.stop="showMathModal = false" class="modal-close-btn absolute top-4 right-4" title="Tutup">
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 
@@ -502,8 +502,8 @@
           <h4 class="font-black text-sm flex items-center gap-2 text-sky-300">
             <i class="ph-bold ph-link"></i> Sisipkan Hyperlink
           </h4>
-          <button type="button" @click.stop="showLinkModal = false" class="modal-close-btn top-4 right-4 w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 flex items-center justify-center transition-all cursor-pointer">
-            <i class="ph-bold ph-x text-xs pointer-events-none"></i>
+          <button type="button" @click.stop="showLinkModal = false" class="modal-close-btn absolute top-4 right-4" title="Tutup">
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
 

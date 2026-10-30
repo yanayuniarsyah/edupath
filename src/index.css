@@ -491,10 +491,18 @@ button[title="Tutup"],
   height: 26px !important;
   min-width: 26px !important;
   min-height: 26px !important;
+  max-width: 26px !important;
+  max-height: 26px !important;
+  padding: 0 !important;
   border-radius: 9999px !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
   user-select: none !important;
   flex-shrink: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .modal-close-btn.absolute,
@@ -507,7 +515,10 @@ button[title="Tutup"],
 
 .modal-close-btn:hover,
 button[title="Tutup"]:hover {
-  transform: scale(1.1) !important;
+  background-color: rgba(244, 63, 94, 0.22) !important;
+  border-color: rgba(244, 63, 94, 0.45) !important;
+  color: #fda4af !important;
+  transform: scale(1.08) !important;
 }
 
 .modal-close-btn:active,
@@ -520,10 +531,14 @@ button[title="Tutup"]:active {
 button[title="Tutup"] i,
 button[title="Tutup"] svg {
   pointer-events: none !important;
-  display: inline-block !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   font-size: 12px !important;
   line-height: 1 !important;
   font-weight: 800 !important;
+  width: 12px !important;
+  height: 12px !important;
 }
 
 /* =====================================================

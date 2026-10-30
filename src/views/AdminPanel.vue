@@ -4383,7 +4383,7 @@
             <i class="ph-bold ph-check-circle text-base text-emerald-400"></i>
             <span>Materi berhasil disimpan! Anda tetap berada di halaman edit materi ini untuk melanjutkan.</span>
           </div>
-          <button type="button" @click="saveSuccessNotice = false" class="text-white/40 hover:text-white cursor-pointer">&times;</button>
+          <button type="button" @click="saveSuccessNotice = false" class="modal-close-btn" title="Tutup"><i class="ph-bold ph-x"></i></button>
         </div>
 
         <form @submit.prevent="saveMaterial(false)" class="p-5 space-y-4">
