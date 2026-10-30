@@ -524,10 +524,11 @@
             <!-- Inner container: TERIKAT ke viewport -->
             <div class="w-full max-w-4xl mx-auto px-5 sm:px-8 text-center space-y-4" style="box-sizing: border-box;">
 
-              <!-- Punchy Headline -->
+              <!-- Punchy Headline Multi-Program -->
               <h1 class="font-black font-heading leading-[1.1] text-white tracking-tight flex flex-col justify-center"
                   style="font-size: clamp(1.8rem, 7vw, 3.75rem); min-height: clamp(90px, 20vw, 140px);">
-                <span>Tembus PTN Impian</span>
+                <span>Bimbel Adaptif Terpadu</span>
+                <span class="text-xs sm:text-base md:text-lg font-bold text-white/80 uppercase tracking-widest mt-1">SD • SMP • SMA • SNPMB</span>
                 <transition name="fade-word" mode="out-in">
                   <span :key="currentWordIdx" style="display: block; word-break: break-word;">
                     dengan <span style="color: #c0ff00; font-style: italic;">{{ rotatingWords[currentWordIdx] }}</span>
@@ -536,56 +537,32 @@
               </h1>
 
               <p class="text-sm sm:text-base md:text-lg text-white/70 mx-auto font-medium leading-relaxed"
-                 style="max-width: min(36rem, calc(100vw - 2.5rem));">
-                EduPath membantu siswa menemukan kelemahan belajar, menyusun jalur belajar adaptif, dan meningkatkan kesiapan menghadapi SNBT secara terukur.
+                 style="max-width: min(38rem, calc(100vw - 2.5rem));">
+                Dari fondasi numerasi-literasi SD, persiapan masuk SMA unggulan (SMP), hingga kurikulum intensif TKA SMA &amp; tembus PTN impian dengan AI adaptif dan tutor bimbel berpengalaman.
               </p>
 
-              <!-- Countdown Timer -->
-              <div class="pt-1 flex justify-center">
-                <div class="inline-flex flex-wrap items-center justify-center gap-1.5 px-3 py-2 rounded-full border border-white/15 bg-black/50 backdrop-blur-md shadow-lg"
-                     style="max-width: calc(100vw - 2.5rem);">
-                  <span class="flex items-center gap-1 text-white/70 font-bold uppercase tracking-wider"
-                        style="font-size: clamp(8px, 2.5vw, 11px);">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00] animate-pulse"></span>
-                    UTBK 2027
-                  </span>
-                  <span class="text-white/20">•</span>
-                  <div class="flex items-center gap-1 font-mono"
-                       style="font-size: clamp(10px, 3vw, 13px);">
-                    <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 font-bold text-white flex items-baseline">
-                      <span class="font-black">{{ countdownDays }}</span>
-                      <span class="text-white/50 font-bold ml-0.5" style="font-size: 9px;">h</span>
-                    </span>
-                    <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 font-bold text-white flex items-baseline">
-                      <span class="font-black">{{ countdownHours.toString().padStart(2, '0') }}</span>
-                      <span class="text-white/50 font-bold ml-0.5" style="font-size: 9px;">j</span>
-                    </span>
-                    <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 font-bold text-white flex items-baseline">
-                      <span class="font-black">{{ countdownMinutes.toString().padStart(2, '0') }}</span>
-                      <span class="text-white/50 font-bold ml-0.5" style="font-size: 9px;">m</span>
-                    </span>
-                    <span class="px-1.5 py-0.5 rounded-md bg-[#c0ff00]/10 border border-[#c0ff00]/30 font-bold text-[#c0ff00] flex items-baseline">
-                      <span class="font-black">{{ countdownSeconds.toString().padStart(2, '0') }}</span>
-                      <span class="text-[#c0ff00]/70 font-bold ml-0.5" style="font-size: 9px;">d</span>
-                    </span>
-                  </div>
-                </div>
+              <!-- Academic Program Badges Under Hero -->
+              <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 pt-1">
+                <span class="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black bg-amber-500/15 text-amber-300 border border-amber-500/30">🎒 TKA SD (Kelas 4–6)</span>
+                <span class="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">📚 TKA SMP (Kelas 7–9)</span>
+                <span class="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">🔬 TKA SMA (Kelas 10–12)</span>
+                <span class="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black bg-blue-500/15 text-blue-300 border border-blue-500/30">🎓 SNPMB &amp; Pejuang PTN</span>
               </div>
 
               <!-- CTA Buttons -->
-              <div class="flex flex-col sm:flex-row justify-center items-center gap-3 pt-6 sm:pt-10 md:pt-14 relative z-20 w-full max-w-sm sm:max-w-none mx-auto px-4 sm:px-0">
+              <div class="flex flex-col sm:flex-row justify-center items-center gap-3 pt-4 sm:pt-6 md:pt-8 relative z-20 w-full max-w-sm sm:max-w-none mx-auto px-4 sm:px-0">
                 <button class="w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8 rounded-xl sm:rounded-2xl border border-[#c0ff00]/60 bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-sm sm:text-base transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.35)] hover:scale-105 active:scale-95 cursor-pointer" @click="startLearning">
                   <span>Mulai Belajar Sekarang</span>
                   <i class="ph-bold ph-arrow-right text-base sm:text-lg"></i>
                 </button>
                 <button class="w-full sm:w-auto h-11 sm:h-12 px-5 sm:px-6 rounded-xl sm:rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 hover:scale-105 active:scale-95 cursor-pointer" @click="scrollToSection('calculator')">
                   <i class="ph-bold ph-calculator text-base sm:text-lg"></i>
-                  <span>Hitung Peluang PTN</span>
+                  <span>Hitung Peluang Lolos</span>
                 </button>
               </div>
 
               <div class="text-xs sm:text-sm text-slate-300 font-medium pb-2 text-center">
-                Untuk Siswa SMA &amp; Pejuang Gap Year yang serius meraih PTN impian.
+                Pilihan metode <strong>Full Online 24/7</strong> atau <strong>Hybrid Tatap Muka</strong> di sentra bimbel cabang.
               </div>
             </div>
           </div>
@@ -681,16 +658,37 @@
             <StudentPotentialPath @take-readiness="handleTakeReadinessFromSpp" />
           </div>
 
-          <!-- 3. Dynamic Section: KALKULATOR PREDIKSI SKOR & PELUANG LOLOS PTN AI -->
+          <!-- 3. Dynamic Section: KALKULATOR PREDIKSI SKOR & PELUANG LOLOS AI (SD, SMP, SMA, SNPMB) -->
           <div id="calculator" class="section-wrapper space-y-12 scroll-mt-24 relative">
             <div class="text-center max-w-3xl mx-auto space-y-3 reveal px-2">
               <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#c0ff00]/30 bg-[#c0ff00]/10 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
-                🎯 SIMULASI INTERAKTIF AI
+                🎯 SIMULASI INTERAKTIF MULTI-PROGRAM
               </span>
-              <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight break-words">Hitung Peluang <span style="color: #c0ff00;">Lolos PTN-mu</span></h2>
+              <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight break-words">
+                Hitung Peluang <span style="color: #c0ff00;">Lolos Target Impianmu</span>
+              </h2>
               <p class="text-sm md:text-base text-white/60 font-medium max-w-2xl mx-auto leading-relaxed">
-                Geser slider sesuai kondisimu saat ini. Sistem AI EduPath akan mengkalkulasi proyeksi lonjakan nilai dan peluang kelulusanmu secara real-time!
+                Pilih jenjang pendidikanmu (SD, SMP, SMA, atau SNPMB), geser slider sesuai kondisimu, dan sistem AI EduPath akan mengkalkulasi proyeksi lonjakan nilai serta peluang kelulusanmu!
               </p>
+
+              <!-- Level Selector Tabs: SD, SMP, SMA, SNPMB -->
+              <div class="flex flex-wrap justify-center gap-2 pt-2">
+                <button
+                  v-for="lvl in simLevels"
+                  :key="lvl.id"
+                  type="button"
+                  @click="setSimLevel(lvl.id)"
+                  :class="[
+                    'px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm',
+                    selectedSimLevel === lvl.id
+                      ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/30 font-black scale-105'
+                      : 'bg-white/5 text-white/70 hover:text-white border border-white/10 hover:border-white/20'
+                  ]"
+                >
+                  <span>{{ lvl.icon }}</span>
+                  <span>{{ lvl.name }}</span>
+                </button>
+              </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch max-w-5xl mx-auto">
@@ -700,21 +698,21 @@
                 <div class="space-y-3.5 sm:space-y-4">
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <label class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-1.5">
-                      <span>🏛️</span> Target Universitas &amp; Jurusan:
+                      <span>{{ currentSimLevelConfig.icon }}</span> {{ currentSimLevelConfig.targetLabel }}:
                     </label>
                     <span class="inline-flex items-center self-start sm:self-auto text-xs font-bold text-[#c0ff00] bg-[#c0ff00]/10 px-3 py-1 rounded-xl border border-[#c0ff00]/30 font-mono whitespace-nowrap">
-                      Target: {{ simTargetPtn.targetScore }} Poin
+                      Target: {{ simTargetPtn?.targetScore || 80 }} {{ currentSimLevelConfig.scoreUnit }}
                     </span>
                   </div>
                   
-                  <!-- Dropdown Selector for all 50 PTNs -->
+                  <!-- Dropdown Selector for Targets of Selected Level -->
                   <div class="relative">
                     <select
                       v-model="simTargetPtn"
                       class="w-full bg-slate-900/90 border border-white/20 text-white text-xs md:text-sm font-bold py-3 px-3.5 pr-8 rounded-xl appearance-none outline-none focus:border-[#c0ff00] transition-colors cursor-pointer shadow-inner"
                     >
-                      <option v-for="ptn in targetPtnList" :key="ptn.id" :value="ptn" class="bg-slate-900 text-white font-medium py-1">
-                        ⭐ [{{ ptn.targetScore }} Poin] {{ ptn.name }}
+                      <option v-for="tgt in currentTargetList" :key="tgt.id" :value="tgt" class="bg-slate-900 text-white font-medium py-1">
+                        ⭐ [{{ tgt.targetScore }} {{ currentSimLevelConfig.scoreUnit }}] {{ tgt.name }}
                       </option>
                     </select>
                     <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#c0ff00] text-xs">
@@ -722,55 +720,55 @@
                     </div>
                   </div>
 
-                  <!-- Quick-Pick Tabs for Top 8 High Score PTNs (Mobile-optimized horizontal scroll / desktop grid) -->
+                  <!-- Quick-Pick Tabs for Level Targets -->
                   <div class="space-y-2 pt-1">
                     <div class="text-[10px] uppercase tracking-wider font-bold text-white/40 flex items-center justify-between">
-                      <span>Pilihan Cepat Terpopuler:</span>
-                      <span class="text-[9px] text-[#c0ff00]">50 Lengkap di Dropdown ↑</span>
+                      <span>Pilihan Cepat Target:</span>
+                      <span class="text-[9px] text-[#c0ff00]">Daftar Lengkap di Dropdown ↑</span>
                     </div>
-                    <div class="flex sm:grid sm:grid-cols-4 gap-2 overflow-x-auto pb-1.5 sm:pb-0 no-scrollbar">
+                    <div class="flex sm:grid sm:grid-cols-3 md:grid-cols-4 gap-2 overflow-x-auto pb-1.5 sm:pb-0 no-scrollbar">
                       <button
-                        v-for="ptn in targetPtnList.slice(0, 8)"
-                        :key="ptn.id"
+                        v-for="tgt in currentTargetList.slice(0, 6)"
+                        :key="tgt.id"
                         type="button"
-                        :class="['p-2.5 rounded-xl text-xs font-bold text-left transition-colors duration-150 border flex flex-col justify-between shrink-0 min-w-[130px] sm:min-w-0 h-[60px] sm:h-[68px] cursor-pointer',
-                          simTargetPtn.id === ptn.id
+                        :class="['p-2.5 rounded-xl text-xs font-bold text-left transition-colors duration-150 border flex flex-col justify-between shrink-0 min-w-[140px] sm:min-w-0 h-[64px] sm:h-[70px] cursor-pointer',
+                          simTargetPtn?.id === tgt.id
                             ? 'bg-[#c0ff00] text-black border-[#c0ff00] shadow-[0_0_15px_rgba(192,255,0,0.3)]'
                             : 'bg-white/5 text-white/70 border-white/10 hover:border-white/30 hover:bg-white/10'
                         ]"
-                        @click="simTargetPtn = ptn"
+                        @click="simTargetPtn = tgt"
                       >
-                        <span class="truncate font-black text-[11px]">{{ ptn.name.split(' (')[0] }}</span>
-                        <span :class="simTargetPtn.id === ptn.id ? 'text-black/80 font-mono text-[10px] font-bold' : 'text-[#c0ff00] font-mono text-[10px]'">
-                          {{ ptn.targetScore }} Poin
+                        <span class="truncate font-black text-[11px]">{{ tgt.name.split(' (')[0] }}</span>
+                        <span :class="simTargetPtn?.id === tgt.id ? 'text-black/80 font-mono text-[10px] font-bold' : 'text-[#c0ff00] font-mono text-[10px]'">
+                          {{ tgt.targetScore }} {{ currentSimLevelConfig.scoreUnit }}
                         </span>
                       </button>
                     </div>
                   </div>
                 </div>
 
-                <!-- Slider 1: Skor Tryout Terakhir -->
+                <!-- Slider 1: Skor / Nilai Terakhir -->
                 <div class="space-y-3 pt-1">
                   <div class="flex justify-between items-center gap-2">
                     <span class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-1.5">
-                      <span>📊</span> Skor Tryout Terakhir Kamu:
+                      <span>📊</span> {{ currentSimLevelConfig.scoreLabel }}:
                     </span>
                     <span class="text-base sm:text-xl font-black font-heading text-white font-mono bg-black/60 px-3 py-1 rounded-xl border border-white/10 shrink-0">
-                      {{ simCurrentScore }} <span class="text-[10px] sm:text-xs text-white/40 font-normal">Poin</span>
+                      {{ simCurrentScore }} <span class="text-[10px] sm:text-xs text-white/40 font-normal">{{ currentSimLevelConfig.scoreUnit }}</span>
                     </span>
                   </div>
                   <input
                     type="range"
                     v-model.number="simCurrentScore"
-                    min="400"
-                    max="750"
-                    step="5"
+                    :min="currentSimLevelConfig.minScore"
+                    :max="currentSimLevelConfig.maxScore"
+                    :step="selectedSimLevel === 'SNPMB' ? 5 : 1"
                     class="w-full h-2.5 cursor-pointer"
                   />
                   <div class="flex justify-between text-[10px] sm:text-[11px] font-bold text-white/30">
-                    <span>400 (Pemula)</span>
-                    <span>550 (Menengah)</span>
-                    <span>750 (Master)</span>
+                    <span>{{ currentSimLevelConfig.scoreScaleText.split(' - ')[0] }}</span>
+                    <span>{{ currentSimLevelConfig.scoreScaleText.split(' - ')[1] }}</span>
+                    <span>{{ currentSimLevelConfig.scoreScaleText.split(' - ')[2] }}</span>
                   </div>
                 </div>
 
@@ -787,15 +785,15 @@
                   <input
                     type="range"
                     v-model.number="simDailyHours"
-                    min="1"
-                    max="6"
+                    :min="currentSimLevelConfig.minHours"
+                    :max="currentSimLevelConfig.maxHours"
                     step="0.5"
                     class="w-full h-2.5 cursor-pointer"
                   />
                   <div class="flex justify-between text-[10px] sm:text-[11px] font-bold text-white/30">
-                    <span>1 Jam (Santai)</span>
-                    <span>3 Jam (Disiplin)</span>
-                    <span>6 Jam (Ambis)</span>
+                    <span>{{ currentSimLevelConfig.minHours }} Jam (Santai)</span>
+                    <span>{{ Math.round((currentSimLevelConfig.minHours + currentSimLevelConfig.maxHours) / 2) }} Jam (Disiplin)</span>
+                    <span>{{ currentSimLevelConfig.maxHours }} Jam (Ambis)</span>
                   </div>
                 </div>
               </div>
@@ -831,15 +829,15 @@
                   <!-- Score Calculation Matrix -->
                   <div class="grid grid-cols-2 gap-3 pt-1">
                     <div class="p-3 sm:p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 text-center">
-                      <div class="text-[10px] font-bold text-white/40 uppercase">Prediksi Skor AI</div>
+                      <div class="text-[10px] font-bold text-white/40 uppercase">Prediksi Nilai AI</div>
                       <div class="text-xl sm:text-2xl font-black text-white font-heading mt-1">{{ simPredictedGain }}</div>
-                      <div class="text-[10px] font-bold text-[#c0ff00] mt-0.5">+{{ simScoreIncrease }} Poin Lonjakan</div>
+                      <div class="text-[10px] font-bold text-[#c0ff00] mt-0.5">+{{ simScoreIncrease }} {{ currentSimLevelConfig.scoreUnit }} Lonjakan</div>
                     </div>
                     <div class="p-3 sm:p-3.5 rounded-2xl bg-white/[0.03] border border-white/10 text-center min-w-0">
                       <div class="text-[10px] font-bold text-white/40 uppercase truncate">Target {{ (simTargetPtn?.name || String(simTargetPtn || '')).split(' (')[0] }}</div>
-                      <div class="text-xl sm:text-2xl font-black text-white/80 font-heading mt-1">{{ simTargetPtn?.targetScore || 700 }}</div>
-                      <div class="text-[10px] font-bold mt-0.5 truncate" :class="(simPredictedGain >= (simTargetPtn?.targetScore || 700)) ? 'text-[#c0ff00]' : 'text-rose-400'">
-                        {{ (simPredictedGain >= (simTargetPtn?.targetScore || 700)) ? '✓ Lolos Passing' : `Sisa ${(simTargetPtn?.targetScore || 700) - simPredictedGain} Poin` }}
+                      <div class="text-xl sm:text-2xl font-black text-white/80 font-heading mt-1">{{ simTargetPtn?.targetScore || 80 }}</div>
+                      <div class="text-[10px] font-bold mt-0.5 truncate" :class="(simPredictedGain >= (simTargetPtn?.targetScore || 80)) ? 'text-[#c0ff00]' : 'text-rose-400'">
+                        {{ (simPredictedGain >= (simTargetPtn?.targetScore || 80)) ? '✓ Lolos Passing' : `Sisa ${(simTargetPtn?.targetScore || 80) - simPredictedGain} Poin` }}
                       </div>
                     </div>
                   </div>
@@ -850,7 +848,7 @@
                       <span>⚡</span> Rekomendasi Subtes Prioritas:
                     </div>
                     <p class="text-xs text-white/70 leading-relaxed font-medium">
-                      Fokus pada: <strong class="text-white">{{ simTargetPtn?.focus || 'TPS & Literasi' }}</strong> untuk akselerasi skor maksimal di {{ (simTargetPtn?.name || String(simTargetPtn || '')).split(' (')[0] }}.
+                      Fokus pada: <strong class="text-white">{{ simTargetPtn?.focus || 'Numerasi & Penalaran' }}</strong> untuk akselerasi skor maksimal di {{ (simTargetPtn?.name || String(simTargetPtn || '')).split(' (')[0] }}.
                     </p>
                   </div>
                 </div>
@@ -861,7 +859,7 @@
                     style="background: #c0ff00;"
                     @click="startLearning"
                   >
-                    <span>Kunci Target &amp; Buat Jadwal AI</span>
+                    <span>Kunci Target &amp; Buat Jadwal Belajar AI</span>
                     <i class="ph-bold ph-arrow-right"></i>
                   </button>
                 </div>
@@ -1620,11 +1618,11 @@
               </span>
               <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight break-words">
                 Investasi Terbaik <br class="hidden sm:inline" />
-                <span style="color: #c0ff00;">Menembus PTN Impian</span>
+                <span style="color: #c0ff00;">Pendidikan Masa Depan</span>
               </h2>
-              <p class="text-sm md:text-base text-white/60 leading-relaxed font-medium flex flex-col gap-1 max-w-2xl mx-auto">
-                <span>Bimbel konvensional memungut Rp 15–30 juta untuk metode satu buku yang sama bagi semua murid.</span>
-                <span>Di EduPath, Anda berinvestasi pada kecerdasan AI adaptif yang melatih langsung titik lemah spesifik Anda.</span>
+              <p class="text-sm md:text-base text-white/70 leading-relaxed font-medium max-w-4xl mx-auto">
+                <span class="block">Bimbel konvensional memungut Rp 15–30 juta untuk metode satu buku yang sama bagi semua murid.</span>
+                <span class="block text-white/90">Di EduPath, Anda berinvestasi pada kecerdasan AI adaptif yang melatih langsung titik lemah spesifik Anda.</span>
               </p>
               
               <!-- Interactive Billing Cycle Toggle with 50/50 balanced layout on mobile -->
@@ -1646,26 +1644,250 @@
                 </div>
               </div>
 
-              <!-- Academic Program Tabs Filter -->
-              <div class="pt-4 flex flex-wrap justify-center gap-1.5 sm:gap-2">
-                <button
-                  v-for="prog in availableProgramTabs"
-                  :key="prog.id"
-                  type="button"
-                  @click="selectedProgramPricingFilter = prog.id"
-                  :class="[
-                    'px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer',
-                    selectedProgramPricingFilter === prog.id
-                      ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/30 font-black'
-                      : 'bg-white/5 text-white/70 hover:text-white border border-white/10 hover:border-white/20'
-                  ]"
-                >
-                  {{ prog.name }}
-                </button>
+              <!-- Controls Toolbar: Mode Tampilan & Filter Metode & Filter Jenjang -->
+              <div class="pt-4 flex flex-col items-center gap-3.5 max-w-4xl mx-auto">
+                <!-- Row 1: View Switcher (Tabel vs Kartu) & Delivery Mode Filter -->
+                <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                  <!-- View Mode Switcher -->
+                  <div class="inline-flex p-1 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md shadow-inner">
+                    <button
+                      type="button"
+                      @click="pricingViewMode = 'table'"
+                      :class="[
+                        'px-3.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer',
+                        pricingViewMode === 'table' ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/25' : 'text-white/70 hover:text-white'
+                      ]"
+                    >
+                      <i class="ph-bold ph-table text-sm"></i>
+                      <span>Tabel Komparasi</span>
+                    </button>
+                    <button
+                      type="button"
+                      @click="pricingViewMode = 'cards'"
+                      :class="[
+                        'px-3.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer',
+                        pricingViewMode === 'cards' ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/25' : 'text-white/70 hover:text-white'
+                      ]"
+                    >
+                      <i class="ph-bold ph-squares-four text-sm"></i>
+                      <span>Kartu Paket</span>
+                    </button>
+                  </div>
+
+                  <!-- Delivery Mode Filter -->
+                  <div class="inline-flex p-1 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+                    <button
+                      v-for="dm in availableDeliveryModeTabs"
+                      :key="dm.id"
+                      type="button"
+                      @click="selectedDeliveryModeFilter = dm.id"
+                      :class="[
+                        'px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5',
+                        selectedDeliveryModeFilter === dm.id
+                          ? 'bg-blue-600 text-white font-black shadow-md'
+                          : 'text-white/60 hover:text-white'
+                      ]"
+                    >
+                      <span>{{ dm.name }}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Row 2: Academic Program Filter Pills -->
+                <div class="flex flex-wrap justify-center gap-1.5 sm:gap-2">
+                  <button
+                    v-for="prog in availableProgramTabs"
+                    :key="prog.id"
+                    type="button"
+                    @click="selectedProgramPricingFilter = prog.id"
+                    :class="[
+                      'px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer',
+                      selectedProgramPricingFilter === prog.id
+                        ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/30 font-black'
+                        : 'bg-white/5 text-white/70 hover:text-white border border-white/10 hover:border-white/20'
+                    ]"
+                  >
+                    {{ prog.name }}
+                  </button>
+                </div>
+
+                <!-- Info summary strip -->
+                <div class="text-[11px] text-white/50 flex flex-wrap items-center justify-center gap-2 pt-0.5">
+                  <span>Menampilkan <strong class="text-white">{{ displayProducts.length }}</strong> paket bimbingan belajar</span>
+                  <span class="text-white/20 hidden sm:inline">•</span>
+                  <span class="text-[#c0ff00]/90 font-medium">⚡ Terintegrasi IRT CBT Adaptif &amp; Bank Soal HOTS 2026</span>
+                </div>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto items-stretch">
+            <!-- VIEW MODE 1: TABEL KOMPARASI HARGA (KOMUNIKATIF) -->
+            <div v-if="pricingViewMode === 'table'" class="max-w-6xl mx-auto">
+              <!-- Empty state -->
+              <div v-if="displayProducts.length === 0" class="py-14 text-center rounded-3xl border border-white/10 bg-white/[0.02]">
+                <i class="ph-bold ph-funnel-simple text-3xl text-white/40 mb-2"></i>
+                <p class="text-sm font-bold text-white/70">Tidak ada paket yang sesuai dengan kombinasi filter saat ini.</p>
+                <button @click="selectedProgramPricingFilter = 'ALL'; selectedDeliveryModeFilter = 'ALL'" class="mt-3 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-all cursor-pointer">
+                  Reset Semua Filter
+                </button>
+              </div>
+
+              <!-- Table Card Container -->
+              <div v-else class="overflow-x-auto rounded-3xl border border-white/15 bg-gradient-to-b from-[#0e1629]/95 to-[#070b14]/95 backdrop-blur-xl shadow-2xl">
+                <table class="w-full text-left border-collapse min-w-[840px]">
+                  <thead>
+                    <tr class="border-b border-white/15 bg-white/[0.04] text-[11px] font-black uppercase tracking-wider text-slate-300">
+                      <th class="py-4 px-6 w-[28%]">Program &amp; Paket Belajar</th>
+                      <th class="py-4 px-4 w-[18%]">Metode Belajar</th>
+                      <th class="py-4 px-5 w-[30%]">Fasilitas &amp; Fitur Utama</th>
+                      <th class="py-4 px-5 w-[24%]">Investasi Biaya</th>
+                      <th class="py-4 px-5 text-center w-[150px]">Pilihan</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5 text-xs">
+                    <tr
+                      v-for="(product, idx) in displayProducts"
+                      :key="product.id"
+                      :class="[
+                        'transition-colors duration-200 group',
+                        idx % 3 === 1 
+                          ? 'bg-[#c0ff00]/[0.03] hover:bg-[#c0ff00]/[0.07]' 
+                          : 'hover:bg-white/[0.03]'
+                      ]"
+                    >
+                      <!-- Col 1: Program & Paket -->
+                      <td class="py-4 px-6 align-top">
+                        <div class="flex flex-wrap items-center gap-1.5 mb-1.5">
+                          <span :class="[
+                            'text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border',
+                            (product.academic_program || '').includes('SMA') ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' :
+                            (product.academic_program || '').includes('SMP') ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' :
+                            (product.academic_program || '').includes('SD') ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
+                            (product.academic_program || '').includes('Alumni') ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' :
+                            'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                          ]">
+                            {{ product.academic_program || 'SNPMB/UTBK' }}
+                          </span>
+                          <span v-if="idx % 3 === 1" class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#c0ff00] text-black shadow-sm">
+                            👑 Paling Populer
+                          </span>
+                          <span v-else-if="idx % 3 === 2" class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                            ⭐ Premium
+                          </span>
+                        </div>
+                        <div class="text-sm sm:text-base font-extrabold text-white font-heading group-hover:text-[#c0ff00] transition-colors">
+                          {{ product.name }}
+                        </div>
+                        <div class="text-[10px] text-white/40 font-mono mt-0.5">
+                          Kode: {{ product.code || 'PAKET' }}
+                        </div>
+                        <p class="text-[11px] text-white/55 mt-1.5 leading-relaxed max-w-xs">
+                          {{ product.description }}
+                        </p>
+                      </td>
+
+                      <!-- Col 2: Metode Belajar -->
+                      <td class="py-4 px-4 align-top">
+                        <div v-if="product.delivery_mode === 'hybrid'" class="space-y-1.5">
+                          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            <span>🏫 Hybrid Tatap Muka</span>
+                          </div>
+                          <div class="text-[10px] text-white/50 leading-tight">
+                            Kelas fisik di cabang bimbel + akses online 24/7
+                          </div>
+                        </div>
+                        <div v-else class="space-y-1.5">
+                          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <span>🌐 Full Online</span>
+                          </div>
+                          <div class="text-[10px] text-white/50 leading-tight">
+                            Belajar mandiri adaptif &amp; live tutor dari mana saja
+                          </div>
+                        </div>
+                      </td>
+
+                      <!-- Col 3: Fasilitas & Fitur -->
+                      <td class="py-4 px-5 align-top">
+                        <ul class="space-y-2 text-xs text-white/80">
+                          <li v-for="(feat, fIdx) in (product.featuresList || []).slice(0, 4)" :key="fIdx" class="flex items-start gap-2">
+                            <i class="ph-bold ph-check-circle text-[#c0ff00] mt-0.5 shrink-0 text-sm"></i>
+                            <span class="leading-tight">{{ feat }}</span>
+                          </li>
+                          <li v-if="(product.featuresList || []).length > 4" class="text-[10px] text-[#c0ff00]/80 font-bold pl-5">
+                            + {{ product.featuresList.length - 4 }} fasilitas pendukung lainnya
+                          </li>
+                        </ul>
+                      </td>
+
+                      <!-- Col 4: Investasi Biaya -->
+                      <td class="py-4 px-5 align-top" v-if="product.activePlan">
+                        <!-- Mode Tahunan -->
+                        <div v-if="isAnnualBilling" class="space-y-1">
+                          <div class="flex items-center gap-1.5">
+                            <span class="text-xs text-white/40 line-through font-mono">Rp {{ Number(product.monthlyBasePrice || 180000).toLocaleString('id-ID') }}</span>
+                            <span class="text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                              Hemat {{ product.annualDiscount || 40 }}%
+                            </span>
+                          </div>
+                          <div class="flex items-baseline gap-1">
+                            <span class="text-2xl font-black font-heading text-[#c0ff00]">
+                              Rp {{ Math.round((product.annualMonthlyEquivalent || (product.activePlan.price / 12)) / 1000).toLocaleString('id-ID') }}k
+                            </span>
+                            <span class="text-[11px] font-bold text-white/50">/bln</span>
+                          </div>
+                          <div class="text-[10px] text-white/50 pt-0.5">
+                            Ditagih tahunan Rp {{ Number(product.activePlan.price).toLocaleString('id-ID') }}
+                          </div>
+                        </div>
+
+                        <!-- Mode Bulanan -->
+                        <div v-else class="space-y-1">
+                          <div class="flex items-baseline gap-1">
+                            <span class="text-2xl font-black font-heading text-white">
+                              Rp {{ Math.round(product.activePlan.price / 1000).toLocaleString('id-ID') }}k
+                            </span>
+                            <span class="text-[11px] font-bold text-white/50">/bln</span>
+                          </div>
+                          <div class="text-[10px] text-white/40">
+                            Ditagih bulanan (fleksibel)
+                          </div>
+                          <div class="text-[10px] text-[#c0ff00] font-bold pt-0.5 cursor-pointer hover:underline" @click="isAnnualBilling = true">
+                            Hemat {{ product.annualDiscount || 40 }}% jika bayar tahunan &rarr;
+                          </div>
+                        </div>
+                      </td>
+
+                      <!-- Col 5: Pilihan Aksi -->
+                      <td class="py-4 px-5 align-middle text-center" v-if="product.activePlan">
+                        <button
+                          type="button"
+                          @click="purchasePlan(product.name, product.activePlan.price)"
+                          :class="[
+                            'w-full py-2.5 px-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-md active:scale-95 flex items-center justify-center gap-1.5',
+                            idx % 3 === 1
+                              ? 'bg-[#c0ff00] hover:bg-[#aee600] text-black shadow-[0_0_20px_rgba(192,255,0,0.35)] font-black'
+                              : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/20'
+                          ]"
+                        >
+                          <span>Pilih Paket</span>
+                          <i class="ph-bold ph-arrow-right text-xs"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- VIEW MODE 2: KARTU PAKET GRID -->
+            <div 
+              v-else 
+              :class="[
+                'grid gap-6 sm:gap-8 mx-auto items-stretch justify-center',
+                displayProducts.length === 1 ? 'max-w-md grid-cols-1' :
+                displayProducts.length === 2 ? 'max-w-4xl grid-cols-1 md:grid-cols-2' :
+                'max-w-6xl grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              ]"
+            >
               <!-- Dynamic Plans -->
               <div 
                 v-for="(product, idx) in displayProducts" 
@@ -3989,18 +4211,18 @@
     <!-- Modal: Pilihan Paket Belajar EduPath (Upgrade & Plan Selector Flow) -->
     <div v-if="showPlanSelectorModal" class="fixed inset-0 z-[95] flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-black/80 backdrop-blur-md" @click="showPlanSelectorModal = false"></div>
-      <div class="relative bg-[#090f1e] border border-white/15 rounded-3xl w-full max-w-4xl p-6 sm:p-8 shadow-2xl animate-fade-in text-white max-h-[90vh] overflow-y-auto">
+      <div class="relative bg-[#090f1e] border border-white/15 rounded-3xl w-full max-w-5xl p-6 sm:p-8 shadow-2xl animate-fade-in text-white max-h-[90vh] overflow-y-auto">
         <!-- Close button -->
         <button @click="showPlanSelectorModal = false" class="!absolute top-5 right-5 z-20 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer" title="Tutup" aria-label="Tutup">
           <i class="ph-bold ph-x text-sm"></i>
         </button>
 
         <!-- Header -->
-        <div class="text-center max-w-xl mx-auto mb-8 space-y-2">
+        <div class="text-center max-w-xl mx-auto mb-6 space-y-2">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
             ⚡ INVESTASI MASA DEPAN
           </div>
-          <h2 class="text-2xl sm:text-3xl font-black font-heading text-white">Pilih Paket Persiapan UTBK SNBT</h2>
+          <h2 class="text-2xl sm:text-3xl font-black font-heading text-white">Pilih Paket Persiapan Akademik</h2>
           <p class="text-xs sm:text-sm text-white/60">Tingkatkan kesiapan ujian dengan ribuan bank soal HOTS terstandar IRT, tryout adaptif, dan analisis AI cerdas.</p>
 
           <!-- Billing Cycle Switch -->
@@ -4023,26 +4245,184 @@
           </div>
         </div>
 
-        <!-- Academic Program Tabs Filter in Dashboard -->
-        <div class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-6">
-          <button
-            v-for="prog in availableProgramTabs"
-            :key="prog.id"
-            type="button"
-            @click="selectedProgramPricingFilter = prog.id"
-            :class="[
-              'px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer',
-              selectedProgramPricingFilter === prog.id
-                ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/30 font-black'
-                : 'bg-white/5 text-white/70 hover:text-white border border-white/10 hover:border-white/20'
-            ]"
-          >
-            {{ prog.name }}
-          </button>
+        <!-- Controls Toolbar in Modal: View Mode Switcher + Delivery Mode Tabs + Academic Program Tabs -->
+        <div class="flex flex-col items-center gap-3 mb-6">
+          <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            <!-- View Mode Switcher -->
+            <div class="inline-flex p-1 rounded-xl bg-white/10 border border-white/15">
+              <button
+                type="button"
+                @click="pricingViewMode = 'table'"
+                :class="[
+                  'px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer',
+                  pricingViewMode === 'table' ? 'bg-[#c0ff00] text-black shadow-md' : 'text-white/70 hover:text-white'
+                ]"
+              >
+                <i class="ph-bold ph-table"></i>
+                <span>Tabel Komparasi</span>
+              </button>
+              <button
+                type="button"
+                @click="pricingViewMode = 'cards'"
+                :class="[
+                  'px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer',
+                  pricingViewMode === 'cards' ? 'bg-[#c0ff00] text-black shadow-md' : 'text-white/70 hover:text-white'
+                ]"
+              >
+                <i class="ph-bold ph-squares-four"></i>
+                <span>Kartu Paket</span>
+              </button>
+            </div>
+
+            <!-- Delivery Mode Filter -->
+            <div class="inline-flex p-1 rounded-xl bg-white/5 border border-white/10">
+              <button
+                v-for="dm in availableDeliveryModeTabs"
+                :key="dm.id"
+                type="button"
+                @click="selectedDeliveryModeFilter = dm.id"
+                :class="[
+                  'px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
+                  selectedDeliveryModeFilter === dm.id
+                    ? 'bg-blue-600 text-white font-black'
+                    : 'text-white/60 hover:text-white'
+                ]"
+              >
+                {{ dm.name }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Academic Program Filter in Modal -->
+          <div class="flex flex-wrap justify-center gap-1.5 sm:gap-2">
+            <button
+              v-for="prog in availableProgramTabs"
+              :key="prog.id"
+              type="button"
+              @click="selectedProgramPricingFilter = prog.id"
+              :class="[
+                'px-3.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer',
+                selectedProgramPricingFilter === prog.id
+                  ? 'bg-white text-black font-black'
+                  : 'bg-white/5 text-white/70 hover:text-white border border-white/10'
+              ]"
+            >
+              {{ prog.name }}
+            </button>
+          </div>
         </div>
 
-        <!-- Plan Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+        <!-- VIEW MODE 1: TABEL KOMPARASI DI DALAM MODAL -->
+        <div v-if="pricingViewMode === 'table'">
+          <div v-if="displayProducts.length === 0" class="py-10 text-center rounded-2xl border border-white/10 bg-white/[0.02]">
+            <p class="text-sm font-bold text-white/70">Tidak ada paket yang sesuai dengan filter.</p>
+            <button @click="selectedProgramPricingFilter = 'ALL'; selectedDeliveryModeFilter = 'ALL'" class="mt-2 px-3 py-1.5 rounded-lg bg-white/10 text-xs font-bold text-white cursor-pointer">
+              Reset Filter
+            </button>
+          </div>
+
+          <div v-else class="overflow-x-auto rounded-2xl border border-white/15 bg-white/[0.02]">
+            <table class="w-full text-left border-collapse min-w-[760px]">
+              <thead>
+                <tr class="border-b border-white/10 bg-white/[0.04] text-[10px] font-black uppercase tracking-wider text-slate-300">
+                  <th class="py-3 px-4 w-[28%]">Paket &amp; Program</th>
+                  <th class="py-3 px-3 w-[18%]">Metode</th>
+                  <th class="py-3 px-4 w-[28%]">Fitur Unggulan</th>
+                  <th class="py-3 px-4 w-[26%]">Biaya</th>
+                  <th class="py-3 px-4 text-center w-[130px]">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5 text-xs">
+                <tr
+                  v-for="(product, idx) in displayProducts"
+                  :key="product.id"
+                  :class="[
+                    'transition-colors',
+                    idx % 3 === 1 ? 'bg-[#c0ff00]/[0.03] hover:bg-[#c0ff00]/[0.06]' : 'hover:bg-white/[0.02]'
+                  ]"
+                >
+                  <!-- Col 1: Nama & Program -->
+                  <td class="py-3.5 px-4 align-top">
+                    <div class="flex items-center gap-1.5 mb-1">
+                      <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                        {{ product.academic_program || 'SNPMB/UTBK' }}
+                      </span>
+                      <span v-if="idx % 3 === 1" class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-[#c0ff00] text-black">
+                        👑 Populer
+                      </span>
+                    </div>
+                    <div class="font-extrabold text-white text-sm">{{ product.name }}</div>
+                    <p class="text-[11px] text-white/50 mt-0.5 leading-snug">{{ product.description }}</p>
+                  </td>
+
+                  <!-- Col 2: Metode -->
+                  <td class="py-3.5 px-3 align-top">
+                    <span :class="['inline-flex text-[10px] font-bold px-2 py-0.5 rounded-lg border', (product.delivery_mode === 'hybrid') ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30']">
+                      {{ product.delivery_mode === 'hybrid' ? '🏫 Hybrid Cabang' : '🌐 Full Online' }}
+                    </span>
+                  </td>
+
+                  <!-- Col 3: Fitur -->
+                  <td class="py-3.5 px-4 align-top">
+                    <ul class="space-y-1 text-[11px] text-white/75">
+                      <li v-for="(feat, fIdx) in (product.featuresList || []).slice(0, 3)" :key="fIdx" class="flex items-start gap-1.5">
+                        <i class="ph-bold ph-check text-[#c0ff00] mt-0.5 shrink-0 text-xs"></i>
+                        <span>{{ feat }}</span>
+                      </li>
+                    </ul>
+                  </td>
+
+                  <!-- Col 4: Biaya -->
+                  <td class="py-3.5 px-4 align-top" v-if="product.activePlan">
+                    <div v-if="isAnnualBilling" class="space-y-0.5">
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-[11px] text-white/40 line-through font-mono">Rp {{ Number(product.monthlyBasePrice || 180000).toLocaleString('id-ID') }}</span>
+                        <span class="text-[9px] font-bold text-emerald-400">Hemat {{ product.annualDiscount || 40 }}%</span>
+                      </div>
+                      <div class="text-xl font-black text-[#c0ff00]">
+                        Rp {{ Math.round((product.annualMonthlyEquivalent || (product.activePlan.price / 12)) / 1000).toLocaleString('id-ID') }}k<span class="text-xs font-normal text-white/50">/bln</span>
+                      </div>
+                      <div class="text-[10px] text-white/40">
+                        Ditagih tahunan Rp {{ Number(product.activePlan.price).toLocaleString('id-ID') }}
+                      </div>
+                    </div>
+                    <div v-else class="space-y-0.5">
+                      <div class="text-xl font-black text-white">
+                        Rp {{ Math.round(product.activePlan.price / 1000).toLocaleString('id-ID') }}k<span class="text-xs font-normal text-white/50">/bln</span>
+                      </div>
+                      <div class="text-[10px] text-white/40">Ditagih bulanan</div>
+                    </div>
+                  </td>
+
+                  <!-- Col 5: Aksi -->
+                  <td class="py-3.5 px-4 align-middle text-center" v-if="product.activePlan">
+                    <button
+                      type="button"
+                      @click="showPlanSelectorModal = false; purchasePlan(product.name, product.activePlan.price)"
+                      :class="[
+                        'w-full py-2 px-2.5 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer shadow-md',
+                        idx % 3 === 1 ? 'bg-[#c0ff00] text-black hover:bg-[#b0ef00]' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/20'
+                      ]"
+                    >
+                      Pilih
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW MODE 2: KARTU GRID DI DALAM MODAL -->
+        <div 
+          v-else 
+          :class="[
+            'grid gap-5 items-stretch justify-center',
+            displayProducts.length === 1 ? 'max-w-sm mx-auto grid-cols-1' :
+            displayProducts.length === 2 ? 'max-w-2xl mx-auto grid-cols-1 md:grid-cols-2' :
+            'grid-cols-1 md:grid-cols-3'
+          ]"
+        >
           <div 
             v-for="(product, idx) in displayProducts" 
             :key="product.id"
@@ -5079,17 +5459,76 @@ export default {
       countdownSeconds.value = Math.floor((diff % (1000 * 60)) / 1000);
     };
 
-    // PTN Chance Simulator — 50 Perguruan Tinggi & Program Studi Favorit
+    // Multi-Program Chance Simulator — SD (SMP Favorit), SMP (SMA Unggulan), SMA (SNBP/PTN), SNPMB (50 PTN Top)
+    const SIM_TARGETS = {
+      'SD': [
+        { id: 'labschool_smp', name: 'SMP Labschool (Jakarta / Cibubur)', targetScore: 85, focus: 'Numerasi Cepat & Logika Pola Angka', unit: 'Poin' },
+        { id: 'smpn1_favorit', name: 'SMPN 1 / Unggulan Kota (Jalur Prestasi)', targetScore: 88, focus: 'Ketelitian Berhitung & Pemahaman Bacaan', unit: 'Poin' },
+        { id: 'kanisius_alazhar', name: 'SMP Al-Azhar / Kanisius / Penabur Unggulan', targetScore: 84, focus: 'Konsep Sains/IPAS & Logika Nalar', unit: 'Poin' },
+        { id: 'asesmen_sd', name: 'Asesmen Standar Pendidikan Dasar (Nilai A)', targetScore: 82, focus: 'Numerasi & Pemecahan Soal Cerita', unit: 'Poin' },
+        { id: 'osn_sd', name: 'Kualifikasi Tim Olimpiade Sains/Matematika SD (OSN)', targetScore: 90, focus: 'Eksplorasi Pola Angka & Soal Berpikir Kritis', unit: 'Poin' }
+      ],
+      'SMP': [
+        { id: 'smatn', name: 'SMA Taruna Nusantara Magelang', targetScore: 88, focus: 'Matematika Terpadu, Bahasa Inggris & Logika', unit: 'Poin' },
+        { id: 'pradita', name: 'SMA Pradita Dirgantara Solo', targetScore: 90, focus: 'Sains Eksakta, Matematika & English Proficiency', unit: 'Poin' },
+        { id: 'man_ic', name: 'MAN Insan Cendekia Serpong / Gorontalo', targetScore: 87, focus: 'Penalaran Matematika & Literasi Sains Holistik', unit: 'Poin' },
+        { id: 'sman8_jkt', name: 'SMAN 8 / SMAN 1 Favorit Kota (Jalur Prestasi)', targetScore: 89, focus: 'Nilai Rapor & Asesmen TKA SMP Standar Nasional', unit: 'Poin' },
+        { id: 'labschool_sma', name: 'SMA Labschool Kebayoran / Rawamangun', targetScore: 86, focus: 'Pemahaman Konsep & Kemampuan Analitik Kritis', unit: 'Poin' },
+        { id: 'sma_swasta_top', name: 'SMA Swasta Unggulan / Sekolah Bilingual', targetScore: 83, focus: 'Literasi Bahasa & Logika Penalaran', unit: 'Poin' }
+      ],
+      'SMA': [
+        { id: 'snbp_top', name: 'Kuota Eligible SNBP 40% Teratas (UI/ITB/UGM)', targetScore: 92, focus: 'Matematika Lanjut & Konsistensi Rapor', unit: 'Poin' },
+        { id: 'tka_saintek', name: 'Nilai TKA Saintek Unggulan (Fisika, Kimia, Biologi)', targetScore: 88, focus: 'Pemecahan Masalah Eksakta Kompleks', unit: 'Poin' },
+        { id: 'tka_soshum', name: 'Nilai TKA Soshum Unggulan (Ekonomi, Sosiologi, Geografi)', targetScore: 86, focus: 'Analisis Sosial, Grafik & Kurva Ekonomi', unit: 'Poin' },
+        { id: 'kedinasan_stan', name: 'Sekolah Kedinasan (PKN STAN / STIS / STIN)', targetScore: 90, focus: 'Tes Potensi Akademik & Kuantitatif Cepat', unit: 'Poin' },
+        { id: 'akmil_akpol', name: 'Seleksi Akademik Taruna Akmil / Akpol', targetScore: 85, focus: 'Matematika Terapan & Logika Umum', unit: 'Poin' },
+        { id: 'mandiri_ptn', name: 'Ujian Mandiri Prestasi (SIMAK UI / UTUL UGM)', targetScore: 89, focus: 'Soal HOTS Campuran & Esai Analitis', unit: 'Poin' }
+      ],
+      'SNPMB': TARGET_UNIVERSITIES
+    };
+
     const targetPtnList = TARGET_UNIVERSITIES;
 
-    const simTargetPtn = ref(targetPtnList[0]);
+    const simLevels = [
+      { id: 'SD', name: 'TKA SD (Kelas 4–6)', icon: '🎒', title: 'Peluang Masuk SMP Unggulan', targetLabel: 'Target SMP Unggulan', scoreLabel: 'Skor Tryout / Asesmen Saat Ini', scoreUnit: 'Poin', minScore: 50, maxScore: 95, defaultScore: 68, minHours: 0.5, maxHours: 3, defaultHours: 1.5, scoreScaleText: '50 (Dasar) - 75 (Menengah) - 95 (Unggulan)' },
+      { id: 'SMP', name: 'TKA SMP (Kelas 7–9)', icon: '📚', title: 'Peluang Masuk SMA Unggulan', targetLabel: 'Target SMA Unggulan / Boarding School', scoreLabel: 'Nilai Ujian / Tryout Saat Ini', scoreUnit: 'Poin', minScore: 50, maxScore: 95, defaultScore: 72, minHours: 1, maxHours: 4, defaultHours: 2, scoreScaleText: '50 (Cukup) - 75 (Baik) - 95 (Istimewa)' },
+      { id: 'SMA', name: 'TKA SMA (Kelas 10–12)', icon: '🔬', title: 'Peluang Masuk Kuota SNBP PTN', targetLabel: 'Target Kuota SNBP & Seleksi Akademik', scoreLabel: 'Nilai TKA / Rapor Saat Ini', scoreUnit: 'Poin', minScore: 55, maxScore: 98, defaultScore: 75, minHours: 1, maxHours: 5, defaultHours: 2.5, scoreScaleText: '55 (Standar) - 78 (Eligible) - 98 (Top 5%)' },
+      { id: 'SNPMB', name: 'SNPMB / UTBK & Alumni', icon: '🎓', title: 'Peluang Lolos PTN Impian', targetLabel: 'Target Universitas & Jurusan', scoreLabel: 'Skor Tryout IRT Terakhir', scoreUnit: 'Poin IRT', minScore: 400, maxScore: 750, defaultScore: 540, minHours: 1, maxHours: 6, defaultHours: 3, scoreScaleText: '400 (Pemula) - 550 (Menengah) - 750 (Master)' }
+    ];
+
+    const selectedSimLevel = ref('SNPMB');
+    const simTargetPtn = ref(SIM_TARGETS['SNPMB'][0]);
     const simCurrentScore = ref(540);
     const simDailyHours = ref(3);
 
+    const currentSimLevelConfig = computed(() => {
+      return simLevels.find(l => l.id === selectedSimLevel.value) || simLevels[3];
+    });
+
+    const currentTargetList = computed(() => {
+      return SIM_TARGETS[selectedSimLevel.value] || TARGET_UNIVERSITIES;
+    });
+
+    const setSimLevel = (lvlId) => {
+      selectedSimLevel.value = lvlId;
+      const cfg = simLevels.find(l => l.id === lvlId) || simLevels[3];
+      const list = SIM_TARGETS[lvlId] || TARGET_UNIVERSITIES;
+      simTargetPtn.value = list[0];
+      simCurrentScore.value = cfg.defaultScore;
+      simDailyHours.value = cfg.defaultHours;
+    };
+
     const simPredictedGain = computed(() => {
       const baseHours = Number(simDailyHours.value);
-      const potentialScore = Math.round(simCurrentScore.value + (baseHours * 38) + 48);
-      return Math.min(800, potentialScore);
+      if (selectedSimLevel.value === 'SNPMB') {
+        const potentialScore = Math.round(simCurrentScore.value + (baseHours * 38) + 48);
+        return Math.min(800, potentialScore);
+      } else {
+        const ratePerHour = selectedSimLevel.value === 'SD' ? 4.5 : (selectedSimLevel.value === 'SMP' ? 4.0 : 3.8);
+        const baselineBoost = selectedSimLevel.value === 'SD' ? 6 : 5;
+        const potentialScore = Math.round(simCurrentScore.value + (baseHours * ratePerHour) + baselineBoost);
+        return Math.min(100, potentialScore);
+      }
     });
 
     const simScoreIncrease = computed(() => {
@@ -5097,16 +5536,26 @@ export default {
     });
 
     const simChancePercentage = computed(() => {
-      const target = simTargetPtn.value.targetScore;
+      const target = simTargetPtn.value ? simTargetPtn.value.targetScore : 700;
       const predicted = simPredictedGain.value;
       const diff = predicted - target;
-      if (diff >= 30) return 96;
-      if (diff >= 15) return 92;
-      if (diff >= 0) return 86;
-      if (diff >= -20) return 74;
-      if (diff >= -40) return 58;
-      if (diff >= -60) return 42;
-      return 28;
+      if (selectedSimLevel.value === 'SNPMB') {
+        if (diff >= 30) return 96;
+        if (diff >= 15) return 92;
+        if (diff >= 0) return 86;
+        if (diff >= -20) return 74;
+        if (diff >= -40) return 58;
+        if (diff >= -60) return 42;
+        return 28;
+      } else {
+        if (diff >= 5) return 96;
+        if (diff >= 2) return 92;
+        if (diff >= 0) return 86;
+        if (diff >= -4) return 74;
+        if (diff >= -8) return 58;
+        if (diff >= -12) return 42;
+        return 28;
+      }
     });
 
     const simChanceStatus = computed(() => {
@@ -5468,7 +5917,9 @@ export default {
     };
 
     const publicPlans = ref([]);
-    const selectedProgramPricingFilter = ref('ALL');
+    const pricingViewMode = ref('cards'); // Default kartu paket sesuai permintaan
+    const selectedDeliveryModeFilter = ref('ALL'); // Default semua metode
+    const selectedProgramPricingFilter = ref('TKA SD'); // Default TKA SD sesuai permintaan
     const availableProgramTabs = [
       { id: 'ALL', name: 'Semua Program' },
       { id: 'SNPMB/UTBK', name: 'SNPMB / UTBK' },
@@ -5476,6 +5927,11 @@ export default {
       { id: 'TKA SMP', name: 'TKA SMP' },
       { id: 'TKA SD', name: 'TKA SD' },
       { id: 'SNPMB Alumni', name: 'SNPMB Alumni' }
+    ];
+    const availableDeliveryModeTabs = [
+      { id: 'ALL', name: 'Semua Metode' },
+      { id: 'online', name: '🌐 Full Online' },
+      { id: 'hybrid', name: '🏫 Hybrid Bimbel' }
     ];
     
     const displayProducts = computed(() => {
@@ -5489,6 +5945,10 @@ export default {
           }
           return prog.includes(target);
         });
+      }
+      if (selectedDeliveryModeFilter.value !== 'ALL') {
+        const targetMode = selectedDeliveryModeFilter.value.toLowerCase();
+        filtered = filtered.filter(p => (p.delivery_mode || 'online').toLowerCase() === targetMode);
       }
 
       const orderMap = { 'MANDIRI': 1, 'STARTER': 1, 'UTBK': 2, 'UTAMA': 2, 'VIP': 3, 'ELITE': 3 };
@@ -6156,7 +6616,12 @@ export default {
       selectSubtes(subtes);
     };
 
-    const rotatingWords = ['Jalur Belajar Terarah.', 'Simulasi IRT Adaptif.', 'Persiapan Terukur.', 'Sistem EduPath.'];
+    const rotatingWords = [
+      'Jalur Belajar Adaptif AI.',
+      'Lolos Masuk Sekolah Favorit.',
+      'Tembus Kuota SNBP & PTN Top.',
+      'Bimbel Tatap Muka & Online.'
+    ];
     const currentWordIdx = ref(0);
 
     const startLearning = () => {
@@ -7123,11 +7588,19 @@ export default {
       cancelEditingProfile,
       displayProducts,
       publicPlans,
+      pricingViewMode,
+      selectedDeliveryModeFilter,
+      availableDeliveryModeTabs,
       selectedProgramPricingFilter,
       availableProgramTabs,
       publicSchoolsList,
       matchedPartnerSchool,
-      onSchoolSelected
+      onSchoolSelected,
+      simLevels,
+      selectedSimLevel,
+      setSimLevel,
+      currentSimLevelConfig,
+      currentTargetList
     };
   }
 };
