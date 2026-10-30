@@ -4717,207 +4717,218 @@
       </div>
     </div>
 
-    <!-- Interactive Login Modal -->
-    <div v-if="showLoginModal" @click.self="showLoginModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in cursor-default">
-      <div class="glass-card max-w-sm w-full p-8 rounded-3xl space-y-6 relative border-primary/30">
-        <!-- Close button -->
+    <!-- Interactive Login & Registration Modal -->
+    <div v-if="showLoginModal" @click.self="showLoginModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div :class="['glass-card w-full rounded-3xl relative border-primary/30 shadow-2xl flex flex-col my-auto max-h-[92vh] overflow-hidden', isLoginMode ? 'max-w-sm p-6 sm:p-7' : 'max-w-lg p-5 sm:p-7']">
+        <!-- Close button (Always pinned top-right) -->
         <button
           type="button"
           @click.stop="showLoginModal = false"
-          class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer"
+          class="modal-close-btn top-3.5 right-3.5 sm:top-4 sm:right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer z-50 shrink-0"
           title="Tutup"
           aria-label="Tutup"
         >
           <i class="ph-bold ph-x text-sm pointer-events-none"></i>
         </button>
 
-        <!-- Logo & Header (Consistent with Admin Portal) -->
-        <div class="text-center mb-6 pt-1 px-6">
-          <div class="inline-flex items-center gap-2.5 group select-none mb-2">
-            <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
-            <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
+        <!-- Logo & Header (Compact to maximize usable form height) -->
+        <div class="text-center mb-3 pt-1 px-8 shrink-0">
+          <div class="inline-flex items-center gap-2 group select-none mb-1">
+            <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base shadow-md shadow-[#c0ff00]/20">E</div>
+            <span class="font-black text-xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
-          <h3 class="text-lg font-bold font-heading text-white">
+          <h3 class="text-base sm:text-lg font-bold font-heading text-white leading-snug">
             {{ isForgotPasswordMode ? 'Lupa Password?' : (isResetPasswordMode ? 'Reset Password' : (isLoginMode ? 'Masuk ke EduPath' : 'Daftar Akun Siswa')) }}
           </h3>
-          <p class="text-xs text-slate-400 font-light mt-1">
+          <p class="text-[11px] text-slate-400 font-light mt-0.5">
             {{ isForgotPasswordMode ? 'Masukkan email Anda untuk menerima token pemulihan.' : (isResetPasswordMode ? 'Masukkan token dan password baru Anda.' : (isLoginMode ? 'Silakan masuk dengan email/username dan password akun Anda.' : 'Mulai perjalanan belajarmu hari ini.')) }}
           </p>
         </div>
 
-        <div v-if="isForgotPasswordMode">
-          <form @submit.prevent="handleForgotPassword" class="space-y-4">
-            <div v-if="authError" class="px-3 py-2 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-[11px] font-bold text-center">
-              {{ authError }}
-            </div>
-            <div class="space-y-1">
-              <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Email</label>
-              <input v-model="authForm.email" type="email" required placeholder="demo@edupath.id" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
-            </div>
-            <button type="submit" :disabled="authLoading" class="w-full py-3 btn-shimmer text-white rounded-xl text-xs font-bold transition-transform hover:scale-[1.02] mt-2 flex justify-center items-center">
-              <span v-if="authLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span>
-              Kirim Token Pemulihan &raquo;
-            </button>
-          </form>
-          <p class="text-[10px] text-slate-500 text-center font-light mt-4">
-            Ingat password Anda?
-            <button @click="isForgotPasswordMode = false; isLoginMode = true" class="text-[#c0ff00] font-bold hover:underline ml-1">Masuk di sini</button>
-          </p>
-        </div>
-
-        <div v-else-if="isResetPasswordMode">
-          <form @submit.prevent="handleResetPassword" class="space-y-4">
-            <div v-if="authError" class="px-3 py-2 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-[11px] font-bold text-center">
-              {{ authError }}
-            </div>
-            <div class="space-y-1">
-              <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Token Pemulihan (Simulasi)</label>
-              <input v-model="resetToken" type="text" required placeholder="Masukkan 6 digit angka" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
-            </div>
-            <div class="space-y-1">
-              <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Password Baru</label>
-              <input v-model="newPassword" type="password" required placeholder="Minimal 6 karakter" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
-            </div>
-            <button type="submit" :disabled="authLoading" class="w-full py-3 btn-shimmer text-white rounded-xl text-xs font-bold transition-transform hover:scale-[1.02] mt-2 flex justify-center items-center">
-              <span v-if="authLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span>
-              Simpan Password Baru &raquo;
-            </button>
-          </form>
-          <p class="text-[10px] text-slate-500 text-center font-light mt-4">
-            Batal ubah password?
-            <button @click="isResetPasswordMode = false; isLoginMode = true" class="text-[#c0ff00] font-bold hover:underline ml-1">Kembali ke Login</button>
-          </p>
-        </div>
-
-        <div v-else>
-          <form @submit.prevent="doAuth" class="space-y-4">
-            <div v-if="authError" class="px-3 py-2.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-[11px] font-bold text-center">
-              <div>{{ authError }}</div>
-              <div v-if="authError.includes('/admin') || authError.includes('Administrator')" class="mt-2 flex justify-center">
-                <a href="#/admin" @click="showLoginModal = false" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-black text-[10px] uppercase tracking-wider transition-all shadow-md shadow-amber-500/20 cursor-pointer">
-                  <i class="ph-bold ph-shield-check text-xs"></i>
-                  <span>Buka Portal Admin / Superadmin &rarr;</span>
-                </a>
+        <!-- Scrollable Form Body -->
+        <div class="overflow-y-auto custom-scrollbar flex-grow pr-1">
+          <div v-if="isForgotPasswordMode">
+            <form @submit.prevent="handleForgotPassword" class="space-y-3.5">
+              <div v-if="authError" class="px-3 py-2 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-[11px] font-bold text-center">
+                {{ authError }}
               </div>
-            </div>
-
-            <!-- Nama Lengkap -->
-            <div v-if="!isLoginMode" class="space-y-1">
-              <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Nama Lengkap</label>
-              <input v-model="authForm.name" type="text" required placeholder="Cth: Budi Santoso" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
-            </div>
-
-            <!-- Dropdown Pilihan Jenjang & Program Belajar (di bawah Nama Lengkap) -->
-            <div v-if="!isLoginMode" class="space-y-1">
-              <div class="flex justify-between items-center">
-                <label class="text-[10px] text-[#c0ff00] font-black uppercase tracking-wider flex items-center gap-1.5">
-                  <i class="ph-bold ph-graduation-cap text-xs"></i>
-                  <span>Pilih Jenjang &amp; Program Belajar</span>
-                </label>
-                <span class="text-[9px] text-white/50 lowercase">Trial 100% Gratis</span>
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Email</label>
+                <input v-model="authForm.email" type="email" required placeholder="demo@edupath.id" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
               </div>
-              <div class="relative">
-                <select
-                  v-model="authForm.academic_program"
-                  @change="onRegistrationProgramDropdownChange"
-                  class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00] appearance-none cursor-pointer font-bold pr-10"
-                >
-                  <option
-                    v-for="prog in availableRegistrationPrograms"
-                    :key="prog.code"
-                    :value="prog.code"
-                    class="bg-slate-900 text-white py-2"
-                  >
-                    {{ prog.icon }} {{ prog.name }} — {{ prog.levelDesc }}
-                  </option>
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/50 text-xs">
-                  <i class="ph-bold ph-caret-down"></i>
+              <button type="submit" :disabled="authLoading" class="w-full py-2.5 btn-shimmer text-white rounded-xl text-xs font-bold transition-transform hover:scale-[1.02] mt-2 flex justify-center items-center">
+                <span v-if="authLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span>
+                Kirim Token Pemulihan &raquo;
+              </button>
+            </form>
+            <p class="text-[10px] text-slate-500 text-center font-light mt-3">
+              Ingat password Anda?
+              <button @click="isForgotPasswordMode = false; isLoginMode = true" class="text-[#c0ff00] font-bold hover:underline ml-1">Masuk di sini</button>
+            </p>
+          </div>
+
+          <div v-else-if="isResetPasswordMode">
+            <form @submit.prevent="handleResetPassword" class="space-y-3.5">
+              <div v-if="authError" class="px-3 py-2 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-[11px] font-bold text-center">
+                {{ authError }}
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Token Pemulihan (Simulasi)</label>
+                <input v-model="resetToken" type="text" required placeholder="Masukkan 6 digit angka" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Password Baru</label>
+                <input v-model="newPassword" type="password" required placeholder="Minimal 6 karakter" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
+              </div>
+              <button type="submit" :disabled="authLoading" class="w-full py-2.5 btn-shimmer text-white rounded-xl text-xs font-bold transition-transform hover:scale-[1.02] mt-2 flex justify-center items-center">
+                <span v-if="authLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span>
+                Simpan Password Baru &raquo;
+              </button>
+            </form>
+            <p class="text-[10px] text-slate-500 text-center font-light mt-3">
+              Batal ubah password?
+              <button @click="isResetPasswordMode = false; isLoginMode = true" class="text-[#c0ff00] font-bold hover:underline ml-1">Kembali ke Login</button>
+            </p>
+          </div>
+
+          <div v-else>
+            <form @submit.prevent="doAuth" class="space-y-3">
+              <div v-if="authError" class="px-3 py-2.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-[11px] font-bold text-center">
+                <div>{{ authError }}</div>
+                <div v-if="authError.includes('/admin') || authError.includes('Administrator')" class="mt-2 flex justify-center">
+                  <a href="#/admin" @click="showLoginModal = false" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-black text-[10px] uppercase tracking-wider transition-all shadow-md shadow-amber-500/20 cursor-pointer">
+                    <i class="ph-bold ph-shield-check text-xs"></i>
+                    <span>Buka Portal Admin / Superadmin &rarr;</span>
+                  </a>
                 </div>
               </div>
-            </div>
 
-            <div v-if="!isLoginMode" class="space-y-1">
-              <div class="flex justify-between items-center">
-                <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Asal Sekolah</label>
-                <span v-if="matchedPartnerSchool" class="text-[9px] font-bold text-emerald-400 flex items-center gap-1">
-                  <i class="ph-bold ph-check-circle"></i> Mitra Terverifikasi
-                </span>
+              <!-- Baris 1: Nama Lengkap (Pendaftaran) -->
+              <div v-if="!isLoginMode" class="space-y-1">
+                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Nama Lengkap</label>
+                <input v-model="authForm.name" type="text" required placeholder="Cth: Budi Santoso" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-[#c0ff00]">
               </div>
-              <div class="relative">
-                <input 
-                  v-model="authForm.school" 
-                  @input="onSchoolSelected"
-                  list="publicSchoolsDatalist" 
-                  type="text" 
-                  :placeholder="authForm.academic_program === 'TKA_SD' ? 'Ketik nama SD / MI asal...' : (authForm.academic_program === 'TKA_SMP' ? 'Ketik nama SMP / MTs asal...' : 'Ketik nama SMA / SMK / MA asal...')" 
-                  class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]"
-                >
-                <datalist id="publicSchoolsDatalist">
-                  <option v-for="sch in publicSchoolsList" :key="sch.id" :value="sch.name">
-                    {{ sch.city ? sch.city : '' }} {{ sch.npsn ? '(NPSN: ' + sch.npsn + ')' : '' }}
-                  </option>
-                </datalist>
-              </div>
-              <p class="text-[9px] text-slate-500">Guru BK sekolah asal Anda dapat memantau hasil tryout &amp; bimbingan.</p>
-            </div>
 
-            <!-- Adaptive Target Goal Field -->
-            <div v-if="!isLoginMode" class="space-y-1">
-              <div class="flex justify-between items-center">
-                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ registrationGoalLabel }}</label>
-                <span class="text-[9px] text-white/40 lowercase">opsional</span>
+              <!-- Baris 2: Dropdown Pilihan Jenjang & Program Belajar (di bawah Nama Lengkap) -->
+              <div v-if="!isLoginMode" class="space-y-1">
+                <div class="flex justify-between items-center">
+                  <label class="text-[10px] text-[#c0ff00] font-black uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="ph-bold ph-graduation-cap text-xs"></i>
+                    <span>Pilih Jenjang &amp; Program Belajar</span>
+                  </label>
+                  <span class="text-[9px] text-emerald-400 font-bold lowercase">Trial 100% Gratis</span>
+                </div>
+                <div class="relative">
+                  <select
+                    v-model="authForm.academic_program"
+                    @change="onRegistrationProgramDropdownChange"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-[#c0ff00] appearance-none cursor-pointer font-bold pr-10"
+                  >
+                    <option
+                      v-for="prog in availableRegistrationPrograms"
+                      :key="prog.code"
+                      :value="prog.code"
+                      class="bg-slate-900 text-white py-2"
+                    >
+                      {{ prog.icon }} {{ prog.name }} — {{ prog.levelDesc }}
+                    </option>
+                  </select>
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/50 text-xs">
+                    <i class="ph-bold ph-caret-down"></i>
+                  </div>
+                </div>
               </div>
-              <input 
-                v-model="authForm.target_goal" 
-                type="text" 
-                :placeholder="registrationGoalPlaceholder" 
-                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]"
-              >
-            </div>
 
-            <div class="space-y-1">
-              <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Email atau Username</label>
-              <input v-model="authForm.email" type="text" required placeholder="nama@email.com / username" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
-            </div>
+              <!-- Baris 3: Asal Sekolah & Target Goal (2 Kolom di Desktop/Tablet) -->
+              <div v-if="!isLoginMode" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Asal Sekolah</label>
+                    <span v-if="matchedPartnerSchool" class="text-[9px] font-bold text-emerald-400 flex items-center gap-0.5">
+                      <i class="ph-bold ph-check-circle"></i> Mitra
+                    </span>
+                  </div>
+                  <div class="relative">
+                    <input 
+                      v-model="authForm.school" 
+                      @input="onSchoolSelected"
+                      list="publicSchoolsDatalist" 
+                      type="text" 
+                      :placeholder="authForm.academic_program === 'TKA_SD' ? 'Nama SD / MI asal...' : (authForm.academic_program === 'TKA_SMP' ? 'Nama SMP / MTs asal...' : 'Nama SMA / SMK / MA asal...')" 
+                      class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-[#c0ff00]"
+                    >
+                    <datalist id="publicSchoolsDatalist">
+                      <option v-for="sch in publicSchoolsList" :key="sch.id" :value="sch.name">
+                        {{ sch.city ? sch.city : '' }} {{ sch.npsn ? '(NPSN: ' + sch.npsn + ')' : '' }}
+                      </option>
+                    </datalist>
+                  </div>
+                </div>
 
-            <div class="space-y-1">
-              <div class="flex justify-between items-center">
-                <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Password</label>
-                <button v-if="isLoginMode" type="button" @click="isForgotPasswordMode = true" class="text-[10px] text-[#c0ff00] hover:underline focus:outline-none">Lupa Password?</button>
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate" :title="registrationGoalLabel">{{ registrationGoalLabel }}</label>
+                    <span class="text-[9px] text-white/40 lowercase shrink-0">opsional</span>
+                  </div>
+                  <input 
+                    v-model="authForm.target_goal" 
+                    type="text" 
+                    :placeholder="registrationGoalPlaceholder" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-[#c0ff00]"
+                  >
+                </div>
               </div>
-              <div class="relative">
-                <input v-model="authForm.password" :type="showPassword ? 'text' : 'password'" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00] pr-10">
-                <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white cursor-pointer select-none" :title="showPassword ? 'Sembunyikan password' : 'Lihat password'">
-                  <svg v-if="!showPassword" class="w-4 h-4 text-slate-400 hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  <svg v-else class="w-4 h-4 text-[#c0ff00] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-                  </svg>
+
+              <!-- Baris 4: Email & Password (2 Kolom di Desktop saat Registrasi, 1 Kolom saat Login) -->
+              <div :class="!isLoginMode ? 'grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3' : 'space-y-3'">
+                <div class="space-y-1">
+                  <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Email atau Username</label>
+                  <input v-model="authForm.email" type="text" required placeholder="nama@email.com / username" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-[#c0ff00]">
+                </div>
+
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Password</label>
+                    <button v-if="isLoginMode" type="button" @click="isForgotPasswordMode = true" class="text-[10px] text-[#c0ff00] hover:underline focus:outline-none">Lupa Password?</button>
+                  </div>
+                  <div class="relative">
+                    <input v-model="authForm.password" :type="showPassword ? 'text' : 'password'" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-[#c0ff00] pr-9">
+                    <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white cursor-pointer select-none" :title="showPassword ? 'Sembunyikan password' : 'Lihat password'">
+                      <svg v-if="!showPassword" class="w-3.5 h-3.5 text-slate-400 hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <svg v-else class="w-3.5 h-3.5 text-[#c0ff00] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="pt-1.5">
+                <button type="submit" :disabled="authLoading" class="w-full py-2.5 sm:py-3 btn-shimmer text-white rounded-xl text-xs font-bold transition-transform hover:scale-[1.01] active:scale-[0.99] flex justify-center items-center shadow-lg cursor-pointer">
+                  <span v-if="authLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span>
+                  {{ isLoginMode ? 'Masuk Sekarang &raquo;' : 'Daftar Sekarang &raquo;' }}
                 </button>
               </div>
-            </div>
+            </form>
 
-            <button type="submit" :disabled="authLoading" class="w-full py-3 btn-shimmer text-white rounded-xl text-xs font-bold transition-transform hover:scale-[1.02] mt-2 flex justify-center items-center">
-              <span v-if="authLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span>
-              {{ isLoginMode ? 'Masuk Sekarang &raquo;' : 'Daftar Sekarang &raquo;' }}
-            </button>
-          </form>
+            <!-- Mode Switcher -->
+            <p class="text-[10px] text-slate-500 text-center font-light mt-3">
+              {{ isLoginMode ? 'Belum punya akun siswa?' : 'Sudah punya akun?' }}
+              <button @click="isLoginMode = !isLoginMode" class="text-[#c0ff00] font-bold hover:underline ml-1 cursor-pointer">
+                {{ isLoginMode ? 'Daftar siswa di sini' : 'Masuk di sini' }}
+              </button>
+            </p>
 
-          <p class="text-[10px] text-slate-500 text-center font-light mt-4">
-            {{ isLoginMode ? 'Belum punya akun siswa?' : 'Sudah punya akun?' }}
-            <button @click="isLoginMode = !isLoginMode" class="text-[#c0ff00] font-bold hover:underline ml-1">
-              {{ isLoginMode ? 'Daftar siswa di sini' : 'Masuk di sini' }}
-            </button>
-          </p>
-
-          <p v-if="!isLoginMode" class="text-[10px] text-slate-500 text-center font-light mt-2">
-            Dengan mendaftar, Anda menyetujui 
-            <button type="button" @click="showTermsModal = true" class="text-[#c0ff00] underline hover:text-white transition-colors cursor-pointer">Syarat &amp; Ketentuan</button> 
-            layanan EduPath.
-          </p>
+            <p v-if="!isLoginMode" class="text-[9px] text-slate-500 text-center font-light mt-1.5 pb-1">
+              Dengan mendaftar, Anda menyetujui 
+              <button type="button" @click="showTermsModal = true" class="text-[#c0ff00] underline hover:text-white transition-colors cursor-pointer">Syarat &amp; Ketentuan</button> 
+              layanan EduPath.
+            </p>
+          </div>
         </div>
       </div>
     </div>
