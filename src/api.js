@@ -636,6 +636,21 @@ export const api = {
     const q = new URLSearchParams(params).toString();
     return apiFetch(`/classes.php?action=sessions${q ? '&' + q : ''}`);
   },
+  deleteClassSession(sessionId) {
+    return apiFetch(`/classes.php?action=sessions&id=${encodeURIComponent(sessionId)}`, { method: 'DELETE' });
+  },
+  getClassSchedules(classId) {
+    return apiFetch(`/classes.php?action=schedules&class_id=${encodeURIComponent(classId)}`);
+  },
+  saveClassSchedule(data) {
+    return apiFetch('/classes.php?action=schedules', { method: 'POST', body: JSON.stringify(data) });
+  },
+  deleteClassSchedule(id) {
+    return apiFetch(`/classes.php?action=schedules&id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+  },
+  generateClassSessions(data) {
+    return apiFetch('/classes.php?action=generate_sessions', { method: 'POST', body: JSON.stringify(data) });
+  },
   rescheduleSession(sessionId, data) {
     return apiFetch(`/classes.php?action=sessions&action_type=reschedule&session_id=${encodeURIComponent(sessionId)}`, {
       method: 'POST',

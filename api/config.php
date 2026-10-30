@@ -441,15 +441,33 @@ function ensure_core_schema_sync($pdo) {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
 
-        // 12. renewal_policies & renewal_records (PRD v1.1 Phase 5 Configurable Cohort Renewal)
+        // 12. renewal_policies, offline class domain & recurring schedules
         $csCols = [
+            "ALTER TABLE `class_students` ADD COLUMN `confirmed_at` DATETIME NULL AFTER `joined_at`",
             "ALTER TABLE `class_students` ADD COLUMN `valid_until` DATE NULL AFTER `joined_at`",
             "ALTER TABLE `class_students` ADD COLUMN `offering_id` VARCHAR(36) NULL AFTER `valid_until`",
-            "ALTER TABLE `class_students` ADD COLUMN `renewal_reference_id` VARCHAR(36) NULL AFTER `offering_id`"
+            "ALTER TABLE `class_students` ADD COLUMN `renewal_reference_id` VARCHAR(36) NULL AFTER `offering_id`",
+            "ALTER TABLE `classes` ADD COLUMN `offering_id` VARCHAR(36) NULL AFTER `academic_year`"
         ];
         foreach ($csCols as $colSql) {
             try { $pdo->exec($colSql); } catch (\Throwable $e) {}
         }
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS class_schedules (
+                id VARCHAR(36) NOT NULL PRIMARY KEY,
+                class_id VARCHAR(36) NOT NULL,
+                day_of_week TINYINT(4) NOT NULL,
+                start_time TIME NOT NULL,
+                end_time TIME NOT NULL,
+                subject VARCHAR(100) NOT NULL,
+                room_id VARCHAR(36) NOT NULL,
+                primary_teacher_id VARCHAR(36) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                KEY cs_class_idx (class_id),
+                KEY cs_room_idx (room_id),
+                KEY cs_teacher_idx (primary_teacher_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
         $pdo->exec("
             CREATE TABLE IF NOT EXISTS renewal_policies (
                 id VARCHAR(36) NOT NULL PRIMARY KEY,

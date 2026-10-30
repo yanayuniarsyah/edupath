@@ -454,6 +454,399 @@ elseif ($action === 'sessions') {
 
         echo json_encode(["success" => true, "session_id" => $newSessionId, "message" => "Sesi kelas berhasil dijadwalkan"]);
         exit;
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $sessionId = $_GET['id'] ?? ($input['id'] ?? '');
+        if (!$sessionId) {
+            http_response_code(400); echo json_encode(["error" => "Session ID wajib disertakan"]); exit;
+        }
+        if (!in_array($payload->role, ['superadmin', 'admin'])) {
+            http_response_code(403); echo json_encode(["error" => "Hanya Administrator yang berwenang membatalkan atau menghapus sesi"]); exit;
+        }
+        if (!$isSuper) {
+            $stmtTenantChk = $pdo->prepare("SELECT c.id FROM class_sessions cs JOIN classes c ON cs.class_id = c.id WHERE cs.id = ? AND c.tenant_id = ?");
+            $stmtTenantChk->execute([$sessionId, $tenant_id]);
+            if (!$stmtTenantChk->fetch()) {
+                http_response_code(403); echo json_encode(["error" => "Forbidden: Anda tidak berwenang menghapus sesi rombel cabang lain"]); exit;
+            }
+        }
+        $pdo->prepare("DELETE FROM session_attendances WHERE session_id = ?")->execute([$sessionId]);
+        $pdo->prepare("DELETE FROM class_sessions WHERE id = ?")->execute([$sessionId]);
+        echo json_encode(["success" => true, "message" => "Sesi kelas berhasil dihapus"]);
+        exit;
+    }
+}
+
+// ========================================================
+// 4b. MANAJEMEN POLA JADWAL RUTIN (class_schedules)
+// ========================================================
+elseif ($action === 'schedules') {
+    $class_id = $_GET['class_id'] ?? ($input['class_id'] ?? '');
+    if (!$class_id && $_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+        http_response_code(400); echo json_encode(["error" => "Class ID wajib disertakan"]); exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $sql = "
+            SELECT cs.*, cr.name as room_name, cr.capacity as room_capacity,
+                   COALESCE(a.name, a.username, 'Guru EduPath') as teacher_name
+            FROM class_schedules cs
+            JOIN class_rooms cr ON cs.room_id = cr.id
+            LEFT JOIN admins a ON cs.primary_teacher_id = a.id
+            JOIN classes c ON cs.class_id = c.id
+            WHERE cs.class_id = ?
+        ";
+        $params = [$class_id];
+        if (!$isSuper) {
+            $sql .= " AND c.tenant_id = ?";
+            $params[] = $tenant_id;
+        }
+        $sql .= " ORDER BY cs.day_of_week ASC, cs.start_time ASC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        echo json_encode(["schedules" => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+        exit;
+    }
+
+    if (!in_array($payload->role, ['superadmin', 'admin'])) {
+        http_response_code(403); echo json_encode(["error" => "Hanya Administrator Cabang yang dapat mengelola jadwal rutin"]); exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $day_of_week = (int)($input['day_of_week'] ?? 1);
+        $start_time = safe_str($input['start_time'] ?? '');
+        $end_time = safe_str($input['end_time'] ?? '');
+        $subject = safe_str($input['subject'] ?? 'Pelajaran Reguler');
+        $room_id = safe_str($input['room_id'] ?? '');
+        $primary_teacher_id = safe_str($input['primary_teacher_id'] ?? '');
+
+        if (!$start_time || !$end_time || !$room_id || !$primary_teacher_id) {
+            http_response_code(400); echo json_encode(["error" => "Semua kolom jadwal rutin wajib diisi (hari, jam mulai/selesai, ruangan, guru)"]); exit;
+        }
+
+        $id = gen_uuid();
+        $ins = $pdo->prepare("
+            INSERT INTO class_schedules (id, class_id, day_of_week, start_time, end_time, subject, room_id, primary_teacher_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $ins->execute([$id, $class_id, $day_of_week, $start_time, $end_time, $subject, $room_id, $primary_teacher_id]);
+        echo json_encode(["success" => true, "id" => $id, "message" => "Pola jadwal rutin berhasil disimpan"]);
+        exit;
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $id = $_GET['id'] ?? ($input['id'] ?? '');
+        if (!$id) {
+            http_response_code(400); echo json_encode(["error" => "Schedule ID wajib disertakan"]); exit;
+        }
+        $stmt = $pdo->prepare("DELETE FROM class_schedules WHERE id = ?");
+        $stmt->execute([$id]);
+        echo json_encode(["success" => true, "message" => "Pola jadwal berhasil dihapus"]);
+        exit;
+    }
+}
+
+// ========================================================
+// 4c. GENERATOR SESI KALENDER RUTIN (generate_sessions)
+// Mendukung penjadwalan massal (misal: 2x seminggu Senin & Kamis pk 13:30 Jan 2026 - Nov 2026)
+// ========================================================
+elseif ($action === 'generate_sessions') {
+    if (!in_array($payload->role, ['superadmin', 'admin'])) {
+        http_response_code(403); echo json_encode(["error" => "Hanya Administrator Cabang yang dapat men-generate jadwal sesi"]); exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405); echo json_encode(["error" => "Metode request harus POST"]); exit;
+    }
+
+    $class_id = safe_str($input['class_id'] ?? '');
+    $days_of_week = is_array($input['days_of_week'] ?? null) ? array_map('intval', $input['days_of_week']) : [];
+    $start_time = safe_str($input['start_time'] ?? '13:30');
+    $end_time = safe_str($input['end_time'] ?? '15:00');
+    $start_date = safe_str($input['start_date'] ?? '');
+    $end_date = safe_str($input['end_date'] ?? '');
+    $room_id = safe_str($input['room_id'] ?? '');
+    $teacher_id = safe_str($input['teacher_id'] ?? '');
+    $subject = safe_str($input['subject'] ?? '');
+    $tutor_fee = !empty($input['tutor_fee_snapshot']) ? (float)$input['tutor_fee_snapshot'] : 75000.00;
+    $skip_conflicts = isset($input['skip_conflicts']) ? (bool)$input['skip_conflicts'] : true;
+    $clear_existing = !empty($input['clear_existing_scheduled']);
+
+    // Dukungan kustom jam per hari (slots array, misal: Selasa pk 10:30 & Kamis pk 13:30)
+    $slotsInput = is_array($input['slots'] ?? null) ? $input['slots'] : [];
+    $slotsByDay = [];
+    if (!empty($slotsInput)) {
+        foreach ($slotsInput as $sl) {
+            $dow = (int)($sl['day_of_week'] ?? 0);
+            if ($dow >= 1 && $dow <= 7) {
+                $st = safe_str($sl['start_time'] ?? $start_time);
+                $et = safe_str($sl['end_time'] ?? $end_time);
+                if (strlen($st) === 5) $st .= ':00';
+                if (strlen($et) === 5) $et .= ':00';
+                $slotsByDay[$dow] = [
+                    'day_of_week' => $dow,
+                    'start_time' => $st,
+                    'end_time' => $et,
+                    'room_id' => safe_str($sl['room_id'] ?? ''),
+                    'teacher_id' => safe_str($sl['teacher_id'] ?? '')
+                ];
+            }
+        }
+    }
+
+    if (!empty($slotsByDay)) {
+        $days_of_week = array_keys($slotsByDay);
+    } else {
+        if (strlen($start_time) === 5) $start_time .= ':00';
+        if (strlen($end_time) === 5) $end_time .= ':00';
+        foreach ($days_of_week as $dow) {
+            $slotsByDay[$dow] = [
+                'day_of_week' => $dow,
+                'start_time' => $start_time,
+                'end_time' => $end_time,
+                'room_id' => '',
+                'teacher_id' => ''
+            ];
+        }
+    }
+
+    if (!$class_id || empty($slotsByDay) || !$start_date || !$end_date) {
+        http_response_code(400);
+        echo json_encode([
+            "error" => "Parameter tidak lengkap: class_id, jadwal hari (days_of_week atau slots), start_date, dan end_date wajib diisi."
+        ]);
+        exit;
+    }
+
+    // Validasi kelas & batas tenant
+    $clsStmt = $pdo->prepare("SELECT * FROM classes WHERE id = ?");
+    $clsStmt->execute([$class_id]);
+    $cls = $clsStmt->fetch(PDO::FETCH_ASSOC);
+    if (!$cls) {
+        http_response_code(404); echo json_encode(["error" => "Rombel kelas tidak ditemukan"]); exit;
+    }
+    if (!$isSuper && $cls['tenant_id'] !== $tenant_id) {
+        http_response_code(403); echo json_encode(["error" => "Forbidden: Anda tidak berwenang mengelola kelas cabang lain"]); exit;
+    }
+
+    // Fallback ruangan & guru dari default kelas bila kosong
+    if (!$room_id) {
+        $room_id = $cls['default_room_id'] ?? '';
+    }
+    if (!$room_id) {
+        $firstRoom = $pdo->prepare("SELECT id FROM class_rooms WHERE tenant_id = ? AND is_active = 1 LIMIT 1");
+        $firstRoom->execute([$cls['tenant_id']]);
+        $room_id = $firstRoom->fetchColumn();
+    }
+    if (!$room_id) {
+        http_response_code(400);
+        echo json_encode(["error" => "Ruang belajar belum ditentukan. Silakan tambahkan atau pilih ruangan kelas terlebih dahulu."]);
+        exit;
+    }
+
+    if (!$teacher_id) {
+        $tStmt = $pdo->prepare("
+            SELECT ur.user_id 
+            FROM user_roles ur 
+            WHERE ur.role IN ('teacher', 'guru', 'tutor') 
+              AND (ur.tenant_id = ? OR ur.tenant_id IS NULL) 
+            LIMIT 1
+        ");
+        $tStmt->execute([$cls['tenant_id']]);
+        $teacher_id = $tStmt->fetchColumn();
+        if (!$teacher_id) {
+            $firstAdmin = $pdo->prepare("SELECT id FROM admins WHERE tenant_id = ? OR tenant_id IS NULL LIMIT 1");
+            $firstAdmin->execute([$cls['tenant_id']]);
+            $teacher_id = $firstAdmin->fetchColumn() ?: $payload->id;
+        }
+    }
+
+    if (!$subject) {
+        $subject = $cls['name'];
+    }
+
+    try {
+        $startDt = new DateTime($start_date);
+        $endDt = new DateTime($end_date);
+        if ($startDt > $endDt) {
+            http_response_code(400); echo json_encode(["error" => "Tanggal mulai tidak boleh lebih besar dari tanggal selesai"]); exit;
+        }
+    } catch (\Throwable $e) {
+        http_response_code(400); echo json_encode(["error" => "Format tanggal tidak valid (gunakan YYYY-MM-DD)"]); exit;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. Simpan pola ke class_schedules untuk setiap hari yang dipilih
+        $scheduleMap = [];
+        $checkSched = $pdo->prepare("SELECT id FROM class_schedules WHERE class_id = ? AND day_of_week = ?");
+        $insSched = $pdo->prepare("
+            INSERT INTO class_schedules (id, class_id, day_of_week, start_time, end_time, subject, room_id, primary_teacher_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $upSched = $pdo->prepare("
+            UPDATE class_schedules SET start_time = ?, end_time = ?, subject = ?, room_id = ?, primary_teacher_id = ?
+            WHERE id = ?
+        ");
+
+        foreach ($slotsByDay as $dow => $slot) {
+            $slotStart = $slot['start_time'];
+            $slotEnd = $slot['end_time'];
+            $slotRoom = !empty($slot['room_id']) ? $slot['room_id'] : $room_id;
+            $slotTeacher = !empty($slot['teacher_id']) ? $slot['teacher_id'] : $teacher_id;
+
+            $checkSched->execute([$class_id, $dow]);
+            $existingSchedId = $checkSched->fetchColumn();
+            if ($existingSchedId) {
+                $upSched->execute([$slotStart, $slotEnd, $subject, $slotRoom, $slotTeacher, $existingSchedId]);
+                $scheduleMap[$dow] = $existingSchedId;
+            } else {
+                $newSchedId = gen_uuid();
+                $insSched->execute([$newSchedId, $class_id, $dow, $slotStart, $slotEnd, $subject, $slotRoom, $slotTeacher]);
+                $scheduleMap[$dow] = $newSchedId;
+            }
+        }
+
+        // 2. Opsi: Bersihkan sesi scheduled masa depan jika diminta (regenerasi bersih)
+        if ($clear_existing) {
+            $delStmt = $pdo->prepare("
+                SELECT id FROM class_sessions 
+                WHERE class_id = ? AND session_date >= ? AND status = 'scheduled'
+            ");
+            $delStmt->execute([$class_id, $start_date]);
+            $oldIds = $delStmt->fetchAll(PDO::FETCH_COLUMN);
+            if (!empty($oldIds)) {
+                $inClause = implode(',', array_fill(0, count($oldIds), '?'));
+                $pdo->prepare("DELETE FROM session_attendances WHERE session_id IN ($inClause)")->execute($oldIds);
+                $pdo->prepare("DELETE FROM class_sessions WHERE id IN ($inClause)")->execute($oldIds);
+            }
+        }
+
+        // 3. Ambil siswa aktif rombel untuk auto-provision roster kehadiran
+        $stStudents = $pdo->prepare("SELECT student_id FROM class_students WHERE class_id = ? AND status = 'active'");
+        $stStudents->execute([$class_id]);
+        $activeStudents = $stStudents->fetchAll(PDO::FETCH_COLUMN);
+
+        // 4. Query pendeteksi benturan jadwal ruangan & guru
+        $conflictStmt = $pdo->prepare("
+            SELECT cs.id, cs.room_id, cs.teacher_id, c.name as conflict_class, cr.name as room_name, COALESCE(a.name, a.username, 'Guru Lain') as teacher_name
+            FROM class_sessions cs
+            JOIN classes c ON cs.class_id = c.id
+            JOIN class_rooms cr ON cs.room_id = cr.id
+            LEFT JOIN admins a ON cs.teacher_id = a.id
+            WHERE cs.session_date = ?
+              AND cs.status NOT IN ('cancelled', 'rescheduled')
+              AND ((cs.room_id = ?) OR (cs.teacher_id = ?))
+              AND (cs.start_time < ? AND cs.end_time > ?)
+            LIMIT 1
+        ");
+
+        $dupStmt = $pdo->prepare("
+            SELECT id FROM class_sessions 
+            WHERE class_id = ? AND session_date = ? AND start_time = ? AND status NOT IN ('cancelled', 'rescheduled')
+            LIMIT 1
+        ");
+
+        $insSession = $pdo->prepare("
+            INSERT INTO class_sessions (id, class_id, schedule_id, session_date, start_time, end_time, room_id, teacher_id, session_type, tutor_fee_snapshot, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'regular', ?, 'scheduled')
+        ");
+
+        $insAtt = $pdo->prepare("
+            INSERT IGNORE INTO session_attendances (id, session_id, student_id, attendance_status)
+            VALUES (?, ?, ?, 'absent')
+        ");
+
+        $dayNames = [
+            1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis',
+            5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
+        ];
+
+        $createdSessions = 0;
+        $conflicts = [];
+        $cur = clone $startDt;
+
+        while ($cur <= $endDt) {
+            $dow = (int)$cur->format('N');
+            if (isset($slotsByDay[$dow])) {
+                $slot = $slotsByDay[$dow];
+                $slotStart = $slot['start_time'];
+                $slotEnd = $slot['end_time'];
+                $slotRoom = !empty($slot['room_id']) ? $slot['room_id'] : $room_id;
+                $slotTeacher = !empty($slot['teacher_id']) ? $slot['teacher_id'] : $teacher_id;
+
+                $dateStr = $cur->format('Y-m-d');
+
+                // Cek duplikat sesi pada rombel ini di jam tersebut
+                $dupStmt->execute([$class_id, $dateStr, $slotStart]);
+                if ($dupStmt->fetch()) {
+                    $cur->modify('+1 day');
+                    continue;
+                }
+
+                // Cek benturan jadwal ruangan dan guru
+                $conflictStmt->execute([$dateStr, $slotRoom, $slotTeacher, $slotEnd, $slotStart]);
+                $cHit = $conflictStmt->fetch(PDO::FETCH_ASSOC);
+                if ($cHit) {
+                    $reason = ($cHit['room_id'] === $slotRoom)
+                        ? "Ruangan {$cHit['room_name']} sedang digunakan kelas '{$cHit['conflict_class']}'"
+                        : "Tutor {$cHit['teacher_name']} sedang mengajar di kelas '{$cHit['conflict_class']}'";
+                    $conflicts[] = [
+                        "date" => $dateStr,
+                        "day" => $dayNames[$dow] ?? '',
+                        "time" => substr($slotStart, 0, 5) . '–' . substr($slotEnd, 0, 5),
+                        "reason" => $reason
+                    ];
+                    if (!$skip_conflicts) {
+                        $pdo->rollBack();
+                        http_response_code(409);
+                        echo json_encode([
+                            "error" => "Benturan jadwal terdeteksi pada {$dateStr} ({$dayNames[$dow]} pk " . substr($slotStart, 0, 5) . "): {$reason}",
+                            "conflicts" => $conflicts
+                        ]);
+                        exit;
+                    }
+                    $cur->modify('+1 day');
+                    continue;
+                }
+
+                $sesId = gen_uuid();
+                $schedId = $scheduleMap[$dow] ?? null;
+                $insSession->execute([$sesId, $class_id, $schedId, $dateStr, $slotStart, $slotEnd, $slotRoom, $slotTeacher, $tutor_fee]);
+
+                // Auto roster presensi untuk seluruh siswa terdaftar
+                foreach ($activeStudents as $stuId) {
+                    $attId = gen_uuid();
+                    $insAtt->execute([$attId, $sesId, $stuId]);
+                }
+
+                $createdSessions++;
+            }
+            $cur->modify('+1 day');
+        }
+
+        $pdo->commit();
+
+        $slotSummaries = [];
+        foreach ($slotsByDay as $dow => $slot) {
+            $dayName = $dayNames[$dow] ?? "Hari-$dow";
+            $slotSummaries[] = "$dayName pk " . substr($slot['start_time'], 0, 5) . '–' . substr($slot['end_time'], 0, 5);
+        }
+
+        echo json_encode([
+            "success" => true,
+            "created_count" => $createdSessions,
+            "skipped_conflicts" => count($conflicts),
+            "conflicts_detail" => $conflicts,
+            "days_summary" => $slotSummaries,
+            "start_date" => $start_date,
+            "end_date" => $end_date,
+            "message" => "Berhasil menghasilkan {$createdSessions} sesi belajar tatap muka (" . implode(' & ', $slotSummaries) . ") dari {$start_date} s/d {$end_date}." . (count($conflicts) > 0 ? " Catatan: " . count($conflicts) . " sesi dilewati karena benturan jadwal." : "")
+        ]);
+        exit;
+    } catch (\Throwable $e) {
+        $pdo->rollBack();
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal men-generate sesi jadwal: " . $e->getMessage()]);
+        exit;
     }
 }
 

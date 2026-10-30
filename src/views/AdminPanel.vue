@@ -792,6 +792,14 @@
                           <span>Siswa ({{ cls.student_count || 0 }})</span>
                         </button>
                         <button 
+                          @click="openRecurringScheduleModal(cls)" 
+                          class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-[10px] font-bold transition-all flex items-center gap-1"
+                          title="Atur Jadwal Rutin & Generate Sesi Pertemuan"
+                        >
+                          <i class="ph-bold ph-calendar-plus"></i>
+                          <span>Jadwal Rutin</span>
+                        </button>
+                        <button 
                           @click="editClass(cls)" 
                           class="p-1 rounded bg-white/5 hover:bg-white/15 text-white/70 hover:text-white transition-colors"
                           title="Ubah Kelas"
@@ -2991,6 +2999,286 @@
 
         <div class="p-3 border-t border-white/10 bg-black/20 text-right shrink-0">
           <button @click="showManageStudentsModal = false" class="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold">Tutup</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Pengaturan Jadwal Rutin & Generator Sesi Rombel (Senin & Kamis pk 13:30, Jan - Nov 2026) -->
+    <div v-if="showRecurringScheduleModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div class="bg-[#0d1427] border border-white/15 rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl animate-fade-in text-white overflow-hidden">
+        <!-- Header -->
+        <div class="p-4 border-b border-white/10 flex items-center justify-between shrink-0 bg-black/30">
+          <div>
+            <h3 class="font-black text-sm text-white flex items-center gap-2">
+              <i class="ph-bold ph-calendar-check text-amber-400 text-base"></i>
+              <span>Atur Jadwal Rutin & Generator Sesi: {{ selectedClassForSchedule?.name }}</span>
+            </h3>
+            <p class="text-[10px] text-white/50">
+              Konfigurasi hari & jam rutin belajar, lalu generate otomatis seluruh sesi pertemuan kalender tanpa benturan.
+            </p>
+          </div>
+          <button @click="showRecurringScheduleModal = false" class="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Body: 2 Columns Layout -->
+        <div class="flex-grow overflow-y-auto p-4 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Left Column: Generator Form (7 cols) -->
+          <div class="lg:col-span-7 space-y-4">
+            <!-- Pilihan Hari Rutin (Pills) -->
+            <div>
+              <label class="text-[11px] font-bold text-white/70 block mb-1.5 flex items-center justify-between">
+                <span>Hari Belajar Rutin Mingguan:</span>
+                <span class="text-[10px] text-amber-300 font-mono">{{ recurringForm.days_of_week.length }} hari dipilih</span>
+              </label>
+              <div class="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
+                <button
+                  v-for="d in dayOptions"
+                  :key="d.value"
+                  type="button"
+                  @click="toggleDayOfWeek(d.value)"
+                  :class="[
+                    'py-2 px-1 text-center rounded-xl text-xs font-bold transition-all border flex flex-col items-center gap-0.5 cursor-pointer',
+                    recurringForm.days_of_week.includes(d.value)
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-md shadow-amber-500/10'
+                      : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10 hover:text-white'
+                  ]"
+                >
+                  <span class="text-[11px]">{{ d.short }}</span>
+                  <i :class="recurringForm.days_of_week.includes(d.value) ? 'ph-bold ph-check text-xs' : 'ph-bold ph-plus text-[10px] opacity-40'"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Mode Waktu Belajar: Seragam vs Custom per Hari -->
+            <div class="bg-black/30 p-3 rounded-xl border border-white/10 space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <span class="text-[11px] font-bold text-white block">Pengaturan Jam Belajar</span>
+                  <span class="text-[10px] text-white/50">Gunakan jam seragam atau atur jam berbeda per hari (misal Selasa 10:30, Kamis 13:30)</span>
+                </div>
+                <button
+                  type="button"
+                  @click="recurringForm.use_custom_time_per_day = !recurringForm.use_custom_time_per_day"
+                  :class="[
+                    'px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer',
+                    recurringForm.use_custom_time_per_day
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                      : 'bg-white/5 text-white/60 border-white/10 hover:text-white'
+                  ]"
+                >
+                  <i :class="recurringForm.use_custom_time_per_day ? 'ph-bold ph-sliders text-xs' : 'ph-bold ph-clock text-xs'"></i>
+                  <span>{{ recurringForm.use_custom_time_per_day ? 'Mode: Jam Beda per Hari' : 'Mode: Jam Seragam' }}</span>
+                </button>
+              </div>
+
+              <!-- Jam Seragam -->
+              <div v-if="!recurringForm.use_custom_time_per_day" class="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label class="text-[10px] font-bold text-white/60 block mb-1">Jam Mulai</label>
+                  <input v-model="recurringForm.start_time" type="time" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400 font-mono" />
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-white/60 block mb-1">Jam Selesai</label>
+                  <input v-model="recurringForm.end_time" type="time" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400 font-mono" />
+                </div>
+              </div>
+
+              <!-- Jam Beda per Hari (Custom Slots per Hari) -->
+              <div v-else class="space-y-2 pt-1">
+                <div
+                  v-for="d in recurringForm.days_of_week"
+                  :key="d"
+                  class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs"
+                >
+                  <div class="flex items-center gap-2 w-28 shrink-0">
+                    <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-300 font-bold text-[11px] flex items-center justify-center border border-amber-500/30">
+                      {{ dayOptions.find(o => o.value === d)?.short }}
+                    </span>
+                    <span class="font-bold text-white">{{ dayOptions.find(o => o.value === d)?.label }}</span>
+                  </div>
+                  <div class="flex items-center gap-2 flex-grow">
+                    <div class="flex items-center gap-1.5 flex-1">
+                      <span class="text-[10px] text-white/40 shrink-0">Mulai:</span>
+                      <input
+                        v-model="recurringForm.custom_slots[d].start_time"
+                        type="time"
+                        class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400 font-mono"
+                      />
+                    </div>
+                    <span class="text-white/30 text-xs">-</span>
+                    <div class="flex items-center gap-1.5 flex-1">
+                      <span class="text-[10px] text-white/40 shrink-0">Selesai:</span>
+                      <input
+                        v-model="recurringForm.custom_slots[d].end_time"
+                        type="time"
+                        class="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400 font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rentang Tanggal Kalender (Misal: 2026-01-01 s/d 2026-11-30) -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-white/70 block mb-1">Tanggal Mulai Periode</label>
+                <input v-model="recurringForm.start_date" type="date" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400 font-mono" />
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-white/70 block mb-1">Tanggal Selesai Periode</label>
+                <input v-model="recurringForm.end_date" type="date" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400 font-mono" />
+              </div>
+            </div>
+
+            <!-- Ruangan & Tutor Pengampu -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-white/70 block mb-1">Ruangan Sesi</label>
+                <select v-model="recurringForm.room_id" class="w-full px-3 py-2 rounded-xl bg-[#0a0f1e] border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400">
+                  <option value="">-- Pilih Ruangan --</option>
+                  <option v-for="r in classRooms" :key="r.id" :value="r.id">{{ r.name }} (Kap: {{ r.capacity }})</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-white/70 block mb-1">Tutor Pengampu</label>
+                <select v-model="recurringForm.teacher_id" class="w-full px-3 py-2 rounded-xl bg-[#0a0f1e] border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400">
+                  <option value="">-- Pilih Guru / Tutor --</option>
+                  <option v-for="t in (staffMembers || []).filter(s => ['teacher', 'guru', 'tutor', 'admin'].includes(s.role) || s.role === 'teacher')" :key="t.id" :value="t.id">
+                    {{ t.name || t.username }} ({{ t.role || 'staff' }})
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Mata Pelajaran / Topik -->
+            <div>
+              <label class="text-[11px] font-bold text-white/70 block mb-1">Mata Pelajaran / Program</label>
+              <input v-model="recurringForm.subject" type="text" placeholder="Contoh: TPS, Matematika Dasar, SNPMB UTBK" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400" />
+            </div>
+
+            <!-- Opsi Tambahan -->
+            <div class="bg-black/30 p-3 rounded-xl border border-white/10 space-y-2 text-xs">
+              <label class="flex items-center gap-2 cursor-pointer select-none text-white/80">
+                <input type="checkbox" v-model="recurringForm.clear_existing_scheduled" class="rounded border-white/20 bg-black/40 text-amber-400 focus:ring-0" />
+                <span>Bersihkan sesi berstatus 'scheduled' masa depan sebelum generate (regenerasi bersih)</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer select-none text-white/80">
+                <input type="checkbox" v-model="recurringForm.skip_conflicts" class="rounded border-white/20 bg-black/40 text-amber-400 focus:ring-0" />
+                <span>Lewati otomatis jika terdeteksi benturan ruangan / guru (jangan batalkan seluruh batch)</span>
+              </label>
+            </div>
+
+            <!-- Live Calculation & Submit Action -->
+            <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div class="text-[10px] text-amber-200 uppercase font-black tracking-wider">Estimasi Sesi Kalender</div>
+                <div class="text-sm font-black text-amber-300 font-mono">
+                  ~{{ estimatedSessionsCount }} Sesi Tatap Muka
+                </div>
+                <div class="text-[10px] text-white/50">
+                  {{ recurringForm.start_date }} s/d {{ recurringForm.end_date }}
+                </div>
+              </div>
+              <button
+                @click="handleGenerateSessions"
+                :disabled="isGeneratingSessions || estimatedSessionsCount === 0"
+                class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-black font-black text-xs transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+              >
+                <i v-if="isGeneratingSessions" class="ph-bold ph-spinner animate-spin text-sm"></i>
+                <i v-else class="ph-bold ph-rocket-launch text-sm"></i>
+                <span>{{ isGeneratingSessions ? 'Men-generate Sesi...' : 'Generate Jadwal & Sesi' }}</span>
+              </button>
+            </div>
+
+            <!-- Feedback Notification Banner -->
+            <div v-if="scheduleGenerationResult" class="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs space-y-1">
+              <div class="font-bold flex items-center gap-1.5">
+                <i class="ph-bold ph-check-circle text-emerald-400"></i>
+                <span>{{ scheduleGenerationResult.message }}</span>
+              </div>
+              <div v-if="scheduleGenerationResult.skipped_conflicts > 0" class="text-[11px] text-amber-300">
+                Peringatan: {{ scheduleGenerationResult.skipped_conflicts }} sesi dilewati karena ruangan atau guru sedang dipakai kelas lain.
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Existing Sessions Preview (5 cols) -->
+          <div class="lg:col-span-5 bg-black/20 rounded-xl border border-white/10 p-3.5 flex flex-col min-h-[350px]">
+            <div class="flex items-center justify-between border-b border-white/10 pb-2.5 mb-3">
+              <div>
+                <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <i class="ph-bold ph-calendar text-sky-400"></i>
+                  <span>Daftar Sesi Terjadwal</span>
+                </h4>
+                <div class="text-[10px] text-white/40 font-mono">{{ existingClassSessions.length }} Sesi Pertemuan</div>
+              </div>
+              <button 
+                @click="fetchClassScheduleAndSessions(selectedClassForSchedule.id)"
+                class="text-[10px] text-sky-400 hover:underline flex items-center gap-1"
+                title="Refresh sesi"
+              >
+                <i class="ph-bold ph-arrows-clockwise" :class="{'animate-spin': isLoadingScheduleData}"></i> Refresh
+              </button>
+            </div>
+
+            <div v-if="isLoadingScheduleData" class="flex-grow flex items-center justify-center p-6 text-white/40 text-xs">
+              <i class="ph-bold ph-spinner animate-spin text-lg mr-2"></i> Memuat daftar sesi...
+            </div>
+            <div v-else-if="existingClassSessions.length === 0" class="flex-grow flex flex-col items-center justify-center p-6 text-center text-white/40 text-xs space-y-1">
+              <i class="ph-bold ph-calendar-blank text-2xl mb-1 text-white/20"></i>
+              <p>Belum ada sesi pertemuan yang dibuat untuk rombel ini.</p>
+              <p class="text-[10px] text-white/30">Gunakan form di samping untuk generate sesi rutin.</p>
+            </div>
+            <div v-else class="flex-grow overflow-y-auto max-h-[420px] divide-y divide-white/5 pr-1">
+              <div
+                v-for="ses in existingClassSessions"
+                :key="ses.id"
+                class="py-2 flex items-center justify-between gap-2 hover:bg-white/5 px-2 rounded-lg transition-colors text-xs"
+              >
+                <div class="min-w-0">
+                  <div class="font-bold text-white flex items-center gap-1.5 truncate">
+                    <span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono text-[10px]">
+                      {{ ses.session_date }}
+                    </span>
+                    <span class="text-white/80 text-[11px] font-mono">
+                      {{ (ses.start_time || '').slice(0, 5) }}–{{ (ses.end_time || '').slice(0, 5) }}
+                    </span>
+                  </div>
+                  <div class="text-[10px] text-white/50 truncate flex items-center gap-1 mt-0.5">
+                    <span>{{ ses.room_name || 'Ruang' }}</span>
+                    <span>•</span>
+                    <span class="text-white/70">{{ ses.teacher_name || 'Guru' }}</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <span :class="['text-[9px] px-1.5 py-0.5 rounded font-mono font-bold uppercase', ses.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-white/50']">
+                    {{ ses.status }}
+                  </span>
+                  <button
+                    v-if="ses.status === 'scheduled'"
+                    @click="handleDeleteSingleSession(ses.id)"
+                    class="p-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors cursor-pointer"
+                    title="Hapus Sesi"
+                  >
+                    <i class="ph-bold ph-trash text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-3 border-t border-white/10 bg-black/30 flex items-center justify-between shrink-0">
+          <div class="text-[10px] text-white/40">
+            EDUPath Automated Batch Session Engine • TOCTOU Conflict Checked
+          </div>
+          <button @click="showRecurringScheduleModal = false" class="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer">
+            Tutup
+          </button>
         </div>
       </div>
     </div>
@@ -7125,6 +7413,86 @@ const studentAssignForm = reactive({
   notes: ''
 });
 
+// ── Recurring Schedule Generator Reactive Data ──
+const showRecurringScheduleModal = ref(false);
+const selectedClassForSchedule = ref(null);
+const classSchedulesList = ref([]);
+const existingClassSessions = ref([]);
+const isLoadingScheduleData = ref(false);
+const isGeneratingSessions = ref(false);
+const scheduleGenerationResult = ref(null);
+
+const recurringForm = reactive({
+  days_of_week: [2, 4], // default Selasa & Kamis
+  use_custom_time_per_day: false,
+  start_time: '13:30',
+  end_time: '15:00',
+  custom_slots: {
+    1: { start_time: '13:30', end_time: '15:00' },
+    2: { start_time: '10:30', end_time: '12:00' },
+    3: { start_time: '13:30', end_time: '15:00' },
+    4: { start_time: '13:30', end_time: '15:00' },
+    5: { start_time: '13:30', end_time: '15:00' },
+    6: { start_time: '09:00', end_time: '10:30' },
+    7: { start_time: '09:00', end_time: '10:30' }
+  },
+  start_date: '2026-01-05',
+  end_date: '2026-11-30',
+  room_id: '',
+  teacher_id: '',
+  subject: '',
+  clear_existing_scheduled: false,
+  skip_conflicts: true
+});
+
+const dayOptions = [
+  { value: 1, label: 'Senin', short: 'Sen' },
+  { value: 2, label: 'Selasa', short: 'Sel' },
+  { value: 3, label: 'Rabu', short: 'Rab' },
+  { value: 4, label: 'Kamis', short: 'Kam' },
+  { value: 5, label: 'Jumat', short: 'Jum' },
+  { value: 6, label: 'Sabtu', short: 'Sab' },
+  { value: 7, label: 'Minggu', short: 'Min' }
+];
+
+const toggleDayOfWeek = (dayVal) => {
+  const idx = recurringForm.days_of_week.indexOf(dayVal);
+  if (idx > -1) {
+    if (recurringForm.days_of_week.length > 1) {
+      recurringForm.days_of_week.splice(idx, 1);
+    } else {
+      alert('Minimal pilih 1 hari belajar');
+    }
+  } else {
+    recurringForm.days_of_week.push(dayVal);
+    recurringForm.days_of_week.sort((a, b) => a - b);
+    if (!recurringForm.custom_slots[dayVal]) {
+      recurringForm.custom_slots[dayVal] = {
+        start_time: recurringForm.start_time || '13:30',
+        end_time: recurringForm.end_time || '15:00'
+      };
+    }
+  }
+};
+
+const estimatedSessionsCount = computed(() => {
+  if (!recurringForm.start_date || !recurringForm.end_date || recurringForm.days_of_week.length === 0) return 0;
+  const start = new Date(recurringForm.start_date + 'T00:00:00');
+  const end = new Date(recurringForm.end_date + 'T00:00:00');
+  if (start > end) return 0;
+  let count = 0;
+  const cur = new Date(start);
+  while (cur <= end) {
+    let day = cur.getDay(); // 0 is Sunday, 1 is Monday ... 6 is Saturday
+    let isoDay = day === 0 ? 7 : day;
+    if (recurringForm.days_of_week.includes(isoDay)) {
+      count++;
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  return count;
+});
+
 // ── Teacher Hub Reactive Data & Sesi Mengajar ──
 const teacherClasses = ref([]);
 const teacherUpcomingSessions = ref([]);
@@ -7284,6 +7652,131 @@ const removeStudentFromClass = async (studentId) => {
     await fetchOfflineClasses();
   } catch (err) {
     alert(err?.message || 'Gagal mengeluarkan siswa');
+  }
+};
+
+// ── Recurring Schedule & Generator Methods ──
+const openRecurringScheduleModal = async (cls) => {
+  selectedClassForSchedule.value = cls;
+  scheduleGenerationResult.value = null;
+  recurringForm.days_of_week = [2, 4]; // Default Selasa & Kamis
+  recurringForm.use_custom_time_per_day = false;
+  recurringForm.start_time = '13:30';
+  recurringForm.end_time = '15:00';
+  recurringForm.custom_slots = {
+    1: { start_time: '13:30', end_time: '15:00' },
+    2: { start_time: '10:30', end_time: '12:00' },
+    3: { start_time: '13:30', end_time: '15:00' },
+    4: { start_time: '13:30', end_time: '15:00' },
+    5: { start_time: '13:30', end_time: '15:00' },
+    6: { start_time: '09:00', end_time: '10:30' },
+    7: { start_time: '09:00', end_time: '10:30' }
+  };
+  recurringForm.start_date = '2026-01-05';
+  recurringForm.end_date = '2026-11-30';
+  recurringForm.room_id = cls.room_id || cls.default_room_id || '';
+  recurringForm.teacher_id = cls.primary_teacher_id || '';
+  recurringForm.subject = cls.name || 'Pelajaran Reguler';
+  recurringForm.clear_existing_scheduled = false;
+  recurringForm.skip_conflicts = true;
+  showRecurringScheduleModal.value = true;
+  await fetchClassScheduleAndSessions(cls.id);
+};
+
+const fetchClassScheduleAndSessions = async (classId) => {
+  if (!classId) return;
+  isLoadingScheduleData.value = true;
+  try {
+    const [schedRes, sessRes] = await Promise.all([
+      api.getClassSchedules(classId).catch(() => ({ schedules: [] })),
+      api.getClassSessions({ class_id: classId }).catch(() => ({ sessions: [] }))
+    ]);
+    classSchedulesList.value = schedRes?.schedules || [];
+    existingClassSessions.value = sessRes?.sessions || [];
+    if (classSchedulesList.value.length > 0) {
+      recurringForm.days_of_week = classSchedulesList.value.map(s => Number(s.day_of_week));
+      let hasVaryingTimes = false;
+      const first = classSchedulesList.value[0];
+      const baseStart = first.start_time ? first.start_time.slice(0, 5) : '13:30';
+      const baseEnd = first.end_time ? first.end_time.slice(0, 5) : '15:00';
+
+      classSchedulesList.value.forEach(s => {
+        const dow = Number(s.day_of_week);
+        const st = s.start_time ? s.start_time.slice(0, 5) : baseStart;
+        const et = s.end_time ? s.end_time.slice(0, 5) : baseEnd;
+        recurringForm.custom_slots[dow] = { start_time: st, end_time: et };
+        if (st !== baseStart || et !== baseEnd) {
+          hasVaryingTimes = true;
+        }
+      });
+
+      recurringForm.use_custom_time_per_day = hasVaryingTimes;
+      recurringForm.start_time = baseStart;
+      recurringForm.end_time = baseEnd;
+      if (first.room_id) recurringForm.room_id = first.room_id;
+      if (first.primary_teacher_id) recurringForm.teacher_id = first.primary_teacher_id;
+    }
+  } catch (err) {
+    console.warn("Gagal memuat jadwal:", err);
+  } finally {
+    isLoadingScheduleData.value = false;
+  }
+};
+
+const handleGenerateSessions = async () => {
+  if (!recurringForm.start_date || !recurringForm.end_date) {
+    return alert('Tentukan tanggal mulai dan tanggal selesai');
+  }
+  if (recurringForm.days_of_week.length === 0) {
+    return alert('Pilih minimal 1 hari');
+  }
+  isGeneratingSessions.value = true;
+  scheduleGenerationResult.value = null;
+  try {
+    const payload = {
+      class_id: selectedClassForSchedule.value.id,
+      start_date: recurringForm.start_date,
+      end_date: recurringForm.end_date,
+      room_id: recurringForm.room_id,
+      teacher_id: recurringForm.teacher_id,
+      subject: recurringForm.subject,
+      clear_existing_scheduled: recurringForm.clear_existing_scheduled,
+      skip_conflicts: recurringForm.skip_conflicts
+    };
+
+    if (recurringForm.use_custom_time_per_day) {
+      payload.slots = recurringForm.days_of_week.map(d => ({
+        day_of_week: d,
+        start_time: recurringForm.custom_slots[d]?.start_time || recurringForm.start_time,
+        end_time: recurringForm.custom_slots[d]?.end_time || recurringForm.end_time,
+        room_id: recurringForm.room_id,
+        teacher_id: recurringForm.teacher_id
+      }));
+    } else {
+      payload.days_of_week = recurringForm.days_of_week;
+      payload.start_time = recurringForm.start_time;
+      payload.end_time = recurringForm.end_time;
+    }
+
+    const res = await api.generateClassSessions(payload);
+    scheduleGenerationResult.value = res;
+    await fetchClassScheduleAndSessions(selectedClassForSchedule.value.id);
+    await fetchOfflineClasses();
+  } catch (err) {
+    alert(err?.message || 'Gagal men-generate sesi jadwal');
+  } finally {
+    isGeneratingSessions.value = false;
+  }
+};
+
+const handleDeleteSingleSession = async (sessionId) => {
+  if (!confirm('Hapus sesi pertemuan ini? Data presensi terkait juga akan dibatalkan.')) return;
+  try {
+    await api.deleteClassSession(sessionId);
+    await fetchClassScheduleAndSessions(selectedClassForSchedule.value.id);
+    await fetchOfflineClasses();
+  } catch (err) {
+    alert(err?.message || 'Gagal menghapus sesi');
   }
 };
 
