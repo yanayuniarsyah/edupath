@@ -1054,10 +1054,12 @@
                 </button>
               </div>
 
-              <!-- Filter Program Ujian (SNBT vs TKA) -->
+              <!-- Filter Program Ujian (SNBT vs TKA SD, SMP, SMA) -->
               <select id="q_assessment_select" v-model="qAssessmentFilter" aria-label="Filter Program Ujian" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
                 <option value="all" class="bg-[#0d1427]">Semua Program</option>
                 <option value="SNBT" class="bg-[#0d1427]">📘 SNBT / SNPMB (Umum)</option>
+                <option value="TKA_sd" class="bg-[#0d1427]">🎒 TKA SD — Sekolah Dasar</option>
+                <option value="TKA_smp" class="bg-[#0d1427]">🎓 TKA SMP — Sekolah Menengah Pertama</option>
                 <option value="TKA_saintek" class="bg-[#0d1427]">🔬 TKA SMA — Saintek</option>
                 <option value="TKA_soshum" class="bg-[#0d1427]">📚 TKA SMA — Soshum</option>
               </select>
@@ -1066,13 +1068,28 @@
 
               <select id="q_sub_materi_select" name="q_sub_materi" aria-label="Semua Komponen & Subtes" v-model="qSubMateri" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
                 <option value="all" class="bg-[#0d1427]">Semua Komponen & Subtes</option>
-                <optgroup label="TKA Saintek (IPA)" class="bg-[#0d1427] font-bold text-emerald-400">
+                <optgroup label="TKA SD (Sekolah Dasar)" class="bg-[#0d1427] font-bold text-teal-400">
+                  <option value="Matematika SD" class="bg-[#0d1427]">Matematika SD</option>
+                  <option value="Bahasa Indonesia SD" class="bg-[#0d1427]">Bahasa Indonesia SD</option>
+                  <option value="IPA SD" class="bg-[#0d1427]">IPA SD</option>
+                  <option value="IPS SD" class="bg-[#0d1427]">IPS SD</option>
+                  <option value="PPKn SD" class="bg-[#0d1427]">PPKn SD</option>
+                </optgroup>
+                <optgroup label="TKA SMP (Sekolah Menengah Pertama)" class="bg-[#0d1427] font-bold text-cyan-400">
+                  <option value="Matematika SMP" class="bg-[#0d1427]">Matematika SMP</option>
+                  <option value="Bahasa Indonesia SMP" class="bg-[#0d1427]">Bahasa Indonesia SMP</option>
+                  <option value="Bahasa Inggris SMP" class="bg-[#0d1427]">Bahasa Inggris SMP</option>
+                  <option value="IPA Terpadu SMP" class="bg-[#0d1427]">IPA Terpadu SMP</option>
+                  <option value="IPS Terpadu SMP" class="bg-[#0d1427]">IPS Terpadu SMP</option>
+                  <option value="PPKn SMP" class="bg-[#0d1427]">PPKn SMP</option>
+                </optgroup>
+                <optgroup label="TKA Saintek (IPA SMA)" class="bg-[#0d1427] font-bold text-emerald-400">
                   <option value="Matematika IPA" class="bg-[#0d1427]">Matematika IPA</option>
                   <option value="Fisika" class="bg-[#0d1427]">Fisika</option>
                   <option value="Kimia" class="bg-[#0d1427]">Kimia</option>
                   <option value="Biologi" class="bg-[#0d1427]">Biologi</option>
                 </optgroup>
-                <optgroup label="TKA Soshum (IPS)" class="bg-[#0d1427] font-bold text-amber-400">
+                <optgroup label="TKA Soshum (IPS SMA)" class="bg-[#0d1427] font-bold text-amber-400">
                   <option value="Sosiologi" class="bg-[#0d1427]">Sosiologi</option>
                   <option value="Ekonomi" class="bg-[#0d1427]">Ekonomi</option>
                   <option value="Geografi" class="bg-[#0d1427]">Geografi</option>
@@ -1262,10 +1279,12 @@
                 </button>
               </div>
 
-              <!-- Filter Program Ujian (SNBT vs TKA) -->
+              <!-- Filter Program Ujian (SNBT vs TKA SD, SMP, SMA) -->
               <select id="m_assessment_select" v-model="mAssessmentFilter" aria-label="Filter Program Ujian Materi" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
                 <option value="all" class="bg-[#0d1427]">Semua Program</option>
                 <option value="SNBT" class="bg-[#0d1427]">📘 SNBT / SNPMB (Umum)</option>
+                <option value="TKA_sd" class="bg-[#0d1427]">🎒 TKA SD — Sekolah Dasar</option>
+                <option value="TKA_smp" class="bg-[#0d1427]">🎓 TKA SMP — Sekolah Menengah Pertama</option>
                 <option value="TKA_saintek" class="bg-[#0d1427]">🔬 TKA SMA — Saintek</option>
                 <option value="TKA_soshum" class="bg-[#0d1427]">📚 TKA SMA — Soshum</option>
               </select>
@@ -1274,13 +1293,28 @@
 
               <select id="m_sub_materi_select" name="m_sub_materi" aria-label="Semua Komponen & Subtes" v-model="mSubMateri" class="px-3 py-2 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-xl outline-none cursor-pointer">
                 <option value="all" class="bg-[#0d1427]">Semua Komponen & Subtes</option>
-                <optgroup label="TKA Saintek (IPA)" class="bg-[#0d1427] font-bold text-emerald-400">
+                <optgroup label="TKA SD (Sekolah Dasar)" class="bg-[#0d1427] font-bold text-teal-400">
+                  <option value="Matematika SD" class="bg-[#0d1427]">Matematika SD</option>
+                  <option value="Bahasa Indonesia SD" class="bg-[#0d1427]">Bahasa Indonesia SD</option>
+                  <option value="IPA SD" class="bg-[#0d1427]">IPA SD</option>
+                  <option value="IPS SD" class="bg-[#0d1427]">IPS SD</option>
+                  <option value="PPKn SD" class="bg-[#0d1427]">PPKn SD</option>
+                </optgroup>
+                <optgroup label="TKA SMP (Sekolah Menengah Pertama)" class="bg-[#0d1427] font-bold text-cyan-400">
+                  <option value="Matematika SMP" class="bg-[#0d1427]">Matematika SMP</option>
+                  <option value="Bahasa Indonesia SMP" class="bg-[#0d1427]">Bahasa Indonesia SMP</option>
+                  <option value="Bahasa Inggris SMP" class="bg-[#0d1427]">Bahasa Inggris SMP</option>
+                  <option value="IPA Terpadu SMP" class="bg-[#0d1427]">IPA Terpadu SMP</option>
+                  <option value="IPS Terpadu SMP" class="bg-[#0d1427]">IPS Terpadu SMP</option>
+                  <option value="PPKn SMP" class="bg-[#0d1427]">PPKn SMP</option>
+                </optgroup>
+                <optgroup label="TKA Saintek (IPA SMA)" class="bg-[#0d1427] font-bold text-emerald-400">
                   <option value="Matematika IPA" class="bg-[#0d1427]">Matematika IPA</option>
                   <option value="Fisika" class="bg-[#0d1427]">Fisika</option>
                   <option value="Kimia" class="bg-[#0d1427]">Kimia</option>
                   <option value="Biologi" class="bg-[#0d1427]">Biologi</option>
                 </optgroup>
-                <optgroup label="TKA Soshum (IPS)" class="bg-[#0d1427] font-bold text-amber-400">
+                <optgroup label="TKA Soshum (IPS SMA)" class="bg-[#0d1427] font-bold text-amber-400">
                   <option value="Sosiologi" class="bg-[#0d1427]">Sosiologi</option>
                   <option value="Ekonomi" class="bg-[#0d1427]">Ekonomi</option>
                   <option value="Geografi" class="bg-[#0d1427]">Geografi</option>
@@ -1415,14 +1449,30 @@
 
         <!-- ===== TAB: MANAJEMEN PAKET ===== -->
         <div v-if="activeTab === 'packages'" class="space-y-4 animate-fade-in">
-          <div class="flex justify-between items-center">
+          <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 class="text-xs font-black text-white uppercase tracking-wider">Manajemen Paket & Langganan</h2>
-              <p class="text-[10px] text-white/40">Paket resmi EduPath sesuai spesifikasi landing page</p>
+              <p class="text-[10px] text-white/40">Katalog paket multi-program resmi EduPath (TKA SD, SMP, SMA, SNPMB/UTBK, Alumni)</p>
             </div>
-            <button @click="openPlanModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5">
-              <i class="ph-bold ph-plus"></i> Tambah Paket
-            </button>
+            <div class="flex items-center gap-2 flex-wrap">
+              <select v-model="planProgramFilter" class="px-3 py-1.5 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-lg outline-none cursor-pointer">
+                <option value="all">Semua Program</option>
+                <option value="SNPMB/UTBK">📘 SNPMB / UTBK</option>
+                <option value="TKA_SD">🎒 TKA SD</option>
+                <option value="TKA_SMP">🎓 TKA SMP</option>
+                <option value="TKA_SMA">🔬 TKA SMA</option>
+                <option value="SNPMB_ALUMNI">🏛️ SNPMB Alumni</option>
+              </select>
+              <select v-model="planModeFilter" class="px-3 py-1.5 text-xs font-bold text-white bg-black/40 border border-white/10 rounded-lg outline-none cursor-pointer">
+                <option value="all">Semua Metode</option>
+                <option value="online">Full Online</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="offline">Offline</option>
+              </select>
+              <button @click="openPlanModal()" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer">
+                <i class="ph-bold ph-plus"></i> Tambah Paket
+              </button>
+            </div>
           </div>
           <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
@@ -1434,6 +1484,7 @@
                     </th>
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12 cursor-pointer hover:text-white" @click="setSort('id')">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('name')">Nama Paket <i v-if="sortKey === 'name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
+                    <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Program & Metode</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('price')">Harga Resmi <i v-if="sortKey === 'price'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('duration')">Durasi <i v-if="sortKey === 'duration'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Entitlements</th>
@@ -1447,14 +1498,20 @@
                     </td>
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ (planPage - 1) * PAGE_SIZE + index + 1 }}</td>
                     <td class="px-4 py-3 font-bold text-white text-sm leading-snug">{{ p.name }}</td>
+                    <td class="px-4 py-3">
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300">{{ p.academic_program || 'SNPMB/UTBK' }}</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="p.delivery_mode === 'hybrid' ? 'bg-amber-500/15 border border-amber-500/30 text-amber-300' : (p.delivery_mode === 'offline' ? 'bg-rose-500/15 border border-rose-500/30 text-rose-300' : 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300')">{{ (p.delivery_mode || 'online').toUpperCase() }}</span>
+                      </div>
+                    </td>
                     <td class="px-4 py-3 font-bold text-emerald-400 font-mono text-sm">Rp {{ Number(p.price || 0).toLocaleString('id-ID') }}</td>
                     <td class="px-4 py-3 font-bold text-white/80 text-xs">{{ p.duration }} Hari</td>
                     <td class="px-4 py-3">
                       <span class="text-xs text-indigo-300 font-medium px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20">{{ Array.isArray(p.features) ? p.features.length : 0 }} fitur</span>
                     </td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
-                      <button @click="openPlanModal(p)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Paket"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
-                      <button @click="deletePlan(p.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Paket"><i class="ph-bold ph-trash"></i> Hapus</button>
+                      <button @click="openPlanModal(p)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Edit Paket"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
+                      <button @click="deletePlan(p.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Hapus Paket"><i class="ph-bold ph-trash"></i> Hapus</button>
                     </td>
                   </tr>
                 </tbody>
@@ -3450,13 +3507,33 @@
             <label for="plan_form_name" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Paket</label>
             <input id="plan_form_name" name="name" v-model="pForm.name" required type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
           </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="plan_form_program" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Program Akademik</label>
+              <select id="plan_form_program" name="academic_program" v-model="pForm.academic_program" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option value="SNPMB/UTBK">📘 SNPMB / UTBK</option>
+                <option value="TKA_SD">🎒 TKA SD</option>
+                <option value="TKA_SMP">🎓 TKA SMP</option>
+                <option value="TKA_SMA">🔬 TKA SMA</option>
+                <option value="SNPMB_ALUMNI">🏛️ SNPMB Alumni</option>
+              </select>
+            </div>
+            <div>
+              <label for="plan_form_mode" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Metode Belajar</label>
+              <select id="plan_form_mode" name="delivery_mode" v-model="pForm.delivery_mode" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option value="online">Full Online</option>
+                <option value="hybrid">Hybrid (Tatap Muka &amp; CBT)</option>
+                <option value="offline">Full Offline</option>
+              </select>
+            </div>
+          </div>
           <div class="grid grid-cols-3 gap-3">
             <div>
               <label for="plan_form_price" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Harga Asli</label>
               <input id="plan_form_price" name="price" v-model="pForm.price" required type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
             </div>
             <div>
-              <label for="plan_form_discount" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Diskon</label>
+              <label for="plan_form_discount" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Diskon (%)</label>
               <input id="plan_form_discount" name="discount" v-model="pForm.discount" type="number" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
             </div>
             <div>
@@ -3752,17 +3829,21 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="q_assessment_type_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Program Ujian</label>
-              <select id="q_assessment_type_select" name="assessment_type" v-model="qForm.assessment_type" @change="onQProgramChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-                <option value="SNBT" class="bg-[#0d1427] text-white">SNBT / SNPMB (Seleksi Nasional Mahasiswa Baru)</option>
-                <option value="TKA" class="bg-[#0d1427] text-white">TKA SMA (Tes Kemampuan Akademik SMA)</option>
+              <select id="q_assessment_type_select" name="assessment_type" v-model="qSelectedProgram" @change="onQProgramChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option value="SNBT" class="bg-[#0d1427] text-white">📘 SNBT / SNPMB (Seleksi Nasional Mahasiswa Baru)</option>
+                <option value="TKA_SD" class="bg-[#0d1427] text-white">🎒 TKA SD (Tes Kemampuan Akademik SD)</option>
+                <option value="TKA_SMP" class="bg-[#0d1427] text-white">🎓 TKA SMP (Tes Kemampuan Akademik SMP)</option>
+                <option value="TKA_SMA" class="bg-[#0d1427] text-white">🔬 TKA SMA (Tes Kemampuan Akademik SMA)</option>
               </select>
             </div>
             <div>
               <label for="q_track_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peminatan / Track</label>
-              <select id="q_track_select" name="track" v-model="qForm.track" @change="onQTrackChange" :disabled="qForm.assessment_type === 'SNBT'" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                <option value="umum" v-if="qForm.assessment_type === 'SNBT'" class="bg-[#0d1427] text-white">Umum (Semua Jurusan)</option>
-                <option value="saintek" class="bg-[#0d1427] text-white">Saintek (IPA: Matematika, Fisika, Kimia, Biologi)</option>
-                <option value="soshum" class="bg-[#0d1427] text-white">Soshum (IPS: Sosiologi, Ekonomi, Geografi, Sejarah)</option>
+              <select id="q_track_select" name="track" v-model="qForm.track" @change="onQTrackChange" :disabled="qSelectedProgram !== 'TKA_SMA'" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                <option value="umum" v-if="qSelectedProgram === 'SNBT'" class="bg-[#0d1427] text-white">Umum (Semua Jurusan)</option>
+                <option value="sd" v-if="qSelectedProgram === 'TKA_SD'" class="bg-[#0d1427] text-white">Kurikulum Terpadu SD</option>
+                <option value="smp" v-if="qSelectedProgram === 'TKA_SMP'" class="bg-[#0d1427] text-white">Kurikulum Terpadu SMP</option>
+                <option value="saintek" v-if="qSelectedProgram === 'TKA_SMA'" class="bg-[#0d1427] text-white">Saintek (IPA: Matematika, Fisika, Kimia, Biologi)</option>
+                <option value="soshum" v-if="qSelectedProgram === 'TKA_SMA'" class="bg-[#0d1427] text-white">Soshum (IPS: Sosiologi, Ekonomi, Geografi, Sejarah)</option>
               </select>
             </div>
           </div>
@@ -3886,18 +3967,71 @@
             />
           </div>
 
-          <!-- Opsi Jawaban -->
-          <div class="space-y-2 pt-2">
+          <!-- Opsi Jawaban Dinamis Sesuai Tipe Soal -->
+          <div class="space-y-3 pt-2">
+            <!-- Header Tipe Opsi -->
             <div class="flex items-center justify-between">
-              <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">Opsi Jawaban (Pilihan Ganda A - E)</label>
-              <span class="text-[10px] text-white/40">Pilih radio button untuk menandai kunci jawaban yang benar</span>
+              <label class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">
+                <span v-if="qForm.question_type === 'multiple_choice'">Opsi Jawaban (Pilihan Ganda A - E)</span>
+                <span v-else-if="qForm.question_type === 'complex_mcq'">Opsi Jawaban (Pilihan Ganda Kompleks — Centang Kunci Benar)</span>
+                <span v-else-if="qForm.question_type === 'true_false'">Matriks Pernyataan (Benar / Salah)</span>
+                <span v-else>Kunci Jawaban Isian Singkat</span>
+              </label>
+              <span v-if="qForm.question_type === 'multiple_choice'" class="text-[10px] text-white/40">Pilih 1 radio button untuk kunci jawaban benar</span>
+              <span v-else-if="qForm.question_type === 'complex_mcq'" class="text-[10px] text-[#c0ff00] font-bold">Kunci Terpilih: {{ qComplexAnswerOptions.map(o => o.toUpperCase()).join(', ') || 'Belum dipilih' }}</span>
+              <span v-else-if="qForm.question_type === 'true_false'" class="text-[10px] text-amber-300 font-bold">Tentukan Benar (B) atau Salah (S) per baris</span>
+              <span v-else class="text-[10px] text-sky-300 font-bold">Ketik teks / angka kunci yang valid</span>
             </div>
-            <div v-for="opt in ['a','b','c','d','e']" :key="opt" class="flex items-center gap-1.5">
-              <input type="radio" :id="'correct_opt_' + opt" v-model="qForm.correct" :value="opt" name="correctOpt" required class="w-4 h-4 text-[#c0ff00] accent-[#c0ff00] cursor-pointer" />
-              <label :for="'correct_opt_' + opt" class="text-xs font-bold uppercase w-5 text-white/80 cursor-pointer">{{ opt }}.</label>
-              <input :id="'q_opt_' + opt" :name="'option_' + opt" v-model="qForm['option_' + opt]" :required="opt !== 'e'" type="text" placeholder="..." class="flex-grow p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 placeholder-white/20 transition-all font-medium" />
+
+            <!-- Tipe 1: Pilihan Ganda Tunggal (multiple_choice) -->
+            <div v-if="qForm.question_type === 'multiple_choice'" class="space-y-2">
+              <div v-for="opt in ['a','b','c','d','e']" :key="'mc_' + opt" class="flex items-center gap-1.5">
+                <input type="radio" :id="'correct_opt_' + opt" v-model="qForm.correct" :value="opt" name="correctOpt" required class="w-4 h-4 text-[#c0ff00] accent-[#c0ff00] cursor-pointer" />
+                <label :for="'correct_opt_' + opt" class="text-xs font-bold uppercase w-5 text-white/80 cursor-pointer">{{ opt }}.</label>
+                <input :id="'q_opt_' + opt" :name="'option_' + opt" v-model="qForm['option_' + opt]" :required="opt !== 'e'" type="text" placeholder="..." class="flex-grow p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 placeholder-white/20 transition-all font-medium" />
+              </div>
+              <p class="text-[10px] text-white/40">Tip: Opsi jawaban mendukung teks, angka, dan simbol (misal: √2, x², ³, ±, π, α, β).</p>
             </div>
-            <p class="text-[10px] text-white/40">Tip: Opsi jawaban mendukung teks, angka, dan simbol (misal: √2, x², ³, ±, π, α, β).</p>
+
+            <!-- Tipe 2: Pilihan Ganda Kompleks (complex_mcq) -->
+            <div v-else-if="qForm.question_type === 'complex_mcq'" class="space-y-2">
+              <div v-for="opt in ['a','b','c','d','e']" :key="'cmcq_' + opt" class="flex items-center gap-2 p-2 rounded-lg border transition-all" :class="qComplexAnswerOptions.includes(opt) ? 'border-[#c0ff00]/40 bg-[#c0ff00]/5' : 'border-white/5 bg-black/20'">
+                <input type="checkbox" :id="'complex_opt_' + opt" :checked="qComplexAnswerOptions.includes(opt)" @change="toggleComplexOpt(opt)" class="w-4 h-4 text-[#c0ff00] accent-[#c0ff00] rounded cursor-pointer" />
+                <label :for="'complex_opt_' + opt" class="text-xs font-bold uppercase w-5 cursor-pointer" :class="qComplexAnswerOptions.includes(opt) ? 'text-[#c0ff00]' : 'text-white/60'">{{ opt }}.</label>
+                <input :id="'q_opt_' + opt" :name="'option_' + opt" v-model="qForm['option_' + opt]" :required="opt !== 'e'" type="text" placeholder="Teks pilihan..." class="flex-grow p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 placeholder-white/20 transition-all font-medium" />
+                <span v-if="qComplexAnswerOptions.includes(opt)" class="px-2 py-0.5 text-[10px] font-bold bg-[#c0ff00]/20 text-[#c0ff00] rounded">Kunci Benar</span>
+              </div>
+              <p class="text-[10px] text-white/40">Centang kotak pada satu atau lebih pilihan yang merupakan jawaban benar.</p>
+            </div>
+
+            <!-- Tipe 3: Pernyataan Benar / Salah (true_false) -->
+            <div v-else-if="qForm.question_type === 'true_false'" class="space-y-2.5">
+              <div v-for="(opt, idx) in ['a','b','c','d']" :key="'tf_' + opt" class="p-2.5 rounded-xl border border-white/10 bg-black/30 space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-black uppercase text-amber-300">Pernyataan {{ idx + 1 }} ({{ opt.toUpperCase() }})</span>
+                  <div class="flex items-center gap-1.5">
+                    <button type="button" @click="setTrueFalse(opt, 'B')" :class="qTrueFalseStatements[opt] === 'B' ? 'bg-emerald-500 text-black font-black shadow-md shadow-emerald-500/20' : 'bg-white/5 text-white/50 hover:bg-white/10'" class="px-3 py-1 text-xs rounded-lg transition-all cursor-pointer">
+                      ✓ Benar
+                    </button>
+                    <button type="button" @click="setTrueFalse(opt, 'S')" :class="qTrueFalseStatements[opt] === 'S' ? 'bg-rose-500 text-white font-black shadow-md shadow-rose-500/20' : 'bg-white/5 text-white/50 hover:bg-white/10'" class="px-3 py-1 text-xs rounded-lg transition-all cursor-pointer">
+                      ✗ Salah
+                    </button>
+                  </div>
+                </div>
+                <input :id="'q_opt_' + opt" :name="'option_' + opt" v-model="qForm['option_' + opt]" :required="idx < 2" type="text" :placeholder="'Tuliskan pernyataan ' + (idx + 1) + ' di sini...'" class="w-full p-2 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-amber-400/50 placeholder-white/20 transition-all font-medium" />
+              </div>
+              <p class="text-[10px] text-white/40">Tentukan status Benar atau Salah untuk tiap butir pernyataan di atas.</p>
+            </div>
+
+            <!-- Tipe 4: Isian Singkat (short_answer) -->
+            <div v-else-if="qForm.question_type === 'short_answer'" class="p-4 rounded-xl border border-[#c0ff00]/30 bg-[#c0ff00]/5 space-y-2">
+              <label for="q_short_answer_input" class="block text-xs font-black text-[#c0ff00] uppercase tracking-wide">Kunci Jawaban Tepat (Teks / Nilai Angka)</label>
+              <input id="q_short_answer_input" name="correct" v-model="qForm.correct" required type="text" placeholder="Contoh: 42, -1/2, atau Kata Kunci Utama" class="w-full p-3 text-sm font-mono font-bold text-white bg-black/60 border border-[#c0ff00]/40 rounded-xl outline-none focus:border-[#c0ff00] placeholder-white/30 transition-all shadow-inner" />
+              <p class="text-[11px] text-white/60 leading-relaxed">
+                <i class="ph-bold ph-info text-[#c0ff00] mr-1"></i>
+                Jawaban siswa akan dicocokkan otomatis secara cerdas (tidak sensitif huruf besar/kecil &amp; toleran terhadap spasi ekstra).
+              </p>
+            </div>
           </div>
 
           <!-- Rich Text Pembahasan Lengkap & Kunci Jawaban -->
@@ -3957,17 +4091,21 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label for="m_assessment_type_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Program Ujian</label>
-              <select id="m_assessment_type_select" name="assessment_type" v-model="mForm.assessment_type" @change="onMProgramChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
-                <option value="SNBT" class="bg-[#0d1427] text-white">SNBT / SNPMB (Seleksi Nasional Mahasiswa Baru)</option>
-                <option value="TKA" class="bg-[#0d1427] text-white">TKA SMA (Tes Kemampuan Akademik SMA)</option>
+              <select id="m_assessment_type_select" name="assessment_type" v-model="mSelectedProgram" @change="onMProgramChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+                <option value="SNBT" class="bg-[#0d1427] text-white">📘 SNBT / SNPMB (Seleksi Nasional Mahasiswa Baru)</option>
+                <option value="TKA_SD" class="bg-[#0d1427] text-white">🎒 TKA SD (Tes Kemampuan Akademik SD)</option>
+                <option value="TKA_SMP" class="bg-[#0d1427] text-white">🎓 TKA SMP (Tes Kemampuan Akademik SMP)</option>
+                <option value="TKA_SMA" class="bg-[#0d1427] text-white">🔬 TKA SMA (Tes Kemampuan Akademik SMA)</option>
               </select>
             </div>
             <div>
               <label for="m_track_select" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Peminatan / Track</label>
-              <select id="m_track_select" name="track" v-model="mForm.track" @change="onMTrackChange" :disabled="mForm.assessment_type === 'SNBT'" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                <option value="umum" v-if="mForm.assessment_type === 'SNBT'" class="bg-[#0d1427] text-white">Umum (Semua Jurusan)</option>
-                <option value="saintek" class="bg-[#0d1427] text-white">Saintek (IPA: Matematika, Fisika, Kimia, Biologi)</option>
-                <option value="soshum" class="bg-[#0d1427] text-white">Soshum (IPS: Sosiologi, Ekonomi, Geografi, Sejarah)</option>
+              <select id="m_track_select" name="track" v-model="mForm.track" @change="onMTrackChange" :disabled="mSelectedProgram !== 'TKA_SMA'" class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                <option value="umum" v-if="mSelectedProgram === 'SNBT'" class="bg-[#0d1427] text-white">Umum (Semua Jurusan)</option>
+                <option value="sd" v-if="mSelectedProgram === 'TKA_SD'" class="bg-[#0d1427] text-white">Kurikulum Terpadu SD</option>
+                <option value="smp" v-if="mSelectedProgram === 'TKA_SMP'" class="bg-[#0d1427] text-white">Kurikulum Terpadu SMP</option>
+                <option value="saintek" v-if="mSelectedProgram === 'TKA_SMA'" class="bg-[#0d1427] text-white">Saintek (IPA: Matematika, Fisika, Kimia, Biologi)</option>
+                <option value="soshum" v-if="mSelectedProgram === 'TKA_SMA'" class="bg-[#0d1427] text-white">Soshum (IPS: Sosiologi, Ekonomi, Geografi, Sejarah)</option>
               </select>
             </div>
           </div>
@@ -5157,10 +5295,34 @@ const qForm = reactive({
   explanation: ''
 });
 
-// Cascading helpers for Question Form (TKA vs SNBT)
+// Cascading helpers & state for Question Form (TKA SD, SMP, SMA vs SNBT)
+const qSelectedProgram = ref('SNBT');
+const qComplexAnswerOptions = ref(['a']);
+const qTrueFalseStatements = reactive({ a: 'B', b: 'S', c: 'B', d: 'S' });
+
+const toggleComplexOpt = (opt) => {
+  const idx = qComplexAnswerOptions.value.indexOf(opt);
+  if (idx > -1) {
+    if (qComplexAnswerOptions.value.length > 1) {
+      qComplexAnswerOptions.value.splice(idx, 1);
+    }
+  } else {
+    qComplexAnswerOptions.value.push(opt);
+    qComplexAnswerOptions.value.sort();
+  }
+  qForm.correct = qComplexAnswerOptions.value.join(',');
+};
+
+const setTrueFalse = (opt, val) => {
+  qTrueFalseStatements[opt] = val;
+  qForm.correct = `a:${qTrueFalseStatements.a || 'B'},b:${qTrueFalseStatements.b || 'S'},c:${qTrueFalseStatements.c || 'B'},d:${qTrueFalseStatements.d || 'S'}`;
+};
+
 const qAvailableComponents = computed(() => {
   if (qForm.assessment_type === 'TKA') {
-    const t = qForm.track || 'saintek';
+    let t = qForm.track || 'saintek';
+    if (qSelectedProgram.value === 'TKA_SD') t = 'sd';
+    else if (qSelectedProgram.value === 'TKA_SMP') t = 'smp';
     return TKA_TAXONOMY[t]?.components || [];
   }
   return SNBT_TAXONOMY?.components || [];
@@ -5181,11 +5343,25 @@ const qCurrentTopicObj = computed(() => {
 });
 
 const onQProgramChange = () => {
-  if (qForm.assessment_type === 'SNBT') {
+  if (qSelectedProgram.value === 'SNBT') {
+    qForm.assessment_type = 'SNBT';
     qForm.track = 'umum';
+    qForm.education_level = 'SMA';
     qForm.exam = 'SNBT';
-  } else {
-    if (!qForm.track || qForm.track === 'umum') qForm.track = 'saintek';
+  } else if (qSelectedProgram.value === 'TKA_SD') {
+    qForm.assessment_type = 'TKA';
+    qForm.track = 'sd';
+    qForm.education_level = 'SD';
+    qForm.exam = 'TKA';
+  } else if (qSelectedProgram.value === 'TKA_SMP') {
+    qForm.assessment_type = 'TKA';
+    qForm.track = 'smp';
+    qForm.education_level = 'SMP';
+    qForm.exam = 'TKA';
+  } else if (qSelectedProgram.value === 'TKA_SMA') {
+    qForm.assessment_type = 'TKA';
+    if (!['saintek', 'soshum'].includes(qForm.track)) qForm.track = 'saintek';
+    qForm.education_level = 'SMA';
     qForm.exam = 'TKA';
   }
   const firstComp = qAvailableComponents.value[0]?.name || '';
@@ -5239,8 +5415,12 @@ const filteredQuestions = computed(() => {
   if (qAssessmentFilter.value && qAssessmentFilter.value !== 'all') {
     if (qAssessmentFilter.value === 'SNBT') {
       list = list.filter(q => (!q.assessment_type || q.assessment_type.toUpperCase() === 'SNBT'));
+    } else if (qAssessmentFilter.value === 'TKA_sd') {
+      list = list.filter(q => q.assessment_type && q.assessment_type.toUpperCase() === 'TKA' && (q.track === 'sd' || q.education_level === 'SD'));
+    } else if (qAssessmentFilter.value === 'TKA_smp') {
+      list = list.filter(q => q.assessment_type && q.assessment_type.toUpperCase() === 'TKA' && (q.track === 'smp' || q.education_level === 'SMP'));
     } else if (qAssessmentFilter.value === 'TKA_saintek') {
-      list = list.filter(q => q.assessment_type && q.assessment_type.toUpperCase() === 'TKA' && (!q.track || q.track.toLowerCase() === 'saintek'));
+      list = list.filter(q => q.assessment_type && q.assessment_type.toUpperCase() === 'TKA' && (q.track === 'saintek' || (!q.track && (q.education_level === 'SMA' || !q.education_level))));
     } else if (qAssessmentFilter.value === 'TKA_soshum') {
       list = list.filter(q => q.assessment_type && q.assessment_type.toUpperCase() === 'TKA' && q.track && q.track.toLowerCase() === 'soshum');
     }
@@ -5272,20 +5452,72 @@ const openQuestionModal = (q = null) => {
   if (q) {
     isEditingQuestion.value = true;
     const aType = (q.assessment_type || q.exam || 'SNBT').toUpperCase();
-    const trk = (q.track || (aType === 'TKA' ? 'saintek' : 'umum')).toLowerCase();
-    let comp = q.test_component || '';
-    const sub = q.subtest || q.sub_materi || (aType === 'TKA' ? (trk === 'soshum' ? 'Sosiologi' : 'Matematika IPA') : 'Penalaran Umum');
-    if (!comp) {
-      if (aType === 'TKA') {
-        comp = trk === 'soshum' ? 'TKA SOSHUM' : 'TKA SAINTEK';
+    const edLevel = (q.education_level || 'SMA').toUpperCase();
+    let trk = (q.track || (aType === 'TKA' ? 'saintek' : 'umum')).toLowerCase();
+
+    // Set qSelectedProgram
+    if (aType === 'TKA') {
+      if (trk === 'sd' || edLevel === 'SD') {
+        qSelectedProgram.value = 'TKA_SD';
+        trk = 'sd';
+      } else if (trk === 'smp' || edLevel === 'SMP') {
+        qSelectedProgram.value = 'TKA_SMP';
+        trk = 'smp';
       } else {
+        qSelectedProgram.value = 'TKA_SMA';
+        if (!['saintek', 'soshum'].includes(trk)) trk = 'saintek';
+      }
+    } else {
+      qSelectedProgram.value = 'SNBT';
+      trk = 'umum';
+    }
+
+    let comp = q.test_component || '';
+    let sub = q.subtest || q.sub_materi || '';
+    if (!sub) {
+      if (qSelectedProgram.value === 'TKA_SD') sub = 'Matematika SD';
+      else if (qSelectedProgram.value === 'TKA_SMP') sub = 'Matematika SMP';
+      else if (qSelectedProgram.value === 'TKA_SMA') sub = trk === 'soshum' ? 'Sosiologi' : 'Matematika IPA';
+      else sub = 'Penalaran Umum';
+    }
+    if (!comp) {
+      if (qSelectedProgram.value === 'TKA_SD') comp = 'TKA SD';
+      else if (qSelectedProgram.value === 'TKA_SMP') comp = 'TKA SMP';
+      else if (qSelectedProgram.value === 'TKA_SMA') comp = trk === 'soshum' ? 'TKA SOSHUM' : 'TKA SAINTEK';
+      else {
         const isLiterasi = ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(sub);
         comp = isLiterasi ? 'TES LITERASI' : 'TPS';
       }
     }
+
+    const qType = q.question_type || 'multiple_choice';
+    const rawCorrect = (q.correct || '').trim();
+
+    // Populate reactive option models based on type
+    if (qType === 'complex_mcq') {
+      const parts = rawCorrect.toLowerCase().split(/[,\s]+/).filter(Boolean);
+      qComplexAnswerOptions.value = parts.length > 0 ? parts : ['a'];
+    } else if (qType === 'true_false') {
+      qTrueFalseStatements.a = 'B';
+      qTrueFalseStatements.b = 'S';
+      qTrueFalseStatements.c = 'B';
+      qTrueFalseStatements.d = 'S';
+      if (rawCorrect.includes(':')) {
+        rawCorrect.split(',').forEach(item => {
+          const [k, v] = item.split(':');
+          if (k && v && qTrueFalseStatements[k.trim().toLowerCase()] !== undefined) {
+            qTrueFalseStatements[k.trim().toLowerCase()] = v.trim().toUpperCase() === 'S' ? 'S' : 'B';
+          }
+        });
+      } else if (rawCorrect.toUpperCase() === 'B' || rawCorrect.toUpperCase() === 'S') {
+        qTrueFalseStatements.a = rawCorrect.toUpperCase();
+      }
+    }
+
     Object.assign(qForm, {
       ...q,
-      assessment_type: aType,
+      assessment_type: aType === 'TKA' ? 'TKA' : 'SNBT',
+      education_level: qSelectedProgram.value === 'TKA_SD' ? 'SD' : (qSelectedProgram.value === 'TKA_SMP' ? 'SMP' : 'SMA'),
       track: trk,
       exam: aType === 'TKA' ? 'TKA' : 'SNBT',
       test_component: comp,
@@ -5295,16 +5527,25 @@ const openQuestionModal = (q = null) => {
       subtopic: q.subtopic || '',
       skill: q.skill || '',
       indicator: q.indicator || '',
-      question_type: q.question_type || 'multiple_choice',
+      question_type: qType,
+      correct: rawCorrect || 'a',
       usage_type: q.usage_type || 'latihan',
       cognitive_demand: q.cognitive_demand || 'C3',
       is_qc_passed: q.is_qc_passed ? 1 : 0
     });
   } else {
     isEditingQuestion.value = false;
+    qSelectedProgram.value = 'SNBT';
+    qComplexAnswerOptions.value = ['a'];
+    qTrueFalseStatements.a = 'B';
+    qTrueFalseStatements.b = 'S';
+    qTrueFalseStatements.c = 'B';
+    qTrueFalseStatements.d = 'S';
+
     Object.assign(qForm, {
       id: null,
       assessment_type: 'SNBT',
+      education_level: 'SMA',
       track: 'umum',
       exam: 'SNBT',
       test_component: 'TPS',
@@ -5339,6 +5580,22 @@ const closeQuestionModal = () => showQuestionModal.value = false;
 const saveQuestion = async () => {
   isSaving.value = true;
   try {
+    // Format correct field based on question_type
+    if (qForm.question_type === 'complex_mcq') {
+      qForm.correct = qComplexAnswerOptions.value.join(',') || 'a';
+    } else if (qForm.question_type === 'true_false') {
+      qForm.correct = `a:${qTrueFalseStatements.a || 'B'},b:${qTrueFalseStatements.b || 'S'},c:${qTrueFalseStatements.c || 'B'},d:${qTrueFalseStatements.d || 'S'}`;
+    } else if (qForm.question_type === 'short_answer') {
+      qForm.correct = (qForm.correct || '').trim();
+      qForm.option_a = '';
+      qForm.option_b = '';
+      qForm.option_c = '';
+      qForm.option_d = '';
+      qForm.option_e = '';
+    } else {
+      qForm.correct = (qForm.correct || 'a').toLowerCase().trim();
+    }
+
     if (isEditingQuestion.value) {
       await api.updateAdminQuestion(qForm.id, qForm);
     } else {
@@ -5377,6 +5634,7 @@ const materialEditorRef = ref(null);
 const saveSuccessNotice = ref(false);
 
 const mAssessmentFilter = ref('all');
+const mSelectedProgram = ref('SNBT');
 
 const mForm = reactive({
   id: null,
@@ -5398,10 +5656,12 @@ const mForm = reactive({
   formula_praktis: ''
 });
 
-// Cascading helpers for Material Form (TKA vs SNBT)
+// Cascading helpers for Material Form (TKA SD, SMP, SMA vs SNBT)
 const mAvailableComponents = computed(() => {
   if (mForm.assessment_type === 'TKA') {
-    const t = mForm.track || 'saintek';
+    let t = mForm.track || 'saintek';
+    if (mSelectedProgram.value === 'TKA_SD') t = 'sd';
+    else if (mSelectedProgram.value === 'TKA_SMP') t = 'smp';
     return TKA_TAXONOMY[t]?.components || [];
   }
   return SNBT_TAXONOMY?.components || [];
@@ -5422,11 +5682,25 @@ const mCurrentTopicObj = computed(() => {
 });
 
 const onMProgramChange = () => {
-  if (mForm.assessment_type === 'SNBT') {
+  if (mSelectedProgram.value === 'SNBT') {
+    mForm.assessment_type = 'SNBT';
     mForm.track = 'umum';
+    mForm.education_level = 'SMA';
     mForm.exam = 'SNBT';
-  } else {
-    if (!mForm.track || mForm.track === 'umum') mForm.track = 'saintek';
+  } else if (mSelectedProgram.value === 'TKA_SD') {
+    mForm.assessment_type = 'TKA';
+    mForm.track = 'sd';
+    mForm.education_level = 'SD';
+    mForm.exam = 'TKA';
+  } else if (mSelectedProgram.value === 'TKA_SMP') {
+    mForm.assessment_type = 'TKA';
+    mForm.track = 'smp';
+    mForm.education_level = 'SMP';
+    mForm.exam = 'TKA';
+  } else if (mSelectedProgram.value === 'TKA_SMA') {
+    mForm.assessment_type = 'TKA';
+    if (!['saintek', 'soshum'].includes(mForm.track)) mForm.track = 'saintek';
+    mForm.education_level = 'SMA';
     mForm.exam = 'TKA';
   }
   const firstComp = mAvailableComponents.value[0]?.name || '';
@@ -5482,8 +5756,12 @@ const filteredMaterials = computed(() => {
   if (mAssessmentFilter.value && mAssessmentFilter.value !== 'all') {
     if (mAssessmentFilter.value === 'SNBT') {
       list = list.filter(m => (!m.assessment_type || m.assessment_type.toUpperCase() === 'SNBT'));
+    } else if (mAssessmentFilter.value === 'TKA_sd') {
+      list = list.filter(m => m.assessment_type && m.assessment_type.toUpperCase() === 'TKA' && (m.track === 'sd' || m.education_level === 'SD'));
+    } else if (mAssessmentFilter.value === 'TKA_smp') {
+      list = list.filter(m => m.assessment_type && m.assessment_type.toUpperCase() === 'TKA' && (m.track === 'smp' || m.education_level === 'SMP'));
     } else if (mAssessmentFilter.value === 'TKA_saintek') {
-      list = list.filter(m => m.assessment_type && m.assessment_type.toUpperCase() === 'TKA' && (!m.track || m.track.toLowerCase() === 'saintek'));
+      list = list.filter(m => m.assessment_type && m.assessment_type.toUpperCase() === 'TKA' && (m.track === 'saintek' || (!m.track && (m.education_level === 'SMA' || !m.education_level))));
     } else if (mAssessmentFilter.value === 'TKA_soshum') {
       list = list.filter(m => m.assessment_type && m.assessment_type.toUpperCase() === 'TKA' && m.track && m.track.toLowerCase() === 'soshum');
     }
@@ -5519,20 +5797,46 @@ const openMaterialModal = (m = null) => {
   if (m) {
     isEditingMaterial.value = true;
     const aType = (m.assessment_type || m.exam || 'SNBT').toUpperCase();
-    const trk = (m.track || (aType === 'TKA' ? 'saintek' : 'umum')).toLowerCase();
-    let comp = m.test_component || '';
-    const sub = m.subtest || m.sub_materi || (aType === 'TKA' ? (trk === 'soshum' ? 'Sosiologi' : 'Matematika IPA') : 'Penalaran Umum');
-    if (!comp) {
-      if (aType === 'TKA') {
-        comp = trk === 'soshum' ? 'TKA SOSHUM' : 'TKA SAINTEK';
+    const edLevel = (m.education_level || 'SMA').toUpperCase();
+    let trk = (m.track || (aType === 'TKA' ? 'saintek' : 'umum')).toLowerCase();
+
+    if (aType === 'TKA') {
+      if (trk === 'sd' || edLevel === 'SD') {
+        mSelectedProgram.value = 'TKA_SD';
+        trk = 'sd';
+      } else if (trk === 'smp' || edLevel === 'SMP') {
+        mSelectedProgram.value = 'TKA_SMP';
+        trk = 'smp';
       } else {
+        mSelectedProgram.value = 'TKA_SMA';
+        if (!['saintek', 'soshum'].includes(trk)) trk = 'saintek';
+      }
+    } else {
+      mSelectedProgram.value = 'SNBT';
+      trk = 'umum';
+    }
+
+    let comp = m.test_component || '';
+    let sub = m.subtest || m.sub_materi || '';
+    if (!sub) {
+      if (mSelectedProgram.value === 'TKA_SD') sub = 'Matematika SD';
+      else if (mSelectedProgram.value === 'TKA_SMP') sub = 'Matematika SMP';
+      else if (mSelectedProgram.value === 'TKA_SMA') sub = trk === 'soshum' ? 'Sosiologi' : 'Matematika IPA';
+      else sub = 'Penalaran Umum';
+    }
+    if (!comp) {
+      if (mSelectedProgram.value === 'TKA_SD') comp = 'TKA SD';
+      else if (mSelectedProgram.value === 'TKA_SMP') comp = 'TKA SMP';
+      else if (mSelectedProgram.value === 'TKA_SMA') comp = trk === 'soshum' ? 'TKA SOSHUM' : 'TKA SAINTEK';
+      else {
         const isLiterasi = ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(sub);
         comp = isLiterasi ? 'TES LITERASI' : 'TPS';
       }
     }
     Object.assign(mForm, {
       ...m,
-      assessment_type: aType,
+      assessment_type: aType === 'TKA' ? 'TKA' : 'SNBT',
+      education_level: mSelectedProgram.value === 'TKA_SD' ? 'SD' : (mSelectedProgram.value === 'TKA_SMP' ? 'SMP' : 'SMA'),
       track: trk,
       exam: aType === 'TKA' ? 'TKA' : 'SNBT',
       test_component: comp,
@@ -5550,11 +5854,13 @@ const openMaterialModal = (m = null) => {
     });
   } else {
     isEditingMaterial.value = false;
+    mSelectedProgram.value = 'SNBT';
     const myTeacherName = isTeacher.value ? (currentAdminUser.value?.name || '') : '';
     const myTeacherId = isTeacher.value ? (currentAdminUser.value?.id || currentUserId.value || '') : '';
     Object.assign(mForm, {
       id: null,
       assessment_type: 'SNBT',
+      education_level: 'SMA',
       track: 'umum',
       exam: 'SNBT',
       test_component: 'TPS',
@@ -5645,12 +5951,34 @@ const deleteMaterial = async (id) => {
 
 // ── Plans / Packages ──
 const plans = ref([]);
-const sortedPlans = computed(() => doSort(plans.value));
+const planProgramFilter = ref('all');
+const planModeFilter = ref('all');
+
+const filteredPlans = computed(() => {
+  let list = plans.value;
+  if (planProgramFilter.value !== 'all') {
+    list = list.filter(p => (p.academic_program || 'SNPMB/UTBK') === planProgramFilter.value);
+  }
+  if (planModeFilter.value !== 'all') {
+    list = list.filter(p => (p.delivery_mode || 'online') === planModeFilter.value);
+  }
+  return doSort(list);
+});
+const sortedPlans = computed(() => filteredPlans.value);
 const pagedPlans = computed(() => paginate(sortedPlans.value, planPage.value));
 const planTotalPages = computed(() => totalPages(sortedPlans.value));
 const showPlanModal = ref(false);
 const isEditingPlan = ref(false);
-const pForm = reactive({ id: null, name: '', price: '', discount: 0, duration: '', features: [] });
+const pForm = reactive({
+  id: null,
+  name: '',
+  price: '',
+  discount: 0,
+  duration: 30,
+  academic_program: 'SNPMB/UTBK',
+  delivery_mode: 'online',
+  features: []
+});
 const entitlementsDict = ref([]);
 
 const loadPlansAndStaff = async () => {
@@ -5687,10 +6015,24 @@ const loadPlansAndStaff = async () => {
 const openPlanModal = (p = null) => {
   if (p) {
     isEditingPlan.value = true;
-    Object.assign(pForm, { ...p, features: [...(p.features || [])] });
+    Object.assign(pForm, {
+      ...p,
+      academic_program: p.academic_program || 'SNPMB/UTBK',
+      delivery_mode: p.delivery_mode || 'online',
+      features: [...(p.features || [])]
+    });
   } else {
     isEditingPlan.value = false;
-    Object.assign(pForm, { id: null, name: '', price: '', discount: 0, duration: '', features: [] });
+    Object.assign(pForm, {
+      id: null,
+      name: '',
+      price: '',
+      discount: 0,
+      duration: 30,
+      academic_program: 'SNPMB/UTBK',
+      delivery_mode: 'online',
+      features: []
+    });
   }
   showPlanModal.value = true;
 };

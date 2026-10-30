@@ -231,7 +231,7 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
     }
 
     if ($subtes) {
-        $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi = ? OR subtes = ? OR subject = ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+        $stmt = $pdo->prepare("SELECT id, COALESCE(question_type, 'multiple_choice') AS question_type, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi = ? OR subtes = ? OR subject = ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
         $stmt->execute([$subtes, $subtes, $subtes]);
         $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($questions) {
@@ -246,7 +246,7 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
         $questions = [];
         $available_by_subject = [];
         foreach ($distribution as $sub_name => $sub_limit) {
-            $stmt = $pdo->prepare("SELECT id, COALESCE(subject, sub_materi, subtes) AS subtes, COALESCE(subject, sub_materi, subtes) AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (subject LIKE ? OR sub_materi LIKE ? OR subtes LIKE ?) AND (track = ? OR track = 'umum' OR track IS NULL) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+            $stmt = $pdo->prepare("SELECT id, COALESCE(question_type, 'multiple_choice') AS question_type, COALESCE(subject, sub_materi, subtes) AS subtes, COALESCE(subject, sub_materi, subtes) AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (subject LIKE ? OR sub_materi LIKE ? OR subtes LIKE ?) AND (track = ? OR track = 'umum' OR track IS NULL) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
             $stmt->execute(["%" . $sub_name . "%", "%" . $sub_name . "%", "%" . $sub_name . "%", $track]);
             $fetched = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $available_by_subject[$sub_name] = count($fetched);
@@ -303,7 +303,7 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
             }
             $questions = [];
             foreach ($tryout_distribution as $sub_name => $sub_limit) {
-                $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi LIKE ? OR subtes LIKE ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+                $stmt = $pdo->prepare("SELECT id, COALESCE(question_type, 'multiple_choice') AS question_type, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE (sub_materi LIKE ? OR subtes LIKE ?) AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
                 $stmt->execute(["%" . $sub_name . "%", "%" . $sub_name . "%"]);
                 $fetched = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($fetched) {
@@ -315,7 +315,7 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
                 }
             }
         } else {
-            $stmt = $pdo->prepare("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+            $stmt = $pdo->prepare("SELECT id, COALESCE(question_type, 'multiple_choice') AS question_type, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
             $stmt->execute();
             $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if ($questions) {
@@ -329,7 +329,7 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
 
     // Resilient fallback for legacy SNBT only — NEVER executed for TKA or non-SNBT
     if (empty($questions) && $assessment_type === 'SNBT') {
-        $stmt = $pdo->query("SELECT id, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND (assessment_type = 'SNBT' OR assessment_type IS NULL)");
+        $stmt = $pdo->query("SELECT id, COALESCE(question_type, 'multiple_choice') AS question_type, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS subtes, COALESCE(NULLIF(sub_materi, ''), subtes, subtest, 'Penalaran Umum') AS sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND (assessment_type = 'SNBT' OR assessment_type IS NULL)");
         $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($questions) {
             shuffle($questions);
@@ -372,7 +372,7 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     if ($sub_materi_input) {
-        $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+        $stmt = $pdo->prepare("SELECT id, COALESCE(question_type, 'multiple_choice') AS question_type, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi = ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
         $stmt->execute([$sub_materi_input]);
         $questions = $stmt->fetchAll();
         if ($questions) {
@@ -410,7 +410,7 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             }
             $questions = [];
             foreach ($tryout_distribution as $sub_name => $sub_limit) {
-                $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi LIKE ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+                $stmt = $pdo->prepare("SELECT id, COALESCE(question_type, 'multiple_choice') AS question_type, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE sub_materi LIKE ? AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
                 $stmt->execute(["%" . $sub_name . "%"]);
                 $fetched = $stmt->fetchAll();
                 if ($fetched) {
@@ -422,7 +422,7 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
                 }
             }
         } else {
-            $stmt = $pdo->prepare("SELECT id, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
+            $stmt = $pdo->prepare("SELECT id, COALESCE(question_type, 'multiple_choice') AS question_type, sub_materi AS subtes, sub_materi, bab, difficulty, question, option_a, option_b, option_c, option_d, option_e FROM questions WHERE is_active = 1 AND is_qc_passed = 1 AND $classification_filter");
             $stmt->execute();
             $questions = $stmt->fetchAll();
             if ($questions) {
@@ -549,7 +549,7 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $qIds = array_column($answers, 'question_id');
         $idList = $qIds;
         $inQuery = implode(',', array_fill(0, count($qIds), '?'));
-        $stmt = $pdo->prepare("SELECT id, correct, irt_score, sub_materi AS subtes, bab FROM questions WHERE id IN ($inQuery)");
+        $stmt = $pdo->prepare("SELECT id, COALESCE(question_type, 'multiple_choice') AS question_type, correct, irt_score, sub_materi AS subtes, bab FROM questions WHERE id IN ($inQuery)");
         $stmt->execute($idList);
         $questionsDb = $stmt->fetchAll();
 
@@ -570,7 +570,37 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $user_ans = is_string($raw_ans) ? strtolower(trim($raw_ans)) : (is_scalar($raw_ans) ? strtolower((string)$raw_ans) : '');
             if (isset($qMap[$qid])) {
                 $db_q = $qMap[$qid];
-                $is_correct = ($user_ans !== '' && $user_ans === strtolower((string)$db_q['correct']));
+                $qType = strtolower($db_q['question_type'] ?? 'multiple_choice');
+                $expected_ans = strtolower(trim((string)$db_q['correct']));
+                
+                $is_correct = false;
+                if ($user_ans !== '' && $expected_ans !== '') {
+                    if ($qType === 'complex_mcq') {
+                        // Order-independent set comparison (e.g. 'a,c' vs 'c,a')
+                        $uParts = array_filter(array_map('trim', explode(',', $user_ans)));
+                        $eParts = array_filter(array_map('trim', explode(',', $expected_ans)));
+                        sort($uParts);
+                        sort($eParts);
+                        $is_correct = (!empty($uParts) && $uParts === $eParts);
+                    } elseif ($qType === 'true_false') {
+                        // Normalize matrix statements (e.g. 'a:b,b:s' or 'a:benar,b:salah')
+                        $cleanU = preg_replace('/\s+/', '', $user_ans);
+                        $cleanE = preg_replace('/\s+/', '', $expected_ans);
+                        $uTokens = array_filter(explode(',', $cleanU));
+                        $eTokens = array_filter(explode(',', $cleanE));
+                        sort($uTokens);
+                        sort($eTokens);
+                        $is_correct = (!empty($uTokens) && $uTokens === $eTokens);
+                    } elseif ($qType === 'short_answer') {
+                        // Whitespace and case-insensitive exact matching
+                        $cleanU = preg_replace('/\s+/', ' ', trim($user_ans));
+                        $cleanE = preg_replace('/\s+/', ' ', trim($expected_ans));
+                        $is_correct = ($cleanU === $cleanE);
+                    } else {
+                        // Standard single choice
+                        $is_correct = ($user_ans === $expected_ans);
+                    }
+                }
                 
                 if ($is_correct) {
                     $correctCount++;

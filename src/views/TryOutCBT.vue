@@ -92,8 +92,19 @@
         <div class="flex-grow overflow-y-auto p-3.5 sm:p-6 md:p-10 font-sans" :class="fontSize">
           <div class="mb-6 sm:mb-8 leading-relaxed text-justify text-slate-900 font-medium question-body" v-html="currentQuestion.text"></div>
 
-          <!-- Options -->
-          <div class="space-y-3 sm:space-y-4">
+          <!-- Question Type Indicator Badge -->
+          <div class="mb-4 flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 border border-slate-300">
+              <span v-if="currentQuestion.question_type === 'complex_mcq'">☑ Pilihan Ganda Kompleks (Bisa pilih lebih dari satu)</span>
+              <span v-else-if="currentQuestion.question_type === 'true_false'">⚖ Benar / Salah (Tentukan setiap pernyataan)</span>
+              <span v-else-if="currentQuestion.question_type === 'short_answer'">✍ Isian Singkat</span>
+              <span v-else>◉ Pilihan Ganda (Pilih satu jawaban)</span>
+            </span>
+          </div>
+
+          <!-- Options Rendered Dynamically by question_type -->
+          <!-- 1. Multiple Choice (Single Choice) -->
+          <div v-if="!currentQuestion.question_type || currentQuestion.question_type === 'multiple_choice'" class="space-y-3 sm:space-y-4">
             <label 
               v-for="(option, idx) in currentQuestion.options" 
               :key="idx"
@@ -114,6 +125,66 @@
               </div>
               <div class="pt-1 leading-relaxed flex-grow text-xs sm:text-sm" v-html="option.text"></div>
             </label>
+          </div>
+
+          <!-- 2. Complex MCQ (Multiple Selection Checkboxes) -->
+          <div v-else-if="currentQuestion.question_type === 'complex_mcq'" class="space-y-3 sm:space-y-4">
+            <div 
+              v-for="(option, idx) in currentQuestion.options" 
+              :key="idx"
+              @click="toggleCbtComplexOption(option.id)"
+              class="flex items-start gap-3 sm:gap-4 p-2.5 sm:p-3 rounded-lg border-2 cursor-pointer transition-colors"
+              :class="isCbtComplexSelected(option.id) ? 'border-[#024a86] bg-blue-50' : 'border-gray-200 hover:bg-gray-50'"
+            >
+              <div class="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-md border-2 mt-0.5 shrink-0 text-xs sm:text-sm font-bold"
+                   :class="isCbtComplexSelected(option.id) ? 'border-[#024a86] bg-[#024a86] text-white' : 'border-gray-400 text-gray-600'">
+                <span>{{ option.id }}</span>
+              </div>
+              <div class="pt-1 leading-relaxed flex-grow text-xs sm:text-sm" v-html="option.text"></div>
+              <span v-if="isCbtComplexSelected(option.id)" class="text-blue-700 font-black text-sm shrink-0">✓ Terpilih</span>
+            </div>
+          </div>
+
+          <!-- 3. True / False (Statement Matrix) -->
+          <div v-else-if="currentQuestion.question_type === 'true_false'" class="space-y-3 sm:space-y-4">
+            <div 
+              v-for="(option, idx) in currentQuestion.options" 
+              :key="idx"
+              class="p-3.5 rounded-xl border border-gray-200 bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            >
+              <div class="flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">{{ option.id }}</span>
+                <span class="text-xs sm:text-sm text-slate-900 leading-relaxed" v-html="option.text"></span>
+              </div>
+              <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                <button
+                  type="button"
+                  @click="setCbtTrueFalse(option.id, 'B')"
+                  :class="['px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all', getCbtTrueFalse(option.id) === 'B' ? 'bg-emerald-600 text-white shadow-md' : 'bg-white text-gray-700 border border-gray-300 hover:bg-emerald-50']"
+                >
+                  ✓ Benar
+                </button>
+                <button
+                  type="button"
+                  @click="setCbtTrueFalse(option.id, 'S')"
+                  :class="['px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all', getCbtTrueFalse(option.id) === 'S' ? 'bg-rose-600 text-white shadow-md' : 'bg-white text-gray-700 border border-gray-300 hover:bg-rose-50']"
+                >
+                  ✗ Salah
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Short Answer -->
+          <div v-else-if="currentQuestion.question_type === 'short_answer'" class="space-y-3">
+            <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Ketikkan Jawaban Akhir Anda:</label>
+            <input 
+              type="text" 
+              v-model="answers[activeIndex]" 
+              placeholder="Ketikkan jawaban berupa angka atau kata kunci..."
+              class="w-full p-3.5 text-sm sm:text-base border-2 border-[#024a86] rounded-xl bg-white text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <p class="text-[11px] text-gray-500 italic">*Pastikan penulisan sesuai instruksi soal tanpa spasi berlebih.</p>
           </div>
         </div>
 
@@ -291,7 +362,17 @@ export default {
       this.track = (urlParams.get('track') || this.$route?.query?.track || 'umum').toLowerCase();
 
       if (this.assessmentType === 'TKA') {
-        if (this.track === 'saintek') {
+        if (this.track === 'sd') {
+          this.cbtTitle = 'Ujian CBT TKA SD';
+          this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik Sekolah Dasar';
+          this.cbtBadge = 'SD';
+          this.totalDurationSec = 60 * 60;
+        } else if (this.track === 'smp') {
+          this.cbtTitle = 'Ujian CBT TKA SMP';
+          this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik Sekolah Menengah Pertama';
+          this.cbtBadge = 'SMP';
+          this.totalDurationSec = 75 * 60;
+        } else if (this.track === 'saintek') {
           this.cbtTitle = 'Ujian CBT TKA SMA — SAINTEK';
           this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik Bidang Sains & Teknologi';
           this.cbtBadge = 'TK';
@@ -327,6 +408,7 @@ export default {
       if (dbQuestions.length > 0) {
         this.questions = dbQuestions.map(q => ({
           id: q.id,
+          question_type: q.question_type || 'multiple_choice',
           subtest: q.sub_materi || q.subtes || 'Tes Akademik',
           text: q.question,
           options: [
@@ -335,7 +417,7 @@ export default {
             { id: 'C', text: q.option_c },
             { id: 'D', text: q.option_d },
             { id: 'E', text: q.option_e }
-          ]
+          ].filter(o => o.text !== null && o.text !== undefined && o.text !== '')
         }));
       } else {
         throw new Error('No questions returned from API');
@@ -398,6 +480,48 @@ export default {
       if (this.activeIndex > 0) {
         this.activeIndex--;
       }
+    },
+    toggleCbtComplexOption(optId) {
+      const current = (this.answers[this.activeIndex] || '')
+        .split(',')
+        .map(s => s.trim().toUpperCase())
+        .filter(Boolean);
+      const target = optId.toUpperCase();
+      const idx = current.indexOf(target);
+      if (idx >= 0) {
+        current.splice(idx, 1);
+      } else {
+        current.push(target);
+      }
+      current.sort();
+      this.answers[this.activeIndex] = current.join(',');
+    },
+    isCbtComplexSelected(optId) {
+      const current = (this.answers[this.activeIndex] || '')
+        .split(',')
+        .map(s => s.trim().toUpperCase())
+        .filter(Boolean);
+      return current.includes(optId.toUpperCase());
+    },
+    setCbtTrueFalse(optId, val) {
+      const key = optId.toLowerCase();
+      const map = {};
+      (this.answers[this.activeIndex] || '').split(',').forEach(item => {
+        const [k, v] = item.split(':');
+        if (k && v) map[k.trim().toLowerCase()] = v.trim().toUpperCase();
+      });
+      map[key] = val.toUpperCase();
+      const parts = Object.keys(map).sort().map(k => `${k}:${map[k]}`);
+      this.answers[this.activeIndex] = parts.join(',');
+    },
+    getCbtTrueFalse(optId) {
+      const key = optId.toLowerCase();
+      const map = {};
+      (this.answers[this.activeIndex] || '').split(',').forEach(item => {
+        const [k, v] = item.split(':');
+        if (k && v) map[k.trim().toLowerCase()] = v.trim().toUpperCase();
+      });
+      return map[key] || null;
     },
     getQuestionBtnClass(idx) {
       // Logic for question button colors based on SNPMB UI

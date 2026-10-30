@@ -31,11 +31,23 @@ try {
                 WHEN code = 'MANDIRI' OR code = 'STARTER' THEN 1
                 WHEN code = 'UTBK' OR code = 'UTAMA' THEN 2
                 WHEN code = 'VIP' OR code = 'ELITE' THEN 3
-                ELSE 4 
+                WHEN code LIKE '%SNBT%' THEN 4
+                WHEN code LIKE '%TKA_SMA%' THEN 5
+                WHEN code LIKE '%TKA_SMP%' THEN 6
+                WHEN code LIKE '%TKA_SD%' THEN 7
+                WHEN code LIKE '%ALUMNI%' THEN 8
+                ELSE 9 
             END ASC
         ");
         $stmt->execute();
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($products) < 6) {
+            require_once __DIR__ . '/database/seed_multi_program_catalog.php';
+            seed_multi_program_catalog($pdo);
+            $stmt->execute();
+            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
     } catch (\Throwable $e) {
         $products = [];
     }
@@ -149,6 +161,9 @@ try {
     foreach ($products as $prod) {
         if (isset($plans_by_product[$prod['id']])) {
             $prod['plans'] = $plans_by_product[$prod['id']];
+            $firstPlan = $prod['plans'][0];
+            $prod['academic_program'] = $firstPlan['academic_program'] ?? 'SNPMB/UTBK';
+            $prod['delivery_mode'] = $firstPlan['delivery_mode'] ?? 'online';
             $response[] = $prod;
         }
     }

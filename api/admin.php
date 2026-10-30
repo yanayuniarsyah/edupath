@@ -2063,52 +2063,9 @@ elseif ($action === 'plans') {
     $VALID_ENTITLEMENTS = ['tryout_unlimited', 'ai_adaptive_path', 'premium_materials', 'feature_quiz'];
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $plans = $pdo->query("SELECT * FROM plans WHERE (is_archived IS NULL OR is_archived = 0) ORDER BY price ASC")->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($plans)) {
-            // Auto-seed official 3 packages exactly matching Landing Page
-            $defaultPlans = [
-                [
-                    'id' => 'plan-mandiri',
-                    'name' => 'Paket Mandiri',
-                    'price' => 180000,
-                    'duration' => 30,
-                    'features' => json_encode([
-                        '500+ Micro-Lessons Adaptif (TPS & Literasi)',
-                        '50.000+ Bank Soal HOTS dengan Standar Skor IRT',
-                        '5x Tryout Nasional / Bulan + Pembahasan Lengkap',
-                        'Radar Deteksi Blind-Spot Belajar Instan',
-                        'Habit Tracker: Weekly Learning Check-in (WLC)'
-                    ])
-                ],
-                [
-                    'id' => 'plan-utama',
-                    'name' => 'Paket Utama',
-                    'price' => 450000,
-                    'duration' => 30,
-                    'features' => json_encode([
-                        'Semua Fitur di Paket Mandiri',
-                        'AI Tutor Companion 24/7 (Bimbingan logika tanpa batas)',
-                        'Unlimited Simulasi IRT Adaptif (Bebas TO tanpa kuota)',
-                        'Estimasi Kesiapan & Rasionalisasi Prodi Edukatif',
-                        'Laporan Progres Belajar Otomatis via WhatsApp Orang Tua'
-                    ])
-                ],
-                [
-                    'id' => 'plan-vip',
-                    'name' => 'Paket VIP',
-                    'price' => 1100000,
-                    'duration' => 30,
-                    'features' => json_encode([
-                        'Semua Fitur Lengkap di Paket Utama',
-                        '1-on-1 Private Mentoring Mingguan via Zoom (60 Menit)',
-                        'Grup WhatsApp VIP Langsung bareng Mentor Senior',
-                        'Audit Portofolio Belajar & Siasat Prodi Pilihan'
-                    ])
-                ]
-            ];
-            $stmtIns = $pdo->prepare("INSERT INTO plans (id, name, price, duration, features) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), price=VALUES(price), duration=VALUES(duration), features=VALUES(features)");
-            foreach ($defaultPlans as $dp) {
-                $stmtIns->execute([$dp['id'], $dp['name'], $dp['price'], $dp['duration'], $dp['features']]);
-            }
+        if (count($plans) < 10) {
+            require_once __DIR__ . '/database/seed_multi_program_catalog.php';
+            seed_multi_program_catalog($pdo);
             $plans = $pdo->query("SELECT * FROM plans WHERE (is_archived IS NULL OR is_archived = 0) ORDER BY price ASC")->fetchAll(PDO::FETCH_ASSOC);
         }
         foreach ($plans as &$plan) {
@@ -2127,16 +2084,19 @@ elseif ($action === 'plans') {
         $id = bin2hex(random_bytes(16));
         $id = substr($id,0,8).'-'.substr($id,8,4).'-'.substr($id,12,4).'-'.substr($id,16,4).'-'.substr($id,20,12);
         
-        $features = is_array($input['features']) ? $input['features'] : [];
+        $features = is_array($input['features'] ?? null) ? $input['features'] : [];
         $valid_features = array_intersect($features, $VALID_ENTITLEMENTS);
         $discount = isset($input['discount']) ? (float)$input['discount'] : 0.00;
         $product_id = !empty($input['product_id']) ? $input['product_id'] : null;
         $billing_cycle = $input['billing_cycle'] ?? 'monthly';
+        $academic_program = $input['academic_program'] ?? 'SNPMB/UTBK';
+        $delivery_mode = $input['delivery_mode'] ?? 'online';
+        $price = (float)($input['price'] ?? 0);
         
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare("INSERT INTO plans (id, tenant_id, name, price, discount, duration, features, product_id, billing_cycle) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$id, null, $input['name'], $input['price'], $discount, $input['duration'], json_encode(array_values($valid_features)), $product_id, $billing_cycle]);
+            $stmt = $pdo->prepare("INSERT INTO plans (id, tenant_id, name, price, base_price, discount, duration, features, product_id, billing_cycle, academic_program, delivery_mode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$id, null, $input['name'], $price, $price, $discount, $input['duration'], json_encode(array_values($valid_features)), $product_id, $billing_cycle, $academic_program, $delivery_mode]);
             
             $stmt_ent = $pdo->prepare("INSERT IGNORE INTO plan_entitlements (id, plan_id, feature_key) VALUES (UUID(), ?, ?)");
             foreach ($valid_features as $fk) {
@@ -2153,17 +2113,20 @@ elseif ($action === 'plans') {
             http_response_code(403); echo json_encode(["error" => "Hanya Superadmin yang berwenang mengubah paket belajar."]); exit;
         }
         $id = $input['id'] ?? '';
-        $features = is_array($input['features']) ? $input['features'] : [];
+        $features = is_array($input['features'] ?? null) ? $input['features'] : [];
         $valid_features = array_intersect($features, $VALID_ENTITLEMENTS);
         
         $discount = isset($input['discount']) ? (float)$input['discount'] : 0.00;
         $product_id = !empty($input['product_id']) ? $input['product_id'] : null;
         $billing_cycle = $input['billing_cycle'] ?? 'monthly';
+        $academic_program = $input['academic_program'] ?? 'SNPMB/UTBK';
+        $delivery_mode = $input['delivery_mode'] ?? 'online';
+        $price = (float)($input['price'] ?? 0);
         
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare("UPDATE plans SET name=?, price=?, discount=?, duration=?, features=?, product_id=?, billing_cycle=? WHERE id=?");
-            $stmt->execute([$input['name'], $input['price'], $discount, $input['duration'], json_encode(array_values($valid_features)), $product_id, $billing_cycle, $id]);
+            $stmt = $pdo->prepare("UPDATE plans SET name=?, price=?, base_price=?, discount=?, duration=?, features=?, product_id=?, billing_cycle=?, academic_program=?, delivery_mode=? WHERE id=?");
+            $stmt->execute([$input['name'], $price, $price, $discount, $input['duration'], json_encode(array_values($valid_features)), $product_id, $billing_cycle, $academic_program, $delivery_mode, $id]);
             
             $pdo->prepare("DELETE FROM plan_entitlements WHERE plan_id = ?")->execute([$id]);
             

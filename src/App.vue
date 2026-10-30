@@ -1645,6 +1645,24 @@
                   </button>
                 </div>
               </div>
+
+              <!-- Academic Program Tabs Filter -->
+              <div class="pt-4 flex flex-wrap justify-center gap-1.5 sm:gap-2">
+                <button
+                  v-for="prog in availableProgramTabs"
+                  :key="prog.id"
+                  type="button"
+                  @click="selectedProgramPricingFilter = prog.id"
+                  :class="[
+                    'px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer',
+                    selectedProgramPricingFilter === prog.id
+                      ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/30 font-black'
+                      : 'bg-white/5 text-white/70 hover:text-white border border-white/10 hover:border-white/20'
+                  ]"
+                >
+                  {{ prog.name }}
+                </button>
+              </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto items-stretch">
@@ -1680,6 +1698,14 @@
                    
                    <div>
                      <h3 class="text-xl sm:text-2xl font-black text-white font-heading">{{ product.name }}</h3>
+                     <div class="flex flex-wrap items-center gap-1.5 mt-2 mb-1">
+                       <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                         {{ product.academic_program || 'SNPMB/UTBK' }}
+                       </span>
+                       <span :class="['text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border', (product.delivery_mode === 'hybrid') ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30']">
+                         {{ product.delivery_mode === 'hybrid' ? '🏫 Hybrid (Offline + Online)' : '🌐 Full Online' }}
+                       </span>
+                     </div>
                      <p :class="[
                        'text-xs mt-1 leading-relaxed',
                        idx % 3 === 1 ? 'text-white/60' : 'text-white/50'
@@ -3997,6 +4023,24 @@
           </div>
         </div>
 
+        <!-- Academic Program Tabs Filter in Dashboard -->
+        <div class="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-6">
+          <button
+            v-for="prog in availableProgramTabs"
+            :key="prog.id"
+            type="button"
+            @click="selectedProgramPricingFilter = prog.id"
+            :class="[
+              'px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer',
+              selectedProgramPricingFilter === prog.id
+                ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/30 font-black'
+                : 'bg-white/5 text-white/70 hover:text-white border border-white/10 hover:border-white/20'
+            ]"
+          >
+            {{ prog.name }}
+          </button>
+        </div>
+
         <!-- Plan Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
           <div 
@@ -4021,6 +4065,14 @@
                 </span>
               </div>
               <h3 class="text-xl font-black text-white">{{ product.name }}</h3>
+              <div class="flex flex-wrap items-center gap-1.5 mt-2 mb-1">
+                <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                  {{ product.academic_program || 'SNPMB/UTBK' }}
+                </span>
+                <span :class="['text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border', (product.delivery_mode === 'hybrid') ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30']">
+                  {{ product.delivery_mode === 'hybrid' ? '🏫 Hybrid (Offline + Online)' : '🌐 Full Online' }}
+                </span>
+              </div>
               <p class="text-xs text-white/50 mt-1 min-h-[32px]">{{ product.description }}</p>
 
               <!-- Price Framing dengan Sistem Coret -->
@@ -5416,10 +5468,31 @@ export default {
     };
 
     const publicPlans = ref([]);
+    const selectedProgramPricingFilter = ref('ALL');
+    const availableProgramTabs = [
+      { id: 'ALL', name: 'Semua Program' },
+      { id: 'SNPMB/UTBK', name: 'SNPMB / UTBK' },
+      { id: 'TKA SMA', name: 'TKA SMA' },
+      { id: 'TKA SMP', name: 'TKA SMP' },
+      { id: 'TKA SD', name: 'TKA SD' },
+      { id: 'SNPMB Alumni', name: 'SNPMB Alumni' }
+    ];
     
     const displayProducts = computed(() => {
+      let filtered = [...publicPlans.value];
+      if (selectedProgramPricingFilter.value !== 'ALL') {
+        const target = selectedProgramPricingFilter.value.toUpperCase();
+        filtered = filtered.filter(p => {
+          const prog = (p.academic_program || '').toUpperCase();
+          if (target === 'SNPMB/UTBK') {
+            return prog.includes('SNBT') || prog.includes('UTBK') || prog.includes('SNPMB') || !p.academic_program;
+          }
+          return prog.includes(target);
+        });
+      }
+
       const orderMap = { 'MANDIRI': 1, 'STARTER': 1, 'UTBK': 2, 'UTAMA': 2, 'VIP': 3, 'ELITE': 3 };
-      const sorted = [...publicPlans.value].sort((a, b) => {
+      const sorted = filtered.sort((a, b) => {
         const ordA = orderMap[a.code] || 99;
         const ordB = orderMap[b.code] || 99;
         return ordA - ordB;
@@ -5507,30 +5580,102 @@ export default {
       }
     };
     const fetchPlans = async () => {
-      // Fallback pricing lokal (harga resmi)
+      // Fallback pricing lokal (harga resmi untuk semua program akademik & model pengajaran)
       const FALLBACK_PRODUCTS = [
         {
-          id: 1, code: 'STARTER', name: 'Paket Mandiri',
-          description: 'Mulai belajar adaptif dengan IRT assessment & 50.000+ soal bank soal.',
+          id: 1, code: 'STARTER', name: 'Paket Mandiri SNPMB', academic_program: 'SNPMB/UTBK', delivery_mode: 'online',
+          description: 'Mulai belajar adaptif dengan IRT assessment & 50.000+ bank soal.',
           plans: [
             { billing_cycle: 'monthly', price: 180000, discount: 0, features: JSON.stringify(['500+ Micro-lessons & Video Ringkas','50.000+ Soal Bank Soal IRT','5x Tryout Nasional Simulasi SNBT','Diagnostic Assessment Awal','Dashboard Progres Belajar']) },
-            { billing_cycle: 'yearly',  price: Math.round(180000 * 12 * 0.60), discount: 40, features: JSON.stringify(['500+ Micro-lessons & Video Ringkas','50.000+ Soal Bank Soal IRT','5x Tryout Nasional Simulasi SNBT','Diagnostic Assessment Awal','Dashboard Progres Belajar']) }
+            { billing_cycle: 'yearly',  price: 1296000, discount: 40, features: JSON.stringify(['500+ Micro-lessons & Video Ringkas','50.000+ Soal Bank Soal IRT','5x Tryout Nasional Simulasi SNBT','Diagnostic Assessment Awal','Dashboard Progres Belajar']) }
           ]
         },
         {
-          id: 2, code: 'UTBK', name: 'Paket Pejuang PTN',
+          id: 2, code: 'UTBK', name: 'Paket Pejuang PTN', academic_program: 'SNPMB/UTBK', delivery_mode: 'online',
           description: 'AI Tutor 24/7, Adaptive IRT tanpa batas, & Rasionalisasi Prodi real-time.',
           plans: [
             { billing_cycle: 'monthly', price: 480000, discount: 0, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas PTN']) },
-            { billing_cycle: 'yearly',  price: Math.round(480000 * 12 * 0.40), discount: 60, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas PTN']) }
+            { billing_cycle: 'yearly',  price: 2304000, discount: 60, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas PTN']) }
           ]
         },
         {
-          id: 3, code: 'ELITE', name: 'Paket Elite Mentoring',
+          id: 3, code: 'ELITE', name: 'Paket Elite Mentoring', academic_program: 'SNPMB/UTBK', delivery_mode: 'online',
           description: '1-on-1 Zoom Mentoring dengan Senior Mentor alumni UI/ITB + akses semua fitur.',
           plans: [
             { billing_cycle: 'monthly', price: 980000, discount: 0, features: JSON.stringify(['Semua fitur Paket Pejuang PTN','1-on-1 Zoom Mentoring Private (4x/bulan)','SOS Live Tutor Senior Mentor UI/ITB','Analisis Soal UTBK Spesifik per Individu','Garansi Score Improvement atau Refund','Akses Eksklusif Beta Fitur Terbaru']) },
-            { billing_cycle: 'yearly',  price: Math.round(980000 * 12 * 0.70), discount: 30, features: JSON.stringify(['Semua fitur Paket Pejuang PTN','1-on-1 Zoom Mentoring Private (4x/bulan)','SOS Live Tutor Senior Mentor UI/ITB','Analisis Soal UTBK Spesifik per Individu','Garansi Score Improvement atau Refund','Akses Eksklusif Beta Fitur Terbaru']) }
+            { billing_cycle: 'yearly',  price: 8232000, discount: 30, features: JSON.stringify(['Semua fitur Paket Pejuang PTN','1-on-1 Zoom Mentoring Private (4x/bulan)','SOS Live Tutor Senior Mentor UI/ITB','Analisis Soal UTBK Spesifik per Individu','Garansi Score Improvement atau Refund','Akses Eksklusif Beta Fitur Terbaru']) }
+          ]
+        },
+        {
+          id: 4, code: 'SNBT_HYBRID', name: 'Paket SNPMB Hybrid Intensif', academic_program: 'SNPMB/UTBK', delivery_mode: 'hybrid',
+          description: 'Kelas tatap muka offline di sentra bimbel + platform adaptif online 24/7.',
+          plans: [
+            { billing_cycle: 'monthly', price: 850000, discount: 0, features: JSON.stringify(['Tatap muka offline 2x/pekan di cabang bimbel','Akses simulasi CBT & Bank Soal tanpa kuota','Bimbingan PR & klinik bedah soal tersulit','Rasionalisasi prodi PTN terarah']) },
+            { billing_cycle: 'yearly',  price: 6120000, discount: 40, features: JSON.stringify(['Tatap muka offline 2x/pekan di cabang bimbel','Akses simulasi CBT & Bank Soal tanpa kuota','Bimbingan PR & klinik bedah soal tersulit','Hemat 40% Paket Tahunan']) }
+          ]
+        },
+        {
+          id: 5, code: 'TKA_SMA_ONLINE', name: 'Paket TKA SMA Mandiri', academic_program: 'TKA SMA', delivery_mode: 'online',
+          description: 'Materi lengkap TKA SMA Saintek & Soshum dengan bank soal adaptif.',
+          plans: [
+            { billing_cycle: 'monthly', price: 180000, discount: 0, features: JSON.stringify(['Bank Soal TKA Saintek & Soshum HOTS','CBT Tryout Simulasi Standar TKA','Pembahasan materi interaktif per bab','Radar deteksi blind-spot belajar']) },
+            { billing_cycle: 'yearly',  price: 1296000, discount: 40, features: JSON.stringify(['Bank Soal TKA Saintek & Soshum HOTS','CBT Tryout Simulasi Standar TKA','Hemat 40% Akses 1 Tahun Ajaran']) }
+          ]
+        },
+        {
+          id: 6, code: 'TKA_SMA_HYBRID', name: 'Paket TKA SMA Terpadu', academic_program: 'TKA SMA', delivery_mode: 'hybrid',
+          description: 'Bimbingan tatap muka di cabang bimbel plus akses aplikasi belajar TKA SMA.',
+          plans: [
+            { billing_cycle: 'monthly', price: 650000, discount: 0, features: JSON.stringify(['Pertemuan offline 2x seminggu di cabang','Bedah materi eksakta & sosial bersama tutor ahli','Modul cetak fisik & worksheet berkala','Akses CBT Tryout TKA Online']) },
+            { billing_cycle: 'yearly',  price: 4680000, discount: 40, features: JSON.stringify(['Pertemuan offline 2x seminggu di cabang','Bedah materi eksakta & sosial bersama tutor ahli','Hemat 40% Paket 1 Tahun Ajaran SMA']) }
+          ]
+        },
+        {
+          id: 7, code: 'TKA_SMP_ONLINE', name: 'Paket TKA SMP Mandiri', academic_program: 'TKA SMP', delivery_mode: 'online',
+          description: 'Fondasi penalaran matematika, literasi bahasa & sains untuk SMP.',
+          plans: [
+            { billing_cycle: 'monthly', price: 150000, discount: 0, features: JSON.stringify(['Materi Penalaran Matematika, Bahasa & IPA/IPS SMP','Latihan Soal Interaktif Berbasis Konsep','CBT Tryout Asesmen Akademik SMP','Laporan Progres Belajar']) },
+            { billing_cycle: 'yearly',  price: 1080000, discount: 40, features: JSON.stringify(['Materi Penalaran Matematika, Bahasa & IPA/IPS SMP','Latihan Soal Interaktif Berbasis Konsep','Hemat 40% Akses Penuh 1 Tahun']) }
+          ]
+        },
+        {
+          id: 8, code: 'TKA_SMP_HYBRID', name: 'Paket TKA SMP Terpadu', academic_program: 'TKA SMP', delivery_mode: 'hybrid',
+          description: 'Bimbingan tatap muka di kelas kecil + pendampingan PR & asesmen.',
+          plans: [
+            { billing_cycle: 'monthly', price: 450000, discount: 0, features: JSON.stringify(['Kelas Tatap Muka 2x Seminggu di Ruang Kelas Nyaman','Bimbingan PR Sekolah & Persiapan Ujian Sekolah','Akses Penuh Aplikasi Belajar & CBT Online','Pendampingan Tutor Berpengalaman']) },
+            { billing_cycle: 'yearly',  price: 3240000, discount: 40, features: JSON.stringify(['Kelas Tatap Muka 2x Seminggu di Ruang Kelas Nyaman','Bimbingan PR Sekolah & Persiapan Ujian Sekolah','Hemat 40% Paket 1 Tahun SMP']) }
+          ]
+        },
+        {
+          id: 9, code: 'TKA_SD_ONLINE', name: 'Paket TKA SD Mandiri', academic_program: 'TKA SD', delivery_mode: 'online',
+          description: 'Penguatan numerasi ceria, literasi membaca & latihan soal bertahap.',
+          plans: [
+            { billing_cycle: 'monthly', price: 120000, discount: 0, features: JSON.stringify(['Numerasi Dasar & Literasi Membaca Ceria','Animasi Konsep Matematika & Sains Mudah Dipahami','Quiz Interaktif dengan Poin & Gamifikasi','Persiapan Masuk SMP Unggulan']) },
+            { billing_cycle: 'yearly',  price: 864000, discount: 40, features: JSON.stringify(['Numerasi Dasar & Literasi Membaca Ceria','Animasi Konsep Matematika & Sains Mudah Dipahami','Hemat 40% Akses Belajar 1 Tahun']) }
+          ]
+        },
+        {
+          id: 10, code: 'TKA_SD_HYBRID', name: 'Paket TKA SD Terpadu', academic_program: 'TKA SD', delivery_mode: 'hybrid',
+          description: 'Pendampingan belajar tatap muka yang hangat & interaktif di sentra bimbel.',
+          plans: [
+            { billing_cycle: 'monthly', price: 350000, discount: 0, features: JSON.stringify(['Kelas Tatap Muka Hangat & Interaktif di Cabang','Bimbingan Membaca, Berhitung Cepat, & PR Sekolah','Akses EduPath Kids CBT & Materi Interaktif','Laporan Perkembangan Karakter & Nilai']) },
+            { billing_cycle: 'yearly',  price: 2520000, discount: 40, features: JSON.stringify(['Kelas Tatap Muka Hangat & Interaktif di Cabang','Bimbingan Membaca, Berhitung Cepat, & PR Sekolah','Hemat 40% Pilihan Terbaik untuk Siswa SD']) }
+          ]
+        },
+        {
+          id: 11, code: 'ALUMNI_ONLINE', name: 'Paket Alumni Gap Year Intensif', academic_program: 'SNPMB Alumni', delivery_mode: 'online',
+          description: 'Kurikulum khusus alumni/gap year untuk perbaikan strategi dan habit belajar.',
+          plans: [
+            { billing_cycle: 'monthly', price: 750000, discount: 0, features: JSON.stringify(['Kurikulum Khusus Gap Year: Bedah Subtes dari Dasar','Analisis Kesalahan UTBK Sebelumnya','Daily Study Checklist & Habit Tracker','Tryout Mingguan Perankingan Nasional Alumni']) },
+            { billing_cycle: 'yearly',  price: 5400000, discount: 40, features: JSON.stringify(['Kurikulum Khusus Gap Year: Bedah Subtes dari Dasar','Analisis Kesalahan UTBK Sebelumnya','Hemat 40% Pendampingan sampai Lolos PTN']) }
+          ]
+        },
+        {
+          id: 12, code: 'ALUMNI_HYBRID', name: 'Paket Alumni Supercamp Karantina', academic_program: 'SNPMB Alumni', delivery_mode: 'hybrid',
+          description: 'Program karantina intensif hybrid tatap muka harian, bedah soal 10 jam/hari.',
+          plans: [
+            { billing_cycle: 'monthly', price: 2500000, discount: 0, features: JSON.stringify(['Supercamp Tatap Muka Harian Full Day di Sentra EduPath','Bedah Soal dan Diskusi 10 Jam per Hari bersama Master Tutor','Akomodasi & Konsumsi Belajar Terpadu','Simulasi CBT Real-time Setiap Pekan']) },
+            { billing_cycle: 'yearly',  price: 18000000, discount: 40, features: JSON.stringify(['Supercamp Tatap Muka Harian Full Day di Sentra EduPath','Bedah Soal dan Diskusi 10 Jam per Hari bersama Master Tutor','Hemat 40% Garansi Pendampingan Penuh']) }
           ]
         }
       ];
@@ -6978,6 +7123,8 @@ export default {
       cancelEditingProfile,
       displayProducts,
       publicPlans,
+      selectedProgramPricingFilter,
+      availableProgramTabs,
       publicSchoolsList,
       matchedPartnerSchool,
       onSchoolSelected

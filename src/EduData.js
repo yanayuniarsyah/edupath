@@ -3,6 +3,138 @@
 // ============================================================================
 
 export const TKA_TAXONOMY = {
+  sd: {
+    name: 'TKA SD',
+    components: [
+      {
+        id: 'tka_sd',
+        name: 'TKA SD',
+        label: 'TKA SD (Sekolah Dasar)',
+        subtests: [
+          {
+            id: 'matematika_sd',
+            name: 'Matematika SD',
+            topics: [
+              { name: 'Operasi Hitung & Pecahan', subtopics: ['Operasi Bilangan Bulat', 'Pecahan Biasa & Campuran', 'Desimal & Persen', 'FPB & KPK'] },
+              { name: 'Geometri & Pengukuran', subtopics: ['Keliling & Luas Bangun Datar', 'Volume Bangun Ruang Sederhana', 'Satuan Baku Panjang, Waktu & Berat', 'Simetri & Sudut'] },
+              { name: 'Pengolahan Data & Statistik Dasar', subtopics: ['Membaca Tabel & Diagram Batang', 'Diagram Lingkaran', 'Rata-rata (Mean)', 'Nilai Tengah & Modus'] },
+              { name: 'Soal Cerita Bernalar & Pemecahan Masalah', subtopics: ['Perbandingan & Skala', 'Aritmetika Sosial Dasar', 'Pola Bilangan Sederhana'] }
+            ]
+          },
+          {
+            id: 'bahasa_indonesia_sd',
+            name: 'Bahasa Indonesia SD',
+            topics: [
+              { name: 'Membaca & Memahami Wacana', subtopics: ['Ide Pokok Paragraf', 'Informasi Tersurat & Tersirat', 'Simpulan Teks', 'Maksud & Tujuan Penulis'] },
+              { name: 'Kosakata & Makna Kata', subtopics: ['Sinonim & Antonim', 'Makna Kata Kontekstual', 'Ungkapan & Peribahasa'] },
+              { name: 'Tata Kalimat & Ejaan (PUEBI)', subtopics: ['Huruf Kapital & Tanda Baca', 'Kata Baku & Tidak Baku', 'Kalimat Efektif Sederhana'] },
+              { name: 'Karya Sastra Anak & Teks Fiksi', subtopics: ['Unsur Intrinsik Dongeng/Cerpen', 'Amanat Cerita', 'Watak Tokoh & Latar'] }
+            ]
+          },
+          {
+            id: 'ipa_sd',
+            name: 'IPA SD',
+            topics: [
+              { name: 'Makhluk Hidup & Lingkungan', subtopics: ['Adaptasi Hewan & Tumbuhan', 'Rantai Makanan & Jaring-jaring Makanan', 'Simbiosis & Keseimbangan Ekosistem', 'Pelestarian Sumber Daya Hayati'] },
+              { name: 'Tubuh Manusia & Kesehatan', subtopics: ['Sistem Pernapasan', 'Sistem Pencernaan', 'Sistem Peredaran Darah', 'Pubertas & Perkembangbiakan'] },
+              { name: 'Benda, Energi & Perubahannya', subtopics: ['Sifat & Wujud Benda', 'Kalor & Perubahan Wujud', 'Gaya & Gerak', 'Bentuk & Sumber Energi Alternatif'] },
+              { name: 'Bumi & Alam Semesta', subtopics: ['Siklus Air & Dampak Cuaca', 'Tata Surya & Karakteristik Planet', 'Rotasi & Revolusi Bumi/Bulan', 'Gerhana Matahari & Bulan'] }
+            ]
+          },
+          {
+            id: 'ips_sd',
+            name: 'IPS SD',
+            topics: [
+              { name: 'Kenampakan Alam & Peta', subtopics: ['Membaca Unsur Peta & Arah Mata Angin', 'Kenampakan Alam Daratan & Perairan', 'Pemanfaatan Sumber Daya Alam'] },
+              { name: 'Keragaman Sosial & Budaya', subtopics: ['Rumah Adat & Pakaian Tradisional', 'Tarian Daerah & Alat Musik', 'Upacara Adat & Sikap Menghargai Keragaman'] },
+              { name: 'Kegiatan Ekonomi Masyarakat', subtopics: ['Produksi, Distribusi & Konsumsi', 'Kegiatan Ekonomi Agraris & Maritim', 'Peran Koperasi & Pasar Tradisional'] },
+              { name: 'Sejarah Perjuangan Bangsa', subtopics: ['Peninggalan Sejarah Hindu-Buddha & Islam', 'Perjuangan Melawan Penjajah', 'Peristiwa Seputar Proklamasi Kemerdekaan'] }
+            ]
+          },
+          {
+            id: 'ppkn_sd',
+            name: 'PPKn SD',
+            topics: [
+              { name: 'Pancasila & Pengamalannya', subtopics: ['Simbol & Makna Sila Pancasila', 'Penerapan Sila 1 s.d. 5 dalam Kehidupan Sehari-hari'] },
+              { name: 'Aturan & Norma Masyarakat', subtopics: ['Aturan di Rumah, Sekolah & Lingkungan', 'Hak dan Kewajiban Anak', 'Tanggung Jawab sebagai Warga'] },
+              { name: 'Keberagaman & Bhinneka Tunggal Ika', subtopics: ['Toleransi Antarumat Beragama', 'Persatuan & Kesatuan Bangsa', 'Gotong Royong dalam Masyarakat'] }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  smp: {
+    name: 'TKA SMP',
+    components: [
+      {
+        id: 'tka_smp',
+        name: 'TKA SMP',
+        label: 'TKA SMP (Sekolah Menengah Pertama)',
+        subtests: [
+          {
+            id: 'matematika_smp',
+            name: 'Matematika SMP',
+            topics: [
+              { name: 'Bilangan & Aljabar', subtopics: ['Pangkat, Bentuk Akar & Pola Barisan', 'Operasi Aljabar & Faktorisasi', 'Persamaan & Pertidaksamaan Linear Satu Variabel', 'Sistem Persamaan Linear Dua Variabel (SPLDV)'] },
+              { name: 'Relasi, Fungsi & Persamaan Garis', subtopics: ['Konsep Relasi & Pemetaan Fungsi', 'Gradien & Persamaan Garis Lurus', 'Grafik Fungsi Kuadrat'] },
+              { name: 'Geometri & Pengukuran', subtopics: ['Teorema Pythagoras', 'Lingkaran: Sudut Pusat, Busur & Juring', 'Kesebangunan & Kekongruenan', 'Bangun Ruang Sisi Datar & Lengkung'] },
+              { name: 'Statistika & Peluang', subtopics: ['Ukuran Pemusatan (Mean, Median, Modus)', 'Penyebaran Data & Jangkauan Kuartil', 'Peluang Teoritik & Empirik'] }
+            ]
+          },
+          {
+            id: 'bahasa_indonesia_smp',
+            name: 'Bahasa Indonesia SMP',
+            topics: [
+              { name: 'Genre Teks Faktual & Ilmiah', subtopics: ['Teks Laporan Hasil Observasi (LHO)', 'Teks Prosedur & Petunjuk Kerja', 'Teks Eksplanasi Fenomena Alam/Sosial', 'Teks Berita & Artikel Ilmiah Populer'] },
+              { name: 'Genre Teks Fiksi & Sastra', subtopics: ['Teks Cerita Pendek (Cerpen)', 'Teks Puisi Modern & Rakyat (Pantun/Gurindam)', 'Teks Drama & Unsur Teatrikal'] },
+              { name: 'Teks Argumentatif & Persuasif', subtopics: ['Teks Diskusi & Pro-Kontra', 'Teks Pidato Persuasif', 'Teks Ulasan (Resensi Buku/Karya)'] },
+              { name: 'Kebahasaan & Kaidah Ejaan', subtopics: ['Konjungsi & Kalimat Majemuk', 'Kalimat Efektif & Variasi Kalimat', 'PUEBI: Ejaan, Tanda Baca & Kata Serapan'] }
+            ]
+          },
+          {
+            id: 'bahasa_inggris_smp',
+            name: 'Bahasa Inggris SMP',
+            topics: [
+              { name: 'Transactional & Interpersonal Texts', subtopics: ['Greetings, Leave-taking & Apologizing', 'Expressing Intention, Congratulating & Complimenting', 'Asking & Giving Opinion'] },
+              { name: 'Short Functional Texts', subtopics: ['Notice, Warning & Caution', 'Greeting Cards & Invitations', 'Short Messages & Announcements'] },
+              { name: 'Reading Genre Texts', subtopics: ['Descriptive Text', 'Recount Text', 'Narrative Text & Fables', 'Procedure Text & Manuals', 'Report Text'] },
+              { name: 'Grammar in Context', subtopics: ['Simple Present & Continuous Tense', 'Simple Past & Past Continuous Tense', 'Present Perfect Tense', 'Degree of Comparison & Modals', 'Passive Voice Basic'] }
+            ]
+          },
+          {
+            id: 'ipa_terpadu_smp',
+            name: 'IPA Terpadu SMP',
+            topics: [
+              { name: 'Fisika SMP: Gerak, Gaya & Energi', subtopics: ['Gerak Lurus (GLB & GLBB)', 'Hukum Newton tentang Gerak', 'Usaha, Daya & Pesawat Sederhana', 'Tekanan Zat (Hidrostatis, Pascal, Archimedes)'] },
+              { name: 'Fisika SMP: Gelombang & Listrik', subtopics: ['Getaran, Gelombang & Bunyi', 'Cahaya & Alat Optik', 'Listrik Statis & Listrik Dinamis', 'Kemagnetan & Induksi Elektromagnetik'] },
+              { name: 'Biologi SMP: Organisasi Kehidupan', subtopics: ['Sel, Jaringan, Organ & Sistem Organ', 'Struktur & Fungsi Jaringan Tumbuhan', 'Sistem Pencernaan, Pernapasan & Sirkulasi Manusia', 'Sistem Ekskresi & Reproduksi Manusia'] },
+              { name: 'Kimia & Bioteknologi SMP', subtopics: ['Zat, Wujud & Perubahannya (Fisika vs Kimia)', 'Unsur, Senyawa & Campuran (Asam, Basa, Garam)', 'Zat Aditif & Zat Adiktif', 'Bioteknologi Konvensional & Modern'] }
+            ]
+          },
+          {
+            id: 'ips_terpadu_smp',
+            name: 'IPS Terpadu SMP',
+            topics: [
+              { name: 'Geografi & Keruangan', subtopics: ['Letak Geografis, Astronomis & Geologis Indonesia', 'Potensi Sumber Daya Alam & Kemaritiman', 'Interaksi Antarruang di Wilayah ASEAN & Benua di Dunia', 'Dinamika Kependudukan & Masalah Demografi'] },
+              { name: 'Sosiologi & Interaksi Sosial', subtopics: ['Bentuk & Pola Interaksi Sosial', 'Lembaga Sosial & Peranannya', 'Pluralitas, Konflik & Integrasi Sosial', 'Perubahan Sosial Budaya & Globalisasi'] },
+              { name: 'Ekonomi & Pasar', subtopics: ['Kelangkaan, Motif & Prinsip Ekonomi', 'Permintaan, Penawaran & Keseimbangan Harga', 'Pasar Bebas, Perdagangan Antardaerah & Antarnegara', 'Ekonomi Kreatif & Pembangunan Berkelanjutan'] },
+              { name: 'Sejarah Perjalanan Bangsa', subtopics: ['Zaman Praaksara & Kerajaan Nusantara', 'Masa Kolonialisme & Perlawanan Kedaerahan', 'Pergerakan Nasional & Sumpah Pemuda', 'Perjuangan Mempertahankan Kemerdekaan RI'] }
+            ]
+          },
+          {
+            id: 'ppkn_smp',
+            name: 'PPKn SMP',
+            topics: [
+              { name: 'Dasar Negara & Konstitusi', subtopics: ['Proses Perumusan & Penetapan Pancasila', 'Kedudukan & Makna Pembukaan UUD NRI 1945', 'Tata Urutan Peraturan Perundang-undangan di Indonesia'] },
+              { name: 'Kedaulatan & Sistem Demokrasi', subtopics: ['Bentuk & Kedaulatan Negara Kesatuan RI', 'Sistem Pemerintahan & Lembaga-lembaga Negara', 'Demokrasi Pancasila & Pemilu'] },
+              { name: 'Wawasan Nusantara & Keragaman', subtopics: ['Harmoni dalam Keberagaman SARA & Gender', 'Bela Negara & Pertahanan Nasional', 'Komitmen Menjaga Keutuhan NKRI'] }
+            ]
+          }
+        ]
+      }
+    ]
+  },
   saintek: {
     name: 'TKA Saintek',
     components: [
