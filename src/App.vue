@@ -4330,12 +4330,11 @@
         <button
           type="button"
           @click.stop="showPlanSelectorModal = false"
-          class="modal-close-btn top-5 right-5 w-11 h-11 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shadow-lg"
-          title="Tutup Modal"
+          class="modal-close-btn top-5 right-5 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer"
+          title="Tutup"
           aria-label="Tutup"
-          style="z-index: 9999 !important;"
         >
-          <i class="ph-bold ph-x text-base pointer-events-none"></i>
+          <i class="ph-bold ph-x text-sm pointer-events-none"></i>
         </button>
 
         <!-- Header -->
@@ -4652,11 +4651,11 @@
           <button
             type="button"
             @click.stop="closeCheckoutModal"
-            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
-            title="Tutup Invoice"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-base pointer-events-none"></i>
+            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
           </button>
         </div>
         
@@ -4725,12 +4724,11 @@
         <button
           type="button"
           @click.stop="showLoginModal = false"
-          class="modal-close-btn top-4 right-4 w-11 h-11 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shadow-lg"
-          title="Tutup Modal"
+          class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer"
+          title="Tutup"
           aria-label="Tutup"
-          style="z-index: 9999 !important;"
         >
-          <i class="ph-bold ph-x text-base pointer-events-none"></i>
+          <i class="ph-bold ph-x text-sm pointer-events-none"></i>
         </button>
 
         <!-- Logo & Header (Consistent with Admin Portal) -->
@@ -4963,11 +4961,11 @@
           <button
             type="button"
             @click.stop="showTermsModal = false"
-            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
-            title="Tutup Syarat & Ketentuan"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-base pointer-events-none"></i>
+            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
           </button>
         </div>
 
@@ -5104,11 +5102,11 @@
           <button
             type="button"
             @click.stop="showPrivacyModal = false"
-            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
-            title="Tutup Kebijakan Privasi"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-base pointer-events-none"></i>
+            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
           </button>
         </div>
 
@@ -5166,11 +5164,11 @@
           <button
             type="button"
             @click.stop="showDisclaimerModal = false"
-            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
-            title="Tutup Disclaimer"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-base pointer-events-none"></i>
+            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
           </button>
         </div>
 
@@ -5225,11 +5223,11 @@
           <button
             type="button"
             @click.stop="showParentConsentModal = false"
-            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
-            title="Tutup Panduan"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-base pointer-events-none"></i>
+            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
           </button>
         </div>
 
@@ -5283,11 +5281,11 @@
           <button
             type="button"
             @click.stop="showContactModal = false"
-            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
-            title="Tutup Kontak"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-base pointer-events-none"></i>
+            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
           </button>
         </div>
 
@@ -5399,11 +5397,11 @@
           <button
             type="button"
             @click.stop="showAffiliateRegisterModal = false"
-            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
-            title="Tutup Pendaftaran"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            title="Tutup"
             aria-label="Tutup"
           >
-            <i class="ph-bold ph-x text-base pointer-events-none"></i>
+            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
           </button>
         </div>
         <div class="p-6">

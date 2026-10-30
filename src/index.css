@@ -488,15 +488,17 @@ input[type=range]::-moz-range-thumb:hover {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  min-width: 40px !important;
-  min-height: 40px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
   border-radius: 9999px !important;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: all 0.15s ease-in-out !important;
   user-select: none !important;
 }
 
 .modal-close-btn:hover {
-  transform: scale(1.1) !important;
+  transform: scale(1.08) !important;
 }
 
 .modal-close-btn:active {
@@ -507,6 +509,7 @@ input[type=range]::-moz-range-thumb:hover {
 .modal-close-btn svg {
   pointer-events: none !important;
   display: inline-block !important;
+  font-size: 14px !important;
   line-height: 1 !important;
 }
 
