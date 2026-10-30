@@ -237,6 +237,9 @@ function ensure_admin_schema($pdo) {
                 CONSTRAINT spp_profiles_attempt_fk FOREIGN KEY (attempt_id) REFERENCES spp_attempts (id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
+        try {
+            $pdo->exec("ALTER TABLE tenants ADD COLUMN is_archived TINYINT(1) DEFAULT 0");
+        } catch (\Throwable $e) {}
     } catch (\Throwable $e) {}
 }
 
@@ -718,17 +721,61 @@ if ($action === 'bulk_delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     exit;
                 }
                 foreach ($ids as $bId) {
+                    if ($bId === 'default_tenant' || $bId === 'tenant-hq') {
+                        continue; // Cabang Pusat utama tidak dapat dihapus
+                    }
+
                     $studentCount = $pdo->prepare("SELECT COUNT(*) FROM students WHERE tenant_id = ?");
                     $studentCount->execute([$bId]);
                     $hasStudents = ((int)$studentCount->fetchColumn()) > 0;
 
-                    $staffCount = $pdo->prepare("SELECT COUNT(*) FROM user_roles WHERE tenant_id = ?");
-                    $staffCount->execute([$bId]);
-                    $hasStaff = ((int)$staffCount->fetchColumn()) > 0;
+                    $orderCount = $pdo->prepare("SELECT COUNT(*) FROM orders WHERE tenant_id = ?");
+                    $orderCount->execute([$bId]);
+                    $hasOrders = ((int)$orderCount->fetchColumn()) > 0;
 
-                    if ($hasStudents || $hasStaff) {
-                        $pdo->prepare("UPDATE tenants SET is_active = 0 WHERE id = ?")->execute([$bId]);
+                    if ($hasStudents || $hasOrders) {
+                        // Soft archive to protect student & financial records ("jangan ubah isi data")
+                        $pdo->prepare("UPDATE tenants SET is_active = 0, is_archived = 1 WHERE id = ?")->execute([$bId]);
                     } else {
+                        // Safe clean hard-delete for empty/test branch
+                        try { $pdo->prepare("DELETE FROM session_attendances WHERE session_id IN (SELECT id FROM class_sessions WHERE tenant_id = ?)")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM class_sessions WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM class_schedules WHERE class_id IN (SELECT id FROM classes WHERE tenant_id = ?)")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM class_students WHERE class_id IN (SELECT id FROM classes WHERE tenant_id = ?)")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM classes WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM class_rooms WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM plan_entitlements WHERE plan_id IN (SELECT id FROM plans WHERE tenant_id = ?)")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM plans WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM spp_certificates WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM entitlements WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM subscriptions WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM products WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM commissions WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM affiliates WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM partner_assignments WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM partner_profiles WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+
+                        $stmtStaffUsers = $pdo->prepare("SELECT user_id FROM user_roles WHERE tenant_id = ?");
+                        $stmtStaffUsers->execute([$bId]);
+                        $staffUserIds = $stmtStaffUsers->fetchAll(PDO::FETCH_COLUMN);
+
+                        try { $pdo->prepare("DELETE FROM admins WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM user_roles WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+
+                        foreach ($staffUserIds as $uId) {
+                            if (empty($uId)) continue;
+                            $otherRoles = $pdo->prepare("SELECT COUNT(*) FROM user_roles WHERE user_id = ?");
+                            $otherRoles->execute([$uId]);
+                            if ((int)$otherRoles->fetchColumn() === 0) {
+                                try { $pdo->prepare("DELETE FROM users WHERE id = ?")->execute([$uId]); } catch (\Throwable $e) {}
+                            }
+                        }
+
+                        try { $pdo->prepare("DELETE FROM audit_logs WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM upgrade_audit_logs WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("DELETE FROM question_imports_staging WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+                        try { $pdo->prepare("UPDATE schools SET tenant_id = 'default_tenant' WHERE tenant_id = ?")->execute([$bId]); } catch (\Throwable $e) {}
+
                         $pdo->prepare("DELETE FROM tenants WHERE id = ?")->execute([$bId]);
                     }
                     $deletedCount++;
@@ -1683,6 +1730,8 @@ elseif ($action === 'tenants') {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $includeArchived = isset($_GET['include_archived']) && $_GET['include_archived'] == '1';
+        $whereClause = $includeArchived ? "" : "WHERE (t.is_archived IS NULL OR t.is_archived = 0)";
         $sql = "
             SELECT 
                 t.*,
@@ -1691,6 +1740,7 @@ elseif ($action === 'tenants') {
                 (SELECT COUNT(*) FROM affiliates WHERE tenant_id = t.id) as affiliate_count,
                 (SELECT u.identity_key FROM user_roles ur JOIN users u ON ur.user_id = u.id WHERE ur.tenant_id = t.id AND ur.role = 'admin' LIMIT 1) as admin_email
             FROM tenants t 
+            $whereClause
             ORDER BY t.created_at DESC
         ";
         $tenantsData = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
@@ -1786,20 +1836,88 @@ elseif ($action === 'tenants') {
         if (empty($id)) {
             http_response_code(400); echo json_encode(["error" => "ID cabang diperlukan"]); exit;
         }
-        $stuCount = $pdo->prepare("SELECT COUNT(*) FROM students WHERE tenant_id = ?");
-        $stuCount->execute([$id]);
-        $hasStudents = ((int)$stuCount->fetchColumn()) > 0;
 
-        $staffCount = $pdo->prepare("SELECT COUNT(*) FROM user_roles WHERE tenant_id = ? AND role IN ('admin', 'teacher')");
-        $staffCount->execute([$id]);
-        $hasStaff = ((int)$staffCount->fetchColumn()) > 0;
+        if ($id === 'default_tenant' || $id === 'tenant-hq') {
+            http_response_code(400);
+            echo json_encode(["error" => "Cabang Pusat utama tidak dapat dihapus."]);
+            exit;
+        }
 
-        if ($hasStudents || $hasStaff) {
-            $pdo->prepare("UPDATE tenants SET is_active = 0 WHERE id = ?")->execute([$id]);
-            echo json_encode(["success" => true, "message" => "Cabang memiliki data terkait, status diubah menjadi Nonaktif"]);
-        } else {
-            $pdo->prepare("DELETE FROM tenants WHERE id = ?")->execute([$id]);
-            echo json_encode(["success" => true, "message" => "Cabang berhasil dihapus"]);
+        try {
+            $pdo->beginTransaction();
+
+            $stuCount = $pdo->prepare("SELECT COUNT(*) FROM students WHERE tenant_id = ?");
+            $stuCount->execute([$id]);
+            $hasStudents = (int)$stuCount->fetchColumn();
+
+            $ordCount = $pdo->prepare("SELECT COUNT(*) FROM orders WHERE tenant_id = ?");
+            $ordCount->execute([$id]);
+            $hasOrders = (int)$ordCount->fetchColumn();
+
+            if ($hasStudents > 0 || $hasOrders > 0) {
+                // Soft archive to protect student & financial records ("jangan ubah isi data")
+                $pdo->prepare("UPDATE tenants SET is_active = 0, is_archived = 1 WHERE id = ?")->execute([$id]);
+                $pdo->commit();
+                log_audit($pdo, $payload->user_id, null, 'tenant_archived', $id, ['students' => $hasStudents, 'orders' => $hasOrders]);
+                echo json_encode([
+                    "success" => true,
+                    "archived" => true,
+                    "message" => "Cabang memiliki {$hasStudents} siswa & {$hasOrders} transaksi. Demi keamanan data akademik & keuangan, cabang dinonaktifkan & diarsipkan dari daftar aktif."
+                ]);
+                exit;
+            }
+
+            // Clean up empty child records for empty/test branch
+            try { $pdo->prepare("DELETE FROM session_attendances WHERE session_id IN (SELECT id FROM class_sessions WHERE tenant_id = ?)")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM class_sessions WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM class_schedules WHERE class_id IN (SELECT id FROM classes WHERE tenant_id = ?)")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM class_students WHERE class_id IN (SELECT id FROM classes WHERE tenant_id = ?)")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM classes WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM class_rooms WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM plan_entitlements WHERE plan_id IN (SELECT id FROM plans WHERE tenant_id = ?)")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM plans WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM spp_certificates WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM entitlements WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM subscriptions WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM products WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM commissions WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM affiliates WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM partner_assignments WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM partner_profiles WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+
+            $stmtStaffUsers = $pdo->prepare("SELECT user_id FROM user_roles WHERE tenant_id = ?");
+            $stmtStaffUsers->execute([$id]);
+            $staffUserIds = $stmtStaffUsers->fetchAll(PDO::FETCH_COLUMN);
+
+            try { $pdo->prepare("DELETE FROM admins WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM user_roles WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+
+            foreach ($staffUserIds as $uId) {
+                if (empty($uId)) continue;
+                $otherRoles = $pdo->prepare("SELECT COUNT(*) FROM user_roles WHERE user_id = ?");
+                $otherRoles->execute([$uId]);
+                if ((int)$otherRoles->fetchColumn() === 0) {
+                    try { $pdo->prepare("DELETE FROM users WHERE id = ?")->execute([$uId]); } catch (\Throwable $e) {}
+                }
+            }
+
+            try { $pdo->prepare("DELETE FROM audit_logs WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM upgrade_audit_logs WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("DELETE FROM question_imports_staging WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+            try { $pdo->prepare("UPDATE schools SET tenant_id = 'default_tenant' WHERE tenant_id = ?")->execute([$id]); } catch (\Throwable $e) {}
+
+            $delStmt = $pdo->prepare("DELETE FROM tenants WHERE id = ?");
+            $delStmt->execute([$id]);
+
+            $pdo->commit();
+            log_audit($pdo, $payload->user_id, null, 'tenant_deleted', $id);
+            echo json_encode(["success" => true, "message" => "Cabang berhasil dihapus secara permanen."]);
+            exit;
+        } catch (\Throwable $e) {
+            $pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(["error" => "Gagal menghapus cabang: " . $e->getMessage()]);
+            exit;
         }
     }
 }

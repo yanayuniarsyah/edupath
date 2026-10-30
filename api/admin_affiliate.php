@@ -638,8 +638,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
         }
 
-        $pdo->prepare("DELETE FROM affiliates WHERE id = ?")->execute([$id]);
-        echo json_encode(["success" => true]);
+        try {
+            $pdo->beginTransaction();
+            $chkComm = $pdo->prepare("SELECT COUNT(*) FROM commissions WHERE affiliate_id = ?");
+            $chkComm->execute([$id]);
+            $commCount = (int)$chkComm->fetchColumn();
+
+            if ($commCount > 0) {
+                $pdo->prepare("UPDATE affiliates SET is_active = 0 WHERE id = ?")->execute([$id]);
+                $pdo->commit();
+                echo json_encode(["success" => true, "message" => "Mitra memiliki riwayat komisi, status diubah menjadi Nonaktif."]);
+                exit;
+            }
+
+            $stmtUser = $pdo->prepare("SELECT user_id FROM affiliates WHERE id = ?");
+            $stmtUser->execute([$id]);
+            $affUserId = $stmtUser->fetchColumn();
+
+            $pdo->prepare("DELETE FROM affiliates WHERE id = ?")->execute([$id]);
+            if ($affUserId) {
+                try { $pdo->prepare("DELETE FROM user_roles WHERE user_id = ? AND role = 'affiliate'")->execute([$affUserId]); } catch (\Throwable $e) {}
+            }
+            $pdo->commit();
+            echo json_encode(["success" => true, "message" => "Mitra afiliasi berhasil dihapus."]);
+            exit;
+        } catch (\Throwable $e) {
+            $pdo->rollBack();
+            http_response_code(500);
+            echo json_encode(["error" => "Gagal menghapus mitra: " . $e->getMessage()]);
+            exit;
+        }
     } elseif ($action === 'payout_commission') {
         $comm_id = $input['commission_id'] ?? '';
         $ref = $input['payout_reference'] ?? 'MANUAL_TRANSFER';

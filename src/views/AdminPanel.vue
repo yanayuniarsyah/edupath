@@ -330,7 +330,7 @@
                 <thead>
                   <tr class="bg-black/40 border-b border-white/10 text-white/60">
                     <th class="w-10 px-3 py-3 text-center">
-                      <input type="checkbox" :checked="isAllSelected(filteredBranches)" @change="toggleSelectAll(filteredBranches)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                      <input type="checkbox" :checked="isAllSelected(filteredBranches, 'branches')" @change="toggleSelectAll(filteredBranches, 'branches')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
                     </th>
                     <th class="text-center px-4 py-3 font-black uppercase tracking-wider w-12">No</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Nama Cabang</th>
@@ -349,7 +349,7 @@
                   </tr>
                   <tr v-for="(b, idx) in filteredBranches" :key="b.id" class="hover:bg-white/5 transition-colors">
                     <td class="w-10 px-3 py-3 text-center" @click.stop>
-                      <input type="checkbox" :value="b.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" />
+                      <input type="checkbox" :value="b.id" v-model="selectedIds" :disabled="!canSelectRow(b, 'branches')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed" />
                     </td>
                     <td class="px-4 py-3 text-center text-white/50 font-bold text-xs">{{ idx + 1 }}</td>
                     <td class="px-4 py-3">
@@ -383,7 +383,8 @@
                     </td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
                       <button @click="openEditBranchModal(b)" class="px-2.5 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Cabang"><i class="ph-bold ph-pencil-simple"></i> Edit</button>
-                      <button @click="deleteBranch(b.id)" class="px-2.5 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus / Nonaktifkan"><i class="ph-bold ph-trash"></i> Hapus</button>
+                      <button v-if="b.id !== 'default_tenant' && b.id !== 'tenant-hq'" @click="deleteBranch(b.id)" class="px-2.5 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Hapus Cabang"><i class="ph-bold ph-trash"></i> Hapus</button>
+                      <span v-else class="px-2.5 py-1.5 bg-white/5 border border-white/10 text-white/40 rounded-lg text-xs font-bold inline-flex items-center gap-1 cursor-not-allowed" title="Cabang Utama Pusat (Tidak dapat dihapus)"><i class="ph-bold ph-shield-check"></i> Pusat</span>
                     </td>
                   </tr>
                 </tbody>
@@ -4779,6 +4780,7 @@ const canSelectRow = (item, context = '') => {
   if (context === 'questions') return canManageQuestion(item);
   if (context === 'materials') return canManageMaterial(item);
   if (context === 'staff') return canSelectStaff(item);
+  if (context === 'branches' || context === 'tenants') return item.id !== 'default_tenant' && item.id !== 'tenant-hq';
   return true;
 };
 
@@ -7027,7 +7029,11 @@ const toggleBranchStatus = async (b) => {
 };
 
 const deleteBranch = async (id) => {
-  if (!confirm('Hapus atau nonaktifkan cabang ini?')) return;
+  if (id === 'default_tenant' || id === 'tenant-hq') {
+    alert('Cabang Pusat utama tidak dapat dihapus.');
+    return;
+  }
+  if (!confirm('Apakah Anda yakin ingin menghapus cabang ini? Cabang tanpa siswa akan dihapus permanen, sedangkan cabang dengan riwayat siswa/transaksi akan dinonaktifkan demi integritas data.')) return;
   try {
     const res = await api.deleteAdminTenant(id);
     alert(res?.message || 'Cabang berhasil diproses');
