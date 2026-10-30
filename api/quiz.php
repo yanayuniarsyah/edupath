@@ -3,6 +3,7 @@
 require_once 'config.php';
 require_once 'jwt.php';
 require_once 'rate_limit.php';
+require_once 'EntitlementService.php';
 
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true);
@@ -275,10 +276,22 @@ if (($action === 'start' || $action === 'start_attempt') && $_SERVER['REQUEST_ME
             exit;
         }
     } else {
-        if (strtolower($quiz_type) === 'tryout') {
+        if ($quiz_type === 'tryout') {
             $has_pbm = 0;
             try {
-                $has_pbm = (int)$pdo->query("SELECT COUNT(*) FROM questions WHERE (sub_materi LIKE '%Bacaan%' OR subtes LIKE '%Bacaan%') AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter")->fetchColumn();
+                $pbm_sql = "SELECT COUNT(*) FROM questions WHERE (sub_materi LIKE '%Bacaan%' OR subtes LIKE '%Bacaan%') AND is_active = 1 AND is_qc_passed = 1 AND classification IN ('LATIHAN', 'TRYOUT')";
+                $pbm_params = [];
+                if (!empty($education_level)) {
+                    $pbm_sql .= " AND (education_level = ? OR education_level IS NULL)";
+                    $pbm_params[] = $education_level;
+                }
+                if (!empty($assessment_type)) {
+                    $pbm_sql .= " AND (assessment_type = ? OR assessment_type IS NULL)";
+                    $pbm_params[] = $assessment_type;
+                }
+                $stmtPbm = $pdo->prepare($pbm_sql);
+                $stmtPbm->execute($pbm_params);
+                $has_pbm = (int)$stmtPbm->fetchColumn();
             } catch (\Throwable $e) {}
 
             if ($has_pbm >= 20) {
@@ -382,10 +395,22 @@ elseif ($action === 'questions' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             }
         }
     } else {
-        if (strtolower($quiz_type) === 'tryout') {
+        if ($quiz_type === 'tryout') {
             $has_pbm = 0;
             try {
-                $has_pbm = (int)$pdo->query("SELECT COUNT(*) FROM questions WHERE (sub_materi LIKE '%Bacaan%' OR subtes LIKE '%Bacaan%') AND is_active = 1 AND is_qc_passed = 1 AND $classification_filter")->fetchColumn();
+                $pbm_sql = "SELECT COUNT(*) FROM questions WHERE (sub_materi LIKE '%Bacaan%' OR subtes LIKE '%Bacaan%') AND is_active = 1 AND is_qc_passed = 1 AND classification IN ('LATIHAN', 'TRYOUT')";
+                $pbm_params = [];
+                if (!empty($education_level)) {
+                    $pbm_sql .= " AND (education_level = ? OR education_level IS NULL)";
+                    $pbm_params[] = $education_level;
+                }
+                if (!empty($assessment_type)) {
+                    $pbm_sql .= " AND (assessment_type = ? OR assessment_type IS NULL)";
+                    $pbm_params[] = $assessment_type;
+                }
+                $stmtPbm = $pdo->prepare($pbm_sql);
+                $stmtPbm->execute($pbm_params);
+                $has_pbm = (int)$stmtPbm->fetchColumn();
             } catch (\Throwable $e) {}
 
             if ($has_pbm >= 20) {

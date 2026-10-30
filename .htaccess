@@ -73,7 +73,7 @@
   Header append Vary Accept-Encoding
 </IfModule>
 
-<FilesMatch "(^\.|\.env|\.sql$|\.bak$|\.key$|\.pem$|^install_db\.php$|^test_.*\.php$|^run_forensic_.*\.php$|^comprehensive_it_.*\.php$)">
+<FilesMatch "(^\.|\.env|\.sql$|\.bak$|\.key$|\.pem$|\.log$|\.ya?ml$|^composer\.(json|lock)$|^package(-lock)?\.json$|^tsconfig\.json$|^vite\.config\.mjs$|^install_db\.php$|^test_.*\.php$|^seed_.*\.php$|^run_.*\.php$|^audit_.*\.php$|^comprehensive_it_.*\.php$)">
   Require all denied
 </FilesMatch>
 

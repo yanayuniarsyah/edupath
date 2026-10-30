@@ -9,6 +9,12 @@ function ensure_and_seed_materials($pdo, $force = false) {
     if ($executed && !$force) return;
     $executed = true;
 
+    $lockFile = sys_get_temp_dir() . '/edupath_materials_schema_' . md5(__DIR__) . '.lock';
+    if (!$force && file_exists($lockFile) && (time() - @filemtime($lockFile) < 86400)) {
+        return;
+    }
+    @touch($lockFile);
+
     try {
         $pdo->exec("
             CREATE TABLE IF NOT EXISTS materials (

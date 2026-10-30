@@ -281,8 +281,10 @@ if ($action === 'create_sa') {
     $sa_email = 'superadmin@uat.edupath.local';
     $sa_pass = 'EduPathSuperAdmin01!2026';
     $sa_hash = password_hash($sa_pass, PASSWORD_BCRYPT);
-    $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$sa_id', '$sa_email', '$sa_hash', 1) ON DUPLICATE KEY UPDATE password='$sa_hash', is_active=1");
-    $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('uat-ur-sa', '$sa_id', NULL, 'superadmin', '$sa_id') ON DUPLICATE KEY UPDATE role='superadmin'");
+    $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE password = VALUES(password), is_active = 1")
+        ->execute([$sa_id, $sa_email, $sa_hash]);
+    $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('uat-ur-sa', ?, NULL, 'superadmin', ?) ON DUPLICATE KEY UPDATE role = 'superadmin'")
+        ->execute([$sa_id, $sa_id]);
     
     $adm_id = 'uat-u-admin';
     $adm_ref = 'uat-r-admin';
@@ -290,10 +292,14 @@ if ($action === 'create_sa') {
     $adm_pass = 'EduPathAdmin01!2026';
     $adm_hash = password_hash($adm_pass, PASSWORD_BCRYPT);
     $uat_tenant_id = 'uat-tenant-01';
-    $pdo->exec("INSERT INTO tenants (id, name, slug, is_active) VALUES ('$uat_tenant_id', 'UAT EduPath Tenant', 'uat-edupath', 1) ON DUPLICATE KEY UPDATE is_active=1");
-    $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$adm_id', '$adm_email', '$adm_hash', 1) ON DUPLICATE KEY UPDATE password='$adm_hash', is_active=1");
-    $pdo->exec("INSERT INTO admins (id, tenant_id, username, password, name) VALUES ('$adm_ref', '$uat_tenant_id', '$adm_email', '$adm_hash', 'UAT Tenant Admin') ON DUPLICATE KEY UPDATE password='$adm_hash'");
-    $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('uat-ur-adm', '$adm_id', '$uat_tenant_id', 'admin', '$adm_ref') ON DUPLICATE KEY UPDATE role='admin'");
+    $pdo->prepare("INSERT INTO tenants (id, name, slug, is_active) VALUES (?, 'UAT EduPath Tenant', 'uat-edupath', 1) ON DUPLICATE KEY UPDATE is_active = 1")
+        ->execute([$uat_tenant_id]);
+    $pdo->prepare("INSERT INTO users (id, identity_key, password, is_active) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE password = VALUES(password), is_active = 1")
+        ->execute([$adm_id, $adm_email, $adm_hash]);
+    $pdo->prepare("INSERT INTO admins (id, tenant_id, username, password, name) VALUES (?, ?, ?, ?, 'UAT Tenant Admin') ON DUPLICATE KEY UPDATE password = VALUES(password)")
+        ->execute([$adm_ref, $uat_tenant_id, $adm_email, $adm_hash]);
+    $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('uat-ur-adm', ?, ?, 'admin', ?) ON DUPLICATE KEY UPDATE role = 'admin'")
+        ->execute([$adm_id, $uat_tenant_id, $adm_ref]);
     
     echo "SA CREATED";
     exit;

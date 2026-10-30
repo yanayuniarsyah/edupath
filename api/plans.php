@@ -52,21 +52,7 @@ try {
         $products = [];
     }
 
-    // 2. Fetch active plans with Phase 1 catalog columns (safe column detection)
-    $plan_cols = [];
-    try {
-        $plan_cols = $pdo->query("DESCRIBE plans")->fetchAll(PDO::FETCH_COLUMN);
-    } catch (\Throwable $e) {
-        $plan_cols = ['id', 'name', 'price', 'duration', 'features'];
-    }
-
-    $has_prog_col = in_array('academic_program', $plan_cols);
-    $has_mode_col = in_array('delivery_mode', $plan_cols);
-    $has_comp_col = in_array('components', $plan_cols);
-    $has_curr_col = in_array('currency', $plan_cols);
-    $has_ver_col  = in_array('version', $plan_cols);
-    $has_code_col = in_array('package_code', $plan_cols);
-
+    // 2. Fetch active plans with Phase 1 catalog columns (direct query using index)
     $sql = "
         SELECT 
             id, 
@@ -76,23 +62,21 @@ try {
             discount, 
             duration, 
             features, 
-            billing_cycle
+            billing_cycle,
+            academic_program,
+            delivery_mode,
+            components,
+            package_code
+        FROM plans 
+        WHERE is_active = 1 AND is_archived = 0
     ";
-    if ($has_prog_col) $sql .= ", academic_program";
-    if ($has_mode_col) $sql .= ", delivery_mode";
-    if ($has_comp_col) $sql .= ", components";
-    if ($has_curr_col) $sql .= ", currency";
-    if ($has_ver_col)  $sql .= ", version";
-    if ($has_code_col) $sql .= ", package_code";
-
-    $sql .= " FROM plans WHERE is_active = 1 AND is_archived = 0";
     $params = [];
 
-    if ($filter_program !== '' && $has_prog_col) {
+    if ($filter_program !== '') {
         $sql .= " AND academic_program = ?";
         $params[] = $filter_program;
     }
-    if ($filter_mode !== '' && $has_mode_col) {
+    if ($filter_mode !== '') {
         $sql .= " AND delivery_mode = ?";
         $params[] = $filter_mode;
     }
@@ -181,12 +165,19 @@ try {
     }
 
     // Return legacy "products" envelope plus unified "packages" and metadata
-    echo json_encode([
+    $output = json_encode([
         "success" => true,
         "products" => $response,
         "packages" => $plans,
         "total" => count($plans)
     ]);
+    $etag = '"' . md5($output) . '"';
+    header("ETag: $etag");
+    if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
+        http_response_code(304);
+        exit;
+    }
+    echo $output;
 
 } catch (PDOException $e) {
     http_response_code(500);

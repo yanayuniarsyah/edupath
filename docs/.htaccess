@@ -1,0 +1,6 @@
+# Deny all direct web access to internal documentation directory
+Order Allow,Deny
+Deny from all
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
