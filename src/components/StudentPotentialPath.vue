@@ -858,7 +858,7 @@
           
           <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-5">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-xl">E</div>
+              <div class="w-10 h-10 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-xl leading-none select-none">E</div>
               <div>
                 <h3 class="font-black text-lg text-white">EduPath Indonesia</h3>
                 <p class="text-[10px] text-white/50 uppercase tracking-widest font-mono">Adaptive Potential Assessment</p>

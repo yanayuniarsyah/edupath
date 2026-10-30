@@ -8,7 +8,7 @@
       <!-- Header Bar -->
       <div class="flex items-center justify-between pb-6 mb-8 border-b border-white/10">
         <router-link to="/" class="flex items-center gap-2.5 group select-none">
-          <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">
+          <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg leading-none shadow-md shadow-[#c0ff00]/20 select-none">
             E
           </div>
           <span class="font-heading font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>

@@ -22,7 +22,7 @@
         <!-- Logo & Header -->
         <div class="text-center mb-6">
           <div class="inline-flex items-center gap-2.5 group select-none mb-2">
-            <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
+            <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg leading-none shadow-md shadow-[#c0ff00]/20 select-none">E</div>
             <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
           <h2 class="text-white font-black text-lg">Masuk Administrator</h2>
@@ -161,7 +161,7 @@
     >
       <!-- Logo -->
       <div class="flex items-center gap-3 px-4 py-4 border-b border-white/10 shrink-0 cursor-pointer select-none" @click="sidebarOpen = !sidebarOpen">
-        <div class="w-9 h-9 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
+        <div class="w-9 h-9 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg leading-none shadow-md shadow-[#c0ff00]/20 select-none">E</div>
         <div v-show="sidebarOpen" class="min-w-0">
           <span class="font-black text-lg tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           <p class="text-[11px] text-white/50 font-bold uppercase tracking-widest whitespace-nowrap">{{ isAffiliate ? 'Portal Afiliasi' : (isTeacher ? 'Portal Pendidik' : 'Admin Portal') }}</p>

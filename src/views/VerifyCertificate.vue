@@ -7,7 +7,7 @@
     <!-- Header Navigation -->
     <header class="border-b border-white/10 bg-[#0b1329]/80 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-30">
       <div class="flex items-center gap-3 cursor-pointer" @click="goToHome">
-        <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">
+        <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg leading-none shadow-md shadow-[#c0ff00]/20 select-none">
           E
         </div>
         <div>

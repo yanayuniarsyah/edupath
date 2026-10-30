@@ -36,7 +36,7 @@
       <div class="flex flex-col flex-1 min-h-0 overflow-y-auto" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-4 sm:p-6 pb-2' : 'p-3 pb-2'">
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-2.5 group cursor-pointer shrink-0" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center w-full'" @click="goToHomeTop">
-            <div class="w-8 h-8 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base group-hover:rotate-12 transition-all duration-300 shadow-md shadow-[#c0ff00]/20">E</div>
+            <div class="w-8 h-8 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base leading-none group-hover:rotate-12 transition-all duration-300 shadow-md shadow-[#c0ff00]/20 select-none">E</div>
             <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="min-w-0">
               <span class="font-black text-xl tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00]">.ai</span></span>
             </div>
@@ -259,7 +259,7 @@
           </button>
 
           <div id="nav-logo" class="flex items-center gap-2.5 group cursor-pointer select-none flex-shrink-0" @click="goToHomeTop">
-            <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base group-hover:rotate-12 transition-all duration-300 shadow-md shadow-[#c0ff00]/20">E</div>
+            <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base leading-none group-hover:rotate-12 transition-all duration-300 shadow-md shadow-[#c0ff00]/20 select-none">E</div>
             <span class="font-black text-lg sm:text-xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
 
@@ -370,7 +370,7 @@
             <!-- Top Bar: Logo & Close Button -->
             <div class="flex items-center justify-between pb-4 border-b border-white/10 shrink-0">
               <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base shadow-md shadow-[#c0ff00]/20">E</div>
+                <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base leading-none shadow-md shadow-[#c0ff00]/20 select-none">E</div>
                 <span class="font-black text-lg tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
               </div>
               <button 
@@ -535,11 +535,6 @@
                   </span>
                 </transition>
               </h1>
-
-              <p class="text-sm sm:text-base md:text-lg text-white/70 mx-auto font-medium leading-relaxed"
-                 style="max-width: min(38rem, calc(100vw - 2.5rem));">
-                Dari fondasi numerasi-literasi SD, persiapan masuk SMA unggulan (SMP), hingga kurikulum intensif TKA SMA &amp; tembus PTN impian dengan AI adaptif dan tutor bimbel berpengalaman.
-              </p>
 
               <!-- Academic Program Badges Under Hero -->
               <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 pt-1">
@@ -4214,7 +4209,7 @@
           <!-- Col 1: Brand & Company Entity -->
           <div class="space-y-3">
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-[0_0_15px_rgba(192,255,0,0.3)]">E</div>
+              <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg leading-none shadow-[0_0_15px_rgba(192,255,0,0.3)] select-none">E</div>
               <span class="font-black text-white text-lg tracking-tight">EduPath<span style="color: #c0ff00;">.ai</span></span>
             </div>
             <p class="text-xs text-white/60 leading-relaxed">
@@ -4740,7 +4735,7 @@
         <!-- Logo & Header (Compact to maximize usable form height) -->
         <div class="text-center mb-3 pt-1 px-8 shrink-0">
           <div class="inline-flex items-center gap-2 group select-none mb-1">
-            <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base shadow-md shadow-[#c0ff00]/20">E</div>
+            <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base leading-none shadow-md shadow-[#c0ff00]/20 select-none">E</div>
             <span class="font-black text-xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
           </div>
           <h3 class="text-base sm:text-lg font-bold font-heading text-white leading-snug">
@@ -5311,7 +5306,7 @@
           <!-- Company Identity Card -->
           <div class="p-5 rounded-2xl bg-white/[0.04] border border-white/10 space-y-3">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-[#c0ff00] text-black flex items-center justify-center font-black text-lg">E</div>
+              <div class="w-10 h-10 rounded-xl bg-[#c0ff00] text-black flex items-center justify-center font-black text-lg leading-none select-none">E</div>
               <div>
                 <div class="text-[11px] font-bold text-[#c0ff00] uppercase tracking-wider">Badan Usaha Resmi</div>
                 <h4 class="text-base font-black text-white">PT Kreasi Hasanah Indonesia</h4>
