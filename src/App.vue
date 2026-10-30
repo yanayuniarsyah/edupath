@@ -4783,38 +4783,40 @@
               </div>
             </div>
 
-            <!-- Multi-Program Trial Selector (SD, SMP, SMA, SNPMB, Alumni) -->
-            <div v-if="!isLoginMode" class="space-y-1.5 pb-1">
-              <label class="text-[10px] text-[#c0ff00] font-black uppercase tracking-wider flex items-center justify-between">
-                <span>Pilih Jenjang &amp; Program Belajar</span>
-                <span class="text-[9px] text-white/50 lowercase">Trial 100% Gratis</span>
-              </label>
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  v-for="prog in availableRegistrationPrograms"
-                  :key="prog.code"
-                  @click="selectRegistrationProgram(prog)"
-                  :class="[
-                    'p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between select-none',
-                    authForm.academic_program === prog.code
-                      ? 'bg-[#c0ff00]/15 border-[#c0ff00] text-white shadow-[0_0_15px_rgba(192,255,0,0.2)]'
-                      : 'bg-slate-900/90 border-slate-700/80 text-white/60 hover:border-slate-500 hover:text-white'
-                  ]"
-                >
-                  <div class="flex items-center justify-between mb-1">
-                    <span class="text-base">{{ prog.icon }}</span>
-                    <span v-if="authForm.academic_program === prog.code" class="w-2 h-2 rounded-full bg-[#c0ff00]"></span>
-                  </div>
-                  <div class="text-[11px] font-black leading-tight">{{ prog.name }}</div>
-                  <div class="text-[9px] text-white/40 mt-0.5 leading-snug">{{ prog.levelDesc }}</div>
-                </button>
-              </div>
-            </div>
-
+            <!-- Nama Lengkap -->
             <div v-if="!isLoginMode" class="space-y-1">
               <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Nama Lengkap</label>
               <input v-model="authForm.name" type="text" required placeholder="Cth: Budi Santoso" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
+            </div>
+
+            <!-- Dropdown Pilihan Jenjang & Program Belajar (di bawah Nama Lengkap) -->
+            <div v-if="!isLoginMode" class="space-y-1">
+              <div class="flex justify-between items-center">
+                <label class="text-[10px] text-[#c0ff00] font-black uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="ph-bold ph-graduation-cap text-xs"></i>
+                  <span>Pilih Jenjang &amp; Program Belajar</span>
+                </label>
+                <span class="text-[9px] text-white/50 lowercase">Trial 100% Gratis</span>
+              </div>
+              <div class="relative">
+                <select
+                  v-model="authForm.academic_program"
+                  @change="onRegistrationProgramDropdownChange"
+                  class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00] appearance-none cursor-pointer font-bold pr-10"
+                >
+                  <option
+                    v-for="prog in availableRegistrationPrograms"
+                    :key="prog.code"
+                    :value="prog.code"
+                    class="bg-slate-900 text-white py-2"
+                  >
+                    {{ prog.icon }} {{ prog.name }} — {{ prog.levelDesc }}
+                  </option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/50 text-xs">
+                  <i class="ph-bold ph-caret-down"></i>
+                </div>
+              </div>
             </div>
 
             <div v-if="!isLoginMode" class="space-y-1">
@@ -6054,6 +6056,14 @@ export default {
       authForm.value.academic_program = prog.code;
       authForm.value.target_level = prog.targetLevel;
       authForm.value.grade_level = prog.levelDesc;
+    };
+
+    const onRegistrationProgramDropdownChange = () => {
+      const p = availableRegistrationPrograms.find(prog => prog.code === authForm.value.academic_program);
+      if (p) {
+        authForm.value.target_level = p.targetLevel;
+        authForm.value.grade_level = p.levelDesc;
+      }
     };
 
     const registrationGoalLabel = computed(() => {
@@ -7946,7 +7956,8 @@ export default {
       activeProgramTargetTitle,
       currentStudentTargetDisplay,
       setActiveProgram,
-      handleProfileProgramChange
+      handleProfileProgramChange,
+      onRegistrationProgramDropdownChange
     };
   }
 };
