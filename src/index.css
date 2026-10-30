@@ -487,10 +487,10 @@ button[title="Tutup"],
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 36px !important;
-  height: 36px !important;
-  min-width: 36px !important;
-  min-height: 36px !important;
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
   border-radius: 9999px !important;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
   user-select: none !important;
@@ -521,7 +521,7 @@ button[title="Tutup"] i,
 button[title="Tutup"] svg {
   pointer-events: none !important;
   display: inline-block !important;
-  font-size: 18px !important;
+  font-size: 12px !important;
   line-height: 1 !important;
   font-weight: 800 !important;
 }
