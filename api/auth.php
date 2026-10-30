@@ -19,6 +19,21 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = is_string($input['password'] ?? null) ? $input['password'] : '';
     $target_ptn = safe_str($input['target_ptn'] ?? '');
     $referral_code = safe_str($input['referral_code'] ?? '');
+    $academic_program = safe_str($input['academic_program'] ?? 'SNPMB_UTBK');
+    $target_level = strtoupper(safe_str($input['target_level'] ?? ''));
+    $grade_level = safe_str($input['grade_level'] ?? '');
+    $target_goal = safe_str($input['target_goal'] ?? ($input['target_school'] ?? $target_ptn));
+
+    if (empty($target_level)) {
+        if ($academic_program === 'TKA_SD') $target_level = 'SD';
+        elseif ($academic_program === 'TKA_SMP') $target_level = 'SMP';
+        elseif ($academic_program === 'TKA_SMA') $target_level = 'SMA';
+        elseif ($academic_program === 'SNPMB_ALUMNI') $target_level = 'ALUMNI';
+        else $target_level = 'SMA';
+    }
+    if (empty($target_ptn) && in_array($target_level, ['SMA', 'ALUMNI'])) {
+        $target_ptn = $target_goal;
+    }
 
     if (!$name || !$email || !$password) {
         http_response_code(400);
@@ -104,12 +119,12 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, school, school_id, tenant_id, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $school ?: null, $school_id ?: null, $tenant_id, $referred_by]);
+            $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, academic_program, target_level, grade_level, target_goal, school, school_id, tenant_id, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn ?: null, $academic_program, $target_level, $grade_level ?: null, $target_goal ?: null, $school ?: null, $school_id ?: null, $tenant_id, $referred_by]);
         } catch (PDOException $e) {
             try {
-                $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, school, tenant_id, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $school ?: null, $tenant_id, $referred_by]);
+                $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, school, school_id, tenant_id, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $school ?: null, $school_id ?: null, $tenant_id, $referred_by]);
             } catch (PDOException $e2) {
                 $stmt = $pdo->prepare("INSERT INTO students (id, name, email, password, target_ptn, tenant_id) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$id, $name, $email, $hashed_password, $target_ptn, $tenant_id]);
@@ -146,7 +161,20 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             "token"         => $token,          // Backward compat: Bearer untuk mobile
             "refresh_token" => $refresh_token,
             "csrf_token"    => $csrf_token,      // Simpan di memory/sessionStorage, bukan localStorage
-            "user"          => ["id" => $id, "name" => $name, "email" => $email, "target_ptn" => $target_ptn]
+            "user"          => [
+                "id"                   => $id, 
+                "name"                 => $name, 
+                "email"                => $email, 
+                "target_ptn"           => $target_ptn,
+                "academic_program"     => $academic_program,
+                "target_level"         => $target_level,
+                "grade_level"          => $grade_level,
+                "target_goal"          => $target_goal,
+                "plan"                 => "free",
+                "plan_name"            => "Paket Free / Trial (" . $academic_program . ")",
+                "is_premium"           => false,
+                "active_subscriptions" => []
+            ]
         ]);
     } catch (PDOException $e) {
         $pdo->rollBack();
@@ -223,6 +251,10 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                s.school as student_school,
                s.phone as student_phone,
                COALESCE(s.target_ptn, '') as target_ptn, 
+               COALESCE(s.academic_program, 'SNPMB_UTBK') as academic_program,
+               COALESCE(s.target_level, 'SMA') as target_level,
+               COALESCE(s.grade_level, '') as grade_level,
+               COALESCE(s.target_goal, s.target_ptn, '') as target_goal,
                COALESCE(s.plan, 'free') as plan,
                COALESCE(t.is_active, 1) as tenant_active,
                aff.id as affiliate_id,
@@ -370,20 +402,36 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user['role'] === 'student') {
             $user['school'] = $user['student_school'] ?? '';
             $user['phone'] = $user['student_phone'] ?? '';
+            $user['academic_program'] = $user['academic_program'] ?? 'SNPMB_UTBK';
+            $user['target_level'] = $user['target_level'] ?? 'SMA';
+            $user['grade_level'] = $user['grade_level'] ?? '';
+            $user['target_goal'] = $user['target_goal'] ?? ($user['target_ptn'] ?? '');
 
-            // Check active subscription in subscriptions table
+            // Check active subscriptions in subscriptions table (multi-package support)
             $has_active_sub = false;
+            $active_subs = [];
             try {
-                $stmtSub = $pdo->prepare("SELECT plan_id, plan_name_snapshot FROM subscriptions WHERE (student_id = ? OR student_id = ?) AND status = 'active' AND expires_at > NOW() ORDER BY id DESC LIMIT 1");
-                $stmtSub->execute([$ref_id, $user['user_id']]);
-                $subRow = $stmtSub->fetch(PDO::FETCH_ASSOC);
-                if ($subRow) {
+                $stmtSubs = $pdo->prepare("
+                    SELECT sub.id, sub.plan_id, sub.plan_name_snapshot, 
+                           COALESCE(sub.academic_program, p.academic_program, 'SNPMB/UTBK') as academic_program,
+                           sub.status, sub.expires_at, sub.started_at
+                    FROM subscriptions sub
+                    LEFT JOIN plans p ON sub.plan_id = p.id
+                    WHERE (sub.student_id = ? OR sub.student_id = ?) 
+                      AND sub.status = 'active' 
+                      AND (sub.expires_at IS NULL OR sub.expires_at > NOW())
+                    ORDER BY sub.expires_at DESC
+                ");
+                $stmtSubs->execute([$ref_id, $user['user_id']]);
+                $active_subs = $stmtSubs->fetchAll(PDO::FETCH_ASSOC);
+                if (!empty($active_subs)) {
                     $has_active_sub = true;
-                    if (!empty($subRow['plan_name_snapshot'])) {
-                        $user['plan_name'] = $subRow['plan_name_snapshot'];
+                    if (!empty($active_subs[0]['plan_name_snapshot'])) {
+                        $user['plan_name'] = $active_subs[0]['plan_name_snapshot'];
                     }
                 }
             } catch (\Throwable $e) {}
+            $user['active_subscriptions'] = $active_subs;
 
             $plan = strtolower($user['plan'] ?? 'free');
             $paid_keywords = ['mandiri', 'starter', 'utama', 'pejuang', 'vip', 'elite', 'utbk', 'premium', 'intensif', 'snbt', 'p1', 'p2', 'p3'];
@@ -693,18 +741,53 @@ elseif ($action === 'update_profile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         // Student
+        $target_ptn = trim($input['target_ptn'] ?? '');
+        $target_goal = trim($input['target_goal'] ?? ($target_ptn ?: ''));
+        $academic_program = trim($input['academic_program'] ?? '');
+        $target_level = strtoupper(trim($input['target_level'] ?? ''));
+        $grade_level = trim($input['grade_level'] ?? '');
+        $phone = trim($input['phone'] ?? '');
+
         if ($hashed_password) {
             try {
-                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ?, school = ?, school_id = ? WHERE id = ? OR id = ? OR id = (SELECT reference_id FROM user_roles WHERE user_id = ? LIMIT 1) OR LOWER(email) = LOWER(?)");
-                $stmt->execute([$name, $email, $hashed_password, $school ?: null, $school_id ?: null, $payload->id, $userId, $userId, $currentEmail]);
+                $stmt = $pdo->prepare("
+                    UPDATE students 
+                    SET name = ?, email = ?, password = ?, school = ?, school_id = ?, 
+                        target_ptn = COALESCE(NULLIF(?, ''), target_ptn),
+                        target_goal = COALESCE(NULLIF(?, ''), target_goal),
+                        academic_program = COALESCE(NULLIF(?, ''), academic_program),
+                        target_level = COALESCE(NULLIF(?, ''), target_level),
+                        grade_level = COALESCE(NULLIF(?, ''), grade_level),
+                        phone = COALESCE(NULLIF(?, ''), phone)
+                    WHERE id = ? OR id = ? OR id = (SELECT reference_id FROM user_roles WHERE user_id = ? LIMIT 1) OR LOWER(email) = LOWER(?)
+                ");
+                $stmt->execute([
+                    $name, $email, $hashed_password, $school ?: null, $school_id ?: null,
+                    $target_ptn, $target_goal, $academic_program, $target_level, $grade_level, $phone,
+                    $payload->id, $userId, $userId, $currentEmail
+                ]);
             } catch (\Throwable $e) {
                 $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, password = ? WHERE id = ? OR id = ? OR id = (SELECT reference_id FROM user_roles WHERE user_id = ? LIMIT 1) OR LOWER(email) = LOWER(?)");
                 $stmt->execute([$name, $email, $hashed_password, $payload->id, $userId, $userId, $currentEmail]);
             }
         } else {
             try {
-                $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ?, school = ?, school_id = ? WHERE id = ? OR id = ? OR id = (SELECT reference_id FROM user_roles WHERE user_id = ? LIMIT 1) OR LOWER(email) = LOWER(?)");
-                $stmt->execute([$name, $email, $school ?: null, $school_id ?: null, $payload->id, $userId, $userId, $currentEmail]);
+                $stmt = $pdo->prepare("
+                    UPDATE students 
+                    SET name = ?, email = ?, school = ?, school_id = ?, 
+                        target_ptn = COALESCE(NULLIF(?, ''), target_ptn),
+                        target_goal = COALESCE(NULLIF(?, ''), target_goal),
+                        academic_program = COALESCE(NULLIF(?, ''), academic_program),
+                        target_level = COALESCE(NULLIF(?, ''), target_level),
+                        grade_level = COALESCE(NULLIF(?, ''), grade_level),
+                        phone = COALESCE(NULLIF(?, ''), phone)
+                    WHERE id = ? OR id = ? OR id = (SELECT reference_id FROM user_roles WHERE user_id = ? LIMIT 1) OR LOWER(email) = LOWER(?)
+                ");
+                $stmt->execute([
+                    $name, $email, $school ?: null, $school_id ?: null,
+                    $target_ptn, $target_goal, $academic_program, $target_level, $grade_level, $phone,
+                    $payload->id, $userId, $userId, $currentEmail
+                ]);
             } catch (\Throwable $e) {
                 $stmt = $pdo->prepare("UPDATE students SET name = ?, email = ? WHERE id = ? OR id = ? OR id = (SELECT reference_id FROM user_roles WHERE user_id = ? LIMIT 1) OR LOWER(email) = LOWER(?)");
                 $stmt->execute([$name, $email, $payload->id, $userId, $userId, $currentEmail]);
@@ -928,7 +1011,37 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $user['school']      = $user['school'] ?? '';
         $user['school_id']   = $user['school_id'] ?? null;
         $user['target_ptn']  = $user['target_ptn'] ?? '';
+        $user['academic_program'] = $user['academic_program'] ?? 'SNPMB_UTBK';
+        $user['target_level'] = $user['target_level'] ?? 'SMA';
+        $user['grade_level'] = $user['grade_level'] ?? '';
+        $user['target_goal'] = $user['target_goal'] ?? ($user['target_ptn'] ?? '');
         $user['phone']       = $user['phone'] ?? '';
+
+        // Fetch multi-package active subscriptions
+        $active_subs = [];
+        try {
+            $stmtSubs = $pdo->prepare("
+                SELECT sub.id, sub.plan_id, sub.plan_name_snapshot, 
+                       COALESCE(sub.academic_program, p.academic_program, 'SNPMB/UTBK') as academic_program,
+                       sub.status, sub.expires_at, sub.started_at
+                FROM subscriptions sub
+                LEFT JOIN plans p ON sub.plan_id = p.id
+                WHERE (sub.student_id = ? OR sub.student_id = ?) 
+                  AND sub.status = 'active' 
+                  AND (sub.expires_at IS NULL OR sub.expires_at > NOW())
+                ORDER BY sub.expires_at DESC
+            ");
+            $stmtSubs->execute([$user['id'], $payload->user_id ?? $user['id']]);
+            $active_subs = $stmtSubs->fetchAll(PDO::FETCH_ASSOC);
+            if (!empty($active_subs)) {
+                $user['is_premium'] = true;
+                if (!empty($active_subs[0]['plan_name_snapshot'])) {
+                    $user['plan_name'] = $active_subs[0]['plan_name_snapshot'];
+                }
+            }
+        } catch (\Throwable $e) {}
+        $user['active_subscriptions'] = $active_subs;
+
         $plan_labels = [
             'mandiri' => 'Paket Mandiri',
             'starter' => 'Paket Mandiri',
@@ -936,11 +1049,11 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             'pejuang' => 'Paket Pejuang PTN (Utama)',
             'vip'     => 'Paket Elite Mentoring (VIP)',
             'elite'   => 'Paket Elite Mentoring (VIP)',
-            'free'    => 'Paket Free / Trial'
+            'free'    => 'Paket Free / Trial (' . $user['academic_program'] . ')'
         ];
         $user['plan_name'] = $plan_labels[$plan] ?? ucfirst($plan);
-        if ($user['is_premium'] && ($user['plan_name'] === 'Paket Free / Trial' || $user['plan_name'] === 'Free')) {
-            $user['plan_name'] = 'Paket Mandiri';
+        if ($user['is_premium'] && (str_contains($user['plan_name'], 'Free') || str_contains($user['plan_name'], 'Trial'))) {
+            $user['plan_name'] = !empty($active_subs[0]['plan_name_snapshot']) ? $active_subs[0]['plan_name_snapshot'] : 'Paket Mandiri';
         }
 
         // Header cache hint untuk CDN / reverse proxy (jika ada)

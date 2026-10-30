@@ -508,6 +508,37 @@ function ensure_core_schema_sync($pdo) {
                 KEY rr_off_idx (offering_id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
+
+        // 13. students & subscriptions multi-program trial & switcher extensions (PRD v1.1 Phase 1-5)
+        $stuCols = $pdo->query("DESCRIBE students")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('academic_program', $stuCols)) {
+            $pdo->exec("ALTER TABLE students ADD COLUMN academic_program VARCHAR(50) NOT NULL DEFAULT 'SNPMB_UTBK' AFTER target_ptn");
+        }
+        if (!in_array('target_level', $stuCols)) {
+            $pdo->exec("ALTER TABLE students ADD COLUMN target_level ENUM('SD', 'SMP', 'SMA', 'ALUMNI') NOT NULL DEFAULT 'SMA' AFTER academic_program");
+        }
+        if (!in_array('grade_level', $stuCols)) {
+            $pdo->exec("ALTER TABLE students ADD COLUMN grade_level VARCHAR(30) NULL AFTER target_level");
+        }
+        if (!in_array('target_goal', $stuCols)) {
+            $pdo->exec("ALTER TABLE students ADD COLUMN target_goal VARCHAR(150) NULL AFTER grade_level");
+            try {
+                $pdo->exec("UPDATE students SET target_goal = target_ptn WHERE (target_goal IS NULL OR target_goal = '') AND target_ptn IS NOT NULL AND target_ptn != ''");
+            } catch (\Throwable $eGoal) {}
+        }
+
+        $subCols = $pdo->query("DESCRIBE subscriptions")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('academic_program', $subCols)) {
+            $pdo->exec("ALTER TABLE subscriptions ADD COLUMN academic_program VARCHAR(50) NULL AFTER plan_id");
+            try {
+                $pdo->exec("
+                    UPDATE subscriptions sub
+                    JOIN plans p ON sub.plan_id = p.id
+                    SET sub.academic_program = p.academic_program
+                    WHERE sub.academic_program IS NULL OR sub.academic_program = ''
+                ");
+            } catch (\Throwable $eSub) {}
+        }
     } catch (\Throwable $e) {}
 }
 ensure_core_schema_sync($pdo);

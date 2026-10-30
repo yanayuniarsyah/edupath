@@ -769,14 +769,23 @@ elseif (($action === 'webhook' || $action === 'notification') && $_SERVER['REQUE
                     echo json_encode(["error" => "Internal error: order tenant missing"]);
                     exit;
                 }
+                $plan_academic_prog = 'SNPMB/UTBK';
+                try {
+                    $stmt_prog = $pdo->prepare("SELECT academic_program FROM plans WHERE id = ?");
+                    $stmt_prog->execute([$order['plan_id']]);
+                    $found_prog = $stmt_prog->fetchColumn();
+                    if (!empty($found_prog)) $plan_academic_prog = $found_prog;
+                } catch (\Throwable $e) {}
+
                 $pdo->prepare("INSERT INTO subscriptions
-                      (id, tenant_id, student_id, plan_id, status, payment_reference, expires_at, plan_name_snapshot)
-                    VALUES (?, ?, ?, ?, 'active', ?, ?, ?)")
+                      (id, tenant_id, student_id, plan_id, academic_program, status, payment_reference, expires_at, plan_name_snapshot)
+                    VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?)")
                     ->execute([
                         $subscription_id,
                         $order['tenant_id'],      // tenant from order
                         $order['student_id'],     // student owner
                         $order['plan_id'],
+                        $plan_academic_prog,
                         $order['id'],          // payment_reference
                         $expires_at,
                         $order['plan_name'],

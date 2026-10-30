@@ -2496,6 +2496,22 @@
                       <span v-if="currentUser?.school_id || profileEditForm.school_id" class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">Mitra Resmi</span>
                     </div>
                   </div>
+                  <div v-if="!isTeacher && !isAdmin && !isSchoolBk && !isAffiliate" class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Program Belajar Aktif</span>
+                    <div class="text-sm font-bold text-white flex items-center gap-2">
+                      <span class="text-lg">{{ getProgramIcon(activeAcademicProgram) }}</span>
+                      <span>{{ getProgramDisplayName(activeAcademicProgram) }}</span>
+                      <span class="px-2 py-0.5 rounded text-[10px] bg-[#c0ff00]/15 text-[#c0ff00] font-bold border border-[#c0ff00]/30">
+                        {{ hasSubscriptionForProgram(activeAcademicProgram) ? 'Langganan Aktif' : 'Trial Siswa' }}
+                      </span>
+                    </div>
+                  </div>
+                  <div v-if="!isTeacher && !isAdmin && !isSchoolBk && !isAffiliate" class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">{{ activeProgramTargetTitle }}</span>
+                    <div class="text-sm font-bold text-amber-400 flex items-center gap-2 truncate">
+                      <span>{{ currentStudentTargetDisplay }}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -2582,7 +2598,7 @@
                       v-model="profileEditForm.school"
                       list="profileSchoolsDatalist"
                       type="text"
-                      placeholder="Masukkan nama SMA / SMK / SMP Anda"
+                      placeholder="Masukkan nama SMA / SMK / SMP / SD Anda"
                       class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-medium"
                     />
                     <datalist id="profileSchoolsDatalist">
@@ -2590,6 +2606,34 @@
                         {{ sch.city ? sch.city : '' }}
                       </option>
                     </datalist>
+                  </div>
+
+                  <!-- Program Belajar & Target Impian (Khusus Siswa) -->
+                  <div v-if="!isTeacher && !isAdmin && !isSchoolBk && !isAffiliate" class="grid grid-cols-1 md:grid-cols-2 gap-5 md:col-span-2">
+                    <div>
+                      <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">Program Belajar Utama</label>
+                      <select
+                        v-model="profileEditForm.academic_program"
+                        @change="handleProfileProgramChange"
+                        class="w-full bg-[#1e293b] border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-[#0f172a] transition-all font-bold"
+                      >
+                        <option v-for="p in allAcademicProgramsList" :key="p.code" :value="p.code">
+                          {{ p.name }} ({{ p.levelDesc }})
+                        </option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">
+                        Target Impian ({{ profileEditForm.target_level === 'SD' ? 'SMP Favorit' : (profileEditForm.target_level === 'SMP' ? 'SMA Impian' : 'PTN / Jurusan') }})
+                      </label>
+                      <input
+                        v-model="profileEditForm.target_goal"
+                        type="text"
+                        :placeholder="profileEditForm.target_level === 'SD' ? 'Contoh: SMPN 1 Jakarta / SMP Labschool' : (profileEditForm.target_level === 'SMP' ? 'Contoh: SMA Taruna Nusantara / SMAN 8' : 'Contoh: UI - Kedokteran / ITB - STEI')"
+                        class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-medium"
+                      />
+                    </div>
                   </div>
 
                   <!-- Password Baru -->
@@ -2704,6 +2748,82 @@
             <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-90 z-10"></div>
           </div>
 
+          <!-- ✨ Program Belajar & Multi-Paket Switcher Bar -->
+          <div class="glass-card p-3 sm:p-4 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-slate-950 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 border border-[#c0ff00]/30 flex items-center justify-center text-xl shrink-0">
+                {{ activeProgramInfo.icon }}
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[9px] font-black uppercase tracking-wider text-[#c0ff00]">Ruang Belajar Aktif</span>
+                  <span :class="['text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider', hasSubscriptionForProgram(activeAcademicProgram) ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30']">
+                    {{ hasSubscriptionForProgram(activeAcademicProgram) ? (currentUser?.plan_name || 'Langganan Aktif') : 'Akses Trial Gratis' }}
+                  </span>
+                </div>
+                <div class="text-sm sm:text-base font-black text-white flex items-center gap-2 truncate">
+                  <span>{{ activeProgramInfo.name }}</span>
+                  <span class="text-xs text-white/40 font-normal">({{ activeProgramInfo.levelDesc }})</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Program Switcher Dropdown Action -->
+            <div class="relative shrink-0 flex items-center gap-2">
+              <button 
+                type="button"
+                @click="showProgramSwitcherDropdown = !showProgramSwitcherDropdown" 
+                class="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+              >
+                <i class="ph-bold ph-arrows-left-right text-sm text-[#c0ff00]"></i>
+                <span>Ganti Program Belajar</span>
+                <i class="ph-bold ph-caret-down text-[10px]"></i>
+              </button>
+
+              <!-- Dropdown list -->
+              <div 
+                v-if="showProgramSwitcherDropdown" 
+                class="absolute right-0 top-full mt-2 w-72 p-2.5 bg-[#0c121e]/98 border border-white/20 rounded-2xl shadow-2xl z-50 animate-fade-in backdrop-blur-2xl space-y-1"
+              >
+                <div class="px-2 pb-1 text-[10px] font-black uppercase tracking-wider text-white/40 flex justify-between items-center">
+                  <span>Pilih Program / Jenjang</span>
+                  <span class="text-[9px] text-[#c0ff00]">5 Program</span>
+                </div>
+                <button 
+                  v-for="prog in allAcademicProgramsList" 
+                  :key="prog.code"
+                  type="button"
+                  @click="setActiveProgram(prog.code); showProgramSwitcherDropdown = false;"
+                  :class="[
+                    'w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer text-xs',
+                    activeAcademicProgram === prog.code 
+                      ? 'bg-[#c0ff00]/15 text-[#c0ff00] font-black border border-[#c0ff00]/30 shadow-sm' 
+                      : 'text-white/70 hover:bg-white/5 hover:text-white border border-transparent'
+                  ]"
+                >
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-base">{{ prog.icon }}</span>
+                    <div>
+                      <div class="font-bold text-white text-xs">{{ prog.name }}</div>
+                      <div class="text-[9px] text-white/40">{{ prog.levelDesc }}</div>
+                    </div>
+                  </div>
+                  <span v-if="hasSubscriptionForProgram(prog.code)" class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">Aktif</span>
+                  <span v-else class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/50 font-bold">Trial</span>
+                </button>
+                <div class="pt-2 border-t border-white/10">
+                  <button 
+                    type="button"
+                    @click="showProgramSwitcherDropdown = false; openPlanSelector()" 
+                    class="w-full py-2 px-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider text-center cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#c0ff00]/20"
+                  >
+                    <i class="ph-bold ph-plus-circle text-sm"></i> Beli Multi-Paket Lain
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- ✨ Text & Tombol Greeting (DI LETAKAN DI BAWAH GAMBAR) -->
           <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
             <!-- Left: Avatar & Greeting Info -->
@@ -2714,10 +2834,12 @@
               <div class="space-y-1 min-w-0">
                 <div class="flex items-center gap-2">
                   <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
-                  <p class="text-[#c0ff00] font-black text-[10px] sm:text-xs tracking-widest uppercase">Selamat belajar hari ini</p>
+                  <p class="text-[#c0ff00] font-black text-[10px] sm:text-xs tracking-widest uppercase">
+                    {{ activeProgramInfo.badge }}
+                  </p>
                 </div>
-                <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa Mandiri') }}!</span></h2>
-                <p class="text-white/70 text-xs md:text-sm font-medium leading-relaxed">Persiapkan SNBT 2027 dengan asesmen IRT adaptif &amp; latihan soal terfokus.</p>
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa EduPath') }}!</span></h2>
+                <p class="text-white/70 text-xs md:text-sm font-medium leading-relaxed">{{ dashboardProgramGreeting }}</p>
               </div>
             </div>
 
@@ -2740,29 +2862,21 @@
             </div>
           </div>
 
-          <!-- ✨ Target PTN Selection & Goal Status -->
+          <!-- ✨ Target Goal Selection & Status (Dinamis: SMP Impian, SMA Unggulan, atau PTN) -->
           <div class="glass-card p-4 md:p-5 rounded-2xl border border-sky-500/30 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-950 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <!-- Left: Target Selector -->
               <div class="flex items-center gap-3.5">
                 <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400 text-lg shrink-0 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
-                  🎯
+                  {{ activeProgramTargetIcon }}
                 </div>
                 <div class="space-y-0.5 min-w-0">
-                  <span class="block text-[9px] font-black uppercase tracking-widest text-sky-400">Target PTN Impian Anda</span>
-                  <div class="relative inline-block max-w-full">
-                    <select
-                      v-model="selectedUniversity"
-                      @change="recalcTargetGap"
-                      class="bg-black/60 border border-white/15 text-white text-xs md:text-sm font-black py-1.5 px-3 pr-8 rounded-lg appearance-none outline-none focus:border-sky-400 shadow-inner transition-colors cursor-pointer max-w-[200px] xs:max-w-xs sm:max-w-sm truncate"
-                    >
-                      <option v-for="u in universities" :key="u.name" :value="u" class="bg-slate-900 text-white font-bold">
-                        {{ u.name }} (Target: {{ u.targetScore }})
-                      </option>
-                    </select>
-                    <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-sky-400 text-xs">
-                      <i class="ph-bold ph-caret-down"></i>
-                    </div>
+                  <span class="block text-[9px] font-black uppercase tracking-widest text-sky-400">{{ activeProgramTargetTitle }}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm md:text-base font-black text-white truncate">{{ currentStudentTargetDisplay }}</span>
+                    <button @click="handleTabClick('settings')" class="text-[10px] px-2 py-0.5 rounded bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 font-bold border border-sky-500/25 transition-all cursor-pointer">
+                      Ubah Target
+                    </button>
                   </div>
                 </div>
               </div>
@@ -2771,10 +2885,10 @@
               <div class="flex items-center gap-2">
                 <span class="px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/25 text-sky-300 text-xs font-bold flex items-center gap-2">
                   <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
-                  <span>Target: <strong class="text-white font-mono">{{ selectedUniversity.targetScore }}</strong></span>
+                  <span>Jenjang: <strong class="text-white">{{ activeProgramInfo.name }}</strong></span>
                 </span>
                 <button @click="handleTabClick('diagnostic')" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
-                  <span>Tes Ulang IRT</span>
+                  <span>Asesmen Diagnostik</span>
                   <i class="ph-bold ph-arrow-clockwise"></i>
                 </button>
               </div>
@@ -4669,6 +4783,35 @@
               </div>
             </div>
 
+            <!-- Multi-Program Trial Selector (SD, SMP, SMA, SNPMB, Alumni) -->
+            <div v-if="!isLoginMode" class="space-y-1.5 pb-1">
+              <label class="text-[10px] text-[#c0ff00] font-black uppercase tracking-wider flex items-center justify-between">
+                <span>Pilih Jenjang &amp; Program Belajar</span>
+                <span class="text-[9px] text-white/50 lowercase">Trial 100% Gratis</span>
+              </label>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  v-for="prog in availableRegistrationPrograms"
+                  :key="prog.code"
+                  @click="selectRegistrationProgram(prog)"
+                  :class="[
+                    'p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between select-none',
+                    authForm.academic_program === prog.code
+                      ? 'bg-[#c0ff00]/15 border-[#c0ff00] text-white shadow-[0_0_15px_rgba(192,255,0,0.2)]'
+                      : 'bg-slate-900/90 border-slate-700/80 text-white/60 hover:border-slate-500 hover:text-white'
+                  ]"
+                >
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-base">{{ prog.icon }}</span>
+                    <span v-if="authForm.academic_program === prog.code" class="w-2 h-2 rounded-full bg-[#c0ff00]"></span>
+                  </div>
+                  <div class="text-[11px] font-black leading-tight">{{ prog.name }}</div>
+                  <div class="text-[9px] text-white/40 mt-0.5 leading-snug">{{ prog.levelDesc }}</div>
+                </button>
+              </div>
+            </div>
+
             <div v-if="!isLoginMode" class="space-y-1">
               <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Nama Lengkap</label>
               <input v-model="authForm.name" type="text" required placeholder="Cth: Budi Santoso" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]">
@@ -4687,7 +4830,7 @@
                   @input="onSchoolSelected"
                   list="publicSchoolsDatalist" 
                   type="text" 
-                  placeholder="Ketik nama SMA/SMK/SMP asal..." 
+                  :placeholder="authForm.academic_program === 'TKA_SD' ? 'Ketik nama SD / MI asal...' : (authForm.academic_program === 'TKA_SMP' ? 'Ketik nama SMP / MTs asal...' : 'Ketik nama SMA / SMK / MA asal...')" 
                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]"
                 >
                 <datalist id="publicSchoolsDatalist">
@@ -4696,7 +4839,21 @@
                   </option>
                 </datalist>
               </div>
-              <p class="text-[9px] text-slate-500">Guru BK sekolah asal Anda dapat memantau hasil tryout &amp; bimbingan PTN.</p>
+              <p class="text-[9px] text-slate-500">Guru BK sekolah asal Anda dapat memantau hasil tryout &amp; bimbingan.</p>
+            </div>
+
+            <!-- Adaptive Target Goal Field -->
+            <div v-if="!isLoginMode" class="space-y-1">
+              <div class="flex justify-between items-center">
+                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ registrationGoalLabel }}</label>
+                <span class="text-[9px] text-white/40 lowercase">opsional</span>
+              </div>
+              <input 
+                v-model="authForm.target_goal" 
+                type="text" 
+                :placeholder="registrationGoalPlaceholder" 
+                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-[#c0ff00]"
+              >
             </div>
 
             <div class="space-y-1">
@@ -5872,7 +6029,127 @@ export default {
       initScrollReveal();
     });
     const showPassword = ref(false);
-    const authForm = ref({ name: '', email: 'demo@edupath.id', password: 'demo123', school: '', school_id: '' });
+    const authForm = ref({ 
+      name: '', 
+      email: 'demo@edupath.id', 
+      password: 'demo123', 
+      school: '', 
+      school_id: '',
+      academic_program: 'SNPMB_UTBK',
+      target_level: 'SMA',
+      grade_level: 'Kelas 12 Pejuang PTN',
+      target_goal: '',
+      target_ptn: ''
+    });
+
+    const availableRegistrationPrograms = [
+      { code: 'TKA_SD', name: 'TKA SD', icon: '🎒', targetLevel: 'SD', levelDesc: 'Kelas 4–6 SD', goalLabel: 'Target SMP Favorit / Impian', goalPlaceholder: 'Cth: SMP Labschool / SMPN 1' },
+      { code: 'TKA_SMP', name: 'TKA SMP', icon: '🏫', targetLevel: 'SMP', levelDesc: 'Kelas 7–9 SMP', goalLabel: 'Target SMA / SMK Impian', goalPlaceholder: 'Cth: SMAN 8 / SMA Taruna Nusantara' },
+      { code: 'TKA_SMA', name: 'TKA SMA', icon: '🎓', targetLevel: 'SMA', levelDesc: 'Kelas 10–12 SMA', goalLabel: 'Target Asesmen Akademik SMA', goalPlaceholder: 'Cth: Peringkat 1 / Olimpiade Saintek' },
+      { code: 'SNPMB_UTBK', name: 'SNPMB / UTBK', icon: '⚡', targetLevel: 'SMA', levelDesc: 'Kelas 12 Pejuang PTN', goalLabel: 'Target PTN & Jurusan Impian', goalPlaceholder: 'Cth: UI - Kedokteran / ITB - STEI' },
+      { code: 'SNPMB_ALUMNI', name: 'SNPMB Alumni', icon: '🏆', targetLevel: 'ALUMNI', levelDesc: 'Gap Year / Lulusan', goalLabel: 'Target PTN Impian', goalPlaceholder: 'Cth: UGM - Teknik / Unair - Kedokteran' }
+    ];
+
+    const selectRegistrationProgram = (prog) => {
+      authForm.value.academic_program = prog.code;
+      authForm.value.target_level = prog.targetLevel;
+      authForm.value.grade_level = prog.levelDesc;
+    };
+
+    const registrationGoalLabel = computed(() => {
+      const p = availableRegistrationPrograms.find(prog => prog.code === authForm.value.academic_program);
+      return p ? p.goalLabel : 'Target Tujuan Belajar';
+    });
+
+    const registrationGoalPlaceholder = computed(() => {
+      const p = availableRegistrationPrograms.find(prog => prog.code === authForm.value.academic_program);
+      return p ? p.goalPlaceholder : 'Cth: Sekolah / Kampus Impian';
+    });
+
+    // Multi-Program & Multi-Subscription Switcher State
+    const activeAcademicProgram = ref(localStorage.getItem('ep_active_program') || 'SNPMB_UTBK');
+    const showProgramSwitcherDropdown = ref(false);
+
+    const allAcademicProgramsList = [
+      { code: 'TKA_SD', name: 'TKA SD', icon: '🎒', badge: 'PROGRAM SEKOLAH DASAR (KELAS 4-6)', levelDesc: 'SD', targetLevel: 'SD', defaultGreeting: 'Semangat belajar berhitung cepat & literasi membaca ceria hari ini!' },
+      { code: 'TKA_SMP', name: 'TKA SMP', icon: '🏫', badge: 'PROGRAM SEKOLAH MENENGAH PERTAMA (KELAS 7-9)', levelDesc: 'SMP', targetLevel: 'SMP', defaultGreeting: 'Asah logika penalaran matematika & sains untuk masuk SMA favorit!' },
+      { code: 'TKA_SMA', name: 'TKA SMA', icon: '🎓', badge: 'PROGRAM SEKOLAH MENENGAH ATAS (KELAS 10-12)', levelDesc: 'SMA', targetLevel: 'SMA', defaultGreeting: 'Kuasai materi kurikulum SMA & raih peringkat terbaik di kelasmu!' },
+      { code: 'SNPMB_UTBK', name: 'SNPMB / UTBK', icon: '⚡', badge: 'PROGRAM PERSIAPAN MASUK PTN 2027', levelDesc: 'Kelas 12', targetLevel: 'SMA', defaultGreeting: 'Persiapkan SNBT 2027 dengan asesmen IRT adaptif & latihan soal terfokus.' },
+      { code: 'SNPMB_ALUMNI', name: 'SNPMB Alumni', icon: '🏆', badge: 'PROGRAM INTENSIF ALUMNI & GAP YEAR', levelDesc: 'Alumni', targetLevel: 'ALUMNI', defaultGreeting: 'Maksimalkan strategi belajar gap year & taklukkan seleksi SNBT 2027!' }
+    ];
+
+    const getProgramDisplayName = (code) => {
+      const p = allAcademicProgramsList.find(item => item.code === code);
+      return p ? p.name : (code || 'SNPMB / UTBK');
+    };
+
+    const getProgramIcon = (code) => {
+      const p = allAcademicProgramsList.find(item => item.code === code);
+      return p ? p.icon : '⚡';
+    };
+
+    const hasSubscriptionForProgram = (code) => {
+      if (!currentUser.value) return false;
+      if (['admin', 'superadmin', 'teacher', 'guru', 'tutor', 'school_bk', 'affiliate'].includes(currentUser.value.role)) return true;
+      if (!currentUser.value.is_premium) return false;
+      if (currentUser.value.active_subscriptions && currentUser.value.active_subscriptions.length) {
+        return currentUser.value.active_subscriptions.some(s => {
+          const p = s.academic_program || '';
+          return p === code || (code === 'SNPMB_UTBK' && p.includes('SNPMB')) || (code === 'TKA_SMA' && p.includes('TKA_SMA'));
+        });
+      }
+      return currentUser.value.academic_program === code;
+    };
+
+    const activeProgramInfo = computed(() => {
+      return allAcademicProgramsList.find(p => p.code === activeAcademicProgram.value) || allAcademicProgramsList[3];
+    });
+
+    const dashboardProgramGreeting = computed(() => {
+      return activeProgramInfo.value.defaultGreeting;
+    });
+
+    const activeProgramTargetIcon = computed(() => {
+      if (activeAcademicProgram.value === 'TKA_SD') return '🎒';
+      if (activeAcademicProgram.value === 'TKA_SMP') return '🏫';
+      if (activeAcademicProgram.value === 'TKA_SMA') return '🏆';
+      return '🎯';
+    });
+
+    const activeProgramTargetTitle = computed(() => {
+      if (activeAcademicProgram.value === 'TKA_SD') return 'Target SMP Favorit / Unggulan';
+      if (activeAcademicProgram.value === 'TKA_SMP') return 'Target SMA / SMK Impian';
+      if (activeAcademicProgram.value === 'TKA_SMA') return 'Target Asesmen Akademik SMA';
+      return 'Target PTN & Jurusan Impian';
+    });
+
+    const currentStudentTargetDisplay = computed(() => {
+      const goal = currentUser.value?.target_goal || currentUser.value?.target_ptn;
+      if (goal && String(goal).trim()) return String(goal).trim();
+      if (activeAcademicProgram.value === 'TKA_SD') return 'SMP Unggulan Kota (Jalur Prestasi)';
+      if (activeAcademicProgram.value === 'TKA_SMP') return 'SMA Taruna Nusantara / SMAN 8';
+      if (activeAcademicProgram.value === 'TKA_SMA') return 'Peringkat 1 Kelas / Prestasi Saintek';
+      return 'Universitas Indonesia - Kedokteran';
+    });
+
+    const setActiveProgram = (code) => {
+      activeAcademicProgram.value = code;
+      localStorage.setItem('ep_active_program', code);
+      if (code === 'TKA_SD') selectedSimLevel.value = 'SD';
+      else if (code === 'TKA_SMP') selectedSimLevel.value = 'SMP';
+      else if (code === 'TKA_SMA') selectedSimLevel.value = 'SMA';
+      else selectedSimLevel.value = 'SNPMB';
+      showToast(`Beralih ke program ${getProgramDisplayName(code)}`);
+    };
+
+    const handleProfileProgramChange = () => {
+      const p = allAcademicProgramsList.find(item => item.code === profileEditForm.value.academic_program);
+      if (p) {
+        profileEditForm.value.target_level = p.targetLevel;
+        profileEditForm.value.grade_level = p.levelDesc;
+      }
+    };
+
     const publicSchoolsList = ref([]);
     const matchedPartnerSchool = computed(() => {
       const sName = (authForm.value.school || '').trim().toLowerCase();
@@ -6173,12 +6450,26 @@ export default {
               simTargetPtn.value = matchedPtn || (typeof res.user.target_ptn === 'object' ? res.user.target_ptn : { id: 'custom', name: String(res.user.target_ptn), targetScore: 700, focus: 'TPS & Literasi' });
             }
             
+            if (res.user?.academic_program) {
+              const savedProg = localStorage.getItem('ep_active_program');
+              if (!savedProg) {
+                activeAcademicProgram.value = res.user.academic_program;
+                localStorage.setItem('ep_active_program', res.user.academic_program);
+              } else {
+                activeAcademicProgram.value = savedProg;
+              }
+            }
+            
             // Sync profileEditForm
             profileEditForm.value.name = res.user.name || '';
             profileEditForm.value.email = res.user.email || '';
             profileEditForm.value.school = res.user.school || '';
             profileEditForm.value.school_id = res.user.school_id || '';
             profileEditForm.value.target_ptn = res.user.target_ptn || '';
+            profileEditForm.value.target_goal = res.user.target_goal || res.user.target_ptn || '';
+            profileEditForm.value.academic_program = res.user.academic_program || 'SNPMB_UTBK';
+            profileEditForm.value.target_level = res.user.target_level || 'SMA';
+            profileEditForm.value.grade_level = res.user.grade_level || '';
             profileEditForm.value.phone = res.user.phone || '';
 
             const currentHash = window.location.hash || '';
@@ -6417,6 +6708,11 @@ export default {
         } else {
           const payload = {
             ...authForm.value,
+            academic_program: authForm.value.academic_program || 'SNPMB_UTBK',
+            target_level: authForm.value.target_level || 'SMA',
+            grade_level: authForm.value.grade_level || '',
+            target_goal: authForm.value.target_goal || authForm.value.target_ptn || '',
+            target_ptn: authForm.value.target_ptn || authForm.value.target_goal || '',
             school: authForm.value.school || localStorage.getItem('student_ref_school') || '',
             school_id: authForm.value.school_id || localStorage.getItem('student_ref_school_id') || '',
             referral_code: localStorage.getItem('affiliate_ref') || ''
@@ -6431,6 +6727,11 @@ export default {
         }
         currentUser.value = res.user;
 
+        if (res.user?.academic_program) {
+          activeAcademicProgram.value = res.user.academic_program;
+          localStorage.setItem('ep_active_program', res.user.academic_program);
+        }
+
         // Sync profileEditForm
         if (res.user) {
           profileEditForm.value.name = res.user.name || '';
@@ -6438,6 +6739,10 @@ export default {
           profileEditForm.value.school = res.user.school || '';
           profileEditForm.value.school_id = res.user.school_id || '';
           profileEditForm.value.target_ptn = res.user.target_ptn || '';
+          profileEditForm.value.target_goal = res.user.target_goal || res.user.target_ptn || '';
+          profileEditForm.value.academic_program = res.user.academic_program || 'SNPMB_UTBK';
+          profileEditForm.value.target_level = res.user.target_level || 'SMA';
+          profileEditForm.value.grade_level = res.user.grade_level || '';
           profileEditForm.value.phone = res.user.phone || '';
         }
 
@@ -7213,6 +7518,12 @@ export default {
       password: '',
       school: '',
       school_id: '',
+      target_ptn: '',
+      target_goal: '',
+      academic_program: 'SNPMB_UTBK',
+      target_level: 'SMA',
+      grade_level: '',
+      phone: '',
       bank_name: '',
       bank_account: '',
       bank_owner: ''
@@ -7224,7 +7535,7 @@ export default {
         const token = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
         const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-        // 1. Update Profile (Name, Email, Password if provided, School)
+        // 1. Update Profile (Name, Email, Password if provided, School, Goals & Program)
         const profileRes = await fetch(`${apiUrl}/auth.php?action=update_profile`, {
           method: 'POST',
           headers: {
@@ -7236,13 +7547,31 @@ export default {
             email: profileEditForm.value.email || undefined,
             password: profileEditForm.value.password || undefined,
             school: profileEditForm.value.school || undefined,
-            school_id: profileEditForm.value.school_id || undefined
+            school_id: profileEditForm.value.school_id || undefined,
+            target_ptn: profileEditForm.value.target_ptn || undefined,
+            target_goal: profileEditForm.value.target_goal || profileEditForm.value.target_ptn || undefined,
+            academic_program: profileEditForm.value.academic_program || undefined,
+            target_level: profileEditForm.value.target_level || undefined,
+            grade_level: profileEditForm.value.grade_level || undefined,
+            phone: profileEditForm.value.phone || undefined,
+            bank_name: profileEditForm.value.bank_name || undefined,
+            bank_account: profileEditForm.value.bank_account || undefined,
+            bank_owner: profileEditForm.value.bank_owner || undefined
           })
         });
 
         const profileData = await profileRes.json();
         if (!profileRes.ok) {
           throw new Error(profileData.error || 'Gagal memperbarui profil');
+        }
+
+        if (currentUser.value) {
+          currentUser.value.name = profileEditForm.value.name;
+          currentUser.value.email = profileEditForm.value.email;
+          currentUser.value.school = profileEditForm.value.school;
+          currentUser.value.target_goal = profileEditForm.value.target_goal;
+          currentUser.value.target_ptn = profileEditForm.value.target_ptn;
+          currentUser.value.academic_program = profileEditForm.value.academic_program;
         }
 
         if (profileData.token) {
@@ -7600,7 +7929,24 @@ export default {
       selectedSimLevel,
       setSimLevel,
       currentSimLevelConfig,
-      currentTargetList
+      currentTargetList,
+      availableRegistrationPrograms,
+      selectRegistrationProgram,
+      registrationGoalLabel,
+      registrationGoalPlaceholder,
+      activeAcademicProgram,
+      showProgramSwitcherDropdown,
+      allAcademicProgramsList,
+      getProgramDisplayName,
+      getProgramIcon,
+      hasSubscriptionForProgram,
+      activeProgramInfo,
+      dashboardProgramGreeting,
+      activeProgramTargetIcon,
+      activeProgramTargetTitle,
+      currentStudentTargetDisplay,
+      setActiveProgram,
+      handleProfileProgramChange
     };
   }
 };
