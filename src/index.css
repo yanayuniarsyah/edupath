@@ -475,6 +475,42 @@ input[type=range]::-moz-range-thumb:hover {
 }
 
 /* =====================================================
+   UNIVERSAL MODAL CLOSE BUTTON & CLICK HITBOXES
+   ===================================================== */
+.modal-close-btn,
+.glass-card > .modal-close-btn,
+.glass-card > button.modal-close-btn {
+  position: absolute !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  border-radius: 9999px !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none !important;
+}
+
+.modal-close-btn:hover {
+  transform: scale(1.1) !important;
+}
+
+.modal-close-btn:active {
+  transform: scale(0.92) !important;
+}
+
+.modal-close-btn i,
+.modal-close-btn svg {
+  pointer-events: none !important;
+  display: inline-block !important;
+  line-height: 1 !important;
+}
+
+/* =====================================================
    GLOBAL EDUPATH-PROSE (Rich Material & Content Rendering)
    ===================================================== */
 .edupath-prose h1 {

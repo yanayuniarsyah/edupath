@@ -4327,8 +4327,15 @@
       <div class="absolute inset-0 bg-black/80 backdrop-blur-md" @click="showPlanSelectorModal = false"></div>
       <div class="relative bg-[#090f1e] border border-white/15 rounded-3xl w-full max-w-5xl p-6 sm:p-8 shadow-2xl animate-fade-in text-white max-h-[90vh] overflow-y-auto">
         <!-- Close button -->
-        <button @click="showPlanSelectorModal = false" class="!absolute top-5 right-5 z-20 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer" title="Tutup" aria-label="Tutup">
-          <i class="ph-bold ph-x text-sm"></i>
+        <button
+          type="button"
+          @click.stop="showPlanSelectorModal = false"
+          class="modal-close-btn top-5 right-5 w-11 h-11 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shadow-lg"
+          title="Tutup Modal"
+          aria-label="Tutup"
+          style="z-index: 9999 !important;"
+        >
+          <i class="ph-bold ph-x text-base pointer-events-none"></i>
         </button>
 
         <!-- Header -->
@@ -4642,8 +4649,14 @@
       <div class="relative bg-slate-900 border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-fade-in text-white">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-xl font-black font-heading">Invoice Pembelian</h2>
-          <button @click="closeCheckoutModal" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
-            <i class="ph-bold ph-x text-sm"></i>
+          <button
+            type="button"
+            @click.stop="closeCheckoutModal"
+            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
+            title="Tutup Invoice"
+            aria-label="Tutup"
+          >
+            <i class="ph-bold ph-x text-base pointer-events-none"></i>
           </button>
         </div>
         
@@ -4706,15 +4719,22 @@
     </div>
 
     <!-- Interactive Login Modal -->
-    <div v-if="showLoginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-fade-in">
+    <div v-if="showLoginModal" @click.self="showLoginModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in cursor-default">
       <div class="glass-card max-w-sm w-full p-8 rounded-3xl space-y-6 relative border-primary/30">
         <!-- Close button -->
-        <button @click="showLoginModal = false" class="!absolute top-5 right-5 z-50 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer" title="Tutup" aria-label="Tutup">
-          <i class="ph-bold ph-x text-sm"></i>
+        <button
+          type="button"
+          @click.stop="showLoginModal = false"
+          class="modal-close-btn top-4 right-4 w-11 h-11 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shadow-lg"
+          title="Tutup Modal"
+          aria-label="Tutup"
+          style="z-index: 9999 !important;"
+        >
+          <i class="ph-bold ph-x text-base pointer-events-none"></i>
         </button>
 
         <!-- Logo & Header (Consistent with Admin Portal) -->
-        <div class="text-center mb-6">
+        <div class="text-center mb-6 pt-1 px-6">
           <div class="inline-flex items-center gap-2.5 group select-none mb-2">
             <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg shadow-md shadow-[#c0ff00]/20">E</div>
             <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
@@ -4916,13 +4936,19 @@
         </div>
         <p class="text-[11px] text-white/60 truncate font-medium mt-0.5">{{ liveActivityList[currentActivityIdx].desc }}</p>
       </div>
-      <button @click="showLiveActivity = false" class="w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 flex items-center justify-center transition-all cursor-pointer shrink-0 ml-1" title="Tutup" aria-label="Tutup">
-        <i class="ph-bold ph-x text-xs"></i>
+      <button
+        type="button"
+        @click.stop="showLiveActivity = false"
+        class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/70 hover:text-rose-300 border border-white/20 hover:scale-110 active:scale-90 flex items-center justify-center transition-all cursor-pointer shrink-0 ml-1"
+        title="Tutup Notifikasi"
+        aria-label="Tutup"
+      >
+        <i class="ph-bold ph-x text-xs pointer-events-none"></i>
       </button>
     </div>
 
     <!-- Modal: Syarat & Ketentuan (Terms & Conditions) -->
-    <div v-if="showTermsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+    <div v-if="showTermsModal" @click.self="showTermsModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in cursor-default">
       <div class="relative w-full max-w-3xl max-h-[88vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
         <div class="flex items-center justify-between border-b border-white/10 pb-4 sticky top-0 bg-[#0c121e]/95 backdrop-blur-md z-10 -mt-2 pt-2">
           <div class="flex items-center gap-3">
@@ -4934,8 +4960,14 @@
               <p class="text-xs text-white/50">EduPath Platform Pembelajaran Digital • Terakhir diperbarui: 1 Oktober 2026</p>
             </div>
           </div>
-          <button @click="showTermsModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
-            <i class="ph-bold ph-x text-sm"></i>
+          <button
+            type="button"
+            @click.stop="showTermsModal = false"
+            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
+            title="Tutup Syarat & Ketentuan"
+            aria-label="Tutup"
+          >
+            <i class="ph-bold ph-x text-base pointer-events-none"></i>
           </button>
         </div>
 
@@ -5057,7 +5089,7 @@
     </div>
 
     <!-- Modal: Kebijakan Privasi (Privacy Policy) -->
-    <div v-if="showPrivacyModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div v-if="showPrivacyModal" @click.self="showPrivacyModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default">
       <div class="relative w-full max-w-2xl max-h-[85vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
         <div class="flex items-center justify-between border-b border-white/10 pb-4">
           <div class="flex items-center gap-3">
@@ -5069,8 +5101,14 @@
               <p class="text-xs text-white/50">Komitmen keamanan data siswa, orang tua, dan sekolah di EduPath</p>
             </div>
           </div>
-          <button @click="showPrivacyModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
-            <i class="ph-bold ph-x text-sm"></i>
+          <button
+            type="button"
+            @click.stop="showPrivacyModal = false"
+            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
+            title="Tutup Kebijakan Privasi"
+            aria-label="Tutup"
+          >
+            <i class="ph-bold ph-x text-base pointer-events-none"></i>
           </button>
         </div>
 
@@ -5113,7 +5151,7 @@
     </div>
 
     <!-- Modal: Disclaimer & Metodologi Latihan -->
-    <div v-if="showDisclaimerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div v-if="showDisclaimerModal" @click.self="showDisclaimerModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default">
       <div class="relative w-full max-w-2xl max-h-[85vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
         <div class="flex items-center justify-between border-b border-white/10 pb-4">
           <div class="flex items-center gap-3">
@@ -5125,8 +5163,14 @@
               <p class="text-xs text-white/50">Transparansi model latihan IRT dan estimasi kesiapan belajar</p>
             </div>
           </div>
-          <button @click="showDisclaimerModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
-            <i class="ph-bold ph-x text-sm"></i>
+          <button
+            type="button"
+            @click.stop="showDisclaimerModal = false"
+            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
+            title="Tutup Disclaimer"
+            aria-label="Tutup"
+          >
+            <i class="ph-bold ph-x text-base pointer-events-none"></i>
           </button>
         </div>
 
@@ -5166,7 +5210,7 @@
     </div>
 
     <!-- Modal: Panduan Orang Tua & Parental Consent -->
-    <div v-if="showParentConsentModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div v-if="showParentConsentModal" @click.self="showParentConsentModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default">
       <div class="relative w-full max-w-2xl max-h-[85vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
         <div class="flex items-center justify-between border-b border-white/10 pb-4">
           <div class="flex items-center gap-3">
@@ -5178,8 +5222,14 @@
               <p class="text-xs text-white/50">Membantu orang tua memantau perkembangan belajar anak tanpa rasa cemas</p>
             </div>
           </div>
-          <button @click="showParentConsentModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
-            <i class="ph-bold ph-x text-sm"></i>
+          <button
+            type="button"
+            @click.stop="showParentConsentModal = false"
+            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
+            title="Tutup Panduan"
+            aria-label="Tutup"
+          >
+            <i class="ph-bold ph-x text-base pointer-events-none"></i>
           </button>
         </div>
 
@@ -5218,7 +5268,7 @@
     </div>
 
     <!-- Modal: Informasi Kontak & Legalitas Perusahaan -->
-    <div v-if="showContactModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div v-if="showContactModal" @click.self="showContactModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default">
       <div class="relative w-full max-w-2xl max-h-[85vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
         <div class="flex items-center justify-between border-b border-white/10 pb-4">
           <div class="flex items-center gap-3">
@@ -5230,8 +5280,14 @@
               <p class="text-xs text-white/50">Layanan resmi operasional dan legalitas EduPath</p>
             </div>
           </div>
-          <button @click="showContactModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
-            <i class="ph-bold ph-x text-sm"></i>
+          <button
+            type="button"
+            @click.stop="showContactModal = false"
+            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
+            title="Tutup Kontak"
+            aria-label="Tutup"
+          >
+            <i class="ph-bold ph-x text-base pointer-events-none"></i>
           </button>
         </div>
 
@@ -5333,15 +5389,21 @@
     </div>
   </div>
     <!-- Affiliate Register Modal -->
-    <div v-if="showAffiliateRegisterModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div v-if="showAffiliateRegisterModal" @click.self="showAffiliateRegisterModal = false" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default">
       <div class="bg-[#121212] border border-amber-500/30 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.2)]">
         <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
           <h3 class="text-xl font-black font-heading text-white flex items-center gap-2">
             <i class="ph-bold ph-hand-coins text-amber-400"></i>
             Daftar Mitra Afiliasi
           </h3>
-          <button @click="showAffiliateRegisterModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
-            <i class="ph-bold ph-x text-sm"></i>
+          <button
+            type="button"
+            @click.stop="showAffiliateRegisterModal = false"
+            class="w-10 h-10 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/80 hover:text-rose-300 border border-white/20 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-md hover:scale-110 active:scale-90"
+            title="Tutup Pendaftaran"
+            aria-label="Tutup"
+          >
+            <i class="ph-bold ph-x text-base pointer-events-none"></i>
           </button>
         </div>
         <div class="p-6">
