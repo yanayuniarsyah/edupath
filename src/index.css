@@ -514,6 +514,153 @@ input[type=range]::-moz-range-thumb:hover {
 }
 
 /* =====================================================
+   EDUPATH UNIFIED MODAL & POPUP DESIGN SYSTEM
+   ===================================================== */
+/* Overlay / Backdrop */
+.edupath-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(4, 7, 15, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  cursor: default;
+  overflow-y: auto;
+}
+
+/* Modal Card Surface */
+.edupath-modal-card {
+  position: relative;
+  background: linear-gradient(180deg, #0c1424 0%, #070b14 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 1.5rem !important; /* 24px */
+  box-shadow: 0 25px 70px -10px rgba(0, 0, 0, 0.85),
+              0 0 35px -5px rgba(192, 255, 0, 0.08) !important;
+  color: #ffffff !important;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  max-height: 90vh;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Modal Header Bar */
+.edupath-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.125rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  flex-shrink: 0;
+}
+
+/* Modal Body */
+.edupath-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* Modal Footer Bar */
+.edupath-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.015);
+  flex-shrink: 0;
+}
+
+/* Modal Icon Badge */
+.edupath-modal-badge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  background: rgba(192, 255, 0, 0.15);
+  color: #c0ff00;
+  border: 1px solid rgba(192, 255, 0, 0.25);
+}
+
+/* Unified Dropdown Popup Menu */
+.edupath-dropdown-menu {
+  background: linear-gradient(180deg, rgba(12, 20, 36, 0.98) 0%, rgba(7, 11, 20, 0.99) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 1rem !important; /* 16px */
+  box-shadow: 0 20px 50px -5px rgba(0, 0, 0, 0.85),
+              0 0 25px -5px rgba(192, 255, 0, 0.06) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  padding: 0.5rem;
+}
+
+/* Unified Buttons */
+.edupath-btn-primary {
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.75rem;
+  background-color: #c0ff00;
+  color: #000000;
+  font-weight: 900;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 4px 15px rgba(192, 255, 0, 0.25);
+}
+
+.edupath-btn-primary:hover {
+  background-color: #b0ef00;
+  transform: scale(1.03);
+}
+
+.edupath-btn-primary:active {
+  transform: scale(0.97);
+}
+
+.edupath-btn-secondary {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.15s ease-in-out;
+}
+
+.edupath-btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.edupath-btn-secondary:active {
+  transform: scale(0.97);
+}
+
+/* =====================================================
    GLOBAL EDUPATH-PROSE (Rich Material & Content Rendering)
    ===================================================== */
 .edupath-prose h1 {

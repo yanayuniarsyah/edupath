@@ -293,7 +293,7 @@
                   v-show="toolsDropdownOpen" 
                   class="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-56 z-50 animate-fade-in"
                 >
-                  <div class="rounded-2xl p-2 bg-[#0c121e]/95 backdrop-blur-xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.7)] space-y-1">
+                  <div class="edupath-dropdown-menu space-y-1">
                     <button 
                       @click="scrollToSection('calculator'); toolsDropdownOpen = false" 
                       class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left hover:bg-white/10 text-white/80 hover:text-white transition-all group"
@@ -2783,7 +2783,7 @@
               <!-- Dropdown list -->
               <div 
                 v-if="showProgramSwitcherDropdown" 
-                class="absolute right-0 top-full mt-2 w-72 p-2.5 bg-[#0c121e]/98 border border-white/20 rounded-2xl shadow-2xl z-50 animate-fade-in backdrop-blur-2xl space-y-1"
+                class="absolute right-0 top-full mt-2 w-72 edupath-dropdown-menu z-50 animate-fade-in space-y-1"
               >
                 <div class="px-2 pb-1 text-[10px] font-black uppercase tracking-wider text-white/40 flex justify-between items-center">
                   <span>Pilih Program / Jenjang</span>
@@ -4323,9 +4323,8 @@
     </main>
 
     <!-- Modal: Pilihan Paket Belajar EduPath (Upgrade & Plan Selector Flow) -->
-    <div v-if="showPlanSelectorModal" class="fixed inset-0 z-[95] flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/80 backdrop-blur-md" @click="showPlanSelectorModal = false"></div>
-      <div class="relative bg-[#090f1e] border border-white/15 rounded-3xl w-full max-w-5xl p-6 sm:p-8 shadow-2xl animate-fade-in text-white max-h-[90vh] overflow-y-auto">
+    <div v-if="showPlanSelectorModal" @click.self="showPlanSelectorModal = false" class="fixed inset-0 z-[95] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-5xl p-6 sm:p-8 animate-fade-in relative my-auto max-h-[90vh] overflow-y-auto">
         <!-- Close button -->
         <button
           type="button"
@@ -4643,15 +4642,22 @@
     </div>
 
     <!-- Checkout Modal -->
-    <div v-if="checkoutModalData.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeCheckoutModal"></div>
-      <div class="relative bg-slate-900 border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-fade-in text-white">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-black font-heading">Invoice Pembelian</h2>
+    <div v-if="checkoutModalData.isOpen" @click.self="closeCheckoutModal" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-md animate-fade-in">
+        <div class="edupath-modal-header">
+          <div class="flex items-center gap-3">
+            <div class="edupath-modal-badge">
+              <i class="ph-bold ph-receipt"></i>
+            </div>
+            <div>
+              <h3 class="text-base sm:text-lg font-black text-white">Invoice Pembelian</h3>
+              <p class="text-[11px] text-white/50">Konfirmasi detail transaksi &amp; paket belajar</p>
+            </div>
+          </div>
           <button
             type="button"
             @click.stop="closeCheckoutModal"
-            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
             title="Tutup"
             aria-label="Tutup"
           >
@@ -4659,13 +4665,13 @@
           </button>
         </div>
         
-        <div class="space-y-4">
-          <div class="p-4 rounded-xl bg-white/5 border border-white/10">
-            <div class="text-xs text-white/50 font-bold uppercase tracking-wider mb-1">Paket yang dipilih</div>
+        <div class="edupath-modal-body space-y-4">
+          <div class="p-4 rounded-2xl bg-white/[0.04] border border-white/10">
+            <div class="text-[10px] text-white/50 font-black uppercase tracking-wider mb-1">Paket yang dipilih</div>
             <div class="text-lg font-black text-[#c0ff00]">Paket {{ checkoutModalData.planName }}</div>
           </div>
           
-          <div class="space-y-2 text-sm font-medium pt-2">
+          <div class="space-y-2 text-xs sm:text-sm font-medium pt-1">
             <div class="flex justify-between text-white/70">
               <span>Harga Dasar</span>
               <span>Rp {{ checkoutModalData.amount.toLocaleString('id-ID') }}</span>
@@ -4682,14 +4688,14 @@
           </div>
           
           <!-- Mandatory Terms Checkbox -->
-          <div class="pt-4 border-t border-white/10">
+          <div class="pt-3 border-t border-white/10">
             <label class="flex items-start gap-2.5 text-xs text-white/80 cursor-pointer select-none">
               <input 
                 type="checkbox" 
                 v-model="checkoutTermsAgreed" 
                 class="rounded border-white/20 bg-white/10 text-[#c0ff00] focus:ring-[#c0ff00] w-4 h-4 mt-0.5 cursor-pointer shrink-0"
               />
-              <span>
+              <span class="text-[11px] leading-relaxed">
                 Saya telah membaca dan menyetujui 
                 <button type="button" @click.stop="showTermsModal = true" class="text-[#c0ff00] font-bold underline hover:text-white">Syarat &amp; Ketentuan</button> 
                 serta Kebijakan Privasi EduPath.
@@ -4697,19 +4703,19 @@
             </label>
           </div>
 
-          <div class="pt-3">
+          <div class="pt-2">
             <button 
               id="btn-midtrans"
               :disabled="!checkoutTermsAgreed"
               :class="[
-                'w-full py-3.5 rounded-xl text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer',
+                'w-full py-3.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer',
                 checkoutTermsAgreed
-                  ? 'bg-[#c0ff00] text-black hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.35)]'
+                  ? 'bg-[#c0ff00] hover:bg-[#b0ef00] text-black hover:scale-[1.02] active:scale-98 shadow-md shadow-[#c0ff00]/25'
                   : 'bg-white/10 text-white/40 cursor-not-allowed opacity-60'
               ]"
               @click="confirmCheckout"
             >
-              <i class="ph-bold ph-credit-card"></i>
+              <i class="ph-bold ph-credit-card text-base"></i>
               Lanjutkan ke Midtrans
             </button>
           </div>
@@ -4719,7 +4725,7 @@
 
     <!-- Interactive Login & Registration Modal -->
     <div v-if="showLoginModal" @click.self="showLoginModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
-      <div :class="['glass-card w-full rounded-3xl relative border-primary/30 shadow-2xl flex flex-col my-auto max-h-[92vh] overflow-hidden', isLoginMode ? 'max-w-sm p-6 sm:p-7' : 'max-w-lg p-5 sm:p-7']">
+      <div :class="['edupath-modal-card relative flex flex-col my-auto max-h-[92vh] overflow-hidden', isLoginMode ? 'max-w-sm p-6 sm:p-7' : 'max-w-lg p-5 sm:p-7']">
         <!-- Close button (Always pinned top-right) -->
         <button
           type="button"
@@ -4957,22 +4963,22 @@
     </div>
 
     <!-- Modal: Syarat & Ketentuan (Terms & Conditions) -->
-    <div v-if="showTermsModal" @click.self="showTermsModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in cursor-default">
-      <div class="relative w-full max-w-3xl max-h-[88vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
-        <div class="flex items-center justify-between border-b border-white/10 pb-4 sticky top-0 bg-[#0c121e]/95 backdrop-blur-md z-10 -mt-2 pt-2">
+    <div v-if="showTermsModal" @click.self="showTermsModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-3xl animate-fade-in text-left">
+        <div class="edupath-modal-header">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center text-xl font-black">
+            <div class="edupath-modal-badge">
               <i class="ph-bold ph-scales"></i>
             </div>
             <div>
-              <h3 class="text-xl font-black text-white">Syarat dan Ketentuan (Terms &amp; Conditions)</h3>
-              <p class="text-xs text-white/50">EduPath Platform Pembelajaran Digital • Terakhir diperbarui: 1 Oktober 2026</p>
+              <h3 class="text-base sm:text-lg font-black text-white">Syarat dan Ketentuan (Terms &amp; Conditions)</h3>
+              <p class="text-[11px] text-white/50">EduPath Platform Pembelajaran Digital • Terakhir diperbarui: 1 Oktober 2026</p>
             </div>
           </div>
           <button
             type="button"
             @click.stop="showTermsModal = false"
-            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
             title="Tutup"
             aria-label="Tutup"
           >
@@ -4980,7 +4986,7 @@
           </button>
         </div>
 
-        <div class="space-y-4 text-xs md:text-sm text-white/75 leading-relaxed">
+        <div class="edupath-modal-body space-y-4 text-xs md:text-sm text-white/75 leading-relaxed">
           <div class="p-4 rounded-2xl bg-white/[0.03] border-l-4 border-[#c0ff00] space-y-1">
             <p class="text-white font-bold">Selamat datang di EduPath.</p>
             <p>Syarat dan Ketentuan ini mengatur penggunaan situs, akun, fitur pembelajaran, paket belajar, tryout, materi digital, dan layanan lain yang disediakan oleh EduPath. Dengan membuat akun, melakukan pembelian, atau menggunakan layanan EduPath, Anda menyatakan telah membaca, memahami, dan menyetujui ketentuan ini.</p>
@@ -5085,12 +5091,12 @@
           </div>
         </div>
 
-        <div class="pt-4 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <a href="terms.html" target="_blank" class="text-xs text-[#c0ff00] hover:underline flex items-center gap-1 font-bold">
+        <div class="edupath-modal-footer flex-col sm:flex-row justify-between items-center gap-3">
+          <a href="terms.html" target="_blank" class="text-xs text-[#c0ff00] hover:underline flex items-center gap-1.5 font-bold">
             <i class="ph-bold ph-arrow-square-out text-sm"></i>
             <span>Buka Versi Halaman Penuh (Cetak Dokumen)</span>
           </a>
-          <button @click="showTermsModal = false" class="px-6 py-2.5 rounded-full bg-[#c0ff00] text-black font-black text-xs hover:scale-105 active:scale-95 transition-all">
+          <button @click="showTermsModal = false" class="edupath-btn-primary">
             Saya Mengerti
           </button>
         </div>
@@ -5098,22 +5104,22 @@
     </div>
 
     <!-- Modal: Kebijakan Privasi (Privacy Policy) -->
-    <div v-if="showPrivacyModal" @click.self="showPrivacyModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default">
-      <div class="relative w-full max-w-2xl max-h-[85vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
-        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+    <div v-if="showPrivacyModal" @click.self="showPrivacyModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-2xl animate-fade-in text-left">
+        <div class="edupath-modal-header">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center text-xl font-black">
+            <div class="edupath-modal-badge">
               <i class="ph-bold ph-shield-check"></i>
             </div>
             <div>
-              <h3 class="text-xl font-black text-white">Kebijakan Privasi &amp; Perlindungan Data</h3>
-              <p class="text-xs text-white/50">Komitmen keamanan data siswa, orang tua, dan sekolah di EduPath</p>
+              <h3 class="text-base sm:text-lg font-black text-white">Kebijakan Privasi &amp; Perlindungan Data</h3>
+              <p class="text-[11px] text-white/50">Komitmen keamanan data siswa, orang tua, dan sekolah di EduPath</p>
             </div>
           </div>
           <button
             type="button"
             @click.stop="showPrivacyModal = false"
-            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
             title="Tutup"
             aria-label="Tutup"
           >
@@ -5121,7 +5127,7 @@
           </button>
         </div>
 
-        <div class="space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
+        <div class="edupath-modal-body space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
           <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
             <h4 class="text-white font-black text-sm flex items-center gap-2">
               <span class="text-[#c0ff00]">1.</span> Data yang Kami Kumpulkan
@@ -5151,8 +5157,8 @@
           </div>
         </div>
 
-        <div class="pt-4 border-t border-white/10 flex justify-end">
-          <button @click="showPrivacyModal = false" class="px-6 py-2.5 rounded-full bg-[#c0ff00] text-black font-black text-xs hover:scale-105 active:scale-95 transition-all">
+        <div class="edupath-modal-footer">
+          <button @click="showPrivacyModal = false" class="edupath-btn-primary">
             Saya Mengerti
           </button>
         </div>
@@ -5160,22 +5166,22 @@
     </div>
 
     <!-- Modal: Disclaimer & Metodologi Latihan -->
-    <div v-if="showDisclaimerModal" @click.self="showDisclaimerModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default">
-      <div class="relative w-full max-w-2xl max-h-[85vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
-        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+    <div v-if="showDisclaimerModal" @click.self="showDisclaimerModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-2xl animate-fade-in text-left">
+        <div class="edupath-modal-header">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-amber-400/15 text-amber-300 flex items-center justify-center text-xl font-black">
+            <div class="edupath-modal-badge !bg-amber-400/15 !text-amber-300 !border-amber-400/30">
               <i class="ph-bold ph-info"></i>
             </div>
             <div>
-              <h3 class="text-xl font-black text-white">Disclaimer Edukatif &amp; Metodologi</h3>
-              <p class="text-xs text-white/50">Transparansi model latihan IRT dan estimasi kesiapan belajar</p>
+              <h3 class="text-base sm:text-lg font-black text-white">Disclaimer Edukatif &amp; Metodologi</h3>
+              <p class="text-[11px] text-white/50">Transparansi model latihan IRT dan estimasi kesiapan belajar</p>
             </div>
           </div>
           <button
             type="button"
             @click.stop="showDisclaimerModal = false"
-            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
             title="Tutup"
             aria-label="Tutup"
           >
@@ -5183,7 +5189,7 @@
           </button>
         </div>
 
-        <div class="space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
+        <div class="edupath-modal-body space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
           <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs">
             ⚠️ <strong>Catatan Penting:</strong> EduPath adalah platform latihan belajar mandiri dan pendampingan akademik adaptif yang dikembangkan dan dioperasikan oleh <strong>PT Kreasi Hasanah Indonesia</strong>. Simulasi dan skor proyeksi bukan merupakan penetapan resmi kelulusan PTN.
           </div>
@@ -5210,8 +5216,8 @@
           </div>
         </div>
 
-        <div class="pt-4 border-t border-white/10 flex justify-end">
-          <button @click="showDisclaimerModal = false" class="px-6 py-2.5 rounded-full bg-[#c0ff00] text-black font-black text-xs hover:scale-105 active:scale-95 transition-all">
+        <div class="edupath-modal-footer">
+          <button @click="showDisclaimerModal = false" class="edupath-btn-primary">
             Saya Paham &amp; Lanjutkan
           </button>
         </div>
@@ -5219,22 +5225,22 @@
     </div>
 
     <!-- Modal: Panduan Orang Tua & Parental Consent -->
-    <div v-if="showParentConsentModal" @click.self="showParentConsentModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default">
-      <div class="relative w-full max-w-2xl max-h-[85vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
-        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+    <div v-if="showParentConsentModal" @click.self="showParentConsentModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-2xl animate-fade-in text-left">
+        <div class="edupath-modal-header">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-indigo-500/15 text-indigo-300 flex items-center justify-center text-xl font-black">
+            <div class="edupath-modal-badge !bg-indigo-500/15 !text-indigo-300 !border-indigo-500/30">
               <i class="ph-bold ph-chats-circle"></i>
             </div>
             <div>
-              <h3 class="text-xl font-black text-white">Panduan &amp; Laporan Orang Tua</h3>
-              <p class="text-xs text-white/50">Membantu orang tua memantau perkembangan belajar anak tanpa rasa cemas</p>
+              <h3 class="text-base sm:text-lg font-black text-white">Panduan &amp; Laporan Orang Tua</h3>
+              <p class="text-[11px] text-white/50">Membantu orang tua memantau perkembangan belajar anak tanpa rasa cemas</p>
             </div>
           </div>
           <button
             type="button"
             @click.stop="showParentConsentModal = false"
-            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
             title="Tutup"
             aria-label="Tutup"
           >
@@ -5242,7 +5248,7 @@
           </button>
         </div>
 
-        <div class="space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
+        <div class="edupath-modal-body space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
           <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
             <h4 class="text-white font-black text-sm flex items-center gap-2 text-indigo-300">
               <i class="ph-bold ph-telegram-logo text-emerald-400 text-base"></i>
@@ -5268,8 +5274,8 @@
           </div>
         </div>
 
-        <div class="pt-4 border-t border-white/10 flex justify-end">
-          <button @click="showParentConsentModal = false" class="px-6 py-2.5 rounded-full bg-[#c0ff00] text-black font-black text-xs hover:scale-105 active:scale-95 transition-all">
+        <div class="edupath-modal-footer">
+          <button @click="showParentConsentModal = false" class="edupath-btn-primary">
             Tutup Panduan
           </button>
         </div>
@@ -5277,22 +5283,22 @@
     </div>
 
     <!-- Modal: Informasi Kontak & Legalitas Perusahaan -->
-    <div v-if="showContactModal" @click.self="showContactModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default">
-      <div class="relative w-full max-w-2xl max-h-[85vh] bg-[#0c121e] border border-white/15 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto text-left space-y-6">
-        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+    <div v-if="showContactModal" @click.self="showContactModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-2xl animate-fade-in text-left">
+        <div class="edupath-modal-header">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center text-xl font-black">
+            <div class="edupath-modal-badge">
               <i class="ph-bold ph-buildings"></i>
             </div>
             <div>
-              <h3 class="text-xl font-black text-white">Informasi Kontak &amp; Perusahaan</h3>
-              <p class="text-xs text-white/50">Layanan resmi operasional dan legalitas EduPath</p>
+              <h3 class="text-base sm:text-lg font-black text-white">Informasi Kontak &amp; Perusahaan</h3>
+              <p class="text-[11px] text-white/50">Layanan resmi operasional dan legalitas EduPath</p>
             </div>
           </div>
           <button
             type="button"
             @click.stop="showContactModal = false"
-            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
             title="Tutup"
             aria-label="Tutup"
           >
@@ -5300,7 +5306,7 @@
           </button>
         </div>
 
-        <div class="space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
+        <div class="edupath-modal-body space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
           
           <!-- Company Identity Card -->
           <div class="p-5 rounded-2xl bg-white/[0.04] border border-white/10 space-y-3">
@@ -5382,9 +5388,9 @@
 
         </div>
 
-        <div class="pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+        <div class="edupath-modal-footer items-center justify-between gap-3">
           <span class="text-[11px] text-white/40">© 2026 PT Kreasi Hasanah Indonesia</span>
-          <button @click="showContactModal = false" class="px-6 py-2.5 rounded-full bg-[#c0ff00] text-black font-black text-xs hover:scale-105 active:scale-95 transition-all">
+          <button @click="showContactModal = false" class="edupath-btn-primary">
             Tutup
           </button>
         </div>
@@ -5398,59 +5404,66 @@
     </div>
   </div>
     <!-- Affiliate Register Modal -->
-    <div v-if="showAffiliateRegisterModal" @click.self="showAffiliateRegisterModal = false" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default">
-      <div class="bg-[#121212] border border-amber-500/30 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.2)]">
-        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
-          <h3 class="text-xl font-black font-heading text-white flex items-center gap-2">
-            <i class="ph-bold ph-hand-coins text-amber-400"></i>
-            Daftar Mitra Afiliasi
-          </h3>
+    <div v-if="showAffiliateRegisterModal" @click.self="showAffiliateRegisterModal = false" class="fixed inset-0 z-[95] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-md animate-fade-in">
+        <div class="edupath-modal-header">
+          <div class="flex items-center gap-3">
+            <div class="edupath-modal-badge !bg-amber-500/15 !text-amber-400 !border-amber-500/30">
+              <i class="ph-bold ph-hand-coins"></i>
+            </div>
+            <div>
+              <h3 class="text-base sm:text-lg font-black text-white">Daftar Mitra Afiliasi</h3>
+              <p class="text-[11px] text-white/50">Dapatkan komisi hingga 25% setiap referral</p>
+            </div>
+          </div>
           <button
             type="button"
             @click.stop="showAffiliateRegisterModal = false"
-            class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
+            class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0"
             title="Tutup"
             aria-label="Tutup"
           >
             <i class="ph-bold ph-x text-sm pointer-events-none"></i>
           </button>
         </div>
-        <div class="p-6">
-          <form @submit.prevent="registerAffiliate" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-            <div class="space-y-1.5">
-              <label class="text-xs font-bold text-white/70">Nama Lengkap</label>
-              <input v-model="affiliateForm.name" type="text" placeholder="Masukkan nama" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+        <div class="edupath-modal-body">
+          <form @submit.prevent="registerAffiliate" class="space-y-3.5 max-h-[70vh] overflow-y-auto custom-scrollbar pr-1">
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold text-white/70 uppercase tracking-wider">Nama Lengkap</label>
+              <input v-model="affiliateForm.name" type="text" placeholder="Masukkan nama" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors" required>
             </div>
-            <div class="space-y-1.5">
-              <label class="text-xs font-bold text-white/70">Email Aktif</label>
-              <input v-model="affiliateForm.email" type="email" placeholder="nama@email.com" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold text-white/70 uppercase tracking-wider">Email Aktif</label>
+              <input v-model="affiliateForm.email" type="email" placeholder="nama@email.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors" required>
             </div>
-            <div class="space-y-1.5">
-              <label class="text-xs font-bold text-white/70">Nomor Telegram</label>
-              <input v-model="affiliateForm.whatsapp" type="tel" placeholder="08..." class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold text-white/70 uppercase tracking-wider">Nomor Telegram</label>
+              <input v-model="affiliateForm.whatsapp" type="tel" placeholder="08..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors" required>
             </div>
-            <div class="space-y-1.5">
-              <label class="text-xs font-bold text-white/70">Password</label>
-              <input v-model="affiliateForm.password" type="password" placeholder="Password" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required minlength="6">
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold text-white/70 uppercase tracking-wider">Password</label>
+              <input v-model="affiliateForm.password" type="password" placeholder="Password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors" required minlength="6">
             </div>
             
-            <div class="pt-4 border-t border-white/10 mt-4 space-y-4">
-              <span class="text-xs text-amber-400 uppercase font-bold tracking-wider block">Informasi Rekening Bank (Untuk Pencairan)</span>
-              <div class="space-y-1.5">
-                <input v-model="affiliateForm.bank_name" type="text" placeholder="Nama Bank (Misal: BCA, Mandiri)" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+            <div class="pt-3 border-t border-white/10 space-y-3">
+              <span class="text-[10px] text-amber-400 uppercase font-black tracking-wider block">Informasi Rekening Bank (Pencairan Komisi)</span>
+              <div class="space-y-1">
+                <input v-model="affiliateForm.bank_name" type="text" placeholder="Nama Bank (BCA, Mandiri, BRI, BNI)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors" required>
               </div>
-              <div class="space-y-1.5">
-                <input v-model="affiliateForm.bank_account" type="text" placeholder="Nomor Rekening" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+              <div class="space-y-1">
+                <input v-model="affiliateForm.bank_account" type="text" placeholder="Nomor Rekening" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors" required>
               </div>
-              <div class="space-y-1.5">
-                <input v-model="affiliateForm.bank_owner" type="text" placeholder="Nama Pemilik Rekening" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors" required>
+              <div class="space-y-1">
+                <input v-model="affiliateForm.bank_owner" type="text" placeholder="Nama Pemilik Rekening" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors" required>
               </div>
             </div>
 
-            <button type="submit" :disabled="isRegistering" class="w-full py-4 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-sm uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 mt-2 disabled:opacity-50 cursor-pointer">
-              <i v-if="!isRegistering" class="ph-bold ph-paper-plane-right"></i> 
-              {{ isRegistering ? 'Memproses...' : 'Kirim Pendaftaran' }}
-            </button>
+            <div class="pt-2">
+              <button type="submit" :disabled="isRegistering" class="edupath-btn-primary w-full py-3.5 !text-xs sm:!text-sm uppercase tracking-wider">
+                <i v-if="!isRegistering" class="ph-bold ph-paper-plane-right"></i> 
+                {{ isRegistering ? 'Memproses...' : 'Kirim Pendaftaran' }}
+              </button>
+            </div>
           </form>
         </div>
       </div>

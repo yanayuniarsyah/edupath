@@ -290,13 +290,15 @@
     </div>
 
     <!-- MODAL: Insert Table -->
-    <div v-if="showTableModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-[#0e1726] border border-white/15 rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-2xl text-white animate-fade-in">
+    <div v-if="showTableModal" @click.self="showTableModal = false" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+      <div class="edupath-modal-card w-full max-w-sm p-5 space-y-4 shadow-2xl text-white animate-fade-in relative">
         <div class="flex items-center justify-between border-b border-white/10 pb-3">
           <h4 class="font-black text-sm flex items-center gap-2 text-indigo-300">
             <i class="ph-bold ph-table"></i> Buat Tabel Baru
           </h4>
-          <button type="button" @click="showTableModal = false" class="text-white/40 hover:text-white">&times;</button>
+          <button type="button" @click.stop="showTableModal = false" class="modal-close-btn top-4 right-4 w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 flex items-center justify-center transition-all cursor-pointer">
+            <i class="ph-bold ph-x text-xs pointer-events-none"></i>
+          </button>
         </div>
 
         <div class="grid grid-cols-2 gap-3 text-xs">
@@ -323,13 +325,15 @@
     </div>
 
     <!-- MODAL: Insert / Upload Image -->
-    <div v-if="showImageModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-[#0e1726] border border-white/15 rounded-2xl w-full max-w-md p-5 space-y-4 shadow-2xl text-white animate-fade-in">
+    <div v-if="showImageModal" @click.self="showImageModal = false" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+      <div class="edupath-modal-card w-full max-w-md p-5 space-y-4 shadow-2xl text-white animate-fade-in relative">
         <div class="flex items-center justify-between border-b border-white/10 pb-3">
           <h4 class="font-black text-sm flex items-center gap-2 text-emerald-300">
             <i class="ph-bold ph-image"></i> Sisipkan Gambar Materi
           </h4>
-          <button type="button" @click="showImageModal = false" class="text-white/40 hover:text-white">&times;</button>
+          <button type="button" @click.stop="showImageModal = false" class="modal-close-btn top-4 right-4 w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 flex items-center justify-center transition-all cursor-pointer">
+            <i class="ph-bold ph-x text-xs pointer-events-none"></i>
+          </button>
         </div>
 
         <div class="space-y-3 text-xs">
@@ -393,17 +397,19 @@
     </div>
 
     <!-- MODAL: Math Formula (KaTeX) -->
-    <div v-if="showMathModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-[#0e1726] border border-white/15 rounded-2xl w-full max-w-2xl p-5 space-y-4 shadow-2xl text-white animate-fade-in max-h-[92vh] overflow-y-auto">
+    <div v-if="showMathModal" @click.self="showMathModal = false" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+      <div class="edupath-modal-card w-full max-w-2xl p-5 space-y-4 shadow-2xl text-white animate-fade-in max-h-[92vh] overflow-y-auto relative">
         <div class="flex items-center justify-between border-b border-white/10 pb-3">
           <div class="flex items-center gap-2">
             <span class="w-8 h-8 rounded-lg bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center font-serif font-black text-sm italic">∑</span>
             <div>
-              <h4 class="font-black text-sm text-white">Editor Persamaan Matematika & Sains (KaTeX)</h4>
+              <h4 class="font-black text-sm text-white">Editor Persamaan Matematika &amp; Sains (KaTeX)</h4>
               <p class="text-[10px] text-white/50">Mendukung penulisan pangkat, akar, pecahan, matriks, kalkulus, dan simbol kompleks</p>
             </div>
           </div>
-          <button type="button" @click="showMathModal = false" class="text-white/40 hover:text-white cursor-pointer text-xl leading-none">&times;</button>
+          <button type="button" @click.stop="showMathModal = false" class="modal-close-btn top-4 right-4 w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 flex items-center justify-center transition-all cursor-pointer">
+            <i class="ph-bold ph-x text-xs pointer-events-none"></i>
+          </button>
         </div>
 
         <!-- Mode Formula: Inline vs Display Block -->
@@ -490,13 +496,15 @@
     </div>
 
     <!-- MODAL: Insert Link -->
-    <div v-if="showLinkModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-[#0e1726] border border-white/15 rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-2xl text-white animate-fade-in">
+    <div v-if="showLinkModal" @click.self="showLinkModal = false" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+      <div class="edupath-modal-card w-full max-w-sm p-5 space-y-4 shadow-2xl text-white animate-fade-in relative">
         <div class="flex items-center justify-between border-b border-white/10 pb-3">
           <h4 class="font-black text-sm flex items-center gap-2 text-sky-300">
             <i class="ph-bold ph-link"></i> Sisipkan Hyperlink
           </h4>
-          <button type="button" @click="showLinkModal = false" class="text-white/40 hover:text-white">&times;</button>
+          <button type="button" @click.stop="showLinkModal = false" class="modal-close-btn top-4 right-4 w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 flex items-center justify-center transition-all cursor-pointer">
+            <i class="ph-bold ph-x text-xs pointer-events-none"></i>
+          </button>
         </div>
 
         <div class="space-y-3 text-xs">

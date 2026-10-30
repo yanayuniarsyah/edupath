@@ -839,8 +839,8 @@
     </div>
 
     <!-- ===== MODAL SERTIFIKAT RESMI TERVERIFIKASI ===== -->
-    <div v-if="showCertModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div class="relative w-full max-w-2xl bg-[#0b1329] border-2 border-emerald-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_60px_rgba(16,185,129,0.25)] text-white space-y-6 my-8">
+    <div v-if="showCertModal" @click.self="showCertModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-2xl !border-emerald-500/40 p-6 sm:p-8 !shadow-[0_0_60px_rgba(16,185,129,0.25)] text-white space-y-6 my-auto max-h-[92vh] overflow-y-auto">
         
         <!-- Modal Top Bar -->
         <div class="flex items-center justify-between border-b border-white/10 pb-4">
@@ -848,8 +848,8 @@
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
             <span class="text-xs font-black uppercase tracking-wider text-emerald-400 font-mono">Official Certificate of Assessment</span>
           </div>
-          <button @click="showCertModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
-            <i class="ph-bold ph-x text-sm"></i>
+          <button @click.stop="showCertModal = false" class="modal-close-btn top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tutup" aria-label="Tutup">
+            <i class="ph-bold ph-x text-sm pointer-events-none"></i>
           </button>
         </div>
 
