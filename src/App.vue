@@ -527,7 +527,7 @@
         <section v-if="currentTab === 'home'" id="landing-top" class="animate-fade-in pt-20 md:pt-24 pb-16 relative w-full">
           
           <!-- Hero Section -->
-          <div class="hero-bg -mt-[80px] md:-mt-[96px] min-h-[580px] sm:min-h-[640px] md:min-h-[680px] flex flex-col justify-center pt-24 sm:pt-28 md:pt-32 pb-24 sm:pb-28 relative z-0 overflow-hidden">
+          <div class="hero-bg -mt-[80px] md:-mt-[96px] min-h-[700px] sm:min-h-[640px] md:min-h-[680px] flex flex-col justify-center pt-24 sm:pt-28 md:pt-32 pb-32 sm:pb-28 relative z-0 overflow-hidden">
             <!-- Dynamic Ambient Pulsing Aura Behind Headline -->
             <div class="pointer-events-none absolute left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[680px] h-[260px] sm:h-[380px] rounded-full bg-gradient-to-tr from-[#c0ff00]/15 via-cyan-500/10 to-[#c0ff00]/10 blur-[110px] animate-pulse-slow -z-10"></div>
 
@@ -574,7 +574,7 @@
           </div>
 
           <!-- Trust Bar — Premium Ticker (UNCLIPPED, Positioned at the bottom of hero background) -->
-          <div class="w-full relative z-20 overflow-hidden py-3.5 sm:py-5 -mt-10 sm:-mt-14 mb-6 sm:mb-8">
+          <div class="w-full relative z-20 overflow-hidden py-3.5 sm:py-5 -mt-6 sm:-mt-14 mb-6 sm:mb-8">
             <div style="transform: rotate(-2deg) scale(1.05); transform-origin: center center;">
               <div class="bg-[#c0ff00] text-black py-2.5 sm:py-3 border-y border-[#c0ff00]/40 shadow-[0_4px_30px_rgba(192,255,0,0.3)]">
                 <div class="flex gap-0 animate-marquee whitespace-nowrap" style="width: max-content;">
