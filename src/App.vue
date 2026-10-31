@@ -527,12 +527,12 @@
         <section v-if="currentTab === 'home'" id="landing-top" class="animate-fade-in pt-20 md:pt-24 pb-16 relative w-full">
           
           <!-- Hero Section -->
-          <div class="hero-bg -mt-[80px] md:-mt-[96px] min-h-[440px] sm:min-h-[480px] md:min-h-[500px] flex flex-col justify-center pt-24 sm:pt-28 pb-14 sm:pb-16 relative z-0 overflow-hidden">
+          <div class="hero-bg -mt-[80px] md:-mt-[96px] min-h-[580px] sm:min-h-[640px] md:min-h-[680px] flex flex-col justify-center pt-24 sm:pt-28 md:pt-32 pb-24 sm:pb-28 relative z-0 overflow-hidden">
             <!-- Dynamic Ambient Pulsing Aura Behind Headline -->
-            <div class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[680px] h-[260px] sm:h-[380px] rounded-full bg-gradient-to-tr from-[#c0ff00]/15 via-cyan-500/10 to-[#c0ff00]/10 blur-[110px] animate-pulse-slow -z-10"></div>
+            <div class="pointer-events-none absolute left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[680px] h-[260px] sm:h-[380px] rounded-full bg-gradient-to-tr from-[#c0ff00]/15 via-cyan-500/10 to-[#c0ff00]/10 blur-[110px] animate-pulse-slow -z-10"></div>
 
-            <!-- Inner container: Center Content (Pill, 2-line Headline, Compact CTA Buttons) -->
-            <div class="w-full max-w-5xl mx-auto px-4 sm:px-8 text-center space-y-3 sm:space-y-4 relative z-10 my-auto" style="box-sizing: border-box;">
+            <!-- Inner container: Center Content (Pill, 2-line Headline, Compact CTA Buttons — shifted down) -->
+            <div class="w-full max-w-5xl mx-auto px-4 sm:px-8 text-center space-y-3 sm:space-y-4 relative z-10 my-auto translate-y-20 sm:translate-y-24 md:translate-y-28" style="box-sizing: border-box;">
 
               <!-- Live Platform Status Pill -->
               <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/15 hover:border-[#c0ff00]/40 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.3)] text-xs font-semibold text-white/90 transition-all duration-300 cursor-default select-none group/status mb-0.5">
@@ -573,8 +573,8 @@
             <div class="pointer-events-none absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-[#050505] via-[#050505]/70 to-transparent z-[5]"></div>
           </div>
 
-          <!-- Trust Bar — Premium Ticker (UNCLIPPED, Positioned over bottom edge of hero) -->
-          <div class="w-full relative z-20 overflow-hidden py-3 sm:py-4 -mt-6 sm:-mt-8 mb-5 sm:mb-7">
+          <!-- Trust Bar — Premium Ticker (UNCLIPPED, Positioned at the bottom of hero background) -->
+          <div class="w-full relative z-20 overflow-hidden py-3.5 sm:py-5 -mt-10 sm:-mt-14 mb-6 sm:mb-8">
             <div style="transform: rotate(-2deg) scale(1.05); transform-origin: center center;">
               <div class="bg-[#c0ff00] text-black py-2.5 sm:py-3 border-y border-[#c0ff00]/40 shadow-[0_4px_30px_rgba(192,255,0,0.3)]">
                 <div class="flex gap-0 animate-marquee whitespace-nowrap" style="width: max-content;">
@@ -7024,10 +7024,10 @@ export default {
 
     const rotatingWords = [
       'Jalur Belajar Adaptif AI.',
-      'Lolos Sekolah Favorit.',
-      'Tembus SNBP & PTN Top.',
-      'AI Adaptif & Tutor Ahli.',
-      'Bimbel Tatap Muka & Online.'
+      'Persiapan Terarah Menuju Impian.',
+      'Strategi Belajar Lebih Terukur.',
+      'AI Adaptif & Pendampingan Ahli.',
+      'Pemetaan Potensi Berbasis IRT.'
     ];
     const currentWordIdx = ref(0);
 
