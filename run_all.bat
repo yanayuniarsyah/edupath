@@ -28,7 +28,7 @@ if %errorlevel% neq 0 (
 netstat -ano | findstr :8000 > nul
 if %errorlevel% neq 0 (
   echo [2/3] Menjalankan PHP Backend Server (port 8000)...
-  start "EduPath Backend (PHP 8000)" cmd /k "cd /d "%~dp0" && php -S localhost:8000"
+  start "EduPath Backend (PHP 8000)" cmd /k "cd /d "%~dp0" && php -S localhost:8000 router.php"
   ping -n 2 127.0.0.1 > nul
 ) else (
   echo [2/3] PHP Backend di port 8000 sudah aktif.

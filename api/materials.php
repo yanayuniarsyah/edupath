@@ -223,7 +223,14 @@ if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode($materials);
+        $output = json_encode($materials);
+        $etag = '"' . md5($output) . '"';
+        header("ETag: $etag");
+        if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
+            http_response_code(304);
+            exit;
+        }
+        echo $output;
     } catch (PDOException $e) {
         // If column formula_praktis or other new column is missing, attempt auto-repair and retry once
         if (strpos($e->getMessage(), 'Unknown column') !== false || strpos($e->getMessage(), 'formula_praktis') !== false) {

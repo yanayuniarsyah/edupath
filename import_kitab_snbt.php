@@ -4,8 +4,13 @@
  * Script pengimpor materi dan bank soal dari berkas Kitab SNBT 2024 ke dalam database EduPath.
  */
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    die("Akses ditolak. Script hanya dapat dijalankan melalui CLI terminal.");
+}
+
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/api/config.php';

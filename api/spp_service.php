@@ -56,8 +56,11 @@ class SPPService {
     public function submitAttempt($student_id, $attempt_id, $responses, $duration_seconds) {
         $this->pdo->beginTransaction();
         try {
-            // Lock attempt
-            $stmt = $this->pdo->prepare("SELECT * FROM spp_attempts WHERE id = ? AND student_id = ? FOR UPDATE");
+            // Lock attempt (pessimistic lock on MySQL, omitted on SQLite)
+            $driver = '';
+            try { $driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME); } catch (\Throwable $t) {}
+            $forUpdate = ($driver === 'sqlite') ? '' : ' FOR UPDATE';
+            $stmt = $this->pdo->prepare("SELECT * FROM spp_attempts WHERE id = ? AND student_id = ?" . $forUpdate);
             $stmt->execute([$attempt_id, $student_id]);
             $attempt = $stmt->fetch(PDO::FETCH_ASSOC);
 

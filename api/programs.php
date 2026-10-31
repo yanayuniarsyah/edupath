@@ -83,10 +83,17 @@ try {
         }
     }
 
-    echo json_encode([
+    $output = json_encode([
         "success" => true,
         "data" => $programs
     ]);
+    $etag = '"' . md5($output) . '"';
+    header("ETag: $etag");
+    if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
+        http_response_code(304);
+        exit;
+    }
+    echo $output;
 
 } catch (PDOException $e) {
     http_response_code(500);

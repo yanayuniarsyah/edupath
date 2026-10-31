@@ -8,7 +8,14 @@ require_once 'DatabaseBackupService.php';
 function ensure_admin_schema($pdo) {
     static $done = false;
     if ($done) return;
+
+    $lockFile = sys_get_temp_dir() . '/edupath_admin_schema_' . md5(__DIR__) . '.lock';
+    if (!isset($_GET['sync_schema']) && file_exists($lockFile) && (time() - @filemtime($lockFile) < 86400)) {
+        $done = true;
+        return;
+    }
     $done = true;
+    @touch($lockFile);
 
     // 1. Table materials
     try {

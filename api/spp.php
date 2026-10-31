@@ -46,7 +46,15 @@ if (($action === 'data' || $action === 'questions') && $_SERVER['REQUEST_METHOD'
             $data["diagnostic_questions"] = $questions;
         }
 
-        echo json_encode($data);
+        $output = json_encode($data);
+        $etag = '"' . md5($output) . '"';
+        header('Cache-Control: public, max-age=300');
+        header("ETag: $etag");
+        if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
+            http_response_code(304);
+            exit;
+        }
+        echo $output;
     } catch (PDOException $e) {
         http_response_code(503);
         echo json_encode(["error" => "Data adaptive learning belum tersedia."]);

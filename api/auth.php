@@ -7,6 +7,46 @@ require_once 'rate_limit.php';
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true);
 
+function ensure_auth_schema_sync($pdo) {
+    static $done = false;
+    if ($done) return;
+    $lockFile = sys_get_temp_dir() . '/edupath_auth_schema_' . md5(__DIR__) . '.lock';
+    if (!isset($_GET['sync_schema']) && file_exists($lockFile) && (time() - @filemtime($lockFile) < 86400)) {
+        $done = true;
+        return;
+    }
+    $done = true;
+    @touch($lockFile);
+
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS schools (
+                id VARCHAR(36) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                slug VARCHAR(255) NOT NULL UNIQUE,
+                npsn VARCHAR(20) NULL,
+                city VARCHAR(100) NULL,
+                province VARCHAR(100) NULL,
+                bk_name VARCHAR(150) NOT NULL,
+                bk_phone VARCHAR(50) NOT NULL,
+                bk_email VARCHAR(150) NOT NULL,
+                estimated_students INT DEFAULT 200,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_school_name (name),
+                INDEX idx_school_slug (slug)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
+        try { $pdo->exec("ALTER TABLE schools CONVERT TO CHARACTER SET utf8mb4"); } catch (\Throwable $e) {}
+    } catch (\Throwable $e) {}
+
+    try {
+        $affCols = $pdo->query("DESCRIBE affiliates")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('name', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN name VARCHAR(150) NULL");
+        if (!in_array('email', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN email VARCHAR(150) NULL");
+    } catch (\Throwable $e) {}
+}
+
 if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!check_rate_limit($pdo, 'register', 5, 30)) {
         http_response_code(429);
@@ -184,7 +224,7 @@ if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 } 
 elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!check_rate_limit($pdo, 'login', 10, 15)) {
+    if (!check_rate_limit($pdo, 'login', 30, 15)) {
         http_response_code(429);
         echo json_encode(["error" => "Terlalu banyak percobaan login. Coba lagi nanti."]);
         exit;
@@ -192,12 +232,6 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $email = safe_str($input['email'] ?? '');
     $password = is_string($input['password'] ?? null) ? $input['password'] : '';
-
-    if (!check_rate_limit($pdo, 'login', 30, 15)) {
-        http_response_code(429);
-        echo json_encode(["error" => "Terlalu banyak percobaan login. Coba lagi nanti."]);
-        exit;
-    }
 
     if (empty($email) || empty($password)) {
         http_response_code(400);
@@ -211,35 +245,8 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-    // Ensure schools table exists for join
-    try {
-        $pdo->exec("
-            CREATE TABLE IF NOT EXISTS schools (
-                id VARCHAR(36) PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                slug VARCHAR(255) NOT NULL UNIQUE,
-                npsn VARCHAR(20) NULL,
-                city VARCHAR(100) NULL,
-                province VARCHAR(100) NULL,
-                bk_name VARCHAR(150) NOT NULL,
-                bk_phone VARCHAR(50) NOT NULL,
-                bk_email VARCHAR(150) NOT NULL,
-                estimated_students INT DEFAULT 200,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX idx_school_name (name),
-                INDEX idx_school_slug (slug)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-        ");
-        try { $pdo->exec("ALTER TABLE schools CONVERT TO CHARACTER SET utf8mb4"); } catch (\Throwable $e) {}
-    } catch (\Throwable $e) {}
-
-    // Ensure affiliates columns exist for backward-compatibility
-    try {
-        $affCols = $pdo->query("DESCRIBE affiliates")->fetchAll(PDO::FETCH_COLUMN);
-        if (!in_array('name', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN name VARCHAR(150) NULL");
-        if (!in_array('email', $affCols)) $pdo->exec("ALTER TABLE affiliates ADD COLUMN email VARCHAR(150) NULL");
-    } catch (\Throwable $e) {}
+        // Ensure schema sync with 24-hour file lock cache
+        ensure_auth_schema_sync($pdo);
 
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.identity_key, u.display_name as user_display_name, u.password as user_password, 

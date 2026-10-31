@@ -2,6 +2,11 @@
 // api/tests/test_admin_and_login_boundary.php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../jwt.php';
+require_once __DIR__ . '/../rate_limit.php';
+
+// Reset rate limits for test IP to ensure independent test isolation
+reset_rate_limit($pdo, 'login', '127.0.0.1');
+reset_rate_limit($pdo, 'login', '::1');
 
 function run_test($name, $closure) {
     echo "=== TEST: $name ===\n";
@@ -188,18 +193,21 @@ $allPassed = run_test("4. Front Login Ditolak untuk Akun Superadmin (HTTP 403)",
 
 // ── TEST 5: Front Login Diizinkan untuk Akun Sekolah Mitra (school_bk) ──
 $allPassed = run_test("5. Front Login DIIZINKAN untuk Sekolah Mitra (school_bk -> HTTP 200)", function() use ($pdo) {
-    // Cek akun sekolah
-    $stmt = $pdo->query("SELECT bk_email FROM schools WHERE bk_email IS NOT NULL AND bk_email != '' LIMIT 1");
-    $schEmail = $stmt->fetchColumn();
-    if (!$schEmail) {
-        // Buat sekolah test jika belum ada
-        $schId = 'sch-test-' . time();
-        $schEmail = 'bk.test.' . time() . '@sekolah.id';
-        $passHash = password_hash('EduPathSchool01!2026', PASSWORD_BCRYPT);
-        $pdo->exec("INSERT INTO schools (id, name, slug, bk_email, bk_name, is_active) VALUES ('$schId', 'SMAN Test 99', 'sman-test-99', '$schEmail', 'Guru BK Test', 1)");
+    // Gunakan akun sekolah test dengan password terverifikasi
+    $schEmail = 'bk.test.admin@sekolah.id';
+    $passHash = password_hash('EduPathSchool01!2026', PASSWORD_BCRYPT);
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE identity_key = ?");
+    $stmt->execute([$schEmail]);
+    $uId = $stmt->fetchColumn();
+    if (!$uId) {
+        $schId = 'sch-test-boundary';
         $uId = 'u-' . $schId;
-        $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$uId', '$schEmail', '$passHash', 1)");
-        $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('ur-$schId', '$uId', 'default_tenant', 'school_bk', '$schId')");
+        $pdo->exec("INSERT INTO schools (id, name, slug, bk_email, bk_name, is_active) VALUES ('$schId', 'SMAN Test 99', 'sman-test-99', '$schEmail', 'Guru BK Test', 1) ON DUPLICATE KEY UPDATE bk_name='Guru BK Test'");
+        $pdo->exec("INSERT INTO users (id, identity_key, password, is_active) VALUES ('$uId', '$schEmail', '$passHash', 1) ON DUPLICATE KEY UPDATE password='$passHash'");
+        $pdo->exec("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES ('ur-$schId', '$uId', 'default_tenant', 'school_bk', '$schId') ON DUPLICATE KEY UPDATE role='school_bk'");
+    } else {
+        $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([$passHash, $uId]);
+        $pdo->prepare("UPDATE schools SET bk_email = ? WHERE id = (SELECT reference_id FROM user_roles WHERE user_id = ? LIMIT 1)")->execute([$schEmail, $uId]);
     }
 
     $ch = curl_init("http://localhost:8000/api/auth.php?action=login");
@@ -230,8 +238,7 @@ $allPassed = run_test("5. Front Login DIIZINKAN untuk Sekolah Mitra (school_bk -
 
 // ── TEST 6: Portal Admin (/admin) Ditolak untuk Non-Admin (school_bk / student) ──
 $allPassed = run_test("6. Portal Admin (/admin) DITOLAK untuk Non-Admin (HTTP 403)", function() use ($pdo) {
-    $stmt = $pdo->query("SELECT bk_email FROM schools WHERE bk_email IS NOT NULL LIMIT 1");
-    $schEmail = $stmt->fetchColumn();
+    $schEmail = 'bk.test.admin@sekolah.id';
 
     $ch = curl_init("http://localhost:8000/api/admin.php?action=login");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
