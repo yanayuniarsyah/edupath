@@ -5030,6 +5030,7 @@ const navItems = computed(() => {
     { id: 'overview',        label: 'Dashboard',             icon: 'ph-squares-four',      roles: ['superadmin', 'admin', 'teacher'] },
     ...(isT ? [{ id: 'teacher_hub', label: 'Siswa & Jadwal Saya', icon: 'ph-chalkboard-teacher', roles: ['teacher'] }] : []),
     { id: 'offline_classes', label: 'Kelas & Jadwal Offline', icon: 'ph-chalkboard-teacher', roles: ['superadmin', 'admin'] },
+    { id: 'offline_sop', label: 'SOP Bimbel Offline', icon: 'ph-buildings', roles: ['superadmin', 'admin', 'teacher'] },
     { id: 'branches',    label: 'Cabang',                icon: 'ph-buildings',     roles: ['superadmin'] },
     { id: 'schools',     label: 'Sekolah Mitra',         icon: 'ph-graduation-cap', roles: ['superadmin', 'admin'] },
     { id: 'questions',   label: isT ? 'Bank Soal Saya' : 'Soal', icon: 'ph-books', roles: ['superadmin', 'admin', 'teacher'] },

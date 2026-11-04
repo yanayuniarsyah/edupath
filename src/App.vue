@@ -7020,6 +7020,10 @@ export default {
     const premiumTabs = ['simulator', 'studyroom', 'learning', 'diagnostic'];
 
     const handleTabClick = (tabId) => {
+      if (tabId === 'offline_sop') {
+        showOfflineRoleModal.value = true;
+        return;
+      }
       const adminTarget = adminTabs.find(t => t.id === tabId);
       if (adminTarget) {
         if (adminTarget.isPreview) {
