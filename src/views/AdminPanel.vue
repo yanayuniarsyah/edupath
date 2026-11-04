@@ -4688,7 +4688,14 @@
       </div>
     </transition>
   </div>
-</template>
+
+    <!-- Modal Panduan & Tanggung Jawab Bimbel Offline Lintas Role -->
+    <OfflineRoleResponsibilitiesModal 
+      :show="showOfflineRoleModal" 
+      :initial-role="currentRole" 
+      @close="showOfflineRoleModal = false" 
+    />
+  </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
@@ -4696,6 +4703,9 @@ import { useRouter } from 'vue-router'
 import api from '../api';
 import { SNBT_TAXONOMY, TKA_TAXONOMY } from '../EduData.js';
 import MaterialRichEditor from '../components/MaterialRichEditor.vue';
+import OfflineRoleResponsibilitiesModal from '../components/OfflineRoleResponsibilitiesModal.vue';
+
+const showOfflineRoleModal = ref(false);
 
 const router = useRouter()
 

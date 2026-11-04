@@ -3843,8 +3843,8 @@
           <div class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-white/10 shadow-2xl bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-slate-950 space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
               <div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-[#c0ff00] block">Simulasi Ujian Resmi CBT EduPath</span>
-                <h3 class="text-base sm:text-lg font-black text-white">Pilih Program Simulasi Ujian CBT</h3>
+                <span class="text-[10px] font-black uppercase tracking-widest text-[#c0ff00] block">Simulasi Try Out Resmi CBT EduPath</span>
+                <h3 class="text-base sm:text-lg font-black text-white">Pilih Program Simulasi Try Out CBT</h3>
               </div>
               <span class="text-xs text-white/50 font-medium">Sistem CBT resmi dengan timer ketat &amp; analitik IRT</span>
             </div>
@@ -5519,7 +5519,14 @@
         </div>
       </div>
     </div>
-</template>
+
+    <!-- Modal Panduan & Tanggung Jawab Bimbel Offline Lintas Role -->
+    <OfflineRoleResponsibilitiesModal 
+      :show="showOfflineRoleModal" 
+      :initial-role="currentUser?.role || 'student'" 
+      @close="showOfflineRoleModal = false" 
+    />
+  </template>
 
 <script>
 import { ref, computed, onMounted, onUnmounted, watch, defineAsyncComponent } from 'vue';
@@ -5535,6 +5542,7 @@ import api from './api';
 import { initNeuralCanvas } from './neuralCanvas';
 
 const StudentPotentialPath = defineAsyncComponent(() => import('./components/StudentPotentialPath.vue'));
+import OfflineRoleResponsibilitiesModal from './components/OfflineRoleResponsibilitiesModal.vue';
 
 export default {
   name: 'App',
@@ -5542,6 +5550,7 @@ export default {
     StudentPotentialPath
   },
   setup() {
+    const showOfflineRoleModal = ref(false);
     const ambientGlowRef = ref(null);
     const canvasOpacity = ref(0);
     const handleScroll = (e) => { canvasOpacity.value = e.target.scrollTop > 300 ? 0.35 : 0; };

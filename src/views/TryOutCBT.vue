@@ -323,8 +323,8 @@ export default {
       isLoading: true,
       assessmentType: 'SNBT',
       track: 'umum',
-      cbtTitle: 'Ujian CBT SNPMB',
-      cbtSubtitle: 'Seleksi Nasional Penerimaan Mahasiswa Baru',
+      cbtTitle: 'Try Out CBT SNPMB',
+      cbtSubtitle: 'Simulasi Try Out Seleksi Nasional Penerimaan Mahasiswa Baru',
       cbtBadge: 'SN',
       insufficientBankError: null,
       entitlementError: null
@@ -363,27 +363,27 @@ export default {
 
       if (this.assessmentType === 'TKA') {
         if (this.track === 'sd') {
-          this.cbtTitle = 'Ujian CBT TKA SD';
+          this.cbtTitle = 'Try Out CBT TKA SD';
           this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik Sekolah Dasar';
           this.cbtBadge = 'SD';
           this.totalDurationSec = 60 * 60;
         } else if (this.track === 'smp') {
-          this.cbtTitle = 'Ujian CBT TKA SMP';
+          this.cbtTitle = 'Try Out CBT TKA SMP';
           this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik Sekolah Menengah Pertama';
           this.cbtBadge = 'SMP';
           this.totalDurationSec = 75 * 60;
         } else if (this.track === 'saintek') {
-          this.cbtTitle = 'Ujian CBT TKA SMA — SAINTEK';
+          this.cbtTitle = 'Try Out CBT TKA SMA — SAINTEK';
           this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik Bidang Sains & Teknologi';
           this.cbtBadge = 'TK';
           this.totalDurationSec = 90 * 60;
         } else if (this.track === 'soshum') {
-          this.cbtTitle = 'Ujian CBT TKA SMA — SOSHUM';
+          this.cbtTitle = 'Try Out CBT TKA SMA — SOSHUM';
           this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik Bidang Sosial & Humaniora';
           this.cbtBadge = 'TK';
           this.totalDurationSec = 90 * 60;
         } else {
-          this.cbtTitle = 'Ujian CBT TKA SMA';
+          this.cbtTitle = 'Try Out CBT TKA SMA';
           this.cbtSubtitle = 'Simulasi Ujian Kemampuan Akademik SMA';
           this.cbtBadge = 'TK';
           this.totalDurationSec = 90 * 60;
