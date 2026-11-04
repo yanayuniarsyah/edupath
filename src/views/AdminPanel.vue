@@ -337,7 +337,7 @@
                     <th class="text-center px-3 py-3 font-black uppercase tracking-wider">Staff</th>
                     <th class="text-center px-3 py-3 font-black uppercase tracking-wider">Mitra</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Status</th>
-                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2"><input type="checkbox" :checked="isAllSelected(filteredBranches, 'branches')" @change="toggleSelectAll(filteredBranches, 'branches')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /> Aksi</span></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2 justify-end"><span>All</span> <input type="checkbox" :checked="isAllSelected(filteredBranches, 'branches')" @change="toggleSelectAll(filteredBranches, 'branches')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /></span></th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -376,10 +376,10 @@
                       </button>
                     </td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap" @click.stop>
-                      <input type="checkbox" :value="b.id" v-model="selectedIds" :disabled="!canSelectRow(b, 'branches')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed mr-1" />
                       <button @click="openEditBranchModal(b)" class="px-2.5 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Cabang"><i class="ph-bold ph-pencil-simple"></i></button>
                       <button v-if="b.id !== 'default_tenant' && b.id !== 'tenant-hq'" @click="deleteBranch(b.id)" class="px-2.5 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Hapus Cabang"><i class="ph-bold ph-trash"></i></button>
                       <span v-else class="px-2.5 py-1.5 bg-white/5 border border-white/10 text-white/40 rounded-lg text-xs font-bold inline-flex items-center gap-1 cursor-not-allowed" title="Cabang Utama Pusat (Tidak dapat dihapus)"><i class="ph-bold ph-shield-check"></i> Pusat</span>
+                      <input type="checkbox" :value="b.id" v-model="selectedIds" :disabled="!canSelectRow(b, 'branches')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ml-1.5" />
                     </td>
                   </tr>
                 </tbody>
@@ -465,7 +465,7 @@
                     <th class="text-center px-3 py-3 font-black uppercase tracking-wider">Siswa Terdata</th>
                     <th class="text-center px-3 py-3 font-black uppercase tracking-wider">Paket Aktif</th>
                     <th class="text-left px-3 py-3 font-black uppercase tracking-wider">Status</th>
-                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2"><input type="checkbox" :checked="isAllSelected(filteredAdminSchools)" @change="toggleSelectAll(filteredAdminSchools)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /> Aksi</span></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2 justify-end"><span>All</span> <input type="checkbox" :checked="isAllSelected(filteredAdminSchools)" @change="toggleSelectAll(filteredAdminSchools)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /></span></th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -515,11 +515,11 @@
                       </button>
                     </td>
                     <td class="px-4 py-3 text-right space-x-1.5 whitespace-nowrap" @click.stop>
-                      <input type="checkbox" :value="s.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer mr-1" />
                       <a href="/#/school" target="_blank" class="px-2.5 py-1.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Buka Portal Guru BK"><i class="ph-bold ph-chalkboard-teacher"></i> Portal BK</a>
                       <button @click="openSchoolReferral(s)" class="px-2.5 py-1.5 bg-[#c0ff00]/15 border border-[#c0ff00]/30 text-[#c0ff00] hover:bg-[#c0ff00]/25 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Link Pendaftaran Khusus Sekolah"><i class="ph-bold ph-link-simple"></i> Link Siswa</button>
                       <button @click="openEditSchoolModal(s)" class="px-2.5 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Edit Data Sekolah &amp; BK"><i class="ph-bold ph-pencil-simple"></i></button>
                       <button @click="deleteSchool(s.id)" class="px-2.5 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Hapus Sekolah"><i class="ph-bold ph-trash"></i></button>
+                      <input type="checkbox" :value="s.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer ml-1.5" />
                     </td>
                   </tr>
                 </tbody>
@@ -733,7 +733,7 @@
                     <th class="px-3 py-2.5">Tutor Utama</th>
                     <th class="px-3 py-2.5">Kapasitas</th>
                     <th class="px-3 py-2.5">Status</th>
-                    <th class="px-4 py-2.5 text-right"><span class="inline-flex items-center gap-2"><input type="checkbox" :checked="isAllSelected(offlineClasses)" @change="toggleSelectAll(offlineClasses)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /> Aksi</span></th>
+                    <th class="px-4 py-2.5 text-right"><span class="inline-flex items-center gap-2 justify-end"><span>All</span> <input type="checkbox" :checked="isAllSelected(offlineClasses)" @change="toggleSelectAll(offlineClasses)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /></span></th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -767,7 +767,6 @@
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right" @click.stop>
-                      <input type="checkbox" :value="cls.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer mr-1.5" />
                       <div class="inline-flex items-center gap-1.5">
                         <button 
                           @click="openManageStudentsModal(cls)" 
@@ -800,6 +799,7 @@
                           <i class="ph-bold ph-trash text-xs"></i>
                         </button>
                       </div>
+                      <input type="checkbox" :value="cls.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer ml-1.5" />
                     </td>
                   </tr>
                 </tbody>
@@ -843,7 +843,7 @@
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Nominal</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Status</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Tanggal</th>
-                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2"><input type="checkbox" :checked="isAllSelected(pagedOrders, 'orders')" @change="toggleSelectAll(pagedOrders, 'orders')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /> Aksi</span></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2 justify-end"><span>All</span> <input type="checkbox" :checked="isAllSelected(pagedOrders, 'orders')" @change="toggleSelectAll(pagedOrders, 'orders')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /></span></th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -863,9 +863,9 @@
                     </td>
                     <td class="px-4 py-3 text-white/50 text-xs">{{ o.created_at ? new Date(o.created_at).toLocaleString('id-ID') : '-' }}</td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap" @click.stop>
-                      <input type="checkbox" :value="o.order_id || o.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer mr-1" />
                       <button @click="openEditOrderStatusModal(o)" title="Ubah Status" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all"><i class="ph-bold ph-pencil-simple"></i></button>
                       <button @click="deleteOrder(o.order_id || o.id)" title="Hapus Transaksi" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all"><i class="ph-bold ph-trash"></i></button>
+                      <input type="checkbox" :value="o.order_id || o.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer ml-1.5" />
                     </td>
                   </tr>
                 </tbody>
@@ -930,7 +930,7 @@
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Asal Sekolah &amp; Target PTN</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('plan')">Paket <i v-if="sortKey === 'plan'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2"><input type="checkbox" :checked="isAllSelected(pagedStudents)" @change="toggleSelectAll(pagedStudents)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /> Aksi</span></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2 justify-end"><span>All</span> <input type="checkbox" :checked="isAllSelected(pagedStudents)" @change="toggleSelectAll(pagedStudents)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /></span></th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -973,9 +973,9 @@
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap" @click.stop>
-                      <input type="checkbox" :value="s.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer mr-1" />
                       <button @click="openEditStudentModal(s)" title="Edit Siswa" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
                       <button @click="deleteStudent(s.id)" title="Hapus Siswa" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm"><i class="ph-bold ph-trash"></i></button>
+                      <input type="checkbox" :value="s.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer ml-1.5" />
                     </td>
                   </tr>
                 </tbody>
@@ -1138,7 +1138,7 @@
                     <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('skill')">Skill / Kompetensi <i v-if="sortKey === 'skill'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('question_type')">Tipe & Level <i v-if="sortKey === 'question_type'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-3 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_qc_passed')">Status QC <i v-if="sortKey === 'is_qc_passed'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2"><input type="checkbox" :checked="isAllSelected(pagedQuestions, 'questions')" @change="toggleSelectAll(pagedQuestions, 'questions')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /> Aksi</span></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2 justify-end"><span>All</span> <input type="checkbox" :checked="isAllSelected(pagedQuestions, 'questions')" @change="toggleSelectAll(pagedQuestions, 'questions')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /></span></th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -1193,12 +1193,12 @@
                       <span v-else class="px-2.5 py-0.5 text-[11px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-md">Belum QC</span>
                     </td>
                     <td class="px-4 py-3 text-right space-x-1.5 whitespace-nowrap" @click.stop>
-                      <input type="checkbox" :value="q.id" v-model="selectedIds" :disabled="!canSelectRow(q, 'questions')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed mr-1" />
                       <template v-if="canManageQuestion(q)">
                         <button @click="openQuestionModal(q)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-all shadow-sm" title="Edit Soal"><i class="ph-bold ph-pencil-simple"></i></button>
                         <button @click="deleteQuestion(q.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-all shadow-sm" title="Hapus Soal"><i class="ph-bold ph-trash"></i></button>
                       </template>
                       <span v-else class="text-xs text-white/40 italic px-2.5 py-1 bg-white/5 rounded-lg border border-white/10">Hanya Pemilik</span>
+                      <input type="checkbox" :value="q.id" v-model="selectedIds" :disabled="!canSelectRow(q, 'questions')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ml-1.5" />
                     </td>
                   </tr>
                 </tbody>
@@ -1362,7 +1362,7 @@
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('sub_materi')">Program & Subtes <i v-if="sortKey === 'sub_materi'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('teacher_name')">Guru / PJ <i v-if="sortKey === 'teacher_name'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('is_active')">Status <i v-if="sortKey === 'is_active'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
-                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2"><input type="checkbox" :checked="isAllSelected(pagedMaterials, 'materials')" @change="toggleSelectAll(pagedMaterials, 'materials')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /> Aksi</span></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2 justify-end"><span>All</span> <input type="checkbox" :checked="isAllSelected(pagedMaterials, 'materials')" @change="toggleSelectAll(pagedMaterials, 'materials')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /></span></th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -1390,13 +1390,13 @@
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap" @click.stop>
-                      <input type="checkbox" :value="m.id" v-model="selectedIds" :disabled="!canSelectRow(m, 'materials')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed mr-1" />
                       <a v-if="m.file_url" :href="m.file_url" target="_blank" class="px-3 py-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Buka File Materi"><i class="ph-bold ph-file-arrow-down"></i> File</a>
                       <template v-if="canManageMaterial(m)">
                         <button @click="openMaterialModal(m)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Materi"><i class="ph-bold ph-pencil-simple"></i></button>
                         <button @click="deleteMaterial(m.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Materi"><i class="ph-bold ph-trash"></i></button>
                       </template>
                       <span v-else class="text-xs text-white/40 italic px-2 py-1 bg-white/5 rounded-lg border border-white/10">Hanya Pemilik</span>
+                      <input type="checkbox" :value="m.id" v-model="selectedIds" :disabled="!canSelectRow(m, 'materials')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ml-1.5" />
                     </td>
                   </tr>
                 </tbody>
@@ -1459,7 +1459,7 @@
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('price')">Harga Resmi <i v-if="sortKey === 'price'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('duration')">Durasi <i v-if="sortKey === 'duration'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Entitlements</th>
-                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2"><input type="checkbox" :checked="isAllSelected(pagedPlans)" @change="toggleSelectAll(pagedPlans)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /> Aksi</span></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2 justify-end"><span>All</span> <input type="checkbox" :checked="isAllSelected(pagedPlans)" @change="toggleSelectAll(pagedPlans)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /></span></th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -1478,9 +1478,9 @@
                       <span class="text-xs text-indigo-300 font-medium px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20">{{ Array.isArray(p.features) ? p.features.length : 0 }} fitur</span>
                     </td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap" @click.stop>
-                      <input type="checkbox" :value="p.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer mr-1" />
                       <button @click="openPlanModal(p)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Edit Paket"><i class="ph-bold ph-pencil-simple"></i></button>
                       <button @click="deletePlan(p.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Hapus Paket"><i class="ph-bold ph-trash"></i></button>
+                      <input type="checkbox" :value="p.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer ml-1.5" />
                     </td>
                   </tr>
                 </tbody>
@@ -1971,7 +1971,7 @@
                     <th class="py-3 px-4 text-left font-bold">Kode Referral</th>
                     <th class="py-3 px-4 text-left font-bold">Komisi (%)</th>
                     <th class="py-3 px-4 text-left font-bold">Bank Info</th>
-                    <th class="py-3 px-4 text-right font-bold"><span class="inline-flex items-center gap-2"><input type="checkbox" :checked="isAllSelected(filteredAffiliates)" @change="toggleSelectAll(filteredAffiliates)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /> Aksi</span></th>
+                    <th class="py-3 px-4 text-right font-bold"><span class="inline-flex items-center gap-2 justify-end"><span>All</span> <input type="checkbox" :checked="isAllSelected(filteredAffiliates)" @change="toggleSelectAll(filteredAffiliates)" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /></span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1998,9 +1998,9 @@
                       {{ aff.bank_name ? `${aff.bank_name} (${aff.bank_account})` : '-' }}
                     </td>
                     <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap" @click.stop>
-                      <input type="checkbox" :value="aff.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer mr-1" />
                       <button @click="openEditAffiliateModal(aff)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Mitra"><i class="ph-bold ph-pencil-simple"></i></button>
                       <button @click="deleteAffiliate(aff.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Mitra"><i class="ph-bold ph-trash"></i></button>
+                      <input type="checkbox" :value="aff.id" v-model="selectedIds" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer ml-1.5" />
                     </td>
                   </tr>
                 </tbody>
@@ -2472,7 +2472,7 @@
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Asal Cabang</th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider cursor-pointer hover:text-white" @click="setSort('role')">Peran (Role) <i v-if="sortKey === 'role'" :class="sortOrder === 'asc' ? 'ph-caret-up' : 'ph-caret-down'"></i></th>
                     <th class="text-left px-4 py-3 font-black uppercase tracking-wider">Status</th>
-                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2"><input type="checkbox" :checked="isAllSelected(filteredStaffMembers, 'staff')" @change="toggleSelectAll(filteredStaffMembers, 'staff')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /> Aksi</span></th>
+                    <th class="text-right px-4 py-3 font-black uppercase tracking-wider"><span class="inline-flex items-center gap-2 justify-end"><span>All</span> <input type="checkbox" :checked="isAllSelected(filteredStaffMembers, 'staff')" @change="toggleSelectAll(filteredStaffMembers, 'staff')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer" title="Pilih Semua" /></span></th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -2497,9 +2497,9 @@
                       </span>
                     </td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap" @click.stop>
-                      <input type="checkbox" :value="s.id" v-model="selectedIds" :disabled="!canSelectRow(s, 'staff')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed mr-1" />
                       <button @click="openStaffModal(s)" class="px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Edit Staff"><i class="ph-bold ph-pencil-simple"></i></button>
                       <button v-if="s.username !== 'admin'" @click="deleteStaff(s.id)" class="px-3 py-1.5 bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 hover:text-white rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm" title="Hapus Staff"><i class="ph-bold ph-trash"></i></button>
+                      <input type="checkbox" :value="s.id" v-model="selectedIds" :disabled="!canSelectRow(s, 'staff')" class="rounded border-white/20 bg-black/40 text-[#c0ff00] focus:ring-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ml-1.5" />
                     </td>
                   </tr>
                 </tbody>

@@ -1093,14 +1093,46 @@ elseif ($action === 'students') {
             $ur_id = substr($ur_id,0,8).'-'.substr($ur_id,8,4).'-'.substr($ur_id,12,4).'-'.substr($ur_id,16,4).'-'.substr($user_id,20,12);
             $stmt = $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'student', ?)");
             $stmt->execute([$ur_id, $user_id, $tenant_id, $student_id]);
+            $academic_program = 'SNPMB_UTBK';
+            $target_level = 'SMA';
+            $plan_clean = strtolower($plan);
+            if (strpos($plan_clean, 'tka_sma') === 0) {
+                $academic_program = 'TKA_SMA';
+                $target_level = 'SMA';
+            } elseif (strpos($plan_clean, 'tka_smp') === 0) {
+                $academic_program = 'TKA_SMP';
+                $target_level = 'SMP';
+            } elseif (strpos($plan_clean, 'tka_sd') === 0) {
+                $academic_program = 'TKA_SD';
+                $target_level = 'SD';
+            } elseif (strpos($plan_clean, 'alumni') === 0) {
+                $academic_program = 'SNPMB Alumni';
+                $target_level = 'Alumni';
+            } elseif ($plan_clean === 'snbt_hybrid' || in_array($plan_clean, ['mandiri', 'utama', 'vip'])) {
+                $academic_program = 'SNPMB_UTBK';
+                $target_level = 'SMA';
+            }
+            try {
+                $pdo->prepare("UPDATE students SET academic_program = ?, target_level = ? WHERE id = ?")->execute([$academic_program, $target_level, $student_id]);
+            } catch (\Throwable $e) {}
 
             // Sync subscription if paid plan
             if (strtolower($plan) !== 'free') {
                 $subId = 'sub-' . md5($student_id);
                 $planNames = [
-                    'mandiri' => 'Paket Mandiri',
-                    'utama' => 'Paket Pejuang PTN (Utama)',
-                    'vip' => 'Paket Elite Mentoring (VIP)'
+                    'free' => 'Free / Trial',
+                    'mandiri' => 'Paket Mandiri SNPMB (Online)',
+                    'utama' => 'Paket Pejuang PTN (Online)',
+                    'vip' => 'Paket Elite Mentoring (Online)',
+                    'snbt_hybrid' => 'Paket SNPMB Hybrid Intensif (Offline+Online)',
+                    'tka_sma_online' => 'Paket TKA SMA Mandiri (Online)',
+                    'tka_sma_hybrid' => 'Paket TKA SMA Terpadu (Offline+Online)',
+                    'tka_smp_online' => 'Paket TKA SMP Mandiri (Online)',
+                    'tka_smp_hybrid' => 'Paket TKA SMP Terpadu (Offline+Online)',
+                    'tka_sd_online' => 'Paket TKA SD Mandiri (Online)',
+                    'tka_sd_hybrid' => 'Paket TKA SD Terpadu (Offline+Online)',
+                    'alumni_online' => 'Paket Alumni Gap Year Intensif (Online)',
+                    'alumni_hybrid' => 'Paket Alumni Supercamp Karantina (Hybrid)'
                 ];
                 $planIdMap = [
                     'mandiri' => 'plan-p1-yearly',
@@ -1189,6 +1221,30 @@ elseif ($action === 'students') {
                 $stmt->execute([$name, $email, $plan, $is_active, $school ?: null, $school_id ?: null, $target_ptn ?: null, $phone ?: null, $id]);
             }
 
+            
+            $academic_program = 'SNPMB_UTBK';
+            $target_level = 'SMA';
+            $plan_clean = strtolower($plan);
+            if (strpos($plan_clean, 'tka_sma') === 0) {
+                $academic_program = 'TKA_SMA';
+                $target_level = 'SMA';
+            } elseif (strpos($plan_clean, 'tka_smp') === 0) {
+                $academic_program = 'TKA_SMP';
+                $target_level = 'SMP';
+            } elseif (strpos($plan_clean, 'tka_sd') === 0) {
+                $academic_program = 'TKA_SD';
+                $target_level = 'SD';
+            } elseif (strpos($plan_clean, 'alumni') === 0) {
+                $academic_program = 'SNPMB Alumni';
+                $target_level = 'Alumni';
+            } elseif ($plan_clean === 'snbt_hybrid' || in_array($plan_clean, ['mandiri', 'utama', 'vip'])) {
+                $academic_program = 'SNPMB_UTBK';
+                $target_level = 'SMA';
+            }
+            try {
+                $pdo->prepare("UPDATE students SET academic_program = ?, target_level = ? WHERE id = ?")->execute([$academic_program, $target_level, $id]);
+            } catch (\Throwable $e) {}
+
             // 2. Find associated user_id from user_roles or users
             $stmtU = $pdo->prepare("SELECT user_id FROM user_roles WHERE reference_id = ? AND role = 'student' LIMIT 1");
             $stmtU->execute([$id]);
@@ -1240,9 +1296,19 @@ elseif ($action === 'students') {
             if (strtolower($plan) !== 'free') {
                 $subId = 'sub-' . md5($id);
                 $planNames = [
-                    'mandiri' => 'Paket Mandiri',
-                    'utama' => 'Paket Pejuang PTN (Utama)',
-                    'vip' => 'Paket Elite Mentoring (VIP)'
+                    'free' => 'Free / Trial',
+                    'mandiri' => 'Paket Mandiri SNPMB (Online)',
+                    'utama' => 'Paket Pejuang PTN (Online)',
+                    'vip' => 'Paket Elite Mentoring (Online)',
+                    'snbt_hybrid' => 'Paket SNPMB Hybrid Intensif (Offline+Online)',
+                    'tka_sma_online' => 'Paket TKA SMA Mandiri (Online)',
+                    'tka_sma_hybrid' => 'Paket TKA SMA Terpadu (Offline+Online)',
+                    'tka_smp_online' => 'Paket TKA SMP Mandiri (Online)',
+                    'tka_smp_hybrid' => 'Paket TKA SMP Terpadu (Offline+Online)',
+                    'tka_sd_online' => 'Paket TKA SD Mandiri (Online)',
+                    'tka_sd_hybrid' => 'Paket TKA SD Terpadu (Offline+Online)',
+                    'alumni_online' => 'Paket Alumni Gap Year Intensif (Online)',
+                    'alumni_hybrid' => 'Paket Alumni Supercamp Karantina (Hybrid)'
                 ];
                 $planIdMap = [
                     'mandiri' => 'plan-p1-yearly',
