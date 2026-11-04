@@ -426,7 +426,7 @@ input[type=range]::-moz-range-thumb:hover {
   border-radius: 1.5rem;
   padding: 2rem;
   transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-  overflow: hidden;
+  overflow-y: auto;
   position: relative;
 }
 .bento-item:hover {
@@ -455,7 +455,7 @@ input[type=range]::-moz-range-thumb:hover {
   font-weight: 600;
   transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
 }
 .btn-premium::before {
   content: '';
@@ -629,7 +629,7 @@ button[title="Tutup"] svg {
   flex-direction: column;
   margin: auto;
   max-height: 90vh;
-  overflow: hidden;
+  overflow-y: auto;
   width: 100%;
 }
 

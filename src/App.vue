@@ -20,7 +20,7 @@
       ></div>
     </transition>
 
-    <!-- Sidebar Navigation — auto-hide on desktop -->
+    <!-- Sidebar Navigation â€” auto-hide on desktop -->
     <aside
       v-if="isLoggedIn"
       class="fixed inset-y-0 left-0 h-full h-[100dvh] max-h-[100dvh] z-50 flex flex-col backdrop-blur-2xl border-r border-white/10 transition-transform duration-300 ease-out overflow-hidden text-white shadow-2xl"
@@ -204,31 +204,31 @@
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-emerald-400">
                 Pendidik / Tutor
               </span>
-              <span class="text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-emerald-400 group-hover:text-black transition-all">Portal Guru ➔</span>
+              <span class="text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-emerald-400 group-hover:text-black transition-all">Portal Guru âž”</span>
             </div>
             <div v-else-if="isAdmin" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Admin Panel">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-indigo-400">
                 {{ currentUser?.role === 'superadmin' ? 'Super Admin' : 'Administrator' }}
               </span>
-              <span class="text-[9px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-indigo-400 group-hover:text-black transition-all">Panel ➔</span>
+              <span class="text-[9px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-indigo-400 group-hover:text-black transition-all">Panel âž”</span>
             </div>
             <div v-else-if="isSchoolBk" @click="window.location.hash = '#/school'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Sekolah / Guru BK">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-amber-400">
                 Guru BK / Mitra
               </span>
-              <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Portal BK ➔</span>
+              <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Portal BK âž”</span>
             </div>
             <div v-else-if="isAffiliate" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Afiliasi">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-amber-400">
                 Mitra Afiliasi
               </span>
-              <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Portal Afiliasi ➔</span>
+              <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Portal Afiliasi âž”</span>
             </div>
             <div v-else @click="openPlanSelector" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Lihat Pilihan Paket">
               <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-[#c0ff00]">
                 Status: {{ isPremiumUser ? (currentUser?.plan_name || 'Premium') : 'Trial' }}
               </span>
-              <span v-if="!isPremiumUser" class="text-[9px] bg-[#c0ff00]/20 text-[#c0ff00] border border-[#c0ff00]/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-[#c0ff00] group-hover:text-black transition-all">Pilih Paket ⚡</span>
+              <span v-if="!isPremiumUser" class="text-[9px] bg-[#c0ff00]/20 text-[#c0ff00] border border-[#c0ff00]/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-[#c0ff00] group-hover:text-black transition-all">Pilih Paket âš¡</span>
             </div>
           </div>
         </div>
@@ -261,7 +261,7 @@
             <i class="ph-bold ph-list text-lg"></i>
           </button>
 
-          <div id="nav-logo" class="flex items-center gap-2.5 group cursor-pointer select-none flex-shrink-0" @click="goToHomeTop" title="EduPath.ai — Beranda">
+          <div id="nav-logo" class="flex items-center gap-2.5 group cursor-pointer select-none flex-shrink-0" @click="goToHomeTop" title="EduPath.ai â€” Beranda">
             <div class="relative w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base leading-none shadow-[0_0_15px_rgba(192,255,0,0.3)] group-hover:shadow-[0_0_35px_rgba(192,255,0,0.9)] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 ease-out select-none overflow-hidden">
               <!-- Animated Light Sheen Sweep across Logo Box on Hover -->
               <span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none"></span>
@@ -398,7 +398,7 @@
                 class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-white font-extrabold text-sm hover:bg-[#c0ff00]/20 transition-all text-left cursor-pointer"
               >
                 <span class="flex items-center gap-3">
-                  <span class="text-base">🎯</span>
+                  <span class="text-base">ðŸŽ¯</span>
                   <span>Tes Potensi Siswa (SPP)</span>
                 </span>
                 <span class="text-[10px] font-black bg-[#c0ff00] text-black px-2 py-0.5 rounded-full uppercase">Free</span>
@@ -408,7 +408,7 @@
                 @click="scrollToSection('calculator'); mobileSidebarOpen = false" 
                 class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
               >
-                <span class="text-base">🏛️</span>
+                <span class="text-base">ðŸ›ï¸</span>
                 <span>Kalkulator Peluang PTN AI</span>
               </button>
 
@@ -416,7 +416,7 @@
                 @click="scrollToSection('quiz-demo'); mobileSidebarOpen = false" 
                 class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
               >
-                <span class="text-base">🧪</span>
+                <span class="text-base">ðŸ§ª</span>
                 <span>Mini Kuis HOTS (IRT)</span>
               </button>
 
@@ -424,7 +424,7 @@
                 @click="scrollToSection('comparison'); mobileSidebarOpen = false" 
                 class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
               >
-                <span class="text-base">⚖️</span>
+                <span class="text-base">âš–ï¸</span>
                 <span>Komparasi EduPath vs Bimbel</span>
               </button>
 
@@ -432,7 +432,7 @@
                 @click="scrollToSection('features'); mobileSidebarOpen = false" 
                 class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
               >
-                <span class="text-base">⚡</span>
+                <span class="text-base">âš¡</span>
                 <span>Fitur Platform</span>
               </button>
 
@@ -440,7 +440,7 @@
                 @click="scrollToSection('testimonials'); mobileSidebarOpen = false" 
                 class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
               >
-                <span class="text-base">💬</span>
+                <span class="text-base">ðŸ’¬</span>
                 <span>Testimoni Pengguna</span>
               </button>
 
@@ -449,7 +449,7 @@
                 class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
               >
                 <span class="flex items-center gap-3">
-                  <span class="text-base">💎</span>
+                  <span class="text-base">ðŸ’Ž</span>
                   <span>Pilihan Paket &amp; Investasi</span>
                 </span>
                 <span class="text-[10px] font-black text-[#c0ff00] bg-[#c0ff00]/10 border border-[#c0ff00]/30 px-2 py-0.5 rounded-full">Hemat 60%</span>
@@ -460,7 +460,7 @@
                 class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 font-bold text-sm hover:bg-amber-500/20 transition-all text-left cursor-pointer"
               >
                 <span class="flex items-center gap-3">
-                  <span class="text-base">🤝</span>
+                  <span class="text-base">ðŸ¤</span>
                   <span>Program Afiliasi Mitra</span>
                 </span>
                 <span class="text-[10px] font-black text-amber-400 bg-amber-500/20 px-2 py-0.5 rounded-full">Komisi 20%</span>
@@ -482,7 +482,7 @@
                 class="w-full py-3.5 rounded-2xl font-black text-sm text-black flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.3)] active:scale-95 transition-all cursor-pointer"
                 style="background: #c0ff00;"
               >
-                <span>Daftar Uji Coba Gratis ⚡</span>
+                <span>Daftar Uji Coba Gratis âš¡</span>
               </button>
             </div>
           </div>
@@ -503,10 +503,10 @@
 
         <div class="flex items-center gap-2">
           <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-sm">
-            <span class="text-purple-400 font-black">🔥 {{ streakCount }}d</span>
+            <span class="text-purple-400 font-black">ðŸ”¥ {{ streakCount }}d</span>
           </div>
           <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white shadow-sm">
-            <span class="text-amber-400 font-black">🪙 {{ coins }}</span>
+            <span class="text-amber-400 font-black">ðŸª™ {{ coins }}</span>
           </div>
           <!-- Avatar Quick Button to open Student Sidebar -->
           <button 
@@ -531,7 +531,7 @@
             <!-- Dynamic Ambient Pulsing Aura Behind Headline -->
             <div class="pointer-events-none absolute left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[680px] h-[260px] sm:h-[380px] rounded-full bg-gradient-to-tr from-[#c0ff00]/15 via-cyan-500/10 to-[#c0ff00]/10 blur-[110px] animate-pulse-slow -z-10"></div>
 
-            <!-- Inner container: Center Content (Pill, 2-line Headline, Compact CTA Buttons — shifted down) -->
+            <!-- Inner container: Center Content (Pill, 2-line Headline, Compact CTA Buttons â€” shifted down) -->
             <div class="w-full max-w-5xl mx-auto px-4 sm:px-8 text-center space-y-3 sm:space-y-4 relative z-10 my-auto translate-y-20 sm:translate-y-24 md:translate-y-28" style="box-sizing: border-box;">
 
               <!-- Live Platform Status Pill -->
@@ -573,35 +573,35 @@
             <div class="pointer-events-none absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-[#050505] via-[#050505]/70 to-transparent z-[5]"></div>
           </div>
 
-          <!-- Trust Bar — Premium Ticker (UNCLIPPED, Positioned at the bottom of hero background) -->
+          <!-- Trust Bar â€” Premium Ticker (UNCLIPPED, Positioned at the bottom of hero background) -->
           <div class="w-full relative z-20 overflow-hidden py-3.5 sm:py-5 -mt-6 sm:-mt-14 mb-6 sm:mb-8">
             <div style="transform: rotate(-2deg) scale(1.05); transform-origin: center center;">
               <div class="bg-[#c0ff00] text-black py-2.5 sm:py-3 border-y border-[#c0ff00]/40 shadow-[0_4px_30px_rgba(192,255,0,0.3)]">
                 <div class="flex gap-0 animate-marquee whitespace-nowrap" style="width: max-content;">
                   <div class="flex gap-8 sm:gap-10 items-center px-6 sm:px-8 font-black text-xs sm:text-sm uppercase tracking-wider shrink-0">
                     <span>Belajar Lebih Terarah</span>
-                    <span class="text-xs opacity-50">✦</span>
+                    <span class="text-xs opacity-50">âœ¦</span>
                     <span>Temukan Blind Spot-mu</span>
-                    <span class="text-xs opacity-50">✦</span>
+                    <span class="text-xs opacity-50">âœ¦</span>
                     <span>Latihan Soal Terstruktur</span>
-                    <span class="text-xs opacity-50">✦</span>
+                    <span class="text-xs opacity-50">âœ¦</span>
                     <span>Pantau Progresmu</span>
-                    <span class="text-xs opacity-50">✦</span>
-                    <span>AI Adaptive Path™</span>
-                    <span class="text-xs opacity-50">✦</span>
+                    <span class="text-xs opacity-50">âœ¦</span>
+                    <span>AI Adaptive Pathâ„¢</span>
+                    <span class="text-xs opacity-50">âœ¦</span>
                   </div>
                   <!-- Duplicate for seamless loop -->
                   <div class="flex gap-8 sm:gap-10 items-center px-6 sm:px-8 font-black text-xs sm:text-sm uppercase tracking-wider shrink-0" aria-hidden="true">
                     <span>Belajar Lebih Terarah</span>
-                    <span class="text-xs opacity-50">✦</span>
+                    <span class="text-xs opacity-50">âœ¦</span>
                     <span>Temukan Blind Spot-mu</span>
-                    <span class="text-xs opacity-50">✦</span>
+                    <span class="text-xs opacity-50">âœ¦</span>
                     <span>Latihan Soal Terstruktur</span>
-                    <span class="text-xs opacity-50">✦</span>
+                    <span class="text-xs opacity-50">âœ¦</span>
                     <span>Pantau Progresmu</span>
-                    <span class="text-xs opacity-50">✦</span>
-                    <span>AI Adaptive Path™</span>
-                    <span class="text-xs opacity-50">✦</span>
+                    <span class="text-xs opacity-50">âœ¦</span>
+                    <span>AI Adaptive Pathâ„¢</span>
+                    <span class="text-xs opacity-50">âœ¦</span>
                   </div>
                 </div>
               </div>
@@ -621,7 +621,7 @@
               </p>
             </div>
 
-            <!-- 3 Cards — Ukuran panjang dan lebar sama persis (Always Visible, no opacity:0) -->
+            <!-- 3 Cards â€” Ukuran panjang dan lebar sama persis (Always Visible, no opacity:0) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative items-stretch">
               <!-- Card 1 -->
               <div class="h-full">
@@ -640,7 +640,7 @@
                   <div class="absolute -top-7 left-6 sm:left-8 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white flex items-center justify-center font-black text-black text-2xl sm:text-3xl">02</div>
                   <div class="space-y-3 flex-grow">
                     <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-white">Hafalan Buta Rumus</h3>
-                    <p class="text-slate-300 font-normal leading-relaxed text-sm sm:text-base">Hafal rumus mati tanpa ngerti logikanya. Pas ketemu soal HOTS variasi baru — blank total.</p>
+                    <p class="text-slate-300 font-normal leading-relaxed text-sm sm:text-base">Hafal rumus mati tanpa ngerti logikanya. Pas ketemu soal HOTS variasi baru â€” blank total.</p>
                   </div>
                 </div>
               </div>
@@ -669,7 +669,7 @@
           <div id="calculator" class="section-wrapper space-y-12 scroll-mt-24 relative">
             <div class="text-center max-w-3xl mx-auto space-y-3 reveal px-2">
               <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#c0ff00]/30 bg-[#c0ff00]/10 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
-                🎯 SIMULASI INTERAKTIF MULTI-PROGRAM
+                ðŸŽ¯ SIMULASI INTERAKTIF MULTI-PROGRAM
               </span>
               <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight break-words">
                 Hitung Peluang <span style="color: #c0ff00;">Lolos Target Impianmu</span>
@@ -719,7 +719,7 @@
                       class="w-full bg-slate-900/90 border border-white/20 text-white text-xs md:text-sm font-bold py-3 px-3.5 pr-8 rounded-xl appearance-none outline-none focus:border-[#c0ff00] transition-colors cursor-pointer shadow-inner"
                     >
                       <option v-for="tgt in currentTargetList" :key="tgt.id" :value="tgt" class="bg-slate-900 text-white font-medium py-1">
-                        ⭐ [{{ tgt.targetScore }} {{ currentSimLevelConfig.scoreUnit }}] {{ tgt.name }}
+                        â­ [{{ tgt.targetScore }} {{ currentSimLevelConfig.scoreUnit }}] {{ tgt.name }}
                       </option>
                     </select>
                     <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#c0ff00] text-xs">
@@ -731,7 +731,7 @@
                   <div class="space-y-2 pt-1">
                     <div class="text-[10px] uppercase tracking-wider font-bold text-white/40 flex items-center justify-between">
                       <span>Pilihan Cepat Target:</span>
-                      <span class="text-[9px] text-[#c0ff00]">Daftar Lengkap di Dropdown ↑</span>
+                      <span class="text-[9px] text-[#c0ff00]">Daftar Lengkap di Dropdown â†‘</span>
                     </div>
                     <div class="flex sm:grid sm:grid-cols-3 md:grid-cols-4 gap-2 overflow-x-auto pb-1.5 sm:pb-0 no-scrollbar">
                       <button
@@ -758,7 +758,7 @@
                 <div class="space-y-3 pt-1">
                   <div class="flex justify-between items-center gap-2">
                     <span class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-1.5">
-                      <span>📊</span> {{ currentSimLevelConfig.scoreLabel }}:
+                      <span>ðŸ“Š</span> {{ currentSimLevelConfig.scoreLabel }}:
                     </span>
                     <span class="text-base sm:text-xl font-black font-heading text-white font-mono bg-black/60 px-3 py-1 rounded-xl border border-white/10 shrink-0">
                       {{ simCurrentScore }} <span class="text-[10px] sm:text-xs text-white/40 font-normal">{{ currentSimLevelConfig.scoreUnit }}</span>
@@ -783,7 +783,7 @@
                 <div class="space-y-3 pt-1">
                   <div class="flex justify-between items-center gap-2">
                     <span class="text-xs font-black uppercase tracking-wider text-white/70 flex items-center gap-1.5">
-                      <span>⏱️</span> Komitmen Belajar Harian:
+                      <span>â±ï¸</span> Komitmen Belajar Harian:
                     </span>
                     <span class="text-base sm:text-xl font-black font-heading text-[#c0ff00] font-mono bg-black/60 px-3 py-1 rounded-xl border border-[#c0ff00]/30 shrink-0">
                       {{ simDailyHours }} <span class="text-[10px] sm:text-xs text-[#c0ff00]/70 font-normal">Jam/Hari</span>
@@ -844,7 +844,7 @@
                       <div class="text-[10px] font-bold text-white/40 uppercase truncate">Target {{ (simTargetPtn?.name || String(simTargetPtn || '')).split(' (')[0] }}</div>
                       <div class="text-xl sm:text-2xl font-black text-white/80 font-heading mt-1">{{ simTargetPtn?.targetScore || 80 }}</div>
                       <div class="text-[10px] font-bold mt-0.5 truncate" :class="(simPredictedGain >= (simTargetPtn?.targetScore || 80)) ? 'text-[#c0ff00]' : 'text-rose-400'">
-                        {{ (simPredictedGain >= (simTargetPtn?.targetScore || 80)) ? '✓ Lolos Passing' : `Sisa ${(simTargetPtn?.targetScore || 80) - simPredictedGain} Poin` }}
+                        {{ (simPredictedGain >= (simTargetPtn?.targetScore || 80)) ? 'âœ“ Lolos Passing' : `Sisa ${(simTargetPtn?.targetScore || 80) - simPredictedGain} Poin` }}
                       </div>
                     </div>
                   </div>
@@ -852,7 +852,7 @@
                   <!-- AI Subtest Focus Tip -->
                   <div class="p-3.5 sm:p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1.5">
                     <div class="flex items-center gap-2 text-xs font-bold text-[#c0ff00]">
-                      <span>⚡</span> Rekomendasi Subtes Prioritas:
+                      <span>âš¡</span> Rekomendasi Subtes Prioritas:
                     </div>
                     <p class="text-xs text-white/70 leading-relaxed font-medium">
                       Fokus pada: <strong class="text-white">{{ simTargetPtn?.focus || 'Numerasi & Penalaran' }}</strong> untuk akselerasi skor maksimal di {{ (simTargetPtn?.name || String(simTargetPtn || '')).split(' (')[0] }}.
@@ -879,7 +879,7 @@
           <div id="quiz-demo" class="section-wrapper space-y-12 scroll-mt-24 relative">
             <div class="text-center max-w-3xl mx-auto space-y-3 reveal px-2">
               <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-sky-500/30 bg-sky-500/10 text-sky-400 text-xs font-black uppercase tracking-widest">
-                🧪 UJI DIAGNOSTIK INSTAN
+                ðŸ§ª UJI DIAGNOSTIK INSTAN
               </span>
               <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight break-words">
                 Coba 1 Soal HOTS &amp; <span style="color: #c0ff00;">Lihat Analisa AI</span>
@@ -909,7 +909,7 @@
                 </div>
 
                 <div class="inline-flex items-center gap-1.5 self-start sm:self-auto px-2.5 py-1 rounded-xl bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-mono font-bold whitespace-nowrap">
-                  <span>✦</span> Bobot Skor IRT: <strong class="text-white">+{{ miniQuizQuestions[miniQuizActiveIdx].irtScore }} Poin</strong>
+                  <span>âœ¦</span> Bobot Skor IRT: <strong class="text-white">+{{ miniQuizQuestions[miniQuizActiveIdx].irtScore }} Poin</strong>
                 </div>
               </div>
 
@@ -941,7 +941,7 @@
                   >
                     <span class="flex-grow pr-2">{{ opt.text }}</span>
                     <span v-if="miniQuizUserAnswer === oIdx" class="text-base sm:text-lg shrink-0">
-                      {{ opt.isCorrect ? '✅' : '❌' }}
+                      {{ opt.isCorrect ? 'âœ…' : 'âŒ' }}
                     </span>
                   </button>
                 </div>
@@ -954,14 +954,14 @@
                       <span class="text-xs sm:text-sm font-black text-white">Analisis Logika &amp; Trik AI EduPath</span>
                     </div>
                     <span class="text-xs font-bold self-start sm:self-auto" :class="miniQuizQuestions[miniQuizActiveIdx].options[miniQuizUserAnswer]?.isCorrect ? 'text-[#c0ff00]' : 'text-amber-400'">
-                      {{ miniQuizQuestions[miniQuizActiveIdx].options[miniQuizUserAnswer]?.isCorrect ? '🎉 Jawaban Tepat! +Bobot IRT Tercapai' : '💡 Belum Tepat! Simak Trik Cepat Berikut:' }}
+                      {{ miniQuizQuestions[miniQuizActiveIdx].options[miniQuizUserAnswer]?.isCorrect ? 'ðŸŽ‰ Jawaban Tepat! +Bobot IRT Tercapai' : 'ðŸ’¡ Belum Tepat! Simak Trik Cepat Berikut:' }}
                     </span>
                   </div>
 
                   <div class="space-y-3 text-xs md:text-sm text-white/80 leading-relaxed">
-                    <p><strong>📖 Pembahasan Konseptual:</strong> {{ miniQuizQuestions[miniQuizActiveIdx].explanation }}</p>
+                    <p><strong>ðŸ“– Pembahasan Konseptual:</strong> {{ miniQuizQuestions[miniQuizActiveIdx].explanation }}</p>
                     <div class="p-3 sm:p-3.5 rounded-xl bg-[#c0ff00]/10 border border-[#c0ff00]/20 text-[#c0ff00] font-medium flex items-start gap-2.5">
-                      <span class="text-base shrink-0">⚡</span>
+                      <span class="text-base shrink-0">âš¡</span>
                       <span><strong>Trik Kilat EduPath:</strong> {{ miniQuizQuestions[miniQuizActiveIdx].trick }}</span>
                     </div>
                   </div>
@@ -978,7 +978,7 @@
                 </div>
 
                 <div v-else class="text-center text-xs text-white/40 pt-2 font-medium">
-                  👆 Klik salah satu pilihan jawaban di atas untuk melihat respon instan AI!
+                  ðŸ‘† Klik salah satu pilihan jawaban di atas untuk melihat respon instan AI!
                 </div>
               </div>
             </div>
@@ -988,7 +988,7 @@
           <div id="comparison" class="section-wrapper space-y-12 scroll-mt-24 relative">
             <div class="text-center max-w-4xl mx-auto space-y-3 reveal px-2">
               <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-400 text-xs font-black uppercase tracking-widest">
-                ⚖️ PERBANDINGAN STRATEGIS
+                âš–ï¸ PERBANDINGAN STRATEGIS
               </span>
               <h2 class="text-2xl sm:text-3xl md:text-5xl font-black font-heading text-white leading-snug">
                 Bimbel Biasa vs <span class="text-sky-400">Aplikasi Video Massal</span> vs <span style="color: #c0ff00;">EduPath.ai</span>
@@ -1006,33 +1006,33 @@
                 <div class="space-y-5">
                   <div class="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
-                      <span class="text-[11px] font-black text-rose-400 uppercase tracking-wider block">METODE LAMA 🏫</span>
+                      <span class="text-[11px] font-black text-rose-400 uppercase tracking-wider block">METODE LAMA ðŸ«</span>
                       <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white">Bimbel Konvensional</h3>
                       <p class="text-[11px] text-white/40 font-medium">Tatap Muka &amp; Kelas Massal</p>
                     </div>
-                    <div class="text-3xl shrink-0">❌</div>
+                    <div class="text-3xl shrink-0">âŒ</div>
                   </div>
 
                   <ul class="space-y-3.5 text-xs md:text-sm text-white/70">
                     <li class="flex items-start gap-2.5">
-                      <span class="text-rose-400 font-bold shrink-0 mt-0.5">✕</span>
-                      <span><strong>1 Buku untuk Semua:</strong> Siswa beda kemampuan dipaksa belajar bab yang sama di kelas ramai 20–30 anak.</span>
+                      <span class="text-rose-400 font-bold shrink-0 mt-0.5">âœ•</span>
+                      <span><strong>1 Buku untuk Semua:</strong> Siswa beda kemampuan dipaksa belajar bab yang sama di kelas ramai 20â€“30 anak.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-rose-400 font-bold shrink-0 mt-0.5">✕</span>
-                      <span><strong>Buang Waktu 2–3 Jam/Hari:</strong> Terjebak macet dan duduk pasif menyimak materi yang sudah dikuasai.</span>
+                      <span class="text-rose-400 font-bold shrink-0 mt-0.5">âœ•</span>
+                      <span><strong>Buang Waktu 2â€“3 Jam/Hari:</strong> Terjebak macet dan duduk pasif menyimak materi yang sudah dikuasai.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-rose-400 font-bold shrink-0 mt-0.5">✕</span>
+                      <span class="text-rose-400 font-bold shrink-0 mt-0.5">âœ•</span>
                       <span><strong>Hafalan Rumus Cepat:</strong> Rawan panik &amp; blank begitu variasi soal nalar HOTS baru muncul di SNBT.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-rose-400 font-bold shrink-0 mt-0.5">✕</span>
+                      <span class="text-rose-400 font-bold shrink-0 mt-0.5">âœ•</span>
                       <span><strong>Konsultasi Guru Terbatas:</strong> Harus antre nomor atau menunggu jadwal kelas tatap muka pekan depan.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-rose-400 font-bold shrink-0 mt-0.5">✕</span>
-                      <span><strong>Biaya Selangit:</strong> Rp 8.000.000 – Rp 25.000.000 per tahun ajaran.</span>
+                      <span class="text-rose-400 font-bold shrink-0 mt-0.5">âœ•</span>
+                      <span><strong>Biaya Selangit:</strong> Rp 8.000.000 â€“ Rp 25.000.000 per tahun ajaran.</span>
                     </li>
                   </ul>
                 </div>
@@ -1049,33 +1049,33 @@
                 <div class="space-y-5">
                   <div class="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
-                      <span class="text-[11px] font-black text-sky-400 uppercase tracking-wider block">VIDEO ON-DEMAND 📱</span>
+                      <span class="text-[11px] font-black text-sky-400 uppercase tracking-wider block">VIDEO ON-DEMAND ðŸ“±</span>
                       <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white">Aplikasi Video Massal</h3>
                       <p class="text-[11px] text-sky-400/70 font-medium">Bimbel Online &amp; Video Rekaman</p>
                     </div>
-                    <div class="text-3xl shrink-0">📺</div>
+                    <div class="text-3xl shrink-0">ðŸ“º</div>
                   </div>
 
                   <ul class="space-y-3.5 text-xs md:text-sm text-white/70">
                     <li class="flex items-start gap-2.5">
-                      <span class="text-sky-400 font-bold shrink-0 mt-0.5">⚠️</span>
+                      <span class="text-sky-400 font-bold shrink-0 mt-0.5">âš ï¸</span>
                       <span><strong>Ribuan Video Satu Arah:</strong> Materi berlimpah tapi pasif, memicu <em>information overload</em> &amp; bingung mulai dari mana.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-sky-400 font-bold shrink-0 mt-0.5">⚠️</span>
-                      <span><strong>Durasi Panjang (15–30 Mnt):</strong> Waktu habis menatap video rekaman, bukan drill aktif eliminasi opsi HOTS.</span>
+                      <span class="text-sky-400 font-bold shrink-0 mt-0.5">âš ï¸</span>
+                      <span><strong>Durasi Panjang (15â€“30 Mnt):</strong> Waktu habis menatap video rekaman, bukan drill aktif eliminasi opsi HOTS.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-sky-400 font-bold shrink-0 mt-0.5">⚠️</span>
+                      <span class="text-sky-400 font-bold shrink-0 mt-0.5">âš ï¸</span>
                       <span><strong>Tanya Soal Terbatas:</strong> Fitur bot tanya soal umum sering berupa teks template dan respons terbatas.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-sky-400 font-bold shrink-0 mt-0.5">⚠️</span>
+                      <span class="text-sky-400 font-bold shrink-0 mt-0.5">âš ï¸</span>
                       <span><strong>Bukan Real-Time Adaptive IRT:</strong> Rekomendasi belajar modul umum, belum memetakan probabilitas lolos PTN per butir soal.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-sky-400 font-bold shrink-0 mt-0.5">⚠️</span>
-                      <span><strong>Komitmen Paket di Depan:</strong> Rp 1.500.000 – Rp 6.000.000 per tahun (sering wajib bayar paket panjang).</span>
+                      <span class="text-sky-400 font-bold shrink-0 mt-0.5">âš ï¸</span>
+                      <span><strong>Komitmen Paket di Depan:</strong> Rp 1.500.000 â€“ Rp 6.000.000 per tahun (sering wajib bayar paket panjang).</span>
                     </li>
                   </ul>
                 </div>
@@ -1090,38 +1090,38 @@
               <!-- Card 3: EduPath.ai Adaptive -->
               <div class="rounded-3xl p-5 sm:p-7 md:p-8 space-y-6 border-2 border-[#c0ff00] bg-[#10160a] shadow-[0_0_50px_rgba(192,255,0,0.18)] relative flex flex-col justify-between lg:scale-105 lg:-translate-y-2 z-10">
                 <span class="absolute top-0 right-0 bg-[#c0ff00] text-black text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider">
-                  Pilihan Cerdas Pejuang PTN ⚡
+                  Pilihan Cerdas Pejuang PTN âš¡
                 </span>
 
                 <div class="space-y-5">
                   <div class="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
-                      <span class="text-[11px] font-black text-[#c0ff00] uppercase tracking-wider block">TEKNOLOGI AI 2026 🚀</span>
+                      <span class="text-[11px] font-black text-[#c0ff00] uppercase tracking-wider block">TEKNOLOGI AI 2026 ðŸš€</span>
                       <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white">EduPath.ai Adaptive</h3>
                       <p class="text-[11px] text-[#c0ff00]/70 font-medium">Dynamic Learning Path &amp; AI Tutor 24/7</p>
                     </div>
-                    <div class="text-3xl shrink-0">⚡</div>
+                    <div class="text-3xl shrink-0">âš¡</div>
                   </div>
 
                   <ul class="space-y-3.5 text-xs md:text-sm text-white">
                     <li class="flex items-start gap-2.5">
-                      <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">✓</span>
+                      <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">âœ“</span>
                       <span><strong>Dynamic Learning Path:</strong> AI mendeteksi titik lemah spesifik dalam 10 menit &amp; menyusun materi yang paling menaikkan skor.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">✓</span>
+                      <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">âœ“</span>
                       <span><strong>Micro-Lessons 5 Menit:</strong> Belajar padat konsep inti + trik eliminasi instan, efisien tanpa rasa overwhelmed.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">✓</span>
+                      <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">âœ“</span>
                       <span><strong>AI Tutor Companion 24/7:</strong> Dialog interaktif Sokratik tanpa batas kuota + opsi SOS Tutor ITB/UI.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">✓</span>
+                      <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">âœ“</span>
                       <span><strong>Evaluasi Model IRT Terkalibrasi:</strong> Perhitungan bobot butir soal menggunakan model Item Response Theory yang dikalibrasi untuk simulasi latihan adaptif.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
-                      <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">✓</span>
+                      <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">âœ“</span>
                       <span><strong>Investasi Super Terjangkau:</strong> Mulai Rp 119.000 / bulan tanpa biaya tersembunyi &amp; tanpa kontrak menjerat.</span>
                     </li>
                   </ul>
@@ -1133,7 +1133,7 @@
                     style="background: #c0ff00;"
                     @click="startLearning"
                   >
-                    <span>Mulai Jalur Belajar Adaptif ⚡</span>
+                    <span>Mulai Jalur Belajar Adaptif âš¡</span>
                   </button>
                 </div>
               </div>
@@ -1145,7 +1145,7 @@
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div>
                   <h3 class="text-xl md:text-2xl font-black text-white flex items-center gap-2.5">
-                    <span>📊</span> Matriks Komparasi Fitur Lengkap
+                    <span>ðŸ“Š</span> Matriks Komparasi Fitur Lengkap
                   </h3>
                   <p class="text-xs md:text-sm text-white/50 mt-1">
                     Bandingkan aspek personalisasi, efisiensi waktu belajar, dukungan tutor, dan biaya secara transparan.
@@ -1169,38 +1169,38 @@
                   <tbody class="divide-y divide-white/5">
                     <tr class="hover:bg-white/[0.02] transition-colors">
                       <td class="py-3.5 px-4 font-bold text-white">Personalisasi Rute Belajar</td>
-                      <td class="py-3.5 px-4 text-white/60">❌ 1 Buku seragam untuk sekelas</td>
-                      <td class="py-3.5 px-4 text-white/60">⚠️ Cari video sendiri di katalog besar</td>
-                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">✅ AI Adaptive Path otomatis (titik lemah spesifik)</td>
+                      <td class="py-3.5 px-4 text-white/60">âŒ 1 Buku seragam untuk sekelas</td>
+                      <td class="py-3.5 px-4 text-white/60">âš ï¸ Cari video sendiri di katalog besar</td>
+                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">âœ… AI Adaptive Path otomatis (titik lemah spesifik)</td>
                     </tr>
                     <tr class="hover:bg-white/[0.02] transition-colors">
                       <td class="py-3.5 px-4 font-bold text-white">Format &amp; Efisiensi Waktu</td>
-                      <td class="py-3.5 px-4 text-white/60">❌ 90–120 mnt/sesi + macet di jalan</td>
-                      <td class="py-3.5 px-4 text-white/60">⚠️ Video rekaman panjang 15–30 mnt</td>
-                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">✅ Micro-lessons 5 menit padat trik HOTS</td>
+                      <td class="py-3.5 px-4 text-white/60">âŒ 90â€“120 mnt/sesi + macet di jalan</td>
+                      <td class="py-3.5 px-4 text-white/60">âš ï¸ Video rekaman panjang 15â€“30 mnt</td>
+                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">âœ… Micro-lessons 5 menit padat trik HOTS</td>
                     </tr>
                     <tr class="hover:bg-white/[0.02] transition-colors">
                       <td class="py-3.5 px-4 font-bold text-white">Bantuan Tanya Soal &amp; PR</td>
-                      <td class="py-3.5 px-4 text-white/60">❌ Terbatas jam les &amp; antre pengajar</td>
-                      <td class="py-3.5 px-4 text-white/60">⚠️ Terbatas kuota koin &amp; teks template</td>
-                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">✅ AI Tutor 24/7 Tanpa Batas + SOS Mentor UI/ITB</td>
+                      <td class="py-3.5 px-4 text-white/60">âŒ Terbatas jam les &amp; antre pengajar</td>
+                      <td class="py-3.5 px-4 text-white/60">âš ï¸ Terbatas kuota koin &amp; teks template</td>
+                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">âœ… AI Tutor 24/7 Tanpa Batas + SOS Mentor UI/ITB</td>
                     </tr>
                     <tr class="hover:bg-white/[0.02] transition-colors">
                       <td class="py-3.5 px-4 font-bold text-white">Akurasi Skoring Tryout</td>
-                      <td class="py-3.5 px-4 text-white/60">⚠️ Tryout bulanan skor persentase biasa</td>
-                      <td class="py-3.5 px-4 text-white/60">⚠️ Tryout berkala terjadwal</td>
-                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">✅ Model Estimasi IRT Terkalibrasi untuk Latihan</td>
+                      <td class="py-3.5 px-4 text-white/60">âš ï¸ Tryout bulanan skor persentase biasa</td>
+                      <td class="py-3.5 px-4 text-white/60">âš ï¸ Tryout berkala terjadwal</td>
+                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">âœ… Model Estimasi IRT Terkalibrasi untuk Latihan</td>
                     </tr>
                     <tr class="hover:bg-white/[0.02] transition-colors">
                       <td class="py-3.5 px-4 font-bold text-white">Fasilitas Drill &amp; Retensi</td>
-                      <td class="py-3.5 px-4 text-white/60">❌ Latihan kertas manual</td>
-                      <td class="py-3.5 px-4 text-white/60">⚠️ Bank soal statis dengan kunci teks</td>
-                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">✅ Spaced Repetition + Analitik IRT per subtopik</td>
+                      <td class="py-3.5 px-4 text-white/60">âŒ Latihan kertas manual</td>
+                      <td class="py-3.5 px-4 text-white/60">âš ï¸ Bank soal statis dengan kunci teks</td>
+                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">âœ… Spaced Repetition + Analitik IRT per subtopik</td>
                     </tr>
                     <tr class="hover:bg-white/[0.02] transition-colors">
                       <td class="py-3.5 px-4 font-bold text-white">Estimasi Biaya / Tahun</td>
-                      <td class="py-3.5 px-4 text-rose-400 font-semibold">Rp 8 – 25 Juta</td>
-                      <td class="py-3.5 px-4 text-sky-400 font-semibold">Rp 1,5 – 6 Juta (kontrak tahunan)</td>
+                      <td class="py-3.5 px-4 text-rose-400 font-semibold">Rp 8 â€“ 25 Juta</td>
+                      <td class="py-3.5 px-4 text-sky-400 font-semibold">Rp 1,5 â€“ 6 Juta (kontrak tahunan)</td>
                       <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5 rounded-b-xl">Mulai Rp 119.000 / bln (hemat s.d 90%)</td>
                     </tr>
                   </tbody>
@@ -1215,7 +1215,7 @@
             <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div class="space-y-6">
                 <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/15 border border-primary/20 text-xs font-bold text-[#c0ff00] rounded-md uppercase tracking-wider">
-                  ⚡ SOLUSI ADAPTIF
+                  âš¡ SOLUSI ADAPTIF
                 </div>
                 <h3 class="text-3xl md:text-5xl font-black font-heading text-white leading-tight">Persiapan Terukur Dengan <span class="text-[#c0ff00]">Analitik Presisi</span></h3>
                 <p class="text-base md:text-lg text-slate-300 leading-relaxed font-medium">
@@ -1277,22 +1277,22 @@
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4">
                 <div class="space-y-3">
-                  <span class="text-3xl">⏱️</span>
+                  <span class="text-3xl">â±ï¸</span>
                   <h4 class="text-lg md:text-xl font-black text-white">Hemat Waktu Belajar</h4>
                   <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">Eliminasi materi yang sudah dikuasai. Hanya pelajari materi kritis yang menahan kenaikan skor Anda.</p>
                 </div>
                 <div class="space-y-3">
-                  <span class="text-3xl">🎯</span>
+                  <span class="text-3xl">ðŸŽ¯</span>
                   <h4 class="text-lg md:text-xl font-black text-white">Simulasi Penilaian IRT</h4>
                   <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">Setiap tryout memberikan konversi persentil kelulusan yang riil sesuai bobot skor SNBT terbaru.</p>
                 </div>
                 <div class="space-y-3">
-                  <span class="text-3xl">🤖</span>
+                  <span class="text-3xl">ðŸ¤–</span>
                   <h4 class="text-lg md:text-xl font-black text-white">AI Tutor Siaga 24 Jam</h4>
                   <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">Klinik tugas aktif setiap saat yang menuntun logika berpikir Anda langkah demi langkah.</p>
                 </div>
                 <div class="space-y-3">
-                  <span class="text-3xl">📈</span>
+                  <span class="text-3xl">ðŸ“ˆ</span>
                   <h4 class="text-lg md:text-xl font-black text-white">Grafik Kenaikan Riil</h4>
                   <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">Pantau secara riil proyeksi peluang Anda menembus universitas target pilihan secara visual.</p>
                 </div>
@@ -1342,11 +1342,11 @@
                       <i class="ph-bold ph-cpu text-xl"></i>
                     </div>
                     <span class="text-[10px] bg-primary/20 text-[#c0ff00] font-mono px-2.5 py-1 rounded-full border border-primary/30 font-bold uppercase tracking-wider">
-                      🎯 IRT Adaptive
+                      ðŸŽ¯ IRT Adaptive
                     </span>
                   </div>
                   <div>
-                    <h3 class="text-xl md:text-2xl font-black text-white font-heading">AI Adaptive Assessment™</h3>
+                    <h3 class="text-xl md:text-2xl font-black text-white font-heading">AI Adaptive Assessmentâ„¢</h3>
                     <p class="text-sm text-slate-300 leading-relaxed font-medium mt-2">
                       Sistem mendeteksi materi kelemahan, lalu reaktif mengubah urutan soal agar pas dengan porsi pemahaman Anda.
                     </p>
@@ -1379,7 +1379,7 @@
                       <i class="ph-bold ph-video-camera text-xl"></i>
                     </div>
                     <span class="text-[10px] bg-secondary/25 text-[#c0ff00] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border border-secondary/30">
-                      📚 Modul Kilat
+                      ðŸ“š Modul Kilat
                     </span>
                   </div>
                   <div>
@@ -1407,7 +1407,7 @@
                 <div class="space-y-2">
                   <div class="flex items-center justify-between mb-2">
                     <div class="w-10 h-10 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center text-[#c0ff00] text-xl">
-                      🤖
+                      ðŸ¤–
                     </div>
                     <span class="text-[10px] bg-emerald-500/15 text-emerald-400 px-2.5 py-1 rounded-full font-mono font-bold border border-emerald-500/30 flex items-center gap-1.5">
                       <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 24/7
@@ -1423,12 +1423,12 @@
 
                 <div class="bg-black/50 border border-white/10 rounded-xl p-3 mt-4 space-y-2 flex-1 flex flex-col justify-end">
                   <div class="flex items-start gap-2 max-w-[90%]">
-                    <div class="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-[10px] shrink-0 mt-0.5">👤</div>
+                    <div class="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-[10px] shrink-0 mt-0.5">ðŸ‘¤</div>
                     <div class="bg-slate-800 text-slate-200 text-xs p-2.5 rounded-xl rounded-tl-none font-medium leading-relaxed">Kak, trik cepat eliminasi silogisme ini gimana?</div>
                   </div>
                   <div class="flex items-start gap-2 max-w-[95%] ml-auto flex-row-reverse">
                     <div class="w-5 h-5 rounded-full bg-[#c0ff00] text-black font-black flex items-center justify-center text-[9px] shrink-0 mt-0.5">AI</div>
-                    <div class="bg-[#c0ff00]/15 border border-[#c0ff00]/30 text-white text-xs p-2.5 rounded-xl rounded-tr-none font-medium leading-relaxed">Coret term penengahnya, jawabannya opsi B! 💡</div>
+                    <div class="bg-[#c0ff00]/15 border border-[#c0ff00]/30 text-white text-xs p-2.5 rounded-xl rounded-tr-none font-medium leading-relaxed">Coret term penengahnya, jawabannya opsi B! ðŸ’¡</div>
                   </div>
                 </div>
               </div>
@@ -1436,7 +1436,7 @@
               <!-- Feature 4: Virtual Study Room -->
               <div class="glass-card rounded-2xl p-6 md:col-span-2 lg:col-span-4 flex flex-col justify-center text-center items-center gap-4 group">
                 <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-[#c0ff00] text-3xl">
-                  ⏳
+                  â³
                 </div>
                 <div>
                   <h3 class="text-xl font-black text-white font-heading mb-2">Pomodoro Lofi Room</h3>
@@ -1476,9 +1476,9 @@
               <button
                 v-for="flt in [
                   { id: 'all', name: 'Semua (3)' },
-                  { id: 'health', name: '🩺 Saintek' },
-                  { id: 'engineering', name: '💻 Teknik & MIPA' },
-                  { id: 'soshum', name: '💼 Soshum' }
+                  { id: 'health', name: 'ðŸ©º Saintek' },
+                  { id: 'engineering', name: 'ðŸ’» Teknik & MIPA' },
+                  { id: 'soshum', name: 'ðŸ’¼ Soshum' }
                 ]"
                 :key="flt.id"
                 :class="['px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-full text-xs font-bold transition-all border cursor-pointer active:scale-95',
@@ -1499,7 +1499,7 @@
                 :key="t.name"
                 class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 relative overflow-hidden group flex flex-col justify-between border border-white/10"
               >
-                <div class="absolute -right-4 -top-6 text-8xl text-white/[0.03] font-black font-serif italic pointer-events-none select-none">“</div>
+                <div class="absolute -right-4 -top-6 text-8xl text-white/[0.03] font-black font-serif italic pointer-events-none select-none">â€œ</div>
                 
                 <div class="space-y-4 relative z-10">
                   <div class="flex items-start justify-between gap-3">
@@ -1559,14 +1559,14 @@
               <div class="absolute -inset-1 bg-gradient-to-r from-[#c0ff00]/20 via-emerald-500/20 to-teal-500/20 rounded-3xl blur-xl opacity-30"></div>
               
               <div class="absolute -right-4 top-1/4 bg-slate-950/90 border border-white/10 p-3 rounded-2xl shadow-2xl hidden md:flex items-center gap-3 z-20 animate-[bounce_3s_infinite]">
-                <span class="text-xl">💎</span>
+                <span class="text-xl">ðŸ’Ž</span>
                 <div>
                   <div class="text-[10px] text-white/40 font-bold uppercase tracking-wider">Skor Tryout</div>
                   <div class="text-xs md:text-sm font-bold text-white">780 Poin</div>
                 </div>
               </div>
               <div class="absolute -left-4 bottom-1/4 bg-slate-950/90 border border-white/10 p-3 rounded-2xl shadow-2xl hidden md:flex items-center gap-3 z-20 animate-[bounce_4s_infinite]">
-                <span class="text-xl">🎯</span>
+                <span class="text-xl">ðŸŽ¯</span>
                 <div>
                   <div class="text-[10px] text-white/40 font-bold uppercase tracking-wider">Rekomendasi AI</div>
                   <div class="text-xs md:text-sm font-bold text-white">Fokus: Geometri</div>
@@ -1607,7 +1607,7 @@
 
                   <!-- AI Tutor Coach Box -->
                   <div class="flex items-start gap-3 bg-white/[0.04] border border-white/10 p-3 sm:p-4 rounded-xl sm:rounded-2xl backdrop-blur-md">
-                    <span class="text-xl sm:text-2xl shrink-0">🤖</span>
+                    <span class="text-xl sm:text-2xl shrink-0">ðŸ¤–</span>
                     <p class="text-[11px] sm:text-xs text-slate-200 font-normal leading-relaxed">
                       <strong class="text-white font-bold">AI Tutor:</strong> "Siswa Mandiri telah meningkatkan kemampuan Aljabar Dasar sebesar 15% minggu ini. Pertahankan streak belajar Anda!"
                     </p>
@@ -1621,14 +1621,14 @@
           <div id="pricing" class="section-wrapper space-y-12 scroll-mt-24">
             <div class="text-center max-w-4xl xl:max-w-5xl mx-auto space-y-4 reveal px-2">
               <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
-                💎 INVESTASI LEHER KE ATAS • BEBAS RISIKO
+                ðŸ’Ž INVESTASI LEHER KE ATAS â€¢ BEBAS RISIKO
               </span>
               <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-heading text-white leading-tight break-words">
                 Investasi Terbaik <br class="hidden sm:inline" />
                 <span style="color: #c0ff00;">Pendidikan Masa Depan</span>
               </h2>
               <p class="text-sm md:text-base text-white/70 leading-relaxed font-medium max-w-4xl mx-auto">
-                <span class="block">Bimbel konvensional memungut Rp 15–30 juta untuk metode satu buku yang sama bagi semua murid.</span>
+                <span class="block">Bimbel konvensional memungut Rp 15â€“30 juta untuk metode satu buku yang sama bagi semua murid.</span>
                 <span class="block text-white/90">Di EduPath, Anda berinvestasi pada kecerdasan AI adaptif yang melatih langsung titik lemah spesifik Anda.</span>
               </p>
               
@@ -1646,7 +1646,7 @@
                     @click="isAnnualBilling = true"
                   >
                     <span class="whitespace-nowrap">Bayar Tahunan</span>
-                    <span :class="['text-[9px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider whitespace-nowrap', isAnnualBilling ? 'bg-black text-[#c0ff00]' : 'bg-[#c0ff00]/20 text-[#c0ff00]']">Hemat 60% 🔥</span>
+                    <span :class="['text-[9px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider whitespace-nowrap', isAnnualBilling ? 'bg-black text-[#c0ff00]' : 'bg-[#c0ff00]/20 text-[#c0ff00]']">Hemat 60% ðŸ”¥</span>
                   </button>
                 </div>
               </div>
@@ -1721,8 +1721,8 @@
                 <!-- Info summary strip -->
                 <div class="text-[11px] text-white/50 flex flex-wrap items-center justify-center gap-2 pt-0.5">
                   <span>Menampilkan <strong class="text-white">{{ displayProducts.length }}</strong> paket bimbingan belajar</span>
-                  <span class="text-white/20 hidden sm:inline">•</span>
-                  <span class="text-[#c0ff00]/90 font-medium">⚡ Terintegrasi IRT CBT Adaptif &amp; Bank Soal HOTS 2026</span>
+                  <span class="text-white/20 hidden sm:inline">â€¢</span>
+                  <span class="text-[#c0ff00]/90 font-medium">âš¡ Terintegrasi IRT CBT Adaptif &amp; Bank Soal HOTS 2026</span>
                 </div>
               </div>
             </div>
@@ -1775,10 +1775,10 @@
                             {{ product.academic_program || 'SNPMB/UTBK' }}
                           </span>
                           <span v-if="idx % 3 === 1" class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#c0ff00] text-black shadow-sm">
-                            👑 Paling Populer
+                            ðŸ‘‘ Paling Populer
                           </span>
                           <span v-else-if="idx % 3 === 2" class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                            ⭐ Premium
+                            â­ Premium
                           </span>
                         </div>
                         <div class="text-sm sm:text-base font-extrabold text-white font-heading group-hover:text-[#c0ff00] transition-colors">
@@ -1796,7 +1796,7 @@
                       <td class="py-4 px-4 align-top">
                         <div v-if="product.delivery_mode === 'hybrid'" class="space-y-1.5">
                           <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                            <span>🏫 Hybrid Tatap Muka</span>
+                            <span>ðŸ« Hybrid Tatap Muka</span>
                           </div>
                           <div class="text-[10px] text-white/50 leading-tight">
                             Kelas fisik di cabang bimbel + akses online 24/7
@@ -1804,7 +1804,7 @@
                         </div>
                         <div v-else class="space-y-1.5">
                           <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            <span>🌐 Full Online</span>
+                            <span>ðŸŒ Full Online</span>
                           </div>
                           <div class="text-[10px] text-white/50 leading-tight">
                             Belajar mandiri adaptif &amp; live tutor dari mana saja
@@ -1909,7 +1909,7 @@
               >
                  <!-- Ribbon for Middle item -->
                  <div v-if="idx % 3 === 1" class="absolute top-0 right-0 bg-[#c0ff00] text-black text-[10px] font-black px-3.5 py-1 rounded-bl-2xl uppercase tracking-wider shadow-md">
-                   👑 PILIHAN UTAMA
+                   ðŸ‘‘ PILIHAN UTAMA
                  </div>
 
                  <!-- Title and Desc -->
@@ -1932,7 +1932,7 @@
                          {{ product.academic_program || 'SNPMB/UTBK' }}
                        </span>
                        <span :class="['text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border', (product.delivery_mode === 'hybrid') ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30']">
-                         {{ product.delivery_mode === 'hybrid' ? '🏫 Hybrid (Offline + Online)' : '🌐 Full Online' }}
+                         {{ product.delivery_mode === 'hybrid' ? 'ðŸ« Hybrid (Offline + Online)' : 'ðŸŒ Full Online' }}
                        </span>
                      </div>
                      <p :class="[
@@ -2000,7 +2000,7 @@
                    ]">
                      <li v-for="(feat, fIdx) in product.featuresList" :key="fIdx" class="flex items-start gap-2.5">
                        <i v-if="idx % 3 === 0" class="ph-bold ph-check text-[#c0ff00] mt-0.5 shrink-0"></i>
-                       <span v-else-if="idx % 3 === 1" class="text-[#c0ff00] text-base shrink-0 font-black">⚡</span>
+                       <span v-else-if="idx % 3 === 1" class="text-[#c0ff00] text-base shrink-0 font-black">âš¡</span>
                        <i v-else-if="idx % 3 === 2" class="ph-bold ph-star text-purple-400 mt-0.5 shrink-0"></i>
                        <span>{{ feat }}</span>
                      </li>
@@ -2150,7 +2150,7 @@
           </div>
 
 
-          <!-- 13. Final CTA — SAMPLE style -->
+          <!-- 13. Final CTA â€” SAMPLE style -->
           <div class="section-wrapper">
           <div class="text-center py-12 sm:py-16 md:py-20 rounded-3xl p-6 sm:p-8 space-y-6 relative overflow-hidden" style="background: #121212; border: 1px solid rgba(255,255,255,0.08);">
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -2161,14 +2161,14 @@
               Siap Tembus<br /><span style="color: #c0ff00;">PTN Impianmu?</span>
             </h2>
             <p class="text-base sm:text-lg text-slate-200 max-w-md mx-auto font-medium relative z-10">
-              Daftar sekarang — assessment diagnostic pertamamu gratis, selamanya.
+              Daftar sekarang â€” assessment diagnostic pertamamu gratis, selamanya.
             </p>
             
 
             <div class="flex flex-col sm:flex-row justify-center items-center gap-3.5 pt-4 relative z-10 w-full max-w-md mx-auto px-4 sm:px-0">
               <button class="w-full sm:w-auto min-h-[50px] px-8 py-3.5 sm:py-4 rounded-2xl font-black text-sm sm:text-base transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(192,255,0,0.4)] flex items-center justify-center gap-2 cursor-pointer" style="background: #c0ff00; color: #000;" @click="startLearning">
                 <span>Mulai Uji Coba Gratis</span>
-                <span>⚡</span>
+                <span>âš¡</span>
               </button>
               <button class="w-full sm:w-auto min-h-[50px] px-6 py-3.5 sm:py-4 rounded-2xl font-bold text-sm sm:text-base border border-white/20 bg-white/5 hover:bg-white/10 text-white transition-all flex items-center justify-center cursor-pointer active:scale-95" @click="currentTab = 'diagnostic'">
                 <span>Coba Tryout Dulu</span>
@@ -2182,13 +2182,13 @@
         <!-- TAB: AFFILIATE -->
         <section v-if="currentTab === 'affiliate'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
 
-          <!-- ✨ Banner Gambar EduPath Partner (PALING ATAS - Gambar 1.jpeg Clean & Clear) -->
+          <!-- âœ¨ Banner Gambar EduPath Partner (PALING ATAS - Gambar 1.jpeg Clean & Clear) -->
           <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden border border-amber-500/30 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
             <img src="/1.jpeg" alt="EduPath Partner Banner" class="w-full h-32 sm:h-44 md:h-56 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
             <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-90 z-10"></div>
           </div>
 
-          <!-- ✨ Text & Tombol Afiliasi (DI LETAKAN DI BAWAH GAMBAR) -->
+          <!-- âœ¨ Text & Tombol Afiliasi (DI LETAKAN DI BAWAH GAMBAR) -->
           <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-amber-500/30 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col lg:flex-row gap-5 sm:gap-6 items-stretch lg:items-center justify-between">
             <!-- Left: Partner Badge & Text -->
             <div class="flex items-start gap-3.5 sm:gap-4 flex-grow w-full lg:w-auto text-left">
@@ -2218,7 +2218,7 @@
             <div v-else class="w-full lg:w-auto shrink-0">
               <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer text-center">
                 <span v-if="isJoiningAffiliate" class="flex items-center gap-2 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
-                <span v-else>Aktifkan Program Afiliasi 🚀</span>
+                <span v-else>Aktifkan Program Afiliasi ðŸš€</span>
               </button>
             </div>
           </div>
@@ -2370,7 +2370,7 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 relative z-10">
               <div class="flex items-center gap-3 sm:gap-4">
                 <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl sm:text-2xl shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
-                  ⚙️
+                  âš™ï¸
                 </div>
                 <div>
                   <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Pengaturan Akun &amp; Langganan</h2>
@@ -2415,7 +2415,7 @@
                 >
                   <i class="ph-bold ph-chalkboard-teacher text-base" v-if="isTeacher"></i>
                   <i class="ph-bold ph-shield-check text-base" v-else></i>
-                  <span>{{ isTeacher ? 'Buka Portal Guru / Bank Soal ➔' : 'Buka Admin Panel ➔' }}</span>
+                  <span>{{ isTeacher ? 'Buka Portal Guru / Bank Soal âž”' : 'Buka Admin Panel âž”' }}</span>
                 </button>
                 <button
                   v-else-if="isSchoolBk"
@@ -2423,7 +2423,7 @@
                   class="w-full sm:w-auto justify-center px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <i class="ph-bold ph-buildings text-base"></i>
-                  <span>Buka Portal Guru BK ➔</span>
+                  <span>Buka Portal Guru BK âž”</span>
                 </button>
                 <button
                   v-else-if="isAffiliate"
@@ -2431,7 +2431,7 @@
                   class="w-full sm:w-auto justify-center px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <i class="ph-bold ph-handshake text-base"></i>
-                  <span>Buka Portal Afiliasi ➔</span>
+                  <span>Buka Portal Afiliasi âž”</span>
                 </button>
                 <button
                   v-else
@@ -2439,7 +2439,7 @@
                   class="w-full sm:w-auto justify-center px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <i class="ph-bold ph-lightning text-base"></i>
-                  <span>{{ isPremiumUser ? 'Perpanjang / Ganti Paket' : 'Pilih Paket Belajar ⚡' }}</span>
+                  <span>{{ isPremiumUser ? 'Perpanjang / Ganti Paket' : 'Pilih Paket Belajar âš¡' }}</span>
                 </button>
               </div>
             </div>
@@ -2453,7 +2453,7 @@
               <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/10 gap-4">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg">
-                    👤
+                    ðŸ‘¤
                   </div>
                   <div>
                     <h4 class="text-white font-black text-lg tracking-wide">Pengaturan Akun &amp; Rekening</h4>
@@ -2474,7 +2474,7 @@
               <!-- Grid Informasi Atribut Profil -->
               <div class="space-y-4 max-w-4xl">
                 <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-400">
-                  <span>👤 Data Profil Akun</span>
+                  <span>ðŸ‘¤ Data Profil Akun</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
@@ -2493,7 +2493,7 @@
                   </div>
                   <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
                     <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Password</span>
-                    <div class="text-sm font-mono text-white/70">•••••••• <span class="text-[10px] text-emerald-400 ml-1.5 font-bold font-sans">(Tersimpan aman)</span></div>
+                    <div class="text-sm font-mono text-white/70">â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢ <span class="text-[10px] text-emerald-400 ml-1.5 font-bold font-sans">(Tersimpan aman)</span></div>
                   </div>
                   <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 md:col-span-2">
                     <span class="block text-[10px] font-black uppercase tracking-wider text-white/40 mb-1">Asal Sekolah</span>
@@ -2525,7 +2525,7 @@
               <!-- Grid Informasi Atribut Rekening -->
               <div class="space-y-4 max-w-4xl pt-2">
                 <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-emerald-400">
-                  <span>🏦 Rekening &amp; E-Wallet Pencairan Komisi Afiliasi</span>
+                  <span>ðŸ¦ Rekening &amp; E-Wallet Pencairan Komisi Afiliasi</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
@@ -2552,7 +2552,7 @@
               <div class="flex items-center justify-between pb-6 border-b border-white/10">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-lg">
-                    ✏️
+                    âœï¸
                   </div>
                   <div>
                     <h4 class="text-white font-black text-lg tracking-wide">Edit Data Akun &amp; Rekening</h4>
@@ -2572,7 +2572,7 @@
               <!-- Section 1: Profil Akun -->
               <div class="space-y-5">
                 <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-400">
-                  <span>👤 Data Profil</span>
+                  <span>ðŸ‘¤ Data Profil</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -2661,7 +2661,7 @@
               <!-- Section 2: Rekening Pencairan -->
               <div class="space-y-5 pt-4 border-t border-white/10">
                 <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-emerald-400">
-                  <span>🏦 Rekening &amp; E-Wallet Pencairan</span>
+                  <span>ðŸ¦ Rekening &amp; E-Wallet Pencairan</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -2749,13 +2749,13 @@
         <!-- TAB 1: DASHBOARD -->
         <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
 
-          <!-- ✨ Banner Gambar Dashboard Belajar (PALING ATAS - Proporsional di HP & Desktop) -->
+          <!-- âœ¨ Banner Gambar Dashboard Belajar (PALING ATAS - Proporsional di HP & Desktop) -->
           <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
             <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-32 sm:h-44 md:h-56 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
             <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-90 z-10"></div>
           </div>
 
-          <!-- ✨ Program Belajar & Multi-Paket Switcher Bar -->
+          <!-- âœ¨ Program Belajar & Multi-Paket Switcher Bar -->
           <div class="glass-card p-3 sm:p-4 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-slate-950 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 border border-[#c0ff00]/30 flex items-center justify-center text-xl shrink-0">
@@ -2831,7 +2831,7 @@
             </div>
           </div>
 
-          <!-- ✨ Text & Tombol Greeting (DI LETAKAN DI BAWAH GAMBAR) -->
+          <!-- âœ¨ Text & Tombol Greeting (DI LETAKAN DI BAWAH GAMBAR) -->
           <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
             <!-- Left: Avatar & Greeting Info -->
             <div class="flex items-start md:items-center gap-3 sm:gap-4 flex-1 min-w-0">
@@ -2869,7 +2869,7 @@
             </div>
           </div>
 
-          <!-- ✨ Target Goal Selection & Status (Dinamis: SMP Impian, SMA Unggulan, atau PTN) -->
+          <!-- âœ¨ Target Goal Selection & Status (Dinamis: SMP Impian, SMA Unggulan, atau PTN) -->
           <div class="glass-card p-4 md:p-5 rounded-2xl border border-sky-500/30 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-950 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <!-- Left: Target Selector -->
@@ -2902,7 +2902,7 @@
             </div>
           </div>
 
-          <!-- ✨ Executive KPI Strip (4 Kolom Proporsional & Presisi) -->
+          <!-- âœ¨ Executive KPI Strip (4 Kolom Proporsional & Presisi) -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Card 1: Skor IRT Terkini -->
             <div class="glass-card p-4 md:p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/20 via-slate-900/80 to-slate-950 flex flex-col justify-between">
@@ -2958,7 +2958,7 @@
                 <span class="px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 text-[10px] font-bold">AKTIF</span>
               </div>
               <div class="flex items-baseline gap-2">
-                <span class="text-3xl md:text-4xl font-black font-heading text-indigo-400 font-mono">🔥 {{ streakCount }}</span>
+                <span class="text-3xl md:text-4xl font-black font-heading text-indigo-400 font-mono">ðŸ”¥ {{ streakCount }}</span>
                 <span class="text-xs text-white/50 font-bold">Hari Berturut</span>
               </div>
               <div class="mt-2 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-white/60">
@@ -2968,7 +2968,7 @@
             </div>
           </div>
 
-          <!-- ✨ Dual Primary Cockpit (Grid 2 Kolom Seimbang: 7 / 5) -->
+          <!-- âœ¨ Dual Primary Cockpit (Grid 2 Kolom Seimbang: 7 / 5) -->
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             <!-- Kolom Kiri (7/12): Skill Map Scanner & Misi Harian -->
@@ -3025,7 +3025,7 @@
                 </div>
                 <ul class="space-y-2.5">
                   <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/25' : 'bg-white/5 border-white/10 hover:border-white/20']">
-                    <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-white text-emerald-400 focus:ring-emerald-500 focus:ring-offset-0 w-4 h-4 cursor-pointer appearance-none checked:bg-emerald-500/100 checked:border-emerald-500 relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-[10px] checked:after:font-black checked:after:left-[3px] checked:after:top-[0px]" @change="checkMissionReward(m)">
+                    <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-white text-emerald-400 focus:ring-emerald-500 focus:ring-offset-0 w-4 h-4 cursor-pointer appearance-none checked:bg-emerald-500/100 checked:border-emerald-500 relative checked:after:content-['âœ“'] checked:after:absolute checked:after:text-black checked:after:text-[10px] checked:after:font-black checked:after:left-[3px] checked:after:top-[0px]" @change="checkMissionReward(m)">
                     <span :class="['text-xs font-bold flex-grow text-white transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
                     <span class="text-xs font-black font-mono shrink-0 text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">+{{ m.reward }} XP</span>
                   </li>
@@ -3057,7 +3057,7 @@
                   <div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 space-y-2">
                     <div class="flex justify-between items-center text-xs">
                       <span class="font-bold text-white">Geometri Bangun Ruang (3D)</span>
-                      <span class="text-rose-400 font-mono font-black text-[11px]">35% · Kritis</span>
+                      <span class="text-rose-400 font-mono font-black text-[11px]">35% Â· Kritis</span>
                     </div>
                     <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
                       <div class="bg-rose-500 h-full rounded-full" style="width: 35%;"></div>
@@ -3074,7 +3074,7 @@
                   <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 space-y-2">
                     <div class="flex justify-between items-center text-xs">
                       <span class="font-bold text-white">Silogisme &amp; Logika Majemuk</span>
-                      <span class="text-amber-400 font-mono font-black text-[11px]">60% · Pemantapan</span>
+                      <span class="text-amber-400 font-mono font-black text-[11px]">60% Â· Pemantapan</span>
                     </div>
                     <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
                       <div class="bg-amber-500 h-full rounded-full" style="width: 60%;"></div>
@@ -3091,7 +3091,7 @@
                   <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 space-y-2">
                     <div class="flex justify-between items-center text-xs">
                       <span class="font-bold text-white">Aljabar &amp; Persamaan Kuadrat</span>
-                      <span class="text-emerald-400 font-mono font-black text-[11px]">85% · Kuasai</span>
+                      <span class="text-emerald-400 font-mono font-black text-[11px]">85% Â· Kuasai</span>
                     </div>
                     <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
                       <div class="bg-emerald-500 h-full rounded-full" style="width: 85%;"></div>
@@ -3140,7 +3140,7 @@
                       <p class="text-[10px] text-white/50">Konsistensi harian kunci kelulusan PTN</p>
                     </div>
                   </div>
-                  <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-black font-mono">🔥 {{ streakCount }} Hari</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-black font-mono">ðŸ”¥ {{ streakCount }} Hari</span>
                 </div>
                 <ul class="space-y-2">
                   <li class="flex items-center gap-2.5 p-2 rounded-xl bg-gradient-to-r from-indigo-500/20 to-purple-500/10 border border-indigo-500/30">
@@ -3328,7 +3328,7 @@
               <!-- Quiz Result State -->
               <div v-else-if="diagnosticFinished" class="space-y-6">
                 <div class="text-center py-6 bg-slate-50 border border-slate-200 rounded-2xl">
-                  <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xl mx-auto mb-2 font-mono">✓</div>
+                  <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xl mx-auto mb-2 font-mono">âœ“</div>
                   <h4 class="text-lg font-black text-slate-900">Diagnostic Selesai!</h4>
                 </div>
 
@@ -3398,7 +3398,7 @@
               <div class="flex items-center gap-1.5 bg-black/40 border border-white/10 px-2.5 py-1.5 rounded-xl shadow-inner">
                 <span class="w-2 h-2 rounded-full" :class="timerActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'"></span>
                 <span class="text-[10px] uppercase font-black tracking-wider text-indigo-300 hidden md:inline">
-                  {{ isBreak ? '☕ Break' : '🎯 Fokus' }}
+                  {{ isBreak ? 'â˜• Break' : 'ðŸŽ¯ Fokus' }}
                 </span>
                 <span class="font-mono font-black text-xs text-white tracking-wider px-0.5">{{ formattedTime }}</span>
                 <button 
@@ -3425,7 +3425,7 @@
               <!-- Subtest Selector Dropdown (Disamping Buka/Sembunyikan Bab) -->
               <div class="relative flex items-center min-w-0">
                 <span class="absolute left-2.5 text-xs pointer-events-none select-none">
-                  {{ selectedSubtes?.icon || '📚' }}
+                  {{ selectedSubtes?.icon || 'ðŸ“š' }}
                 </span>
                 <select 
                   id="subtest-select"
@@ -3849,9 +3849,9 @@
               <span class="text-xs text-white/50 font-medium">Sistem CBT resmi dengan timer ketat &amp; analitik IRT</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <!-- Card 1: SNBT / SNPMB -->
-              <div class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-sky-500/30 hover:border-sky-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <!-- Card SNBT / SNPMB -->
+              <div v-if="!activeAcademicProgram || activeAcademicProgram === 'SNPMB_UTBK' || activeAcademicProgram.includes('Alumni') || activeAcademicProgram.includes('SNPMB')" class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-sky-500/30 hover:border-sky-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between">
                     <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30">SNBT / SNPMB</span>
@@ -3872,8 +3872,8 @@
                 </button>
               </div>
 
-              <!-- Card 2: TKA Saintek -->
-              <div class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-emerald-500/30 hover:border-emerald-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
+              <!-- Card TKA Saintek -->
+              <div v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SMA'" class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-emerald-500/30 hover:border-emerald-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between">
                     <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">TKA SMA IPA</span>
@@ -3894,8 +3894,8 @@
                 </button>
               </div>
 
-              <!-- Card 3: TKA Soshum -->
-              <div class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-amber-500/30 hover:border-amber-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
+              <!-- Card TKA Soshum -->
+              <div v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SMA'" class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-amber-500/30 hover:border-amber-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between">
                     <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">TKA SMA IPS</span>
@@ -3913,6 +3913,50 @@
                 >
                   <i class="ph-bold ph-play-circle text-base"></i>
                   <span>Mulai CBT Soshum</span>
+                </button>
+              </div>
+
+              <!-- Card TKA SMP -->
+              <div v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SMP'" class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-violet-500/30 hover:border-violet-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-violet-500/20 text-violet-300 border border-violet-500/30">TKA SMP</span>
+                    <span class="text-[10px] font-mono text-white/50">90 Menit</span>
+                  </div>
+                  <h4 class="text-sm font-black text-white group-hover:text-violet-300 transition-colors">TKA SMP</h4>
+                  <p class="text-[11px] text-white/60 leading-relaxed">
+                    Simulasi ujian masuk SMA unggulan &amp; Olimpiade tingkat SMP.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  @click="window.location.hash = '#/tryout?assessment_type=TKA&level=smp'"
+                  class="mt-4 w-full py-2.5 px-3 rounded-xl bg-violet-500 hover:bg-violet-400 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-violet-500/20 active:scale-95 cursor-pointer"
+                >
+                  <i class="ph-bold ph-play-circle text-base"></i>
+                  <span>Mulai CBT SMP</span>
+                </button>
+              </div>
+
+              <!-- Card TKA SD -->
+              <div v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SD'" class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-pink-500/30 hover:border-pink-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/30">TKA SD</span>
+                    <span class="text-[10px] font-mono text-white/50">60 Menit</span>
+                  </div>
+                  <h4 class="text-sm font-black text-white group-hover:text-pink-300 transition-colors">TKA SD</h4>
+                  <p class="text-[11px] text-white/60 leading-relaxed">
+                    Simulasi ujian masuk SMP unggulan &amp; Olimpiade tingkat SD.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  @click="window.location.hash = '#/tryout?assessment_type=TKA&level=sd'"
+                  class="mt-4 w-full py-2.5 px-3 rounded-xl bg-pink-500 hover:bg-pink-400 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-pink-500/20 active:scale-95 cursor-pointer"
+                >
+                  <i class="ph-bold ph-play-circle text-base"></i>
+                  <span>Mulai CBT SD</span>
                 </button>
               </div>
             </div>
@@ -4317,7 +4361,7 @@
         <div class="border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
           <div class="flex items-center gap-2">
             <div class="w-2 h-2 rounded-full bg-[#c0ff00] animate-ping"></div>
-            <span>© 2026 <strong class="text-white/80">PT Kreasi Hasanah Indonesia</strong> (EduPath). All rights reserved.</span>
+            <span>Â© 2026 <strong class="text-white/80">PT Kreasi Hasanah Indonesia</strong> (EduPath). All rights reserved.</span>
           </div>
           <div class="flex flex-wrap items-center gap-4 text-xs">
             <button @click="showTermsModal = true" class="text-[#c0ff00] hover:underline font-bold">Syarat &amp; Ketentuan</button>
@@ -4331,7 +4375,7 @@
 
     <!-- Modal: Pilihan Paket Belajar EduPath (Upgrade & Plan Selector Flow) -->
     <div v-if="showPlanSelectorModal" @click.self="showPlanSelectorModal = false" class="fixed inset-0 z-[95] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
-      <div class="edupath-modal-card w-full max-w-5xl p-6 sm:p-8 animate-fade-in relative my-auto max-h-[90vh] overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-5xl p-6 sm:p-8 animate-fade-in relative my-auto">
         <!-- Close button -->
         <button
           type="button"
@@ -4346,7 +4390,7 @@
         <!-- Header -->
         <div class="text-center max-w-xl mx-auto mb-6 space-y-2">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-black uppercase tracking-widest">
-            ⚡ INVESTASI MASA DEPAN
+            âš¡ INVESTASI MASA DEPAN
           </div>
           <h2 class="text-2xl sm:text-3xl font-black font-heading text-white">Pilih Paket Persiapan Akademik</h2>
           <p class="text-xs sm:text-sm text-white/60">Tingkatkan kesiapan ujian dengan ribuan bank soal HOTS terstandar IRT, tryout adaptif, dan analisis AI cerdas.</p>
@@ -4474,7 +4518,7 @@
                         {{ product.academic_program || 'SNPMB/UTBK' }}
                       </span>
                       <span v-if="idx % 3 === 1" class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-[#c0ff00] text-black">
-                        👑 Populer
+                        ðŸ‘‘ Populer
                       </span>
                     </div>
                     <div class="font-extrabold text-white text-sm">{{ product.name }}</div>
@@ -4484,7 +4528,7 @@
                   <!-- Col 2: Metode -->
                   <td class="py-3.5 px-3 align-top">
                     <span :class="['inline-flex text-[10px] font-bold px-2 py-0.5 rounded-lg border', (product.delivery_mode === 'hybrid') ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30']">
-                      {{ product.delivery_mode === 'hybrid' ? '🏫 Hybrid Cabang' : '🌐 Full Online' }}
+                      {{ product.delivery_mode === 'hybrid' ? 'ðŸ« Hybrid Cabang' : 'ðŸŒ Full Online' }}
                     </span>
                   </td>
 
@@ -4559,7 +4603,7 @@
           >
             <!-- Badge for Middle Plan -->
             <div v-if="idx % 3 === 1" class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#c0ff00] text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
-              👑 PALING POPULER
+              ðŸ‘‘ PALING POPULER
             </div>
 
             <div>
@@ -4576,7 +4620,7 @@
                   {{ product.academic_program || 'SNPMB/UTBK' }}
                 </span>
                 <span :class="['text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border', (product.delivery_mode === 'hybrid') ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30']">
-                  {{ product.delivery_mode === 'hybrid' ? '🏫 Hybrid (Offline + Online)' : '🌐 Full Online' }}
+                  {{ product.delivery_mode === 'hybrid' ? 'ðŸ« Hybrid (Offline + Online)' : 'ðŸŒ Full Online' }}
                 </span>
               </div>
               <p class="text-xs text-white/50 mt-1 min-h-[32px]">{{ product.description }}</p>
@@ -4843,7 +4887,7 @@
                       :value="prog.code"
                       class="bg-slate-900 text-white py-2"
                     >
-                      {{ prog.icon }} {{ prog.name }} — {{ prog.levelDesc }}
+                      {{ prog.icon }} {{ prog.name }} â€” {{ prog.levelDesc }}
                     </option>
                   </select>
                   <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white/50 text-xs">
@@ -4905,7 +4949,7 @@
                     <button v-if="isLoginMode" type="button" @click="isForgotPasswordMode = true" class="text-[10px] text-[#c0ff00] hover:underline focus:outline-none">Lupa Password?</button>
                   </div>
                   <div class="relative">
-                    <input v-model="authForm.password" :type="showPassword ? 'text' : 'password'" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-[#c0ff00] pr-9">
+                    <input v-model="authForm.password" :type="showPassword ? 'text' : 'password'" required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-[#c0ff00] pr-9">
                     <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white cursor-pointer select-none" :title="showPassword ? 'Sembunyikan password' : 'Lihat password'">
                       <svg v-if="!showPassword" class="w-3.5 h-3.5 text-slate-400 hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -4979,7 +5023,7 @@
             </div>
             <div>
               <h3 class="text-base sm:text-lg font-black text-white">Syarat dan Ketentuan (Terms &amp; Conditions)</h3>
-              <p class="text-[11px] text-white/50">EduPath Platform Pembelajaran Digital • Terakhir diperbarui: 1 Oktober 2026</p>
+              <p class="text-[11px] text-white/50">EduPath Platform Pembelajaran Digital â€¢ Terakhir diperbarui: 1 Oktober 2026</p>
             </div>
           </div>
           <button
@@ -5064,7 +5108,7 @@
 
           <div class="p-4 rounded-2xl bg-[#c0ff00]/5 border border-[#c0ff00]/20 space-y-1.5">
             <h4 class="text-[#c0ff00] font-black text-sm flex items-center gap-2">
-              <span>✦ 10.</span> Batasan Fitur Analitik, Simulasi &amp; AI
+              <span>âœ¦ 10.</span> Batasan Fitur Analitik, Simulasi &amp; AI
             </h4>
             <p class="text-white/85">Kalkulator prediksi skor AI dan peluang kelulusan PTN adalah instrumen simulasi dan evaluasi belajar. <strong>Hasil tersebut bukan jaminan mutlak kelulusan ujian resmi (SNPMB/UTBK)</strong>, melainkan panduan penentuan strategi belajar.</p>
           </div>
@@ -5094,7 +5138,7 @@
             <h4 class="text-white font-black text-sm flex items-center gap-2">
               <span class="text-[#c0ff00]">21-22.</span> Kontak Resmi &amp; Persetujuan
             </h4>
-            <p>Email: <strong>admin@edupath.co.id</strong> • Website: <strong>https://edupath.co.id</strong></p>
+            <p>Email: <strong>admin@edupath.co.id</strong> â€¢ Website: <strong>https://edupath.co.id</strong></p>
           </div>
         </div>
 
@@ -5198,26 +5242,26 @@
 
         <div class="edupath-modal-body space-y-4 text-xs md:text-sm text-white/70 leading-relaxed">
           <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs">
-            ⚠️ <strong>Catatan Penting:</strong> EduPath adalah platform latihan belajar mandiri dan pendampingan akademik adaptif yang dikembangkan dan dioperasikan oleh <strong>PT Kreasi Hasanah Indonesia</strong>. Simulasi dan skor proyeksi bukan merupakan penetapan resmi kelulusan PTN.
+            âš ï¸ <strong>Catatan Penting:</strong> EduPath adalah platform latihan belajar mandiri dan pendampingan akademik adaptif yang dikembangkan dan dioperasikan oleh <strong>PT Kreasi Hasanah Indonesia</strong>. Simulasi dan skor proyeksi bukan merupakan penetapan resmi kelulusan PTN.
           </div>
 
           <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
             <h4 class="text-white font-black text-sm flex items-center gap-2">
-              <span class="text-[#c0ff00]">✦</span> Model Estimasi Berbasis IRT Terkalibrasi
+              <span class="text-[#c0ff00]">âœ¦</span> Model Estimasi Berbasis IRT Terkalibrasi
             </h4>
             <p>Penilaian latihan di EduPath mengadopsi prinsip <em>Item Response Theory (IRT)</em> yang dikalibrasi berdasarkan tingkat kesulitan butir soal latihan. Model ini berfungsi sebagai tolok ukur edukatif agar siswa fokus menambal kelemahan pada materi berbobot tinggi.</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
             <h4 class="text-white font-black text-sm flex items-center gap-2">
-              <span class="text-[#c0ff00]">✦</span> Peran AI Sebagai Asisten Belajar
+              <span class="text-[#c0ff00]">âœ¦</span> Peran AI Sebagai Asisten Belajar
             </h4>
             <p>AI Tutor dan rekomendasi jalur belajar dirancang sebagai pemandu eksplorasi minat dan asisten pemecahan logika soal. Keputusan akhir pemilihan program studi dan strategi sepenuhnya berada pada pertimbangan siswa, orang tua, dan guru BK.</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
             <h4 class="text-white font-black text-sm flex items-center gap-2">
-              <span class="text-[#c0ff00]">✦</span> Independensi &amp; Non-Afiliasi Pemerintah
+              <span class="text-[#c0ff00]">âœ¦</span> Independensi &amp; Non-Afiliasi Pemerintah
             </h4>
             <p>EduPath adalah platform teknologi pendidikan swasta independen naungan <strong>PT Kreasi Hasanah Indonesia</strong>. Platform ini tidak memiliki afiliasi dinas atau endorsement langsung dari Balai Pengelolaan Pengujian Pendidikan (BP3), Kemendikbudristek, maupun panitia SNPMB.</p>
           </div>
@@ -5389,14 +5433,14 @@
             </div>
             <div>
               <div class="text-xs font-bold text-white">Jam Operasional Layanan</div>
-              <div class="text-[11px] text-white/50">Senin – Sabtu: 08.00 – 20.00 WIB • Hari Minggu &amp; Libur Nasional: Melalui Pesan Otomatis</div>
+              <div class="text-[11px] text-white/50">Senin â€“ Sabtu: 08.00 â€“ 20.00 WIB â€¢ Hari Minggu &amp; Libur Nasional: Melalui Pesan Otomatis</div>
             </div>
           </div>
 
         </div>
 
         <div class="edupath-modal-footer items-center justify-between gap-3">
-          <span class="text-[11px] text-white/40">© 2026 PT Kreasi Hasanah Indonesia</span>
+          <span class="text-[11px] text-white/40">Â© 2026 PT Kreasi Hasanah Indonesia</span>
           <button @click="showContactModal = false" class="edupath-btn-primary">
             Tutup
           </button>
@@ -5709,7 +5753,7 @@ export default {
       countdownSeconds.value = Math.floor((diff % (1000 * 60)) / 1000);
     };
 
-    // Multi-Program Chance Simulator — SD (SMP Favorit), SMP (SMA Unggulan), SMA (SNBP/PTN), SNPMB (50 PTN Top)
+    // Multi-Program Chance Simulator â€” SD (SMP Favorit), SMP (SMA Unggulan), SMA (SNBP/PTN), SNPMB (50 PTN Top)
     const SIM_TARGETS = {
       'SD': [
         { id: 'labschool_smp', name: 'SMP Labschool (Jakarta / Cibubur)', targetScore: 85, focus: 'Numerasi Cepat & Logika Pola Angka', unit: 'Poin' },
@@ -5740,10 +5784,10 @@ export default {
     const targetPtnList = TARGET_UNIVERSITIES;
 
     const simLevels = [
-      { id: 'SD', name: 'TKA SD (Kelas 4–6)', icon: '🎒', title: 'Peluang Masuk SMP Unggulan', targetLabel: 'Target SMP Unggulan', scoreLabel: 'Skor Tryout / Asesmen Saat Ini', scoreUnit: 'Poin', minScore: 50, maxScore: 95, defaultScore: 68, minHours: 0.5, maxHours: 3, defaultHours: 1.5, scoreScaleText: '50 (Dasar) - 75 (Menengah) - 95 (Unggulan)' },
-      { id: 'SMP', name: 'TKA SMP (Kelas 7–9)', icon: '📚', title: 'Peluang Masuk SMA Unggulan', targetLabel: 'Target SMA Unggulan / Boarding School', scoreLabel: 'Nilai Ujian / Tryout Saat Ini', scoreUnit: 'Poin', minScore: 50, maxScore: 95, defaultScore: 72, minHours: 1, maxHours: 4, defaultHours: 2, scoreScaleText: '50 (Cukup) - 75 (Baik) - 95 (Istimewa)' },
-      { id: 'SMA', name: 'TKA SMA (Kelas 10–12)', icon: '🔬', title: 'Peluang Masuk Kuota SNBP PTN', targetLabel: 'Target Kuota SNBP & Seleksi Akademik', scoreLabel: 'Nilai TKA / Rapor Saat Ini', scoreUnit: 'Poin', minScore: 55, maxScore: 98, defaultScore: 75, minHours: 1, maxHours: 5, defaultHours: 2.5, scoreScaleText: '55 (Standar) - 78 (Eligible) - 98 (Top 5%)' },
-      { id: 'SNPMB', name: 'SNPMB / UTBK & Alumni', icon: '🎓', title: 'Peluang Lolos PTN Impian', targetLabel: 'Target Universitas & Jurusan', scoreLabel: 'Skor Tryout IRT Terakhir', scoreUnit: 'Poin IRT', minScore: 400, maxScore: 750, defaultScore: 540, minHours: 1, maxHours: 6, defaultHours: 3, scoreScaleText: '400 (Pemula) - 550 (Menengah) - 750 (Master)' }
+      { id: 'SD', name: 'TKA SD (Kelas 4â€“6)', icon: 'ðŸŽ’', title: 'Peluang Masuk SMP Unggulan', targetLabel: 'Target SMP Unggulan', scoreLabel: 'Skor Tryout / Asesmen Saat Ini', scoreUnit: 'Poin', minScore: 50, maxScore: 95, defaultScore: 68, minHours: 0.5, maxHours: 3, defaultHours: 1.5, scoreScaleText: '50 (Dasar) - 75 (Menengah) - 95 (Unggulan)' },
+      { id: 'SMP', name: 'TKA SMP (Kelas 7â€“9)', icon: 'ðŸ“š', title: 'Peluang Masuk SMA Unggulan', targetLabel: 'Target SMA Unggulan / Boarding School', scoreLabel: 'Nilai Ujian / Tryout Saat Ini', scoreUnit: 'Poin', minScore: 50, maxScore: 95, defaultScore: 72, minHours: 1, maxHours: 4, defaultHours: 2, scoreScaleText: '50 (Cukup) - 75 (Baik) - 95 (Istimewa)' },
+      { id: 'SMA', name: 'TKA SMA (Kelas 10â€“12)', icon: 'ðŸ”¬', title: 'Peluang Masuk Kuota SNBP PTN', targetLabel: 'Target Kuota SNBP & Seleksi Akademik', scoreLabel: 'Nilai TKA / Rapor Saat Ini', scoreUnit: 'Poin', minScore: 55, maxScore: 98, defaultScore: 75, minHours: 1, maxHours: 5, defaultHours: 2.5, scoreScaleText: '55 (Standar) - 78 (Eligible) - 98 (Top 5%)' },
+      { id: 'SNPMB', name: 'SNPMB / UTBK & Alumni', icon: 'ðŸŽ“', title: 'Peluang Lolos PTN Impian', targetLabel: 'Target Universitas & Jurusan', scoreLabel: 'Skor Tryout IRT Terakhir', scoreUnit: 'Poin IRT', minScore: 400, maxScore: 750, defaultScore: 540, minHours: 1, maxHours: 6, defaultHours: 3, scoreScaleText: '400 (Pemula) - 550 (Menengah) - 750 (Master)' }
     ];
 
     const selectedSimLevel = ref('SNPMB');
@@ -5810,31 +5854,31 @@ export default {
 
     const simChanceStatus = computed(() => {
       const pct = simChancePercentage.value;
-      if (pct >= 85) return { text: 'Peluang Sangat Tinggi 🚀', color: '#c0ff00', badge: 'bg-[#c0ff00]/20 text-[#c0ff00] border-[#c0ff00]/40' };
-      if (pct >= 70) return { text: 'Peluang Bagus (Dalam Jangkauan) ⚡', color: '#38bdf8', badge: 'bg-sky-500/20 text-sky-400 border-sky-500/40' };
-      if (pct >= 50) return { text: 'Perlu Akselerasi Materi Kritis ⚠️', color: '#fbbf24', badge: 'bg-amber-500/20 text-amber-400 border-amber-500/40' };
-      return { text: 'Butuh Jalur Intensif Khusus 🛑', color: '#f87171', badge: 'bg-rose-500/20 text-rose-400 border-rose-500/40' };
+      if (pct >= 85) return { text: 'Peluang Sangat Tinggi ðŸš€', color: '#c0ff00', badge: 'bg-[#c0ff00]/20 text-[#c0ff00] border-[#c0ff00]/40' };
+      if (pct >= 70) return { text: 'Peluang Bagus (Dalam Jangkauan) âš¡', color: '#38bdf8', badge: 'bg-sky-500/20 text-sky-400 border-sky-500/40' };
+      if (pct >= 50) return { text: 'Perlu Akselerasi Materi Kritis âš ï¸', color: '#fbbf24', badge: 'bg-amber-500/20 text-amber-400 border-amber-500/40' };
+      return { text: 'Butuh Jalur Intensif Khusus ðŸ›‘', color: '#f87171', badge: 'bg-rose-500/20 text-rose-400 border-rose-500/40' };
     });
 
     // Mini Interactive HOTS Quiz Widget on Landing Page
     const miniQuizQuestions = [
       {
         category: 'Pengetahuan Kuantitatif (PK)',
-        icon: '📐',
-        question: 'Jika x dan y adalah bilangan bulat positif yang memenuhi x² - y² = 31, berapakah nilai dari x² + y²?',
+        icon: 'ðŸ“',
+        question: 'Jika x dan y adalah bilangan bulat positif yang memenuhi xÂ² - yÂ² = 31, berapakah nilai dari xÂ² + yÂ²?',
         options: [
           { text: 'A. 481', isCorrect: true },
           { text: 'B. 465', isCorrect: false },
           { text: 'C. 521', isCorrect: false },
           { text: 'D. 397', isCorrect: false }
         ],
-        explanation: 'Faktorkan (x - y)(x + y) = 31. Karena 31 bilangan prima, x - y = 1 dan x + y = 31. Maka 2x = 32 -> x = 16, y = 15. Diperoleh x² + y² = 16² + 15² = 256 + 225 = 481.',
-        trick: 'Trik Cepat Prima: Untuk a² - b² = P (prima), a = (P+1)/2 = 16 dan b = (P-1)/2 = 15. Langsung ketemu tanpa aljabar panjang!',
+        explanation: 'Faktorkan (x - y)(x + y) = 31. Karena 31 bilangan prima, x - y = 1 dan x + y = 31. Maka 2x = 32 -> x = 16, y = 15. Diperoleh xÂ² + yÂ² = 16Â² + 15Â² = 256 + 225 = 481.',
+        trick: 'Trik Cepat Prima: Untuk aÂ² - bÂ² = P (prima), a = (P+1)/2 = 16 dan b = (P-1)/2 = 15. Langsung ketemu tanpa aljabar panjang!',
         irtScore: 42
       },
       {
         category: 'Penalaran Umum (PU)',
-        icon: '🧠',
+        icon: 'ðŸ§ ',
         question: 'Semua mahasiswa teknik rajin berhitung. Sebagian orang yang rajin berhitung gemar bermain catur. Kesimpulan yang PALING VALID adalah...',
         options: [
           { text: 'A. Semua mahasiswa teknik gemar bermain catur', isCorrect: false },
@@ -5848,7 +5892,7 @@ export default {
       },
       {
         category: 'Literasi Bahasa Indonesia',
-        icon: '🇮🇩',
+        icon: 'ðŸ‡®ðŸ‡©',
         question: 'Manakah penulisan kata serapan dan gabungan kata di bawah ini yang SELURUHNYA sesuai dengan Pedoman EYD Edisi V?',
         options: [
           { text: 'A. Mempertanggung jawabkan, pasca panen, analisa', isCorrect: false },
@@ -5883,7 +5927,7 @@ export default {
       {
         name: 'Rafi A.',
         school: 'Siswa Kelas 12 SMA',
-        avatar: '📚',
+        avatar: 'ðŸ“š',
         cluster: 'health',
         clusterLabel: 'Saintek',
         target: 'Saintek / Kedokteran UI',
@@ -5893,7 +5937,7 @@ export default {
       {
         name: 'Dimas P.',
         school: 'Alumni / Pejuang Gap Year',
-        avatar: '🎯',
+        avatar: 'ðŸŽ¯',
         cluster: 'engineering',
         clusterLabel: 'Teknik',
         target: 'Teknik Informatika ITB',
@@ -5903,7 +5947,7 @@ export default {
       {
         name: 'Nadia R.',
         school: 'Siswa Kelas 12 SMA',
-        avatar: '✨',
+        avatar: 'âœ¨',
         cluster: 'soshum',
         clusterLabel: 'Soshum',
         target: 'Akuntansi / FEB UGM',
@@ -6117,7 +6161,7 @@ export default {
       if (tabInfo) {
         document.title = `${tabInfo.label} | EduPath`;
       } else {
-        document.title = 'EduPath — Bimbel Adaptif Terpadu SD, SMP, SMA & SNPMB';
+        document.title = 'EduPath â€” Bimbel Adaptif Terpadu SD, SMP, SMA & SNPMB';
       }
       initScrollReveal();
     });
@@ -6136,11 +6180,11 @@ export default {
     });
 
     const availableRegistrationPrograms = [
-      { code: 'TKA_SD', name: 'TKA SD', icon: '🎒', targetLevel: 'SD', levelDesc: 'Kelas 4–6 SD', goalLabel: 'Target SMP Favorit / Impian', goalPlaceholder: 'Cth: SMP Labschool / SMPN 1' },
-      { code: 'TKA_SMP', name: 'TKA SMP', icon: '🏫', targetLevel: 'SMP', levelDesc: 'Kelas 7–9 SMP', goalLabel: 'Target SMA / SMK Impian', goalPlaceholder: 'Cth: SMAN 8 / SMA Taruna Nusantara' },
-      { code: 'TKA_SMA', name: 'TKA SMA', icon: '🎓', targetLevel: 'SMA', levelDesc: 'Kelas 10–12 SMA', goalLabel: 'Target Asesmen Akademik SMA', goalPlaceholder: 'Cth: Peringkat 1 / Olimpiade Saintek' },
-      { code: 'SNPMB_UTBK', name: 'SNPMB / UTBK', icon: '⚡', targetLevel: 'SMA', levelDesc: 'Kelas 12 Pejuang PTN', goalLabel: 'Target PTN & Jurusan Impian', goalPlaceholder: 'Cth: UI - Kedokteran / ITB - STEI' },
-      { code: 'SNPMB_ALUMNI', name: 'SNPMB Alumni', icon: '🏆', targetLevel: 'ALUMNI', levelDesc: 'Gap Year / Lulusan', goalLabel: 'Target PTN Impian', goalPlaceholder: 'Cth: UGM - Teknik / Unair - Kedokteran' }
+      { code: 'TKA_SD', name: 'TKA SD', icon: 'ðŸŽ’', targetLevel: 'SD', levelDesc: 'Kelas 4â€“6 SD', goalLabel: 'Target SMP Favorit / Impian', goalPlaceholder: 'Cth: SMP Labschool / SMPN 1' },
+      { code: 'TKA_SMP', name: 'TKA SMP', icon: 'ðŸ«', targetLevel: 'SMP', levelDesc: 'Kelas 7â€“9 SMP', goalLabel: 'Target SMA / SMK Impian', goalPlaceholder: 'Cth: SMAN 8 / SMA Taruna Nusantara' },
+      { code: 'TKA_SMA', name: 'TKA SMA', icon: 'ðŸŽ“', targetLevel: 'SMA', levelDesc: 'Kelas 10â€“12 SMA', goalLabel: 'Target Asesmen Akademik SMA', goalPlaceholder: 'Cth: Peringkat 1 / Olimpiade Saintek' },
+      { code: 'SNPMB_UTBK', name: 'SNPMB / UTBK', icon: 'âš¡', targetLevel: 'SMA', levelDesc: 'Kelas 12 Pejuang PTN', goalLabel: 'Target PTN & Jurusan Impian', goalPlaceholder: 'Cth: UI - Kedokteran / ITB - STEI' },
+      { code: 'SNPMB_ALUMNI', name: 'SNPMB Alumni', icon: 'ðŸ†', targetLevel: 'ALUMNI', levelDesc: 'Gap Year / Lulusan', goalLabel: 'Target PTN Impian', goalPlaceholder: 'Cth: UGM - Teknik / Unair - Kedokteran' }
     ];
 
     const selectRegistrationProgram = (prog) => {
@@ -6172,11 +6216,11 @@ export default {
     const showProgramSwitcherDropdown = ref(false);
 
     const allAcademicProgramsList = [
-      { code: 'TKA_SD', name: 'TKA SD', icon: '🎒', badge: 'PROGRAM SEKOLAH DASAR (KELAS 4-6)', levelDesc: 'SD', targetLevel: 'SD', defaultGreeting: 'Semangat belajar berhitung cepat & literasi membaca ceria hari ini!' },
-      { code: 'TKA_SMP', name: 'TKA SMP', icon: '🏫', badge: 'PROGRAM SEKOLAH MENENGAH PERTAMA (KELAS 7-9)', levelDesc: 'SMP', targetLevel: 'SMP', defaultGreeting: 'Asah logika penalaran matematika & sains untuk masuk SMA favorit!' },
-      { code: 'TKA_SMA', name: 'TKA SMA', icon: '🎓', badge: 'PROGRAM SEKOLAH MENENGAH ATAS (KELAS 10-12)', levelDesc: 'SMA', targetLevel: 'SMA', defaultGreeting: 'Kuasai materi kurikulum SMA & raih peringkat terbaik di kelasmu!' },
-      { code: 'SNPMB_UTBK', name: 'SNPMB / UTBK', icon: '⚡', badge: 'PROGRAM PERSIAPAN MASUK PTN 2027', levelDesc: 'Kelas 12', targetLevel: 'SMA', defaultGreeting: 'Persiapkan SNBT 2027 dengan asesmen IRT adaptif & latihan soal terfokus.' },
-      { code: 'SNPMB_ALUMNI', name: 'SNPMB Alumni', icon: '🏆', badge: 'PROGRAM INTENSIF ALUMNI & GAP YEAR', levelDesc: 'Alumni', targetLevel: 'ALUMNI', defaultGreeting: 'Maksimalkan strategi belajar gap year & taklukkan seleksi SNBT 2027!' }
+      { code: 'TKA_SD', name: 'TKA SD', icon: 'ðŸŽ’', badge: 'PROGRAM SEKOLAH DASAR (KELAS 4-6)', levelDesc: 'SD', targetLevel: 'SD', defaultGreeting: 'Semangat belajar berhitung cepat & literasi membaca ceria hari ini!' },
+      { code: 'TKA_SMP', name: 'TKA SMP', icon: 'ðŸ«', badge: 'PROGRAM SEKOLAH MENENGAH PERTAMA (KELAS 7-9)', levelDesc: 'SMP', targetLevel: 'SMP', defaultGreeting: 'Asah logika penalaran matematika & sains untuk masuk SMA favorit!' },
+      { code: 'TKA_SMA', name: 'TKA SMA', icon: 'ðŸŽ“', badge: 'PROGRAM SEKOLAH MENENGAH ATAS (KELAS 10-12)', levelDesc: 'SMA', targetLevel: 'SMA', defaultGreeting: 'Kuasai materi kurikulum SMA & raih peringkat terbaik di kelasmu!' },
+      { code: 'SNPMB_UTBK', name: 'SNPMB / UTBK', icon: 'âš¡', badge: 'PROGRAM PERSIAPAN MASUK PTN 2027', levelDesc: 'Kelas 12', targetLevel: 'SMA', defaultGreeting: 'Persiapkan SNBT 2027 dengan asesmen IRT adaptif & latihan soal terfokus.' },
+      { code: 'SNPMB_ALUMNI', name: 'SNPMB Alumni', icon: 'ðŸ†', badge: 'PROGRAM INTENSIF ALUMNI & GAP YEAR', levelDesc: 'Alumni', targetLevel: 'ALUMNI', defaultGreeting: 'Maksimalkan strategi belajar gap year & taklukkan seleksi SNBT 2027!' }
     ];
 
     const getProgramDisplayName = (code) => {
@@ -6186,7 +6230,7 @@ export default {
 
     const getProgramIcon = (code) => {
       const p = allAcademicProgramsList.find(item => item.code === code);
-      return p ? p.icon : '⚡';
+      return p ? p.icon : 'âš¡';
     };
 
     const hasSubscriptionForProgram = (code) => {
@@ -6211,10 +6255,10 @@ export default {
     });
 
     const activeProgramTargetIcon = computed(() => {
-      if (activeAcademicProgram.value === 'TKA_SD') return '🎒';
-      if (activeAcademicProgram.value === 'TKA_SMP') return '🏫';
-      if (activeAcademicProgram.value === 'TKA_SMA') return '🏆';
-      return '🎯';
+      if (activeAcademicProgram.value === 'TKA_SD') return 'ðŸŽ’';
+      if (activeAcademicProgram.value === 'TKA_SMP') return 'ðŸ«';
+      if (activeAcademicProgram.value === 'TKA_SMA') return 'ðŸ†';
+      return 'ðŸŽ¯';
     });
 
     const activeProgramTargetTitle = computed(() => {
@@ -6308,8 +6352,8 @@ export default {
     ];
     const availableDeliveryModeTabs = [
       { id: 'ALL', name: 'Semua Metode' },
-      { id: 'online', name: '🌐 Full Online' },
-      { id: 'hybrid', name: '🏫 Hybrid Bimbel' }
+      { id: 'online', name: 'ðŸŒ Full Online' },
+      { id: 'hybrid', name: 'ðŸ« Hybrid Bimbel' }
     ];
     
     const displayProducts = computed(() => {
@@ -6689,7 +6733,7 @@ export default {
                 test_component: comp,
                 assessment_type: aType,
                 track: trk,
-                icon: aType === 'TKA' ? (trk === 'saintek' ? '🔬' : '📚') : '📘',
+                icon: aType === 'TKA' ? (trk === 'saintek' ? 'ðŸ”¬' : 'ðŸ“š') : 'ðŸ“˜',
                 babList: []
               };
               materiUtbk.value.push(targetSub);
@@ -7538,8 +7582,8 @@ export default {
     const simulateTelegramSent = () => showToast(' Laporan mingguan sukses dikirimkan ke Telegram Orang Tua.');
 
     const liveActivityList = [
-      { icon: '🔥', title: 'EduPath Beta Aktif', desc: 'Platform sedang dalam tahap pengembangan & pengujian', time: 'Live' },
-      { icon: '🚀', title: 'Fitur Baru Segera Hadir', desc: 'Daftar sekarang untuk akses early bird & notifikasi peluncuran', time: 'Coming Soon' }
+      { icon: 'ðŸ”¥', title: 'EduPath Beta Aktif', desc: 'Platform sedang dalam tahap pengembangan & pengujian', time: 'Live' },
+      { icon: 'ðŸš€', title: 'Fitur Baru Segera Hadir', desc: 'Daftar sekarang untuk akses early bird & notifikasi peluncuran', time: 'Coming Soon' }
     ];
     const currentActivityIdx = ref(0);
     const showLiveActivity = ref(true);

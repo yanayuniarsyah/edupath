@@ -114,7 +114,8 @@ MTH-Q-0001,MTH001,multiple_choice,medium,"Jika x²‑5x+6=0, maka nilai x yang b
 | Preferensi topik | Rating topik | Kuesioner likert + klik contoh materi | `topicRatings` (1‑5) | Menyesuaikan *track* belajar (Matematika, Fisika, dsb.). |
 | Motivasi karir | Score karir | Inventori RIASEC atau serupa | `careerScore` (0‑100) | Menghubungkan modul *Interest* dengan rekomendasi PTN/kedinasan/TKA. |
 | Engagement historis | Aktivitas LMS | Log aktivitas (durasi, frekuensi) | `engagementMetric` (numeric) | Mengukur minat secara dinamis; memperbarui rekomendasi konten. |
-*Aggregated Interest* = 0.4 Preferensi + 0.3 Motivasi + 0.3 Engagement.
+*Aggregated Interest* = 0.4 Pr
+eferensi + 0.3 Motivasi + 0.3 Engagement.
 
 ### 4.3 Learning – Gaya belajar (konsep, visual, studi kasus)
 | Komponen | Indikator | Cara mengukur | Format data | Kegunaan dalam SPP |
