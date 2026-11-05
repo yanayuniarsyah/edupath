@@ -2863,10 +2863,45 @@
                 </button>
                 <button @click="handleTabClick('practice')" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
                   <i class="ph-bold ph-pencil-simple text-base text-white/70"></i>
-                  <span>Latihan Soal</span>
+                  <span>Latihan</span>
                 </button>
               </div>
+              <button 
+                type="button"
+                @click="currentTab = 'offline_sop'" 
+                class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md shadow-sm"
+              >
+                <span class="text-sm">🏢</span>
+                <span>SOP &amp; Tanggung Jawab Bimbel</span>
+              </button>
             </div>
+          </div>
+
+          <!-- ✨ Card Panduan & Tanggung Jawab Bimbel Offline untuk Seluruh Role -->
+          <div class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-amber-500/35 shadow-[0_12px_40px_rgba(245,158,11,0.15)] bg-gradient-to-r from-amber-950/50 via-slate-900/90 to-slate-950 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start sm:items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0 text-amber-400 shadow-lg shadow-amber-500/10">
+                🏢
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/15 px-2.5 py-0.5 rounded-full border border-amber-400/30">Panduan Operasional Terpadu</span>
+                  <span class="text-xs text-white/50 font-medium">SOP &amp; Matriks RACI 7 Role</span>
+                </div>
+                <h3 class="text-base sm:text-lg font-black text-white mt-1">Tanggung Jawab Utama dalam Bimbel Offline</h3>
+                <p class="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
+                  Pelajari standar operasional prosedur, hak &amp; kewajiban tatap muka, syarat absensi minimal 75%, tata cara make-up class, serta pembagian peran (Superadmin, Admin Cabang, FO, Guru, Siswa, dan Wali Murid).
+                </p>
+              </div>
+            </div>
+            <button 
+              type="button"
+              @click="currentTab = 'offline_sop'" 
+              class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition-all flex items-center justify-center gap-2 shrink-0 shadow-lg shadow-amber-400/20 cursor-pointer"
+            >
+              <span>Buka Panduan Seluruh Role</span>
+              <i class="ph-bold ph-arrow-right"></i>
+            </button>
           </div>
 
           <!-- ✨ Target Goal Selection & Status (Dinamis: SMP Impian, SMA Unggulan, atau PTN) -->
@@ -3743,14 +3778,27 @@
                 <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Parent Portal &amp; Monitoring Belajar</h2>
               </div>
             </div>
-            <button 
-              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
-              title="Tutup Halaman & Kembali"
-              aria-label="Tutup"
-            >
-              <i class="ph-bold ph-x text-sm"></i>
-            </button>
+            <div class="flex items-center gap-2">
+              <button 
+                type="button"
+                @click="currentTab = 'offline_sop'" 
+                class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                title="Panduan SOP & Tanggung Jawab Bimbel Offline Lintas Peran"
+              >
+                <span>🏢</span>
+                <span class="hidden sm:inline">Tanggung Jawab Offline</span>
+                <span class="sm:hidden">SOP Offline</span>
+              </button>
+              <button 
+                type="button"
+                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+                class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
+                title="Tutup Halaman & Kembali"
+                aria-label="Tutup"
+              >
+                <i class="ph-bold ph-x text-sm"></i>
+              </button>
+            </div>
           </div>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Parent insight metrics card -->
@@ -3847,6 +3895,25 @@
                 <h3 class="text-base sm:text-lg font-black text-white">Pilih Program Simulasi Try Out CBT</h3>
               </div>
               <span class="text-xs text-white/50 font-medium">Sistem CBT resmi dengan timer ketat &amp; analitik IRT</span>
+            </div>
+
+            <!-- Info Bar SOP Bimbel Offline untuk Siswa & Tutor -->
+            <div class="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-transparent border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+              <div class="flex items-center gap-3 text-xs text-amber-200">
+                <span class="text-xl p-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 shrink-0">🏢</span>
+                <div>
+                  <div class="font-bold text-white text-xs">Ketentuan Ujian &amp; Kehadiran Peserta Bimbel Offline:</div>
+                  <div class="text-[11px] text-amber-200/80">Wajib hadir tatap muka minimal 75% sesi dan mengerjakan seluruh paket Try Out CBT mingguan sesuai standar SOP cabang.</div>
+                </div>
+              </div>
+              <button 
+                type="button"
+                @click="currentTab = 'offline_sop'"
+                class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black shrink-0 transition flex items-center justify-center gap-1.5 shadow-md shadow-amber-400/20 cursor-pointer"
+              >
+                <span>Lihat Tanggung Jawab Bimbel Offline</span>
+                <span>➔</span>
+              </button>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -4173,8 +4240,30 @@
                   <span class="text-[11px] font-bold text-white/60 uppercase tracking-wider">Sisa Waktu Ujian</span>
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 </div>
-                <div class="flex items-center justify-center p-3 rounded-xl bg-black/60 border border-white/10 font-mono font-black text-2xl md:text-3xl text-[#c0ff00] tracking-widest">
-                  {{ cbtFormattedTimer }}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-black/60 border border-white/10">
+                  <div class="font-mono font-black text-2xl md:text-3xl text-[#c0ff00] tracking-widest">
+                    {{ cbtFormattedTimer }}
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <button 
+                      type="button"
+                      @click="toggleCbtTimer" 
+                      class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1"
+                      :class="isCbtTimerRunning ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30'"
+                      :title="isCbtTimerRunning ? 'Jeda Timer' : 'Lanjutkan Timer'"
+                    >
+                      <i :class="isCbtTimerRunning ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
+                      <span>{{ isCbtTimerRunning ? 'Jeda' : 'Mulai' }}</span>
+                    </button>
+                    <button 
+                      type="button"
+                      @click="resetCbtTimer(5400)" 
+                      class="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 transition"
+                      title="Reset Waktu Ujian (90 Menit)"
+                    >
+                      <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
+                    </button>
+                  </div>
                 </div>
                 <div class="flex items-center justify-between text-[10px] text-white/50 border-t border-white/10 pt-2 font-medium">
                   <span>Peserta: <strong class="text-white">{{ currentUser?.name || 'Siswa Mandiri' }}</strong></span>
@@ -4370,6 +4459,175 @@
         </div>
         </div><!-- /section-wrapper -->
       </footer>
+
+    
+        <!-- TAB: SOP BIMBEL OFFLINE SISWA & WALI MURID -->
+        <section v-if="currentTab === 'offline_sop'" class="space-y-6 animate-fade-in pb-12 w-full max-w-7xl mx-auto">
+          <!-- Top Header Bar -->
+          <div class="flex items-center justify-between bg-slate-900/95 border border-amber-500/30 rounded-2xl p-4 sm:p-5 backdrop-blur-xl shadow-xl gap-3 bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-950">
+            <div class="flex items-center gap-3.5 min-w-0">
+              <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-2xl font-black shrink-0 shadow-md shadow-amber-500/10">
+                🏢
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+                    Standar Operasional Prosedur (SOP)
+                  </span>
+                  <span class="text-xs text-white/50">Bimbel Offline &amp; Hybrid EduPath</span>
+                </div>
+                <h2 class="text-base sm:text-xl md:text-2xl font-black text-white leading-tight truncate mt-0.5">
+                  Tanggung Jawab Utama Bimbel Offline Lintas Peran
+                </h2>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button 
+                type="button"
+                @click="showOfflineRoleModal = true"
+                class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+              >
+                <span>Modal Pop-up</span>
+                <i class="ph-bold ph-arrow-square-out"></i>
+              </button>
+              <button 
+                type="button"
+                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+                class="w-9 h-9 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
+                title="Tutup & Kembali"
+                aria-label="Tutup"
+              >
+                <i class="ph-bold ph-x text-sm"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Highlight Aturan Wajib Siswa Bimbel Offline -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- 1. Presensi 75% -->
+            <div class="glass-card rounded-2xl p-5 border border-emerald-500/30 bg-emerald-950/20 space-y-2.5">
+              <div class="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+                <span class="text-lg">🎯</span>
+                <h4>Wajib Hadir Minimal 75%</h4>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Kehadiran tatap muka di ruang kelas fisik minimal 75% dari total pertemuan adalah syarat wajib kelulusan program dan klaim garansi lolos PTN.
+              </p>
+              <div class="text-[11px] font-semibold text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                ✓ Presensi dicatat real-time oleh Guru Pengampu
+              </div>
+            </div>
+
+            <!-- 2. Make-up Class -->
+            <div class="glass-card rounded-2xl p-5 border border-sky-500/30 bg-sky-950/20 space-y-2.5">
+              <div class="flex items-center gap-2 text-sky-400 font-bold text-sm">
+                <span class="text-lg">🔄</span>
+                <h4>Alur Izin &amp; Make-up Class</h4>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Siswa yang berhalangan hadir karena sakit atau dinas sekolah berhak mengajukan kelas pengganti melalui Front Office atau dashboard maksimal H+2.
+              </p>
+              <div class="text-[11px] font-semibold text-sky-300 bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20">
+                ✓ Disetujui Admin Cabang pada rombel paralel
+              </div>
+            </div>
+
+            <!-- 3. Bot Telegram Orang Tua -->
+            <div class="glass-card rounded-2xl p-5 border border-rose-500/30 bg-rose-950/20 space-y-2.5">
+              <div class="flex items-center gap-2 text-rose-400 font-bold text-sm">
+                <span class="text-lg">🤖</span>
+                <h4>Monitoring Telegram Wali</h4>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Setiap kedatangan siswa di gedung cabang dan nilai Try Out CBT mingguan otomatis dikirimkan ke Telegram orang tua melalui Bot EduPath.
+              </p>
+              <div class="text-[11px] font-semibold text-rose-300 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/20">
+                ✓ Sistem peringatan dini (EWS) jika alpa &gt; 2 sesi
+              </div>
+            </div>
+          </div>
+
+          <!-- Matriks RACI 7 Role -->
+          <div class="glass-card rounded-2xl p-5 sm:p-6 border border-white/10 bg-slate-900/90 space-y-4">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 class="text-base font-black text-white flex items-center gap-2">
+                <span>📊</span> Matriks RACI Tanggung Jawab Operasional Bimbel Offline
+              </h3>
+              <span class="text-xs text-white/50">EduPath National Standard</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+              <div class="bg-black/40 p-2.5 rounded-xl border border-white/10"><strong class="text-emerald-400">R (Responsible):</strong> Pelaksana operasional</div>
+              <div class="bg-black/40 p-2.5 rounded-xl border border-white/10"><strong class="text-amber-400">A (Accountable):</strong> Pengambil keputusan</div>
+              <div class="bg-black/40 p-2.5 rounded-xl border border-white/10"><strong class="text-sky-400">C (Consulted):</strong> Masukan &amp; koordinasi</div>
+              <div class="bg-black/40 p-2.5 rounded-xl border border-white/10"><strong class="text-slate-400">I (Informed):</strong> Laporan notifikasi</div>
+            </div>
+
+            <!-- Tabel RACI -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-black/40 text-slate-300 font-bold border-b border-white/10">
+                  <tr>
+                    <th class="py-3 px-3">Aktivitas Operasional</th>
+                    <th class="py-3 px-2 text-center text-amber-400">Superadmin</th>
+                    <th class="py-3 px-2 text-center text-emerald-400">Admin Cabang</th>
+                    <th class="py-3 px-2 text-center text-sky-400">Front Office</th>
+                    <th class="py-3 px-2 text-center text-purple-400">Guru/Tutor</th>
+                    <th class="py-3 px-2 text-center text-blue-400">Siswa</th>
+                    <th class="py-3 px-2 text-center text-rose-400">Wali Murid</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr class="hover:bg-white/5">
+                    <td class="py-2.5 px-3 font-medium text-white">Check-in Kehadiran Meja Depan</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-amber-400 font-bold">A</td>
+                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">R</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                  </tr>
+                  <tr class="hover:bg-white/5">
+                    <td class="py-2.5 px-3 font-medium text-white">Presensi Kelas &amp; Pengisian BAP Digital</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-amber-400 font-bold">A</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">R</td>
+                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                  </tr>
+                  <tr class="hover:bg-white/5">
+                    <td class="py-2.5 px-3 font-medium text-white">Alert Otomatis Bot Telegram Orang Tua</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-amber-400 font-bold">A</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">R (Penerima)</td>
+                  </tr>
+                  <tr class="hover:bg-white/5">
+                    <td class="py-2.5 px-3 font-medium text-white">Pengajuan &amp; Verifikasi Sesi Make-up</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">A / R</td>
+                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
+                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
+                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">R</td>
+                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
+                  </tr>
+                  <tr class="hover:bg-white/5">
+                    <td class="py-2.5 px-3 font-medium text-white">Simulasi Try Out CBT &amp; Analitik IRT</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-amber-400 font-bold">A</td>
+                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
+                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
+                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">R</td>
+                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">I (Rapor)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
 
     </main>
 
@@ -5702,6 +5960,62 @@ export default {
     const cbtFontSize = ref('normal');
     const cbtShowAnalysis = ref(false);
     const cbtTimerSeconds = ref(5400);
+    const cbtTimerInterval = ref(null);
+    const isCbtTimerRunning = ref(true);
+
+    const startCbtTimer = () => {
+      if (cbtTimerInterval.value) clearInterval(cbtTimerInterval.value);
+      isCbtTimerRunning.value = true;
+      cbtTimerInterval.value = setInterval(() => {
+        if (cbtTimerSeconds.value > 0) {
+          cbtTimerSeconds.value--;
+        } else {
+          stopCbtTimer();
+          showToast('Waktu pengerjaan tryout telah habis!', 'warning');
+        }
+      }, 1000);
+    };
+
+    const stopCbtTimer = () => {
+      if (cbtTimerInterval.value) {
+        clearInterval(cbtTimerInterval.value);
+        cbtTimerInterval.value = null;
+      }
+      isCbtTimerRunning.value = false;
+    };
+
+    const toggleCbtTimer = () => {
+      if (isCbtTimerRunning.value) {
+        stopCbtTimer();
+      } else {
+        startCbtTimer();
+      }
+    };
+
+    const resetCbtTimer = (sec = 5400) => {
+      stopCbtTimer();
+      cbtTimerSeconds.value = sec;
+      startCbtTimer();
+    };
+
+    // Auto-start timer saat tab simulator dibuka
+    watch(currentTab, (newTab) => {
+      if (newTab === 'simulator') {
+        startCbtTimer();
+      } else {
+        stopCbtTimer();
+      }
+    });
+
+    onMounted(() => {
+      if (currentTab.value === 'simulator') {
+        startCbtTimer();
+      }
+    });
+
+    onUnmounted(() => {
+      stopCbtTimer();
+    });
 
     const cbtFormattedTimer = computed(() => {
       const h = Math.floor(cbtTimerSeconds.value / 3600);
@@ -6067,6 +6381,7 @@ export default {
       { id: 'diagnostic', label: 'Asesmen', icon: 'ph-brain' },
       { id: 'learning', label: 'Materi', icon: 'ph-books' },
       { id: 'simulator', label: 'Tryout', icon: 'ph-calculator' },
+      { id: 'offline_sop', label: 'SOP Bimbel', icon: 'ph-buildings' },
       { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' },
       { id: 'settings', label: 'Pengaturan', icon: 'ph-user-gear' }
     ];
@@ -8057,6 +8372,9 @@ export default {
       cbtShowAnalysis,
       cbtTimerSeconds,
       cbtFormattedTimer,
+      isCbtTimerRunning,
+      toggleCbtTimer,
+      resetCbtTimer,
       currentSubtestQuestions,
       currentCbtQuestion,
       toggleRaguRagu,

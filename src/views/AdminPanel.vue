@@ -2780,6 +2780,218 @@
           </div>
         </div>
 
+      
+        <!-- TAB: SOP BIMBEL OFFLINE & MATRIKS RACI LINTAS PERAN -->
+        <section v-if="activeTab === 'offline_sop'" class="space-y-6 animate-fade-in pb-12">
+          <!-- Top Header Banner -->
+          <div class="bg-gradient-to-r from-amber-950/60 via-slate-900/90 to-slate-950 border border-amber-500/30 rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start sm:items-center gap-4">
+              <div class="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-3xl shrink-0 text-amber-400 shadow-lg shadow-amber-500/10">
+                🏢
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/15 px-2.5 py-0.5 rounded-full border border-amber-400/30">
+                    SOP Resmi EduPath Cabang
+                  </span>
+                  <span class="text-xs text-white/50 font-medium">Buku Panduan Operasional Terpadu (7 Peran)</span>
+                </div>
+                <h2 class="text-lg sm:text-xl md:text-2xl font-black text-white mt-1">Standar Operasional Prosedur (SOP) &amp; Tanggung Jawab Bimbel Offline</h2>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl leading-relaxed">
+                  Panduan tata kelola, hak, kewajiban, alur kerja harian, dan matriks kewenangan RACI operasional bimbel tatap muka &amp; hybrid di seluruh cabang fisik EduPath.
+                </p>
+              </div>
+            </div>
+            <button 
+              type="button"
+              @click="showOfflineRoleModal = true"
+              class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition flex items-center justify-center gap-2 shrink-0 shadow-lg shadow-amber-400/20 cursor-pointer"
+            >
+              <span>Buka Modal Interaktif</span>
+              <i class="ph-bold ph-arrow-square-out text-sm"></i>
+            </button>
+          </div>
+
+          <!-- Quick Role Selector Cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div class="bg-slate-900/80 border border-amber-500/30 rounded-xl p-3.5 space-y-1 shadow-sm">
+              <span class="text-2xl">👑</span>
+              <div class="font-bold text-xs text-white">Superadmin</div>
+              <p class="text-[11px] text-slate-400">Master Tenant, Shared Catalog (B1), Audit Nasional.</p>
+            </div>
+            <div class="bg-slate-900/80 border border-emerald-500/30 rounded-xl p-3.5 space-y-1 shadow-sm">
+              <span class="text-2xl">🏢</span>
+              <div class="font-bold text-xs text-white">Admin Cabang</div>
+              <p class="text-[11px] text-slate-400">Ruangan, Rombel, Generate Sesi, Approval Make-up.</p>
+            </div>
+            <div class="bg-slate-900/80 border border-sky-500/30 rounded-xl p-3.5 space-y-1 shadow-sm">
+              <span class="text-2xl">🛎️</span>
+              <div class="font-bold text-xs text-white">Front Office</div>
+              <p class="text-[11px] text-slate-400">Check-in Siswa, Piket Gedung, Layanan Tamu.</p>
+            </div>
+            <div class="bg-slate-900/80 border border-purple-500/30 rounded-xl p-3.5 space-y-1 shadow-sm">
+              <span class="text-2xl">👨‍🏫</span>
+              <div class="font-bold text-xs text-white">Guru / Tutor</div>
+              <p class="text-[11px] text-slate-400">Absensi Kelas, Pengisian BAP Digital, Syarat Honor.</p>
+            </div>
+            <div class="bg-slate-900/80 border border-blue-500/30 rounded-xl p-3.5 space-y-1 shadow-sm">
+              <span class="text-2xl">🎓</span>
+              <div class="font-bold text-xs text-white">Siswa Offline</div>
+              <p class="text-[11px] text-slate-400">Presensi Min. 75%, Try Out Mingguan, Make-up Class.</p>
+            </div>
+            <div class="bg-slate-900/80 border border-rose-500/30 rounded-xl p-3.5 space-y-1 shadow-sm">
+              <span class="text-2xl">👨‍👩‍👧</span>
+              <div class="font-bold text-xs text-white">Wali Murid</div>
+              <p class="text-[11px] text-slate-400">Alert Bot Telegram, EWS Kehadiran, Rapor Bulanan.</p>
+            </div>
+          </div>
+
+          <!-- Matriks RACI Table Section -->
+          <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-5 sm:p-6 space-y-4 shadow-xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+              <div>
+                <h3 class="text-base font-black text-white flex items-center gap-2">
+                  <span>📊</span> Matriks RACI Kewenangan Operasional Cabang
+                </h3>
+                <p class="text-xs text-slate-400 mt-0.5">Distribusi tanggung jawab resmi untuk mencegah tumpang tindih operasional.</p>
+              </div>
+              <div class="flex items-center gap-2 text-[11px]">
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">R = Responsible</span>
+                <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30">A = Accountable</span>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-black/40 text-slate-300 font-bold border-b border-white/10">
+                  <tr>
+                    <th class="py-3 px-4">Aktivitas Operasional Cabang</th>
+                    <th class="py-3 px-2 text-center text-amber-400">Superadmin</th>
+                    <th class="py-3 px-2 text-center text-emerald-400">Admin Cabang</th>
+                    <th class="py-3 px-2 text-center text-sky-400">Front Office</th>
+                    <th class="py-3 px-2 text-center text-purple-400">Guru / Tutor</th>
+                    <th class="py-3 px-2 text-center text-blue-400">Siswa</th>
+                    <th class="py-3 px-2 text-center text-rose-400">Orang Tua</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="py-3 px-4 font-medium text-white">Pendaftaran Cabang &amp; Kuota Ruang Fisik</td>
+                    <td class="py-3 px-2 text-center font-bold text-amber-400 bg-amber-400/10">A</td>
+                    <td class="py-3 px-2 text-center font-bold text-emerald-400 bg-emerald-400/10">R</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                  </tr>
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="py-3 px-4 font-medium text-white">Pembentukan Rombel &amp; Kapasitas Kursi</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-emerald-400 bg-emerald-400/10">A / R</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-sky-400 bg-sky-400/10">C</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                  </tr>
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="py-3 px-4 font-medium text-white">Penjadwalan Rutin &amp; Mesin Anti-Benturan</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-emerald-400 bg-emerald-400/10">A / R</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-sky-400 bg-sky-400/10">C</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                  </tr>
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="py-3 px-4 font-medium text-white">Check-in Kehadiran Meja Depan (Lobi)</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-amber-400 bg-amber-400/10">A</td>
+                    <td class="py-3 px-2 text-center font-bold text-emerald-400 bg-emerald-400/10">R</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-sky-400 bg-sky-400/10">C</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                  </tr>
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="py-3 px-4 font-medium text-white">Presensi Kelas &amp; Pengisian BAP Digital</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-amber-400 bg-amber-400/10">A</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-emerald-400 bg-emerald-400/10">R</td>
+                    <td class="py-3 px-2 text-center font-bold text-sky-400 bg-sky-400/10">C</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                  </tr>
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="py-3 px-4 font-medium text-white">Notifikasi Otomatis Bot Telegram Kehadiran</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-amber-400 bg-amber-400/10">A</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-emerald-400 bg-emerald-400/10">R (Penerima)</td>
+                  </tr>
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="py-3 px-4 font-medium text-white">Pengajuan &amp; Approval Kelas Pengganti (Make-up)</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-emerald-400 bg-emerald-400/10">A / R</td>
+                    <td class="py-3 px-2 text-center font-bold text-sky-400 bg-sky-400/10">C</td>
+                    <td class="py-3 px-2 text-center font-bold text-sky-400 bg-sky-400/10">C</td>
+                    <td class="py-3 px-2 text-center font-bold text-emerald-400 bg-emerald-400/10">R</td>
+                    <td class="py-3 px-2 text-center font-bold text-sky-400 bg-sky-400/10">C</td>
+                  </tr>
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="py-3 px-4 font-medium text-white">Rekapitulasi Honor &amp; Payroll Tutor Bulanan</td>
+                    <td class="py-3 px-2 text-center font-bold text-sky-400 bg-sky-400/10">C</td>
+                    <td class="py-3 px-2 text-center font-bold text-emerald-400 bg-emerald-400/10">A / R</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                    <td class="py-3 px-2 text-center font-bold text-slate-500">I</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Standar Operasional Kunci (3 Pilar) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-5 space-y-3">
+              <div class="flex items-center gap-2 text-amber-400 font-bold text-sm">
+                <span>⏱️</span>
+                <h4>SOP Presensi &amp; BAP Guru</h4>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-2 list-disc list-inside">
+                <li>Guru wajib mengisi presensi saat sesi kelas berlangsung.</li>
+                <li>Topik materi wajib diisi lengkap agar tombol BAP terbuka.</li>
+                <li>Honor mengajar bulanan hanya dihitung dari sesi dengan BAP valid.</li>
+              </ul>
+            </div>
+
+            <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-5 space-y-3">
+              <div class="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+                <span>🎓</span>
+                <h4>SOP Kehadiran Siswa 75%</h4>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-2 list-disc list-inside">
+                <li>Syarat mutlak klaim garansi kelulusan PTN adalah kehadiran minimal 75%.</li>
+                <li>Izin sakit wajib dilaporkan H-2 jam sebelum kelas dimulai.</li>
+                <li>Sesi make-up dialokasikan ke rombel paralel yang setara.</li>
+              </ul>
+            </div>
+
+            <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-5 space-y-3">
+              <div class="flex items-center gap-2 text-sky-400 font-bold text-sm">
+                <span>🤖</span>
+                <h4>SOP Integrasi Bot Telegram</h4>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-2 list-disc list-inside">
+                <li>Notifikasi kehadiran otomatis terkirim ke Telegram orang tua murid.</li>
+                <li>Peringatan Early Warning System (EWS) aktif jika absensi siswa &lt; 75%.</li>
+                <li>Laporan perkembangan belajar dikirim berkala setiap akhir pekan.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
 
