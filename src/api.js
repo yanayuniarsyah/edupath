@@ -794,6 +794,65 @@ export const api = {
       body: JSON.stringify(data)
     });
   },
+
+  // ── School Intelligence Module (PRD v1.2) ──
+  getSchoolReportTemplate(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/school.php?action=report_template${q ? '&' + q : ''}`);
+  },
+  getSchoolReportCards(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/school.php?action=report_cards${q ? '&' + q : ''}`);
+  },
+  getSchoolReportCardDetail(id) {
+    return apiFetch(`/school.php?action=report_card_detail&id=${encodeURIComponent(id)}`);
+  },
+  saveSchoolReportCard(data) {
+    return apiFetch('/school.php?action=save_report_card', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  verifySchoolReportCard(data) {
+    return apiFetch('/school.php?action=verify_report_card', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  previewSchoolReportImport(data) {
+    return apiFetch('/school.php?action=report_import_preview', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  commitSchoolReportImport(data) {
+    return apiFetch('/school.php?action=report_import_commit', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  getStudent360(studentId) {
+    return apiFetch(`/school.php?action=student_360&student_id=${encodeURIComponent(studentId)}`);
+  },
+  getGuidanceRecords(params = {}) {
+    const q = new URLSearchParams(params).toString();
+    return apiFetch(`/school.php?action=guidance_records${q ? '&' + q : ''}`);
+  },
+  saveGuidanceRecord(data) {
+    return apiFetch('/school.php?action=guidance_records', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  updateGuidanceRecord(data) {
+    return apiFetch('/school.php?action=guidance_records', {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+  getSchoolAdmissionReadiness() {
+    return apiFetch('/school.php?action=admission_readiness');
+  },
   updateAdminProfile(data) {
     return apiFetch('/admin.php?action=update_profile', {
       method: 'POST',

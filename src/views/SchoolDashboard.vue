@@ -749,6 +749,522 @@
         </div>
 
         <!-- ============================================================== -->
+        
+        <!-- ============================================================== -->
+        <!-- TAB: MANAJEMEN NILAI RAPOR SISWA (PRD v1.2)                    -->
+        <!-- ============================================================== -->
+        <div v-if="activeTab === 'reports'" class="space-y-6 animate-fade-in">
+          <!-- Top Action Bar -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/5 p-4 sm:p-5 rounded-2xl border border-white/10">
+            <div>
+              <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                <i class="ph-bold ph-file-text text-amber-400"></i>
+                <span>Manajemen Nilai Rapor Siswa</span>
+              </h2>
+              <p class="text-xs text-white/60 mt-0.5">
+                Kelola nilai rapor semesteran siswa jenjang SD, SMP, dan SMA. Tersedia input manual, verifikasi kelayakan, dan import Excel.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button 
+                @click="openImportReportModal = true; resetImportState();" 
+                class="px-3.5 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <i class="ph-bold ph-file-arrow-up text-base"></i>
+                <span>Import Excel</span>
+              </button>
+              <button 
+                @click="downloadReportTemplate(filterReportLevel !== 'ALL' ? filterReportLevel : 'SMA')" 
+                class="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Unduh Format Template Excel Rapor"
+              >
+                <i class="ph-bold ph-download-simple text-base"></i>
+                <span>Unduh Template</span>
+              </button>
+              <button 
+                @click="openCreateReportModal" 
+                class="px-4 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs flex items-center gap-1.5 transition-all shadow-lg shadow-[#c0ff00]/20 cursor-pointer"
+              >
+                <i class="ph-bold ph-plus-circle text-base"></i>
+                <span>Input Nilai Rapor</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter & Search Toolbar -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 bg-[#0e1726]/80 p-3.5 rounded-2xl border border-white/10 text-xs">
+            <!-- Jenjang -->
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Jenjang</label>
+              <select v-model="filterReportLevel" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                <option value="ALL">Semua Jenjang</option>
+                <option value="SD">SD (Kelas 1-6)</option>
+                <option value="SMP">SMP (Kelas 7-9)</option>
+                <option value="SMA">SMA (Kelas 10-12)</option>
+              </select>
+            </div>
+            <!-- Tahun Ajaran -->
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tahun Ajaran</label>
+              <select v-model="filterReportYear" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                <option value="">Semua Tahun</option>
+                <option value="2026/2027">2026/2027</option>
+                <option value="2025/2026">2025/2026</option>
+                <option value="2024/2025">2024/2025</option>
+              </select>
+            </div>
+            <!-- Semester -->
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Semester</label>
+              <select v-model="filterReportSemester" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                <option value="">Semua Semester</option>
+                <option value="ganjil">Ganjil</option>
+                <option value="genap">Genap</option>
+              </select>
+            </div>
+            <!-- Status Rapor -->
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Data</label>
+              <select v-model="filterReportStatus" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                <option value="">Semua Status</option>
+                <option value="draft">Draft (Belum Diverifikasi)</option>
+                <option value="submitted">Submitted (Menunggu Verifikasi)</option>
+                <option value="verified">Verified (Terverifikasi)</option>
+                <option value="locked">Locked (Terkunci)</option>
+              </select>
+            </div>
+            <!-- Pencarian Siswa -->
+            <div class="col-span-2">
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cari Siswa / Kelas</label>
+              <div class="relative">
+                <i class="ph-bold ph-magnifying-glass absolute left-3 top-2.5 text-white/40"></i>
+                <input 
+                  v-model="searchReportQuery" 
+                  @input="debounceFetchReportCards" 
+                  type="text" 
+                  placeholder="Ketik nama siswa atau kelas..." 
+                  class="w-full pl-9 pr-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white placeholder-white/30 outline-none focus:border-[#c0ff00]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Roster Nilai Rapor Table -->
+          <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="border-b border-white/10 bg-white/[0.02] text-white/60 uppercase font-black tracking-wider text-[10px]">
+                    <th class="p-4">Siswa</th>
+                    <th class="p-4">Jenjang &amp; Kelas</th>
+                    <th class="p-4">Tahun / Semester</th>
+                    <th class="p-4 text-center">Jml Mapel</th>
+                    <th class="p-4 text-center">Rata-rata Nilai</th>
+                    <th class="p-4 text-center">Status</th>
+                    <th class="p-4 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr v-if="reportsLoading">
+                    <td colspan="7" class="p-8 text-center text-white/50">
+                      <div class="flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-spinner animate-spin text-lg text-[#c0ff00]"></i>
+                        <span>Memuat data rapor siswa...</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-else-if="reportCards.length === 0">
+                    <td colspan="7" class="p-8 text-center text-white/50">
+                      <i class="ph-bold ph-folder-open text-2xl text-white/30 block mb-2"></i>
+                      <span>Belum ada rekaman nilai rapor siswa pada filter ini. Klik <strong>Input Nilai Rapor</strong> atau <strong>Import Excel</strong>.</span>
+                    </td>
+                  </tr>
+                  <tr v-else v-for="rc in reportCards" :key="rc.id" class="hover:bg-white/[0.03] transition-colors">
+                    <td class="p-4">
+                      <div class="font-bold text-white">{{ rc.student_name }}</div>
+                      <div class="text-[10px] text-white/40">{{ rc.student_email }}</div>
+                    </td>
+                    <td class="p-4">
+                      <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase" :class="rc.education_level === 'SD' ? 'bg-amber-500/20 text-amber-300' : (rc.education_level === 'SMP' ? 'bg-sky-500/20 text-sky-300' : 'bg-purple-500/20 text-purple-300')">
+                          {{ rc.education_level }}
+                        </span>
+                        <span class="text-white font-medium">{{ rc.class_level }}</span>
+                        <span v-if="rc.class_name" class="text-white/50 text-[10px]">({{ rc.class_name }})</span>
+                      </div>
+                    </td>
+                    <td class="p-4 text-white">
+                      <div>{{ rc.academic_year }}</div>
+                      <div class="text-[10px] text-white/50 capitalize">Sem. {{ rc.semester }}</div>
+                    </td>
+                    <td class="p-4 text-center text-white font-bold">
+                      {{ rc.total_subjects }} Mapel
+                    </td>
+                    <td class="p-4 text-center">
+                      <span class="px-2.5 py-1 rounded-lg font-black text-xs" :class="rc.average_score >= 85 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : (rc.average_score >= 75 ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30')">
+                        {{ rc.average_score }}
+                      </span>
+                    </td>
+                    <td class="p-4 text-center">
+                      <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider" :class="{
+                        'bg-slate-500/20 text-slate-300 border border-slate-500/30': rc.status === 'draft',
+                        'bg-amber-500/20 text-amber-300 border border-amber-500/30': rc.status === 'submitted',
+                        'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30': rc.status === 'verified',
+                        'bg-sky-500/20 text-sky-300 border border-sky-500/30': rc.status === 'locked',
+                        'bg-rose-500/20 text-rose-300 border border-rose-500/30': rc.status === 'rejected'
+                      }">
+                        {{ rc.status }}
+                      </span>
+                    </td>
+                    <td class="p-4 text-right">
+                      <div class="flex items-center justify-end gap-1.5">
+                        <button 
+                          @click="openReportDetail(rc.id)" 
+                          class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
+                          title="Lihat Detail Nilai"
+                        >
+                          <i class="ph-bold ph-eye"></i>
+                          <span>Detail</span>
+                        </button>
+                        <button 
+                          @click="openStudent360(rc.student_id)" 
+                          class="px-2.5 py-1 rounded-lg bg-[#c0ff00]/15 hover:bg-[#c0ff00]/25 text-[#c0ff00] border border-[#c0ff00]/30 font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
+                          title="Buka Profil Student 360"
+                        >
+                          <i class="ph-bold ph-user-focus"></i>
+                          <span>360</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div v-if="reportsTotal > reportsLimit" class="p-4 border-t border-white/10 flex items-center justify-between text-xs text-white/60">
+              <div>Menampilkan {{ (reportsPage - 1) * reportsLimit + 1 }} - {{ Math.min(reportsPage * reportsLimit, reportsTotal) }} dari {{ reportsTotal }} rapor</div>
+              <div class="flex gap-2">
+                <button :disabled="reportsPage <= 1" @click="reportsPage--; fetchReportCards();" class="px-3 py-1 bg-white/10 hover:bg-white/15 disabled:opacity-30 rounded-lg text-white font-bold cursor-pointer">Sebelumnya</button>
+                <button :disabled="reportsPage * reportsLimit >= reportsTotal" @click="reportsPage++; fetchReportCards();" class="px-3 py-1 bg-white/10 hover:bg-white/15 disabled:opacity-30 rounded-lg text-white font-bold cursor-pointer">Berikutnya</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB: STUDENT 360 INTELLIGENCE (PRD v1.2)                        -->
+        <!-- ============================================================== -->
+        <div v-if="activeTab === 'student_360'" class="space-y-6 animate-fade-in">
+          <!-- Student Selector Header -->
+          <div class="bg-gradient-to-r from-slate-900 via-[#0e1726] to-slate-900 p-5 rounded-2xl border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-black text-[10px] uppercase tracking-wider border border-emerald-500/30">Student 360 Profile</span>
+                <span class="text-white/40 text-xs">Evaluasi Holistik Akademik &amp; Potensi</span>
+              </div>
+              <h2 class="text-xl font-black text-white mt-1">{{ student360Data?.student?.name || 'Pilih Siswa untuk Melihat Student 360' }}</h2>
+              <p class="text-xs text-white/60 mt-0.5">Integrasi nilai rapor kurikulum, performa CBT TKA / SNBT, pemetaan minat RIASEC, dan early warning gap kompetensi.</p>
+            </div>
+            <!-- Quick Student Switcher -->
+            <div class="flex items-center gap-2">
+              <select v-model="selectedStudent360Id" @change="loadStudent360(selectedStudent360Id)" class="px-3 py-2 bg-black/50 border border-white/20 rounded-xl text-white text-xs outline-none focus:border-[#c0ff00]">
+                <option value="" disabled>Pilih Siswa Sekolah</option>
+                <option v-for="s in students" :key="s.id" :value="s.id">{{ s.name }} ({{ s.target_ptn || 'Siswa' }})</option>
+              </select>
+            </div>
+          </div>
+
+          <div v-if="student360Loading" class="p-12 text-center text-white/50">
+            <i class="ph-bold ph-spinner animate-spin text-3xl text-[#c0ff00] block mx-auto mb-2"></i>
+            <span>Mengalkulasi Student 360 &amp; Riwayat Akademik Siswa...</span>
+          </div>
+
+          <div v-else-if="!student360Data?.student" class="p-12 text-center text-white/40 bg-white/[0.02] border border-white/10 rounded-2xl">
+            <i class="ph-bold ph-user-focus text-4xl mb-3 block text-white/20"></i>
+            <p class="text-sm font-bold text-white/70">Silakan pilih siswa dari dropdown di atas atau klik tombol 360 pada daftar siswa.</p>
+          </div>
+
+          <div v-else class="space-y-6">
+            <!-- 4 Quick KPI Summary Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Card 1: Rata-rata Rapor Kumulatif -->
+              <div class="p-4 rounded-2xl bg-[#0e1726]/80 border border-white/10 space-y-1">
+                <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">Rata-rata Rapor</span>
+                <div class="text-2xl font-black text-white">
+                  {{ computeCumulativeRaporGpa(student360Data.report_cards) }}
+                </div>
+                <div class="text-[10px] text-white/50">{{ student360Data.report_cards?.length || 0 }} Semester Tercatat</div>
+              </div>
+
+              <!-- Card 2: Tryout CBT / TKA Score -->
+              <div class="p-4 rounded-2xl bg-[#0e1726]/80 border border-white/10 space-y-1">
+                <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00]">Skor Tryout Terkini</span>
+                <div class="text-2xl font-black text-[#c0ff00]">
+                  {{ student360Data.assessment_history?.[0]?.score || 'N/A' }}
+                </div>
+                <div class="text-[10px] text-white/50">{{ student360Data.assessment_history?.length || 0 }} Tryout Selesai</div>
+              </div>
+
+              <!-- Card 3: Minat Holland RIASEC -->
+              <div class="p-4 rounded-2xl bg-[#0e1726]/80 border border-white/10 space-y-1">
+                <span class="text-[10px] font-black uppercase tracking-wider text-purple-400">Minat Dominan (RIASEC)</span>
+                <div class="text-lg font-black text-purple-300 truncate">
+                  {{ student360Data.diagnostic?.recommended_track || 'Investigatif & Realistis' }}
+                </div>
+                <div class="text-[10px] text-white/50">Kecenderungan Karir</div>
+              </div>
+
+              <!-- Card 4: Target Impian -->
+              <div class="p-4 rounded-2xl bg-[#0e1726]/80 border border-white/10 space-y-1">
+                <span class="text-[10px] font-black uppercase tracking-wider text-sky-400">Target Pendidikan</span>
+                <div class="text-base font-black text-sky-300 truncate">
+                  {{ student360Data.student?.target_ptn || 'Belum Diatur' }}
+                </div>
+                <div class="text-[10px] text-white/50">Jalur SNBP / SNBT</div>
+              </div>
+            </div>
+
+            <!-- Dual Column: Riwayat Nilai per Semester & Learning Gap Scanner -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Left: Progres Nilai Rapor Antar-Semester -->
+              <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 p-5 space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <i class="ph-bold ph-chart-line-up text-amber-400"></i>
+                    <span>Grafik Nilai Rapor per Semester</span>
+                  </h3>
+                  <span class="text-[10px] px-2 py-0.5 rounded bg-white/10 text-white/60">Kurikulum Merdeka</span>
+                </div>
+                <div v-if="!student360Data.semester_progression?.length" class="p-6 text-center text-white/40 text-xs">
+                  Belum ada rekaman nilai rapor semester untuk siswa ini.
+                </div>
+                <div v-else class="space-y-3">
+                  <div v-for="sp in student360Data.semester_progression" :key="sp.period" class="space-y-1">
+                    <div class="flex justify-between text-xs">
+                      <span class="text-white font-bold">{{ sp.period }} &bull; <span class="text-white/50">{{ sp.class_level }}</span></span>
+                      <span class="font-black text-amber-400">{{ sp.average }}</span>
+                    </div>
+                    <div class="w-full h-2.5 rounded-full bg-white/10 overflow-hidden">
+                      <div class="h-full rounded-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-500" :style="{ width: Math.min(100, sp.average) + '%' }"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Learning Gap & Early Warning Kesenjangan Kompetensi -->
+              <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 p-5 space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <i class="ph-bold ph-warning-circle text-rose-400"></i>
+                    <span>Learning Gap &amp; Rekomendasi Belajar</span>
+                  </h3>
+                  <span class="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold">Kriteria &lt; KKM</span>
+                </div>
+                <div v-if="!student360Data.learning_gaps?.length" class="p-6 text-center text-emerald-400 text-xs bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                  <i class="ph-bold ph-check-circle text-2xl block mb-1"></i>
+                  <span>Performa seluruh mata pelajaran di atas batas minimum KKM! Kesiapan akademik siswa prima.</span>
+                </div>
+                <div v-else class="space-y-2.5">
+                  <div v-for="lg in student360Data.learning_gaps" :key="lg.subject" class="p-3 rounded-xl bg-white/[0.02] border border-white/10 flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-black text-xs shrink-0">
+                      !
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex justify-between items-center">
+                        <div class="text-xs font-bold text-white">{{ lg.subject }}</div>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-black">{{ lg.gap_severity }}</span>
+                      </div>
+                      <div class="text-[10px] text-white/50 mt-0.5">Rata-rata: <strong class="text-rose-400">{{ lg.average_score }}</strong> / Target: 75.00</div>
+                      <p class="text-[11px] text-white/70 mt-1 leading-relaxed">{{ lg.recommendation }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Guidance Records & Action Plans for this Student -->
+            <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-black text-white flex items-center gap-2">
+                  <i class="ph-bold ph-chats-circle text-purple-400"></i>
+                  <span>Riwayat Konseling &amp; Intervensi Guru BK</span>
+                </h3>
+                <button @click="openCreateGuidanceModal(student360Data.student)" class="px-3 py-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 text-xs font-bold transition cursor-pointer">
+                  + Catat Pendampingan
+                </button>
+              </div>
+              <div v-if="!student360Data.guidance_records?.length" class="p-6 text-center text-white/40 text-xs">
+                Belum ada catatan konseling atau intervensi khusus untuk siswa ini.
+              </div>
+              <div v-else class="space-y-2.5">
+                <div v-for="gr in student360Data.guidance_records" :key="gr.id" class="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <span class="text-[10px] px-2 py-0.5 rounded font-black uppercase mr-2" :class="gr.priority === 'kritis' ? 'bg-rose-500/20 text-rose-300' : (gr.priority === 'tinggi' ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-500/20 text-slate-300')">
+                        {{ gr.priority }}
+                      </span>
+                      <strong class="text-xs text-white uppercase">{{ gr.category }}</strong>
+                    </div>
+                    <span class="text-[10px] text-white/40">{{ gr.created_at }}</span>
+                  </div>
+                  <p class="text-xs text-white/80 font-medium">{{ gr.issue_summary }}</p>
+                  <div class="p-2.5 rounded-lg bg-black/40 text-[11px] text-white/70">
+                    <strong class="text-[#c0ff00]">Rencana Intervensi:</strong> {{ gr.action_plan }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB: BIMBINGAN & KONSELING (GUIDANCE INTELLIGENCE)             -->
+        <!-- ============================================================== -->
+        <div v-if="activeTab === 'guidance'" class="space-y-6 animate-fade-in">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/5 p-5 rounded-2xl border border-white/10">
+            <div>
+              <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                <i class="ph-bold ph-chats-circle text-purple-400"></i>
+                <span>Bimbingan Konseling &amp; Pendampingan Akademik</span>
+              </h2>
+              <p class="text-xs text-white/60 mt-0.5">
+                Pencatatan intervensi siswa yang membutuhkan pendampingan khusus, early warning capaian, dan monitoring rencana tindak lanjut.
+              </p>
+            </div>
+            <button @click="openCreateGuidanceModal(null)" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs flex items-center gap-1.5 transition shadow-lg shadow-purple-600/20 cursor-pointer">
+              <i class="ph-bold ph-plus-circle text-base"></i>
+              <span>Tambah Catatan Konseling</span>
+            </button>
+          </div>
+
+          <!-- Guidance Records Table -->
+          <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="border-b border-white/10 bg-white/[0.02] text-white/60 uppercase font-black tracking-wider text-[10px]">
+                    <th class="p-4">Siswa</th>
+                    <th class="p-4">Kategori</th>
+                    <th class="p-4">Prioritas</th>
+                    <th class="p-4">Ringkasan Masalah &amp; Intervensi</th>
+                    <th class="p-4 text-center">Status</th>
+                    <th class="p-4 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr v-if="guidanceLoading">
+                    <td colspan="6" class="p-8 text-center text-white/50">Memuat catatan bimbingan...</td>
+                  </tr>
+                  <tr v-else-if="!guidanceRecords.length">
+                    <td colspan="6" class="p-8 text-center text-white/50">Belum ada catatan bimbingan konseling.</td>
+                  </tr>
+                  <tr v-else v-for="g in guidanceRecords" :key="g.id" class="hover:bg-white/[0.02]">
+                    <td class="p-4 font-bold text-white">{{ g.student_name }}</td>
+                    <td class="p-4 text-white uppercase text-[10px]">{{ g.category }}</td>
+                    <td class="p-4">
+                      <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase" :class="g.priority === 'kritis' ? 'bg-rose-500/20 text-rose-300' : 'bg-amber-500/20 text-amber-300'">
+                        {{ g.priority }}
+                      </span>
+                    </td>
+                    <td class="p-4 max-w-md">
+                      <div class="text-white text-xs font-semibold">{{ g.issue_summary }}</div>
+                      <div class="text-[10px] text-white/60 mt-1 truncate">Rencana: {{ g.action_plan }}</div>
+                    </td>
+                    <td class="p-4 text-center">
+                      <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase" :class="g.status === 'resolved' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-sky-500/20 text-sky-300'">
+                        {{ g.status }}
+                      </span>
+                    </td>
+                    <td class="p-4 text-right">
+                      <button @click="openStudent360(g.student_id)" class="px-2.5 py-1 rounded-lg bg-[#c0ff00]/15 text-[#c0ff00] font-bold text-[11px] cursor-pointer">
+                        Lihat 360
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB: KESIAPAN SELEKSI SNBP & SNBT (ADMISSION INTELLIGENCE)      -->
+        <!-- ============================================================== -->
+        <div v-if="activeTab === 'admission'" class="space-y-6 animate-fade-in">
+          <div class="bg-white/5 p-5 rounded-2xl border border-white/10">
+            <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+              <i class="ph-bold ph-graduation-cap text-sky-400"></i>
+              <span>Kesiapan Seleksi Masuk PTN (SNBP &amp; SNBT)</span>
+            </h2>
+            <p class="text-xs text-white/60 mt-0.5">
+              Analisis konsistensi nilai rapor semester untuk pemetaan kuota SNBP serta agregasi performa skor tryout UTBK SNBT siswa.
+            </p>
+          </div>
+
+          <!-- Dual Section: SNBP Ranking & SNBT Tryout Performance -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- SNBP Eligible Candidate Ranking -->
+            <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <h3 class="text-sm font-black text-white flex items-center gap-2">
+                  <i class="ph-bold ph-medal text-amber-400"></i>
+                  <span>Top Kandidat Kuota SNBP (Berdasarkan Rapor)</span>
+                </h3>
+                <span class="text-[10px] text-white/50">Eligible Pool</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead>
+                    <tr class="text-[10px] text-white/40 uppercase font-bold border-b border-white/5">
+                      <th class="pb-2">Siswa</th>
+                      <th class="pb-2">Target PTN</th>
+                      <th class="pb-2 text-right">Rata-rata Rapor</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                    <tr v-for="cand in admissionData.snbp_ranking" :key="cand.student_id" class="hover:bg-white/[0.02]">
+                      <td class="py-2.5 font-bold text-white">{{ cand.student_name }}</td>
+                      <td class="py-2.5 text-white/60">{{ cand.target_ptn || 'Belum dipilih' }}</td>
+                      <td class="py-2.5 text-right font-black text-amber-400">{{ cand.cumulative_gpa }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- SNBT CBT Scores Overview -->
+            <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <h3 class="text-sm font-black text-white flex items-center gap-2">
+                  <i class="ph-bold ph-trend-up text-[#c0ff00]"></i>
+                  <span>Distribusi Performa Tryout CBT SNBT</span>
+                </h3>
+                <span class="text-[10px] text-white/50">Rata-rata IRT</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead>
+                    <tr class="text-[10px] text-white/40 uppercase font-bold border-b border-white/5">
+                      <th class="pb-2">Siswa</th>
+                      <th class="pb-2">Target PTN</th>
+                      <th class="pb-2 text-right">Skor Rata-rata</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                    <tr v-for="cand in admissionData.snbt_performance" :key="cand.student_id" class="hover:bg-white/[0.02]">
+                      <td class="py-2.5 font-bold text-white">{{ cand.student_name }}</td>
+                      <td class="py-2.5 text-white/60">{{ cand.target_ptn || 'Belum dipilih' }}</td>
+                      <td class="py-2.5 text-right font-black text-[#c0ff00]">{{ cand.avg_cbt_score }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
         <!-- TAB: PENGATURAN PROFIL SEKOLAH & GURU BK                       -->
         <!-- ============================================================== -->
         <div v-if="activeTab === 'settings'" class="space-y-6 max-w-4xl animate-fade-in">
@@ -787,7 +1303,360 @@
                   <i class="ph-bold ph-floppy-disk"></i>
                   <span>{{ isSavingSchoolSettings ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
                 </button>
-              </template>
+              
+    <!-- ============================================================== -->
+    <!-- MODAL: INPUT / EDIT MANUAL NILAI RAPOR                         -->
+    <!-- ============================================================== -->
+    <div v-if="openManualReportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="openManualReportModal = false"></div>
+      <div class="relative z-10 w-full max-w-3xl max-h-[90vh] flex flex-col p-6 rounded-3xl bg-[#090e1f] border border-white/15 shadow-2xl space-y-4 overflow-hidden">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+              <i class="ph-bold ph-pencil-simple text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-white">Input / Edit Nilai Rapor Siswa</h3>
+              <span class="text-[10px] text-white/50">Simpan sebagai Draft atau Submit untuk Verifikasi</span>
+            </div>
+          </div>
+          <button @click="openManualReportModal = false" class="modal-close-btn" title="Tutup">
+            <i class="ph-bold ph-x"></i>
+          </button>
+        </div>
+
+        <div class="overflow-y-auto space-y-4 pr-1 text-xs">
+          <!-- Identitas Rapor Form -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-2xl bg-white/[0.02] border border-white/10">
+            <!-- Siswa Selector -->
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Siswa *</label>
+              <select v-model="manualReportForm.student_id" class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                <option value="" disabled>-- Pilih Siswa --</option>
+                <option v-for="s in students" :key="s.id" :value="s.id">{{ s.name }}</option>
+              </select>
+            </div>
+            <!-- Jenjang -->
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Jenjang *</label>
+              <select v-model="manualReportForm.education_level" @change="onReportFormLevelChange" class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                <option value="SD">SD (Sekolah Dasar)</option>
+                <option value="SMP">SMP (Sekolah Menengah Pertama)</option>
+                <option value="SMA">SMA (Sekolah Menengah Atas)</option>
+              </select>
+            </div>
+            <!-- Kelas -->
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tingkat Kelas</label>
+              <input v-model="manualReportForm.class_level" type="text" placeholder="misal: Kelas 12" class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-[#c0ff00]" />
+            </div>
+            <!-- Tahun Ajaran -->
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tahun Ajaran *</label>
+              <select v-model="manualReportForm.academic_year" class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                <option value="2026/2027">2026/2027</option>
+                <option value="2025/2026">2025/2026</option>
+                <option value="2024/2025">2024/2025</option>
+              </select>
+            </div>
+            <!-- Semester -->
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Semester *</label>
+              <select v-model="manualReportForm.semester" class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                <option value="ganjil">Ganjil</option>
+                <option value="genap">Genap</option>
+              </select>
+            </div>
+            <!-- Kurikulum -->
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kurikulum</label>
+              <input v-model="manualReportForm.curriculum" type="text" placeholder="Kurikulum Merdeka" class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-[#c0ff00]" />
+            </div>
+          </div>
+
+          <!-- Daftar Mata Pelajaran & Nilai -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-black uppercase text-white/70 tracking-wider">Daftar Nilai Mata Pelajaran</span>
+              <button @click="addManualSubjectRow" type="button" class="text-[10px] font-bold text-[#c0ff00] hover:underline cursor-pointer">
+                + Tambah Mapel Lain
+              </button>
+            </div>
+
+            <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+              <div v-for="(sub, sIdx) in manualReportForm.details" :key="sIdx" class="grid grid-cols-12 gap-2 p-2 rounded-xl bg-black/30 border border-white/10 items-center">
+                <div class="col-span-5">
+                  <input v-model="sub.subject_name" type="text" placeholder="Nama Mata Pelajaran" class="w-full p-1.5 bg-black/50 border border-white/10 rounded-lg text-white text-xs outline-none focus:border-[#c0ff00]" />
+                </div>
+                <div class="col-span-2">
+                  <input v-model.number="sub.score" type="number" min="0" max="100" placeholder="Nilai" class="w-full p-1.5 bg-black/50 border border-white/10 rounded-lg text-white font-bold text-center text-xs outline-none focus:border-[#c0ff00]" />
+                </div>
+                <div class="col-span-2">
+                  <input v-model.number="sub.kkm" type="number" min="0" max="100" placeholder="KKM" class="w-full p-1.5 bg-black/50 border border-white/10 rounded-lg text-white/70 text-center text-xs outline-none" />
+                </div>
+                <div class="col-span-2">
+                  <span class="block text-center font-black" :class="sub.score >= 85 ? 'text-emerald-400' : (sub.score >= 75 ? 'text-sky-300' : 'text-amber-400')">
+                    {{ sub.score >= 90 ? 'A' : (sub.score >= 80 ? 'B' : (sub.score >= 70 ? 'C' : 'D')) }}
+                  </span>
+                </div>
+                <div class="col-span-1 text-center">
+                  <button @click="removeManualSubjectRow(sIdx)" type="button" class="text-rose-400 hover:text-rose-300 font-black cursor-pointer" title="Hapus">
+                    <i class="ph-bold ph-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+          <button @click="openManualReportModal = false" class="px-4 py-2 rounded-xl bg-white/10 text-white font-bold text-xs cursor-pointer">
+            Batal
+          </button>
+          <div class="flex gap-2">
+            <button @click="submitManualReport('draft')" :disabled="savingReportLoading" class="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/20 text-white font-bold text-xs cursor-pointer">
+              Simpan Draft
+            </button>
+            <button @click="submitManualReport('submitted')" :disabled="savingReportLoading" class="px-5 py-2 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs cursor-pointer shadow-lg shadow-[#c0ff00]/20">
+              Submit Rapor
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL: IMPORT NILAI RAPOR VIA EXCEL                            -->
+    <!-- ============================================================== -->
+    <div v-if="openImportReportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="openImportReportModal = false"></div>
+      <div class="relative z-10 w-full max-w-3xl max-h-[90vh] flex flex-col p-6 rounded-3xl bg-[#090e1f] border border-white/15 shadow-2xl space-y-4 overflow-hidden">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+              <i class="ph-bold ph-file-arrow-up text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-white">Import Nilai Rapor Siswa dari Excel</h3>
+              <span class="text-[10px] text-white/50">Mendukung format .xlsx, .xls, dan .csv dengan verifikasi preview</span>
+            </div>
+          </div>
+          <button @click="openImportReportModal = false" class="modal-close-btn" title="Tutup">
+            <i class="ph-bold ph-x"></i>
+          </button>
+        </div>
+
+        <div class="overflow-y-auto space-y-4 pr-1 text-xs">
+          <!-- Step 1: Upload Box & Template Link -->
+          <div class="p-5 rounded-2xl border-2 border-dashed border-white/20 hover:border-[#c0ff00]/50 transition-colors text-center space-y-2 bg-black/30">
+            <i class="ph-bold ph-microsoft-excel-logo text-3xl text-emerald-400 block mx-auto"></i>
+            <div class="text-xs font-bold text-white">Pilih file Excel Rapor (.xlsx / .csv)</div>
+            <p class="text-[10px] text-white/50">Gunakan template resmi agar nama kolom sesuai dengan mata pelajaran jenjang terkait.</p>
+            <input type="file" accept=".xlsx, .xls, .csv" @change="onExcelFileSelected" class="hidden" id="excelRaporInput" />
+            <div class="pt-2 flex justify-center gap-2">
+              <label for="excelRaporInput" class="px-4 py-2 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs cursor-pointer inline-flex items-center gap-1.5 shadow-md shadow-[#c0ff00]/20">
+                <i class="ph-bold ph-upload-simple"></i>
+                <span>Pilih File Spreadsheet</span>
+              </label>
+              <button @click="downloadReportTemplate(filterReportLevel !== 'ALL' ? filterReportLevel : 'SMA')" type="button" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs cursor-pointer inline-flex items-center gap-1.5">
+                <i class="ph-bold ph-download-simple"></i>
+                <span>Unduh Template</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Preview Hasil Validasi Baris -->
+          <div v-if="importPreviewSummary" class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-black text-white text-xs uppercase tracking-wider flex items-center gap-2">
+                <i class="ph-bold ph-list-checks text-emerald-400"></i>
+                <span>Hasil Validasi Spreadsheet</span>
+              </h4>
+              <div class="flex gap-2 text-[10px] font-black">
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Valid: {{ importPreviewSummary.valid_rows }}</span>
+                <span v-if="importPreviewSummary.warning_rows > 0" class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">Peringatan: {{ importPreviewSummary.warning_rows }}</span>
+                <span v-if="importPreviewSummary.error_rows > 0" class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400">Error: {{ importPreviewSummary.error_rows }}</span>
+              </div>
+            </div>
+
+            <!-- Preview List -->
+            <div class="max-h-56 overflow-y-auto space-y-1.5 border border-white/10 rounded-xl p-2 bg-black/40">
+              <div v-for="row in importPreviewRows" :key="row.row_num" class="p-2 rounded-lg text-xs flex items-center justify-between" :class="row.status === 'VALID' ? 'bg-emerald-500/10 border border-emerald-500/20' : (row.status === 'WARNING' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-rose-500/10 border border-rose-500/20')">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="text-[10px] font-bold text-white/50 w-6">#{{ row.row_num }}</span>
+                  <div class="truncate">
+                    <span class="font-bold text-white">{{ row.student_name }}</span>
+                    <span class="text-[10px] text-white/50 ml-1.5">({{ row.academic_year }} Sem. {{ row.semester }})</span>
+                    <div v-if="row.issues?.length" class="text-[10px] text-amber-300 mt-0.5">
+                      {{ row.issues.join('; ') }}
+                    </div>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[9px] font-black shrink-0 uppercase" :class="row.status === 'VALID' ? 'bg-emerald-500/20 text-emerald-400' : (row.status === 'WARNING' ? 'bg-amber-500/20 text-amber-400' : 'bg-rose-500/20 text-rose-400')">
+                  {{ row.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+          <button @click="openImportReportModal = false" class="px-4 py-2 rounded-xl bg-white/10 text-white font-bold text-xs cursor-pointer">
+            Batal
+          </button>
+          <button 
+            @click="commitReportImport" 
+            :disabled="!importPreviewRows.length || importPreviewSummary?.error_rows > 0 || committingImportLoading" 
+            class="px-5 py-2 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] disabled:opacity-40 text-black font-black text-xs cursor-pointer shadow-lg shadow-[#c0ff00]/20 flex items-center gap-1.5"
+          >
+            <i class="ph-bold ph-check"></i>
+            <span>{{ committingImportLoading ? 'Mengimpor Data...' : 'Konfirmasi & Simpan Rapor' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL: DETAIL & VERIFIKASI NILAI RAPOR                         -->
+    <!-- ============================================================== -->
+    <div v-if="openViewReportModal && activeReportDetail" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="openViewReportModal = false"></div>
+      <div class="relative z-10 w-full max-w-2xl max-h-[90vh] flex flex-col p-6 rounded-3xl bg-[#090e1f] border border-white/15 shadow-2xl space-y-4 overflow-hidden">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
+              <i class="ph-bold ph-book-open text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-white">Rincian Nilai Rapor &bull; {{ activeReportDetail.student_name }}</h3>
+              <span class="text-[10px] text-white/50">{{ activeReportDetail.academic_year }} &bull; Semester {{ activeReportDetail.semester }} &bull; {{ activeReportDetail.class_level }}</span>
+            </div>
+          </div>
+          <button @click="openViewReportModal = false" class="modal-close-btn" title="Tutup">
+            <i class="ph-bold ph-x"></i>
+          </button>
+        </div>
+
+        <div class="overflow-y-auto space-y-3 pr-1 text-xs">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-white/10 text-[10px] uppercase font-bold text-white/50">
+                  <th class="pb-2">Mata Pelajaran</th>
+                  <th class="pb-2 text-center">KKM</th>
+                  <th class="pb-2 text-center">Nilai Angka</th>
+                  <th class="pb-2 text-center">Predikat</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5">
+                <tr v-for="d in activeReportDetail.details" :key="d.id" class="hover:bg-white/[0.02]">
+                  <td class="py-2.5 font-bold text-white">{{ d.subject_name }}</td>
+                  <td class="py-2.5 text-center text-white/50">{{ d.kkm }}</td>
+                  <td class="py-2.5 text-center font-black text-amber-400">{{ d.score }}</td>
+                  <td class="py-2.5 text-center font-black" :class="d.letter_grade === 'A' ? 'text-emerald-400' : (d.letter_grade === 'B' ? 'text-sky-300' : 'text-amber-400')">
+                    {{ d.letter_grade }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+          <button @click="openViewReportModal = false" class="px-4 py-2 rounded-xl bg-white/10 text-white font-bold text-xs cursor-pointer">
+            Tutup
+          </button>
+          <div class="flex gap-2">
+            <button 
+              v-if="activeReportDetail.status !== 'verified'" 
+              @click="verifyReportStatus(activeReportDetail.id, 'verified')" 
+              class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs cursor-pointer shadow-lg shadow-emerald-600/20"
+            >
+              Verifikasi Rapor
+            </button>
+            <button 
+              v-if="activeReportDetail.status !== 'locked'" 
+              @click="verifyReportStatus(activeReportDetail.id, 'locked')" 
+              class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs cursor-pointer"
+            >
+              Kunci Rapor
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL: CATATAN BIMBINGAN KONSELING & INTERVENSI                -->
+    <!-- ============================================================== -->
+    <div v-if="openGuidanceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="openGuidanceModal = false"></div>
+      <div class="relative z-10 w-full max-w-lg p-6 rounded-3xl bg-[#090e1f] border border-white/15 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
+              <i class="ph-bold ph-chats-circle text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-white">Catat Pendampingan Siswa</h3>
+              <span class="text-[10px] text-white/50">Bimbingan Akademik, Karir, &amp; Intervensi Belajar</span>
+            </div>
+          </div>
+          <button @click="openGuidanceModal = false" class="modal-close-btn" title="Tutup">
+            <i class="ph-bold ph-x"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Siswa *</label>
+            <select v-model="guidanceForm.student_id" class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-purple-400">
+              <option value="" disabled>-- Pilih Siswa --</option>
+              <option v-for="s in students" :key="s.id" :value="s.id">{{ s.name }}</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kategori</label>
+              <select v-model="guidanceForm.category" class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-purple-400">
+                <option value="akademik">Akademik</option>
+                <option value="karir_studi">Karir &amp; Studi Lanjut</option>
+                <option value="kedisiplinan">Kedisiplinan</option>
+                <option value="pribadi">Pribadi / Konseling</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Prioritas</label>
+              <select v-model="guidanceForm.priority" class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-purple-400">
+                <option value="rendah">Rendah</option>
+                <option value="sedang">Sedang</option>
+                <option value="tinggi">Tinggi</option>
+                <option value="kritis">Kritis</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Ringkasan Masalah / Asesmen *</label>
+            <textarea v-model="guidanceForm.issue_summary" rows="2" placeholder="Catat kendala belajar, penurunan nilai, atau kebutuhan bimbingan..." class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-purple-400"></textarea>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Rencana Tindak Lanjut / Intervensi *</label>
+            <textarea v-model="guidanceForm.action_plan" rows="2" placeholder="Rencana pendampingan, remedial, atau konsultasi wali..." class="w-full p-2 bg-black/50 border border-white/15 rounded-xl text-white outline-none focus:border-purple-400"></textarea>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+          <button @click="openGuidanceModal = false" class="px-4 py-2 rounded-xl bg-white/10 text-white font-bold text-xs cursor-pointer">
+            Batal
+          </button>
+          <button @click="saveGuidanceNote" :disabled="savingGuidanceLoading" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs cursor-pointer shadow-lg shadow-purple-600/20">
+            Simpan Catatan
+          </button>
+        </div>
+      </div>
+    </div>
+
+</template>
             </div>
           </div>
 
@@ -1034,6 +1903,10 @@
             <i class="ph-bold ph-chat-circle-dots"></i>
             <span>Hubungi via WhatsApp</span>
           </a>
+          <button @click="openStudent360(selectedStudent.id); selectedStudent = null;" class="px-3 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs cursor-pointer flex items-center gap-1 shadow-md shadow-[#c0ff00]/20">
+            <i class="ph-bold ph-user-focus"></i>
+            <span>Buka Student 360</span>
+          </button>
           <button @click="selectedStudent = null" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs cursor-pointer">
             Tutup
           </button>
@@ -1044,6 +1917,7 @@
 </template>
 
 <script setup>
+import * as XLSX from 'xlsx';
 import { ref, computed, onMounted, reactive, watch } from 'vue';
 import { api } from '../api.js';
 
@@ -1114,6 +1988,34 @@ const navItems = computed(() => [
     id: 'analytics',
     label: 'Dashboard',
     icon: 'ph-chart-pie-slice'
+  },
+  {
+    id: 'reports',
+    label: 'Manajemen Rapor',
+    icon: 'ph-file-text',
+    badge: 'SD/SMP/SMA',
+    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-500/20 text-amber-400'
+  },
+  {
+    id: 'student_360',
+    label: 'Student 360',
+    icon: 'ph-user-focus',
+    badge: 'Intelligence',
+    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-300'
+  },
+  {
+    id: 'guidance',
+    label: 'Bimbingan Konseling',
+    icon: 'ph-chats-circle',
+    badge: 'Intervensi',
+    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-purple-500/20 text-purple-300'
+  },
+  {
+    id: 'admission',
+    label: 'Kesiapan Seleksi',
+    icon: 'ph-graduation-cap',
+    badge: 'SNBP & SNBT',
+    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-sky-500/20 text-sky-300'
   },
   {
     id: 'packages',
@@ -1208,6 +2110,447 @@ const riasecList = computed(() => {
 });
 
 // ── Lifecycle & Init ──
+
+// ==============================================================
+// SCHOOL INTELLIGENCE STATE & METHODS (PRD v1.2)
+// ==============================================================
+
+// ── 1. Reports Management State ──
+const reportCards = ref([]);
+const reportsLoading = ref(false);
+const reportsTotal = ref(0);
+const reportsPage = ref(1);
+const reportsLimit = ref(20);
+const filterReportLevel = ref('ALL');
+const filterReportYear = ref('2026/2027');
+const filterReportSemester = ref('');
+const filterReportStatus = ref('');
+const searchReportQuery = ref('');
+let reportSearchTimeout = null;
+
+const openManualReportModal = ref(false);
+const openImportReportModal = ref(false);
+const openViewReportModal = ref(false);
+const activeReportDetail = ref(null);
+const savingReportLoading = ref(false);
+
+const manualReportForm = ref({
+  student_id: '',
+  education_level: 'SMA',
+  class_level: 'Kelas 12',
+  class_name: '',
+  academic_year: '2026/2027',
+  semester: 'ganjil',
+  curriculum: 'Kurikulum Merdeka',
+  notes: '',
+  details: []
+});
+
+const defaultSubjectsByLevel = {
+  SD: [
+    { subject_name: 'Matematika', kkm: 70, score: 80 },
+    { subject_name: 'Bahasa Indonesia', kkm: 75, score: 82 },
+    { subject_name: 'Ilmu Pengetahuan Alam dan Sosial (IPAS)', kkm: 72, score: 78 },
+    { subject_name: 'Pendidikan Pancasila', kkm: 75, score: 85 },
+    { subject_name: 'Bahasa Inggris', kkm: 70, score: 75 },
+    { subject_name: 'Seni Budaya & Prakarya', kkm: 75, score: 88 },
+    { subject_name: 'PJOK', kkm: 75, score: 85 }
+  ],
+  SMP: [
+    { subject_name: 'Matematika', kkm: 72, score: 80 },
+    { subject_name: 'Bahasa Indonesia', kkm: 75, score: 83 },
+    { subject_name: 'Bahasa Inggris', kkm: 72, score: 78 },
+    { subject_name: 'IPA Terpadu', kkm: 72, score: 76 },
+    { subject_name: 'IPS Terpadu', kkm: 75, score: 80 },
+    { subject_name: 'Pendidikan Pancasila', kkm: 75, score: 85 },
+    { subject_name: 'Informatika', kkm: 75, score: 82 },
+    { subject_name: 'PJOK', kkm: 75, score: 84 },
+    { subject_name: 'Seni Budaya', kkm: 75, score: 86 }
+  ],
+  SMA: [
+    { subject_name: 'Matematika Wajib', kkm: 75, score: 82 },
+    { subject_name: 'Bahasa Indonesia', kkm: 75, score: 85 },
+    { subject_name: 'Bahasa Inggris', kkm: 75, score: 80 },
+    { subject_name: 'Pendidikan Pancasila', kkm: 75, score: 88 },
+    { subject_name: 'Sejarah', kkm: 75, score: 84 },
+    { subject_name: 'Fisika', kkm: 75, score: 78 },
+    { subject_name: 'Kimia', kkm: 75, score: 76 },
+    { subject_name: 'Biologi', kkm: 75, score: 82 }
+  ]
+};
+
+const fetchReportCards = async () => {
+  reportsLoading.value = true;
+  try {
+    const params = {
+      page: reportsPage.value,
+      limit: reportsLimit.value,
+      academic_year: filterReportYear.value,
+      semester: filterReportSemester.value,
+      status: filterReportStatus.value,
+      search: searchReportQuery.value
+    };
+    if (filterReportLevel.value !== 'ALL') {
+      params.education_level = filterReportLevel.value;
+    }
+    const res = await api.getSchoolReportCards(params);
+    if (res?.success) {
+      reportCards.value = res.report_cards || [];
+      reportsTotal.value = res.total || 0;
+    }
+  } catch (e) {
+    console.error('Error fetching report cards:', e);
+  } finally {
+    reportsLoading.value = false;
+  }
+};
+
+const debounceFetchReportCards = () => {
+  if (reportSearchTimeout) clearTimeout(reportSearchTimeout);
+  reportSearchTimeout = setTimeout(() => {
+    reportsPage.value = 1;
+    fetchReportCards();
+  }, 400);
+};
+
+const onReportFormLevelChange = () => {
+  const lvl = manualReportForm.value.education_level || 'SMA';
+  const defaults = defaultSubjectsByLevel[lvl] || defaultSubjectsByLevel.SMA;
+  manualReportForm.value.details = defaults.map(d => ({ ...d }));
+  if (lvl === 'SD') manualReportForm.value.class_level = 'Kelas 5';
+  else if (lvl === 'SMP') manualReportForm.value.class_level = 'Kelas 8';
+  else manualReportForm.value.class_level = 'Kelas 12';
+};
+
+const openCreateReportModal = () => {
+  manualReportForm.value.student_id = students.value[0]?.id || '';
+  manualReportForm.value.education_level = 'SMA';
+  onReportFormLevelChange();
+  openManualReportModal.value = true;
+};
+
+const addManualSubjectRow = () => {
+  manualReportForm.value.details.push({
+    subject_name: '',
+    kkm: 75,
+    score: 80
+  });
+};
+
+const removeManualSubjectRow = (idx) => {
+  manualReportForm.value.details.splice(idx, 1);
+};
+
+const submitManualReport = async (targetStatus) => {
+  if (!manualReportForm.value.student_id) {
+    alert('Silakan pilih siswa terlebih dahulu.');
+    return;
+  }
+  savingReportLoading.value = true;
+  try {
+    const payload = {
+      ...manualReportForm.value,
+      status: targetStatus
+    };
+    const res = await api.saveSchoolReportCard(payload);
+    if (res?.success) {
+      openManualReportModal.value = false;
+      fetchReportCards();
+      alert(res.message || 'Nilai rapor berhasil disimpan.');
+    } else {
+      alert(res?.error || 'Gagal menyimpan nilai rapor.');
+    }
+  } catch (e) {
+    alert(e.message || 'Terjadi kesalahan sistem.');
+  } finally {
+    savingReportLoading.value = false;
+  }
+};
+
+const openReportDetail = async (id) => {
+  try {
+    const res = await api.getSchoolReportCardDetail(id);
+    if (res?.success) {
+      activeReportDetail.value = res.report_card;
+      openViewReportModal.value = true;
+    }
+  } catch (e) {
+    alert('Gagal memuat rincian rapor: ' + e.message);
+  }
+};
+
+const verifyReportStatus = async (id, status) => {
+  try {
+    const res = await api.verifySchoolReportCard({ id, status });
+    if (res?.success) {
+      if (activeReportDetail.value) activeReportDetail.value.status = status;
+      fetchReportCards();
+      alert('Status rapor berhasil diubah menjadi ' + status.toUpperCase());
+    }
+  } catch (e) {
+    alert('Gagal verifikasi: ' + e.message);
+  }
+};
+
+// ── Excel Import / Export ──
+const importPreviewSummary = ref(null);
+const importPreviewRows = ref([]);
+const committingImportLoading = ref(false);
+
+const resetImportState = () => {
+  importPreviewSummary.value = null;
+  importPreviewRows.value = [];
+};
+
+const downloadReportTemplate = (level = 'SMA') => {
+  const lvl = level || 'SMA';
+  const defaults = defaultSubjectsByLevel[lvl] || defaultSubjectsByLevel.SMA;
+  
+  const headers = ['nisn', 'name', 'email', 'jenjang', 'kelas', 'tahun_ajaran', 'semester'];
+  defaults.forEach(d => {
+    headers.push(d.subject_name);
+  });
+
+  // Example sample row
+  const sampleRow = {
+    nisn: '0012345678',
+    name: students.value[0]?.name || 'Ahmad Fauzi',
+    email: students.value[0]?.email || 'siswa@contoh.sch.id',
+    jenjang: lvl,
+    kelas: lvl === 'SD' ? 'Kelas 5' : (lvl === 'SMP' ? 'Kelas 8' : 'Kelas 12'),
+    tahun_ajaran: '2026/2027',
+    semester: 'ganjil'
+  };
+  defaults.forEach(d => {
+    sampleRow[d.subject_name] = d.score || 85;
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet([sampleRow], { header: headers });
+  XLSX.utils.book_append_sheet(wb, ws, `Template_Rapor_${lvl}`);
+  XLSX.writeFile(wb, `Template_Nilai_Rapor_${lvl}_EduPath.xlsx`);
+};
+
+const onExcelFileSelected = async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (evt) => {
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rawRows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+
+      if (!rawRows.length) {
+        alert('File spreadsheet kosong atau format sheet tidak terbaca.');
+        return;
+      }
+
+      // Map rows
+      const parsedRows = rawRows.map(row => {
+        const nisn = row.nisn || row['NISN'] || row['NISN / ID'] || '';
+        const name = row.name || row['nama'] || row['Nama Siswa'] || '';
+        const email = row.email || row['Email Siswa'] || '';
+        const education_level = row.jenjang || row['Jenjang'] || 'SMA';
+        const class_level = row.kelas || row['Kelas'] || 'Kelas 12';
+        const academic_year = row.tahun_ajaran || row['Tahun Ajaran'] || '2026/2027';
+        const semester = row.semester || row['Semester'] || 'ganjil';
+
+        const subjects = {};
+        Object.keys(row).forEach(k => {
+          const lower = k.toLowerCase().trim();
+          if (!['nisn', 'name', 'nama', 'email', 'jenjang', 'kelas', 'tahun_ajaran', 'semester', 'nisn / id', 'nama siswa', 'email siswa'].includes(lower)) {
+            subjects[k] = row[k];
+          }
+        });
+
+        return {
+          nisn,
+          name,
+          email,
+          education_level,
+          class_level,
+          academic_year,
+          semester,
+          subjects
+        };
+      });
+
+      // Send to backend preview endpoint
+      const res = await api.previewSchoolReportImport({ rows: parsedRows });
+      if (res?.success) {
+        importPreviewSummary.value = res.summary;
+        importPreviewRows.value = res.preview;
+      }
+    } catch (err) {
+      alert('Gagal memproses file Excel: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+};
+
+const commitReportImport = async () => {
+  const validRows = importPreviewRows.value.filter(r => r.status === 'VALID' || r.status === 'WARNING');
+  if (!validRows.length) {
+    alert('Tidak ada baris yang valid untuk diimpor.');
+    return;
+  }
+  committingImportLoading.value = true;
+  try {
+    const res = await api.commitSchoolReportImport({ rows: validRows });
+    if (res?.success) {
+      openImportReportModal.value = false;
+      resetImportState();
+      fetchReportCards();
+      alert(res.message || 'Import nilai rapor selesai!');
+    }
+  } catch (e) {
+    alert('Gagal mengimpor: ' + e.message);
+  } finally {
+    committingImportLoading.value = false;
+  }
+};
+
+// ── 2. Student 360 State & Methods ──
+const selectedStudent360Id = ref('');
+const student360Data = ref(null);
+const student360Loading = ref(false);
+
+const openStudent360 = (studentId) => {
+  selectedStudent360Id.value = studentId;
+  activeTab.value = 'student_360';
+  loadStudent360(studentId);
+};
+
+const loadStudent360 = async (studentId) => {
+  if (!studentId) return;
+  student360Loading.value = true;
+  try {
+    const res = await api.getStudent360(studentId);
+    if (res?.success) {
+      student360Data.value = res;
+    }
+  } catch (e) {
+    console.error('Error loading student 360:', e);
+  } finally {
+    student360Loading.value = false;
+  }
+};
+
+const computeCumulativeRaporGpa = (rcList) => {
+  if (!rcList || !rcList.length) return '0.00';
+  let totalScore = 0;
+  let totalCount = 0;
+  rcList.forEach(rc => {
+    if (rc.details) {
+      rc.details.forEach(d => {
+        totalScore += parseFloat(d.score || 0);
+        totalCount++;
+      });
+    }
+  });
+  return totalCount > 0 ? (totalScore / totalCount).toFixed(2) : '0.00';
+};
+
+// ── 3. Guidance Intelligence State & Methods ──
+const guidanceRecords = ref([]);
+const guidanceLoading = ref(false);
+const openGuidanceModal = ref(false);
+const savingGuidanceLoading = ref(false);
+
+const guidanceForm = ref({
+  id: '',
+  student_id: '',
+  counselor_name: '',
+  category: 'akademik',
+  priority: 'sedang',
+  issue_summary: '',
+  action_plan: '',
+  status: 'open',
+  follow_up_date: ''
+});
+
+const fetchGuidanceRecords = async () => {
+  guidanceLoading.value = true;
+  try {
+    const res = await api.getGuidanceRecords();
+    if (res?.success) {
+      guidanceRecords.value = res.guidance_records || [];
+    }
+  } catch (e) {
+    console.error('Error fetching guidance:', e);
+  } finally {
+    guidanceLoading.value = false;
+  }
+};
+
+const openCreateGuidanceModal = (student) => {
+  guidanceForm.value = {
+    id: '',
+    student_id: student?.id || (students.value[0]?.id || ''),
+    counselor_name: schoolData.value?.bk_name || 'Guru BK',
+    category: 'akademik',
+    priority: 'sedang',
+    issue_summary: '',
+    action_plan: '',
+    status: 'open',
+    follow_up_date: ''
+  };
+  openGuidanceModal.value = true;
+};
+
+const saveGuidanceNote = async () => {
+  if (!guidanceForm.value.student_id || !guidanceForm.value.issue_summary) {
+    alert('Silakan pilih siswa dan isi ringkasan masalah.');
+    return;
+  }
+  savingGuidanceLoading.value = true;
+  try {
+    const res = await api.saveGuidanceRecord(guidanceForm.value);
+    if (res?.success) {
+      openGuidanceModal.value = false;
+      fetchGuidanceRecords();
+      if (student360Data.value?.student?.id === guidanceForm.value.student_id) {
+        loadStudent360(guidanceForm.value.student_id);
+      }
+      alert('Catatan pendampingan berhasil disimpan.');
+    }
+  } catch (e) {
+    alert('Gagal menyimpan catatan: ' + e.message);
+  } finally {
+    savingGuidanceLoading.value = false;
+  }
+};
+
+// ── 4. Admission Readiness State & Methods ──
+const admissionData = ref({
+  snbp_ranking: [],
+  snbt_performance: [],
+  popular_targets: []
+});
+const admissionLoading = ref(false);
+
+const fetchAdmissionReadiness = async () => {
+  admissionLoading.value = true;
+  try {
+    const res = await api.getSchoolAdmissionReadiness();
+    if (res?.success) {
+      admissionData.value = {
+        snbp_ranking: res.snbp_ranking || [],
+        snbt_performance: res.snbt_performance || [],
+        popular_targets: res.popular_targets || []
+      };
+    }
+  } catch (e) {
+    console.error('Error fetching admission readiness:', e);
+  } finally {
+    admissionLoading.value = false;
+  }
+};
+
+
 onMounted(() => {
   const savedToken = sessionStorage.getItem('school_token') || localStorage.getItem('auth_token');
   const savedData = sessionStorage.getItem('school_data') || localStorage.getItem('school_data');
@@ -1365,6 +2708,15 @@ async function saveSchoolSettings() {
 watch(activeTab, (newTab) => {
   if (newTab === 'settings') {
     loadSchoolSettings();
+  } else if (newTab === 'reports') {
+    fetchReportCards();
+  } else if (newTab === 'guidance') {
+    fetchGuidanceRecords();
+  } else if (newTab === 'admission') {
+    fetchAdmissionReadiness();
+  } else if (newTab === 'student_360' && !student360Data.value && students.value.length > 0) {
+    selectedStudent360Id.value = students.value[0].id;
+    loadStudent360(students.value[0].id);
   }
 });
 

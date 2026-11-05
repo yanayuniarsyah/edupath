@@ -71,6 +71,93 @@ function ensure_school_schema($pdo) {
 
     try { $pdo->exec("ALTER TABLE quiz_attempts ADD COLUMN quiz_type VARCHAR(50) DEFAULT 'tryout'"); } catch (\Throwable $e) {}
     try { $pdo->exec("ALTER TABLE quiz_results ADD COLUMN quiz_type VARCHAR(50) DEFAULT 'tryout'"); } catch (\Throwable $e) {}
+
+    // Phase 15: School Intelligence Tables
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS report_cards (
+              id VARCHAR(36) NOT NULL PRIMARY KEY,
+              tenant_id VARCHAR(36) NOT NULL DEFAULT 'default_tenant',
+              school_id VARCHAR(36) NOT NULL,
+              student_id VARCHAR(36) NOT NULL,
+              education_level ENUM('SD', 'SMP', 'SMA') NOT NULL DEFAULT 'SMA',
+              academic_year VARCHAR(20) NOT NULL,
+              semester ENUM('ganjil', 'genap') NOT NULL DEFAULT 'ganjil',
+              class_level VARCHAR(20) NOT NULL,
+              class_name VARCHAR(50) NULL,
+              curriculum VARCHAR(50) NOT NULL DEFAULT 'Kurikulum Merdeka',
+              status ENUM('draft', 'submitted', 'verified', 'rejected', 'locked') NOT NULL DEFAULT 'draft',
+              notes TEXT NULL,
+              verified_by VARCHAR(36) NULL,
+              verified_at DATETIME NULL,
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+              UNIQUE KEY uq_student_report_period (student_id, academic_year, semester),
+              KEY idx_rc_school (school_id),
+              KEY idx_rc_level (education_level),
+              KEY idx_rc_status (status)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS report_card_details (
+              id VARCHAR(36) NOT NULL PRIMARY KEY,
+              report_card_id VARCHAR(36) NOT NULL,
+              subject_name VARCHAR(100) NOT NULL,
+              subject_code VARCHAR(50) NULL,
+              score DECIMAL(5, 2) NOT NULL DEFAULT 0.00,
+              letter_grade VARCHAR(5) NULL,
+              kkm DECIMAL(5, 2) NOT NULL DEFAULT 75.00,
+              competency_achievement TEXT NULL,
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+              KEY idx_rcd_card (report_card_id),
+              KEY idx_rcd_subject (subject_name)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS guidance_records (
+              id VARCHAR(36) NOT NULL PRIMARY KEY,
+              tenant_id VARCHAR(36) NOT NULL DEFAULT 'default_tenant',
+              school_id VARCHAR(36) NOT NULL,
+              student_id VARCHAR(36) NOT NULL,
+              counselor_name VARCHAR(150) NOT NULL,
+              category ENUM('akademik', 'karir_studi', 'kedisiplinan', 'pribadi') NOT NULL DEFAULT 'akademik',
+              priority ENUM('rendah', 'sedang', 'tinggi', 'kritis') NOT NULL DEFAULT 'sedang',
+              issue_summary TEXT NOT NULL,
+              action_plan TEXT NOT NULL,
+              status ENUM('open', 'in_progress', 'resolved', 'monitoring') NOT NULL DEFAULT 'open',
+              follow_up_date DATE NULL,
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+              KEY idx_gr_school (school_id),
+              KEY idx_gr_student (student_id),
+              KEY idx_gr_priority (priority),
+              KEY idx_gr_status (status)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ");
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS admission_trackings (
+              id VARCHAR(36) NOT NULL PRIMARY KEY,
+              tenant_id VARCHAR(36) NOT NULL DEFAULT 'default_tenant',
+              school_id VARCHAR(36) NOT NULL,
+              student_id VARCHAR(36) NOT NULL,
+              target_university VARCHAR(150) NOT NULL,
+              target_faculty VARCHAR(150) NULL,
+              target_major VARCHAR(150) NOT NULL,
+              selection_path ENUM('SNBP', 'SNBT', 'MANDIRI', 'KEDINASAN', 'LAINNYA') NOT NULL DEFAULT 'SNBT',
+              priority_order INT NOT NULL DEFAULT 1,
+              status ENUM('rencana', 'terdaftar', 'lolos', 'tidak_lolos', 'cadangan') NOT NULL DEFAULT 'rencana',
+              notes TEXT NULL,
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+              KEY idx_at_school (school_id),
+              KEY idx_at_student (student_id),
+              KEY idx_at_path (selection_path)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ");
+    } catch (\Throwable $e) {
+        error_log("Phase 15 schema auto-creation error: " . $e->getMessage());
+    }
 }
 
 ensure_school_schema($pdo);
@@ -855,6 +942,883 @@ if ($action === 'update_profile' && in_array($_SERVER['REQUEST_METHOD'], ['POST'
         exit;
     }
 }
+
+// =============================================================
+// PHASE 15: EDUPATH SCHOOL INTELLIGENCE API ENDPOINTS
+// PRD: EDUPATH SCHOOL INTELLIGENCE (v1.2, Baseline)
+// =============================================================
+
+// Helper: Standard subjects configuration per level & curriculum
+function get_standard_subjects_config($level = 'SMA', $curriculum = 'Kurikulum Merdeka') {
+    $lvl = strtoupper(trim($level));
+    if ($lvl === 'SD') {
+        return [
+            ["code" => "MAT_SD", "name" => "Matematika", "kkm" => 70, "group" => "Wajib"],
+            ["code" => "BIN_SD", "name" => "Bahasa Indonesia", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "IPAS_SD", "name" => "Ilmu Pengetahuan Alam dan Sosial (IPAS)", "kkm" => 72, "group" => "Wajib"],
+            ["code" => "PPKN_SD", "name" => "Pendidikan Pancasila", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "ENG_SD", "name" => "Bahasa Inggris", "kkm" => 70, "group" => "Wajib"],
+            ["code" => "SENI_SD", "name" => "Seni Budaya & Prakarya", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "PJOK_SD", "name" => "PJOK", "kkm" => 75, "group" => "Wajib"]
+        ];
+    } elseif ($lvl === 'SMP') {
+        return [
+            ["code" => "MAT_SMP", "name" => "Matematika", "kkm" => 72, "group" => "Wajib"],
+            ["code" => "BIN_SMP", "name" => "Bahasa Indonesia", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "ENG_SMP", "name" => "Bahasa Inggris", "kkm" => 72, "group" => "Wajib"],
+            ["code" => "IPA_SMP", "name" => "IPA Terpadu", "kkm" => 72, "group" => "Wajib"],
+            ["code" => "IPS_SMP", "name" => "IPS Terpadu", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "PPKN_SMP", "name" => "Pendidikan Pancasila", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "INF_SMP", "name" => "Informatika", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "PJOK_SMP", "name" => "PJOK", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "SENI_SMP", "name" => "Seni Budaya", "kkm" => 75, "group" => "Wajib"]
+        ];
+    } else { // SMA
+        return [
+            ["code" => "MAT_SMA", "name" => "Matematika Wajib", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "BIN_SMA", "name" => "Bahasa Indonesia", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "ENG_SMA", "name" => "Bahasa Inggris", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "PPKN_SMA", "name" => "Pendidikan Pancasila", "kkm" => 75, "group" => "Wajib"],
+            ["code" => "SEJ_SMA", "name" => "Sejarah", "kkm" => 75, "group" => "Wajib"],
+            // Mata Pelajaran Pilihan / Peminatan
+            ["code" => "FIS_SMA", "name" => "Fisika", "kkm" => 75, "group" => "Peminatan Saintek"],
+            ["code" => "KIM_SMA", "name" => "Kimia", "kkm" => 75, "group" => "Peminatan Saintek"],
+            ["code" => "BIO_SMA", "name" => "Biologi", "kkm" => 75, "group" => "Peminatan Saintek"],
+            ["code" => "MAT_TL_SMA", "name" => "Matematika Tingkat Lanjut", "kkm" => 75, "group" => "Peminatan Saintek"],
+            ["code" => "EKO_SMA", "name" => "Ekonomi", "kkm" => 75, "group" => "Peminatan Soshum"],
+            ["code" => "SOS_SMA", "name" => "Sosiologi", "kkm" => 75, "group" => "Peminatan Soshum"],
+            ["code" => "GEO_SMA", "name" => "Geografi", "kkm" => 75, "group" => "Peminatan Soshum"]
+        ];
+    }
+}
+
+// -------------------------------------------------------------
+// 1. REPORT TEMPLATE METADATA (Untuk konfigurasi & template Excel)
+// -------------------------------------------------------------
+if ($action === 'report_template' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $level = $_GET['level'] ?? 'SMA';
+    $curriculum = $_GET['curriculum'] ?? 'Kurikulum Merdeka';
+    $subjects = get_standard_subjects_config($level, $curriculum);
+
+    echo json_encode([
+        "success" => true,
+        "level" => strtoupper($level),
+        "curriculum" => $curriculum,
+        "subjects" => $subjects,
+        "sample_headers" => array_merge(
+            ["NISN / ID", "Nama Siswa", "Email Siswa", "Jenjang", "Kelas", "Tahun Ajaran", "Semester"],
+            array_column($subjects, 'name')
+        )
+    ]);
+    exit;
+}
+
+// -------------------------------------------------------------
+// 2. REPORT CARDS ROSTER (List Nilai Rapor dengan Filter & Rata-rata)
+// -------------------------------------------------------------
+if ($action === 'report_cards' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $page = max(1, (int)($_GET['page'] ?? 1));
+    $limit = max(1, min(100, (int)($_GET['limit'] ?? 20)));
+    $offset = ($page - 1) * $limit;
+
+    $academic_year = $_GET['academic_year'] ?? '';
+    $semester = $_GET['semester'] ?? '';
+    $class_level = $_GET['class_level'] ?? '';
+    $education_level = $_GET['education_level'] ?? '';
+    $status = $_GET['status'] ?? '';
+    $search = trim($_GET['search'] ?? '');
+
+    $where = ["(rc.school_id = :school_id OR LOWER(TRIM(st.school)) = LOWER(TRIM(:school_name)))"];
+    $params = [
+        ":school_id" => $current_school_id,
+        ":school_name" => $current_school_name
+    ];
+
+    if (!empty($academic_year)) {
+        $where[] = "rc.academic_year = :academic_year";
+        $params[":academic_year"] = $academic_year;
+    }
+    if (!empty($semester)) {
+        $where[] = "rc.semester = :semester";
+        $params[":semester"] = $semester;
+    }
+    if (!empty($class_level)) {
+        $where[] = "rc.class_level = :class_level";
+        $params[":class_level"] = $class_level;
+    }
+    if (!empty($education_level)) {
+        $where[] = "rc.education_level = :education_level";
+        $params[":education_level"] = strtoupper($education_level);
+    }
+    if (!empty($status)) {
+        $where[] = "rc.status = :status";
+        $params[":status"] = $status;
+    }
+    if (!empty($search)) {
+        $where[] = "(st.name LIKE :search OR st.email LIKE :search OR rc.class_name LIKE :search)";
+        $params[":search"] = "%$search%";
+    }
+
+    $whereSql = implode(" AND ", $where);
+
+    // Count query
+    $countStmt = $pdo->prepare("
+        SELECT COUNT(DISTINCT rc.id)
+        FROM report_cards rc
+        JOIN students st ON rc.student_id = st.id
+        WHERE $whereSql
+    ");
+    $countStmt->execute($params);
+    $total = (int)$countStmt->fetchColumn();
+
+    // Data query with aggregate scores
+    $queryStmt = $pdo->prepare("
+        SELECT 
+            rc.id, rc.student_id, rc.education_level, rc.academic_year, rc.semester,
+            rc.class_level, rc.class_name, rc.curriculum, rc.status, rc.notes,
+            rc.verified_at, rc.created_at, rc.updated_at,
+            st.name as student_name, st.email as student_email, st.phone as student_phone,
+            st.school as student_school, st.target_ptn, st.plan as student_plan,
+            COUNT(rcd.id) as total_subjects,
+            COALESCE(ROUND(AVG(rcd.score), 2), 0) as average_score,
+            COALESCE(MAX(rcd.score), 0) as max_score,
+            COALESCE(MIN(rcd.score), 0) as min_score
+        FROM report_cards rc
+        JOIN students st ON rc.student_id = st.id
+        LEFT JOIN report_card_details rcd ON rc.id = rcd.report_card_id
+        WHERE $whereSql
+        GROUP BY rc.id
+        ORDER BY rc.academic_year DESC, rc.semester DESC, st.name ASC
+        LIMIT :limit OFFSET :offset
+    ");
+
+    foreach ($params as $k => $v) {
+        $queryStmt->bindValue($k, $v);
+    }
+    $queryStmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $queryStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $queryStmt->execute();
+    $reportCards = $queryStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode([
+        "success" => true,
+        "total" => $total,
+        "page" => $page,
+        "limit" => $limit,
+        "report_cards" => $reportCards
+    ]);
+    exit;
+}
+
+// -------------------------------------------------------------
+// 3. REPORT CARD DETAIL (Single Rapor dengan Rincian per Mapel)
+// -------------------------------------------------------------
+if ($action === 'report_card_detail' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $id = safe_str($_GET['id'] ?? '');
+    if (empty($id)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Parameter ID rapor wajib diisi."]);
+        exit;
+    }
+
+    $stmt = $pdo->prepare("
+        SELECT 
+            rc.*,
+            st.name as student_name, st.email as student_email, st.phone as student_phone,
+            st.school as student_school, st.target_ptn, st.plan as student_plan
+        FROM report_cards rc
+        JOIN students st ON rc.student_id = st.id
+        WHERE rc.id = ? AND (rc.school_id = ? OR LOWER(TRIM(st.school)) = LOWER(TRIM(?)))
+    ");
+    $stmt->execute([$id, $current_school_id, $current_school_name]);
+    $reportCard = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$reportCard) {
+        http_response_code(404);
+        echo json_encode(["error" => "Data rapor tidak ditemukan atau tidak berwenang."]);
+        exit;
+    }
+
+    $detailStmt = $pdo->prepare("
+        SELECT id, subject_name, subject_code, score, letter_grade, kkm, competency_achievement
+        FROM report_card_details
+        WHERE report_card_id = ?
+        ORDER BY subject_name ASC
+    ");
+    $detailStmt->execute([$id]);
+    $reportCard['details'] = $detailStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode(["success" => true, "report_card" => $reportCard]);
+    exit;
+}
+
+// -------------------------------------------------------------
+// 4. SAVE REPORT CARD (Manual Input / Edit Draft Rapor)
+// -------------------------------------------------------------
+if ($action === 'save_report_card' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $student_id = safe_str($input['student_id'] ?? '');
+    $education_level = strtoupper(safe_str($input['education_level'] ?? 'SMA'));
+    $academic_year = safe_str($input['academic_year'] ?? '2026/2027');
+    $semester = strtolower(safe_str($input['semester'] ?? 'ganjil'));
+    $class_level = safe_str($input['class_level'] ?? 'Kelas 12');
+    $class_name = safe_str($input['class_name'] ?? '');
+    $curriculum = safe_str($input['curriculum'] ?? 'Kurikulum Merdeka');
+    $status = safe_str($input['status'] ?? 'draft');
+    $notes = safe_str($input['notes'] ?? '');
+    $details = $input['details'] ?? [];
+
+    if (empty($student_id) || empty($academic_year)) {
+        http_response_code(400);
+        echo json_encode(["error" => "ID Siswa dan Tahun Ajaran wajib diisi."]);
+        exit;
+    }
+
+    // Verify student belongs to this school
+    $stCheck = $pdo->prepare("
+        SELECT id, name, school, school_id 
+        FROM students 
+        WHERE id = ? AND (school_id = ? OR LOWER(TRIM(school)) = LOWER(TRIM(?)))
+    ");
+    $stCheck->execute([$student_id, $current_school_id, $current_school_name]);
+    $student = $stCheck->fetch(PDO::FETCH_ASSOC);
+    if (!$student) {
+        http_response_code(403);
+        echo json_encode(["error" => "Siswa tidak terdaftar pada sekolah Anda."]);
+        exit;
+    }
+
+    $pdo->beginTransaction();
+    try {
+        // Check if report card already exists for this period
+        $checkRc = $pdo->prepare("
+            SELECT id, status FROM report_cards 
+            WHERE student_id = ? AND academic_year = ? AND semester = ?
+        ");
+        $checkRc->execute([$student_id, $academic_year, $semester]);
+        $existingRc = $checkRc->fetch(PDO::FETCH_ASSOC);
+
+        if ($existingRc && in_array($existingRc['status'], ['verified', 'locked']) && !in_array($payload->role, ['superadmin', 'admin'])) {
+            $pdo->rollBack();
+            http_response_code(400);
+            echo json_encode(["error" => "Rapor periode ini telah diverifikasi/dikunci. Hubungi Kepala Sekolah/Admin untuk koreksi."]);
+            exit;
+        }
+
+        $report_card_id = $existingRc['id'] ?? generate_school_uuid();
+
+        if ($existingRc) {
+            $upRc = $pdo->prepare("
+                UPDATE report_cards SET 
+                    education_level = ?, class_level = ?, class_name = ?, 
+                    curriculum = ?, status = ?, notes = ?, updated_at = NOW()
+                WHERE id = ?
+            ");
+            $upRc->execute([$education_level, $class_level, $class_name, $curriculum, $status, $notes, $report_card_id]);
+        } else {
+            $inRc = $pdo->prepare("
+                INSERT INTO report_cards (
+                    id, tenant_id, school_id, student_id, education_level, 
+                    academic_year, semester, class_level, class_name, curriculum, status, notes
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $inRc->execute([
+                $report_card_id, $payload->tenant_id ?? 'default_tenant', $current_school_id,
+                $student_id, $education_level, $academic_year, $semester,
+                $class_level, $class_name, $curriculum, $status, $notes
+            ]);
+        }
+
+        // Replace details
+        $pdo->prepare("DELETE FROM report_card_details WHERE report_card_id = ?")->execute([$report_card_id]);
+
+        $inDetail = $pdo->prepare("
+            INSERT INTO report_card_details (
+                id, report_card_id, subject_name, subject_code, score, letter_grade, kkm, competency_achievement
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+        foreach ($details as $d) {
+            $sName = safe_str($d['subject_name'] ?? '');
+            if (empty($sName)) continue;
+            $sCode = safe_str($d['subject_code'] ?? '');
+            $score = max(0, min(100, (float)($d['score'] ?? 0)));
+            $kkm = max(0, min(100, (float)($d['kkm'] ?? 75)));
+            
+            // Auto compute letter grade if not supplied
+            $letter = safe_str($d['letter_grade'] ?? '');
+            if (empty($letter)) {
+                if ($score >= 90) $letter = 'A';
+                elseif ($score >= 80) $letter = 'B';
+                elseif ($score >= 70) $letter = 'C';
+                else $letter = 'D';
+            }
+
+            $comp = safe_str($d['competency_achievement'] ?? '');
+            $inDetail->execute([
+                generate_school_uuid(), $report_card_id, $sName, $sCode,
+                $score, $letter, $kkm, $comp
+            ]);
+        }
+
+        $pdo->commit();
+
+        echo json_encode([
+            "success" => true,
+            "message" => "Nilai rapor berhasil disimpan.",
+            "report_card_id" => $report_card_id,
+            "status" => $status
+        ]);
+        exit;
+    } catch (\Throwable $e) {
+        $pdo->rollBack();
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal menyimpan rapor: " . $e->getMessage()]);
+        exit;
+    }
+}
+
+// -------------------------------------------------------------
+// 5. VERIFY REPORT CARD (Verifikasi / Approval Status Rapor)
+// -------------------------------------------------------------
+if ($action === 'verify_report_card' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = safe_str($input['id'] ?? '');
+    $newStatus = safe_str($input['status'] ?? 'verified'); // verified, rejected, locked
+    $verifyNotes = safe_str($input['notes'] ?? '');
+
+    if (empty($id) || !in_array($newStatus, ['verified', 'rejected', 'locked', 'draft'])) {
+        http_response_code(400);
+        echo json_encode(["error" => "Parameter ID dan Status valid ('verified', 'rejected', 'locked', 'draft') wajib diisi."]);
+        exit;
+    }
+
+    try {
+        $stmt = $pdo->prepare("
+            UPDATE report_cards SET 
+                status = ?, notes = CASE WHEN ? != '' THEN ? ELSE notes END,
+                verified_by = ?, verified_at = NOW(), updated_at = NOW()
+            WHERE id = ? AND school_id = ?
+        ");
+        $stmt->execute([$newStatus, $verifyNotes, $verifyNotes, $payload->id ?? 'counselor', $id, $current_school_id]);
+
+        echo json_encode([
+            "success" => true,
+            "message" => "Status rapor berhasil diperbarui menjadi " . strtoupper($newStatus),
+            "status" => $newStatus
+        ]);
+        exit;
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal verifikasi rapor: " . $e->getMessage()]);
+        exit;
+    }
+}
+
+// -------------------------------------------------------------
+// 6. IMPORT PREVIEW (Validasi Baris Excel Sebelum Commit)
+// -------------------------------------------------------------
+if ($action === 'report_import_preview' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $rows = $input['rows'] ?? [];
+    if (empty($rows) || !is_array($rows)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Data baris Excel tidak ditemukan."]);
+        exit;
+    }
+
+    // Fetch all students for this school into memory for fast lookup
+    $stStmt = $pdo->prepare("
+        SELECT id, name, email, phone 
+        FROM students 
+        WHERE school_id = ? OR LOWER(TRIM(school)) = LOWER(TRIM(?))
+    ");
+    $stStmt->execute([$current_school_id, $current_school_name]);
+    $schoolStudents = $stStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $previewList = [];
+    $validCount = 0;
+    $warningCount = 0;
+    $errorCount = 0;
+
+    foreach ($rows as $idx => $r) {
+        $rowNum = $idx + 1;
+        $studentIdentifier = trim($r['nisn'] ?? ($r['email'] ?? ($r['name'] ?? '')));
+        $studentName = trim($r['name'] ?? ($r['nama'] ?? ''));
+        $studentEmail = trim($r['email'] ?? '');
+        $academicYear = trim($r['academic_year'] ?? ($r['tahun_ajaran'] ?? '2026/2027'));
+        $semester = strtolower(trim($r['semester'] ?? 'ganjil'));
+        $classLevel = trim($r['class_level'] ?? ($r['kelas'] ?? 'Kelas 12'));
+        $educationLevel = strtoupper(trim($r['education_level'] ?? ($r['jenjang'] ?? 'SMA')));
+        $curriculum = trim($r['curriculum'] ?? 'Kurikulum Merdeka');
+        $subjectsData = $r['subjects'] ?? [];
+
+        // Match student
+        $matchedStudent = null;
+        foreach ($schoolStudents as $st) {
+            if (!empty($studentEmail) && strtolower($st['email']) === strtolower($studentEmail)) {
+                $matchedStudent = $st;
+                break;
+            }
+            if (!empty($studentName) && strtolower(trim($st['name'])) === strtolower($studentName)) {
+                $matchedStudent = $st;
+                break;
+            }
+        }
+
+        $rowStatus = 'VALID';
+        $issues = [];
+
+        if (!$matchedStudent) {
+            $rowStatus = 'ERROR';
+            $issues[] = "Siswa '$studentName' ($studentEmail) tidak ditemukan di daftar siswa sekolah ini.";
+        }
+
+        if (empty($subjectsData) || !is_array($subjectsData)) {
+            $rowStatus = 'ERROR';
+            $issues[] = "Tidak ada nilai mata pelajaran yang terbaca pada baris ini.";
+        } else {
+            foreach ($subjectsData as $sName => $sVal) {
+                if (!is_numeric($sVal) || $sVal < 0 || $sVal > 100) {
+                    $rowStatus = ($rowStatus === 'ERROR') ? 'ERROR' : 'WARNING';
+                    $issues[] = "Nilai $sName ($sVal) tidak valid (harus 0-100).";
+                }
+            }
+        }
+
+        // Check duplicate period
+        $isDuplicate = false;
+        if ($matchedStudent) {
+            $chkDup = $pdo->prepare("
+                SELECT id, status FROM report_cards 
+                WHERE student_id = ? AND academic_year = ? AND semester = ?
+            ");
+            $chkDup->execute([$matchedStudent['id'], $academicYear, $semester]);
+            $existing = $chkDup->fetch(PDO::FETCH_ASSOC);
+            if ($existing) {
+                $isDuplicate = true;
+                if ($rowStatus !== 'ERROR') {
+                    $rowStatus = 'WARNING';
+                    $issues[] = "Data rapor periode ini sudah ada (akan menimpa data yang ada jika dilanjutkan).";
+                }
+            }
+        }
+
+        if ($rowStatus === 'VALID') $validCount++;
+        elseif ($rowStatus === 'WARNING') $warningCount++;
+        else $errorCount++;
+
+        $previewList[] = [
+            "row_num" => $rowNum,
+            "student_id" => $matchedStudent['id'] ?? null,
+            "student_name" => $matchedStudent['name'] ?? $studentName,
+            "student_email" => $matchedStudent['email'] ?? $studentEmail,
+            "academic_year" => $academicYear,
+            "semester" => $semester,
+            "class_level" => $classLevel,
+            "education_level" => $educationLevel,
+            "curriculum" => $curriculum,
+            "subjects" => $subjectsData,
+            "is_duplicate" => $isDuplicate,
+            "status" => $rowStatus,
+            "issues" => $issues
+        ];
+    }
+
+    echo json_encode([
+        "success" => true,
+        "summary" => [
+            "total_rows" => count($rows),
+            "valid_rows" => $validCount,
+            "warning_rows" => $warningCount,
+            "error_rows" => $errorCount
+        ],
+        "preview" => $previewList
+    ]);
+    exit;
+}
+
+// -------------------------------------------------------------
+// 7. IMPORT COMMIT (Eksekusi Simpan Batch Rapor yang Lolos Validasi)
+// -------------------------------------------------------------
+if ($action === 'report_import_commit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $rows = $input['rows'] ?? [];
+    if (empty($rows) || !is_array($rows)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Daftar baris untuk di-commit kosong."]);
+        exit;
+    }
+
+    $pdo->beginTransaction();
+    $committedCount = 0;
+    try {
+        $inRc = $pdo->prepare("
+            INSERT INTO report_cards (
+                id, tenant_id, school_id, student_id, education_level, 
+                academic_year, semester, class_level, class_name, curriculum, status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted')
+            ON DUPLICATE KEY UPDATE 
+                education_level = VALUES(education_level),
+                class_level = VALUES(class_level),
+                class_name = VALUES(class_name),
+                curriculum = VALUES(curriculum),
+                status = 'submitted',
+                updated_at = NOW()
+        ");
+
+        $delDetail = $pdo->prepare("DELETE FROM report_card_details WHERE report_card_id = ?");
+        $inDetail = $pdo->prepare("
+            INSERT INTO report_card_details (
+                id, report_card_id, subject_name, score, letter_grade, kkm
+            ) VALUES (?, ?, ?, ?, ?, 75.00)
+        ");
+
+        foreach ($rows as $r) {
+            $studentId = safe_str($r['student_id'] ?? '');
+            if (empty($studentId)) continue;
+
+            $academicYear = safe_str($r['academic_year'] ?? '2026/2027');
+            $semester = strtolower(safe_str($r['semester'] ?? 'ganjil'));
+            $classLevel = safe_str($r['class_level'] ?? 'Kelas 12');
+            $className = safe_str($r['class_name'] ?? '');
+            $eduLevel = strtoupper(safe_str($r['education_level'] ?? 'SMA'));
+            $curriculum = safe_str($r['curriculum'] ?? 'Kurikulum Merdeka');
+            $subjects = $r['subjects'] ?? [];
+
+            // Get existing ID or generate
+            $chk = $pdo->prepare("SELECT id FROM report_cards WHERE student_id = ? AND academic_year = ? AND semester = ?");
+            $chk->execute([$studentId, $academicYear, $semester]);
+            $existingId = $chk->fetchColumn();
+            $rcId = $existingId ?: generate_school_uuid();
+
+            $inRc->execute([
+                $rcId, $payload->tenant_id ?? 'default_tenant', $current_school_id,
+                $studentId, $eduLevel, $academicYear, $semester, $classLevel,
+                $className, $curriculum
+            ]);
+
+            // Re-fetch ID in case of ON DUPLICATE KEY
+            $chk->execute([$studentId, $academicYear, $semester]);
+            $actualRcId = $chk->fetchColumn() ?: $rcId;
+
+            // Details
+            $delDetail->execute([$actualRcId]);
+            foreach ($subjects as $sName => $sScore) {
+                if (!is_numeric($sScore)) continue;
+                $scoreNum = max(0, min(100, (float)$sScore));
+                $letter = ($scoreNum >= 90) ? 'A' : (($scoreNum >= 80) ? 'B' : (($scoreNum >= 70) ? 'C' : 'D'));
+                $inDetail->execute([generate_school_uuid(), $actualRcId, safe_str($sName), $scoreNum, $letter]);
+            }
+
+            $committedCount++;
+        }
+
+        $pdo->commit();
+        echo json_encode([
+            "success" => true,
+            "message" => "Berhasil mengimpor $committedCount nilai rapor siswa.",
+            "committed_count" => $committedCount
+        ]);
+        exit;
+    } catch (\Throwable $e) {
+        $pdo->rollBack();
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal commit import rapor: " . $e->getMessage()]);
+        exit;
+    }
+}
+
+// -------------------------------------------------------------
+// 8. STUDENT 360 INTELLIGENCE (Profil Komprehensif Terpadu Siswa)
+// -------------------------------------------------------------
+if ($action === 'student_360' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $student_id = safe_str($_GET['student_id'] ?? '');
+    if (empty($student_id)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Parameter student_id wajib diisi."]);
+        exit;
+    }
+
+    // Student identity
+    $stStmt = $pdo->prepare("
+        SELECT id, name, email, phone, school, target_ptn, plan, streak, total_score, created_at
+        FROM students 
+        WHERE id = ? AND (school_id = ? OR LOWER(TRIM(school)) = LOWER(TRIM(?)))
+    ");
+    $stStmt->execute([$student_id, $current_school_id, $current_school_name]);
+    $student = $stStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$student) {
+        http_response_code(404);
+        echo json_encode(["error" => "Siswa tidak ditemukan atau tidak berada dalam kewenangan sekolah ini."]);
+        exit;
+    }
+
+    // 1. Report Cards History across semesters
+    $rcStmt = $pdo->prepare("
+        SELECT rc.id, rc.education_level, rc.academic_year, rc.semester, rc.class_level, rc.class_name, rc.curriculum, rc.status, rc.verified_at
+        FROM report_cards rc
+        WHERE rc.student_id = ?
+        ORDER BY rc.academic_year ASC, rc.semester ASC
+    ");
+    $rcStmt->execute([$student_id]);
+    $reportCards = $rcStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $detStmt = $pdo->prepare("
+        SELECT subject_name, score, letter_grade, kkm, competency_achievement 
+        FROM report_card_details 
+        WHERE report_card_id = ?
+        ORDER BY subject_name ASC
+    ");
+
+    $semesterProgression = [];
+    $allSubjectScores = [];
+
+    foreach ($reportCards as &$rc) {
+        $detStmt->execute([$rc['id']]);
+        $rc['details'] = $detStmt->fetchAll(PDO::FETCH_ASSOC);
+        $avg = count($rc['details']) > 0 ? round(array_sum(array_column($rc['details'], 'score')) / count($rc['details']), 2) : 0;
+        $rc['average_score'] = $avg;
+        $label = $rc['academic_year'] . ' (' . ucfirst($rc['semester']) . ')';
+        $semesterProgression[] = [
+            "period" => $label,
+            "average" => $avg,
+            "class_level" => $rc['class_level']
+        ];
+        foreach ($rc['details'] as $dt) {
+            $allSubjectScores[$dt['subject_name']][] = (float)$dt['score'];
+        }
+    }
+
+    // 2. CBT / Assessment Tryout History
+    $cbtStmt = $pdo->prepare("
+        SELECT id, quiz_type, subtes, score, correct, total, duration_sec, created_at
+        FROM quiz_results
+        WHERE student_id = ?
+        ORDER BY created_at DESC
+        LIMIT 15
+    ");
+    $cbtStmt->execute([$student_id]);
+    $assessmentHistory = $cbtStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 3. Diagnostic & Learning Path
+    $diagStmt = $pdo->prepare("
+        SELECT id, answers, raw_score, recommended_track, created_at
+        FROM diagnostic_results
+        WHERE student_id = ?
+        ORDER BY created_at DESC
+        LIMIT 1
+    ");
+    $diagStmt->execute([$student_id]);
+    $diagnosticResult = $diagStmt->fetch(PDO::FETCH_ASSOC);
+
+    // 4. Learning Gap Identification (Mata pelajaran dengan nilai < KKM atau rata-rata terendah)
+    $learningGaps = [];
+    foreach ($allSubjectScores as $subj => $scores) {
+        $avgScore = round(array_sum($scores) / count($scores), 2);
+        if ($avgScore < 75) {
+            $learningGaps[] = [
+                "subject" => $subj,
+                "average_score" => $avgScore,
+                "gap_severity" => ($avgScore < 65 ? "TINGGI" : "SEDANG"),
+                "recommendation" => "Perlu bimbingan intensif materi dasar & latihan mandiri pada topik $subj."
+            ];
+        }
+    }
+
+    // 5. Guidance Counseling Records
+    $grStmt = $pdo->prepare("
+        SELECT id, counselor_name, category, priority, issue_summary, action_plan, status, follow_up_date, created_at
+        FROM guidance_records
+        WHERE student_id = ?
+        ORDER BY created_at DESC
+    ");
+    $grStmt->execute([$student_id]);
+    $guidanceRecords = $grStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 6. Admission Tracking
+    $atStmt = $pdo->prepare("
+        SELECT id, target_university, target_faculty, target_major, selection_path, priority_order, status, notes
+        FROM admission_trackings
+        WHERE student_id = ?
+        ORDER BY priority_order ASC
+    ");
+    $atStmt->execute([$student_id]);
+    $admissionTracking = $atStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode([
+        "success" => true,
+        "student" => $student,
+        "report_cards" => $reportCards,
+        "semester_progression" => $semesterProgression,
+        "assessment_history" => $assessmentHistory,
+        "diagnostic" => $diagnosticResult,
+        "learning_gaps" => $learningGaps,
+        "guidance_records" => $guidanceRecords,
+        "admission_tracking" => $admissionTracking
+    ]);
+    exit;
+}
+
+// -------------------------------------------------------------
+// 9. GUIDANCE INTELLIGENCE RECORDS (Catatan Konseling BK)
+// -------------------------------------------------------------
+if ($action === 'guidance_records') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $student_id = safe_str($_GET['student_id'] ?? '');
+        $status = safe_str($_GET['status'] ?? '');
+        $category = safe_str($_GET['category'] ?? '');
+
+        $where = ["gr.school_id = ?"];
+        $params = [$current_school_id];
+
+        if (!empty($student_id)) {
+            $where[] = "gr.student_id = ?";
+            $params[] = $student_id;
+        }
+        if (!empty($status)) {
+            $where[] = "gr.status = ?";
+            $params[] = $status;
+        }
+        if (!empty($category)) {
+            $where[] = "gr.category = ?";
+            $params[] = $category;
+        }
+
+        $stmt = $pdo->prepare("
+            SELECT gr.*, st.name as student_name, st.email as student_email, st.phone as student_phone, st.target_ptn
+            FROM guidance_records gr
+            JOIN students st ON gr.student_id = st.id
+            WHERE " . implode(" AND ", $where) . "
+            ORDER BY gr.created_at DESC
+        ");
+        $stmt->execute($params);
+        $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode(["success" => true, "guidance_records" => $records]);
+        exit;
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $student_id = safe_str($input['student_id'] ?? '');
+        $counselor_name = safe_str($input['counselor_name'] ?? ($payload->name ?? 'Guru BK'));
+        $category = safe_str($input['category'] ?? 'akademik');
+        $priority = safe_str($input['priority'] ?? 'sedang');
+        $issue_summary = safe_str($input['issue_summary'] ?? '');
+        $action_plan = safe_str($input['action_plan'] ?? '');
+        $status = safe_str($input['status'] ?? 'open');
+        $follow_up_date = !empty($input['follow_up_date']) ? safe_str($input['follow_up_date']) : null;
+
+        if (empty($student_id) || empty($issue_summary)) {
+            http_response_code(400);
+            echo json_encode(["error" => "ID Siswa dan Ringkasan Permasalahan wajib diisi."]);
+            exit;
+        }
+
+        $id = generate_school_uuid();
+        $stmt = $pdo->prepare("
+            INSERT INTO guidance_records (
+                id, tenant_id, school_id, student_id, counselor_name, category, priority, 
+                issue_summary, action_plan, status, follow_up_date
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $id, $payload->tenant_id ?? 'default_tenant', $current_school_id, $student_id,
+            $counselor_name, $category, $priority, $issue_summary, $action_plan, $status, $follow_up_date
+        ]);
+
+        echo json_encode(["success" => true, "message" => "Catatan pendampingan berhasil disimpan.", "id" => $id]);
+        exit;
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+        $id = safe_str($input['id'] ?? '');
+        $status = safe_str($input['status'] ?? 'in_progress');
+        $action_plan = safe_str($input['action_plan'] ?? '');
+        $follow_up_date = !empty($input['follow_up_date']) ? safe_str($input['follow_up_date']) : null;
+
+        if (empty($id)) {
+            http_response_code(400);
+            echo json_encode(["error" => "ID catatan pendampingan wajib diisi."]);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("
+            UPDATE guidance_records SET 
+                status = ?, 
+                action_plan = CASE WHEN ? != '' THEN ? ELSE action_plan END,
+                follow_up_date = ?,
+                updated_at = NOW()
+            WHERE id = ? AND school_id = ?
+        ");
+        $stmt->execute([$status, $action_plan, $action_plan, $follow_up_date, $id, $current_school_id]);
+
+        echo json_encode(["success" => true, "message" => "Status catatan pendampingan diperbarui."]);
+        exit;
+    }
+}
+
+// -------------------------------------------------------------
+// 10. ADMISSION READINESS INTELLIGENCE (Analisis SNBP & SNBT)
+// -------------------------------------------------------------
+if ($action === 'admission_readiness' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    // 1. SNBP Readiness: Students ranking with consistent high GPA across semesters
+    $snbpStmt = $pdo->prepare("
+        SELECT 
+            st.id as student_id, st.name as student_name, st.email, st.phone, st.target_ptn,
+            COUNT(rc.id) as total_semesters_recorded,
+            ROUND(AVG(rcd.score), 2) as cumulative_gpa,
+            MAX(rcd.score) as highest_subject_score,
+            MIN(rcd.score) as lowest_subject_score
+        FROM students st
+        JOIN report_cards rc ON st.id = rc.student_id
+        JOIN report_card_details rcd ON rc.id = rcd.report_card_id
+        WHERE (st.school_id = :school_id OR LOWER(TRIM(st.school)) = LOWER(TRIM(:school_name)))
+        GROUP BY st.id
+        HAVING total_semesters_recorded >= 1
+        ORDER BY cumulative_gpa DESC
+        LIMIT 50
+    ");
+    $snbpStmt->execute([
+        ":school_id" => $current_school_id,
+        ":school_name" => $current_school_name
+    ]);
+    $snbpRanking = $snbpStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 2. SNBT CBT Performance Distribution
+    $snbtStmt = $pdo->prepare("
+        SELECT 
+            st.id as student_id, st.name as student_name, st.target_ptn,
+            ROUND(AVG(qr.score), 1) as avg_cbt_score,
+            COUNT(qr.id) as tryouts_attempted,
+            MAX(qr.score) as top_score
+        FROM students st
+        JOIN quiz_results qr ON st.id = qr.student_id
+        WHERE (st.school_id = :school_id OR LOWER(TRIM(st.school)) = LOWER(TRIM(:school_name)))
+        GROUP BY st.id
+        ORDER BY avg_cbt_score DESC
+        LIMIT 50
+    ");
+    $snbtStmt->execute([
+        ":school_id" => $current_school_id,
+        ":school_name" => $current_school_name
+    ]);
+    $snbtPerformance = $snbtStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 3. Admission Trackings target count
+    $targetStmt = $pdo->prepare("
+        SELECT target_university, target_major, selection_path, COUNT(*) as applicant_count
+        FROM admission_trackings
+        WHERE school_id = ?
+        GROUP BY target_university, target_major, selection_path
+        ORDER BY applicant_count DESC
+        LIMIT 10
+    ");
+    $targetStmt->execute([$current_school_id]);
+    $popularTargets = $targetStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode([
+        "success" => true,
+        "snbp_ranking" => $snbpRanking,
+        "snbt_performance" => $snbtPerformance,
+        "popular_targets" => $popularTargets
+    ]);
+    exit;
+}
+
 
 http_response_code(404);
 echo json_encode(["error" => "Action tidak valid."]);
