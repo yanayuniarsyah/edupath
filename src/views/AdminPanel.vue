@@ -5032,12 +5032,14 @@
   </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../api';
 import { SNBT_TAXONOMY, TKA_TAXONOMY } from '../EduData.js';
-import MaterialRichEditor from '../components/MaterialRichEditor.vue';
-import OfflineRoleResponsibilitiesModal from '../components/OfflineRoleResponsibilitiesModal.vue';
+
+// Dynamic lazy loading for heavy sub-components to maximize initial load speed
+const MaterialRichEditor = defineAsyncComponent(() => import('../components/MaterialRichEditor.vue'));
+const OfflineRoleResponsibilitiesModal = defineAsyncComponent(() => import('../components/OfflineRoleResponsibilitiesModal.vue'));
 
 const showOfflineRoleModal = ref(false);
 

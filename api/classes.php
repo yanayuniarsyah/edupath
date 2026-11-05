@@ -26,6 +26,22 @@ if ($payload->role === 'student' && !in_array($action, $allowedStudentActions)) 
 
 $tenant_id = $payload->tenant_id;
 $isSuper = ($payload->role === 'superadmin');
+ensure_classes_performance_indexes($pdo);
+
+// Optimization: Performance indexes on offline class queries
+function ensure_classes_performance_indexes($pdo) {
+    static $indexed = false;
+    if ($indexed) return;
+    $indexed = true;
+    $lock = sys_get_temp_dir() . '/edupath_classes_idx.lock';
+    if (file_exists($lock) && (time() - @filemtime($lock) < 86400 * 7)) return;
+    @touch($lock);
+    try {
+        @$pdo->exec("CREATE INDEX idx_cses_teacher_date ON class_sessions(teacher_id, session_date)");
+        @$pdo->exec("CREATE INDEX idx_cstd_class_status ON class_students(class_id, status)");
+        @$pdo->exec("CREATE INDEX idx_satt_session_student ON session_attendances(session_id, student_id)");
+    } catch (Throwable $e) {}
+}
 
 // Helper UUID
 function gen_uuid() {
@@ -1010,14 +1026,19 @@ elseif ($action === 'teacher_hub') {
     $clsStmt->execute([$myTeacherId]);
     $myClasses = $clsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Ambil daftar siswa unik yang diajar oleh guru ini
+    // Ambil daftar siswa unik yang diajar oleh guru ini beserta rekap kehadiran (Hadir, Izin, Sakit)
     $stdStmt = $pdo->prepare("
-        SELECT DISTINCT s.id, s.name, s.email, s.phone, c.name as class_name
+        SELECT s.id, s.name, s.email, s.phone, c.name as class_name,
+               COALESCE(SUM(CASE WHEN sa.attendance_status = 'present' THEN 1 ELSE 0 END), 0) as hadir_count,
+               COALESCE(SUM(CASE WHEN sa.attendance_status = 'permit' OR sa.attendance_status = 'izin' THEN 1 ELSE 0 END), 0) as izin_count,
+               COALESCE(SUM(CASE WHEN sa.attendance_status = 'sick' OR sa.attendance_status = 'sakit' THEN 1 ELSE 0 END), 0) as sakit_count
         FROM class_sessions ses
         JOIN class_students cs ON ses.class_id = cs.class_id AND cs.status = 'active'
         JOIN students s ON cs.student_id = s.id
         JOIN classes c ON cs.class_id = c.id
+        LEFT JOIN session_attendances sa ON sa.session_id = ses.id AND sa.student_id = s.id
         WHERE ses.teacher_id = ?
+        GROUP BY s.id, s.name, s.email, s.phone, c.name
         ORDER BY s.name ASC
         LIMIT 50
     ");

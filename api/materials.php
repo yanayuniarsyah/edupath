@@ -117,6 +117,13 @@ function ensure_and_seed_materials($pdo, $force = false) {
 $action = $_GET['action'] ?? '';
 
 if ($action === 'seed' || $action === 'sync') {
+    // Security check: Only authenticated superadmin or admin can execute seed / sync
+    $payload = authenticate($pdo);
+    if (!$payload || !in_array($payload->role, ['superadmin', 'admin'], true)) {
+        http_response_code(403);
+        echo json_encode(["success" => false, "error" => "Akses ditolak. Hanya administrator yang dapat melakukan sinkronisasi materi."]);
+        exit;
+    }
     ensure_and_seed_materials($pdo, true);
     $total = (int)$pdo->query("SELECT COUNT(*) FROM materials")->fetchColumn();
     echo json_encode(["success" => true, "message" => "Seed materials executed", "total_materials" => $total]);

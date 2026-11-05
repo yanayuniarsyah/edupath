@@ -1,3 +1,5 @@
+Options -Indexes
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
@@ -66,6 +68,11 @@
     Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>
   Header set Connection keep-alive
+</IfModule>
+
+
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/plain text/html text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml image/x-icon font/ttf font/otf application/x-font-ttf
 </IfModule>
 
 <IfModule mod_deflate.c>

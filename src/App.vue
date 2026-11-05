@@ -5992,7 +5992,7 @@ import api from './api';
 import { initNeuralCanvas } from './neuralCanvas';
 
 const StudentPotentialPath = defineAsyncComponent(() => import('./components/StudentPotentialPath.vue'));
-import OfflineRoleResponsibilitiesModal from './components/OfflineRoleResponsibilitiesModal.vue';
+const OfflineRoleResponsibilitiesModal = defineAsyncComponent(() => import('./components/OfflineRoleResponsibilitiesModal.vue'));
 
 export default {
   name: 'App',

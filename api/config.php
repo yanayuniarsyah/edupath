@@ -20,6 +20,12 @@ if (!empty($_SERVER['DOCUMENT_ROOT'])) {
 }
 load_env(dirname(dirname(__DIR__)) . '/.env');
 
+// Ultra-fast HTTP response compression for JSON APIs (up to 85% bandwidth reduction)
+if (!ini_get('zlib.output_compression') && extension_loaded('zlib') && !ob_get_level()) {
+    @ini_set('zlib.output_compression', 'On');
+    @ini_set('zlib.output_compression_level', '6');
+}
+
 // ----------------------------------------------------------------
 // CORS HARDENING — Strict origin validation
 // ----------------------------------------------------------------
