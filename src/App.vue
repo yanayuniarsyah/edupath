@@ -3906,20 +3906,55 @@
             </div>
           </div>
 
-          <!-- Mode Latihan Soal Mandiri & Bedah Materi AI (In-Page Quick Practice) -->
-          <div class="glass-card rounded-2xl p-4 sm:p-5 border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-slate-900/90 to-slate-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
-            <div class="flex items-center gap-3">
-              <span class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl shrink-0">📖</span>
-              <div>
-                <div class="flex items-center gap-2">
-                  <h3 class="text-sm sm:text-base font-black text-white">Latihan Soal Mandiri &amp; Bedah Solusi AI</h3>
-                  <span class="text-[9px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full border border-indigo-500/30">Mode Latihan</span>
+          <!-- Mode Latihan Soal Mandiri & Bedah Materi AI dengan Timer Terintegrasi -->
+          <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-slate-900/90 to-slate-950 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <!-- Sisi Kiri: Judul & Deskripsi Mode Latihan -->
+            <div class="flex items-start sm:items-center gap-3.5 min-w-0">
+              <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/35 flex items-center justify-center text-2xl shrink-0 shadow-md shadow-indigo-500/10">
+                📖
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-base sm:text-lg font-black text-white">Latihan Soal Mandiri &amp; Bedah Solusi AI</h3>
+                  <span class="text-[9px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full border border-indigo-500/30">
+                    Mode Latihan
+                  </span>
                 </div>
-                <p class="text-xs text-slate-300 mt-0.5">Pilih subtes di bawah untuk berlatih mandiri. Pilihan jawaban langsung memunculkan <strong>Analisis Jalur Solusi</strong> &amp; <strong>Trik Cepat 30 Detik AI</strong> tanpa batas waktu ujian resmi.</p>
+                <p class="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
+                  Latihan mandiri per subtes tanpa tekanan timer ujian resmi. Pilihan jawaban langsung memunculkan <strong>Analisis Solusi</strong> &amp; <strong>Trik Cepat 30 Detik AI</strong>.
+                </p>
               </div>
             </div>
-            <div class="text-[11px] text-indigo-300 bg-indigo-500/10 px-3 py-1.5 rounded-xl border border-indigo-500/20 font-bold shrink-0 text-center">
-              Drill Latihan Cepat
+
+            <!-- Sisi Kanan: Panel Timer Latihan Soal Terintegrasi -->
+            <div class="bg-black/50 border border-white/10 rounded-2xl px-4 py-2.5 flex items-center justify-between md:justify-end gap-3 shrink-0 shadow-inner">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-[10px] font-bold text-white/60 uppercase tracking-wider hidden sm:inline">Timer Latihan:</span>
+                <div class="font-mono font-black text-xl sm:text-2xl text-[#c0ff00] tracking-widest px-2.5 py-0.5 rounded-lg bg-black/60 border border-white/10">
+                  {{ cbtFormattedTimer }}
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 border-l border-white/10 pl-2.5">
+                <button 
+                  type="button"
+                  @click="toggleCbtTimer" 
+                  class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                  :class="isCbtTimerRunning ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30'"
+                  :title="isCbtTimerRunning ? 'Jeda Timer' : 'Lanjutkan Timer'"
+                >
+                  <i :class="isCbtTimerRunning ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
+                  <span>{{ isCbtTimerRunning ? 'Jeda' : 'Mulai' }}</span>
+                </button>
+                <button 
+                  type="button"
+                  @click="resetCbtTimer(5400)" 
+                  class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 transition cursor-pointer"
+                  title="Reset Waktu Latihan (90 Menit)"
+                >
+                  <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -3929,51 +3964,6 @@
             <!-- Left Workspace (Col 8): Official CBT Question Area -->
             <div class="lg:col-span-8 space-y-4">
               
-              <!-- Subtest Selector Bar (Official SNPMB Subtests) -->
-              <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3 shadow-lg">
-                <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-white/10">
-                  <div class="flex items-center gap-2 min-w-0">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#c0ff00] animate-pulse shrink-0"></span>
-                    <span class="text-xs font-black uppercase tracking-wider text-white shrink-0">Subtes:</span>
-                    <span class="text-xs font-bold text-[#c0ff00] truncate">
-                      {{ activeSubtest === 'PU' ? 'Penalaran Umum (PU)' : 
-                         activeSubtest === 'PK' ? 'Pengetahuan Kuantitatif (PK)' : 
-                         activeSubtest === 'PBM' ? 'Pemahaman Bacaan & Menulis (PBM)' : 
-                         activeSubtest === 'PPU' ? 'Pengetahuan & Pemahaman Umum (PPU)' : 
-                         activeSubtest === 'LIndo' ? 'Literasi Bahasa Indonesia' : 
-                         activeSubtest === 'LEng' ? 'Literasi Bahasa Inggris' : 'Penalaran Matematika (PM)' }}
-                    </span>
-                  </div>
-                  <span class="text-[11px] font-mono text-white/60 font-bold shrink-0 whitespace-nowrap">
-                    {{ currentSubtestQuestions.length }} Soal
-                  </span>
-                </div>
-
-                <div class="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scroll-smooth no-scrollbar">
-                  <button 
-                    v-for="sub in [
-                      { id: 'PU', name: 'PU', fullName: 'Penalaran Umum (30)' },
-                      { id: 'PK', name: 'PK', fullName: 'Kuantitatif (15)' },
-                      { id: 'PBM', name: 'PBM', fullName: 'PBM (20)' },
-                      { id: 'PPU', name: 'PPU', fullName: 'PPU (20)' },
-                      { id: 'LIndo', name: 'L.Indo', fullName: 'Literasi B.Indo (30)' },
-                      { id: 'LEng', name: 'L.Ingg', fullName: 'Literasi B.Ingg (20)' },
-                      { id: 'PM', name: 'PM', fullName: 'Penalaran MTK (20)' }
-                    ]" 
-                    :key="sub.id"
-                    :class="['px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 border cursor-pointer', 
-                      activeSubtest === sub.id 
-                        ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-500/30 font-black' 
-                        : 'bg-white/5 border-white/10 text-white/70 hover:text-white hover:bg-white/10'
-                    ]"
-                    @click="setSubtest(sub.id)"
-                    :title="sub.fullName"
-                  >
-                    {{ sub.name }}
-                  </button>
-                </div>
-              </div>
-
               <!-- CBT Question Card (Official Paper Style) -->
               <div v-if="currentCbtQuestion" class="bg-white rounded-2xl p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-slate-200">
                 <!-- Question Header Strip -->
@@ -4125,77 +4115,88 @@
               </div>
             </div>
 
-            <!-- Right Sidebar (Col 4): Official CBT Navigation Grid & Timer -->
+            <!-- Right Sidebar (Col 4): Navigasi Soal Latihan & Pemilih Subtes Terintegrasi -->
             <div class="lg:col-span-4 space-y-4">
               
-              <!-- Countdown Timer Card (Official SNPMB Header) -->
-              <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
-                <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-bold text-white/60 uppercase tracking-wider">Timer Latihan Soal</span>
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                </div>
-                <div class="flex items-center justify-between p-3 rounded-xl bg-black/60 border border-white/10">
-                  <div class="font-mono font-black text-2xl md:text-3xl text-[#c0ff00] tracking-widest">
-                    {{ cbtFormattedTimer }}
+              <!-- Panel Navigasi Soal Latihan Terintegrasi dengan Pemilih Subtes -->
+              <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl">
+                
+                <!-- 1. Header Navigasi & Pemilih Subtes -->
+                <div class="space-y-2.5 border-b border-white/10 pb-3.5">
+                  <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <i class="ph-bold ph-squares-four text-indigo-400"></i>
+                      <span>Navigasi Soal Latihan</span>
+                    </h4>
+                    <span class="text-[10px] font-mono text-[#c0ff00] font-bold bg-[#c0ff00]/10 px-2 py-0.5 rounded-full border border-[#c0ff00]/20">
+                      {{ currentSubtestQuestions.length }} Soal
+                    </span>
                   </div>
-                  <div class="flex items-center gap-1.5">
+
+                  <!-- Keterangan Subtes Aktif -->
+                  <div class="text-[11px] font-bold text-indigo-300 truncate bg-indigo-500/10 px-2.5 py-1.5 rounded-xl border border-indigo-500/20 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse shrink-0"></span>
+                    <span class="truncate font-semibold">
+                      {{ activeSubtest === 'PU' ? 'Penalaran Umum (PU)' : 
+                         activeSubtest === 'PK' ? 'Pengetahuan Kuantitatif (PK)' : 
+                         activeSubtest === 'PBM' ? 'Pemahaman Bacaan & Menulis (PBM)' : 
+                         activeSubtest === 'PPU' ? 'Pengetahuan & Pemahaman Umum (PPU)' : 
+                         activeSubtest === 'LIndo' ? 'Literasi Bahasa Indonesia' : 
+                         activeSubtest === 'LEng' ? 'Literasi Bahasa Inggris' : 'Penalaran Matematika (PM)' }}
+                    </span>
+                  </div>
+
+                  <!-- Tab / Button Pills Pemilih Subtes (Proporsional & Rapi) -->
+                  <div class="flex flex-wrap gap-1.5 pt-1">
                     <button 
+                      v-for="sub in [
+                        { id: 'PU', name: 'PU', fullName: 'Penalaran Umum' },
+                        { id: 'PK', name: 'PK', fullName: 'Kuantitatif' },
+                        { id: 'PBM', name: 'PBM', fullName: 'PBM' },
+                        { id: 'PPU', name: 'PPU', fullName: 'PPU' },
+                        { id: 'LIndo', name: 'L.Indo', fullName: 'Literasi B.Indo' },
+                        { id: 'LEng', name: 'L.Ingg', fullName: 'Literasi B.Ingg' },
+                        { id: 'PM', name: 'PM', fullName: 'Penalaran MTK' }
+                      ]" 
+                      :key="sub.id"
                       type="button"
-                      @click="toggleCbtTimer" 
-                      class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1"
-                      :class="isCbtTimerRunning ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30'"
-                      :title="isCbtTimerRunning ? 'Jeda Timer' : 'Lanjutkan Timer'"
+                      :class="['px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all border cursor-pointer', 
+                        activeSubtest === sub.id 
+                          ? 'bg-indigo-600 text-white border-indigo-400 shadow-md font-black' 
+                          : 'bg-white/5 border-white/10 text-white/70 hover:text-white hover:bg-white/10'
+                      ]"
+                      @click="setSubtest(sub.id)"
+                      :title="sub.fullName"
                     >
-                      <i :class="isCbtTimerRunning ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
-                      <span>{{ isCbtTimerRunning ? 'Jeda' : 'Mulai' }}</span>
-                    </button>
-                    <button 
-                      type="button"
-                      @click="resetCbtTimer(5400)" 
-                      class="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 transition"
-                      title="Reset Waktu Ujian (90 Menit)"
-                    >
-                      <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
+                      {{ sub.name }}
                     </button>
                   </div>
                 </div>
-                <div class="flex items-center justify-between text-[10px] text-white/50 border-t border-white/10 pt-2 font-medium">
-                  <span>Peserta: <strong class="text-white">{{ currentUser?.name || 'Siswa Mandiri' }}</strong></span>
-                  <span>Mode Latihan Mandiri</span>
-                </div>
-              </div>
 
-              <!-- Question Grid Number Navigator (Official CBT 5-Column Grid) -->
-              <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
-                <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
-                  <h4 class="text-xs font-black text-white uppercase tracking-wider">Navigasi Soal Latihan</h4>
-                  <span class="text-[10px] font-mono text-white/50">Subtes {{ activeSubtest }}</span>
-                </div>
-
-                <!-- CBT Status Legend -->
+                <!-- 2. Status Legenda -->
                 <div class="grid grid-cols-3 gap-2 text-[10px] font-bold text-white/70 py-1 border-b border-white/10">
                   <div class="flex items-center gap-1.5">
-                    <span class="w-3 h-3 rounded bg-emerald-500 shrink-0"></span>
+                    <span class="w-2.5 h-2.5 rounded bg-emerald-500 shrink-0"></span>
                     <span>Dijawab</span>
                   </div>
                   <div class="flex items-center gap-1.5">
-                    <span class="w-3 h-3 rounded bg-amber-400 shrink-0"></span>
+                    <span class="w-2.5 h-2.5 rounded bg-amber-400 shrink-0"></span>
                     <span>Ragu-Ragu</span>
                   </div>
                   <div class="flex items-center gap-1.5">
-                    <span class="w-3 h-3 rounded bg-white/10 border border-white/20 shrink-0"></span>
+                    <span class="w-2.5 h-2.5 rounded bg-white/10 border border-white/20 shrink-0"></span>
                     <span>Belum</span>
                   </div>
                 </div>
 
-                <!-- Number Grid (Clickable) -->
-                <div class="grid grid-cols-5 gap-2 max-h-72 overflow-y-auto pr-1 pt-1">
+                <!-- 3. Grid Nomor Soal (5 Kolom Clickable) -->
+                <div class="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto pr-1 pt-1">
                   <button 
                     v-for="(q, idx) in currentSubtestQuestions" 
                     :key="q.id"
                     @click="jumpToQuestion(idx)"
                     :class="[
-                      'h-10 rounded-xl font-mono text-xs font-black transition-all flex items-center justify-center cursor-pointer border',
+                      'h-9 rounded-xl font-mono text-xs font-black transition-all flex items-center justify-center cursor-pointer border',
                       cbtCurrentIndex === idx ? 'ring-2 ring-indigo-400 scale-105 z-10' : '',
                       cbtRaguMap[q.id] 
                         ? 'bg-amber-400 text-black border-amber-500 shadow-sm' 
@@ -4203,14 +4204,14 @@
                             ? 'bg-emerald-500 text-white border-emerald-400 shadow-sm' 
                             : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/15 hover:border-white/25')
                     ]"
-                    :title="`Soal #${idx + 1}`"
+                    :title="'Soal #' + (idx + 1)"
                   >
                     {{ idx + 1 }}
                   </button>
                 </div>
 
-                <!-- Summary Counter -->
-                <div class="pt-3 border-t border-white/10 space-y-2">
+                <!-- 4. Summary Counter & Tombol Selesai Latihan -->
+                <div class="pt-3 border-t border-white/10 space-y-2.5">
                   <div class="flex justify-between text-xs font-semibold text-white/70">
                     <span>Terjawab: <strong class="text-emerald-400 font-mono">{{ Object.keys(userAnswersMap).filter(id => id.startsWith(activeSubtest)).length }}</strong></span>
                     <span>Ragu: <strong class="text-amber-400 font-mono">{{ Object.keys(cbtRaguMap).filter(id => id.startsWith(activeSubtest) && cbtRaguMap[id]).length }}</strong></span>
@@ -4219,7 +4220,7 @@
 
                   <button 
                     @click="currentTab = 'dashboard'"
-                    class="w-full py-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(192,255,0,0.3)] hover:scale-[1.02] active:scale-95 cursor-pointer mt-2 flex items-center justify-center gap-1.5"
+                    class="w-full py-2.5 px-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(192,255,0,0.3)] hover:scale-[1.02] active:scale-95 cursor-pointer mt-1 flex items-center justify-center gap-1.5"
                   >
                     <i class="ph-bold ph-check-circle text-base"></i>
                     <span>Selesai &amp; Evaluasi Latihan Subtes</span>
