@@ -247,6 +247,20 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Ensure schema sync with 24-hour file lock cache
         ensure_auth_schema_sync($pdo);
+        // Auto-seed PRD v1.2 School Intelligence demo data if not yet seeded
+        try {
+            $hasDemo = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE identity_key = 'bk.sma@edupath.id'")->fetchColumn();
+            if ($hasDemo === 0) {
+                $seederFile = __DIR__ . '/database/seeds/seed_school_intelligence.php';
+                if (file_exists($seederFile)) {
+                    require_once $seederFile;
+                    if (function_exists('seed_school_intelligence_data')) {
+                        seed_school_intelligence_data($pdo);
+                    }
+                }
+            }
+        } catch (\Throwable $se) {}
+
 
     $stmt = $pdo->prepare("
         SELECT u.id as user_id, u.identity_key, u.display_name as user_display_name, u.password as user_password, 

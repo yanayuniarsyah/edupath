@@ -5377,6 +5377,55 @@
                 </div>
               </div>
 
+              <!-- Demo Quick Fill Accounts (PRD v1.2: Siswa SD/SMP/SMA, Guru BK Sekolah, Guru/Tutor Bimbel) -->
+              <div v-if="isLoginMode" class="pt-2 pb-1 space-y-2 border-t border-slate-800">
+                <div class="flex items-center justify-between">
+                  <span class="text-[9px] uppercase font-black text-slate-400 tracking-wider">⚡ Pilih Cepat Akun Demo (PRD v1.2):</span>
+                  <button type="button" @click="triggerSeedDummyApp" :disabled="isSeedingDummy" class="text-[9px] text-[#c0ff00] hover:underline font-bold flex items-center gap-1 cursor-pointer">
+                    <i :class="['ph-bold ph-plant', isSeedingDummy ? 'animate-spin' : '']"></i>
+                    <span>{{ isSeedingDummy ? 'Menyuntik...' : 'Suntik Data Dummy' }}</span>
+                  </button>
+                </div>
+                
+                <div class="space-y-1.5">
+                  <div class="text-[9px] text-slate-400 font-bold">Role Siswa:</div>
+                  <div class="grid grid-cols-3 gap-1.5 text-[10px]">
+                    <button type="button" @click="fillDemoAccount('rizky.sma@edupath.id', 'password123')" class="px-2 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-300 font-bold text-center truncate cursor-pointer transition">
+                      🎓 Siswa SMA
+                    </button>
+                    <button type="button" @click="fillDemoAccount('alif.smp@edupath.id', 'password123')" class="px-2 py-1.5 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/20 text-sky-300 font-bold text-center truncate cursor-pointer transition">
+                      📘 Siswa SMP
+                    </button>
+                    <button type="button" @click="fillDemoAccount('kenzo.sd@edupath.id', 'password123')" class="px-2 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-300 font-bold text-center truncate cursor-pointer transition">
+                      🎒 Siswa SD
+                    </button>
+                  </div>
+
+                  <div class="text-[9px] text-slate-400 font-bold pt-1">Role Sekolah &amp; Guru BK:</div>
+                  <div class="grid grid-cols-3 gap-1.5 text-[10px]">
+                    <button type="button" @click="fillDemoAccount('bk.sma@edupath.id', 'password123')" class="px-2 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-300 font-bold text-center truncate cursor-pointer transition">
+                      🏛️ BK SMA
+                    </button>
+                    <button type="button" @click="fillDemoAccount('bk.smp@edupath.id', 'password123')" class="px-2 py-1.5 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/20 text-teal-300 font-bold text-center truncate cursor-pointer transition">
+                      🏛️ BK SMP
+                    </button>
+                    <button type="button" @click="fillDemoAccount('bk.sd@edupath.id', 'password123')" class="px-2 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 text-orange-300 font-bold text-center truncate cursor-pointer transition">
+                      🏛️ BK SD
+                    </button>
+                  </div>
+
+                  <div class="text-[9px] text-slate-400 font-bold pt-1">Role Guru &amp; Admin:</div>
+                  <div class="grid grid-cols-2 gap-1.5 text-[10px]">
+                    <button type="button" @click="fillDemoAccount('guru.matematika@edupath.id', 'password123')" class="px-2 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-300 font-bold text-center truncate cursor-pointer transition">
+                      👨‍🏫 Guru Bimbel
+                    </button>
+                    <button type="button" @click="fillDemoAccount('admin', 'admin123')" class="px-2 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 font-bold text-center truncate cursor-pointer transition">
+                      🛡️ Super Admin
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <!-- Submit Button -->
               <div class="pt-1.5">
                 <button type="submit" :disabled="authLoading" class="w-full py-2.5 sm:py-3 btn-shimmer text-white rounded-xl text-xs font-bold transition-transform hover:scale-[1.01] active:scale-[0.99] flex justify-center items-center shadow-lg cursor-pointer">
@@ -7653,6 +7702,14 @@ export default {
         localStorage.setItem('student_ref_school_id', refSchoolId);
         authForm.value.school_id = refSchoolId;
       }
+
+      // Check URL for action=login or redirect=school to automatically display unified login modal
+      const actionParam = params.get('action');
+      const redirectParam = params.get('redirect');
+      if (actionParam === 'login' || redirectParam === 'school' || redirectParam === 'admin' || window.location.hash.includes('action=login') || window.location.hash.includes('redirect=')) {
+        showLoginModal.value = true;
+        isLoginMode.value = true;
+      }
       fetchPlans();
       checkAuth();
       fetchMaterialsFromDb();
@@ -7661,6 +7718,28 @@ export default {
         publicSchoolsList.value = Array.isArray(schools) ? schools : (schools?.schools || []);
       } catch (e) {}
     });
+
+
+    const isSeedingDummy = ref(false);
+    const fillDemoAccount = (email, password) => {
+      isLoginMode.value = true;
+      authForm.value.email = email;
+      authForm.value.password = password;
+      authError.value = '';
+    };
+
+    const triggerSeedDummyApp = async () => {
+      if (isSeedingDummy.value) return;
+      isSeedingDummy.value = true;
+      try {
+        const res = await api.seedSchoolDummy();
+        showToast('🌱 Data Dummy PRD v1.2 Berhasil Disuntikkan!');
+      } catch (err) {
+        showToast('Gagal menyuntik data dummy: ' + (err.message || 'Error'));
+      } finally {
+        isSeedingDummy.value = false;
+      }
+    };
 
     const doAuth = async () => {
       authError.value = '';
@@ -7713,6 +7792,8 @@ export default {
         // 1. SMART REDIRECT: Guru BK / Perwakilan Sekolah Mitra
         if (res.user?.role === 'school_bk') {
           sessionStorage.setItem('school_token', res.token);
+          localStorage.setItem('school_token', res.token);
+          localStorage.setItem('auth_token', res.token);
           const sData = res.user.school || {
             id: res.user.school_id || res.user.reference_id,
             name: res.user.school_name || res.user.name,
@@ -7721,6 +7802,7 @@ export default {
             city: res.user.school_city || ''
           };
           sessionStorage.setItem('school_data', JSON.stringify(sData));
+          localStorage.setItem('school_data', JSON.stringify(sData));
           showLoginModal.value = false;
           showToast('Selamat datang di Portal Guru BK ' + (sData.name || '') + '!');
           window.location.hash = '#/school';
@@ -7728,23 +7810,45 @@ export default {
           return;
         }
 
-        // 2. Administrator & Superadmin wajib masuk melalui portal admin di /#/admin
+        // 2. Administrator & Superadmin
         if (['admin', 'superadmin'].includes(res.user?.role)) {
-          authError.value = 'Akun Administrator & Superadmin wajib masuk melalui portal admin di /#/admin.';
-          return;
-        }
-
-        // 3. Guru & Tutor Bimbel (non-admin)
-        if (['teacher', 'guru', 'tutor'].includes(res.user?.role)) {
           sessionStorage.setItem('admin_token', res.token);
           sessionStorage.setItem('admin_role', res.user.role);
           sessionStorage.setItem('ep_user', JSON.stringify(res.user));
+          localStorage.setItem('auth_token', res.token);
           localStorage.setItem('user', JSON.stringify(res.user));
           if (res.user.name) localStorage.setItem('user_name', res.user.name);
           if (res.user.email) localStorage.setItem('user_email', res.user.email);
           showLoginModal.value = false;
-          showToast('Selamat datang di Portal Pengajar!');
-          window.location.hash = '#/admin';
+          showToast('Selamat datang, Administrator ' + (res.user.name || '') + '!');
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get('redirect') === 'school') {
+            window.location.hash = '#/school';
+          } else {
+            window.location.hash = '#/admin';
+          }
+          window.location.reload();
+          return;
+        }
+
+        // 3. Guru & Tutor Bimbel
+        if (['teacher', 'guru', 'tutor'].includes(res.user?.role)) {
+          sessionStorage.setItem('admin_token', res.token);
+          sessionStorage.setItem('admin_role', res.user.role);
+          sessionStorage.setItem('ep_user', JSON.stringify(res.user));
+          localStorage.setItem('auth_token', res.token);
+          localStorage.setItem('user', JSON.stringify(res.user));
+          if (res.user.name) localStorage.setItem('user_name', res.user.name);
+          if (res.user.email) localStorage.setItem('user_email', res.user.email);
+          showLoginModal.value = false;
+          showToast('Selamat datang, Bapak/Ibu Guru ' + (res.user.name || '') + '!');
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get('redirect') === 'school') {
+            window.location.hash = '#/school';
+          } else {
+            window.location.hash = '#/admin';
+          }
+          window.location.reload();
           return;
         }
 
@@ -8818,6 +8922,9 @@ export default {
       authLoading,
       authError,
       doAuth,
+      fillDemoAccount,
+      triggerSeedDummyApp,
+      isSeedingDummy,
       isForgotPasswordMode,
       isResetPasswordMode,
       resetToken,

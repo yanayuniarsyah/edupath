@@ -1,147 +1,16 @@
 <template>
-  <!-- ============================================================== -->
-  <!-- GATE 1: UNAUTHENTICATED (LOGIN GATE MIRRORING ADMIN/GURU DESIGN) -->
-  <!-- ============================================================== -->
-  <div v-if="!isAuthenticated" class="min-h-screen flex items-center justify-center relative overflow-hidden" style="background: linear-gradient(135deg, #050a18 0%, #0d1224 60%, #050a18 100%);">
-    <!-- Glow decorations -->
-    <div class="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #c0ff00 0%, transparent 70%);"></div>
-    <div class="absolute bottom-0 right-1/4 w-80 h-80 rounded-full opacity-15 blur-3xl pointer-events-none" style="background: radial-gradient(circle, #6366f1 0%, transparent 70%);"></div>
-
-    <div class="relative z-10 w-full max-w-md mx-4">
-      <!-- Login Card -->
-      <div class="rounded-3xl p-8 border relative backdrop-blur-2xl shadow-2xl" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08);">
-        <!-- Close button to home -->
-        <button @click="$router.push('/')" class="!absolute top-5 right-5 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-transparent hover:border-rose-500/30 text-sm cursor-pointer" title="Kembali ke Beranda">
-          <i class="ph-bold ph-x"></i>
-        </button>
-
-        <!-- Logo & Header -->
-        <div class="text-center mb-6">
-          <div class="inline-flex items-center gap-2.5 group select-none mb-2">
-            <div class="w-9 h-9 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg leading-none shadow-md shadow-[#c0ff00]/20 select-none">E</div>
-            <span class="font-black text-2xl tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
-          </div>
-          <h2 class="text-white font-black text-lg">Portal Sekolah &amp; Guru BK</h2>
-          <p class="text-white/40 text-xs font-semibold uppercase tracking-widest mt-1">Dashboard Analitik Agregat &amp; Minat Bakat Siswa</p>
-        </div>
-
-        <!-- Error Message -->
-        <div v-if="authError" class="mb-4 px-4 py-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-bold flex items-center gap-2">
-          <i class="ph-bold ph-warning-circle text-base shrink-0"></i>
-          <span>{{ authError }}</span>
-        </div>
-
-        <!-- Success Message -->
-        <div v-if="authSuccess" class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2">
-          <i class="ph-bold ph-check-circle text-base shrink-0"></i>
-          <span>{{ authSuccess }}</span>
-        </div>
-
-        <form @submit.prevent="handleLogin" class="space-y-4">
-          <div>
-            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Email Guru BK / Sekolah</label>
-            <div class="relative">
-              <i class="ph-bold ph-envelope absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
-              <input
-                v-model="loginForm.email"
-                type="email"
-                required
-                placeholder="bk.sekolah@sch.id"
-                class="w-full pl-9 pr-4 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all placeholder:text-white/20"
-                style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-white/60 text-xs font-bold mb-1.5 uppercase tracking-wider">Password</label>
-            <div class="relative">
-              <i class="ph-bold ph-lock absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-sm"></i>
-              <input
-                v-model="loginForm.password"
-                :type="showPassword ? 'text' : 'password'"
-                required
-                placeholder="••••••••"
-                class="w-full pl-9 pr-10 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all placeholder:text-white/20"
-                style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);"
-              />
-              <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors cursor-pointer select-none p-1">
-                <i :class="['ph-bold', showPassword ? 'ph-eye-slash text-[#c0ff00]' : 'ph-eye']"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Quick Fill Demo School Account (SD, SMP, SMA Sesuai PRD v1.2) -->
-          <div class="pt-1 space-y-2">
-            <span class="block text-[10px] uppercase font-black text-white/40 tracking-wider">Pilih Akun Demo Guru BK (PRD v1.2):</span>
-            <div class="grid grid-cols-2 gap-2 text-[11px]">
-              <button
-                type="button"
-                @click="loginForm.email = 'bk.sma@edupath.id'; loginForm.password = 'password123'"
-                class="px-2.5 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 font-bold transition-all text-left flex items-center gap-1.5 cursor-pointer truncate"
-              >
-                <span>🏛️</span>
-                <span class="truncate">SMA Unggulan</span>
-              </button>
-              <button
-                type="button"
-                @click="loginForm.email = 'bk.smp@edupath.id'; loginForm.password = 'password123'"
-                class="px-2.5 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 font-bold transition-all text-left flex items-center gap-1.5 cursor-pointer truncate"
-              >
-                <span>🏫</span>
-                <span class="truncate">SMP Cendekia</span>
-              </button>
-              <button
-                type="button"
-                @click="loginForm.email = 'bk.sd@edupath.id'; loginForm.password = 'password123'"
-                class="px-2.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-bold transition-all text-left flex items-center gap-1.5 cursor-pointer truncate"
-              >
-                <span>🎒</span>
-                <span class="truncate">SD Prestasi</span>
-              </button>
-              <button
-                type="button"
-                @click="loginForm.email = 'bk.smansaciamis@edupath.co.id'; loginForm.password = 'EduPathSchool01!2026'"
-                class="px-2.5 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold transition-all text-left flex items-center gap-1.5 cursor-pointer truncate"
-              >
-                <span>🏢</span>
-                <span class="truncate">SMANSA Ciamis</span>
-              </button>
-            </div>
-            <!-- Quick Seeder Action -->
-            <button
-              type="button"
-              @click="triggerSeedDummy"
-              class="w-full py-1.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-[10px] text-white/70 hover:text-white font-bold flex items-center justify-center gap-1.5 transition cursor-pointer"
-            >
-              <span>🌱</span>
-              <span>Suntik / Refresh Data Dummy PRD v1.2</span>
-            </button>
-          </div>
-
-          <button
-            type="submit"
-            :disabled="authLoading"
-            class="w-full py-3 rounded-xl font-black text-sm text-black transition-all hover:opacity-90 active:scale-95 mt-2 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
-            style="background: #c0ff00;"
-          >
-            <span v-if="!authLoading">Masuk ke Portal Sekolah</span>
-            <span v-else class="flex items-center gap-2">
-              <i class="ph-bold ph-spinner animate-spin"></i> Memverifikasi...
-            </span>
-          </button>
-        </form>
-
-        <div class="mt-5 pt-4 border-t border-white/8 text-center space-y-1">
-          <p class="text-white/30 text-[11px] font-medium">Akses khusus Koordinator BK &amp; Tim Bimbingan Karir Sekolah Mitra.</p>
-        </div>
+  <!-- Loading state saat memvalidasi sesi terpadu -->
+  <div v-if="authChecking" class="min-h-screen flex items-center justify-center bg-[#070b14] text-white">
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-12 h-12 rounded-2xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-2xl animate-pulse shadow-lg shadow-[#c0ff00]/20">E</div>
+      <div class="flex items-center gap-2 text-xs font-bold text-white/70">
+        <i class="ph-bold ph-spinner animate-spin text-[#c0ff00]"></i>
+        <span>Memverifikasi Sesi Portal Sekolah...</span>
       </div>
     </div>
   </div>
 
-  <!-- ============================================================== -->
-  <!-- GATE 2: AUTHENTICATED DASHBOARD WITH SIDEBAR NAVIGATION        -->
-  <!-- ============================================================== -->
+  <!-- PORTAL SEKOLAH & GURU BK DASHBOARD -->
   <div v-else class="flex h-screen bg-[#070b14] font-body overflow-hidden text-white select-none">
     <!-- Backdrop Overlay for Mobile Drawer -->
     <transition
@@ -1956,6 +1825,7 @@ import { ref, computed, onMounted, reactive, watch } from 'vue';
 import { api } from '../api.js';
 
 // ── State Autentikasi ──
+const authChecking = ref(true);
 const isAuthenticated = ref(false);
 const authLoading = ref(false);
 const authError = ref('');
@@ -2586,7 +2456,7 @@ const fetchAdmissionReadiness = async () => {
 
 
 onMounted(() => {
-  const savedToken = sessionStorage.getItem('school_token') || localStorage.getItem('auth_token');
+  const savedToken = sessionStorage.getItem('school_token') || localStorage.getItem('school_token') || localStorage.getItem('auth_token') || sessionStorage.getItem('admin_token');
   const savedData = sessionStorage.getItem('school_data') || localStorage.getItem('school_data');
 
   if (savedToken) {
@@ -2595,10 +2465,15 @@ onMounted(() => {
         schoolData.value = typeof savedData === 'string' ? JSON.parse(savedData) : savedData;
       }
       isAuthenticated.value = true;
+      authChecking.value = false;
       loadAllDashboardData();
     } catch (e) {
       handleLogout();
     }
+  } else {
+    // Sesi tidak ditemukan: redirect ke formulir login terpadu siswa/guru/sekolah di App.vue
+    authChecking.value = true;
+    window.location.href = '/#/?action=login&redirect=school';
   }
 });
 
@@ -2668,7 +2543,7 @@ async function handleLogout() {
   schoolData.value = null;
 
   // Arahkan ke beranda dan reload agar state reaktif bersih
-  window.location.href = window.location.origin + window.location.pathname + '#/';
+  window.location.href = window.location.origin + window.location.pathname + '#/?action=login';
   window.location.reload();
 }
 

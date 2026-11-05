@@ -162,6 +162,21 @@ function ensure_school_schema($pdo) {
 
 ensure_school_schema($pdo);
 
+// Auto-seed PRD v1.2 School Intelligence demo data if schools table is empty
+try {
+    $schCount = (int)$pdo->query("SELECT COUNT(*) FROM schools")->fetchColumn();
+    if ($schCount === 0) {
+        $seederFile = __DIR__ . '/database/seeds/seed_school_intelligence.php';
+        if (file_exists($seederFile)) {
+            require_once $seederFile;
+            if (function_exists('seed_school_intelligence_data')) {
+                seed_school_intelligence_data($pdo);
+            }
+        }
+    }
+} catch (\Throwable $se) {}
+
+
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
