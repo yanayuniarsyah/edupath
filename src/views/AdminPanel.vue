@@ -5065,7 +5065,8 @@ const activeTab = ref(initialTab());
 const selectNavTab = (tabId) => {
   activeTab.value = tabId;
   mobileSidebarOpen.value = false;
-  sidebarExpanded.value = false;
+  // Jangan set sidebarExpanded = false agar tidak berkedip saat diklik;
+  // sidebar tetap terbuka selama mouse di atas sidebar dan otomatis auto-hide saat mouse keluar (@mouseleave) persis role siswa.
 };
 
 // Sorting state
