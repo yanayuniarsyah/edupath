@@ -193,6 +193,22 @@ function generate_school_uuid() {
 }
 
 // -------------------------------------------------------------
+// 0. SEED DUMMY DATA ACTION (Unauthenticated untuk Demo & UAT PRD v1.2)
+// -------------------------------------------------------------
+if ($action === 'seed_dummy') {
+    try {
+        require_once __DIR__ . '/database/seeds/seed_school_intelligence.php';
+        $res = seed_school_intelligence_data($pdo);
+        echo json_encode(["success" => true, "message" => "Data dummy School Intelligence berhasil disuntikkan.", "details" => $res]);
+        exit;
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal seeding dummy: " . $e->getMessage()]);
+        exit;
+    }
+}
+
+// -------------------------------------------------------------
 // PUBLIC LIST (Untuk dropdown asal sekolah saat registrasi/profil siswa)
 // -------------------------------------------------------------
 if ($action === 'public_list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -1023,21 +1039,7 @@ function get_standard_subjects_config($level = 'SMA', $curriculum = 'Kurikulum M
 // -------------------------------------------------------------
 // 1. REPORT TEMPLATE METADATA (Untuk konfigurasi & template Excel)
 // -------------------------------------------------------------
-// -------------------------------------------------------------
-// 0. SEED DUMMY DATA ACTION (Untuk UAT & Demo PRD v1.2)
-// -------------------------------------------------------------
-if ($action === 'seed_dummy') {
-    try {
-        require_once __DIR__ . '/database/seeds/seed_school_intelligence.php';
-        $res = seed_school_intelligence_data($pdo);
-        echo json_encode(["success" => true, "message" => "Data dummy School Intelligence berhasil disuntikkan.", "details" => $res]);
-        exit;
-    } catch (\Throwable $e) {
-        http_response_code(500);
-        echo json_encode(["error" => "Gagal seeding dummy: " . $e->getMessage()]);
-        exit;
-    }
-}
+
 
 if ($action === 'report_template' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $level = $_GET['level'] ?? 'SMA';
