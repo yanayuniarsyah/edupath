@@ -2630,16 +2630,42 @@
                       </select>
                     </div>
 
-                    <div>
-                      <label class="block text-xs uppercase font-black tracking-wider text-white/60 mb-2">
-                        Target Impian ({{ profileEditForm.target_level === 'SD' ? 'SMP Favorit' : (profileEditForm.target_level === 'SMP' ? 'SMA Impian' : 'PTN / Jurusan') }})
-                      </label>
-                      <input
-                        v-model="profileEditForm.target_goal"
-                        type="text"
-                        :placeholder="profileEditForm.target_level === 'SD' ? 'Contoh: SMPN 1 Jakarta / SMP Labschool' : (profileEditForm.target_level === 'SMP' ? 'Contoh: SMA Taruna Nusantara / SMAN 8' : 'Contoh: UI - Kedokteran / ITB - STEI')"
-                        class="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-medium"
-                      />
+                    <div class="space-y-2">
+                      <div class="flex items-center justify-between">
+                        <label class="block text-xs uppercase font-black tracking-wider text-white/60">
+                          Target Impian ({{ profileEditForm.target_level === 'SD' ? 'SMP Favorit' : (profileEditForm.target_level === 'SMP' ? 'SMA Impian' : 'PTN / Jurusan') }})
+                        </label>
+                        <span class="text-[10px] text-amber-400 font-semibold">Pilih dari menu atau tulis manual</span>
+                      </div>
+
+                      <!-- Dropdown Menu Sesuai Paket Belajar -->
+                      <select
+                        v-model="selectedProfileTargetPreset"
+                        @change="handleProfileTargetPresetChange"
+                        class="w-full bg-[#1e293b] border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-[#0f172a] transition-all font-bold"
+                      >
+                        <option value="" disabled>-- Pilih Target Impian --</option>
+                        <option v-for="tgt in currentProfileTargetPresets" :key="tgt" :value="tgt">
+                          {{ tgt }}
+                        </option>
+                        <option value="__CUSTOM__">✍️ Lainnya / Tulis Pilihan Sendiri...</option>
+                      </select>
+
+                      <!-- Input Manual jika belum ada pilihan di dropdown -->
+                      <div v-if="isProfileTargetCustom" class="pt-1 animate-fade-in space-y-1">
+                        <div class="relative">
+                          <input
+                            v-model="profileEditForm.target_goal"
+                            type="text"
+                            :placeholder="profileEditForm.target_level === 'SD' ? 'Contoh: SMPN 1 Jakarta / SMP Labschool' : (profileEditForm.target_level === 'SMP' ? 'Contoh: SMA Taruna Nusantara / SMAN 8' : 'Contoh: UI - Kedokteran / ITB - STEI')"
+                            class="w-full bg-white/5 border border-amber-400/50 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-white/10 transition-all font-medium pr-10"
+                          />
+                          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-amber-400 font-bold">Manual</span>
+                        </div>
+                        <p class="text-[11px] text-white/40">
+                          Ketik target baru bila belum tersedia pada pilihan menu drop down di atas.
+                        </p>
+                      </div>
                     </div>
                   </div>
 
@@ -2916,8 +2942,9 @@
                   <span class="block text-[9px] font-black uppercase tracking-widest text-sky-400">{{ activeProgramTargetTitle }}</span>
                   <div class="flex items-center gap-2">
                     <span class="text-sm md:text-base font-black text-white truncate">{{ currentStudentTargetDisplay }}</span>
-                    <button @click="handleTabClick('settings')" class="text-[10px] px-2 py-0.5 rounded bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 font-bold border border-sky-500/25 transition-all cursor-pointer">
-                      Ubah Target
+                    <button @click="openQuickTargetModal" class="text-[10px] px-2.5 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white font-bold border border-sky-500/35 transition-all cursor-pointer flex items-center gap-1 shadow-sm">
+                      <i class="ph-bold ph-pencil-simple text-xs"></i>
+                      <span>Ubah Target</span>
                     </button>
                   </div>
                 </div>
@@ -5161,17 +5188,35 @@
                   </div>
                 </div>
 
-                <div class="space-y-1">
+                <div class="space-y-1.5">
                   <div class="flex justify-between items-center">
                     <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate" :title="registrationGoalLabel">{{ registrationGoalLabel }}</label>
-                    <span class="text-[9px] text-white/40 lowercase shrink-0">opsional</span>
+                    <span class="text-[9px] text-amber-400 font-bold">Menu Pilihan</span>
                   </div>
-                  <input 
-                    v-model="authForm.target_goal" 
-                    type="text" 
-                    :placeholder="registrationGoalPlaceholder" 
-                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-[#c0ff00]"
+
+                  <!-- Dropdown Menu Pilihan Target Sesuai Program Registrasi -->
+                  <select
+                    v-model="selectedAuthTargetPreset"
+                    @change="handleAuthTargetPresetChange"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-[#c0ff00] font-medium"
                   >
+                    <option value="" disabled>-- Pilih Target Impian --</option>
+                    <option v-for="tgt in authTargetPresets" :key="tgt" :value="tgt">
+                      {{ tgt }}
+                    </option>
+                    <option value="__CUSTOM__">✍️ Lainnya / Tulis Target Sendiri...</option>
+                  </select>
+
+                  <!-- Input Manual jika memilih Lainnya / belum ada pilihan -->
+                  <div v-if="isAuthTargetCustom" class="pt-0.5 animate-fade-in">
+                    <input 
+                      v-model="authForm.target_goal" 
+                      type="text" 
+                      :placeholder="registrationGoalPlaceholder" 
+                      class="w-full bg-slate-900 border border-amber-400/50 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-amber-400 font-medium"
+                    >
+                    <p class="text-[10px] text-slate-400 mt-0.5">Tuliskan target pilihanmu bila belum ada di daftar pilihan di atas.</p>
+                  </div>
                 </div>
               </div>
 
@@ -5567,6 +5612,95 @@
         <div class="edupath-modal-footer">
           <button @click="showParentConsentModal = false" class="edupath-btn-primary">
             Tutup Panduan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Ubah Target Impian Cepat (Dropdown Sesuai Paket + Ketik Manual) -->
+    <div v-if="showQuickTargetModal" @click.self="showQuickTargetModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card w-full max-w-lg animate-fade-in text-left border border-sky-500/30 shadow-2xl relative">
+        <div class="edupath-modal-header border-b border-white/10 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center text-xl shrink-0 shadow-md">
+              {{ activeProgramTargetIcon }}
+            </div>
+            <div>
+              <h3 class="text-base sm:text-lg font-black text-white">Ubah {{ activeProgramTargetTitle }}</h3>
+              <p class="text-[11px] text-white/50">Program Aktif: <strong class="text-sky-300">{{ activeProgramInfo.name }}</strong> ({{ activeProgramInfo.levelDesc }})</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            @click.stop="showQuickTargetModal = false"
+            class="modal-close-btn absolute top-4 right-4"
+            title="Tutup"
+            aria-label="Tutup"
+          >
+            <i class="ph-bold ph-x"></i>
+          </button>
+        </div>
+
+        <div class="edupath-modal-body p-5 space-y-4 text-xs md:text-sm">
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="text-xs uppercase font-bold text-white/70 tracking-wider">
+                Pilih Target Impian:
+              </label>
+              <span class="text-[10px] text-amber-400 font-medium">Sesuai Kurikulum &amp; Jenjang</span>
+            </div>
+
+            <!-- Dropdown Pilihan Target Sesuai Paket Belajar -->
+            <select
+              v-model="quickTargetSelectedPreset"
+              @change="handleQuickTargetPresetChange"
+              class="w-full bg-[#1e293b] border border-white/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-sky-400 focus:bg-[#0f172a] transition-all font-bold"
+            >
+              <option value="" disabled>-- Pilih Target Impian --</option>
+              <option v-for="t in quickTargetOptions" :key="t" :value="t">
+                {{ t }}
+              </option>
+              <option value="__CUSTOM__">✍️ Lainnya / Tulis Pilihan Sendiri...</option>
+            </select>
+          </div>
+
+          <!-- Input Manual bila pilihan belum ada pada menu drop down -->
+          <div v-if="isQuickTargetCustom" class="space-y-1.5 animate-fade-in pt-1">
+            <label class="text-xs uppercase font-bold text-amber-300 tracking-wider">
+              Tulis Target Impian Baru:
+            </label>
+            <div class="relative">
+              <input
+                v-model="quickTargetCustomText"
+                type="text"
+                :placeholder="activeAcademicProgram === 'TKA_SD' ? 'Contoh: SMP Labschool / SMPN 1 Favorit' : (activeAcademicProgram === 'TKA_SMP' ? 'Contoh: SMAN 8 / SMA Taruna Nusantara' : 'Contoh: UI - Kedokteran / ITB - STEI')"
+                class="w-full bg-slate-900 border border-amber-400/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 font-medium pr-10"
+              />
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-amber-400 font-bold">Manual</span>
+            </div>
+            <p class="text-[11px] text-white/50">
+              Target baru yang kamu ketikkan akan otomatis tersimpan sebagai sasaran evaluasi kelulusan &amp; try out.
+            </p>
+          </div>
+        </div>
+
+        <div class="edupath-modal-footer p-4 border-t border-white/10 flex items-center justify-end gap-3 bg-black/40">
+          <button 
+            type="button" 
+            @click="showQuickTargetModal = false"
+            class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white/70 hover:text-white text-xs font-bold transition cursor-pointer"
+          >
+            Batal
+          </button>
+          <button 
+            type="button" 
+            @click="saveQuickTarget"
+            :disabled="isSavingQuickTarget"
+            class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-400 to-emerald-400 hover:from-sky-300 hover:to-emerald-300 text-slate-950 text-xs font-black transition flex items-center gap-1.5 shadow-lg shadow-sky-500/20 cursor-pointer disabled:opacity-50"
+          >
+            <i v-if="isSavingQuickTarget" class="ph-bold ph-spinner animate-spin"></i>
+            <i v-else class="ph-bold ph-check"></i>
+            <span>{{ isSavingQuickTarget ? 'Menyimpan...' : 'Simpan Target Impian' }}</span>
           </button>
         </div>
       </div>
@@ -6618,12 +6752,229 @@ export default {
       showToast(`Beralih ke program ${getProgramDisplayName(code)}`);
     };
 
+    // Helper: Preset Target Goals per Academic Program / Package
+    const getTargetOptionsForProgram = (programCode) => {
+      const code = programCode || activeAcademicProgram.value || 'SNPMB_UTBK';
+      if (code === 'TKA_SD') {
+        return [
+          'SMPN 1 Jakarta',
+          'SMPN 115 Jakarta (Smabel)',
+          'SMP Labschool Kebayoran',
+          'SMP Labschool Rawamangun',
+          'SMPN 1 Surabaya',
+          'SMPN 1 Bandung',
+          'SMPN 5 Bandung',
+          'SMP Al Azhar Favorit',
+          'SMP Kanisius Jakarta',
+          'SMP Santa Ursula Jakarta',
+          'SMP Taruna Bakti Bandung',
+          'SMP Unggulan Kota (Jalur Prestasi & Zonasi)'
+        ];
+      }
+      if (code === 'TKA_SMP') {
+        return [
+          'SMA Taruna Nusantara Magelang',
+          'SMA Pradita Dirgantara Solo',
+          'SMAN 8 Jakarta',
+          'SMAN 70 Jakarta',
+          'SMAN 68 Jakarta',
+          'SMAN 3 Bandung',
+          'SMAN 5 Surabaya',
+          'SMAN 1 Teladan Yogyakarta',
+          'MAN Insan Cendekia Serpong',
+          'MAN Insan Cendekia Gorontalo',
+          'SMA Labschool Kebayoran',
+          'SMKN Unggulan / SMK Telkom'
+        ];
+      }
+      if (code === 'TKA_SMA') {
+        return [
+          'Peringkat 1 Kelas / Juara Umum',
+          'Juara Olimpiade Sains Nasional (OSN)',
+          'Eligible SNBP (Siswa Eligible Nilai Rapor)',
+          'Fakultas Kedokteran (Persiapan PTN Top)',
+          'Fakultas Teknik / STEI / IT (Persiapan PTN Top)',
+          'Sekolah Kedinasan (STAN / STIS / IPDN)'
+        ];
+      }
+      // SNPMB_UTBK & SNPMB_ALUMNI: Use TARGET_UNIVERSITIES + Top PTN list
+      const ptnDefaults = [
+        'Kedokteran UI (Universitas Indonesia)',
+        'STEI ITB (Institut Teknologi Bandung)',
+        'Kedokteran UGM (Universitas Gadjah Mada)',
+        'FTTM ITB (Teknik Pertambangan & Perminyakan)',
+        'Ilmu Komputer UI (Universitas Indonesia)',
+        'Kedokteran UNAIR (Universitas Airlangga)',
+        'Teknik Informatika ITB',
+        'Sekolah Bisnis & Manajemen (SBM) ITB',
+        'Aktuaria UGM',
+        'Ilmu Hukum UI',
+        'Akuntansi UI (FEB UI)',
+        'Hubungan Internasional UI',
+        'Teknik Informatika ITS Surabaya',
+        'Kedokteran UNDIP Semarang',
+        'Statistika & Sains Data IPB University',
+        'Kedokteran UNPAD Bandung',
+        'Kedokteran UB (Universitas Brawijaya)',
+        'Manajemen UGM (FEB UGM)',
+        'Psikologi UI',
+        'Sistem Informasi UI (FASILKOM)',
+        'Teknik Sipil ITB (FTSL)',
+        'Teknik Kimia ITB (FTI)',
+        'Kedokteran UNS Surakarta',
+        'Teknik Elektro UI',
+        'Ilmu Ekonomi UI',
+        'Farmasi UNAIR / Farmasi UI',
+        'Sekolah Kedinasan (PKN STAN / STIS / IPDN / Poltekip)'
+      ];
+      if (Array.isArray(TARGET_UNIVERSITIES) && TARGET_UNIVERSITIES.length) {
+        const uNames = TARGET_UNIVERSITIES.map(u => u.name);
+        return Array.from(new Set([...ptnDefaults, ...uNames]));
+      }
+      return ptnDefaults;
+    };
+
+    // 1. Profile Settings Target State
+    const currentProfileTargetPresets = computed(() => {
+      return getTargetOptionsForProgram(profileEditForm.value.academic_program);
+    });
+    const selectedProfileTargetPreset = ref('');
+    const isProfileTargetCustom = ref(false);
+
+    const syncProfileTargetPreset = () => {
+      const list = currentProfileTargetPresets.value;
+      const current = (profileEditForm.value.target_goal || profileEditForm.value.target_ptn || '').trim();
+      if (!current) {
+        selectedProfileTargetPreset.value = '';
+        isProfileTargetCustom.value = false;
+      } else if (list.includes(current)) {
+        selectedProfileTargetPreset.value = current;
+        isProfileTargetCustom.value = false;
+      } else {
+        selectedProfileTargetPreset.value = '__CUSTOM__';
+        isProfileTargetCustom.value = true;
+      }
+    };
+
+    const handleProfileTargetPresetChange = () => {
+      if (selectedProfileTargetPreset.value === '__CUSTOM__') {
+        isProfileTargetCustom.value = true;
+      } else {
+        isProfileTargetCustom.value = false;
+        profileEditForm.value.target_goal = selectedProfileTargetPreset.value;
+        profileEditForm.value.target_ptn = selectedProfileTargetPreset.value;
+      }
+    };
+
+    // 2. Registration Modal Target State
+    const authTargetPresets = computed(() => {
+      return getTargetOptionsForProgram(authForm.value.academic_program);
+    });
+    const selectedAuthTargetPreset = ref('');
+    const isAuthTargetCustom = ref(false);
+
+    const handleAuthTargetPresetChange = () => {
+      if (selectedAuthTargetPreset.value === '__CUSTOM__') {
+        isAuthTargetCustom.value = true;
+      } else {
+        isAuthTargetCustom.value = false;
+        authForm.value.target_goal = selectedAuthTargetPreset.value;
+        authForm.value.target_ptn = selectedAuthTargetPreset.value;
+      }
+    };
+
+    // 3. Quick Target Modal State (Overview Dashboard)
+    const showQuickTargetModal = ref(false);
+    const quickTargetSelectedPreset = ref('');
+    const quickTargetCustomText = ref('');
+    const isQuickTargetCustom = ref(false);
+    const isSavingQuickTarget = ref(false);
+
+    const quickTargetOptions = computed(() => {
+      return getTargetOptionsForProgram(activeAcademicProgram.value);
+    });
+
+    const openQuickTargetModal = () => {
+      const current = (currentUser.value?.target_goal || currentUser.value?.target_ptn || '').trim();
+      const list = quickTargetOptions.value;
+      if (current && list.includes(current)) {
+        quickTargetSelectedPreset.value = current;
+        quickTargetCustomText.value = '';
+        isQuickTargetCustom.value = false;
+      } else if (current) {
+        quickTargetSelectedPreset.value = '__CUSTOM__';
+        quickTargetCustomText.value = current;
+        isQuickTargetCustom.value = true;
+      } else {
+        quickTargetSelectedPreset.value = list[0] || '';
+        quickTargetCustomText.value = '';
+        isQuickTargetCustom.value = false;
+      }
+      showQuickTargetModal.value = true;
+    };
+
+    const handleQuickTargetPresetChange = () => {
+      if (quickTargetSelectedPreset.value === '__CUSTOM__') {
+        isQuickTargetCustom.value = true;
+      } else {
+        isQuickTargetCustom.value = false;
+        quickTargetCustomText.value = '';
+      }
+    };
+
+    const saveQuickTarget = async () => {
+      const finalTarget = isQuickTargetCustom.value 
+        ? (quickTargetCustomText.value || '').trim() 
+        : quickTargetSelectedPreset.value;
+
+      if (!finalTarget) {
+        showToast('Silakan pilih atau ketik nama target impian.');
+        return;
+      }
+
+      isSavingQuickTarget.value = true;
+      try {
+        if (currentUser.value) {
+          currentUser.value.target_goal = finalTarget;
+          currentUser.value.target_ptn = finalTarget;
+          profileEditForm.value.target_goal = finalTarget;
+          profileEditForm.value.target_ptn = finalTarget;
+        }
+
+        const token = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
+        if (token) {
+          const apiUrl = import.meta.env.VITE_API_URL || '/api';
+          await fetch(`${apiUrl}/auth.php?action=update_profile`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              target_goal: finalTarget,
+              target_ptn: finalTarget
+            })
+          });
+        }
+        localStorage.setItem('user_target', finalTarget);
+        showToast(`Target impian berhasil disimpan: ${finalTarget}`);
+        showQuickTargetModal.value = false;
+      } catch (err) {
+        console.error('Save target error:', err);
+        showToast('Target tersimpan.');
+        showQuickTargetModal.value = false;
+      } finally {
+        isSavingQuickTarget.value = false;
+      }
+    };
+
     const handleProfileProgramChange = () => {
       const p = allAcademicProgramsList.find(item => item.code === profileEditForm.value.academic_program);
       if (p) {
         profileEditForm.value.target_level = p.targetLevel;
         profileEditForm.value.grade_level = p.levelDesc;
       }
+      syncProfileTargetPreset();
     };
 
     const publicSchoolsList = ref([]);
@@ -7938,7 +8289,10 @@ export default {
         profileEditForm.value.school = currentUser.value.school || '';
         profileEditForm.value.school_id = currentUser.value.school_id || '';
         profileEditForm.value.target_ptn = currentUser.value.target_ptn || '';
+        profileEditForm.value.target_goal = currentUser.value.target_goal || currentUser.value.target_ptn || '';
+        profileEditForm.value.academic_program = currentUser.value.academic_program || activeAcademicProgram.value || 'SNPMB_UTBK';
         profileEditForm.value.phone = currentUser.value.phone || '';
+        syncProfileTargetPreset();
       }
       isEditingProfile.value = true;
     };
@@ -8426,6 +8780,24 @@ export default {
       profileEditForm,
       isSavingProfile,
       saveProfileAndBankSettings,
+      getTargetOptionsForProgram,
+      currentProfileTargetPresets,
+      selectedProfileTargetPreset,
+      isProfileTargetCustom,
+      handleProfileTargetPresetChange,
+      authTargetPresets,
+      selectedAuthTargetPreset,
+      isAuthTargetCustom,
+      handleAuthTargetPresetChange,
+      showQuickTargetModal,
+      quickTargetSelectedPreset,
+      quickTargetCustomText,
+      isQuickTargetCustom,
+      isSavingQuickTarget,
+      quickTargetOptions,
+      openQuickTargetModal,
+      handleQuickTargetPresetChange,
+      saveQuickTarget,
       isAdmin,
       isTeacher,
       isParent,
