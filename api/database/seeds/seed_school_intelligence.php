@@ -528,16 +528,20 @@ function seed_school_intelligence_data(PDO $pdo): array {
     // -------------------------------------------------------------
     // 5. DIAGNOSTIC RESULTS & LEARNING PATH
     // -------------------------------------------------------------
+    $delDiag = $pdo->prepare("DELETE FROM diagnostic_results WHERE student_id = ?");
     $inDiag = $pdo->prepare("
-        INSERT INTO diagnostic_results (id, student_id, answers, raw_score, recommended_track, created_at)
-        VALUES (?, ?, '{}', ?, ?, NOW())
-        ON DUPLICATE KEY UPDATE recommended_track = VALUES(recommended_track)
+        INSERT INTO diagnostic_results (id, student_id, total_score, gap_domain, gap_sub_materi, gap_score, details, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
     ");
 
     foreach ($students as $st) {
-        $track = ($st['gpa_category'] === 'high') ? 'Investigatif & Realistis (Sains & Teknologi)' : 'Enterprising & Sosial (Bisnis & Humaniora)';
+        $delDiag->execute([$st['id']]);
+        $domain = ($st['gpa_category'] === 'high') ? 'Penalaran Matematika' : (($st['gpa_category'] === 'med') ? 'Literasi Bahasa Inggris' : 'Pemahaman Kuantitatif');
+        $sub = ($st['gpa_category'] === 'high') ? 'Aljabar & Fungsi' : 'Struktur Kalimat & Kosakata';
+        $gap = ($st['gpa_category'] === 'high') ? 85.5 : (($st['gpa_category'] === 'med') ? 68.0 : 54.0);
         $inDiag->execute([
-            'diag-' . $st['id'], $st['id'], rand(75, 95), $track
+            'diag-' . $st['id'], $st['id'], rand(75, 95), $domain, $sub, $gap,
+            json_encode(['track' => ($st['gpa_category'] === 'high' ? 'Sains & Teknologi' : 'Bisnis & Humaniora')])
         ]);
     }
 
@@ -623,10 +627,13 @@ function seed_school_intelligence_data(PDO $pdo): array {
     return $summary;
 }
 
-if (php_sapi_name() === 'cli' || defined('STDIN')) {
+if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'] ?? '')) {
     echo "=== SEEDING EDUPATH SCHOOL INTELLIGENCE DUMMY DATA ===\n";
     try {
-        $pdo = get_db_connection();
+        global $pdo;
+        if (!isset($pdo)) {
+            require_once dirname(__DIR__, 2) . '/config.php';
+        }
         $res = seed_school_intelligence_data($pdo);
         print_r($res);
         echo "SUCCESS! Data dummy berhasil disuntikkan.\n";

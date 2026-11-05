@@ -1653,15 +1653,23 @@ if ($action === 'student_360' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $assessmentHistory = $cbtStmt->fetchAll(PDO::FETCH_ASSOC);
 
     // 3. Diagnostic & Learning Path
-    $diagStmt = $pdo->prepare("
-        SELECT id, answers, raw_score, recommended_track, created_at
-        FROM diagnostic_results
-        WHERE student_id = ?
-        ORDER BY created_at DESC
-        LIMIT 1
-    ");
-    $diagStmt->execute([$student_id]);
-    $diagnosticResult = $diagStmt->fetch(PDO::FETCH_ASSOC);
+    $diagnosticResult = null;
+    try {
+        $diagStmt = $pdo->prepare("
+            SELECT id, total_score, gap_domain, gap_sub_materi, gap_score, details, created_at
+            FROM diagnostic_results
+            WHERE student_id = ?
+            ORDER BY created_at DESC
+            LIMIT 1
+        ");
+        $diagStmt->execute([$student_id]);
+        $diagnosticResult = $diagStmt->fetch(PDO::FETCH_ASSOC);
+        if ($diagnosticResult) {
+            $diagnosticResult['recommended_track'] = !empty($diagnosticResult['gap_domain']) ? $diagnosticResult['gap_domain'] : 'Investigatif & Realistis';
+        }
+    } catch (\Throwable $de) {
+        $diagnosticResult = null;
+    }
 
     // 4. Learning Gap Identification (Mata pelajaran dengan nilai < KKM atau rata-rata terendah)
     $learningGaps = [];

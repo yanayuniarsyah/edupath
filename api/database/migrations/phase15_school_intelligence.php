@@ -119,8 +119,11 @@ function run_phase15_migration(PDO $pdo): array {
     return $results;
 }
 
-if (php_sapi_name() === 'cli' || defined('STDIN')) {
-    $pdo = get_db_connection();
+if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'] ?? '')) {
+    global $pdo;
+    if (!isset($pdo)) {
+        require_once dirname(__DIR__, 2) . '/config.php';
+    }
     echo "Running Phase 15 Migration: School Intelligence Module...\n";
     $res = run_phase15_migration($pdo);
     print_r($res);
