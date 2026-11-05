@@ -2930,36 +2930,12 @@
                   <span>Latihan</span>
                 </button>
               </div>
-              <button v-if="!isTeacher" type="button" @click="currentTab = 'offline_sop'" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md shadow-sm"
+              <button v-if="isAdmin" type="button" @click="currentTab = 'offline_sop'" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md shadow-sm"
               >
                 <span class="text-sm">🏢</span>
                 <span>SOP &amp; Tanggung Jawab Bimbel</span>
               </button>
             </div>
-          </div>
-
-          <!-- ✨ Card Panduan & Tanggung Jawab Bimbel Offline untuk Seluruh Role -->
-          <div class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-amber-500/35 shadow-[0_12px_40px_rgba(245,158,11,0.15)] bg-gradient-to-r from-amber-950/50 via-slate-900/90 to-slate-950 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="flex items-start sm:items-center gap-3.5">
-              <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0 text-amber-400 shadow-lg shadow-amber-500/10">
-                🏢
-              </div>
-              <div>
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/15 px-2.5 py-0.5 rounded-full border border-amber-400/30">{{ sopCardRoleBadge }}</span>
-                  <span class="text-xs text-white/50 font-medium">{{ sopCardSubBadge }}</span>
-                </div>
-                <h3 class="text-base sm:text-lg font-black text-white mt-1">{{ sopCardTitle }}</h3>
-                <p class="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
-                  {{ sopCardDescription }}
-                </p>
-              </div>
-            </div>
-            <button v-if="!isTeacher" type="button" @click="currentTab = 'offline_sop'" class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition-all flex items-center justify-center gap-2 shrink-0 shadow-lg shadow-amber-400/20 cursor-pointer"
-            >
-              <span>{{ sopCardButtonText }}</span>
-              <i class="ph-bold ph-arrow-right"></i>
-            </button>
           </div>
 
           <!-- ✨ Target Goal Selection & Status (Dinamis: SMP Impian, SMA Unggulan, atau PTN) -->
