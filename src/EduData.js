@@ -3393,7 +3393,6 @@ export const DIAGNOSTIC_QUESTIONS_SMP = [
   }
 ];
 
-export const DIAGNOSTIC_QUESTIONS_SNBT = DIAGNOSTIC_QUESTIONS;
 
 export const DIAGNOSTIC_QUESTIONS = [
   {
@@ -3525,6 +3524,8 @@ export const DIAGNOSTIC_QUESTIONS = [
 // ============================================================================
 // SIMULATOR QUESTIONS GENERATOR
 // ============================================================================
+export const DIAGNOSTIC_QUESTIONS_SNBT = DIAGNOSTIC_QUESTIONS;
+
 export const generateFull155Questions = () => {
   const categories = {
     PU: { subject: 'TPS', name: 'Penalaran Umum', total: 30, baseQuestion: 'Jika pemerintah menaikkan subsidi energi, maka harga barang pokok stabil. Jika harga barang pokok stabil, daya beli masyarakat meningkat.' },
