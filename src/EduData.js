@@ -2574,6 +2574,827 @@ export const MICRO_LESSONS = MATERI_UTBK.flatMap(m =>
 // ============================================================================
 // DIAGNOSTIC QUESTIONS
 // ============================================================================
+
+// ============================================================================
+// MATERI LEVEL SD & SMP (TKA TAXONOMY CURRICULUM READY)
+// ============================================================================
+export const MATERI_SD = [
+  {
+    "id": "m_sd_mtk",
+    "exam": "TKA SD",
+    "test_component": "TKA SD",
+    "subtest": "Matematika SD",
+    "code": "MTK-SD",
+    "icon": "🔢",
+    "deskripsi": "Materi dasar berhitung cepat, pemahaman pecahan, bangun geometri, dan penalaran soal cerita SD.",
+    "topics": [
+      "Operasi Hitung & Pecahan",
+      "Geometri & Pengukuran",
+      "Pengolahan Data & Statistik Dasar",
+      "Soal Cerita Bernalar"
+    ],
+    "babList": [
+      {
+        "id": "b_sd_mtk_1",
+        "topic": "Operasi Hitung & Pecahan",
+        "subtopic": "Pecahan Biasa, Campuran & Desimal",
+        "skill": "Menyelesaikan Operasi Hitung Pecahan",
+        "indicator": "Mampu menjumlahkan, mengurangkan, mengalikan pecahan dan desimal secara cepat",
+        "judul": "Operasi Pecahan & Hitung Cepat SD",
+        "teoriSingkat": "Pecahan terdiri dari pembilang dan penyebut (a/b). Untuk penjumlahan dan pengurangan pecahan, samakan penyebut menggunakan KPK. Untuk perkalian pecahan, kalikan langsung pembilang dengan pembilang dan penyebut dengan penyebut: (a/b) * (c/d) = (a*c)/(b*d). Untuk pembagian pecahan, balikkan pecahan kedua menjadi perkalian: (a/b) : (c/d) = (a/b) * (d/c).",
+        "formula_praktis": "Samakan penyebut dengan KPK untuk tambah/kurang. Untuk bagi, balikkan pecahan kedua dan kalikan.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Trik Cepat: Operasi Pecahan & Desimal SD",
+          "duration": "5 Menit",
+          "type": "Modul TKA SD",
+          "summary": "Kuasai konsep menyamakan penyebut dengan KPK dan trik silang perkalian pecahan dalam 5 menit."
+        }
+      },
+      {
+        "id": "b_sd_mtk_2",
+        "topic": "Geometri & Pengukuran",
+        "subtopic": "Keliling & Luas Bangun Datar",
+        "skill": "Menghitung Keliling dan Luas Bangun Datar",
+        "indicator": "Mampu menghitung luas persegi, persegi panjang, segitiga, trapesium, dan lingkaran",
+        "judul": "Keliling & Luas Bangun Datar",
+        "teoriSingkat": "Luas Persegi = s * s, Keliling = 4 * s. Luas Persegi Panjang = p * l, Keliling = 2 * (p + l). Luas Segitiga = 1/2 * alas * tinggi. Luas Lingkaran = pi * r^2, Keliling = 2 * pi * r. Nilai pi = 22/7 jika jari-jari kelipatan 7, atau 3,14 jika bukan kelipatan 7.",
+        "formula_praktis": "Persegi Panjang: L = p * l, K = 2(p+l). Lingkaran: L = pi * r^2. Segitiga: L = 1/2 * a * t.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Trik Rumus: Bangun Datar SD Favorit",
+          "duration": "6 Menit",
+          "type": "Modul TKA SD",
+          "summary": "Kumpulan rumus praktis keliling dan luas bangun datar yang sering muncul pada ujian masuk SMP."
+        }
+      },
+      {
+        "id": "b_sd_mtk_3",
+        "topic": "Pengolahan Data & Statistik Dasar",
+        "subtopic": "Diagram Batang, Rata-rata (Mean) & Modus",
+        "skill": "Membaca Data dan Menghitung Rata-rata",
+        "indicator": "Mampu menentukan rata-rata dan membaca diagram batang dengan teliti",
+        "judul": "Statistika Dasar: Rata-rata, Median & Modus",
+        "teoriSingkat": "Mean (Rata-rata) = Jumlah seluruh nilai data dibagi Banyak data. Modus = Nilai yang paling sering muncul / memiliki frekuensi terbanyak. Median = Nilai tengah data setelah diurutkan dari yang terkecil sampai terbesar.",
+        "formula_praktis": "Rata-rata = Total Nilai / Jumlah Siswa. Modus = yang paling sering muncul.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Kuasai Rata-rata & Modus Tanpa Salah Hitung",
+          "duration": "5 Menit",
+          "type": "Modul TKA SD",
+          "summary": "Metode cepat menghitung nilai rata-rata gabungan dan membaca diagram batang tabel frekuensi."
+        }
+      },
+      {
+        "id": "b_sd_mtk_4",
+        "topic": "Soal Cerita Bernalar",
+        "subtopic": "Perbandingan, Skala & Aritmetika Sosial",
+        "skill": "Menyelesaikan Soal Cerita Penalaran Matematika",
+        "indicator": "Mampu menghitung skala peta, perbandingan senilai, dan keuntungan/kerugian",
+        "judul": "Penalaran Soal Cerita, Skala & Aritmetika Sosial",
+        "teoriSingkat": "Skala = Jarak pada Peta (JP) / Jarak Sebenarnya (JS). Jarak Sebenarnya = JP / Skala. Ingat untuk menyamakan satuan ke cm terlebih dahulu (1 km = 100.000 cm, 1 m = 100 cm). Untung = Harga Jual - Harga Beli. Rugi = Harga Beli - Harga Jual.",
+        "formula_praktis": "JP = Skala * JS. Selalu ubah kilometer menjadi sentimeter (kalikan 100.000).",
+        "file_url": "",
+        "microLesson": {
+          "title": "Trik Skala & Soal Cerita Masuk SMP Favorit",
+          "duration": "7 Menit",
+          "type": "Modul TKA SD",
+          "summary": "Strategi mudah membedah soal cerita matematika HOTS tingkat SD tanpa panik."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m_sd_bin",
+    "exam": "TKA SD",
+    "test_component": "TKA SD",
+    "subtest": "Bahasa Indonesia SD",
+    "code": "BIN-SD",
+    "icon": "📖",
+    "deskripsi": "Pemahaman membaca teks, ide pokok wacana, kosakata kontekstual, dan tata bahasa baku EYD SD.",
+    "topics": [
+      "Ide Pokok Paragraf",
+      "Kosakata & Makna Kata",
+      "Tata Bahasa & EYD V",
+      "Karya Sastra & Cerita Anak"
+    ],
+    "babList": [
+      {
+        "id": "b_sd_bin_1",
+        "topic": "Ide Pokok Paragraf",
+        "subtopic": "Menentukan Gagasan Utama",
+        "skill": "Menemukan Gagasan Utama dan Informasi Tersurat",
+        "indicator": "Mampu menemukan ide pokok paragraf deduktif maupun induktif",
+        "judul": "Menentukan Ide Pokok & Informasi Teks",
+        "teoriSingkat": "Ide pokok adalah gagasan yang menjadi dasar pengembangan sebuah paragraf. Paragraf Deduktif meletakkan kalimat utama di awal paragraf. Paragraf Induktif meletakkan kalimat utama di akhir paragraf (biasanya diawali kata jadi, oleh karena itu, dengan demikian).",
+        "formula_praktis": "Cari kalimat utama di awal atau akhir paragraf, lalu ringkas inti pembahasannya.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Cara Cepat Menemukan Ide Pokok Paragraf",
+          "duration": "5 Menit",
+          "type": "Modul TKA SD",
+          "summary": "Langkah taktis menemukan ide pokok dan menjawab pertanyaan apa, siapa, di mana, kapan, mengapa, bagaimana."
+        }
+      },
+      {
+        "id": "b_sd_bin_2",
+        "topic": "Tata Bahasa & EYD V",
+        "subtopic": "Huruf Kapital, Tanda Baca & Kata Baku",
+        "skill": "Menerapkan Kaidah Ejaan yang Tepat",
+        "indicator": "Mampu menggunakan huruf kapital dan tanda titik, koma, titik dua dengan benar",
+        "judul": "Penggunaan Huruf Kapital & Tanda Baca EYD V",
+        "teoriSingkat": "Huruf kapital dipakai pada: 1. Huruf pertama awal kalimat. 2. Huruf pertama nama orang dan gelar kehormatan. 3. Huruf pertama nama bangsa, suku bangsa, dan bahasa. 4. Huruf pertama nama geografi (sungai, gunung, pulau, kota, provinsi). Kata baku: nasihat (bukan nasehat), izin (bukan ijin), apotek (bukan apotik).",
+        "formula_praktis": "Nama geografi diawali kapital hanya jika diikuti nama spesifik (misal: Sungai Musi, Pulau Bali).",
+        "file_url": "",
+        "microLesson": {
+          "title": "Bedah Ejaan & Kata Baku yang Sering Keluar di Ujian",
+          "duration": "6 Menit",
+          "type": "Modul TKA SD",
+          "summary": "Daftar kata baku yang sering menjebak dan aturan penulisan huruf kapital paling esensial."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m_sd_ipa",
+    "exam": "TKA SD",
+    "test_component": "TKA SD",
+    "subtest": "IPA SD",
+    "code": "IPA-SD",
+    "icon": "🌿",
+    "deskripsi": "Sains dasar: ekosistem, tubuh manusia, energi, gaya & gerak, serta tata surya.",
+    "topics": [
+      "Makhluk Hidup & Lingkungan",
+      "Tubuh Manusia & Kesehatan",
+      "Benda, Kalor & Energi",
+      "Bumi & Alam Semesta"
+    ],
+    "babList": [
+      {
+        "id": "b_sd_ipa_1",
+        "topic": "Makhluk Hidup & Lingkungan",
+        "subtopic": "Rantai Makanan & Simbiosis",
+        "skill": "Menganalisis Keseimbangan Ekosistem",
+        "indicator": "Mampu memprediksi dampak perubahan populasi dalam rantai makanan",
+        "judul": "Rantai Makanan, Jaring-jaring & Simbiosis",
+        "teoriSingkat": "Rantai makanan adalah perpindahan energi dari produsen (tumbuhan berklorofil) ke konsumen I (herbivora), konsumen II (karnivora/omnivora), hingga pengurai (dekomposer). Jika populasi satu tingkatan berkurang drastis, populasi mangsa akan bertambah dan populasi predator pemangsanya akan berkurang.",
+        "formula_praktis": "Produsen -> Herbivora -> Karnivora -> Pengurai. Simbiosis: Mutualisme (untung-untung), Komensalisme (untung-netral), Parasitisme (untung-rugi).",
+        "file_url": "",
+        "microLesson": {
+          "title": "Prediksi Rantai Makanan & Simbiosis Tanpa Ragu",
+          "duration": "5 Menit",
+          "type": "Modul TKA SD",
+          "summary": "Memahami efek domino rantai makanan dan contoh konkrit ketiga jenis simbiosis di alam."
+        }
+      },
+      {
+        "id": "b_sd_ipa_2",
+        "topic": "Benda, Kalor & Energi",
+        "subtopic": "Perubahan Wujud Benda & Energi Alternatif",
+        "skill": "Menjelaskan Perubahan Wujud Zat dan Energi",
+        "indicator": "Mampu mengidentifikasi proses membeku, mencair, menguap, mengembun, menyublim, dan mengkristal",
+        "judul": "Perubahan Wujud Zat & Sumber Energi Alternatif",
+        "teoriSingkat": "Perubahan wujud yang menyerap kalor: mencair (padat ke cair), menguap (cair ke gas), menyublim (padat ke gas). Perubahan wujud yang melepaskan kalor: membeku (cair ke padat), mengembun (gas ke cair), mengkristal/deposisi (gas ke padat). Energi alternatif ramah lingkungan: matahari (panel surya), angin (aerogenerator), air (PLTA), dan panas bumi (geotermal).",
+        "formula_praktis": "Serap Kalor: Cair, Uap, Sublim. Lepas Kalor: Beku, Embun, Kristal.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Trik Menghafal 6 Perubahan Wujud Benda & Energi",
+          "duration": "5 Menit",
+          "type": "Modul TKA SD",
+          "summary": "Trik visual skema segitiga perubahan wujud zat dan aplikasi praktisnya dalam kehidupan sehari-hari."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m_sd_ips",
+    "exam": "TKA SD",
+    "test_component": "TKA SD",
+    "subtest": "IPS SD",
+    "code": "IPS-SD",
+    "icon": "🌏",
+    "deskripsi": "Geografi nusantara, keragaman sosial budaya, kegiatan ekonomi, dan sejarah perjuangan bangsa.",
+    "topics": [
+      "Kenampakan Alam & Peta",
+      "Keragaman Sosial Budaya",
+      "Kegiatan Ekonomi",
+      "Sejarah Perjuangan Bangsa"
+    ],
+    "babList": [
+      {
+        "id": "b_sd_ips_1",
+        "topic": "Kenampakan Alam & Peta",
+        "subtopic": "Unsur Peta & Kenampakan Alam Indonesia",
+        "skill": "Membaca Peta dan Mengenal Wilayah Nusantara",
+        "indicator": "Mampu mengidentifikasi unsur peta dan bentang alam Indonesia",
+        "judul": "Peta Geografi & Kenampakan Alam Indonesia",
+        "teoriSingkat": "Unsur-unsur peta: judul peta, skala, legenda (keterangan simbol), arah mata angin, garis astronomis (lintang dan bujur), serta peta inset. Indonesia terletak di antara 2 benua (Asia dan Australia) dan 2 samudra (Hindia dan Pasifik). Letak astronomis 6°LU - 11°LS dan 95°BT - 141°BT membuat Indonesia beriklim tropis.",
+        "formula_praktis": "Letak geografis: silang 2 benua & 2 samudra. Letak astronomis: 6°LU - 11°LS (Tropis dengan 2 musim).",
+        "file_url": "",
+        "microLesson": {
+          "title": "Mengenal Peta & Geografi Indonesia",
+          "duration": "5 Menit",
+          "type": "Modul TKA SD",
+          "summary": "Poin penting kenampakan alam daratan/perairan dan pembagian zona waktu di Indonesia (WIB, WITA, WIT)."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m_sd_ppkn",
+    "exam": "TKA SD",
+    "test_component": "TKA SD",
+    "subtest": "PPKn SD",
+    "code": "PPK-SD",
+    "icon": "🇮🇩",
+    "deskripsi": "Pancasila, norma kemasyarakatan, hak dan kewajiban, serta persatuan Bhinneka Tunggal Ika.",
+    "topics": [
+      "Pancasila & Pengamalannya",
+      "Norma & Aturan",
+      "Persatuan & Keberagaman"
+    ],
+    "babList": [
+      {
+        "id": "b_sd_ppkn_1",
+        "topic": "Pancasila & Pengamalannya",
+        "subtopic": "Makna Simbol Sila 1 s.d. 5 Pancasila",
+        "skill": "Menerapkan Nilai Pancasila dalam Kehidupan Sehari-hari",
+        "indicator": "Mampu menghubungkan perilaku dengan sila Pancasila yang sesuai",
+        "judul": "Makna Simbol & Penerapan Sila Pancasila",
+        "teoriSingkat": "Sila 1: Bintang (Ketuhanan, toleransi beragama). Sila 2: Rantai Emas (Kemanusiaan, tolong menolong tanpa membedakan). Sila 3: Pohon Beringin (Persatuan, cinta tanah air, bangga produk lokal). Sila 4: Kepala Banteng (Musyawarah untuk mufakat). Sila 5: Padi dan Kapas (Keadilan sosial, hemat, tidak bergaya hidup mewah).",
+        "formula_praktis": "1: Bintang (Agama), 2: Rantai (Kemanusiaan), 3: Beringin (Persatuan), 4: Banteng (Musyawarah), 5: Padi-Kapas (Keadilan).",
+        "file_url": "",
+        "microLesson": {
+          "title": "Hafal Cepat Butir Pengamalan Sila Pancasila",
+          "duration": "5 Menit",
+          "type": "Modul TKA SD",
+          "summary": "Contoh tindakan nyata pengamalan sila 1 sampai 5 di rumah, sekolah, dan lingkungan sekitar."
+        }
+      }
+    ]
+  }
+];
+
+export const MATERI_SMP = [
+  {
+    "id": "m_smp_mtk",
+    "exam": "TKA SMP",
+    "test_component": "TKA SMP",
+    "subtest": "Matematika SMP",
+    "code": "MTK-SMP",
+    "icon": "📐",
+    "deskripsi": "Aljabar, SPLDV, relasi fungsi, teorema pythagoras, geometri bangun ruang, dan statistika SMP.",
+    "topics": [
+      "Bilangan & Aljabar",
+      "Relasi, Fungsi & Garis Lurus",
+      "Geometri & Teorema Pythagoras",
+      "Statistika & Peluang"
+    ],
+    "babList": [
+      {
+        "id": "b_smp_mtk_1",
+        "topic": "Bilangan & Aljabar",
+        "subtopic": "Operasi Aljabar & Sistem Persamaan Linear Dua Variabel (SPLDV)",
+        "skill": "Menyelesaikan Soal SPLDV dengan Metode Eliminasi & Substitusi",
+        "indicator": "Mampu menentukan himpunan penyelesaian dari sistem persamaan linear dua variabel",
+        "judul": "Aljabar & Sistem Persamaan Linear Dua Variabel (SPLDV)",
+        "teoriSingkat": "SPLDV berbentuk: ax + by = c dan dx + ey = f. Metode penyelesaian utama: 1. Eliminasi: Menyamakan koefisien salah satu variabel lalu mengurangkan/menjumlahkan kedua persamaan untuk menghilangkan variabel tersebut. 2. Substitusi: Menyatakan satu variabel dalam variabel lain lalu memasukkannya ke persamaan lainnya. 3. Metode Gabungan: Melakukan eliminasi sekali untuk mencari variabel pertama, lalu mensubstitusikannya untuk mencari variabel kedua.",
+        "formula_praktis": "Metode Campuran paling cepat: Eliminasi koefisien variabel yang angkanya kecil, lalu substitusikan nilainya.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Trik Menyelesaikan SPLDV dalam 1 Menit",
+          "duration": "6 Menit",
+          "type": "Modul TKA SMP",
+          "summary": "Metode taktis menyelesaikan soal cerita SPLDV harga barang dan umur tanpa bingung tanda aljabar."
+        }
+      },
+      {
+        "id": "b_smp_mtk_2",
+        "topic": "Relasi, Fungsi & Garis Lurus",
+        "subtopic": "Gradien & Persamaan Garis Lurus",
+        "skill": "Menghitung Gradien dan Membentuk Persamaan Garis",
+        "indicator": "Mampu menentukan gradien garis sejajar dan tegak lurus serta rumus persamaannya",
+        "judul": "Gradien & Persamaan Garis Lurus SMP",
+        "teoriSingkat": "Gradien (m) adalah tingkat kemiringan garis. Melalui dua titik (x1, y1) dan (x2, y2): m = (y2 - y1) / (x2 - x1). Dari persamaan ax + by + c = 0, gradien m = -a/b. Hubungan 2 garis: 1. Sejajar: m1 = m2. 2. Tegak Lurus: m1 * m2 = -1 (m2 = -1/m1). Persamaan garis melalui titik (x1, y1) dengan gradien m: y - y1 = m(x - x1).",
+        "formula_praktis": "Gradien ax+by+c=0 adalah m = -a/b. Dua garis tegak lurus: m1 * m2 = -1.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Kuasai Gradien & Garis Tegak Lurus",
+          "duration": "6 Menit",
+          "type": "Modul TKA SMP",
+          "summary": "Rumus cepat gradien garis dan trik menentukan garis lurus sejajar maupun tegak lurus."
+        }
+      },
+      {
+        "id": "b_smp_mtk_3",
+        "topic": "Geometri & Teorema Pythagoras",
+        "subtopic": "Teorema Pythagoras & Triple Pythagoras",
+        "skill": "Menghitung Sisi Segitiga Siku-siku",
+        "indicator": "Mampu menerapkan rumus c^2 = a^2 + b^2 dan memanfaatkan triple Pythagoras",
+        "judul": "Teorema Pythagoras & Triple Pythagoras Favorit",
+        "teoriSingkat": "Pada segitiga siku-siku dengan sisi siku-siku a dan b serta sisi miring (hipotenusa) c berlaku: c^2 = a^2 + b^2, a^2 = c^2 - b^2, b^2 = c^2 - a^2. Hafalkan Triple Pythagoras Populer: (3, 4, 5), (5, 12, 13), (7, 24, 25), (8, 15, 17) beserta kelipatannya (misal: 6, 8, 10 atau 9, 12, 15).",
+        "formula_praktis": "c^2 = a^2 + b^2. Triple pythagoras wajib hafal: (3, 4, 5), (5, 12, 13), (7, 24, 25), (8, 15, 17).",
+        "file_url": "",
+        "microLesson": {
+          "title": "Hafalan Cepat Triple Pythagoras Tanpa Menghitung Akar",
+          "duration": "5 Menit",
+          "type": "Modul TKA SMP",
+          "summary": "Gunakan kelipatan triple Pythagoras untuk menghemat waktu ujian matematika masuk SMA unggulan."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m_smp_bin",
+    "exam": "TKA SMP",
+    "test_component": "TKA SMP",
+    "subtest": "Bahasa Indonesia SMP",
+    "code": "BIN-SMP",
+    "icon": "📝",
+    "deskripsi": "Genre teks eksplanasi, berita, cerpen, pidato persuasif, teks diskusi, dan kaidah PUEBI.",
+    "topics": [
+      "Genre Teks Faktual & Ilmiah",
+      "Teks Eksplanasi & Argumen",
+      "Teks Sastra & Cerpen",
+      "Kebahasaan & Kaidah Ejaan"
+    ],
+    "babList": [
+      {
+        "id": "b_smp_bin_1",
+        "topic": "Teks Eksplanasi & Argumen",
+        "subtopic": "Struktur & Ciri Kebahasaan Teks Eksplanasi",
+        "skill": "Menganalisis Rangkaian Sebab-Akibat Peristiwa",
+        "indicator": "Mampu menentukan pernyataan umum, deretan penjelas (kausalitas), dan interpretasi teks eksplanasi",
+        "judul": "Struktur & Ciri Teks Eksplanasi Fenomena",
+        "teoriSingkat": "Teks eksplanasi menjelaskan proses terjadinya suatu fenomena alam, sosial, ilmu pengetahuan, atau budaya. Struktur teks eksplanasi: 1. Identifikasi Fenomena (Pernyataan umum pengenalan peristiwa). 2. Rangkaian Kejadian / Deretan Penjelas (Memuat hubungan sebab-akibat atau kronologi waktu). 3. Ulasan / Interpretasi (Simpulan atau konsekuensi dari peristiwa). Ciri kebahasaan: Menggunakan konjungsi kausalitas (sebab, karena, sehingga, oleh karena itu) dan konjungsi kronologis (kemudian, lalu, setelah itu).",
+        "formula_praktis": "Struktur: Identifikasi Fenomena -> Proses Kejadian (Sebab-Akibat) -> Ulasan/Simpulan.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Membedah Struktur Teks Eksplanasi",
+          "duration": "5 Menit",
+          "type": "Modul TKA SMP",
+          "summary": "Strategi membedakan deretan penjelas sebab-akibat dengan pernyataan umum pada teks ilmiah."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m_smp_eng",
+    "exam": "TKA SMP",
+    "test_component": "TKA SMP",
+    "subtest": "Bahasa Inggris SMP",
+    "code": "ENG-SMP",
+    "icon": "🗣️",
+    "deskripsi": "Reading comprehension genre texts, functional texts, grammar tenses, modals, and dialogues.",
+    "topics": [
+      "Transactional & Interpersonal Dialogues",
+      "Short Functional Texts",
+      "Reading Genre Texts",
+      "Grammar in Context"
+    ],
+    "babList": [
+      {
+        "id": "b_smp_eng_1",
+        "topic": "Reading Genre Texts",
+        "subtopic": "Descriptive, Recount & Narrative Texts",
+        "skill": "Finding Main Ideas and Implicit Information",
+        "indicator": "Mampu menganalisis tujuan komunikatif teks recount/narrative dan gagasan paragraf",
+        "judul": "Reading Comprehension: Recount & Narrative Texts",
+        "teoriSingkat": "Recount Text menceritakan pengalaman nyata masa lalu (past experience) dengan struktur: Orientation, Events, Reorientation. Menggunakan Simple Past Tense (V2 / was / were). Narrative Text menceritakan kisah fiksi/dongeng dengan struktur: Orientation, Complication (masalah), Resolution (pemecahan masalah), dan Coda/Moral value.",
+        "formula_praktis": "Recount: Orientation -> Events -> Reorientation. Narrative: Orientation -> Complication -> Resolution.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Mastering Recount and Narrative Questions",
+          "duration": "6 Menit",
+          "type": "Modul TKA SMP",
+          "summary": "Key techniques to identify character traits, moral value, and main events quickly."
+        }
+      },
+      {
+        "id": "b_smp_eng_2",
+        "topic": "Grammar in Context",
+        "subtopic": "Simple Past vs Present Perfect Tense",
+        "skill": "Using Appropriate Verb Forms in English Sentences",
+        "indicator": "Mampu membedakan penggunaan V2 (lampau spesifik) dan have/has + V3 (belum lama selesai)",
+        "judul": "Grammar: Simple Past vs Present Perfect Tense",
+        "teoriSingkat": "Simple Past Tense digunakan untuk kejadian yang terjadi dan selesai di masa lampau dengan penanda waktu pasti (yesterday, last week, 2 days ago, in 2020). Rumus: S + V2 (did). Present Perfect Tense digunakan untuk kegiatan yang sudah dilakukan tetapi waktunya tidak spesifik atau efeknya masih terasa hingga sekarang (already, yet, since, for, just). Rumus: S + have/has + V3.",
+        "formula_praktis": "Past Tense: Ada waktu jelas di masa lampau (yesterday, last...). Present Perfect: have/has + V3 (since, for, already).",
+        "file_url": "",
+        "microLesson": {
+          "title": "Past Tense vs Present Perfect in 5 Minutes",
+          "duration": "5 Menit",
+          "type": "Modul TKA SMP",
+          "summary": "Eliminate confusion between V2 and have/has + V3 with proven time marker clues."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m_smp_ipa",
+    "exam": "TKA SMP",
+    "test_component": "TKA SMP",
+    "subtest": "IPA Terpadu SMP",
+    "code": "IPA-SMP",
+    "icon": "🧪",
+    "deskripsi": "Fisika mekanika & gelombang, biologi sistem organ manusia, serta kimia zat & campuran.",
+    "topics": [
+      "Fisika: Gerak, Gaya & Energi",
+      "Fisika: Tekanan & Listrik",
+      "Biologi: Organisasi Kehidupan",
+      "Kimia & Bioteknologi"
+    ],
+    "babList": [
+      {
+        "id": "b_smp_ipa_1",
+        "topic": "Fisika: Gerak, Gaya & Energi",
+        "subtopic": "Hukum Newton tentang Gerak & GLBB",
+        "skill": "Menghitung Gaya, Massa dan Percepatan Gerak",
+        "indicator": "Mampu menerapkan Hukum II Newton: Sigma F = m * a dalam perhitungan gerak benda",
+        "judul": "Hukum Newton tentang Gerak & Rumus Percepatan",
+        "teoriSingkat": "Hukum I Newton (Inersia/Kelembaman): Benda diam akan tetap diam, dan benda bergerak lurus beraturan akan tetap bergerak jika Sigma F = 0. Hukum II Newton: Percepatan berbanding lurus dengan gaya total dan berbanding terbalik dengan massa (Sigma F = m * a atau a = Sigma F / m). Hukum III Newton (Aksi-Reaksi): Gaya aksi sama besar dan berlawanan arah dengan gaya reaksi (F_aksi = -F_reaksi), bekerja pada dua benda berbeda.",
+        "formula_praktis": "Hukum II Newton: Sigma F = m * a. Resultan gaya searah dijumlahkan, berlawanan arah dikurangkan.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Memahami Hukum Newton I, II, dan III",
+          "duration": "6 Menit",
+          "type": "Modul TKA SMP",
+          "summary": "Konsep inti gaya resultan dan contoh soal Hukum II Newton Sigma F = m * a yang sering keluar."
+        }
+      },
+      {
+        "id": "b_smp_ipa_2",
+        "topic": "Biologi: Organisasi Kehidupan",
+        "subtopic": "Sistem Ekskresi & Filtrasi Ginjal Manusia",
+        "skill": "Menganalisis Tahapan Pembentukan Urine di Ginjal",
+        "indicator": "Mampu membedakan proses filtrasi, reabsorpsi, dan augmentasi pada nefron ginjal",
+        "judul": "Sistem Ekskresi Manusia: Tahapan Pembentukan Urine",
+        "teoriSingkat": "Organ ekskresi manusia meliputi: ginjal (urine), kulit (keringat), paru-paru (CO2 dan uap air), dan hati (empedu). Tahapan pembentukan urine di nefron ginjal: 1. Filtrasi (Penyaringan darah di glomerulus menghasilkan urine primer). 2. Reabsorpsi (Penyerapan kembali zat berguna seperti glukosa dan asam amino di tubulus kontortus proksimal menghasilkan urine sekunder). 3. Augmentasi (Pengeluaran zat sisa racun di tubulus kontortus distal menghasilkan urine sesungguhnya).",
+        "formula_praktis": "Filtrasi (Glomerulus -> Urine Primer) -> Reabsorpsi (TKP -> Urine Sekunder) -> Augmentasi (TKD -> Urine Sesungguhnya).",
+        "file_url": "",
+        "microLesson": {
+          "title": "Hafalan Alur Nefron Ginjal & Pembentukan Urine",
+          "duration": "5 Menit",
+          "type": "Modul TKA SMP",
+          "summary": "Trik mudah membedakan filtrasi, reabsorpsi, dan augmentasi beserta lokasi nefronnya."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m_smp_ips",
+    "exam": "TKA SMP",
+    "test_component": "TKA SMP",
+    "subtest": "IPS Terpadu SMP",
+    "code": "IPS-SMP",
+    "icon": "🧭",
+    "deskripsi": "Geografi keruangan nusantara & ASEAN, sosiologi interaksi sosial, ekonomi pasar, dan sejarah nasional.",
+    "topics": [
+      "Geografi & Keruangan",
+      "Sosiologi & Interaksi Sosial",
+      "Ekonomi & Pasar",
+      "Sejarah Perjuangan Bangsa"
+    ],
+    "babList": [
+      {
+        "id": "b_smp_ips_1",
+        "topic": "Geografi & Keruangan",
+        "subtopic": "Letak Wilayah Indonesia & Kawasan ASEAN",
+        "skill": "Menganalisis Interaksi Antarnegara di Kawasan ASEAN",
+        "indicator": "Mampu menjelaskan karakteristik geografis dan kerja sama sosial-ekonomi ASEAN",
+        "judul": "Karakteristik Wilayah & Kerja Sama ASEAN",
+        "teoriSingkat": "ASEAN didirikan pada 8 Agustus 1967 di Bangkok oleh 5 negara pendiri: Indonesia, Malaysia, Singapura, Thailand, dan Filipina. Letak astronomis kawasan ASEAN berada di 28°LU - 11°LS dan 93°BT - 141°BT, sebagian besar beriklim tropis. Bentuk kerja sama ekonomi meliputi AFTA (Asean Free Trade Area) dan proyek industri bersama.",
+        "formula_praktis": "5 Negara pendiri ASEAN (Deklarasi Bangkok): Indonesia, Malaysia, Singapura, Thailand, Filipina.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Poin Kunci Geografi & Dinamika ASEAN",
+          "duration": "5 Menit",
+          "type": "Modul TKA SMP",
+          "summary": "Karakteristik penting negara-negara anggota ASEAN dan bentuk integrasi ekonominya."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m_smp_ppkn",
+    "exam": "TKA SMP",
+    "test_component": "TKA SMP",
+    "subtest": "PPKn SMP",
+    "code": "PPK-SMP",
+    "icon": "🏛️",
+    "deskripsi": "Pancasila, Pembukaan UUD 1945, tata urutan perundang-undangan, kedaulatan rakyat & lembaga negara.",
+    "topics": [
+      "Dasar Negara & UUD 1945",
+      "Tata Urutan Perundang-undangan",
+      "Kedaulatan & Lembaga Negara"
+    ],
+    "babList": [
+      {
+        "id": "b_smp_ppkn_1",
+        "topic": "Dasar Negara & UUD 1945",
+        "subtopic": "Kedudukan Pancasila & Pembukaan UUD NRI 1945",
+        "skill": "Menjelaskan Pancasila sebagai Dasar Negara dan Pandangan Hidup",
+        "indicator": "Mampu mengidentifikasi makna 4 alinea Pembukaan UUD NRI 1945",
+        "judul": "Makna 4 Alinea Pembukaan UUD NRI 1945",
+        "teoriSingkat": "Alinea 1: Dalil kemerdekaan adalah hak segala bangsa dan penjajahan harus dihapuskan. Alinea 2: Penghargaan atas perjuangan pergerakan kemerdekaan Indonesia menuju gerbang kemerdekaan yang bersatu, berdaulat, adil dan makmur. Alinea 3: Pengakuan bahwa kemerdekaan diraih atas berkat rahmat Allah Yang Maha Kuasa. Alinea 4: Tujuan negara (melindungi, memajukan kesejahteraan, mencerdaskan kehidupan bangsa, ikut ketertiban dunia) dan dasar falsafah Pancasila.",
+        "formula_praktis": "Alinea 1: Hak Kemerdekaan. Alinea 2: Cita-cita kemerdekaan. Alinea 3: Rahmat Tuhan. Alinea 4: Tujuan Negara & Dasar Pancasila.",
+        "file_url": "",
+        "microLesson": {
+          "title": "Makna Penting Pembukaan UUD 1945",
+          "duration": "5 Menit",
+          "type": "Modul TKA SMP",
+          "summary": "Rangkuman makna alinea I sampai IV Pembukaan UUD 1945 yang kerap diuji pada asesmen PPKn."
+        }
+      }
+    ]
+  }
+];
+
+export const DIAGNOSTIC_QUESTIONS_SD = [
+  {
+    "id": "q_sd_1",
+    "subject": "TKA SD",
+    "category": "Matematika SD",
+    "skill": "Operasi Bilangan & Pecahan",
+    "difficulty": "Intermediate",
+    "question": "Ibu membeli 3 1/2 kg gula pasir di pasar. Sebanyak 1 1/4 kg digunakan untuk membuat kue bolu dan 0,75 kg digunakan untuk membuat es sirup. Berapa kg sisa gula pasir yang belum terpakai?",
+    "options": [
+      "1,25 kg",
+      "1,50 kg",
+      "1,75 kg",
+      "2,00 kg"
+    ],
+    "answer": 1,
+    "hint": "Ubah semua pecahan ke bentuk desimal agar lebih mudah dihitung: 3 1/2 = 3,5 kg dan 1 1/4 = 1,25 kg.",
+    "concept": "Operasi pengurangan pecahan campuran dan bilangan desimal.",
+    "guidedSteps": [
+      "Langkah 1: Ubah 3 1/2 kg ke desimal: 3,5 kg.",
+      "Langkah 2: Ubah 1 1/4 kg ke desimal: 1,25 kg.",
+      "Langkah 3: Hitung total gula yang digunakan: 1,25 + 0,75 = 2,00 kg.",
+      "Langkah 4: Kurangkan dari total gula mula-mula: 3,50 - 2,00 = 1,50 kg."
+    ],
+    "explanation": "Total gula terpakai = 1,25 kg + 0,75 kg = 2,00 kg. Sisa gula = 3,50 kg - 2,00 kg = 1,50 kg (atau 1 1/2 kg)."
+  },
+  {
+    "id": "q_sd_2",
+    "subject": "TKA SD",
+    "category": "Matematika SD",
+    "skill": "Geometri & Keliling",
+    "difficulty": "HOTS",
+    "question": "Sebuah taman sekolah berbentuk persegi panjang dengan panjang 20 meter dan lebar 15 meter. Di sekeliling taman tersebut akan dipasang pagar kawat berduri sebanyak 3 lilitan putaran. Berapakah panjang total kawat berduri yang dibutuhkan?",
+    "options": [
+      "70 meter",
+      "140 meter",
+      "210 meter",
+      "300 meter"
+    ],
+    "answer": 2,
+    "hint": "Hitung keliling persegi panjang terlebih dahulu, lalu kalikan dengan 3 putaran lilitan.",
+    "concept": "Penerapan keliling persegi panjang pada soal cerita bernalar.",
+    "guidedSteps": [
+      "Langkah 1: Rumus keliling persegi panjang = 2 * (panjang + lebar).",
+      "Langkah 2: Keliling taman = 2 * (20 + 15) = 2 * 35 = 70 meter.",
+      "Langkah 3: Karena dipasang 3 lilitan putaran kawat, maka total panjang kawat = 3 * 70 meter = 210 meter."
+    ],
+    "explanation": "Keliling 1 putaran = 2 * (20 m + 15 m) = 70 m. Untuk 3 putaran kawat: 3 * 70 m = 210 meter."
+  },
+  {
+    "id": "q_sd_3",
+    "subject": "TKA SD",
+    "category": "Bahasa Indonesia SD",
+    "skill": "Ide Pokok Paragraf",
+    "difficulty": "Intermediate",
+    "question": "Bacalah teks berikut: \"Terumbu karang memiliki manfaat yang luar biasa bagi kelangsungan hidup biota laut. Selain menjadi habitat dan tempat mencari makan ribuan jenis ikan, terumbu karang juga melindungi pantai pesisir dari hempasan ombak badai yang kuat.\" Gagasan utama paragraf tersebut adalah...",
+    "options": [
+      "Tempat mencari makan ribuan jenis ikan laut",
+      "Manfaat terumbu karang bagi biota laut dan lingkungan",
+      "Penyebab utama timbulnya ombak badai di pesisir",
+      "Cara melestarikan keindahan terumbu karang"
+    ],
+    "answer": 1,
+    "hint": "Perhatikan kalimat pertama sebagai kalimat deduktif yang memuat tema keseluruhan teks.",
+    "concept": "Menentukan ide pokok pada paragraf deduktif.",
+    "guidedSteps": [
+      "Langkah 1: Kalimat pertama menyatakan terumbu karang memiliki manfaat luar biasa.",
+      "Langkah 2: Kalimat berikutnya menjelaskan rincian manfaat habitat dan pelindung pantai.",
+      "Langkah 3: Kesimpulan gagasan utama adalah manfaat terumbu karang."
+    ],
+    "explanation": "Paragraf tersebut merupakan paragraf deduktif dengan gagasan utama di kalimat pertama mengenai manfaat besar terumbu karang."
+  },
+  {
+    "id": "q_sd_4",
+    "subject": "TKA SD",
+    "category": "Bahasa Indonesia SD",
+    "skill": "Ejaan & Huruf Kapital",
+    "difficulty": "Basic",
+    "question": "Manakah kalimat berikut yang penulisan huruf kapitalnya sudah BENAR menurut kaidah ejaan?",
+    "options": [
+      "Ayah berlayar melintasi selat sunda menuju pulau Sumatra.",
+      "Ayah berlayar melintasi Selat Sunda menuju Pulau Sumatra.",
+      "Ayah berlayar melintasi Selat sunda menuju pulau sumatra.",
+      "Ayah berlayar melintasi selat Sunda menuju Pulau sumatra."
+    ],
+    "answer": 1,
+    "hint": "Nama geografi (selat, pulau, gunung, sungai) ditulis kapital jika diikuti nama diri geografisnya.",
+    "concept": "Aturan penulisan huruf kapital pada nama unsur geografi spesifik.",
+    "guidedSteps": [
+      "Langkah 1: Kata \"Selat\" yang diikuti nama \"Sunda\" harus diawali huruf kapital (Selat Sunda).",
+      "Langkah 2: Kata \"Pulau\" yang diikuti nama \"Sumatra\" harus diawali huruf kapital (Pulau Sumatra).",
+      "Langkah 3: Opsi B adalah penulisan yang tepat."
+    ],
+    "explanation": "Unsur geografi yang diikuti nama spesifik wajib ditulis dengan huruf kapital: Selat Sunda dan Pulau Sumatra."
+  },
+  {
+    "id": "q_sd_5",
+    "subject": "TKA SD",
+    "category": "IPA SD",
+    "skill": "Rantai Makanan & Ekosistem",
+    "difficulty": "HOTS",
+    "question": "Perhatikan rantai makanan berikut: Tanaman Padi -> Belalang -> Katak -> Ular -> Elang. Jika petani secara masif membasmi katak karena dianggap hama, dampak langsung yang akan terjadi pada ekosistem sawah adalah...",
+    "options": [
+      "Populasi ular meningkat drastis",
+      "Populasi belalang melonjak pesat dan tanaman padi rusak",
+      "Populasi elang bertambah banyak",
+      "Tanaman padi tumbuh lebih subur tanpa gangguan"
+    ],
+    "answer": 1,
+    "hint": "Katak adalah pemangsa belalang sekaligus mangsa bagi ular. Jika katak habis, belalang tidak ada yang memangsa.",
+    "concept": "Dampak ketidakseimbangan rantai makanan akibat penurunan satu populasi.",
+    "guidedSteps": [
+      "Langkah 1: Katak memangsa belalang.",
+      "Langkah 2: Jika populasi katak menurun drastis, pemangsa belalang hilang sehingga belalang berkembang biak tanpa kendali.",
+      "Langkah 3: Lonjakan populasi belalang akan menyebabkan tanaman padi habis dimakan."
+    ],
+    "explanation": "Hilangnya populasi katak menyebabkan populasi belalang melonjak cepat karena tidak ada predator alaminya, sehingga tanaman padi mengalami kerusakan hebat."
+  },
+  {
+    "id": "q_sd_6",
+    "subject": "TKA SD",
+    "category": "IPA SD",
+    "skill": "Perubahan Wujud Benda",
+    "difficulty": "Intermediate",
+    "question": "Peristiwa terbentuknya butiran-butiran air pada permukaan luar dinding gelas yang berisi es teh manis merupakan contoh proses...",
+    "options": [
+      "Menguap",
+      "Membeku",
+      "Mengembun",
+      "Menyublim"
+    ],
+    "answer": 2,
+    "hint": "Udara di sekitar dinding gelas melepaskan kalor karena dingin sehingga berubah wujud dari gas ke cair.",
+    "concept": "Perubahan wujud gas menjadi cair (kondensasi/mengembun).",
+    "guidedSteps": [
+      "Langkah 1: Butiran air di luar gelas berasal dari uap air di udara luar, bukan rembesan es dari dalam gelas.",
+      "Langkah 2: Udara hangat di luar bersentuhan dengan dinding gelas yang dingin dan suhunya turun.",
+      "Langkah 3: Perubahan wujud uap air (gas) menjadi butiran air (cair) disebut mengembun."
+    ],
+    "explanation": "Butiran air di luar gelas dingin terjadi karena uap air di udara sekitar mengalami penurunan suhu (melepaskan kalor) dan mengembun menjadi tetesan air cair."
+  }
+];
+
+export const DIAGNOSTIC_QUESTIONS_SMP = [
+  {
+    "id": "q_smp_1",
+    "subject": "TKA SMP",
+    "category": "Matematika SMP",
+    "skill": "Aljabar & SPLDV",
+    "difficulty": "Intermediate",
+    "question": "Di toko alat tulis, Ani membeli 3 buku tulis dan 2 pulpen seharga Rp21.000. Di toko yang sama, Budi membeli 2 buku tulis dan 3 pulpen yang sama seharga Rp19.000. Berapakah harga 1 buku tulis dan 1 pulpen?",
+    "options": [
+      "Rp7.000",
+      "Rp8.000",
+      "Rp9.000",
+      "Rp10.000"
+    ],
+    "answer": 1,
+    "hint": "Jumlahkan langsung kedua persamaan tersebut: (3b + 2p) + (2b + 3p) = 5b + 5p, lalu bagi dengan 5.",
+    "concept": "Sistem Persamaan Linear Dua Variabel (SPLDV) dengan trik penjumlahan simetris.",
+    "guidedSteps": [
+      "Langkah 1: Persamaan 1: 3b + 2p = 21.000",
+      "Langkah 2: Persamaan 2: 2b + 3p = 19.000",
+      "Langkah 3: Jumlahkan kedua persamaan: 5b + 5p = 40.000",
+      "Langkah 4: Bagi kedua ruas dengan 5: b + p = 8.000"
+    ],
+    "explanation": "Dengan menjumlahkan kedua persamaan: 5(b + p) = Rp40.000, sehingga harga 1 buku + 1 pulpen (b + p) = Rp40.000 / 5 = Rp8.000."
+  },
+  {
+    "id": "q_smp_2",
+    "subject": "TKA SMP",
+    "category": "Matematika SMP",
+    "skill": "Teorema Pythagoras",
+    "difficulty": "HOTS",
+    "question": "Sebuah kapal berlayar dari pelabuhan A ke arah timur sejauh 40 km, kemudian berbelok ke arah utara sejauh 30 km menuju pelabuhan B. Berapakah jarak terpendek kapal tersebut dari pelabuhan A ke pelabuhan B?",
+    "options": [
+      "45 km",
+      "50 km",
+      "60 km",
+      "70 km"
+    ],
+    "answer": 1,
+    "hint": "Arah timur dan arah utara membentuk sudut siku-siku 90 derajat. Gunakan dalil Pythagoras c^2 = a^2 + b^2.",
+    "concept": "Penerapan teorema Pythagoras dan triple Pythagoras (3, 4, 5).",
+    "guidedSteps": [
+      "Langkah 1: Perjalanan membentuk segitiga siku-siku dengan alas = 40 km dan tinggi = 30 km.",
+      "Langkah 2: Hipotenusa c = akar(40^2 + 30^2) = akar(1600 + 900) = akar(2500) = 50 km.",
+      "Langkah 3: Atau langsung kenali kelipatan 10 dari triple pythagoras (3, 4, 5) -> 30, 40, 50 km."
+    ],
+    "explanation": "Jarak terpendek adalah garis miring hipotenusa: akar(40^2 + 30^2) = 50 km (kelipatan 10 dari triple 3-4-5)."
+  },
+  {
+    "id": "q_smp_3",
+    "subject": "TKA SMP",
+    "category": "Bahasa Indonesia SMP",
+    "skill": "Teks Eksplanasi & Logika",
+    "difficulty": "Intermediate",
+    "question": "Bacalah kutipan berikut: \"Tingginya curah hujan di wilayah hulu menyebabkan debit air sungai meningkat melebihi kapasitas tanggul. Akibatnya, air meluap dan menggenangi permukiman warga di bantaran sungai.\" Konjungsi kausalitas yang menandai hubungan sebab-akibat dalam paragraf di atas adalah...",
+    "options": [
+      "Di wilayah",
+      "Menyebabkan & Akibatnya",
+      "Melebihi kapasitas",
+      "Di bantaran sungai"
+    ],
+    "answer": 1,
+    "hint": "Cari kata hubung yang menunjukkan hubungan karena/sebab atau akibat suatu peristiwa.",
+    "concept": "Ciri kebahasaan teks eksplanasi konjungsi kausalitas.",
+    "guidedSteps": [
+      "Langkah 1: Kata \"menyebabkan\" menghubungkan penyebab (curah hujan tinggi) dengan dampak awal (debit air sungai meningkat).",
+      "Langkah 2: Kata \"akibatnya\" mengawali hasil akhir peristiwa luapan air banjir.",
+      "Langkah 3: Keduanya merupakan konjungsi kausalitas."
+    ],
+    "explanation": "Kata \"menyebabkan\" dan \"akibatnya\" merupakan konjungsi kausalitas inti yang menegaskan hubungan sebab-akibat dalam teks eksplanasi."
+  },
+  {
+    "id": "q_smp_4",
+    "subject": "TKA SMP",
+    "category": "Bahasa Inggris SMP",
+    "skill": "Grammar & Tenses",
+    "difficulty": "Intermediate",
+    "question": "Complete the sentence with the most appropriate form: \"Dina ... in this town since she was five years old, so she knows every corner of the street.\"",
+    "options": [
+      "lived",
+      "has lived",
+      "is living",
+      "will live"
+    ],
+    "answer": 1,
+    "hint": "The time marker \"since\" (sejak) indicates an action that started in the past and continues until now (Present Perfect).",
+    "concept": "Usage of Present Perfect Tense with the preposition \"since\".",
+    "guidedSteps": [
+      "Langkah 1: Terdapat kata penanda \"since she was five years old\" (sejak umur 5 tahun).",
+      "Langkah 2: Penanda \"since\" berpasangan dengan Present Perfect Tense (have/has + V3).",
+      "Langkah 3: Dina adalah subjek tunggal (she), sehingga menggunakan \"has lived\"."
+    ],
+    "explanation": "Because of the time marker \"since\", we use the Present Perfect Tense: \"has lived\"."
+  },
+  {
+    "id": "q_smp_5",
+    "subject": "TKA SMP",
+    "category": "IPA Terpadu SMP",
+    "skill": "Gaya & Hukum Newton",
+    "difficulty": "HOTS",
+    "question": "Sebuah balok bermassa 20 kg ditarik di atas lantai mendatar yang licin tanpa gesekan oleh dua gaya searah masing-masing F1 = 35 N dan F2 = 25 N. Berapakah percepatan gerak balok tersebut?",
+    "options": [
+      "1,5 m/s^2",
+      "2,0 m/s^2",
+      "3,0 m/s^2",
+      "4,0 m/s^2"
+    ],
+    "answer": 2,
+    "hint": "Gunakan Hukum II Newton: a = Sigma F / m. Karena kedua gaya searah, jumlahkan gaya-gaya tersebut.",
+    "concept": "Penerapan Hukum II Newton pada gerak lurus resultan gaya searah.",
+    "guidedSteps": [
+      "Langkah 1: Hitung gaya total resultan (Sigma F) = F1 + F2 = 35 N + 25 N = 60 N.",
+      "Langkah 2: Massa benda m = 20 kg.",
+      "Langkah 3: Hitung percepatan a = Sigma F / m = 60 / 20 = 3,0 m/s^2."
+    ],
+    "explanation": "Resultan gaya searah = 35 + 25 = 60 N. Berdasarkan Hukum II Newton: a = F / m = 60 N / 20 kg = 3,0 m/s^2."
+  },
+  {
+    "id": "q_smp_6",
+    "subject": "TKA SMP",
+    "category": "IPA Terpadu SMP",
+    "skill": "Sistem Ekskresi Manusia",
+    "difficulty": "Intermediate",
+    "question": "Pada proses pembentukan urine manusia, tahap penyaringan darah yang berlangsung di bagian glomerulus dan menghasilkan urine primer disebut...",
+    "options": [
+      "Reabsorpsi",
+      "Filtrasi",
+      "Augmentasi",
+      "Defekasi"
+    ],
+    "answer": 1,
+    "hint": "Ingat kata dasar \"filter\" yang artinya menyaring.",
+    "concept": "Tahapan ekskresi ginjal: Filtrasi di glomerulus.",
+    "guidedSteps": [
+      "Langkah 1: Glomerulus berfungsi menyaring darah dari sel darah dan protein besar.",
+      "Langkah 2: Proses penyaringan darah ini disebut Filtrasi.",
+      "Langkah 3: Hasil filtrasi adalah urine primer."
+    ],
+    "explanation": "Proses penyaringan darah di glomerulus ginjal disebut Filtrasi dan menghasilkan cairan yang dinamakan urine primer."
+  }
+];
+
+export const DIAGNOSTIC_QUESTIONS_SNBT = DIAGNOSTIC_QUESTIONS;
+
 export const DIAGNOSTIC_QUESTIONS = [
   {
     id: 'q1',

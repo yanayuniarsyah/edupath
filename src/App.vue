@@ -99,86 +99,131 @@
               <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="font-bold tracking-tight whitespace-nowrap" :class="currentTab === tab.id ? 'text-white' : ''">{{ tab.label }}</span>
             </button>
 
-            <!-- Sub Menu Materi di Side Menu (Auto Hide) -->
+            <!-- Sub Menu Materi di Side Menu (Auto Hide) Sesuai Paket Belajar Siswa -->
             <div v-if="tab.id === 'learning' && (sidebarExpanded || mobileSidebarOpen) && materiSubMenuOpen" class="ml-4 pl-3 border-l border-white/10 flex flex-col gap-1 my-1 animate-fade-in shrink-0">
-              <!-- Group TPS -->
-              <div class="px-2 pt-1 pb-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/80">TPS (Skolastik)</div>
-              <button
-                v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TPS' || (!m.test_component && ['Penalaran Umum', 'Pengetahuan Kuantitatif', 'Pengetahuan & Pemahaman Umum', 'Pemahaman Bacaan & Menulis'].includes(m.subtes || m.subtest))))"
-                :key="subtes.id"
-                :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
-                  currentTab === 'learning' && selectedSubtes?.id === subtes.id
-                    ? 'bg-[#c0ff00]/15 text-[#c0ff00] font-bold border border-[#c0ff00]/30'
-                    : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
-                ]"
-                @click.stop="selectSubtesFromSidebar(subtes)"
-              >
-                <div class="flex items-center gap-2 overflow-hidden">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]/70 shrink-0"></span>
-                  <span class="truncate">{{ subtes.subtes }}</span>
-                </div>
-                <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
-              </button>
-
-              <!-- Group TES LITERASI -->
-              <div class="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase tracking-wider text-sky-400/80">TES LITERASI</div>
-              <button
-                v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtes || m.subtest)))"
-                :key="subtes.id"
-                :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
-                  currentTab === 'learning' && selectedSubtes?.id === subtes.id
-                    ? 'bg-sky-400/15 text-sky-400 font-bold border border-sky-400/30'
-                    : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
-                ]"
-                @click.stop="selectSubtesFromSidebar(subtes)"
-              >
-                <div class="flex items-center gap-2 overflow-hidden">
-                  <span class="w-1.5 h-1.5 rounded-full bg-sky-400/70 shrink-0"></span>
-                  <span class="truncate">{{ subtes.subtes }}</span>
-                </div>
-                <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
-              </button>
-
-              <!-- Group TKA SAINTEK -->
-              <template v-if="materiUtbk.some(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtes || m.subtest))">
-                <div class="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/80">TKA SAINTEK</div>
+              <!-- Mode Paket SD -->
+              <template v-if="activeStudentLevel === 'SD'">
+                <div class="px-2 pt-1 pb-0.5 text-[9px] font-black uppercase tracking-wider text-[#c0ff00]">TKA SD (Sekolah Dasar)</div>
                 <button
-                  v-for="subtes in materiUtbk.filter(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtes || m.subtest))"
+                  v-for="subtes in materiUtbk"
                   :key="subtes.id"
                   :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
                     currentTab === 'learning' && selectedSubtes?.id === subtes.id
-                      ? 'bg-emerald-400/15 text-emerald-400 font-bold border border-emerald-400/30'
+                      ? 'bg-[#c0ff00]/15 text-[#c0ff00] font-bold border border-[#c0ff00]/30'
                       : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
                   ]"
                   @click.stop="selectSubtesFromSidebar(subtes)"
                 >
                   <div class="flex items-center gap-2 overflow-hidden">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400/70 shrink-0"></span>
-                    <span class="truncate">{{ subtes.subtes }}</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]/70 shrink-0"></span>
+                    <span class="truncate">{{ subtes.subtest || subtes.subtes }}</span>
                   </div>
                   <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
                 </button>
               </template>
 
-              <!-- Group TKA SOSHUM -->
-              <template v-if="materiUtbk.some(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtes || m.subtest))">
-                <div class="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase tracking-wider text-amber-400/80">TKA SOSHUM</div>
+              <!-- Mode Paket SMP -->
+              <template v-else-if="activeStudentLevel === 'SMP'">
+                <div class="px-2 pt-1 pb-0.5 text-[9px] font-black uppercase tracking-wider text-cyan-400">TKA SMP (Sekolah Menengah Pertama)</div>
                 <button
-                  v-for="subtes in materiUtbk.filter(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtes || m.subtest))"
+                  v-for="subtes in materiUtbk"
                   :key="subtes.id"
                   :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
                     currentTab === 'learning' && selectedSubtes?.id === subtes.id
-                      ? 'bg-amber-400/15 text-amber-400 font-bold border border-amber-400/30'
+                      ? 'bg-cyan-400/15 text-cyan-400 font-bold border border-cyan-400/30'
                       : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
                   ]"
                   @click.stop="selectSubtesFromSidebar(subtes)"
                 >
                   <div class="flex items-center gap-2 overflow-hidden">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400/70 shrink-0"></span>
-                    <span class="truncate">{{ subtes.subtes }}</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400/70 shrink-0"></span>
+                    <span class="truncate">{{ subtes.subtest || subtes.subtes }}</span>
                   </div>
                   <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
                 </button>
+              </template>
+
+              <!-- Mode Paket SMA / SNBT -->
+              <template v-else>
+                <!-- Group TPS -->
+                <div class="px-2 pt-1 pb-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/80">TPS (Skolastik)</div>
+                <button
+                  v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TPS' || (!m.test_component && ['Penalaran Umum', 'Pengetahuan Kuantitatif', 'Pengetahuan & Pemahaman Umum', 'Pemahaman Bacaan & Menulis'].includes(m.subtes || m.subtest))))"
+                  :key="subtes.id"
+                  :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
+                    currentTab === 'learning' && selectedSubtes?.id === subtes.id
+                      ? 'bg-[#c0ff00]/15 text-[#c0ff00] font-bold border border-[#c0ff00]/30'
+                      : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
+                  ]"
+                  @click.stop="selectSubtesFromSidebar(subtes)"
+                >
+                  <div class="flex items-center gap-2 overflow-hidden">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]/70 shrink-0"></span>
+                    <span class="truncate">{{ subtes.subtest || subtes.subtes }}</span>
+                  </div>
+                  <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                </button>
+
+                <!-- Group TES LITERASI -->
+                <div class="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase tracking-wider text-sky-400/80">TES LITERASI</div>
+                <button
+                  v-for="subtes in materiUtbk.filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtes || m.subtest)))"
+                  :key="subtes.id"
+                  :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
+                    currentTab === 'learning' && selectedSubtes?.id === subtes.id
+                      ? 'bg-sky-400/15 text-sky-400 font-bold border border-sky-400/30'
+                      : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
+                  ]"
+                  @click.stop="selectSubtesFromSidebar(subtes)"
+                >
+                  <div class="flex items-center gap-2 overflow-hidden">
+                    <span class="w-1.5 h-1.5 rounded-full bg-sky-400/70 shrink-0"></span>
+                    <span class="truncate">{{ subtes.subtest || subtes.subtes }}</span>
+                  </div>
+                  <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                </button>
+
+                <!-- Group TKA SAINTEK -->
+                <template v-if="materiUtbk.some(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtes || m.subtest))">
+                  <div class="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400/80">TKA SAINTEK</div>
+                  <button
+                    v-for="subtes in materiUtbk.filter(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtes || m.subtest))"
+                    :key="subtes.id"
+                    :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
+                      currentTab === 'learning' && selectedSubtes?.id === subtes.id
+                        ? 'bg-emerald-400/15 text-emerald-400 font-bold border border-emerald-400/30'
+                        : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
+                    ]"
+                    @click.stop="selectSubtesFromSidebar(subtes)"
+                  >
+                    <div class="flex items-center gap-2 overflow-hidden">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400/70 shrink-0"></span>
+                      <span class="truncate">{{ subtes.subtest || subtes.subtes }}</span>
+                    </div>
+                    <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                  </button>
+                </template>
+
+                <!-- Group TKA SOSHUM -->
+                <template v-if="materiUtbk.some(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtes || m.subtest))">
+                  <div class="px-2 pt-2 pb-0.5 text-[9px] font-black uppercase tracking-wider text-amber-400/80">TKA SOSHUM</div>
+                  <button
+                    v-for="subtes in materiUtbk.filter(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtes || m.subtest))"
+                    :key="subtes.id"
+                    :class="['text-left text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2', 
+                      currentTab === 'learning' && selectedSubtes?.id === subtes.id
+                        ? 'bg-amber-400/15 text-amber-400 font-bold border border-amber-400/30'
+                        : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
+                    ]"
+                    @click.stop="selectSubtesFromSidebar(subtes)"
+                  >
+                    <div class="flex items-center gap-2 overflow-hidden">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-400/70 shrink-0"></span>
+                      <span class="truncate">{{ subtes.subtest || subtes.subtes }}</span>
+                    </div>
+                    <i v-if="isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key text-rose-400 shrink-0"></i>
+                  </button>
+                </template>
               </template>
             </div>
           </template>
@@ -3234,8 +3279,8 @@
                   <i class="ph-bold ph-exam"></i>
                 </div>
                 <div class="min-w-0">
-                  <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-purple-400 truncate">Asesmen Diagnostik Adaptif</span>
-                  <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Asesmen Diagnostik &amp; Pemetaan Kemampuan</h2>
+                  <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-purple-400 truncate">Asesmen Diagnostik Adaptif {{ activeStudentLevel === 'SD' ? 'TKA SD' : (activeStudentLevel === 'SMP' ? 'TKA SMP' : 'UTBK SNBT') }}</span>
+                  <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Asesmen Diagnostik &amp; Pemetaan Kemampuan ({{ activeStudentLevel === 'SD' ? 'TKA SD' : (activeStudentLevel === 'SMP' ? 'TKA SMP' : 'UTBK SNBT') }})</h2>
                 </div>
               </div>
               <!-- Tutup button visible immediately on top right for mobile -->
@@ -3311,9 +3356,13 @@
                 <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-2xl mx-auto mb-4 font-black font-mono">
                   IRT
                 </div>
-                <h4 class="text-lg font-black font-heading text-slate-900 mb-2">Mulai Diagnostic Assessment</h4>
+                <h4 class="text-lg font-black font-heading text-slate-900 mb-2">Mulai Diagnostic Assessment ({{ activeStudentLevel === 'SD' ? 'TKA SD' : (activeStudentLevel === 'SMP' ? 'TKA SMP' : 'UTBK SNBT') }})</h4>
                 <p class="text-xs text-slate-600 max-w-sm mx-auto mb-6 leading-relaxed font-medium">
-                  Ukur kemampuan Aljabar, Geometri, dan Penalaran Logis awal Anda secara presisi dalam 4 soal terpilih.
+                  {{ activeStudentLevel === 'SD' 
+                    ? 'Ukur kemampuan dasar Berhitung Cepat, Pemahaman Wacana, dan Konsep Sains SD Anda dalam ' + (diagnosticQuestions.length || 6) + ' soal pilihan.'
+                    : activeStudentLevel === 'SMP'
+                    ? 'Ukur penalaran Aljabar, Pemahaman Teks Bahasa, dan Konsep Sains SMP Anda dalam ' + (diagnosticQuestions.length || 6) + ' soal pilihan.'
+                    : 'Ukur kemampuan Aljabar, Geometri, dan Penalaran Logis awal Anda secara presisi dalam ' + (diagnosticQuestions.length || 6) + ' soal terpilih.' }}
                 </p>
                 <button class="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all" @click="startDiagnostic">
                   Mulai Ujian
@@ -3464,12 +3513,12 @@
                   id="subtest-select"
                   :value="selectedSubtes ? (selectedSubtes.id || selectedSubtes.code || selectedSubtes.subtest || selectedSubtes.subtes) : ''"
                   @change="onSubtestDropdownChange($event)"
-                  aria-label="Pilih Komponen & Subtes UTBK"
+                  :aria-label="'Pilih Mata Pelajaran / Subtes ' + (activeStudentLevel === 'SD' ? 'TKA SD' : (activeStudentLevel === 'SMP' ? 'TKA SMP' : 'UTBK SNBT'))"
                   class="pl-7 pr-7 py-2 bg-slate-800/90 hover:bg-slate-800 text-[#c0ff00] font-black text-xs rounded-xl border border-white/20 focus:border-[#c0ff00] focus:ring-1 focus:ring-[#c0ff00] outline-none transition-all shadow-sm cursor-pointer appearance-none max-w-[190px] sm:max-w-xs truncate"
                 >
-                  <optgroup label="Tes Potensi Skolastik (TPS)" class="bg-slate-900 text-slate-100 font-bold">
+                  <optgroup v-if="activeStudentLevel === 'SD'" label="Mata Pelajaran TKA SD" class="bg-slate-900 text-[#c0ff00] font-bold">
                     <option 
-                      v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TPS' || (!m.test_component && ['Penalaran Umum', 'Pengetahuan Kuantitatif', 'Pengetahuan & Pemahaman Umum', 'Pemahaman Bacaan & Menulis'].includes(m.subtest || m.subtes))))" 
+                      v-for="sub in (materiUtbk || [])" 
                       :key="sub.id" 
                       :value="sub.id || sub.code || sub.subtest || sub.subtes"
                       class="bg-slate-900 text-white py-1"
@@ -3477,9 +3526,9 @@
                       {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
                     </option>
                   </optgroup>
-                  <optgroup label="Tes Literasi" class="bg-slate-900 text-slate-100 font-bold">
+                  <optgroup v-else-if="activeStudentLevel === 'SMP'" label="Mata Pelajaran TKA SMP" class="bg-slate-900 text-cyan-400 font-bold">
                     <option 
-                      v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtest || m.subtes)))" 
+                      v-for="sub in (materiUtbk || [])" 
                       :key="sub.id" 
                       :value="sub.id || sub.code || sub.subtest || sub.subtes"
                       class="bg-slate-900 text-white py-1"
@@ -3487,26 +3536,48 @@
                       {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
                     </option>
                   </optgroup>
-                  <optgroup v-if="(materiUtbk || []).some(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtest || m.subtes))" label="TKA Saintek (IPA)" class="bg-slate-900 text-emerald-400 font-bold">
-                    <option 
-                      v-for="sub in (materiUtbk || []).filter(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtest || m.subtes))" 
-                      :key="sub.id" 
-                      :value="sub.id || sub.code || sub.subtest || sub.subtes"
-                      class="bg-slate-900 text-white py-1"
-                    >
-                      {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
-                    </option>
-                  </optgroup>
-                  <optgroup v-if="(materiUtbk || []).some(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtest || m.subtes))" label="TKA Soshum (IPS)" class="bg-slate-900 text-amber-400 font-bold">
-                    <option 
-                      v-for="sub in (materiUtbk || []).filter(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtest || m.subtes))" 
-                      :key="sub.id" 
-                      :value="sub.id || sub.code || sub.subtest || sub.subtes"
-                      class="bg-slate-900 text-white py-1"
-                    >
-                      {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
-                    </option>
-                  </optgroup>
+                  <template v-else>
+                    <optgroup label="Tes Potensi Skolastik (TPS)" class="bg-slate-900 text-slate-100 font-bold">
+                      <option 
+                        v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TPS' || (!m.test_component && ['Penalaran Umum', 'Pengetahuan Kuantitatif', 'Pengetahuan & Pemahaman Umum', 'Pemahaman Bacaan & Menulis'].includes(m.subtest || m.subtes))))" 
+                        :key="sub.id" 
+                        :value="sub.id || sub.code || sub.subtest || sub.subtes"
+                        class="bg-slate-900 text-white py-1"
+                      >
+                        {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
+                      </option>
+                    </optgroup>
+                    <optgroup label="Tes Literasi" class="bg-slate-900 text-slate-100 font-bold">
+                      <option 
+                        v-for="sub in (materiUtbk || []).filter(m => (m.test_component === 'TES LITERASI' || ['Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris', 'Penalaran Matematika'].includes(m.subtest || m.subtes)))" 
+                        :key="sub.id" 
+                        :value="sub.id || sub.code || sub.subtest || sub.subtes"
+                        class="bg-slate-900 text-white py-1"
+                      >
+                        {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
+                      </option>
+                    </optgroup>
+                    <optgroup v-if="(materiUtbk || []).some(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtest || m.subtes))" label="TKA Saintek (IPA)" class="bg-slate-900 text-emerald-400 font-bold">
+                      <option 
+                        v-for="sub in (materiUtbk || []).filter(m => (m.assessment_type === 'TKA' && m.track === 'saintek') || ['Matematika IPA', 'Fisika', 'Kimia', 'Biologi'].includes(m.subtest || m.subtes))" 
+                        :key="sub.id" 
+                        :value="sub.id || sub.code || sub.subtest || sub.subtes"
+                        class="bg-slate-900 text-white py-1"
+                      >
+                        {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
+                      </option>
+                    </optgroup>
+                    <optgroup v-if="(materiUtbk || []).some(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtest || m.subtes))" label="TKA Soshum (IPS)" class="bg-slate-900 text-amber-400 font-bold">
+                      <option 
+                        v-for="sub in (materiUtbk || []).filter(m => (m.assessment_type === 'TKA' && m.track === 'soshum') || ['Sosiologi', 'Ekonomi', 'Geografi', 'Sejarah'].includes(m.subtest || m.subtes))" 
+                        :key="sub.id" 
+                        :value="sub.id || sub.code || sub.subtest || sub.subtes"
+                        class="bg-slate-900 text-white py-1"
+                      >
+                        {{ sub.subtest || sub.subtes }} ({{ sub.babList ? sub.babList.length : 0 }} Bab)
+                      </option>
+                    </optgroup>
+                  </template>
                 </select>
                 <i class="ph-bold ph-caret-down text-white/50 text-xs absolute right-2.5 pointer-events-none"></i>
               </div>
@@ -3571,7 +3642,7 @@
                 <div class="space-y-4 border-b border-slate-200 pb-6">
                   <div class="flex flex-wrap items-center gap-2">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-md text-xs font-black text-emerald-700 uppercase tracking-wider">
-                      <i class="ph-bold ph-tree-structure"></i> SNBT &bull; {{ selectedSubtes?.subtest || selectedSubtes?.subtes || '' }}
+                      <i class="ph-bold ph-tree-structure"></i> {{ activeStudentLevel === 'SD' ? 'TKA SD' : (activeStudentLevel === 'SMP' ? 'TKA SMP' : 'SNBT') }} &bull; {{ selectedSubtes?.subtest || selectedSubtes?.subtes || '' }}
                     </span>
                     <span v-if="selectedBab.topic" class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-md text-xs font-bold text-blue-700">
                       Topik: {{ selectedBab.topic }}
@@ -5984,8 +6055,13 @@ import {
   SKILL_MAP, 
   TARGET_UNIVERSITIES, 
   MATERI_UTBK,
+  MATERI_SD,
+  MATERI_SMP,
   MICRO_LESSONS, 
   DIAGNOSTIC_QUESTIONS,
+  DIAGNOSTIC_QUESTIONS_SD,
+  DIAGNOSTIC_QUESTIONS_SMP,
+  DIAGNOSTIC_QUESTIONS_SNBT,
   SIMULATOR_DATABASE
 } from './EduData.js';
 import api from './api';
@@ -7466,7 +7542,8 @@ export default {
 
     const fetchMaterialsFromDb = async () => {
       try {
-        const res = await api.getMaterials();
+        const lvl = activeStudentLevel.value === 'SD' ? 'SD' : (activeStudentLevel.value === 'SMP' ? 'SMP' : 'SMA');
+        const res = await api.getMaterials({ education_level: lvl });
         const serverList = Array.isArray(res) ? res : (res?.materials || []);
         if (serverList.length > 0 && materiUtbk.value) {
           serverList.forEach(m => {
@@ -8099,6 +8176,25 @@ export default {
     const diagnosticAnswers = ref([]);
     const diagnosticResultData = ref(null);
 
+    // Dynamic Student Level Computation based on Plan & Academic Program
+    const activeStudentLevel = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      if (prog === 'TKA_SD') return 'SD';
+      if (prog === 'TKA_SMP') return 'SMP';
+      if (prog === 'TKA_SMA') return 'SMA';
+      const p = (currentUser.value?.plan || currentUser.value?.plan_name || '').toLowerCase();
+      if (p.includes('sd')) return 'SD';
+      if (p.includes('smp')) return 'SMP';
+      if (p.includes('tka_sma')) return 'SMA';
+      return 'SNBT';
+    });
+
+    const getBaseMaterialsForLevel = (level) => {
+      if (level === 'SD') return JSON.parse(JSON.stringify(MATERI_SD));
+      if (level === 'SMP') return JSON.parse(JSON.stringify(MATERI_SMP));
+      return JSON.parse(JSON.stringify(MATERI_UTBK));
+    };
+
     const currentDiagQuestion = computed(() => diagnosticQuestions.value[diagnosticIdx.value] || {});
 
     const startDiagnostic = async () => {
@@ -8112,8 +8208,9 @@ export default {
         openPlanSelector();
         return;
       }
+      const lvlParam = activeStudentLevel.value.toLowerCase();
       try {
-        const res = await api.startDiagnostic();
+        const res = await api.startDiagnostic(lvlParam);
         if (res?.data && res.data.length > 0) {
           // Map backend format to frontend format
           diagnosticQuestions.value = res.data.map(q => ({
@@ -8125,12 +8222,24 @@ export default {
             options: [q.option_a, q.option_b, q.option_c, q.option_d, q.option_e].filter(Boolean)
           }));
         } else {
-          console.warn('API diagnostic kosong, gunakan bank soal lokal');
-          diagnosticQuestions.value = DIAGNOSTIC_QUESTIONS;
+          console.warn('API diagnostic kosong/kurang, gunakan bank soal lokal level ' + activeStudentLevel.value);
+          if (activeStudentLevel.value === 'SD') {
+            diagnosticQuestions.value = DIAGNOSTIC_QUESTIONS_SD;
+          } else if (activeStudentLevel.value === 'SMP') {
+            diagnosticQuestions.value = DIAGNOSTIC_QUESTIONS_SMP;
+          } else {
+            diagnosticQuestions.value = DIAGNOSTIC_QUESTIONS_SNBT;
+          }
         }
       } catch (e) {
-        console.warn('Error startDiagnostic dari API, gunakan fallback lokal', e);
-        diagnosticQuestions.value = DIAGNOSTIC_QUESTIONS;
+        console.warn('Error startDiagnostic dari API, gunakan fallback lokal level ' + activeStudentLevel.value, e);
+        if (activeStudentLevel.value === 'SD') {
+          diagnosticQuestions.value = DIAGNOSTIC_QUESTIONS_SD;
+        } else if (activeStudentLevel.value === 'SMP') {
+          diagnosticQuestions.value = DIAGNOSTIC_QUESTIONS_SMP;
+        } else {
+          diagnosticQuestions.value = DIAGNOSTIC_QUESTIONS_SNBT;
+        }
       }
 
       if (diagnosticQuestions.value && diagnosticQuestions.value.length > 0) {
@@ -8139,7 +8248,8 @@ export default {
         diagnosticIdx.value = 0;
         selectedDiagAnswer.value = null;
         diagnosticAnswers.value = [];
-        showToast('Diagnostic Assessment Dimulai!');
+        const lvlName = activeStudentLevel.value === 'SD' ? 'TKA SD' : (activeStudentLevel.value === 'SMP' ? 'TKA SMP' : 'UTBK SNBT');
+        showToast(`Diagnostic Assessment ${lvlName} Dimulai!`);
       } else {
         showToast('Gagal memuat soal diagnostic.', 'error');
       }
@@ -8189,9 +8299,19 @@ export default {
 
     const diagnosticFocus = computed(() => diagnosticActive.value || diagnosticFinished.value);
 
-    const materiUtbk = ref(MATERI_UTBK);
-    const selectedSubtes = ref(MATERI_UTBK[0]);
-    const selectedBab = ref(MATERI_UTBK[0].babList[0]);
+    const materiUtbk = ref(getBaseMaterialsForLevel(activeStudentLevel.value));
+    const selectedSubtes = ref(materiUtbk.value[0]);
+    const selectedBab = ref(materiUtbk.value[0]?.babList?.[0]);
+
+    // Automatically synchronize curriculum materials when student package / level changes
+    watch(activeStudentLevel, (newLevel) => {
+      const baseMats = getBaseMaterialsForLevel(newLevel);
+      materiUtbk.value = baseMats;
+      if (baseMats && baseMats.length > 0) {
+        selectSubtes(baseMats[0]);
+      }
+      fetchMaterialsFromDb();
+    });
 
     const restoreSavedMaterial = () => {
       try {
@@ -8814,6 +8934,7 @@ export default {
       startDiagnostic,
       submitDiagAnswer,
       resetDiagnostic,
+      activeStudentLevel,
       materiUtbk,
       selectedSubtes,
       selectedBab,

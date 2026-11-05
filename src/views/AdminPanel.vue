@@ -4031,19 +4031,15 @@
               </option>
             </datalist>
           </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label for="student_form_ptn" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Target PTN Impian</label>
-              <input id="student_form_ptn" name="target_ptn" v-model="studentForm.target_ptn" placeholder="UI, ITB, UGM, Unair..." type="text" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" />
-            </div>
-            <div>
-              <label for="student_form_phone" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">No. WhatsApp / HP</label>
-              <input id="student_form_phone" name="phone" v-model="studentForm.phone" placeholder="08xxxxxxxxxx" type="tel" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium font-mono" />
-            </div>
-          </div>
+          <!-- 1. Paket Belajar (Diposisikan SEBELUM Target Impian) -->
           <div>
-            <label for="student_form_plan" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Paket Belajar</label>
-            <select id="student_form_plan" name="plan" v-model="studentForm.plan" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
+            <div class="flex items-center justify-between mb-1">
+              <label for="student_form_plan" class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">
+                Paket Belajar <span class="text-[#c0ff00]">*</span>
+              </label>
+              <span class="text-[9px] text-[#c0ff00] font-mono font-bold">Langkah 1: Tentukan Paket</span>
+            </div>
+            <select id="student_form_plan" name="plan" v-model="studentForm.plan" @change="onStudentPlanChange" required class="w-full p-2.5 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium">
               <option value="free" class="bg-[#0d1427] text-white">Free / Trial</option>
               <optgroup label="SNPMB / UTBK" class="bg-[#0d1427] text-white/60 font-black">
                 <option value="mandiri" class="bg-[#0d1427] text-white">Paket Mandiri SNPMB (Online)</option>
@@ -4068,6 +4064,46 @@
                 <option value="alumni_hybrid" class="bg-[#0d1427] text-white">Paket Alumni Supercamp Karantina (Hybrid)</option>
               </optgroup>
             </select>
+          </div>
+
+          <!-- 2. Target Impian (Dinamis Sesuai Paket Belajar) & No. WhatsApp / HP -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="student_form_ptn" class="block text-[10px] font-bold text-white/50 uppercase tracking-wider">
+                  {{ studentTargetInfo.label }}
+                </label>
+                <span class="text-[9px] text-[#c0ff00] font-mono">Pilihan Dinamis</span>
+              </div>
+              <div class="space-y-1.5">
+                <!-- Dropdown Preset Sesuai Paket Belajar -->
+                <select 
+                  id="student_target_preset_select"
+                  v-model="selectedTargetPreset"
+                  @change="onTargetPresetSelected"
+                  class="w-full p-2 text-xs text-white bg-[#0d1427] border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium"
+                >
+                  <option value="">-- Rekomendasi {{ studentTargetInfo.category }} --</option>
+                  <option v-for="preset in studentTargetInfo.presets" :key="preset" :value="preset">
+                    {{ preset }}
+                  </option>
+                  <option value="__custom__">✍️ Tulis Sendiri / Kustom (Ketik di bawah)</option>
+                </select>
+                <!-- Input Teks Bebas (Bila belum ada di pilihan atau ingin kustom) -->
+                <input 
+                  id="student_form_ptn" 
+                  name="target_ptn" 
+                  v-model="studentForm.target_ptn" 
+                  :placeholder="studentTargetInfo.placeholder" 
+                  type="text" 
+                  class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium" 
+                />
+              </div>
+            </div>
+            <div>
+              <label for="student_form_phone" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">No. WhatsApp / HP</label>
+              <input id="student_form_phone" name="phone" v-model="studentForm.phone" placeholder="08xxxxxxxxxx" type="tel" class="w-full p-2.5 text-xs text-white bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-all font-medium font-mono" />
+            </div>
           </div>
           <div v-if="isEditingStudent">
             <label for="student_form_status" class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Akun</label>
@@ -5642,6 +5678,8 @@ const allStudents = ref([]);
 const isEditingStudent = ref(false);
 const showStudentModal = ref(false);
 const isSaving = ref(false);
+const selectedTargetPreset = ref('');
+
 const studentForm = reactive({
   id: null,
   tenant_id: '',
@@ -5655,6 +5693,78 @@ const studentForm = reactive({
   phone: '',
   is_active: 1
 });
+
+// Dynamic Target Info & Presets based on selected student package level
+const studentTargetInfo = computed(() => {
+  const p = (studentForm.plan || '').toLowerCase();
+  if (p.includes('sd')) {
+    return {
+      label: 'Target SMP Impian',
+      category: 'SMP Impian',
+      placeholder: 'Pilih opsi di atas atau ketik SMP Impian (misal: SMPN 1 Jakarta, SMP Labschool)...',
+      presets: [
+        'SMPN 1 Jakarta',
+        'SMP Labschool Kebayoran',
+        'SMP Labschool Rawamangun',
+        'SMP Al-Azhar 1 Pusat Jakarta',
+        'MTsN 1 Favorit Unggulan',
+        'SMP Kanisius Jakarta',
+        'SMP Santa Ursula Jakarta',
+        'SMP Taruna Nusantara Junior',
+        'SMPN 1 Surabaya',
+        'SMPN 1 Bandung',
+        'SMPN 1 Yogyakarta'
+      ]
+    };
+  }
+  if (p.includes('smp')) {
+    return {
+      label: 'Target SMA/SMK Impian',
+      category: 'SMA/SMK Impian',
+      placeholder: 'Pilih opsi di atas atau ketik SMA/SMK Impian (misal: SMAN 8 Jakarta, SMA Taruna Nusantara)...',
+      presets: [
+        'SMAN 8 Jakarta',
+        'SMA Taruna Nusantara Magelang',
+        'MAN Insan Cendekia Serpong',
+        'SMAN 3 Bandung',
+        'SMAN 1 Teladan Yogyakarta',
+        'SMAN 5 Surabaya',
+        'SMA Pradita Dirgantara',
+        'SMKN 1 Favorit Unggulan'
+      ]
+    };
+  }
+  return {
+    label: 'Target PTN Impian',
+    category: 'PTN Impian',
+    placeholder: 'Pilih opsi di atas atau ketik PTN Impian (misal: UI, ITB, UGM, Unair)...',
+    presets: [
+      'Universitas Indonesia (UI)',
+      'Institut Teknologi Bandung (ITB)',
+      'Universitas Gadjah Mada (UGM)',
+      'Universitas Airlangga (UNAIR)',
+      'Institut Teknologi Sepuluh Nopember (ITS)',
+      'Universitas Diponegoro (UNDIP)',
+      'Universitas Brawijaya (UB)',
+      'Universitas Padjadjaran (UNPAD)',
+      'Universitas Sebelas Maret (UNS)',
+      'UIN Syarif Hidayatullah'
+    ]
+  };
+});
+
+const onTargetPresetSelected = () => {
+  if (selectedTargetPreset.value && selectedTargetPreset.value !== '__custom__') {
+    studentForm.target_ptn = selectedTargetPreset.value;
+  }
+};
+
+const onStudentPlanChange = () => {
+  // Check if current target matches the new presets, otherwise allow custom typing
+  if (selectedTargetPreset.value && !studentTargetInfo.value.presets.includes(selectedTargetPreset.value)) {
+    selectedTargetPreset.value = studentForm.target_ptn ? '__custom__' : '';
+  }
+};
 
 // ── Pagination helpers ──
 const PAGE_SIZE = 10;
@@ -5709,6 +5819,7 @@ const studentTotalPages = computed(() => totalPages(filteredStudents.value));
 const openCreateStudentModal = () => {
   isSaving.value = false;
   isEditingStudent.value = false;
+  selectedTargetPreset.value = '';
   const defTenant = tenantsList.value?.[0]?.id || '';
   Object.assign(studentForm, {
     id: null,
@@ -5742,6 +5853,15 @@ const openEditStudentModal = (s) => {
     phone: s.phone || '',
     is_active: s.is_active != 0 ? 1 : 0
   });
+  // Auto-select preset if matches, otherwise set custom
+  const target = s.target_ptn || '';
+  if (studentTargetInfo.value.presets.includes(target)) {
+    selectedTargetPreset.value = target;
+  } else if (target) {
+    selectedTargetPreset.value = '__custom__';
+  } else {
+    selectedTargetPreset.value = '';
+  }
   showStudentModal.value = true;
 };
 

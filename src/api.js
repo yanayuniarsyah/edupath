@@ -439,11 +439,22 @@ export const api = {
       body: JSON.stringify({ attempt_id: attemptId, answers })
     });
   },
-  getMaterials(subtes = '', assessment_type = '', track = '') {
+  getMaterials(subtes = '', assessment_type = '', track = '', education_level = '') {
+    if (typeof subtes === 'object' && subtes !== null) {
+      const opts = subtes;
+      const params = [];
+      if (opts.subtes && opts.subtes !== 'all') params.push(`subtes=${encodeURIComponent(opts.subtes)}`);
+      if (opts.assessment_type && opts.assessment_type !== 'all') params.push(`assessment_type=${encodeURIComponent(opts.assessment_type)}`);
+      if (opts.track && opts.track !== 'all') params.push(`track=${encodeURIComponent(opts.track)}`);
+      if (opts.education_level && opts.education_level !== 'all') params.push(`education_level=${encodeURIComponent(opts.education_level)}`);
+      const q = params.length > 0 ? '&' + params.join('&') : '';
+      return apiFetch(`/materials.php?action=list${q}`);
+    }
     const params = [];
     if (subtes && subtes !== 'all') params.push(`subtes=${encodeURIComponent(subtes)}`);
     if (assessment_type && assessment_type !== 'all') params.push(`assessment_type=${encodeURIComponent(assessment_type)}`);
     if (track && track !== 'all') params.push(`track=${encodeURIComponent(track)}`);
+    if (education_level && education_level !== 'all') params.push(`education_level=${encodeURIComponent(education_level)}`);
     const q = params.length > 0 ? '&' + params.join('&') : '';
     return apiFetch(`/materials.php?action=list${q}`);
   },

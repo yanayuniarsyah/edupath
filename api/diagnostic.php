@@ -120,8 +120,26 @@ $action = $_GET["action"] ?? "";
 if ($action === "start") {
     $payload = verify_diagnostic_access($pdo);
     try {
-        // Fetch diagnostic questions covering key domains
-        $domains = ["Penalaran Umum", "Pengetahuan Kuantitatif", "Pemahaman Bacaan & Menulis", "Penalaran Matematika", "Literasi Bahasa Indonesia", "Literasi Bahasa Inggris"];
+        $level = strtolower($_GET['level'] ?? '');
+        if (!$level && $payload && $payload->role === 'student') {
+            try {
+                $stStmt = $pdo->prepare("SELECT plan FROM students WHERE id = ?");
+                $stStmt->execute([$payload->id]);
+                $stPlan = strtolower($stStmt->fetchColumn() ?: '');
+                if (strpos($stPlan, 'sd') !== false) $level = 'sd';
+                elseif (strpos($stPlan, 'smp') !== false) $level = 'smp';
+                else $level = 'sma';
+            } catch (\Throwable $te) {}
+        }
+
+        if ($level === 'sd') {
+            $domains = ["Matematika SD", "Bahasa Indonesia SD", "IPA SD", "IPS SD", "PPKn SD"];
+        } elseif ($level === 'smp') {
+            $domains = ["Matematika SMP", "Bahasa Indonesia SMP", "Bahasa Inggris SMP", "IPA Terpadu SMP", "IPS Terpadu SMP"];
+        } else {
+            $domains = ["Penalaran Umum", "Pengetahuan Kuantitatif", "Pemahaman Bacaan & Menulis", "Penalaran Matematika", "Literasi Bahasa Indonesia", "Literasi Bahasa Inggris"];
+        }
+
         $diagnostic_questions = [];
 
         foreach ($domains as $domain) {
@@ -137,8 +155,8 @@ if ($action === "start") {
             $diagnostic_questions = array_merge($diagnostic_questions, $questions);
         }
 
-        // Fallback / fill up from general pool if needed
-        if (count($diagnostic_questions) < 4) {
+        // Fallback / fill up from pool matching level if available
+        if (count($diagnostic_questions) < 4 && $level !== 'sd' && $level !== 'smp') {
             $existingIds = array_column($diagnostic_questions, 'id');
             $placeholders = !empty($existingIds) ? implode(',', array_fill(0, count($existingIds), '?')) : '0';
             $limit = 8 - count($diagnostic_questions);
@@ -154,7 +172,7 @@ if ($action === "start") {
             $diagnostic_questions = array_merge($diagnostic_questions, $extra);
         }
 
-        echo json_encode(["success" => true, "data" => $diagnostic_questions]);
+        echo json_encode(["success" => true, "level" => $level, "data" => $diagnostic_questions]);
     } catch (PDOException $e) {
         http_response_code(500);
         echo json_encode(["error" => "Failed to load diagnostic test: " . $e->getMessage()]);
