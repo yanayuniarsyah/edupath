@@ -674,6 +674,70 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $upd = $pdo->prepare("UPDATE quiz_attempts SET status = 'completed', completed_at = NOW() WHERE id = ? AND student_id = ?");
             $upd->execute([$attempt_id, $payload->id]);
         }
+
+        // Auto-sync Try Out CBT results to IRT Diagnostic & Radar Blind-Spot
+        if (!empty($answers) && !empty($questionsDb)) {
+            try {
+                $dom_stats = [];
+                $subm_stats = [];
+                foreach ($answers as $ans) {
+                    $qid = is_scalar($ans['question_id'] ?? null) ? (string)$ans['question_id'] : '';
+                    if ($qid !== '' && isset($qMap[$qid])) {
+                        $db_q = $qMap[$qid];
+                        $dom = !empty($db_q['subtes']) ? $db_q['subtes'] : ($subtes ?: 'Umum');
+                        $subm = !empty($db_q['bab']) ? $db_q['bab'] : (!empty($db_q['sub_materi']) ? $db_q['sub_materi'] : $dom);
+                        
+                        if (!isset($dom_stats[$dom])) $dom_stats[$dom] = ['correct' => 0, 'total' => 0];
+                        if (!isset($subm_stats[$subm])) $subm_stats[$subm] = ['correct' => 0, 'total' => 0, 'domain' => $dom];
+                        
+                        $dom_stats[$dom]['total']++;
+                        $subm_stats[$subm]['total']++;
+                        
+                        $raw_ans = $ans['answer'] ?? '';
+                        $u_ans = is_string($raw_ans) ? strtolower(trim($raw_ans)) : (is_scalar($raw_ans) ? strtolower((string)$raw_ans) : '');
+                        $exp_ans = strtolower(trim((string)$db_q['correct']));
+                        if ($u_ans !== '' && $u_ans === $exp_ans) {
+                            $dom_stats[$dom]['correct']++;
+                            $subm_stats[$subm]['correct']++;
+                        }
+                    }
+                }
+                
+                if (!empty($subm_stats)) {
+                    $worst_subm = array_key_first($subm_stats);
+                    $worst_dom = $subm_stats[$worst_subm]['domain'] ?? 'Umum';
+                    $lowest_pct = 100.0;
+                    
+                    foreach ($subm_stats as $sm => $st) {
+                        $tot = max(1, (int)$st['total']);
+                        $pct = round(($st['correct'] / $tot) * 100, 2);
+                        if ($pct < $lowest_pct) {
+                            $lowest_pct = $pct;
+                            $worst_subm = $sm;
+                            $worst_dom = $st['domain'];
+                        }
+                    }
+                    
+                    $diag_id = bin2hex(random_bytes(16));
+                    $diag_id = substr($diag_id,0,8).'-'.substr($diag_id,8,4).'-'.substr($diag_id,12,4).'-'.substr($diag_id,16,4).'-'.substr($diag_id,20,12);
+                    $diagDetails = json_encode([
+                        'source' => 'tryout_cbt',
+                        'attempt_id' => $attempt_id,
+                        'quiz_type' => $quiz_type,
+                        'assessment_type' => $assessment_type,
+                        'track' => $track,
+                        'domain_stats' => $dom_stats,
+                        'submateri_stats' => $subm_stats
+                    ]);
+                    
+                    $insDiag = $pdo->prepare("
+                        INSERT INTO diagnostic_results (id, student_id, total_score, gap_domain, gap_sub_materi, gap_score, details, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+                    ");
+                    $insDiag->execute([$diag_id, $payload->id, (int)$totalScore, $worst_dom, $worst_subm, $lowest_pct, $diagDetails]);
+                }
+            } catch (\Throwable $eDiag) {}
+        }
     } catch (PDOException $e) {
         // Fallback for Web App backward compatibility if columns don't exist
         $ins = $pdo->prepare("INSERT INTO quiz_results (id, student_id, attempt_id, quiz_type, subtes, score, correct, total, duration_sec, answers) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -681,6 +745,70 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($attempt_id) {
             $upd = $pdo->prepare("UPDATE quiz_attempts SET status = 'completed', completed_at = NOW() WHERE id = ? AND student_id = ?");
             $upd->execute([$attempt_id, $payload->id]);
+        }
+
+        // Auto-sync Try Out CBT results to IRT Diagnostic & Radar Blind-Spot
+        if (!empty($answers) && !empty($questionsDb)) {
+            try {
+                $dom_stats = [];
+                $subm_stats = [];
+                foreach ($answers as $ans) {
+                    $qid = is_scalar($ans['question_id'] ?? null) ? (string)$ans['question_id'] : '';
+                    if ($qid !== '' && isset($qMap[$qid])) {
+                        $db_q = $qMap[$qid];
+                        $dom = !empty($db_q['subtes']) ? $db_q['subtes'] : ($subtes ?: 'Umum');
+                        $subm = !empty($db_q['bab']) ? $db_q['bab'] : (!empty($db_q['sub_materi']) ? $db_q['sub_materi'] : $dom);
+                        
+                        if (!isset($dom_stats[$dom])) $dom_stats[$dom] = ['correct' => 0, 'total' => 0];
+                        if (!isset($subm_stats[$subm])) $subm_stats[$subm] = ['correct' => 0, 'total' => 0, 'domain' => $dom];
+                        
+                        $dom_stats[$dom]['total']++;
+                        $subm_stats[$subm]['total']++;
+                        
+                        $raw_ans = $ans['answer'] ?? '';
+                        $u_ans = is_string($raw_ans) ? strtolower(trim($raw_ans)) : (is_scalar($raw_ans) ? strtolower((string)$raw_ans) : '');
+                        $exp_ans = strtolower(trim((string)$db_q['correct']));
+                        if ($u_ans !== '' && $u_ans === $exp_ans) {
+                            $dom_stats[$dom]['correct']++;
+                            $subm_stats[$subm]['correct']++;
+                        }
+                    }
+                }
+                
+                if (!empty($subm_stats)) {
+                    $worst_subm = array_key_first($subm_stats);
+                    $worst_dom = $subm_stats[$worst_subm]['domain'] ?? 'Umum';
+                    $lowest_pct = 100.0;
+                    
+                    foreach ($subm_stats as $sm => $st) {
+                        $tot = max(1, (int)$st['total']);
+                        $pct = round(($st['correct'] / $tot) * 100, 2);
+                        if ($pct < $lowest_pct) {
+                            $lowest_pct = $pct;
+                            $worst_subm = $sm;
+                            $worst_dom = $st['domain'];
+                        }
+                    }
+                    
+                    $diag_id = bin2hex(random_bytes(16));
+                    $diag_id = substr($diag_id,0,8).'-'.substr($diag_id,8,4).'-'.substr($diag_id,12,4).'-'.substr($diag_id,16,4).'-'.substr($diag_id,20,12);
+                    $diagDetails = json_encode([
+                        'source' => 'tryout_cbt',
+                        'attempt_id' => $attempt_id,
+                        'quiz_type' => $quiz_type,
+                        'assessment_type' => $assessment_type,
+                        'track' => $track,
+                        'domain_stats' => $dom_stats,
+                        'submateri_stats' => $subm_stats
+                    ]);
+                    
+                    $insDiag = $pdo->prepare("
+                        INSERT INTO diagnostic_results (id, student_id, total_score, gap_domain, gap_sub_materi, gap_score, details, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+                    ");
+                    $insDiag->execute([$diag_id, $payload->id, (int)$totalScore, $worst_dom, $worst_subm, $lowest_pct, $diagDetails]);
+                }
+            } catch (\Throwable $eDiag) {}
         }
     }
 

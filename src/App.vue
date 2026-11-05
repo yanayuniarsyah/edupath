@@ -1513,10 +1513,10 @@
             <div class="flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-2xl mx-auto px-4">
               <button
                 v-for="flt in [
-                  { id: 'all', name: 'Semua (3)' },
-                  { id: 'health', name: '🩺 Saintek' },
-                  { id: 'engineering', name: '💻 Teknik & MIPA' },
-                  { id: 'soshum', name: '💼 Soshum' }
+                  { id: 'all', name: 'Semua Jenjang' },
+                  { id: 'sd', name: '🎒 TKA SD' },
+                  { id: 'smp', name: '📘 TKA SMP' },
+                  { id: 'sma', name: '🎓 SMA & SNPMB' }
                 ]"
                 :key="flt.id"
                 :class="['px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-full text-xs font-bold transition-all border cursor-pointer active:scale-95',
@@ -3153,52 +3153,38 @@
                 </div>
 
                 <div class="space-y-3">
-                  <!-- Skill 1: Geometri (Critical) -->
-                  <div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 space-y-2">
+                  <div 
+                    v-for="blind in radarBlindSpots" 
+                    :key="blind.title" 
+                    :class="['p-3 rounded-xl space-y-2 border', 
+                      blind.color === 'rose' ? 'bg-rose-500/10 border-rose-500/25' : 
+                      (blind.color === 'amber' ? 'bg-amber-500/10 border-amber-500/25' : 'bg-emerald-500/10 border-emerald-500/25')]"
+                  >
                     <div class="flex justify-between items-center text-xs">
-                      <span class="font-bold text-white">Geometri Bangun Ruang (3D)</span>
-                      <span class="text-rose-400 font-mono font-black text-[11px]">35% · Kritis</span>
+                      <span class="font-bold text-white">{{ blind.title }}</span>
+                      <span :class="['font-mono font-black text-[11px]', 
+                        blind.color === 'rose' ? 'text-rose-400' : (blind.color === 'amber' ? 'text-amber-400' : 'text-emerald-400')]">
+                        {{ blind.score }}% · {{ blind.status }}
+                      </span>
                     </div>
                     <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                      <div class="bg-rose-500 h-full rounded-full" style="width: 35%;"></div>
+                      <div 
+                        :class="['h-full rounded-full', 
+                          blind.color === 'rose' ? 'bg-rose-500' : (blind.color === 'amber' ? 'bg-amber-500' : 'bg-emerald-500')]" 
+                        :style="{ width: blind.score + '%' }"
+                      ></div>
                     </div>
                     <div class="flex justify-between items-center text-[10px]">
-                      <span class="text-white/60">Skor hilang: <strong class="text-rose-400">-35 Poin</strong></span>
-                      <button @click="handleTabClick('learning')" class="font-black text-[#c0ff00] hover:underline cursor-pointer">
-                        Drill 5 Menit &raquo;
+                      <span class="text-white/60">{{ blind.lossText || 'Prioritas remedial' }}</span>
+                      <button 
+                        v-if="blind.color !== 'emerald'"
+                        @click="handleTabClick('learning')" 
+                        :class="['font-black hover:underline cursor-pointer', 
+                          blind.color === 'rose' ? 'text-[#c0ff00]' : 'text-amber-300']"
+                      >
+                        Drill Materi &raquo;
                       </button>
-                    </div>
-                  </div>
-
-                  <!-- Skill 2: Silogisme (Moderate) -->
-                  <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 space-y-2">
-                    <div class="flex justify-between items-center text-xs">
-                      <span class="font-bold text-white">Silogisme &amp; Logika Majemuk</span>
-                      <span class="text-amber-400 font-mono font-black text-[11px]">60% · Pemantapan</span>
-                    </div>
-                    <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                      <div class="bg-amber-500 h-full rounded-full" style="width: 60%;"></div>
-                    </div>
-                    <div class="flex justify-between items-center text-[10px]">
-                      <span class="text-white/60">Akurasi: <strong class="text-white/80">6/10 Soal</strong></span>
-                      <button @click="handleTabClick('practice')" class="font-black text-amber-300 hover:underline cursor-pointer">
-                        Latihan &raquo;
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Skill 3: Aljabar (Strong) -->
-                  <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 space-y-2">
-                    <div class="flex justify-between items-center text-xs">
-                      <span class="font-bold text-white">Aljabar &amp; Persamaan Kuadrat</span>
-                      <span class="text-emerald-400 font-mono font-black text-[11px]">85% · Kuasai</span>
-                    </div>
-                    <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                      <div class="bg-emerald-500 h-full rounded-full" style="width: 85%;"></div>
-                    </div>
-                    <div class="flex justify-between items-center text-[10px]">
-                      <span class="text-white/60">Tingkat akurasi tinggi</span>
-                      <span class="text-emerald-400 font-mono font-bold">AMAN</span>
+                      <span v-else class="text-emerald-400 font-mono font-bold">AMAN</span>
                     </div>
                   </div>
                 </div>
@@ -5026,15 +5012,15 @@
             </h4>
             <ul class="text-xs text-white/70 space-y-2.5">
               <li>
-                <a href="https://wa.me/6281234567890?text=Halo%20Tim%20PT%20Kreasi%20Hasanah%20Indonesia%20(EduPath),%20saya%20ingin%20tanya%20seputar%20platform%20belajar%20adaptif" target="_blank" rel="noopener noreferrer" class="hover:text-[#c0ff00] transition-colors flex items-center gap-2 group">
-                  <i class="ph-bold ph-telegram-logo text-emerald-400 text-sm group-hover:scale-110 transition-transform"></i>
-                  <span>Telegram CS &amp; Konsultasi</span>
+                <a href="https://wa.me/628151880508?text=Halo%20Tim%20EduPath,%20saya%20ingin%20konsultasi%20program%20belajar%20adaptif" target="_blank" rel="noopener noreferrer" class="hover:text-[#c0ff00] transition-colors flex items-center gap-2 group">
+                  <i class="ph-bold ph-whatsapp-logo text-emerald-400 text-sm group-hover:scale-110 transition-transform"></i>
+                  <span>WhatsApp CS &amp; Konsultasi (08151880508)</span>
                 </a>
               </li>
               <li>
-                <a href="mailto:kontak@elyana.biz.id" class="hover:text-[#c0ff00] transition-colors flex items-center gap-2">
+                <a href="mailto:kontak@elyana.co.id" class="hover:text-[#c0ff00] transition-colors flex items-center gap-2">
                   <i class="ph-bold ph-envelope text-sky-400 text-sm"></i>
-                  <span>kontak@elyana.biz.id</span>
+                  <span>kontak@elyana.co.id</span>
                 </a>
               </li>
               <li>
@@ -6283,23 +6269,23 @@
           <!-- Direct Communication Channels -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <a 
-              href="https://wa.me/6281234567890?text=Halo%20Admin%20PT%20Kreasi%20Hasanah%20Indonesia%20(EduPath),%20saya%20ingin%20konsultasi" 
+              href="https://wa.me/628151880508?text=Halo%20Admin%20EduPath,%20saya%20ingin%20konsultasi%20paket%20belajar" 
               target="_blank" 
               rel="noopener noreferrer" 
               class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-400/40 transition-all space-y-1 block group"
             >
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                  <i class="ph-bold ph-telegram-logo text-base"></i> Telegram CS
+                  <i class="ph-bold ph-whatsapp-logo text-base"></i> WhatsApp &amp; CS
                 </span>
                 <i class="ph-bold ph-arrow-up-right text-emerald-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform text-xs"></i>
               </div>
-              <p class="font-black text-white text-sm">+62 812-3456-7890</p>
-              <p class="text-[11px] text-white/50">Respon cepat via pesan Telegram</p>
+              <p class="font-black text-white text-sm">08151880508</p>
+              <p class="text-[11px] text-white/50">Respon cepat via WhatsApp / Hotline</p>
             </a>
 
             <a 
-              href="mailto:kontak@elyana.biz.id" 
+              href="mailto:kontak@elyana.co.id" 
               class="p-4 rounded-2xl bg-sky-500/10 border border-sky-500/20 hover:border-sky-400/40 transition-all space-y-1 block group"
             >
               <div class="flex items-center justify-between">
@@ -6308,7 +6294,7 @@
                 </span>
                 <i class="ph-bold ph-arrow-up-right text-sky-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform text-xs"></i>
               </div>
-              <p class="font-black text-white text-sm">kontak@elyana.biz.id</p>
+              <p class="font-black text-white text-sm">kontak@elyana.co.id</p>
               <p class="text-[11px] text-white/50">Kerjasama B2B sekolah &amp; permohonan</p>
             </a>
           </div>
@@ -6375,8 +6361,8 @@
               <input v-model="affiliateForm.email" type="email" placeholder="nama@email.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors" required>
             </div>
             <div class="space-y-1">
-              <label class="text-[10px] font-bold text-white/70 uppercase tracking-wider">Nomor Telegram</label>
-              <input v-model="affiliateForm.whatsapp" type="tel" placeholder="08..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors" required>
+              <label class="text-[10px] font-bold text-white/70 uppercase tracking-wider">Nomor WhatsApp / HP</label>
+              <input v-model="affiliateForm.whatsapp" type="tel" placeholder="08151880508" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors" required>
             </div>
             <div class="space-y-1">
               <label class="text-[10px] font-bold text-white/70 uppercase tracking-wider">Password</label>
@@ -6463,6 +6449,9 @@
 import { ref, computed, onMounted, onUnmounted, watch, defineAsyncComponent } from 'vue';
 import { 
   SKILL_MAP, 
+  SKILL_MAP_SD,
+  SKILL_MAP_SMP,
+  SKILL_MAP_SMA,
   TARGET_UNIVERSITIES, 
   MATERI_UTBK,
   MATERI_SD,
@@ -6909,34 +6898,54 @@ export default {
     const testimonialFilter = ref('all');
     const testimonialsList = [
       {
-        name: 'Rafi A.',
-        school: 'Siswa Kelas 12 SMA',
-        avatar: '📚',
-        cluster: 'health',
-        clusterLabel: 'Saintek',
-        target: 'Saintek / Kedokteran UI',
-        badge: 'Pengguna Beta',
-        text: 'Baru coba EduPath beberapa minggu dan udah kerasa bedanya. Fitur diagnostik blind spot-nya bikin aku tahu persis topik mana yang harus aku fokus duluan. Belajar jadi lebih terarah!'
+        name: 'Ibu Dewi Sartika',
+        school: 'Wali Murid Kelas 6 SD',
+        avatar: '🎒',
+        cluster: 'sd',
+        clusterLabel: 'TKA SD',
+        target: 'SMP Negeri 1 Unggulan',
+        badge: 'Pengguna Terverifikasi',
+        text: 'Persiapan anak saya menghadapi TKA masuk SMP favorit jadi jauh lebih terstruktur. Diagnostik kelemahan matematika dasarnya cepat ketahuan dan langsung diberi latihan konsep yang pas.'
       },
       {
-        name: 'Dimas P.',
+        name: 'Kevin Julio',
+        school: 'Siswa Kelas 9 SMP',
+        avatar: '📘',
+        cluster: 'smp',
+        clusterLabel: 'TKA SMP',
+        target: 'SMA Pradita Dirgantara',
+        badge: 'Pengguna Terverifikasi',
+        text: 'Materi IPA Terpadu dan Matematika TKA SMP-nya padat trik konsep. Hasil tryout langsung otomatis memetakan bab mana yang masih kurang, jadi belajarnya lebih terarah dan percaya diri.'
+      },
+      {
+        name: 'Muhammad Rizky',
+        school: 'Siswa Kelas 12 SMA',
+        avatar: '🩺',
+        cluster: 'sma',
+        clusterLabel: 'SNPMB Saintek',
+        target: 'Pendidikan Dokter UI',
+        badge: 'Pengguna Terverifikasi',
+        text: 'Fitur diagnostik IRT dan bank soal HOTS-nya sangat presisi. Saya bisa tahu persis letak kelemahan di Penalaran Matematika dan langsung memperbaiki skor secara terarah!'
+      },
+      {
+        name: 'Dimas Pratama',
         school: 'Alumni / Pejuang Gap Year',
-        avatar: '🎯',
-        cluster: 'engineering',
-        clusterLabel: 'Teknik',
+        avatar: '💻',
+        cluster: 'sma',
+        clusterLabel: 'SNPMB Teknik',
         target: 'Teknik Informatika ITB',
-        badge: 'Pengguna Beta',
-        text: 'Latihan soalnya berbeda dari platform lain. Gak cuma asal kerjain soal, tapi ada analisis otomatis setelah TO. Aku jadi paham kenapa jawaban aku salah, bukan cuma lihat kunci.'
+        badge: 'Pengguna Terverifikasi',
+        text: 'Latihan soalnya beda dari bimbel lain. Ada analisis IRT otomatis setelah Try Out CBT. Paham betul kenapa jawaban salah dan cara penyelesaian cepatnya.'
       },
       {
-        name: 'Nadia R.',
+        name: 'Nadia Rahma',
         school: 'Siswa Kelas 12 SMA',
-        avatar: '✨',
-        cluster: 'soshum',
-        clusterLabel: 'Soshum',
-        target: 'Akuntansi / FEB UGM',
-        badge: 'Pengguna Beta',
-        text: 'Fitur laporan mingguan ke Telegram orang tua keren banget. Orang tua jadi bisa pantau perkembangan belajarku tanpa harus nanya-nanya terus. Akhirnya belajar tenang!'
+        avatar: '💼',
+        cluster: 'sma',
+        clusterLabel: 'SNPMB Soshum',
+        target: 'Akuntansi FEB UGM',
+        badge: 'Pengguna Terverifikasi',
+        text: 'Fitur asesmen minat bakat RIASEC dan laporan progres mingguan sangat membantu memilih jurusan kuliah yang paling sesuai potensi diri saya.'
       }
     ];
 
@@ -6978,7 +6987,13 @@ export default {
       'Reading Comprehension': 72
     });
 
-    const skillMap = ref(SKILL_MAP);
+    const skillMap = computed(() => {
+      const lvl = activeStudentLevel.value;
+      if (lvl === 'SD') return SKILL_MAP_SD;
+      if (lvl === 'SMP') return SKILL_MAP_SMP;
+      if (lvl === 'SMA') return SKILL_MAP_SMA;
+      return SKILL_MAP;
+    });
 
     const getSkillMastery = (name) => skillMastery.value[name] || 50;
 
@@ -8590,23 +8605,23 @@ export default {
 
     const faqs = ref([
       { 
-        q: "Bagaimana EduPath membantu kesiapan menghadapi SNBT secara terukur?", 
-        a: "EduPath mendeteksi kelemahan belajar melalui asesmen awal, menyusun jalur belajar adaptif berbasis micro-lessons, dan mengukur progres latihan secara berkala menggunakan model estimasi IRT terkalibrasi.", 
+        q: "Bagaimana EduPath membantu kesiapan belajar siswa SD, SMP, SMA hingga SNPMB secara terukur?", 
+        a: "EduPath mendeteksi kelemahan belajar melalui asesmen diagnostik & tryout CBT, menyusun jalur belajar adaptif berbasis modul konsep ringkas, dan mengukur progres latihan secara berkala menggunakan model estimasi IRT terkalibrasi untuk semua jenjang (TKA SD, TKA SMP, TKA SMA, dan SNPMB).", 
         open: true 
       },
       { 
-        q: "Bagaimana cara kerja model estimasi skor IRT di EduPath?", 
-        a: "Sistem mengadopsi prinsip Item Response Theory (IRT) yang dikalibrasi untuk latihan. Soal dengan tingkat kesulitan lebih tinggi dan jarang dijawab benar oleh peserta lain memiliki bobot nilai pemahaman lebih besar, sehingga hasil simulasi memberikan peta kesiapan yang realistis.", 
+        q: "Jenjang dan paket belajar apa saja yang diakomodir oleh EduPath?", 
+        a: "EduPath mengakomodir 4 jenjang pendidikan utama: TKA SD (persiapan masuk SMP Favorit), TKA SMP (persiapan masuk SMA Unggulan), TKA SMA (akademik sekolah & ujian berkala), serta SNPMB/UTBK & Kedinasan. Siswa dapat dengan mudah memilih dan beralih kurikulum sesuai jenjang pendidikannya.", 
         open: false 
       },
       { 
-        q: "Apakah EduPath memberikan jaminan kelulusan PTN 100%?", 
-        a: "EduPath adalah platform latihan dan akselerasi belajar adaptif. Kami tidak memberikan klaim kelulusan mutlak karena hasil seleksi nasional resmi bergantung pada performa resmi ujian siswa.", 
+        q: "Bagaimana cara kerja model estimasi skor IRT di EduPath?", 
+        a: "Sistem mengadopsi prinsip Item Response Theory (IRT) yang dikalibrasi untuk latihan. Soal dengan tingkat kesulitan lebih tinggi dan menuntut nalar HOTS memiliki bobot nilai pemahaman lebih besar, sehingga hasil simulasi memberikan peta kesiapan yang realistis.", 
         open: false 
       },
       { 
         q: "Bagaimana orang tua memantau perkembangan belajar anak?", 
-        a: "Laporan ringkas mengenai topik yang dikuasai, skor latihan berkala, dan rekomendasi fokus mingguan dikirimkan otomatis ke Telegram orang tua tanpa perlu menginstal aplikasi tambahan.", 
+        a: "Laporan ringkas mengenai topik yang dikuasai, skor tryout berkala, dan rekomendasi fokus belajar dapat dipantau langsung oleh orang tua secara transparan dan berkala.", 
         open: false 
       },
       { 
@@ -8616,22 +8631,22 @@ export default {
       },
       {
         q: "Apakah ada versi gratis atau harus langsung bayar?",
-        a: "EduPath menyediakan versi uji coba gratis (Free Tier) agar Anda bisa merasakan langsung asesmen diagnostik dan beberapa micro-lessons. Untuk akses penuh ke seluruh perpustakaan materi, AI Companion, dan TryOut Nasional, Anda dapat berlangganan paket Premium.",
+        a: "EduPath menyediakan versi uji coba gratis (Free Tier) di semua jenjang agar siswa bisa merasakan langsung asesmen diagnostik, materi modul belajar, dan latihan soal. Untuk akses penuh perpustakaan bank soal, AI Companion, dan TryOut CBT berkala, tersedia paket Premium.",
         open: false
       },
       {
-        q: "Bagaimana cara kerja komisi Program Afiliasi EduPath?",
-        a: "Anda akan mendapatkan komisi sebesar 20% pada tahun pertama untuk setiap transaksi langganan dari pengguna yang mendaftar menggunakan kode referral Anda, ditambah komisi berulang (recurring) 10% seumur hidup selama pengguna tersebut memperpanjang langganannya.",
+        q: "Bagaimana jika butuh bantuan atau konsultasi paket belajar?",
+        a: "Tim EduPath siap melayani konsultasi via WhatsApp / Hotline di nomor 08151880508 atau melalui email resmi di kontak@elyana.co.id.",
         open: false
       },
       {
         q: "Apakah EduPath bisa diakses lewat HP/Tablet?",
-        a: "Ya! EduPath dirancang 100% responsif. Anda bisa belajar, menonton micro-lessons, hingga melakukan TryOut dengan nyaman melalui smartphone, tablet, maupun laptop/PC tanpa perlu menginstal aplikasi tambahan.",
+        a: "Ya! EduPath dirancang 100% responsif. Anda bisa belajar, membaca modul materi, hingga mengerjakan TryOut CBT dengan nyaman melalui smartphone, tablet, maupun laptop/PC tanpa perlu menginstal aplikasi tambahan.",
         open: false
       },
       {
         q: "Apakah jadwal TryOut Nasional selalu serentak?",
-        a: "Ya, TryOut Nasional diselenggarakan secara serentak sesuai jadwal yang telah ditentukan untuk mensimulasikan tekanan dan kondisi UTBK aslinya. Namun, untuk latihan reguler dan asesmen mandiri, Anda bisa mengerjakannya kapan saja 24/7.",
+        a: "TryOut Nasional diselenggarakan secara serentak sesuai jadwal untuk mensimulasikan tekanan ujian riil. Namun, untuk latihan mandiri per bab dan asesmen adaptif, Anda bisa mengaksesnya kapan saja 24/7.",
         open: false
       }
     ]);
@@ -8653,12 +8668,73 @@ export default {
       }
     };
 
+    const radarBlindSpots = computed(() => {
+      const level = activeStudentLevel.value;
+      const gaps = student360Data.value?.learning_gaps;
+      if (gaps && gaps.length > 0) {
+        return gaps.slice(0, 3).map((g) => ({
+          title: g.subject,
+          score: g.average_score,
+          status: g.average_score < 50 ? 'Kritis' : (g.average_score < 70 ? 'Pemantapan' : 'Kuasai'),
+          color: g.average_score < 50 ? 'rose' : (g.average_score < 70 ? 'amber' : 'emerald'),
+          lossText: g.average_score < 50 ? `Skor hilang: -${Math.round(100 - g.average_score)} Poin` : (g.average_score < 70 ? 'Perlu latihan drill' : 'Tingkat akurasi tinggi')
+        }));
+      }
+
+      if (level === 'SD') {
+        return [
+          { title: 'Operasi Pecahan & Desimal (Matematika SD)', score: 38, status: 'Kritis', color: 'rose', lossText: 'Skor hilang: -35 Poin' },
+          { title: 'Rantai Makanan & Ekosistem (IPA SD)', score: 62, status: 'Pemantapan', color: 'amber', lossText: 'Akurasi: 6/10 Soal' },
+          { title: 'Menemukan Ide Pokok Paragraf (B. Indo SD)', score: 85, status: 'Kuasai', color: 'emerald', lossText: 'Tingkat akurasi tinggi' }
+        ];
+      } else if (level === 'SMP') {
+        return [
+          { title: 'SPLDV & Fungsi Kuadrat (Matematika SMP)', score: 36, status: 'Kritis', color: 'rose', lossText: 'Skor hilang: -35 Poin' },
+          { title: 'Hukum Newton & Gaya (IPA SMP)', score: 58, status: 'Pemantapan', color: 'amber', lossText: 'Akurasi: 6/10 Soal' },
+          { title: 'Teks Eksplanasi & Ejaan (B. Indo SMP)', score: 86, status: 'Kuasai', color: 'emerald', lossText: 'Tingkat akurasi tinggi' }
+        ];
+      } else if (level === 'SMA') {
+        return [
+          { title: 'Trigonometri & Kalkulus Dasar (Matematika SMA)', score: 35, status: 'Kritis', color: 'rose', lossText: 'Skor hilang: -35 Poin' },
+          { title: 'Dinamika Gerak & Usaha (Fisika SMA)', score: 60, status: 'Pemantapan', color: 'amber', lossText: 'Akurasi: 6/10 Soal' },
+          { title: 'Struktur Sel & Genetika (Biologi SMA)', score: 84, status: 'Kuasai', color: 'emerald', lossText: 'Tingkat akurasi tinggi' }
+        ];
+      } else {
+        return [
+          { title: 'Geometri Bangun Ruang (3D)', score: 35, status: 'Kritis', color: 'rose', lossText: 'Skor hilang: -35 Poin' },
+          { title: 'Silogisme & Logika Majemuk', score: 60, status: 'Pemantapan', color: 'amber', lossText: 'Akurasi: 6/10 Soal' },
+          { title: 'Aljabar & Persamaan Kuadrat', score: 85, status: 'Kuasai', color: 'emerald', lossText: 'Tingkat akurasi tinggi' }
+        ];
+      }
+    });
+
     const learningRecommendations = computed(() => {
-      const path = [];
-      if (getSkillMastery('Persamaan Kuadrat') < 50) path.push({ title: 'Aljabar & Persamaan Kuadrat', desc: 'Penguasaan 40%. Remedial disarankan sebelum lanjut ke Geometri.' });
-      if (getSkillMastery('Problem Solving') < 60) path.push({ title: 'Penalaran Kuantitatif', desc: 'Penalaran kuantitatif 45%. Fokus pada data interpretation dan logika matematika.' });
-      path.push({ title: 'Latihan Pemeliharaan Geometri', desc: 'Tinjau bangun ruang untuk pemantapan skor target UTBK Anda.' });
-      return path;
+      const level = activeStudentLevel.value;
+      if (level === 'SD') {
+        return [
+          { title: 'Pecahan, Desimal & Persen', desc: 'Pemantapan konsep dasar operasi hitung campuran persiapan TKA Masuk SMP.' },
+          { title: 'Ekosistem & Penyesuaian Makhluk Hidup', desc: 'Latihan soal penalaran IPA dan hubungan antarmakhluk hidup.' },
+          { title: 'Latihan Menulis & Menemukan Ide Pokok', desc: 'Drill membaca cepat dan simpulan paragraf Bahasa Indonesia SD.' }
+        ];
+      } else if (level === 'SMP') {
+        return [
+          { title: 'Sistem Persamaan Linear Dua Variabel (SPLDV)', desc: 'Penguasaan metode eliminasi dan substitusi soal cerita TKA SMP.' },
+          { title: 'Hukum Newton & Tekanan Zat', desc: 'Analisis fenomena fisis dan rumus terapan IPA Terpadu SMP.' },
+          { title: 'Reading Comprehension & Functional Text', desc: 'Pemantapan kosa kata kontekstual dan tenses Bahasa Inggris.' }
+        ];
+      } else if (level === 'SMA') {
+        return [
+          { title: 'Trigonometri & Persamaan Kuadrat Lanjut', desc: 'Penguasaan sudut istimewa dan identitas trigonometri akademik SMA.' },
+          { title: 'Dinamika Gerak Lurus & Hukum Gravitasi', desc: 'Drill penalaran analitik fisika dan pemodelan matematis.' },
+          { title: 'Pemahaman Wacana Kritis & Kaidah Bahasa', desc: 'Pemantapan struktur argumen dan analisis teks kompleks.' }
+        ];
+      } else {
+        const path = [];
+        if (getSkillMastery('Persamaan Kuadrat') < 50) path.push({ title: 'Aljabar & Persamaan Kuadrat', desc: 'Penguasaan 40%. Remedial disarankan sebelum lanjut ke Geometri.' });
+        if (getSkillMastery('Problem Solving') < 60) path.push({ title: 'Penalaran Kuantitatif', desc: 'Penalaran kuantitatif 45%. Fokus pada data interpretation dan logika matematika.' });
+        path.push({ title: 'Latihan Pemeliharaan Geometri', desc: 'Tinjau bangun ruang untuk pemantapan skor target UTBK Anda.' });
+        return path;
+      }
     });
 
     const showToast = (msg) => {
@@ -9392,6 +9468,7 @@ export default {
       dailyMissions,
       checkMissionReward,
       learningRecommendations,
+      radarBlindSpots,
       rotatingWords,
       currentWordIdx,
       startLearning,

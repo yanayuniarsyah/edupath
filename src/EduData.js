@@ -541,6 +541,44 @@ export const SKILL_MAP = {
   }
 };
 
+export const SKILL_MAP_SD = {
+  'MAPEL UTAMA TKA SD': {
+    'Matematika SD': ['Operasi Hitung', 'Pecahan & Desimal', 'Geometri Bangun Datar', 'Pengukuran & Skala'],
+    'Bahasa Indonesia SD': ['Ide Pokok Paragraf', 'Kosa Kata & Ejaan', 'Struktur Kalimat', 'Menyimpulkan Teks'],
+    'IPA SD': ['Rantai Makanan & Ekosistem', 'Wujud & Sifat Benda', 'Gaya & Gerak', 'Energi & Perubahannya']
+  },
+  'MAPEL PENDUKUNG SD': {
+    'IPS SD': ['Kenampakan Alam', 'Kegiatan Ekonomi', 'Keragaman Sosial Budaya'],
+    'PPKn SD': ['Nilai Pancasila', 'Hak & Kewajiban', 'Persatuan & Kesatuan']
+  }
+};
+
+export const SKILL_MAP_SMP = {
+  'MAPEL UTAMA TKA SMP': {
+    'Matematika SMP': ['Aljabar & SPLDV', 'Teorema Pythagoras', 'Persamaan Garis Lurus', 'Statistika & Peluang'],
+    'Bahasa Indonesia SMP': ['Teks Eksplanasi & Laporan', 'Teks Narasi & Puisi', 'Kaidah Ejaan & Kalimat Efektif'],
+    'Bahasa Inggris SMP': ['Tenses & Grammar', 'Reading Comprehension', 'Short Functional Text']
+  },
+  'MAPEL SAINS & SOSIAL SMP': {
+    'IPA Terpadu SMP': ['Hukum Newton & Gerak', 'Sistem Organ Tubuh', 'Zat & Perubahannya', 'Listrik & Magnet'],
+    'IPS Terpadu SMP': ['Dinamika Kependudukan', 'Interaksi Antarruang ASEAN', 'Aktivitas Ekonomi & Pasar']
+  }
+};
+
+export const SKILL_MAP_SMA = {
+  'SAINTEK SMA': {
+    'Matematika SMA': ['Trigonometri', 'Turunan & Integral', 'Polinomial', 'Vektor'],
+    'Fisika SMA': ['Kinematika & Dinamika', 'Termodinamika', 'Gelombang & Optik', 'Listrik Statis & Dinamis'],
+    'Kimia SMA': ['Struktur Atom & Ikatan', 'Stoikiometri', 'Termokimia', 'Kesetimbangan Kimia'],
+    'Biologi SMA': ['Sel & Genetika', 'Metabolisme', 'Sistem Organ Tubuh', 'Bioteknologi']
+  },
+  'SOSHUM SMA': {
+    'Ekonomi SMA': ['Konsep Dasar Ekonomi', 'Mekanisme Pasar', 'Kebijakan Moneter & Fiskal', 'Akuntansi'],
+    'Sosiologi SMA': ['Struktur Sosial', 'Konflik & Integrasi', 'Perubahan Sosial', 'Penelitian Sosial'],
+    'Geografi SMA': ['Prinsip Geografi', 'Litosfer & Atmosfer', 'Penginderaan Jauh & SIG']
+  }
+};
+
 export const TARGET_UNIVERSITIES = [
   { id: 'fk_ui', name: 'Kedokteran UI (Universitas Indonesia)', targetScore: 740, cluster: 'health', focus: 'Penalaran Matematika & Geometri', reqAbility: { 'Penalaran Umum': 90, 'Pengetahuan Kuantitatif': 92, 'Bahasa Indonesia': 88, 'Bahasa Inggris': 85 } },
   { id: 'stei_itb', name: 'STEI ITB (Institut Teknologi Bandung)', targetScore: 735, cluster: 'engineering', focus: 'Pengetahuan Kuantitatif & Logika Tingkat Tinggi', reqAbility: { 'Penalaran Umum': 90, 'Pengetahuan Kuantitatif': 95, 'Bahasa Indonesia': 80, 'Bahasa Inggris': 88 } },
