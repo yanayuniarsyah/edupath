@@ -3953,40 +3953,54 @@
               </div>
             </div>
 
-            <!-- Sisi Kanan: Panel Timer Latihan Soal Terintegrasi -->
-            <div class="bg-black/50 border border-white/10 rounded-2xl px-4 py-2.5 flex items-center justify-between md:justify-end gap-3 shrink-0 shadow-inner">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-[10px] font-bold text-white/60 uppercase tracking-wider hidden sm:inline">Timer Latihan:</span>
-                <div class="font-mono font-black text-xl sm:text-2xl text-[#c0ff00] tracking-widest px-2.5 py-0.5 rounded-lg bg-black/60 border border-white/10">
-                  {{ cbtFormattedTimer }}
+            <!-- Sisi Kanan: Tombol Mulai Latihan & Panel Timer Latihan Terintegrasi -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+              <!-- Tombol Mulai Latihan (Padanan Prominen Tombol Mulai Try Out CBT) -->
+              <button
+                type="button"
+                @click="startPracticeMode"
+                class="px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-sky-500 hover:from-indigo-400 hover:to-sky-400 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 active:scale-95 cursor-pointer whitespace-nowrap"
+                :title="'Mulai Sesi ' + currentProgramPracticeButtonLabel"
+              >
+                <i class="ph-bold ph-pencil-simple text-base sm:text-lg"></i>
+                <span>{{ currentProgramPracticeButtonLabel }}</span>
+              </button>
+
+              <!-- Panel Stopwatch Timer Latihan -->
+              <div class="bg-black/50 border border-white/10 rounded-2xl px-3 sm:px-4 py-2 flex items-center justify-between sm:justify-end gap-2.5 shrink-0 shadow-inner">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span class="text-[10px] font-bold text-white/60 uppercase tracking-wider hidden lg:inline">Timer:</span>
+                  <div class="font-mono font-black text-lg sm:text-xl text-[#c0ff00] tracking-widest px-2 py-0.5 rounded-lg bg-black/60 border border-white/10">
+                    {{ cbtFormattedTimer }}
+                  </div>
                 </div>
-              </div>
-              <div class="flex items-center gap-1.5 border-l border-white/10 pl-2.5">
-                <button 
-                  type="button"
-                  @click="toggleCbtTimer" 
-                  class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
-                  :class="isCbtTimerRunning ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30'"
-                  :title="isCbtTimerRunning ? 'Jeda Timer' : 'Lanjutkan Timer'"
-                >
-                  <i :class="isCbtTimerRunning ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
-                  <span>{{ isCbtTimerRunning ? 'Jeda' : 'Mulai' }}</span>
-                </button>
-                <button 
-                  type="button"
-                  @click="resetCbtTimer(5400)" 
-                  class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 transition cursor-pointer"
-                  title="Reset Waktu Latihan (90 Menit)"
-                >
-                  <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
-                </button>
+                <div class="flex items-center gap-1 border-l border-white/10 pl-2">
+                  <button 
+                    type="button"
+                    @click="toggleCbtTimer" 
+                    class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                    :class="isCbtTimerRunning ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30'"
+                    :title="isCbtTimerRunning ? 'Jeda Timer' : 'Lanjutkan Timer'"
+                  >
+                    <i :class="isCbtTimerRunning ? 'ph-bold ph-pause' : 'ph-bold ph-play'"></i>
+                    <span class="text-[11px]">{{ isCbtTimerRunning ? 'Jeda' : 'Mulai' }}</span>
+                  </button>
+                  <button 
+                    type="button"
+                    @click="resetCbtTimer(5400)" 
+                    class="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 transition cursor-pointer"
+                    title="Reset Waktu Latihan (90 Menit)"
+                  >
+                    <i class="ph-bold ph-arrow-counter-clockwise text-xs"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Grid Area Latihan Soal Mandiri -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <div id="practice-question-area" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
             <!-- Left Workspace (Col 8): Official CBT Question Area -->
             <div class="lg:col-span-8 space-y-4">
@@ -8581,6 +8595,25 @@ export default {
       return 'Mulai Try Out CBT SNBT';
     });
 
+    const currentProgramPracticeButtonLabel = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      if (prog === 'TKA_SD') return 'Mulai Latihan SD';
+      if (prog === 'TKA_SMP') return 'Mulai Latihan SMP';
+      if (prog === 'TKA_SMA') return 'Mulai Latihan SMA';
+      return 'Mulai Latihan SNBT';
+    });
+
+    const startPracticeMode = () => {
+      if (!isCbtTimerRunning.value) {
+        startCbtTimer();
+      }
+      const el = document.getElementById('practice-question-area');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      showToast(`Sesi ${currentProgramPracticeButtonLabel.value} aktif.`);
+    };
+
     const startCbtExam = (assessmentType, track = '') => {
       if (!isLoggedIn.value) {
         showLoginModal.value = true;
@@ -8598,6 +8631,8 @@ export default {
       startCbtExam,
       launchCurrentProgramCbt,
       currentProgramCbtButtonLabel,
+      currentProgramPracticeButtonLabel,
+      startPracticeMode,
 
       showIrtInfo,
       hideBabSidebar,
