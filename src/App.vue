@@ -3916,120 +3916,219 @@
               </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <!-- Card SNBT / SNPMB -->
-              <div v-if="!activeAcademicProgram || activeAcademicProgram === 'SNPMB_UTBK' || activeAcademicProgram.includes('Alumni') || activeAcademicProgram.includes('SNPMB')" class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-sky-500/30 hover:border-sky-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30">SNBT / SNPMB</span>
-                    <span class="text-[10px] font-mono text-white/50">195 Menit</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              
+              <!-- Card 1: Try Out SNBT / SNPMB -->
+              <div 
+                v-if="!activeAcademicProgram || activeAcademicProgram === 'SNPMB_UTBK' || activeAcademicProgram.includes('Alumni') || activeAcademicProgram.includes('SNPMB')" 
+                class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-sky-500/35 hover:border-sky-400 bg-gradient-to-b from-sky-950/40 via-slate-900/90 to-slate-950 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden shadow-xl hover:shadow-sky-500/10"
+              >
+                <div class="space-y-3.5">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                      SNBT / SNPMB
+                    </span>
+                    <span class="text-xs font-mono font-bold text-sky-300 bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20 flex items-center gap-1.5">
+                      <i class="ph-bold ph-timer text-sm"></i>
+                      <span>195 Menit</span>
+                    </span>
                   </div>
-                  <h4 class="text-sm font-black text-white group-hover:text-sky-300 transition-colors">UTBK SNBT 2027</h4>
-                  <p class="text-[11px] text-white/60 leading-relaxed">
-                    Tes Potensi Skolastik (PU, PK, PBM, PPU) &amp; Tes Literasi (Indo, Inggris, MTK).
-                  </p>
+                  <div>
+                    <h4 class="text-base sm:text-lg font-black text-white group-hover:text-sky-300 transition-colors">
+                      Try Out UTBK SNBT 2027
+                    </h4>
+                    <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                      Tes Potensi Skolastik (PU, PK, PBM, PPU) &amp; Tes Literasi (Indo, Inggris, MTK).
+                    </p>
+                  </div>
+                  <div class="pt-2 border-t border-white/10 flex items-center gap-3 text-[11px] text-slate-400">
+                    <span class="flex items-center gap-1">✓ 160 Butir Soal</span>
+                    <span class="flex items-center gap-1">✓ Penskoran IRT Adaptif</span>
+                  </div>
                 </div>
                 <button
                   type="button"
                   @click="startCbtExam('SNBT')"
-                  class="mt-4 w-full py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-sky-500/20 active:scale-95 cursor-pointer"
+                  class="mt-5 w-full py-3 px-4 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 active:scale-95 cursor-pointer"
                 >
-                  <i class="ph-bold ph-play-circle text-base"></i>
-                  <span>Mulai CBT SNBT</span>
+                  <i class="ph-bold ph-play-circle text-lg"></i>
+                  <span>Mulai Try Out CBT SNBT</span>
                 </button>
               </div>
 
-              <!-- Card TKA Saintek -->
-              <div v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SMA'" class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-emerald-500/30 hover:border-emerald-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">TKA SMA IPA</span>
-                    <span class="text-[10px] font-mono text-white/50">90 Menit</span>
+              <!-- Card 2: Try Out TKA SMA Saintek -->
+              <div 
+                v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SMA'" 
+                class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-emerald-500/35 hover:border-emerald-400 bg-gradient-to-b from-emerald-950/40 via-slate-900/90 to-slate-950 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden shadow-xl hover:shadow-emerald-500/10"
+              >
+                <div class="space-y-3.5">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      TKA SMA SAINTEK
+                    </span>
+                    <span class="text-xs font-mono font-bold text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 flex items-center gap-1.5">
+                      <i class="ph-bold ph-timer text-sm"></i>
+                      <span>90 Menit</span>
+                    </span>
                   </div>
-                  <h4 class="text-sm font-black text-white group-hover:text-emerald-300 transition-colors">TKA Saintek</h4>
-                  <p class="text-[11px] text-white/60 leading-relaxed">
-                    Matematika IPA, Fisika, Kimia, dan Biologi untuk Ujian Mandiri PTN &amp; Ujian Sekolah.
-                  </p>
+                  <div>
+                    <h4 class="text-base sm:text-lg font-black text-white group-hover:text-emerald-300 transition-colors">
+                      Try Out TKA SMA Saintek
+                    </h4>
+                    <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                      Matematika IPA, Fisika, Kimia, dan Biologi untuk Ujian Mandiri PTN &amp; Ujian Sekolah.
+                    </p>
+                  </div>
+                  <div class="pt-2 border-t border-white/10 flex items-center gap-3 text-[11px] text-slate-400">
+                    <span class="flex items-center gap-1">✓ Paket Lengkap IPA</span>
+                    <span class="flex items-center gap-1">✓ Pembobotan PTN</span>
+                  </div>
                 </div>
                 <button
                   type="button"
                   @click="startCbtExam('TKA', 'saintek')"
-                  class="mt-4 w-full py-2.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer"
+                  class="mt-5 w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 cursor-pointer"
                 >
-                  <i class="ph-bold ph-play-circle text-base"></i>
-                  <span>Mulai CBT Saintek</span>
+                  <i class="ph-bold ph-play-circle text-lg"></i>
+                  <span>Mulai Try Out CBT SMA Saintek</span>
                 </button>
               </div>
 
-              <!-- Card TKA Soshum -->
-              <div v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SMA'" class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-amber-500/30 hover:border-amber-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">TKA SMA IPS</span>
-                    <span class="text-[10px] font-mono text-white/50">90 Menit</span>
+              <!-- Card 3: Try Out TKA SMA Soshum -->
+              <div 
+                v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SMA'" 
+                class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-amber-500/35 hover:border-amber-400 bg-gradient-to-b from-amber-950/40 via-slate-900/90 to-slate-950 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden shadow-xl hover:shadow-amber-500/10"
+              >
+                <div class="space-y-3.5">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      TKA SMA SOSHUM
+                    </span>
+                    <span class="text-xs font-mono font-bold text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 flex items-center gap-1.5">
+                      <i class="ph-bold ph-timer text-sm"></i>
+                      <span>90 Menit</span>
+                    </span>
                   </div>
-                  <h4 class="text-sm font-black text-white group-hover:text-amber-300 transition-colors">TKA Soshum</h4>
-                  <p class="text-[11px] text-white/60 leading-relaxed">
-                    Sosiologi, Ekonomi, Geografi, dan Sejarah untuk Ujian Mandiri PTN &amp; Ujian Sekolah.
-                  </p>
+                  <div>
+                    <h4 class="text-base sm:text-lg font-black text-white group-hover:text-amber-300 transition-colors">
+                      Try Out TKA SMA Soshum
+                    </h4>
+                    <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                      Sosiologi, Ekonomi, Geografi, dan Sejarah untuk Ujian Mandiri PTN &amp; Ujian Sekolah.
+                    </p>
+                  </div>
+                  <div class="pt-2 border-t border-white/10 flex items-center gap-3 text-[11px] text-slate-400">
+                    <span class="flex items-center gap-1">✓ Paket Lengkap IPS</span>
+                    <span class="flex items-center gap-1">✓ Pembobotan PTN</span>
+                  </div>
                 </div>
                 <button
                   type="button"
                   @click="startCbtExam('TKA', 'soshum')"
-                  class="mt-4 w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer"
+                  class="mt-5 w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer"
                 >
-                  <i class="ph-bold ph-play-circle text-base"></i>
-                  <span>Mulai CBT Soshum</span>
+                  <i class="ph-bold ph-play-circle text-lg"></i>
+                  <span>Mulai Try Out CBT SMA Soshum</span>
                 </button>
               </div>
 
-              <!-- Card TKA SMP -->
-              <div v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SMP'" class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-violet-500/30 hover:border-violet-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-violet-500/20 text-violet-300 border border-violet-500/30">TKA SMP</span>
-                    <span class="text-[10px] font-mono text-white/50">90 Menit</span>
+              <!-- Card 4: Try Out TKA SMP -->
+              <div 
+                v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SMP'" 
+                class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-violet-500/35 hover:border-violet-400 bg-gradient-to-b from-violet-950/40 via-slate-900/90 to-slate-950 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden shadow-xl hover:shadow-violet-500/10"
+              >
+                <div class="space-y-3.5">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                      TKA SMP
+                    </span>
+                    <span class="text-xs font-mono font-bold text-violet-300 bg-violet-500/10 px-2.5 py-1 rounded-lg border border-violet-500/20 flex items-center gap-1.5">
+                      <i class="ph-bold ph-timer text-sm"></i>
+                      <span>75 Menit</span>
+                    </span>
                   </div>
-                  <h4 class="text-sm font-black text-white group-hover:text-violet-300 transition-colors">TKA SMP</h4>
-                  <p class="text-[11px] text-white/60 leading-relaxed">
-                    Simulasi ujian masuk SMA unggulan &amp; Olimpiade tingkat SMP.
-                  </p>
+                  <div>
+                    <h4 class="text-base sm:text-lg font-black text-white group-hover:text-violet-300 transition-colors">
+                      Try Out TKA SMP
+                    </h4>
+                    <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                      Simulasi ujian akademik masuk SMA unggulan, asesmen sekolah, &amp; olimpiade tingkat SMP.
+                    </p>
+                  </div>
+                  <div class="pt-2 border-t border-white/10 flex items-center gap-3 text-[11px] text-slate-400">
+                    <span class="flex items-center gap-1">✓ Standar SMA Unggulan</span>
+                    <span class="flex items-center gap-1">✓ Lolos Seleksi</span>
+                  </div>
                 </div>
                 <button
                   type="button"
                   @click="startCbtExam('TKA', 'smp')"
-                  class="mt-4 w-full py-2.5 px-3 rounded-xl bg-violet-500 hover:bg-violet-400 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-violet-500/20 active:scale-95 cursor-pointer"
+                  class="mt-5 w-full py-3 px-4 rounded-xl bg-violet-500 hover:bg-violet-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-500/25 active:scale-95 cursor-pointer"
                 >
-                  <i class="ph-bold ph-play-circle text-base"></i>
-                  <span>Mulai CBT SMP</span>
+                  <i class="ph-bold ph-play-circle text-lg"></i>
+                  <span>Mulai Try Out CBT SMP</span>
                 </button>
               </div>
 
-              <!-- Card TKA SD -->
-              <div v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SD'" class="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-pink-500/30 hover:border-pink-400 transition-all flex flex-col justify-between group relative overflow-hidden shadow-lg">
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/30">TKA SD</span>
-                    <span class="text-[10px] font-mono text-white/50">60 Menit</span>
+              <!-- Card 5: Try Out TKA SD -->
+              <div 
+                v-if="!activeAcademicProgram || activeAcademicProgram === 'TKA_SD'" 
+                class="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-pink-500/35 hover:border-pink-400 bg-gradient-to-b from-pink-950/40 via-slate-900/90 to-slate-950 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden shadow-xl hover:shadow-pink-500/10"
+              >
+                <div class="space-y-3.5">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/30">
+                      TKA SD
+                    </span>
+                    <span class="text-xs font-mono font-bold text-pink-300 bg-pink-500/10 px-2.5 py-1 rounded-lg border border-pink-500/20 flex items-center gap-1.5">
+                      <i class="ph-bold ph-timer text-sm"></i>
+                      <span>60 Menit</span>
+                    </span>
                   </div>
-                  <h4 class="text-sm font-black text-white group-hover:text-pink-300 transition-colors">TKA SD</h4>
-                  <p class="text-[11px] text-white/60 leading-relaxed">
-                    Simulasi ujian masuk SMP unggulan &amp; Olimpiade tingkat SD.
-                  </p>
+                  <div>
+                    <h4 class="text-base sm:text-lg font-black text-white group-hover:text-pink-300 transition-colors">
+                      Try Out TKA SD
+                    </h4>
+                    <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                      Simulasi ujian akademik masuk SMP unggulan, asesmen sekolah, &amp; olimpiade tingkat SD.
+                    </p>
+                  </div>
+                  <div class="pt-2 border-t border-white/10 flex items-center gap-3 text-[11px] text-slate-400">
+                    <span class="flex items-center gap-1">✓ Standar SMP Unggulan</span>
+                    <span class="flex items-center gap-1">✓ Pondasi Kuat</span>
+                  </div>
                 </div>
                 <button
                   type="button"
                   @click="startCbtExam('TKA', 'sd')"
-                  class="mt-4 w-full py-2.5 px-3 rounded-xl bg-pink-500 hover:bg-pink-400 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-pink-500/20 active:scale-95 cursor-pointer"
+                  class="mt-5 w-full py-3 px-4 rounded-xl bg-pink-500 hover:bg-pink-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-pink-500/25 active:scale-95 cursor-pointer"
                 >
-                  <i class="ph-bold ph-play-circle text-base"></i>
-                  <span>Mulai CBT SD</span>
+                  <i class="ph-bold ph-play-circle text-lg"></i>
+                  <span>Mulai Try Out CBT SD</span>
                 </button>
               </div>
+
             </div>
           </div>
 
-          <!-- Main CBT Exam Simulation Grid (Official SNPMB Interface) -->
+          <!-- Mode Latihan Soal Mandiri & Bedah Materi AI (In-Page Quick Practice) -->
+          <div class="glass-card rounded-2xl p-4 sm:p-5 border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-slate-900/90 to-slate-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl shrink-0">📖</span>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-sm sm:text-base font-black text-white">Latihan Soal Mandiri &amp; Bedah Solusi AI</h3>
+                  <span class="text-[9px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full border border-indigo-500/30">Mode Latihan</span>
+                </div>
+                <p class="text-xs text-slate-300 mt-0.5">Pilih subtes di bawah untuk berlatih mandiri. Pilihan jawaban langsung memunculkan <strong>Analisis Jalur Solusi</strong> &amp; <strong>Trik Cepat 30 Detik AI</strong> tanpa batas waktu ujian resmi.</p>
+              </div>
+            </div>
+            <div class="text-[11px] text-indigo-300 bg-indigo-500/10 px-3 py-1.5 rounded-xl border border-indigo-500/20 font-bold shrink-0 text-center">
+              Drill Latihan Cepat
+            </div>
+          </div>
+
+          <!-- Grid Area Latihan Soal Mandiri -->
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
             <!-- Left Workspace (Col 8): Official CBT Question Area -->
@@ -4237,7 +4336,7 @@
               <!-- Countdown Timer Card (Official SNPMB Header) -->
               <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
                 <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-bold text-white/60 uppercase tracking-wider">Sisa Waktu Ujian</span>
+                  <span class="text-[11px] font-bold text-white/60 uppercase tracking-wider">Timer Latihan Soal</span>
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 </div>
                 <div class="flex items-center justify-between p-3 rounded-xl bg-black/60 border border-white/10">
@@ -4267,14 +4366,14 @@
                 </div>
                 <div class="flex items-center justify-between text-[10px] text-white/50 border-t border-white/10 pt-2 font-medium">
                   <span>Peserta: <strong class="text-white">{{ currentUser?.name || 'Siswa Mandiri' }}</strong></span>
-                  <span>SNBT 2027</span>
+                  <span>Mode Latihan Mandiri</span>
                 </div>
               </div>
 
               <!-- Question Grid Number Navigator (Official CBT 5-Column Grid) -->
               <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
                 <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
-                  <h4 class="text-xs font-black text-white uppercase tracking-wider">Daftar Nomor Soal</h4>
+                  <h4 class="text-xs font-black text-white uppercase tracking-wider">Navigasi Soal Latihan</h4>
                   <span class="text-[10px] font-mono text-white/50">Subtes {{ activeSubtest }}</span>
                 </div>
 
@@ -4328,7 +4427,7 @@
                     class="w-full py-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(192,255,0,0.3)] hover:scale-[1.02] active:scale-95 cursor-pointer mt-2 flex items-center justify-center gap-1.5"
                   >
                     <i class="ph-bold ph-check-circle text-base"></i>
-                    <span>Selesai &amp; Kumpulkan Subtes</span>
+                    <span>Selesai &amp; Evaluasi Latihan Subtes</span>
                   </button>
                 </div>
               </div>
