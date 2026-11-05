@@ -162,10 +162,11 @@ function ensure_school_schema($pdo) {
 
 ensure_school_schema($pdo);
 
-// Auto-seed PRD v1.2 School Intelligence demo data if schools table is empty
+// Auto-seed PRD v1.2 School Intelligence demo data if schools table is empty or dummy student is missing
 try {
     $schCount = (int)$pdo->query("SELECT COUNT(*) FROM schools")->fetchColumn();
-    if ($schCount === 0) {
+    $hasSiswa = (int)$pdo->query("SELECT COUNT(*) FROM students WHERE email = 'rizky.sma@edupath.id'")->fetchColumn();
+    if ($schCount === 0 || $hasSiswa === 0) {
         $seederFile = __DIR__ . '/database/seeds/seed_school_intelligence.php';
         if (file_exists($seederFile)) {
             require_once $seederFile;

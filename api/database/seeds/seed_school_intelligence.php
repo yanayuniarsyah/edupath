@@ -321,16 +321,77 @@ function seed_school_intelligence_data(PDO $pdo): array {
     ");
 
     foreach ($students as $st) {
+        $emailLower = strtolower(trim($st['email']));
+        
+        // 1. Ensure user exists with exact password_hash and is_active = 1
+        $stmtU = $pdo->prepare("SELECT id FROM users WHERE LOWER(TRIM(identity_key)) = ? LIMIT 1");
+        $stmtU->execute([$emailLower]);
+        $existingUid = $stmtU->fetchColumn();
+        $uid = $existingUid ?: ('usr-' . $st['id']);
+
+        $inStdUser = $pdo->prepare("
+            INSERT INTO users (id, identity_key, password, display_name, is_active)
+            VALUES (?, ?, ?, ?, 1)
+            ON DUPLICATE KEY UPDATE password = VALUES(password), display_name = VALUES(display_name), is_active = 1
+        ");
+        $inStdUser->execute([$uid, $emailLower, $password_hash, $st['name']]);
+        
+        // Re-query to guarantee exact UID in database
+        $stmtU->execute([$emailLower]);
+        $actualUid = $stmtU->fetchColumn() ?: $uid;
+
+        // 2. Ensure student exists in students table with password and is_active = 1
+        $inStudent = $pdo->prepare("
+            INSERT INTO students (id, tenant_id, school_id, school, name, email, password, phone, target_ptn, plan, academic_program, target_level, grade_level, is_active)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+            ON DUPLICATE KEY UPDATE 
+                school_id = VALUES(school_id), school = VALUES(school), name = VALUES(name),
+                password = VALUES(password), phone = VALUES(phone),
+                target_ptn = VALUES(target_ptn), plan = VALUES(plan), 
+                academic_program = VALUES(academic_program), target_level = VALUES(target_level),
+                grade_level = VALUES(grade_level), is_active = 1
+        ");
         $inStudent->execute([
             $st['id'], $tenant_id, $st['school_id'], $st['school_name'],
-            $st['name'], $st['email'], $password_hash, $st['phone'],
+            $st['name'], $emailLower, $password_hash, $st['phone'],
             $st['target_ptn'], $st['plan'], $st['academic_program'],
             $st['target_level'], $st['grade_level']
         ]);
-        $inStdUser->execute(['usr-' . $st['id'], $st['email'], $password_hash]);
-        $inStdRole->execute(['rol-' . $st['id'], 'usr-' . $st['id'], $tenant_id, $st['id']]);
+
+        $stmtS = $pdo->prepare("SELECT id FROM students WHERE LOWER(TRIM(email)) = ? LIMIT 1");
+        $stmtS->execute([$emailLower]);
+        $actualStdId = $stmtS->fetchColumn() ?: $st['id'];
+
+        // 3. Ensure user_roles has exact clean mapping
+        try {
+            $pdo->prepare("DELETE FROM user_roles WHERE user_id = ? OR (reference_id = ? AND role = 'student')")
+                ->execute([$actualUid, $actualStdId]);
+            $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'student', ?)")
+                ->execute(['rol-' . bin2hex(random_bytes(8)), $actualUid, $tenant_id, $actualStdId]);
+        } catch (\Throwable $re) {}
     }
     $summary['students_seeded'] = count($students);
+
+    // 2b. GURU / TUTOR BIMBEL DUMMY
+    $guruEmail = 'guru.matematika@edupath.id';
+    $stmtG = $pdo->prepare("SELECT id FROM users WHERE LOWER(TRIM(identity_key)) = ? LIMIT 1");
+    $stmtG->execute([$guruEmail]);
+    $gUid = $stmtG->fetchColumn() ?: 'usr-guru-001';
+    
+    $pdo->prepare("
+        INSERT INTO users (id, identity_key, password, display_name, is_active)
+        VALUES (?, ?, ?, 'Hendra Wijaya, S.Si (Guru Matematika)', 1)
+        ON DUPLICATE KEY UPDATE password = VALUES(password), display_name = VALUES(display_name), is_active = 1
+    ")->execute([$gUid, $guruEmail, $password_hash]);
+
+    $stmtG->execute([$guruEmail]);
+    $gUidActual = $stmtG->fetchColumn() ?: $gUid;
+
+    try {
+        $pdo->prepare("DELETE FROM user_roles WHERE user_id = ?")->execute([$gUidActual]);
+        $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'teacher', ?)")
+            ->execute(['rol-guru-001', $gUidActual, $tenant_id, $gUidActual]);
+    } catch (\Throwable $ge) {}
 
     // -------------------------------------------------------------
     // 3. NILAI RAPOR MULTI-SEMESTER & DETAILS

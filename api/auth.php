@@ -326,6 +326,66 @@ elseif ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Direct student fallback & auto-healing if user table or user_roles was missing/mismatched
+    if (!$user || !$password_matched) {
+        try {
+            $stmtDirect = $pdo->prepare("
+                SELECT id as student_id, name, email, password as student_password, school, school_id, phone,
+                       target_ptn, academic_program, target_level, grade_level, target_goal, plan, tenant_id, is_active
+                FROM students
+                WHERE LOWER(TRIM(email)) = LOWER(TRIM(?)) AND is_active = 1
+                LIMIT 1
+            ");
+            $stmtDirect->execute([$email]);
+            $directStd = $stmtDirect->fetch(PDO::FETCH_ASSOC);
+            if ($directStd && password_verify($password, $directStd['student_password'] ?? '')) {
+                // Auto-heal users and user_roles
+                $uidFix = 'usr-std-' . bin2hex(random_bytes(8));
+                try {
+                    $pdo->prepare("INSERT INTO users (id, identity_key, password, display_name, is_active) VALUES (?, ?, ?, ?, 1) ON DUPLICATE KEY UPDATE password = VALUES(password)")
+                        ->execute([$uidFix, $directStd['email'], $directStd['student_password'], $directStd['name']]);
+                    $actualUid = $pdo->query("SELECT id FROM users WHERE LOWER(TRIM(identity_key)) = LOWER(TRIM(" . $pdo->quote($directStd['email']) . ")) LIMIT 1")->fetchColumn() ?: $uidFix;
+                    $pdo->prepare("DELETE FROM user_roles WHERE user_id = ? OR reference_id = ?")->execute([$actualUid, $directStd['student_id']]);
+                    $pdo->prepare("INSERT INTO user_roles (id, user_id, tenant_id, role, reference_id) VALUES (?, ?, ?, 'student', ?)")
+                        ->execute(['rol-' . bin2hex(random_bytes(8)), $actualUid, $directStd['tenant_id'] ?: 'default_tenant', $directStd['student_id']]);
+                } catch (\Throwable $eHeal) {}
+
+                $user = [
+                    'user_id' => $actualUid ?? $uidFix,
+                    'identity_key' => $directStd['email'],
+                    'user_display_name' => $directStd['name'],
+                    'user_password' => $directStd['student_password'],
+                    'student_password' => $directStd['student_password'],
+                    'student_email' => $directStd['email'],
+                    'role' => 'student',
+                    'tenant_id' => $directStd['tenant_id'] ?: 'default_tenant',
+                    'reference_id' => $directStd['student_id'],
+                    'student_id' => $directStd['student_id'],
+                    'name' => $directStd['name'],
+                    'email' => $directStd['email'],
+                    'student_school' => $directStd['school'],
+                    'student_phone' => $directStd['phone'],
+                    'target_ptn' => $directStd['target_ptn'] ?? '',
+                    'academic_program' => $directStd['academic_program'] ?? 'SNPMB_UTBK',
+                    'target_level' => $directStd['target_level'] ?? 'SMA',
+                    'grade_level' => $directStd['grade_level'] ?? '',
+                    'target_goal' => $directStd['target_goal'] ?? $directStd['target_ptn'] ?? '',
+                    'plan' => $directStd['plan'] ?? 'free',
+                    'tenant_active' => 1,
+                    'affiliate_id' => null,
+                    'referral_code' => '',
+                    'school_id' => $directStd['school_id'] ?? null,
+                    'school_name' => $directStd['school'] ?? '',
+                    'bk_name' => null,
+                    'bk_email' => null,
+                    'school_city' => null,
+                    'school_slug' => null
+                ];
+                $password_matched = true;
+            }
+        } catch (\Throwable $eFallback) {}
+    }
+
     if ($user && $password_matched) {
         // If account has school_bk role or matches registered school BK email
         if ($user['role'] === 'school_bk' || (!empty($user['bk_email']) && strtolower(trim($user['bk_email'])) === strtolower(trim($email)))) {

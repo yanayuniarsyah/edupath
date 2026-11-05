@@ -5414,13 +5414,10 @@
                     </button>
                   </div>
 
-                  <div class="text-[9px] text-slate-400 font-bold pt-1">Role Guru &amp; Admin:</div>
-                  <div class="grid grid-cols-2 gap-1.5 text-[10px]">
-                    <button type="button" @click="fillDemoAccount('guru.matematika@edupath.id', 'password123')" class="px-2 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-300 font-bold text-center truncate cursor-pointer transition">
-                      👨‍🏫 Guru Bimbel
-                    </button>
-                    <button type="button" @click="fillDemoAccount('admin', 'admin123')" class="px-2 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 font-bold text-center truncate cursor-pointer transition">
-                      🛡️ Super Admin
+                  <div class="text-[9px] text-slate-400 font-bold pt-1">Role Guru Bimbel:</div>
+                  <div>
+                    <button type="button" @click="fillDemoAccount('guru.matematika@edupath.id', 'password123')" class="w-full px-2 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-300 font-bold text-center truncate cursor-pointer transition">
+                      👨‍🏫 Guru/Tutor Bimbel (Hendra Wijaya, S.Si)
                     </button>
                   </div>
                 </div>
@@ -7810,24 +7807,9 @@ export default {
           return;
         }
 
-        // 2. Administrator & Superadmin
+        // 2. Administrator & Superadmin wajib masuk melalui portal admin khusus di /#/admin
         if (['admin', 'superadmin'].includes(res.user?.role)) {
-          sessionStorage.setItem('admin_token', res.token);
-          sessionStorage.setItem('admin_role', res.user.role);
-          sessionStorage.setItem('ep_user', JSON.stringify(res.user));
-          localStorage.setItem('auth_token', res.token);
-          localStorage.setItem('user', JSON.stringify(res.user));
-          if (res.user.name) localStorage.setItem('user_name', res.user.name);
-          if (res.user.email) localStorage.setItem('user_email', res.user.email);
-          showLoginModal.value = false;
-          showToast('Selamat datang, Administrator ' + (res.user.name || '') + '!');
-          const urlParams = new URLSearchParams(window.location.search);
-          if (urlParams.get('redirect') === 'school') {
-            window.location.hash = '#/school';
-          } else {
-            window.location.hash = '#/admin';
-          }
-          window.location.reload();
+          authError.value = 'Akun Administrator & Superadmin Cabang wajib masuk melalui portal login admin khusus di /#/admin.';
           return;
         }
 
