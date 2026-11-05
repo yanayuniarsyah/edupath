@@ -45,8 +45,8 @@
             </div>
           </div>
           <!-- Close button for mobile -->
-          <button v-show="(sidebarExpanded || mobileSidebarOpen)" @click="mobileSidebarOpen = false" class="lg:hidden w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all cursor-pointer shrink-0" aria-label="Tutup Menu" title="Tutup Menu">
-            <i class="ph-bold ph-x text-sm"></i>
+          <button v-show="(sidebarExpanded || mobileSidebarOpen)" @click="mobileSidebarOpen = false" class="lg:hidden modal-close-btn shrink-0" aria-label="Tutup" title="Tutup">
+            <i class="ph-bold ph-x"></i>
           </button>
         </div>
         <p v-show="(sidebarExpanded || mobileSidebarOpen)" class="text-xs text-white/40 font-semibold mb-3 uppercase tracking-wider whitespace-nowrap shrink-0">Adaptive Learning Platform</p>
@@ -2892,10 +2892,7 @@
                   <span>Latihan</span>
                 </button>
               </div>
-              <button 
-                type="button"
-                @click="currentTab = 'offline_sop'" 
-                class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md shadow-sm"
+              <button v-if="!isTeacher" type="button" @click="currentTab = 'offline_sop'" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md shadow-sm"
               >
                 <span class="text-sm">🏢</span>
                 <span>SOP &amp; Tanggung Jawab Bimbel</span>
@@ -2920,10 +2917,7 @@
                 </p>
               </div>
             </div>
-            <button 
-              type="button"
-              @click="currentTab = 'offline_sop'" 
-              class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition-all flex items-center justify-center gap-2 shrink-0 shadow-lg shadow-amber-400/20 cursor-pointer"
+            <button v-if="!isTeacher" type="button" @click="currentTab = 'offline_sop'" class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition-all flex items-center justify-center gap-2 shrink-0 shadow-lg shadow-amber-400/20 cursor-pointer"
             >
               <span>{{ sopCardButtonText }}</span>
               <i class="ph-bold ph-arrow-right"></i>
@@ -3806,10 +3800,7 @@
               </div>
             </div>
             <div class="flex items-center gap-2">
-              <button 
-                type="button"
-                @click="currentTab = 'offline_sop'" 
-                class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+              <button v-if="!isTeacher" type="button" @click="currentTab = 'offline_sop'" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer"
                 title="Panduan SOP & Tanggung Jawab Bimbel Offline"
               >
                 <span>🏢</span>
@@ -5425,14 +5416,8 @@
         </div>
         <p class="text-[11px] text-white/60 truncate font-medium mt-0.5">{{ liveActivityList[currentActivityIdx].desc }}</p>
       </div>
-      <button
-        type="button"
-        @click.stop="showLiveActivity = false"
-        class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/25 text-white/70 hover:text-rose-300 border border-white/20 hover:scale-110 active:scale-90 flex items-center justify-center transition-all cursor-pointer shrink-0 ml-1"
-        title="Tutup Notifikasi"
-        aria-label="Tutup"
-      >
-        <i class="ph-bold ph-x text-xs pointer-events-none"></i>
+      <button type="button" @click.stop="showLiveActivity = false" class="modal-close-btn shrink-0 ml-1" title="Tutup" aria-label="Tutup">
+        <i class="ph-bold ph-x"></i>
       </button>
     </div>
 
@@ -6728,11 +6713,16 @@ export default {
       if (isAdmin.value && !isStudentPreviewMode.value) {
         return adminTabs;
       }
+      let res = studentTabs;
       // Hide Home tab for logged-in users
       if (isLoggedIn.value) {
-        return studentTabs.filter(t => t.id !== 'home');
+        res = res.filter(t => t.id !== 'home');
       }
-      return studentTabs;
+      // SOP Bimbel disembunyikan untuk role Guru (guru fokus ke Jadwal & BAP)
+      if (isTeacher.value) {
+        res = res.filter(t => t.id !== 'offline_sop');
+      }
+      return res;
     });
     const isLoginMode = ref(true);
     
