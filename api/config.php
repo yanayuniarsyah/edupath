@@ -89,17 +89,20 @@ $port    = env('DB_PORT', '3306');
 // Validasi: pastikan konfigurasi database ada
 if (empty($db_user) || empty($db_name)) {
     http_response_code(500);
-    echo json_encode([
+    $resp = [
         "success" => false,
         "error" => "Konfigurasi server tidak lengkap: DB_USER atau DB_NAME belum terbaca di .env cPanel.",
-        "status" => "error",
-        "debug_paths" => [
+        "status" => "error"
+    ];
+    if (env('APP_DEBUG') === 'true' || env('APP_ENV') === 'development') {
+        $resp["debug_paths"] = [
             "api_dir" => __DIR__,
             "root_dir" => dirname(__DIR__),
             "api_env_exists" => file_exists(__DIR__ . '/.env'),
             "root_env_exists" => file_exists(dirname(__DIR__) . '/.env')
-        ]
-    ]);
+        ];
+    }
+    echo json_encode($resp);
     exit;
 }
 

@@ -131,6 +131,8 @@ function ensure_school_schema($pdo) {
               updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
               KEY idx_gr_school (school_id),
               KEY idx_gr_student (student_id),
+              KEY idx_gr_school_student (school_id, student_id),
+              KEY idx_gr_student_created (student_id, created_at),
               KEY idx_gr_priority (priority),
               KEY idx_gr_status (status)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -152,6 +154,7 @@ function ensure_school_schema($pdo) {
               updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
               KEY idx_at_school (school_id),
               KEY idx_at_student (student_id),
+              KEY idx_at_school_student (school_id, student_id),
               KEY idx_at_path (selection_path)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
         ");
@@ -212,19 +215,26 @@ if ($action === 'seed_dummy') {
 // PUBLIC LIST (Untuk dropdown asal sekolah saat registrasi/profil siswa)
 // -------------------------------------------------------------
 if ($action === 'public_list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    header('Cache-Control: public, max-age=120, stale-while-revalidate=600');
+    $schools = [];
     try {
         $stmt = $pdo->query("SELECT id, name, city, province FROM schools WHERE is_active IS NULL OR is_active != 0 ORDER BY name ASC");
         $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(["success" => true, "schools" => $schools]);
     } catch (\Throwable $e) {
         try {
             $stmt = $pdo->query("SELECT id, name, city, province FROM schools ORDER BY name ASC");
             $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode(["success" => true, "schools" => $schools]);
         } catch (\Throwable $e2) {
-            echo json_encode(["success" => true, "schools" => []]);
+            $schools = [];
         }
     }
+    $etag = '"' . md5(json_encode($schools)) . '"';
+    header("ETag: $etag");
+    if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
+        http_response_code(304);
+        exit;
+    }
+    echo json_encode(["success" => true, "schools" => $schools]);
     exit;
 }
 
@@ -1643,19 +1653,27 @@ if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_MET
     $rcStmt->execute([$student_id]);
     $reportCards = $rcStmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $detStmt = $pdo->prepare("
-        SELECT subject_name, score, letter_grade, kkm, competency_achievement 
-        FROM report_card_details 
-        WHERE report_card_id = ?
-        ORDER BY subject_name ASC
-    ");
+    $rcIds = array_column($reportCards, 'id');
+    $detailsByRc = [];
+    if (!empty($rcIds)) {
+        $placeholders = implode(',', array_fill(0, count($rcIds), '?'));
+        $detStmt = $pdo->prepare("
+            SELECT report_card_id, subject_name, score, letter_grade, kkm, competency_achievement 
+            FROM report_card_details 
+            WHERE report_card_id IN ($placeholders)
+            ORDER BY subject_name ASC
+        ");
+        $detStmt->execute($rcIds);
+        foreach ($detStmt->fetchAll(PDO::FETCH_ASSOC) as $dtRow) {
+            $detailsByRc[$dtRow['report_card_id']][] = $dtRow;
+        }
+    }
 
     $semesterProgression = [];
     $allSubjectScores = [];
 
     foreach ($reportCards as &$rc) {
-        $detStmt->execute([$rc['id']]);
-        $rc['details'] = $detStmt->fetchAll(PDO::FETCH_ASSOC);
+        $rc['details'] = $detailsByRc[$rc['id']] ?? [];
         $avg = count($rc['details']) > 0 ? round(array_sum(array_column($rc['details'], 'score')) / count($rc['details']), 2) : 0;
         $rc['average_score'] = $avg;
         $label = $rc['academic_year'] . ' (' . ucfirst($rc['semester']) . ')';
@@ -1668,6 +1686,7 @@ if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_MET
             $allSubjectScores[$dt['subject_name']][] = (float)$dt['score'];
         }
     }
+    unset($rc);
 
     // 2. CBT / Assessment Tryout History
     $cbtStmt = $pdo->prepare("

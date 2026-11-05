@@ -30,7 +30,8 @@ if (preg_match('#^/(scratch|api/backups|api/tests)/#i', $uri)) {
 // RewriteRule ^progress/(.*)$ progress.php?action=$1
 // RewriteRule ^payment/(.*)$ payment.php?action=$1
 // RewriteRule ^quiz/(.*)$ quiz.php?action=$1
-if (preg_match('#^/api/(auth|admin|progress|payment|quiz)/(.*)$#', $uri, $m)) {
+// RewriteRule ^school/(.*)$ school.php?action=$1
+if (preg_match('#^/api/(auth|admin|progress|payment|quiz|school)/(.*)$#', $uri, $m)) {
     $_GET['action'] = $m[2];
     $targetScript = __DIR__ . '/api/' . $m[1] . '.php';
     if (file_exists($targetScript)) {
