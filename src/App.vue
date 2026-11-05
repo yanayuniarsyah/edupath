@@ -94,7 +94,7 @@
               <div class="relative shrink-0 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-white/10" :class="(sidebarExpanded || mobileSidebarOpen) ? 'w-6 h-6' : 'w-8 h-8'">
                 <span class="absolute text-xs font-black opacity-100 text-white">{{ tab.label.charAt(0) }}</span>
                 <i :class="['ph-bold relative z-10', tab.icon, (sidebarExpanded || mobileSidebarOpen) ? 'text-lg' : 'text-xl', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/70 group-hover:text-white']"></i>
-                <i v-if="['diagnostic', 'learning', 'simulator'].includes(tab.id) && isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
+                <i v-if="['learning', 'simulator'].includes(tab.id) && isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
               </div>
               <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="font-bold tracking-tight whitespace-nowrap" :class="currentTab === tab.id ? 'text-white' : ''">{{ tab.label }}</span>
             </button>
@@ -6644,6 +6644,8 @@ export default {
       if (isStaff.value) return true;
       if (isAffiliate.value || isSchoolBk.value) return true;
       if (currentUser.value?.is_premium) return true;
+      const pkg = (currentUser.value?.package_code || currentUser.value?.package_name || currentUser.value?.paket || '').toLowerCase();
+      if (pkg && !pkg.includes('free') && !pkg.includes('trial')) return true;
       const p = (currentUser.value?.plan || currentUser.value?.plan_name || '').toLowerCase();
       if (!p || p === 'free' || p === 'trial' || p === 'paket free / trial' || p === 'paket free') return false;
       return true;
@@ -7480,7 +7482,7 @@ export default {
             }
 
             // Guard trial student from staying on premium tabs
-            if (['simulator', 'studyroom', 'learning', 'diagnostic'].includes(currentTab.value) && !res.user.is_premium && !['admin', 'superadmin', 'teacher', 'guru', 'tutor'].includes(userRoleLower)) {
+            if (['simulator', 'studyroom', 'learning'].includes(currentTab.value) && !isPremiumUser.value && !['admin', 'superadmin', 'teacher', 'guru', 'tutor'].includes(userRoleLower)) {
               currentTab.value = 'dashboard';
             }
           }
@@ -7825,7 +7827,7 @@ export default {
     };
 
     const materiSubMenuOpen = ref(false);
-    const premiumTabs = ['simulator', 'studyroom', 'learning', 'diagnostic'];
+    const premiumTabs = ['simulator', 'studyroom', 'learning'];
 
     const handleTabClick = (tabId) => {
       if (tabId === 'offline_sop') {
@@ -8154,14 +8156,14 @@ export default {
 
     // Dynamic Student Level Computation based on Plan & Academic Program
     const activeStudentLevel = computed(() => {
-      const prog = (activeAcademicProgram.value || '').toUpperCase();
-      if (prog === 'TKA_SD') return 'SD';
-      if (prog === 'TKA_SMP') return 'SMP';
-      if (prog === 'TKA_SMA') return 'SMA';
-      const p = (currentUser.value?.plan || currentUser.value?.plan_name || '').toLowerCase();
+      const prog = (activeAcademicProgram.value || currentUser.value?.academic_program || '').toUpperCase();
+      if (prog.includes('SD')) return 'SD';
+      if (prog.includes('SMP')) return 'SMP';
+      if (prog.includes('SMA')) return 'SMA';
+      const p = (currentUser.value?.plan || currentUser.value?.plan_name || currentUser.value?.package_code || currentUser.value?.package_name || currentUser.value?.paket || '').toLowerCase();
       if (p.includes('sd')) return 'SD';
       if (p.includes('smp')) return 'SMP';
-      if (p.includes('tka_sma')) return 'SMA';
+      if (p.includes('tka_sma') || p.includes('sma')) return 'SMA';
       return 'SNBT';
     });
 

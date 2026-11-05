@@ -400,6 +400,9 @@
               <p class="text-[10px] text-white/40">Kelola data sekolah rekanan, akun koordinator BK, link referral pendaftaran siswa, dan pantau sebaran siswa &amp; paket</p>
             </div>
             <div class="flex items-center gap-2">
+              <button @click="triggerSeedSchoolDummy" class="px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-purple-500/40 cursor-pointer" title="Suntik data dummy PRD v1.2 untuk sekolah SD, SMP, SMA, dan Siswa">
+                <span>🌱</span> Suntik Dummy PRD v1.2
+              </button>
               <button @click="fetchSchools" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-white/10 cursor-pointer">
                 <i class="ph-bold ph-arrows-clockwise" :class="isSchoolsLoading ? 'animate-spin' : ''"></i> Refresh
               </button>
@@ -7542,6 +7545,24 @@ const filteredAdminSchools = computed(() => {
   }
   return list;
 });
+
+const triggerSeedSchoolDummy = async () => {
+  if (!confirm('Suntik / refresh data dummy PRD v1.2 (Sekolah SD/SMP/SMA, Siswa, Rapor, CBT, & Konseling)?')) return;
+  try {
+    isSchoolsLoading.value = true;
+    const res = await api.seedSchoolDummy();
+    if (res?.success) {
+      alert(res.message || 'Data dummy PRD v1.2 berhasil disuntikkan!');
+      await fetchSchools();
+    } else {
+      alert(res?.error || 'Gagal menyuntikkan data dummy.');
+    }
+  } catch (err) {
+    alert('Error: ' + err.message);
+  } finally {
+    isSchoolsLoading.value = false;
+  }
+};
 
 const fetchSchools = async () => {
   isSchoolsLoading.value = true;

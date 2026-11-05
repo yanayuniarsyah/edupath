@@ -1338,7 +1338,160 @@
                   <i class="ph-bold ph-floppy-disk"></i>
                   <span>{{ isSavingSchoolSettings ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
                 </button>
-              
+              </template>
+            </div>
+          </div>
+          <!-- 1. VIEW MODE (Profil Sekolah) -->
+          <div v-if="!isEditingSchoolSettings" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- View Card 1: Data Koordinator BK -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Koordinator Guru BK</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Aktif</span>
+              </div>
+              <div class="space-y-3.5 text-xs">
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Guru BK</span>
+                  <div class="text-sm font-bold text-white">{{ schoolData?.bk_name || '-' }}</div>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Email Login Guru BK</span>
+                  <div class="text-sm font-mono text-white/90">{{ schoolData?.bk_email || '-' }}</div>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nomor WhatsApp / HP</span>
+                  <div class="text-sm font-mono text-[#c0ff00] font-bold">{{ schoolData?.bk_phone || '-' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- View Card 2: Data Lembaga Sekolah -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-graduation-cap text-emerald-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Identitas Sekolah Mitra</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Mitra Resmi</span>
+              </div>
+              <div class="space-y-3.5 text-xs">
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Sekolah</span>
+                  <div class="text-sm font-bold text-white">{{ schoolData?.name || '-' }}</div>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Kota / Kabupaten</span>
+                  <div class="text-sm font-medium text-white">{{ schoolData?.city || '-' }}</div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">NPSN</span>
+                    <div class="text-xs font-mono text-white/80">{{ schoolData?.npsn || '-' }}</div>
+                  </div>
+                  <div>
+                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Estimasi Siswa</span>
+                    <div class="text-xs font-bold text-white">{{ schoolData?.estimated_students || '200' }} Siswa</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- View Card 3: Keamanan Akun -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-3 md:col-span-2">
+              <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                  <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
+                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Kata Sandi</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">Terenkripsi BCRYPT</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-white/70">Password akun portal BK sekolah Anda terlindungi dengan enkripsi aman standar perbankan.</span>
+                <button @click="startEditSchoolSettings" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold underline cursor-pointer">
+                  Ubah Kata Sandi &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. EDIT MODE (Form Profil Sekolah) -->
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Edit Card 1: Data Koordinator BK -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Data Koordinator BK</h3>
+              </div>
+              <div class="space-y-3 text-xs">
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Koordinator BK</label>
+                  <input v-model="schoolSettingsForm.bk_name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Dra. H. Nuraeni, M.Pd" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Login Koordinator BK</label>
+                  <input v-model="schoolSettingsForm.email" type="email" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="bk@sekolah.sch.id" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor WhatsApp / HP</label>
+                  <input v-model="schoolSettingsForm.phone" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="08123456789" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Edit Card 2: Identitas Sekolah -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
+              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                <i class="ph-bold ph-graduation-cap text-emerald-400 text-lg"></i>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Identitas Sekolah</h3>
+              </div>
+              <div class="space-y-3 text-xs">
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Sekolah</label>
+                  <input v-model="schoolSettingsForm.name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: SMAN 1 Ciamis" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kota / Kabupaten</label>
+                  <input v-model="schoolSettingsForm.city" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Kabupaten Ciamis" />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">NPSN</label>
+                    <input v-model="schoolSettingsForm.npsn" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="NPSN Sekolah" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Estimasi Siswa</label>
+                    <input v-model.number="schoolSettingsForm.estimated_students" type="number" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="200" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Edit Card 3: Keamanan / Ganti Password -->
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4 md:col-span-2">
+              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
+                <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
+                <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Ganti Password</h3>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password Baru (Kosongkan jika tidak diubah)</label>
+                  <input v-model="schoolSettingsForm.new_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Minimal 6 karakter" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Konfirmasi Password Baru</label>
+                  <input v-model="schoolSettingsForm.confirm_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Ulangi password baru" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
     <!-- ============================================================== -->
     <!-- MODAL: INPUT / EDIT MANUAL NILAI RAPOR                         -->
     <!-- ============================================================== -->
@@ -1691,160 +1844,6 @@
       </div>
     </div>
 
-</template>
-            </div>
-          </div>
-
-          <!-- 1. VIEW MODE (Profil Sekolah) -->
-          <div v-if="!isEditingSchoolSettings" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- View Card 1: Data Koordinator BK -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
-              <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                <div class="flex items-center gap-2">
-                  <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
-                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Koordinator Guru BK</h3>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Aktif</span>
-              </div>
-              <div class="space-y-3.5 text-xs">
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Guru BK</span>
-                  <div class="text-sm font-bold text-white">{{ schoolData?.bk_name || '-' }}</div>
-                </div>
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Email Login Guru BK</span>
-                  <div class="text-sm font-mono text-white/90">{{ schoolData?.bk_email || '-' }}</div>
-                </div>
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nomor WhatsApp / HP</span>
-                  <div class="text-sm font-mono text-[#c0ff00] font-bold">{{ schoolData?.bk_phone || '-' }}</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- View Card 2: Data Lembaga Sekolah -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
-              <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                <div class="flex items-center gap-2">
-                  <i class="ph-bold ph-graduation-cap text-emerald-400 text-lg"></i>
-                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Identitas Sekolah Mitra</h3>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Mitra Resmi</span>
-              </div>
-              <div class="space-y-3.5 text-xs">
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Nama Sekolah</span>
-                  <div class="text-sm font-bold text-white">{{ schoolData?.name || '-' }}</div>
-                </div>
-                <div>
-                  <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Kota / Kabupaten</span>
-                  <div class="text-sm font-medium text-white">{{ schoolData?.city || '-' }}</div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                  <div>
-                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">NPSN</span>
-                    <div class="text-xs font-mono text-white/80">{{ schoolData?.npsn || '-' }}</div>
-                  </div>
-                  <div>
-                    <span class="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-0.5">Estimasi Siswa</span>
-                    <div class="text-xs font-bold text-white">{{ schoolData?.estimated_students || '200' }} Siswa</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- View Card 3: Keamanan Akun -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-3 md:col-span-2">
-              <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                <div class="flex items-center gap-2">
-                  <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
-                  <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Kata Sandi</h3>
-                </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">Terenkripsi BCRYPT</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs text-white/70">Password akun portal BK sekolah Anda terlindungi dengan enkripsi aman standar perbankan.</span>
-                <button @click="startEditSchoolSettings" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold underline cursor-pointer">
-                  Ubah Kata Sandi &rarr;
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 2. EDIT MODE (Form Profil Sekolah) -->
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Edit Card 1: Data Koordinator BK -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
-              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
-                <i class="ph-bold ph-user-circle text-indigo-400 text-lg"></i>
-                <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Data Koordinator BK</h3>
-              </div>
-              <div class="space-y-3 text-xs">
-                <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Koordinator BK</label>
-                  <input v-model="schoolSettingsForm.bk_name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Dra. H. Nuraeni, M.Pd" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Email Login Koordinator BK</label>
-                  <input v-model="schoolSettingsForm.email" type="email" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="bk@sekolah.sch.id" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nomor WhatsApp / HP</label>
-                  <input v-model="schoolSettingsForm.phone" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="08123456789" />
-                </div>
-              </div>
-            </div>
-
-            <!-- Edit Card 2: Identitas Sekolah -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4">
-              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
-                <i class="ph-bold ph-graduation-cap text-emerald-400 text-lg"></i>
-                <h3 class="font-black text-white text-xs uppercase tracking-wider">Edit Identitas Sekolah</h3>
-              </div>
-              <div class="space-y-3 text-xs">
-                <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Nama Sekolah</label>
-                  <input v-model="schoolSettingsForm.name" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: SMAN 1 Ciamis" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Kota / Kabupaten</label>
-                  <input v-model="schoolSettingsForm.city" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Cth: Kabupaten Ciamis" />
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">NPSN</label>
-                    <input v-model="schoolSettingsForm.npsn" type="text" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="NPSN Sekolah" />
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Estimasi Siswa</label>
-                    <input v-model.number="schoolSettingsForm.estimated_students" type="number" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="200" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Edit Card 3: Keamanan / Ganti Password -->
-            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-5 space-y-4 md:col-span-2">
-              <div class="flex items-center gap-2 border-b border-white/10 pb-3">
-                <i class="ph-bold ph-lock-key text-amber-400 text-lg"></i>
-                <h3 class="font-black text-white text-xs uppercase tracking-wider">Keamanan &amp; Ganti Password</h3>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Password Baru (Kosongkan jika tidak diubah)</label>
-                  <input v-model="schoolSettingsForm.new_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Minimal 6 karakter" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Konfirmasi Password Baru</label>
-                  <input v-model="schoolSettingsForm.confirm_password" type="password" class="w-full p-2.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]" placeholder="Ulangi password baru" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </main>
 
     <!-- ============================================================== -->
     <!-- MODAL: QR CODE SISWA POPUP                                     -->
@@ -2768,10 +2767,25 @@ watch(activeTab, (newTab) => {
     fetchGuidanceRecords();
   } else if (newTab === 'admission') {
     fetchAdmissionReadiness();
-  } else if (newTab === 'student_360' && !student360Data.value && students.value.length > 0) {
-    selectedStudent360Id.value = students.value[0].id;
-    loadStudent360(students.value[0].id);
+  } else if (newTab === 'student_360') {
+    if (!student360Data.value) {
+      if (students.value.length > 0) {
+        selectedStudent360Id.value = students.value[0].id;
+        loadStudent360(students.value[0].id);
+      } else {
+        fetchStudents(1).then(() => {
+          if (students.value.length > 0) {
+            selectedStudent360Id.value = students.value[0].id;
+            loadStudent360(students.value[0].id);
+          }
+        });
+      }
+    }
   }
+});
+
+watch(filterPackage, () => {
+  fetchStudents(1);
 });
 
 async function loadAllDashboardData() {

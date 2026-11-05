@@ -1012,7 +1012,7 @@ function get_standard_subjects_config($level = 'SMA', $curriculum = 'Kurikulum M
 // -------------------------------------------------------------
 if ($action === 'seed_dummy') {
     try {
-        require_once dirname(__DIR__) . '/api/database/seeds/seed_school_intelligence.php';
+        require_once __DIR__ . '/database/seeds/seed_school_intelligence.php';
         $res = seed_school_intelligence_data($pdo);
         echo json_encode(["success" => true, "message" => "Data dummy School Intelligence berhasil disuntikkan.", "details" => $res]);
         exit;
