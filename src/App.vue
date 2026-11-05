@@ -5998,24 +5998,7 @@ export default {
       startCbtTimer();
     };
 
-    // Auto-start timer saat tab simulator dibuka
-    watch(currentTab, (newTab) => {
-      if (newTab === 'simulator') {
-        startCbtTimer();
-      } else {
-        stopCbtTimer();
-      }
-    });
 
-    onMounted(() => {
-      if (currentTab.value === 'simulator') {
-        startCbtTimer();
-      }
-    });
-
-    onUnmounted(() => {
-      stopCbtTimer();
-    });
 
     const cbtFormattedTimer = computed(() => {
       const h = Math.floor(cbtTimerSeconds.value / 3600);
@@ -7337,6 +7320,15 @@ export default {
     const handleTabClick = (tabId) => {
       if (tabId === 'offline_sop') {
         showOfflineRoleModal.value = true;
+
+    // Auto-start timer saat tab simulator dibuka (Dipasang aman setelah inisialisasi currentTab)
+    watch(currentTab, (newTab) => {
+      if (newTab === 'simulator') {
+        startCbtTimer();
+      } else {
+        stopCbtTimer();
+      }
+    });
         return;
       }
       const adminTarget = adminTabs.find(t => t.id === tabId);
