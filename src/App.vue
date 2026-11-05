@@ -2885,12 +2885,12 @@
               </div>
               <div>
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/15 px-2.5 py-0.5 rounded-full border border-amber-400/30">Panduan Operasional Terpadu</span>
-                  <span class="text-xs text-white/50 font-medium">SOP &amp; Matriks RACI 7 Role</span>
+                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/15 px-2.5 py-0.5 rounded-full border border-amber-400/30">{{ sopCardRoleBadge }}</span>
+                  <span class="text-xs text-white/50 font-medium">{{ sopCardSubBadge }}</span>
                 </div>
-                <h3 class="text-base sm:text-lg font-black text-white mt-1">Tanggung Jawab Utama dalam Bimbel Offline</h3>
+                <h3 class="text-base sm:text-lg font-black text-white mt-1">{{ sopCardTitle }}</h3>
                 <p class="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
-                  Pelajari standar operasional prosedur, hak &amp; kewajiban tatap muka, syarat absensi minimal 75%, tata cara make-up class, serta pembagian peran (Superadmin, Admin Cabang, FO, Guru, Siswa, dan Wali Murid).
+                  {{ sopCardDescription }}
                 </p>
               </div>
             </div>
@@ -2899,7 +2899,7 @@
               @click="currentTab = 'offline_sop'" 
               class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition-all flex items-center justify-center gap-2 shrink-0 shadow-lg shadow-amber-400/20 cursor-pointer"
             >
-              <span>Buka Panduan Seluruh Role</span>
+              <span>{{ sopCardButtonText }}</span>
               <i class="ph-bold ph-arrow-right"></i>
             </button>
           </div>
@@ -3783,7 +3783,7 @@
                 type="button"
                 @click="currentTab = 'offline_sop'" 
                 class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer"
-                title="Panduan SOP & Tanggung Jawab Bimbel Offline Lintas Peran"
+                title="Panduan SOP & Tanggung Jawab Bimbel Offline"
               >
                 <span>🏢</span>
                 <span class="hidden sm:inline">Tanggung Jawab Offline</span>
@@ -4258,7 +4258,7 @@
                   <span class="text-xs text-white/50">Cabang Fisik &amp; Hybrid EduPath</span>
                 </div>
                 <h2 class="text-base sm:text-xl md:text-2xl font-black text-white leading-tight truncate mt-1">
-                  {{ isTeacher ? 'SOP &amp; Tanggung Jawab Pengajar / Tutor' : (isParent ? 'SOP &amp; Panduan Monitoring Orang Tua / Wali' : 'SOP &amp; Panduan Belajar Siswa Bimbel Tatap Muka') }}
+                  {{ isAdmin ? 'SOP Manajemen Cabang &amp; Matriks RACI' : (isTeacher ? 'SOP &amp; Tanggung Jawab Pengajar / Tutor' : (isParent ? 'SOP &amp; Panduan Monitoring Orang Tua / Wali' : 'SOP &amp; Panduan Belajar Siswa Bimbel Tatap Muka')) }}
                 </h2>
               </div>
             </div>
@@ -4274,7 +4274,7 @@
           </div>
 
           <!-- KONTEN 1: KHUSUS SISWA (Default & Siswa Aktif) -->
-          <div v-if="!isTeacher && !isParent" class="space-y-6">
+          <div v-if="!isTeacher && !isParent && !isAdmin" class="space-y-6">
             <!-- 4 Pilar Tanggung Jawab Siswa -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <!-- Pilar 1: Kehadiran 75% -->
@@ -4428,6 +4428,69 @@
                 <h4 class="font-black text-white text-sm">📊 Rapor Perkembangan Bulanan</h4>
                 <p class="text-xs text-slate-300 leading-relaxed">
                   Menerima rekapitulasi skor Try Out CBT mingguan dan grafik proyeksi kelulusan kampus pilihan ananda.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- KONTEN 4: KHUSUS ADMIN CABANG & SUPERADMIN -->
+          <div v-else-if="isAdmin" class="space-y-6">
+            <div class="glass-card rounded-2xl p-5 border border-amber-500/35 bg-gradient-to-r from-amber-950/40 via-slate-900/90 to-slate-950 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
+              <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-2xl shrink-0">
+                  🏢
+                </div>
+                <div>
+                  <h3 class="text-base font-black text-white">Tata Kelola Operasional Cabang &amp; Matriks RACI</h3>
+                  <p class="text-xs text-slate-300 mt-0.5">
+                    Anda login dengan akses Administrator. Matriks RACI lengkap dan manajemen cabang dapat diakses langsung di Portal Admin Cabang.
+                  </p>
+                </div>
+              </div>
+              <button 
+                type="button"
+                @click="window.location.hash = '#/admin'" 
+                class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition flex items-center justify-center gap-2 shrink-0 shadow-lg cursor-pointer"
+              >
+                <span>Buka Portal Admin Cabang</span>
+                <i class="ph-bold ph-arrow-square-out"></i>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="glass-card rounded-2xl p-5 border border-amber-500/35 bg-amber-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm flex items-center gap-2">
+                  <span class="text-amber-400">1.</span> Manajemen Rombel &amp; Kapasitas Ruangan
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Admin Cabang bertanggung jawab mengatur pembagian rombongan belajar (rombel), plot jadwal tutor pengajar, dan menjaga batas kapasitas ruangan (maksimal 15-20 siswa per kelas).
+                </p>
+              </div>
+
+              <div class="glass-card rounded-2xl p-5 border border-sky-500/35 bg-sky-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm flex items-center gap-2">
+                  <span class="text-sky-400">2.</span> Approval Make-up Class &amp; Sesi Inval
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Memverifikasi surat izin/sakit siswa, menjadwalkan kelas pengganti di rombel paralel yang setara, serta menugaskan tutor pengganti (inval) jika pengampu utama berhalangan.
+                </p>
+              </div>
+
+              <div class="glass-card rounded-2xl p-5 border border-emerald-500/35 bg-emerald-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm flex items-center gap-2">
+                  <span class="text-emerald-400">3.</span> Validasi BAP &amp; Rekap Honor Pengajar
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Memeriksa dan menyetujui Berita Acara Perkuliahan (BAP) digital yang diisi tutor pengajar sebagai syarat otorisasi pencairan honor mengajar bulanan.
+                </p>
+              </div>
+
+              <div class="glass-card rounded-2xl p-5 border border-purple-500/35 bg-purple-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm flex items-center gap-2">
+                  <span class="text-purple-400">4.</span> Monitoring Presensi &amp; Early Warning System
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Memantau tingkat kehadiran siswa tiap pekan. Mengirimkan notifikasi dan konseling khusus bila absensi siswa mendekati batas kritis &lt; 75% sesi belajar.
                 </p>
               </div>
             </div>
@@ -6304,6 +6367,7 @@ export default {
     // Computed: filter tab berdasarkan role user
     const isAdmin = computed(() => currentUser.value?.role === 'admin' || currentUser.value?.role === 'superadmin');
     const isTeacher = computed(() => ['teacher', 'guru', 'tutor'].includes(currentUser.value?.role));
+    const isParent = computed(() => ['parent', 'wali', 'orangtua', 'ortu'].includes(currentUser.value?.role));
     const isStaff = computed(() => isAdmin.value || isTeacher.value);
     const isAffiliate = computed(() => {
       const r = (currentUser.value?.role || localStorage.getItem('user_role') || '').toLowerCase();
@@ -6320,6 +6384,48 @@ export default {
       const p = (currentUser.value?.plan || currentUser.value?.plan_name || '').toLowerCase();
       if (!p || p === 'free' || p === 'trial' || p === 'paket free / trial' || p === 'paket free') return false;
       return true;
+    });
+
+    // Dynamic SOP card content tailored to active user role
+    const sopCardRoleBadge = computed(() => {
+      if (isAdmin.value) return 'Panduan Operasional Cabang';
+      if (isTeacher.value) return 'SOP Pengajar Cabang';
+      if (isParent.value) return 'Panduan Orang Tua & Wali';
+      return 'Panduan Siswa Bimbel Tatap Muka';
+    });
+
+    const sopCardSubBadge = computed(() => {
+      if (isAdmin.value) return 'SOP & Matriks RACI Cabang';
+      if (isTeacher.value) return 'Integritas Akademik & BAP';
+      if (isParent.value) return 'Monitoring & Absensi Real-time';
+      return 'SOP & Tata Tertib Siswa';
+    });
+
+    const sopCardTitle = computed(() => {
+      if (isAdmin.value) return 'SOP Manajemen Cabang & Matriks RACI';
+      if (isTeacher.value) return 'Tanggung Jawab Utama Guru / Tutor Bimbel';
+      if (isParent.value) return 'Panduan Monitoring Belajar Orang Tua / Wali';
+      return 'Tanggung Jawab & Tata Tertib Siswa Bimbel Offline';
+    });
+
+    const sopCardDescription = computed(() => {
+      if (isAdmin.value) {
+        return 'Pelajari standar operasional prosedur cabang, matriks RACI lintas peran (Admin, FO, Guru, Siswa), approval make-up class, serta rekapitulasi BAP pengajar.';
+      }
+      if (isTeacher.value) {
+        return 'Pelajari standar kehadiran sesi kelas, presensi real-time siswa, pengisian Berita Acara Perkuliahan (BAP) digital untuk honor mengajar, dan alur konfirmasi guru pengganti (inval).';
+      }
+      if (isParent.value) {
+        return 'Pelajari alur notifikasi bot Telegram saat ananda hadir di kelas, sistem peringatan dini (EWS) kehadiran < 75%, serta pemantauan rapor grafik nilai Try Out CBT mingguan.';
+      }
+      return 'Pelajari hak & kewajiban belajar tatap muka di cabang, syarat mutlak absensi minimal 75%, tata cara izin & jadwal make-up class, serta kewajiban Try Out CBT berkala.';
+    });
+
+    const sopCardButtonText = computed(() => {
+      if (isAdmin.value) return 'Buka SOP & Matriks RACI';
+      if (isTeacher.value) return 'Buka SOP Guru / Tutor';
+      if (isParent.value) return 'Buka Panduan Orang Tua';
+      return 'Buka SOP Siswa Bimbel';
     });
 
     const getStudentDisplayName = (u) => {
@@ -8322,6 +8428,12 @@ export default {
       saveProfileAndBankSettings,
       isAdmin,
       isTeacher,
+      isParent,
+      sopCardRoleBadge,
+      sopCardSubBadge,
+      sopCardTitle,
+      sopCardDescription,
+      sopCardButtonText,
       isStaff,
       isAffiliate,
       isSchoolBk,
