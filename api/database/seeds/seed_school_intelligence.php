@@ -119,6 +119,193 @@ function seed_school_intelligence_data(PDO $pdo): array {
     }
     $summary['schools_seeded'] = count($schools);
 
+    $students = [
+        // SMA (SMAN 1 EduPath Unggulan Jakarta)
+        [
+            'id' => 'std-sma-001',
+            'school_id' => 'sch-sma-001',
+            'school_name' => 'SMAN 1 EduPath Unggulan Jakarta',
+            'name' => 'Muhammad Rizky Pratama',
+            'email' => 'rizky.sma@edupath.id',
+            'phone' => '081299887701',
+            'target_ptn' => 'Pendidikan Dokter - Universitas Indonesia (UI)',
+            'plan' => 'pejuang_ptn',
+            'academic_program' => 'SNPMB_UTBK',
+            'target_level' => 'SMA',
+            'grade_level' => 'Kelas 12',
+            'class_name' => '12 MIPA 1',
+            'gpa_category' => 'high'
+        ],
+        [
+            'id' => 'std-sma-002',
+            'school_id' => 'sch-sma-001',
+            'school_name' => 'SMAN 1 EduPath Unggulan Jakarta',
+            'name' => 'Aulia Zahra Putri',
+            'email' => 'aulia.sma@edupath.id',
+            'phone' => '081299887702',
+            'target_ptn' => 'Teknik Informatika - Institut Teknologi Bandung (ITB)',
+            'plan' => 'mandiri',
+            'academic_program' => 'SNPMB_UTBK',
+            'target_level' => 'SMA',
+            'grade_level' => 'Kelas 12',
+            'class_name' => '12 MIPA 1',
+            'gpa_category' => 'high'
+        ],
+        [
+            'id' => 'std-sma-003',
+            'school_id' => 'sch-sma-001',
+            'school_name' => 'SMAN 1 EduPath Unggulan Jakarta',
+            'name' => 'Dimas Surya Nugraha',
+            'email' => 'dimas.sma@edupath.id',
+            'phone' => '081299887703',
+            'target_ptn' => 'Manajemen - Universitas Gadjah Mada (UGM)',
+            'plan' => 'pejuang_ptn',
+            'academic_program' => 'SNPMB_UTBK',
+            'target_level' => 'SMA',
+            'grade_level' => 'Kelas 12',
+            'class_name' => '12 IPS 1',
+            'gpa_category' => 'med'
+        ],
+        [
+            'id' => 'std-sma-004',
+            'school_id' => 'sch-sma-001',
+            'school_name' => 'SMAN 1 EduPath Unggulan Jakarta',
+            'name' => 'Nabila Anindya',
+            'email' => 'nabila.sma@edupath.id',
+            'phone' => '081299887704',
+            'target_ptn' => 'Psikologi - Universitas Padjadjaran (UNPAD)',
+            'plan' => 'elite',
+            'academic_program' => 'SNPMB_UTBK',
+            'target_level' => 'SMA',
+            'grade_level' => 'Kelas 12',
+            'class_name' => '12 IPS 2',
+            'gpa_category' => 'med'
+        ],
+        [
+            'id' => 'std-sma-005',
+            'school_id' => 'sch-sma-001',
+            'school_name' => 'SMAN 1 EduPath Unggulan Jakarta',
+            'name' => 'Fajar Hidayat',
+            'email' => 'fajar.sma@edupath.id',
+            'phone' => '081299887705',
+            'target_ptn' => 'Farmasi - Universitas Airlangga (UNAIR)',
+            'plan' => 'pejuang_ptn',
+            'academic_program' => 'SNPMB_UTBK',
+            'target_level' => 'SMA',
+            'grade_level' => 'Kelas 12',
+            'class_name' => '12 MIPA 2',
+            'gpa_category' => 'gap'
+        ],
+        // SMAN 1 Ciamis
+        [
+            'id' => 'std-ciamis-001',
+            'school_id' => 'sch-ciamis-001',
+            'school_name' => 'SMAN 1 Ciamis',
+            'name' => 'Rangga Wijaya Kusuma',
+            'email' => 'rangga.ciamis@edupath.id',
+            'phone' => '081322114455',
+            'target_ptn' => 'Teknik Elektro - ITB',
+            'plan' => 'pejuang_ptn',
+            'academic_program' => 'SNPMB_UTBK',
+            'target_level' => 'SMA',
+            'grade_level' => 'Kelas 12',
+            'class_name' => '12 MIPA 1',
+            'gpa_category' => 'high'
+        ],
+        [
+            'id' => 'std-ciamis-002',
+            'school_id' => 'sch-ciamis-001',
+            'school_name' => 'SMAN 1 Ciamis',
+            'name' => 'Tiara Salma Dewi',
+            'email' => 'tiara.ciamis@edupath.id',
+            'phone' => '081322114456',
+            'target_ptn' => 'Akuntansi - Universitas Padjadjaran (UNPAD)',
+            'plan' => 'mandiri',
+            'academic_program' => 'SNPMB_UTBK',
+            'target_level' => 'SMA',
+            'grade_level' => 'Kelas 12',
+            'class_name' => '12 IPS 1',
+            'gpa_category' => 'med'
+        ],
+        // SMP (SMP EduPath Cendekia Bandung)
+        [
+            'id' => 'std-smp-001',
+            'school_id' => 'sch-smp-001',
+            'school_name' => 'SMP EduPath Cendekia Bandung',
+            'name' => 'Alif Pratama Putra',
+            'email' => 'alif.smp@edupath.id',
+            'phone' => '082155667701',
+            'target_ptn' => 'Target SMA: SMAN 3 Bandung (Unggulan)',
+            'plan' => 'tka_smp',
+            'academic_program' => 'TKA_SMP',
+            'target_level' => 'SMP',
+            'grade_level' => 'Kelas 9',
+            'class_name' => '9A',
+            'gpa_category' => 'high'
+        ],
+        [
+            'id' => 'std-smp-002',
+            'school_id' => 'sch-smp-001',
+            'school_name' => 'SMP EduPath Cendekia Bandung',
+            'name' => 'Farah Diba Ayu',
+            'email' => 'farah.smp@edupath.id',
+            'phone' => '082155667702',
+            'target_ptn' => 'Target SMA: SMAN 5 Bandung',
+            'plan' => 'tka_smp',
+            'academic_program' => 'TKA_SMP',
+            'target_level' => 'SMP',
+            'grade_level' => 'Kelas 9',
+            'class_name' => '9B',
+            'gpa_category' => 'med'
+        ],
+        [
+            'id' => 'std-smp-003',
+            'school_id' => 'sch-smp-001',
+            'school_name' => 'SMP EduPath Cendekia Bandung',
+            'name' => 'Kevin Julio Pangestu',
+            'email' => 'kevin.smp@edupath.id',
+            'phone' => '082155667703',
+            'target_ptn' => 'Target SMK: SMKN 1 Bandung (Teknologi Informasi)',
+            'plan' => 'tka_smp',
+            'academic_program' => 'TKA_SMP',
+            'target_level' => 'SMP',
+            'grade_level' => 'Kelas 9',
+            'class_name' => '9C',
+            'gpa_category' => 'gap'
+        ],
+        // SD (SD EduPath Prestasi Mandiri Surabaya)
+        [
+            'id' => 'std-sd-001',
+            'school_id' => 'sch-sd-001',
+            'school_name' => 'SD EduPath Prestasi Mandiri Surabaya',
+            'name' => 'Kenzo Ardiansyah',
+            'email' => 'kenzo.sd@edupath.id',
+            'phone' => '083144556601',
+            'target_ptn' => 'Target SMP: SMP Negeri 1 Surabaya',
+            'plan' => 'tka_sd',
+            'academic_program' => 'TKA_SD',
+            'target_level' => 'SD',
+            'grade_level' => 'Kelas 6',
+            'class_name' => '6A',
+            'gpa_category' => 'high'
+        ],
+        [
+            'id' => 'std-sd-002',
+            'school_id' => 'sch-sd-001',
+            'school_name' => 'SD EduPath Prestasi Mandiri Surabaya',
+            'name' => 'Clarissa Aurelia',
+            'email' => 'clarissa.sd@edupath.id',
+            'phone' => '083144556602',
+            'target_ptn' => 'Target SMP: SMP Labschool Surabaya',
+            'plan' => 'tka_sd',
+            'academic_program' => 'TKA_SD',
+            'target_level' => 'SD',
+            'grade_level' => 'Kelas 6',
+            'class_name' => '6B',
+            'gpa_category' => 'med'
+        ]
+    ];
+
     // 2. Insert/Update Students (SD, SMP, SMA)
     foreach ($students as $st) {
         $email = strtolower(trim($st['email']));
