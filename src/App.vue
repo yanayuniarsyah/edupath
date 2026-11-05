@@ -44,10 +44,7 @@
               <span class="font-black text-xl tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00] group-hover:drop-shadow-[0_0_12px_rgba(192,255,0,0.9)] transition-all">.ai</span></span>
             </div>
           </div>
-          <!-- Close button for mobile -->
-          <button v-show="(sidebarExpanded || mobileSidebarOpen)" @click="mobileSidebarOpen = false" class="lg:hidden modal-close-btn shrink-0" aria-label="Tutup" title="Tutup">
-            <i class="ph-bold ph-x"></i>
-          </button>
+
         </div>
         <p v-show="(sidebarExpanded || mobileSidebarOpen)" class="text-xs text-white/40 font-semibold mb-3 uppercase tracking-wider whitespace-nowrap shrink-0">Adaptive Learning Platform</p>
         <p v-show="!(sidebarExpanded || mobileSidebarOpen)" class="mb-3 shrink-0"></p>
@@ -380,12 +377,8 @@
                 <div class="w-8 h-8 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-base leading-none shadow-md shadow-[#c0ff00]/20 select-none">E</div>
                 <span class="font-black text-lg tracking-tight text-white">EduPath<span class="text-[#c0ff00]">.ai</span></span>
               </div>
-              <button 
-                @click="mobileSidebarOpen = false" 
-                class="w-9 h-9 rounded-xl bg-white/10 border border-white/15 text-white flex items-center justify-center hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                aria-label="Tutup Menu"
-              >
-                <i class="ph-bold ph-x text-lg"></i>
+              <button @click="mobileSidebarOpen = false" class="modal-close-btn" aria-label="Tutup" title="Tutup">
+                <i class="ph-bold ph-x"></i>
               </button>
             </div>
 
@@ -3246,13 +3239,8 @@
                 </div>
               </div>
               <!-- Tutup button visible immediately on top right for mobile -->
-              <button 
-                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="sm:hidden w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm shrink-0 ml-2 cursor-pointer"
-                title="Tutup Halaman & Kembali"
-                aria-label="Tutup"
-              >
-                <i class="ph-bold ph-x text-sm"></i>
+              <button @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" class="sm:hidden modal-close-btn shrink-0 ml-2" title="Tutup" aria-label="Tutup">
+                <i class="ph-bold ph-x"></i>
               </button>
             </div>
 
@@ -3267,13 +3255,8 @@
                 <span>{{ showIrtInfo ? 'Sembunyikan Panel IRT' : 'Tampilkan Panel IRT' }}</span>
                 <i :class="showIrtInfo ? 'ph-bold ph-eye-slash' : 'ph-bold ph-eye'"></i>
               </button>
-              <button 
-                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="hidden sm:flex w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
-                title="Tutup Halaman & Kembali"
-                aria-label="Tutup"
-              >
-                <i class="ph-bold ph-x text-sm"></i>
+              <button @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" class="hidden sm:inline-flex modal-close-btn shrink-0" title="Tutup" aria-label="Tutup">
+                <i class="ph-bold ph-x"></i>
               </button>
             </div>
           </div>
@@ -3416,14 +3399,8 @@
               <div>
                 <div class="flex items-center justify-between mb-4">
                   <h3 class="text-lg font-black font-heading text-slate-900">Kenapa Memilih IRT Model?</h3>
-                  <button 
-                    type="button"
-                    @click="showIrtInfo = false" 
-                    class="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 hover:border-rose-300 flex items-center justify-center transition-all cursor-pointer shrink-0"
-                    title="Tutup Kotak IRT"
-                    aria-label="Tutup Kotak IRT"
-                  >
-                    <i class="ph-bold ph-x text-sm"></i>
+                  <button type="button" @click="showIrtInfo = false" class="modal-close-btn shrink-0" title="Tutup" aria-label="Tutup">
+                    <i class="ph-bold ph-x"></i>
                   </button>
                 </div>
                 <div class="space-y-3">
@@ -3549,14 +3526,8 @@
               <div class="h-5 w-px bg-white/15"></div>
 
               <!-- Tutup Button (Kanan Atas) -->
-              <button 
-                type="button"
-                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
-                title="Tutup & Kembali ke Dashboard"
-                aria-label="Tutup Materi"
-              >
-                <i class="ph-bold ph-x text-sm"></i>
+              <button type="button" @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" class="modal-close-btn shrink-0" title="Tutup" aria-label="Tutup">
+                <i class="ph-bold ph-x"></i>
               </button>
             </div>
           </div>
@@ -3688,11 +3659,11 @@
             </div>
             <button 
               @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
-              title="Tutup Practice Engine"
-              aria-label="Tutup Practice Engine"
+              class="modal-close-btn shrink-0"
+              title="Tutup"
+              aria-label="Tutup"
             >
-              <i class="ph-bold ph-x text-sm"></i>
+              <i class="ph-bold ph-x"></i>
             </button>
           </div>
           <div class="grid grid-cols-1 gap-6" :class="showAICompanion ? 'lg:grid-cols-3' : ''">
@@ -3807,14 +3778,8 @@
                 <span class="hidden sm:inline">Tanggung Jawab Offline</span>
                 <span class="sm:hidden">SOP Offline</span>
               </button>
-              <button 
-                type="button"
-                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0 text-xs"
-                title="Tutup"
-                aria-label="Tutup"
-              >
-                <i class="ph-bold ph-x text-sm"></i>
+              <button type="button" @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" class="modal-close-btn shrink-0" title="Tutup" aria-label="Tutup">
+                <i class="ph-bold ph-x"></i>
               </button>
             </div>
           </div>
@@ -3913,14 +3878,8 @@
               </button>
 
               <!-- Tombol Icon Closed Ramping Sesuai Ukuran Login Form -->
-              <button 
-                type="button"
-                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0 text-xs"
-                title="Tutup"
-                aria-label="Tutup"
-              >
-                <i class="ph-bold ph-x text-xs"></i>
+              <button type="button" @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" class="modal-close-btn shrink-0" title="Tutup" aria-label="Tutup">
+                <i class="ph-bold ph-x"></i>
               </button>
             </div>
           </div>
@@ -4295,14 +4254,8 @@
                 </h2>
               </div>
             </div>
-            <button 
-              type="button"
-              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0 text-xs"
-              title="Tutup"
-              aria-label="Tutup"
-            >
-              <i class="ph-bold ph-x text-xs"></i>
+            <button type="button" @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" class="modal-close-btn shrink-0" title="Tutup" aria-label="Tutup">
+              <i class="ph-bold ph-x"></i>
             </button>
           </div>
 

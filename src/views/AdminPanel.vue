@@ -145,22 +145,24 @@
       leave-to-class="opacity-0"
     >
       <div
-        v-if="sidebarOpen"
+        v-if="mobileSidebarOpen"
         class="fixed inset-0 bg-black/75 backdrop-blur-sm z-40 lg:hidden cursor-pointer"
-        @click="sidebarOpen = false"
+        @click="mobileSidebarOpen = false"
       ></div>
     </transition>
 
-    <!-- ===== SIDEBAR ===== -->
+    <!-- ===== SIDEBAR (Auto-Hide On Hover Seperti Role Siswa, Tanpa Icon Close) ===== -->
     <aside
-      class="fixed inset-y-0 left-0 z-50 lg:static lg:z-auto flex flex-col h-full shrink-0 transition-transform lg:transition-all duration-300 ease-out overflow-hidden border-r border-white/10 shadow-2xl"
+      class="fixed inset-y-0 left-0 z-50 flex flex-col h-full shrink-0 transition-all duration-300 ease-out overflow-hidden border-r border-white/10 shadow-2xl"
       :class="[
-        sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-[64px]'
+        sidebarOpen ? 'translate-x-0 w-64 shadow-[20px_0_60px_rgba(0,0,0,0.5)]' : '-translate-x-full lg:translate-x-0 lg:w-[68px]'
       ]"
+      @mouseenter="sidebarExpanded = true"
+      @mouseleave="sidebarExpanded = false"
       style="background: linear-gradient(160deg, #050a18 0%, #0d1224 60%, #050a18 100%);"
     >
       <!-- Logo -->
-      <div class="flex items-center gap-3 px-4 py-4 border-b border-white/10 shrink-0 cursor-pointer select-none" @click="sidebarOpen = !sidebarOpen">
+      <div class="flex items-center gap-3 px-4 py-4 border-b border-white/10 shrink-0 select-none">
         <div class="w-9 h-9 shrink-0 rounded-xl bg-[#c0ff00] flex items-center justify-center font-black text-black text-lg leading-none shadow-md shadow-[#c0ff00]/20 select-none">E</div>
         <div v-show="sidebarOpen" class="min-w-0">
           <span class="font-black text-lg tracking-tight text-white whitespace-nowrap">EduPath<span class="text-[#c0ff00]">.ai</span></span>
@@ -212,12 +214,12 @@
     </aside>
 
     <!-- ===== MAIN CONTENT ===== -->
-    <div class="flex flex-col flex-grow min-w-0 overflow-hidden">
+    <div class="flex flex-col flex-grow min-w-0 overflow-hidden lg:pl-[68px]">
 
       <!-- Top Bar -->
       <header class="flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3 bg-[#0b1329]/95 backdrop-blur-md border-b border-white/10 shrink-0">
         <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-          <button @click="sidebarOpen = !sidebarOpen" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors text-white/80 shrink-0 cursor-pointer" title="Menu Sidebar">
+          <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors text-white/80 shrink-0 cursor-pointer lg:hidden" title="Menu Sidebar">
             <i class="ph-bold ph-list text-base"></i>
           </button>
           <h1 class="text-xs sm:text-sm font-black text-white tracking-wide uppercase truncate">{{ currentNavItem?.label }}</h1>
@@ -5044,7 +5046,9 @@ const router = useRouter()
 // ── Data ──
 const isAuthenticated = ref(false);
 const isLoggingOut = ref(false);
-const sidebarOpen = ref(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
+const sidebarExpanded = ref(false);
+const mobileSidebarOpen = ref(false);
+const sidebarOpen = computed(() => sidebarExpanded.value || mobileSidebarOpen.value);
 const initialTab = () => {
   const stored = sessionStorage.getItem('admin_active_tab');
   const role = (sessionStorage.getItem('admin_role') || localStorage.getItem('user_role') || '').toLowerCase();
@@ -5060,9 +5064,8 @@ const activeTab = ref(initialTab());
 
 const selectNavTab = (tabId) => {
   activeTab.value = tabId;
-  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-    sidebarOpen.value = false;
-  }
+  mobileSidebarOpen.value = false;
+  sidebarExpanded.value = false;
 };
 
 // Sorting state
