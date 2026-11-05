@@ -834,6 +834,9 @@ export const api = {
   getStudent360(studentId) {
     return apiFetch(`/school.php?action=student_360&student_id=${encodeURIComponent(studentId)}`);
   },
+  getMyStudent360() {
+    return apiFetch('/school.php?action=my_360');
+  },
   getGuidanceRecords(params = {}) {
     const q = new URLSearchParams(params).toString();
     return apiFetch(`/school.php?action=guidance_records${q ? '&' + q : ''}`);

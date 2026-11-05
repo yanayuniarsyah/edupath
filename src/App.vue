@@ -2972,6 +2972,36 @@
             </div>
           </div>
 
+          <!-- ✨ Widget Rapor & Profil Holistik Siswa (PRD v1.2 School Intelligence) -->
+          <div class="glass-card p-4 sm:p-5 rounded-2xl border border-purple-500/35 bg-gradient-to-r from-purple-950/30 via-slate-900/90 to-indigo-950/30 shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5 min-w-0">
+              <div class="w-11 h-11 rounded-2xl bg-purple-500/20 border border-purple-500/35 flex items-center justify-center text-purple-300 text-xl shrink-0 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+                <i class="ph-bold ph-chart-line-up"></i>
+              </div>
+              <div class="space-y-0.5 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[9px] font-black uppercase tracking-widest text-purple-400">School Intelligence PRD v1.2</span>
+                  <span v-if="student360Data?.report_cards?.length" class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+                    {{ student360Data.report_cards.length }} Semester Terverifikasi
+                  </span>
+                  <span v-if="student360Data?.student?.school" class="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/70 font-medium">
+                    🏛️ {{ student360Data.student.school }}
+                  </span>
+                </div>
+                <h3 class="text-sm sm:text-base font-black text-white truncate">Agregasi Holistik Rapor &amp; Profil Siswa</h3>
+                <p class="text-xs text-white/60 truncate">Grafik nilai rapor multi-semester, hasil tryout CBT, diagnostik RIASEC &amp; catatan pendampingan Guru BK.</p>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              @click="currentTab = 'student_360'; fetchMyStudent360();" 
+              class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-lg shadow-purple-600/30 active:scale-95"
+            >
+              <span>Buka Rapor &amp; Profil 360</span>
+              <i class="ph-bold ph-arrow-right"></i>
+            </button>
+          </div>
+
           <!-- ✨ Executive KPI Strip (4 Kolom Proporsional & Presisi) -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Card 1: Skor IRT Terkini -->
@@ -3242,6 +3272,320 @@
             </div>
 
           </div>
+        </section>
+
+        <!-- TAB: STUDENT 360 HOLISTIC PROFILE (EDUPATH SCHOOL INTELLIGENCE PRD v1.2) -->
+        <section v-if="currentTab === 'student_360'" class="animate-fade-in space-y-6 w-full max-w-7xl mx-auto pb-16">
+          
+          <!-- Top Header Bar -->
+          <div class="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 bg-gradient-to-r from-slate-900/95 via-purple-950/40 to-slate-900/95 shadow-[0_16px_50px_rgba(0,0,0,0.5)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-black text-[10px] uppercase tracking-wider border border-purple-500/30 flex items-center gap-1.5">
+                  <i class="ph-bold ph-student"></i>
+                  <span>PRD v1.2 School Intelligence</span>
+                </span>
+                <span v-if="student360Data?.student?.school" class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-bold text-[10px] border border-emerald-500/25">
+                  🏛️ {{ student360Data.student.school }}
+                </span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                <span>Rapor &amp; Profil Holistik Siswa</span>
+                <span v-if="student360Loading" class="text-xs text-purple-400 font-normal animate-pulse">(Memuat data...)</span>
+              </h2>
+              <p class="text-xs sm:text-sm text-white/60 font-medium">
+                Agregasi resmi nilai rapor semester terverifikasi sekolah, performa tryout CBT/TKA, asesmen diagnostik minat bakat, early warning gap kompetensi, dan catatan pendampingan Guru BK.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2.5 shrink-0">
+              <button 
+                type="button" 
+                @click="fetchMyStudent360" 
+                class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer backdrop-blur-md"
+                :disabled="student360Loading"
+              >
+                <i class="ph-bold ph-arrow-clockwise" :class="{ 'animate-spin': student360Loading }"></i>
+                <span>Segarkan Data 360</span>
+              </button>
+              <button 
+                type="button" 
+                @click="currentTab = 'dashboard'" 
+                class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-purple-600/30"
+              >
+                <i class="ph-bold ph-gauge"></i>
+                <span>Ke Dashboard</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 Executive KPI Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Card 1: Rata-Rata Rapor Kumulatif -->
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-slate-900/80 to-slate-950">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-amber-400">Rata-Rata Rapor</span>
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 text-[10px] font-bold">KUMULATIF</span>
+              </div>
+              <div class="text-3xl font-black font-heading text-amber-400 font-mono">
+                {{ computeCumulativeRaporGpa(student360Data?.report_cards) }}
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/60 flex justify-between">
+                <span>Semester Terdata</span>
+                <strong class="text-white">{{ student360Data?.report_cards?.length || 0 }} Periode</strong>
+              </div>
+            </div>
+
+            <!-- Card 2: Skor Tryout CBT / TKA -->
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/20 via-slate-900/80 to-slate-950">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Tryout CBT / TKA</span>
+                <span class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 text-[10px] font-bold">TERKINI</span>
+              </div>
+              <div class="text-3xl font-black font-heading text-[#c0ff00] font-mono">
+                {{ student360Data?.assessment_history?.[0]?.score || (currentAbilityScore || 'N/A') }}
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/60 flex justify-between">
+                <span>Tryout Selesai</span>
+                <strong class="text-emerald-300">{{ student360Data?.assessment_history?.length || 0 }} Kali</strong>
+              </div>
+            </div>
+
+            <!-- Card 3: Minat Dominan Holland RIASEC -->
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-950/20 via-slate-900/80 to-slate-950">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Minat Bakat (RIASEC)</span>
+                <span class="px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-300 text-[10px] font-bold">DIAGNOSTIK</span>
+              </div>
+              <div class="text-base sm:text-lg font-black text-purple-300 truncate mt-1">
+                {{ student360Data?.diagnostic?.recommended_track || 'Penalaran Matematika' }}
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/60 flex justify-between">
+                <span>Kecenderungan</span>
+                <strong class="text-purple-300">Investigatif</strong>
+              </div>
+            </div>
+
+            <!-- Card 4: Target Seleksi Akademik -->
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-sky-500/30 bg-gradient-to-br from-sky-950/20 via-slate-900/80 to-slate-950">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-sky-400">Target Pendidikan</span>
+                <span class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-300 text-[10px] font-bold">SELEKSI</span>
+              </div>
+              <div class="text-xs sm:text-sm font-black text-sky-300 truncate mt-1">
+                {{ student360Data?.student?.target_ptn || currentStudentTargetDisplay || 'Pilihan Kampus' }}
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/60 flex justify-between">
+                <span>Jalur Peluang</span>
+                <strong class="text-sky-300">SNBP / SNBT</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid: Grafik Progres Rapor & Early Warning Gap -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Kolom Kiri (7/12): Grafik Nilai Rapor Antar-Semester & Rekap Rapor -->
+            <div class="lg:col-span-7 space-y-6">
+              
+              <!-- Grafik Progres Rapor Antar-Semester -->
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl shrink-0">
+                      <i class="ph-bold ph-chart-line-up"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-base font-black text-white">Grafik Nilai Rapor per Semester</h3>
+                      <p class="text-xs text-white/50">Tren stabilitas &amp; peningkatan nilai akademik rapor kurikulum resmi</p>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase">
+                    Kurikulum Merdeka
+                  </span>
+                </div>
+
+                <div v-if="!student360Data?.semester_progression?.length" class="p-8 text-center text-white/40 text-xs bg-white/[0.02] rounded-xl border border-white/5">
+                  <i class="ph-bold ph-book-open text-3xl block mb-2 opacity-50"></i>
+                  <span>Belum ada data rapor semester yang disinkronkan oleh pihak sekolah.</span>
+                </div>
+
+                <div v-else class="space-y-3.5">
+                  <div v-for="sp in student360Data.semester_progression" :key="sp.period" class="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="text-white font-bold flex items-center gap-2">
+                        <span>{{ sp.period }}</span>
+                        <span class="text-white/40 text-[11px] font-normal">&bull; {{ sp.class_level }}</span>
+                      </span>
+                      <span class="font-black font-mono text-amber-400 text-sm">{{ sp.average }}</span>
+                    </div>
+                    <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
+                      <div class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(245,158,11,0.5)]" :style="{ width: Math.min(100, (sp.average / 100) * 100) + '%' }"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tabel Rekap Buku Rapor Semester Terverifikasi -->
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl shrink-0">
+                      <i class="ph-bold ph-certificate"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-base font-black text-white">Buku Nilai Rapor Sekolah</h3>
+                      <p class="text-xs text-white/50">Daftar buku rapor yang telah diinput &amp; diverifikasi Guru BK/Sekolah</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="!student360Data?.report_cards?.length" class="p-8 text-center text-white/40 text-xs">
+                  Tidak ada riwayat rapor.
+                </div>
+
+                <div v-else class="space-y-3">
+                  <div v-for="rc in student360Data.report_cards" :key="rc.id" class="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-emerald-500/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="space-y-1">
+                      <div class="flex items-center gap-2">
+                        <span class="text-sm font-black text-white">T.A. {{ rc.academic_year }} &bull; Semester {{ rc.semester ? rc.semester.toUpperCase() : '' }}</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase" :class="rc.status === 'verified' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'">
+                          {{ rc.status === 'verified' ? '✓ Terverifikasi Sekolah' : 'Draft' }}
+                        </span>
+                      </div>
+                      <div class="text-xs text-white/60">
+                        {{ rc.class_level }} &bull; {{ rc.class_name || 'Reguler' }} &bull; {{ rc.curriculum || 'Kurikulum Merdeka' }} &bull; Rata-rata: <strong class="text-amber-400 font-mono">{{ rc.average_score }}</strong>
+                      </div>
+                    </div>
+                    <button 
+                      type="button" 
+                      @click="openStudentReportCardDetail(rc)" 
+                      class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-emerald-500/20 hover:text-emerald-300 hover:border-emerald-500/40 border border-white/15 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                    >
+                      <i class="ph-bold ph-eye text-sm"></i>
+                      <span>Lihat Rincian Mapel</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Kolom Kanan (5/12): Learning Gap, Riwayat CBT, & Catatan BK -->
+            <div class="lg:col-span-5 space-y-6">
+
+              <!-- Early Warning & Learning Gap -->
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-rose-500/25 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-rose-950/20 space-y-3">
+                <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-base border border-rose-500/30">
+                      <i class="ph-bold ph-warning-circle"></i>
+                    </span>
+                    <div>
+                      <h4 class="text-sm font-black text-white tracking-tight uppercase">Early Warning &amp; Learning Gap</h4>
+                      <p class="text-[10px] text-white/50">Mata pelajaran dengan skor &lt; KKM yang perlu ditingkatkan</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="!student360Data?.learning_gaps?.length" class="p-5 text-center text-emerald-400 text-xs bg-emerald-500/10 rounded-xl border border-emerald-500/25">
+                  <i class="ph-bold ph-check-circle text-2xl block mb-1"></i>
+                  <span class="font-bold">Kesiapan Akademik Prima!</span>
+                  <p class="text-[11px] text-white/70 mt-0.5">Seluruh mata pelajaran rapor di atas ambang batas minimum KKM sekolah.</p>
+                </div>
+
+                <div v-else class="space-y-2.5">
+                  <div v-for="lg in student360Data.learning_gaps" :key="lg.subject" class="p-3.5 rounded-xl bg-white/[0.02] border border-rose-500/30 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="font-black text-white">{{ lg.subject }}</span>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase font-mono" :class="lg.gap_severity === 'TINGGI' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'">
+                        {{ lg.gap_severity }} &bull; Skor {{ lg.average_score }}
+                      </span>
+                    </div>
+                    <p class="text-[11px] text-white/60 leading-relaxed">{{ lg.recommendation }}</p>
+                    <button @click="handleTabClick('learning')" class="text-[10px] font-black text-[#c0ff00] hover:underline flex items-center gap-1 cursor-pointer">
+                      <span>Buka Modul Penguatan {{ lg.subject }} &raquo;</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Riwayat Tryout CBT / SNBT -->
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-sky-500/25 space-y-3">
+                <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-base border border-sky-500/30">
+                      <i class="ph-bold ph-exam"></i>
+                    </span>
+                    <div>
+                      <h4 class="text-sm font-black text-white tracking-tight uppercase">Riwayat Tryout CBT</h4>
+                      <p class="text-[10px] text-white/50">Hasil pengerjaan simulasi ujian terkini</p>
+                    </div>
+                  </div>
+                  <button @click="handleTabClick('simulator')" class="text-[10px] font-bold text-sky-400 hover:underline cursor-pointer">
+                    Ikut Tryout &raquo;
+                  </button>
+                </div>
+
+                <div v-if="!student360Data?.assessment_history?.length" class="p-5 text-center text-white/40 text-xs">
+                  Belum ada riwayat tryout CBT yang dikerjakan.
+                </div>
+
+                <div v-else class="space-y-2">
+                  <div v-for="cbt in student360Data.assessment_history.slice(0, 5)" :key="cbt.id" class="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs">
+                    <div>
+                      <div class="font-bold text-white">{{ cbt.subtes || cbt.quiz_type || 'Tryout SNBT' }}</div>
+                      <div class="text-[10px] text-white/40">{{ cbt.created_at ? cbt.created_at.split(' ')[0] : '' }} &bull; {{ cbt.correct || 0 }}/{{ cbt.total || 0 }} Benar</div>
+                    </div>
+                    <span class="font-black font-mono text-[#c0ff00] text-sm">{{ cbt.score }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Catatan Konseling & Pendampingan Guru BK -->
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-purple-500/25 space-y-3">
+                <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-base border border-purple-500/30">
+                      <i class="ph-bold ph-chats-circle"></i>
+                    </span>
+                    <div>
+                      <h4 class="text-sm font-black text-white tracking-tight uppercase">Pendampingan Guru BK</h4>
+                      <p class="text-[10px] text-white/50">Catatan arahan &amp; intervensi dari Koordinator BK</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="!student360Data?.guidance_records?.length" class="p-5 text-center text-white/40 text-xs">
+                  Belum ada catatan konseling khusus dari Guru BK sekolah.
+                </div>
+
+                <div v-else class="space-y-3">
+                  <div v-for="gr in student360Data.guidance_records" :key="gr.id" class="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <span class="text-[10px] px-2 py-0.5 rounded font-black uppercase mr-2" :class="gr.priority === 'kritis' ? 'bg-rose-500/20 text-rose-300' : (gr.priority === 'tinggi' ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-500/20 text-slate-300')">
+                          {{ gr.priority }}
+                        </span>
+                        <span class="text-xs font-bold text-white">{{ gr.counselor_name || 'Guru BK' }}</span>
+                      </div>
+                      <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-white/10 text-white/70 uppercase">{{ gr.status }}</span>
+                    </div>
+                    <p class="text-xs text-white/80 leading-relaxed">{{ gr.issue_summary }}</p>
+                    <div v-if="gr.action_plan" class="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-[11px] text-purple-200">
+                      <strong>Rencana Tindak Lanjut:</strong> {{ gr.action_plan }}
+                    </div>
+                    <div v-if="gr.follow_up_date" class="text-[10px] text-white/40">
+                      Jadwal Evaluasi: {{ gr.follow_up_date }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
         </section>
 
         <!-- TAB 2: DIAGNOSTIC & TRY OUT -->
@@ -6063,6 +6407,50 @@
       </div>
     </div>
 
+    <!-- Modal Rincian Nilai Rapor Siswa (School Intelligence PRD v1.2) -->
+    <div v-if="showReportCardDetailModal && selectedReportCardDetail" @click.self="showReportCardDetailModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+      <div class="edupath-modal-card relative flex flex-col my-auto max-h-[90vh] w-full max-w-2xl overflow-hidden p-5 sm:p-6">
+        <button @click.stop="showReportCardDetailModal = false" class="modal-close-btn absolute top-4 right-4 z-50" title="Tutup">
+          <i class="ph-bold ph-x"></i>
+        </button>
+        <div class="space-y-1 pb-4 border-b border-white/10 pr-8">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-black uppercase border border-emerald-500/30">
+              Rapor Terverifikasi Sekolah
+            </span>
+            <span class="text-xs text-white/60">T.A. {{ selectedReportCardDetail.academic_year }} &bull; Semester {{ selectedReportCardDetail.semester ? selectedReportCardDetail.semester.toUpperCase() : '' }}</span>
+          </div>
+          <h3 class="text-base sm:text-lg font-black text-white">Rincian Nilai Mata Pelajaran Siswa</h3>
+          <p class="text-xs text-white/50">{{ selectedReportCardDetail.class_level }} &bull; {{ selectedReportCardDetail.class_name || 'Reguler' }} &bull; {{ selectedReportCardDetail.curriculum || 'Kurikulum Merdeka' }}</p>
+        </div>
+
+        <div class="overflow-y-auto py-4 space-y-3 flex-1 max-h-[60vh] pr-1">
+          <div v-if="!selectedReportCardDetail.details?.length" class="text-center py-8 text-white/40 text-xs">
+            Rincian nilai mata pelajaran belum tersedia.
+          </div>
+          <div v-else class="space-y-2">
+            <div v-for="(dt, idx) in selectedReportCardDetail.details" :key="idx" class="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between gap-3 text-xs">
+              <div class="min-w-0">
+                <div class="font-bold text-white truncate text-sm">{{ dt.subject_name }}</div>
+                <div class="text-[11px] text-white/50 mt-0.5">KKM: {{ dt.kkm || 75 }} &bull; Capaian: <span class="text-white/70">{{ dt.competency_achievement || 'Tercapai dengan sangat baik' }}</span></div>
+              </div>
+              <div class="flex items-center gap-3 shrink-0">
+                <span class="text-lg font-black font-mono text-amber-400">{{ dt.score }}</span>
+                <span class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-black flex items-center justify-center text-xs">{{ dt.letter_grade || 'A' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-white/10 flex justify-between items-center">
+          <span class="text-xs text-white/50">Rata-rata: <strong class="text-amber-400 font-mono">{{ selectedReportCardDetail.average_score }}</strong></span>
+          <button @click="showReportCardDetailModal = false" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition cursor-pointer">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Panduan & Tanggung Jawab Bimbel Offline Lintas Role -->
     <OfflineRoleResponsibilitiesModal 
       :show="showOfflineRoleModal" 
@@ -6651,6 +7039,7 @@ export default {
     const studentTabs = [
       { id: 'home', label: 'Home', icon: 'ph-house' },
       { id: 'dashboard', label: 'Dashboard', icon: 'ph-gauge' },
+      { id: 'student_360', label: 'Rapor & Profil 360', icon: 'ph-user-focus' },
       { id: 'diagnostic', label: 'Asesmen', icon: 'ph-brain' },
       { id: 'learning', label: 'Materi', icon: 'ph-books' },
       { id: 'simulator', label: 'Tryout & Latihan', icon: 'ph-calculator' },
@@ -7440,6 +7829,46 @@ export default {
 
 
 
+    // ── Student 360 Holistic Profile State & Methods (PRD v1.2 School Intelligence) ──
+    const student360Data = ref(null);
+    const student360Loading = ref(false);
+    const selectedReportCardDetail = ref(null);
+    const showReportCardDetailModal = ref(false);
+
+    const computeCumulativeRaporGpa = (rcList) => {
+      if (!rcList || !rcList.length) return '0.00';
+      let totalScore = 0;
+      let totalCount = 0;
+      rcList.forEach(rc => {
+        if (rc.details) {
+          rc.details.forEach(d => {
+            totalScore += parseFloat(d.score || 0);
+            totalCount++;
+          });
+        }
+      });
+      return totalCount > 0 ? (totalScore / totalCount).toFixed(2) : '0.00';
+    };
+
+    const fetchMyStudent360 = async () => {
+      student360Loading.value = true;
+      try {
+        const res = await api.getMyStudent360();
+        if (res && res.success) {
+          student360Data.value = res;
+        }
+      } catch (err) {
+        console.error('Failed to load student 360:', err);
+      } finally {
+        student360Loading.value = false;
+      }
+    };
+
+    const openStudentReportCardDetail = (rc) => {
+      selectedReportCardDetail.value = rc;
+      showReportCardDetailModal.value = true;
+    };
+
     const checkAuth = async () => {
       const token = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
       if (token) {
@@ -7451,6 +7880,7 @@ export default {
             res.user.is_premium = Boolean(res.user.is_premium || isPaid || res.user.role === 'affiliate' || res.user.role === 'school_bk');
             currentUser.value = res.user;
             isLoggedIn.value = true;
+            fetchMyStudent360();
             // Update global states based on user data
             currentAbilityScore.value = res.user.total_score || 0;
             streakCount.value = res.user.streak || 0;
@@ -7857,6 +8287,7 @@ export default {
         streakCount.value = res.user.streak || 0;
         coins.value = res.user.coins || 0;
         currentTab.value = 'dashboard';
+        fetchMyStudent360();
 
         // Persist student session and profile data
         localStorage.setItem('user', JSON.stringify(res.user));
@@ -7957,6 +8388,10 @@ export default {
       currentTab.value = tabId;
       if (tabId === 'affiliate' || tabId === 'settings') {
         fetchAffiliateData();
+      }
+      if (tabId === 'student_360') {
+        fetchMyStudent360();
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     };
 
@@ -8882,6 +9317,14 @@ export default {
     };
 
     return {
+      student360Data,
+      student360Loading,
+      selectedReportCardDetail,
+      showReportCardDetailModal,
+      computeCumulativeRaporGpa,
+      fetchMyStudent360,
+      openStudentReportCardDetail,
+
       startCbtExam,
       launchCurrentProgramCbt,
       currentProgramCbtButtonLabel,

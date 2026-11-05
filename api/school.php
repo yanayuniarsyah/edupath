@@ -438,9 +438,13 @@ if (!empty($_GET['token']) && empty($_SERVER['HTTP_AUTHORIZATION']) && ($action 
 
 $payload = authenticate();
 if (!in_array($payload->role, ['school_bk', 'teacher', 'admin', 'superadmin'])) {
-    http_response_code(403);
-    echo json_encode(["error" => "Akses khusus Guru BK / Sekolah"]);
-    exit;
+    if ($payload->role === 'student' && in_array($action, ['my_360', 'student_360'])) {
+        // Akses diizinkan untuk siswa mengakses agregasi profil holistik diri sendiri (PRD v1.2)
+    } else {
+        http_response_code(403);
+        echo json_encode(["error" => "Akses khusus Guru BK / Sekolah"]);
+        exit;
+    }
 }
 
 // Resolve current school identity
@@ -1582,8 +1586,22 @@ if ($action === 'report_import_commit' && $_SERVER['REQUEST_METHOD'] === 'POST')
 // -------------------------------------------------------------
 // 8. STUDENT 360 INTELLIGENCE (Profil Komprehensif Terpadu Siswa)
 // -------------------------------------------------------------
-if ($action === 'student_360' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $student_id = safe_str($_GET['student_id'] ?? '');
+
+    // Jika diakses oleh siswa atau action my_360, otomatis resolve ID siswa sendiri
+    if ($payload->role === 'student' || $action === 'my_360') {
+        $stLookup = $pdo->prepare("SELECT id FROM students WHERE id = ? OR email = ? LIMIT 1");
+        $stLookup->execute([$payload->id ?? '', $payload->email ?? '']);
+        $matchedId = $stLookup->fetchColumn();
+        if (!$matchedId && !empty($payload->user_id)) {
+            $urLookup = $pdo->prepare("SELECT reference_id FROM user_roles WHERE user_id = ? AND role = 'student' LIMIT 1");
+            $urLookup->execute([$payload->user_id]);
+            $matchedId = $urLookup->fetchColumn();
+        }
+        $student_id = $matchedId ?: ($payload->id ?? '');
+    }
+
     if (empty($student_id)) {
         http_response_code(400);
         echo json_encode(["error" => "Parameter student_id wajib diisi."]);
@@ -1591,12 +1609,22 @@ if ($action === 'student_360' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     // Student identity
-    $stStmt = $pdo->prepare("
-        SELECT id, name, email, phone, school, target_ptn, plan, streak, total_score, created_at
-        FROM students 
-        WHERE id = ? AND (school_id = ? OR LOWER(TRIM(school)) = LOWER(TRIM(?)))
-    ");
-    $stStmt->execute([$student_id, $current_school_id, $current_school_name]);
+    if ($payload->role === 'student' || $action === 'my_360') {
+        $stStmt = $pdo->prepare("
+            SELECT id, name, email, phone, school, target_ptn, plan, streak, total_score, created_at
+            FROM students 
+            WHERE id = ? OR email = ?
+            LIMIT 1
+        ");
+        $stStmt->execute([$student_id, $payload->email ?? '']);
+    } else {
+        $stStmt = $pdo->prepare("
+            SELECT id, name, email, phone, school, target_ptn, plan, streak, total_score, created_at
+            FROM students 
+            WHERE id = ? AND (school_id = ? OR LOWER(TRIM(school)) = LOWER(TRIM(?)))
+        ");
+        $stStmt->execute([$student_id, $current_school_id, $current_school_name]);
+    }
     $student = $stStmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$student) {
