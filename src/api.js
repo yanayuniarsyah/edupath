@@ -853,6 +853,9 @@ export const api = {
   getSchoolAdmissionReadiness() {
     return apiFetch('/school.php?action=admission_readiness');
   },
+  seedSchoolDummy() {
+    return apiFetch('/school.php?action=seed_dummy', { method: 'POST' });
+  },
   updateAdminProfile(data) {
     return apiFetch('/admin.php?action=update_profile', {
       method: 'POST',

@@ -443,6 +443,18 @@ if (empty($current_school_name) && !empty($current_school_id)) {
     }
 }
 
+// Fallback for Admin/Superadmin if no specific school selected: choose first active school
+if (empty($current_school_name)) {
+    try {
+        $stmt_first = $pdo->query("SELECT id, name FROM schools WHERE is_active IS NULL OR is_active != 0 ORDER BY name ASC LIMIT 1");
+        $first_sch = $stmt_first->fetch(PDO::FETCH_ASSOC);
+        if ($first_sch) {
+            $current_school_id = $first_sch['id'];
+            $current_school_name = $first_sch['name'];
+        }
+    } catch (\Throwable $e) {}
+}
+
 // -------------------------------------------------------------
 // 3. DASHBOARD SEKOLAH AGREGAT (KPIs, Paket Belajar, RIASEC, PTN)
 // -------------------------------------------------------------
@@ -995,6 +1007,22 @@ function get_standard_subjects_config($level = 'SMA', $curriculum = 'Kurikulum M
 // -------------------------------------------------------------
 // 1. REPORT TEMPLATE METADATA (Untuk konfigurasi & template Excel)
 // -------------------------------------------------------------
+// -------------------------------------------------------------
+// 0. SEED DUMMY DATA ACTION (Untuk UAT & Demo PRD v1.2)
+// -------------------------------------------------------------
+if ($action === 'seed_dummy') {
+    try {
+        require_once dirname(__DIR__) . '/api/database/seeds/seed_school_intelligence.php';
+        $res = seed_school_intelligence_data($pdo);
+        echo json_encode(["success" => true, "message" => "Data dummy School Intelligence berhasil disuntikkan.", "details" => $res]);
+        exit;
+    } catch (\Throwable $e) {
+        http_response_code(500);
+        echo json_encode(["error" => "Gagal seeding dummy: " . $e->getMessage()]);
+        exit;
+    }
+}
+
 if ($action === 'report_template' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $level = $_GET['level'] ?? 'SMA';
     $curriculum = $_GET['curriculum'] ?? 'Kurikulum Merdeka';
@@ -1071,7 +1099,7 @@ if ($action === 'report_cards' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $countStmt->execute($params);
     $total = (int)$countStmt->fetchColumn();
 
-    // Data query with aggregate scores
+    // Data query with aggregate scores (Strict ANSI SQL & ONLY_FULL_GROUP_BY compliant)
     $queryStmt = $pdo->prepare("
         SELECT 
             rc.id, rc.student_id, rc.education_level, rc.academic_year, rc.semester,
@@ -1079,15 +1107,23 @@ if ($action === 'report_cards' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             rc.verified_at, rc.created_at, rc.updated_at,
             st.name as student_name, st.email as student_email, st.phone as student_phone,
             st.school as student_school, st.target_ptn, st.plan as student_plan,
-            COUNT(rcd.id) as total_subjects,
-            COALESCE(ROUND(AVG(rcd.score), 2), 0) as average_score,
-            COALESCE(MAX(rcd.score), 0) as max_score,
-            COALESCE(MIN(rcd.score), 0) as min_score
+            COALESCE(agg.total_subjects, 0) as total_subjects,
+            COALESCE(agg.average_score, 0) as average_score,
+            COALESCE(agg.max_score, 0) as max_score,
+            COALESCE(agg.min_score, 0) as min_score
         FROM report_cards rc
         JOIN students st ON rc.student_id = st.id
-        LEFT JOIN report_card_details rcd ON rc.id = rcd.report_card_id
+        LEFT JOIN (
+            SELECT 
+                report_card_id,
+                COUNT(id) as total_subjects,
+                ROUND(AVG(score), 2) as average_score,
+                MAX(score) as max_score,
+                MIN(score) as min_score
+            FROM report_card_details
+            GROUP BY report_card_id
+        ) agg ON rc.id = agg.report_card_id
         WHERE $whereSql
-        GROUP BY rc.id
         ORDER BY rc.academic_year DESC, rc.semester DESC, st.name ASC
         LIMIT :limit OFFSET :offset
     ");
@@ -1767,7 +1803,7 @@ if ($action === 'admission_readiness' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         JOIN report_cards rc ON st.id = rc.student_id
         JOIN report_card_details rcd ON rc.id = rcd.report_card_id
         WHERE (st.school_id = :school_id OR LOWER(TRIM(st.school)) = LOWER(TRIM(:school_name)))
-        GROUP BY st.id
+        GROUP BY st.id, st.name, st.email, st.phone, st.target_ptn
         HAVING total_semesters_recorded >= 1
         ORDER BY cumulative_gpa DESC
         LIMIT 50
@@ -1788,7 +1824,7 @@ if ($action === 'admission_readiness' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         FROM students st
         JOIN quiz_results qr ON st.id = qr.student_id
         WHERE (st.school_id = :school_id OR LOWER(TRIM(st.school)) = LOWER(TRIM(:school_name)))
-        GROUP BY st.id
+        GROUP BY st.id, st.name, st.target_ptn
         ORDER BY avg_cbt_score DESC
         LIMIT 50
     ");

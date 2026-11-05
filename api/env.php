@@ -22,12 +22,15 @@ function load_env(string $path = ''): void {
     }
     $loaded[$path] = true;
 
-    if (!file_exists($path) || !is_readable($path)) {
+    if (!file_exists($path)) {
         // .env tidak wajib ada — server bisa set env via server config (cPanel, etc)
         return;
     }
 
-    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $lines = @file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return;
+    }
     foreach ($lines as $line) {
         // Skip komentar
         if (str_starts_with(trim($line), '#')) {

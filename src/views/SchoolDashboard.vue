@@ -71,16 +71,51 @@
             </div>
           </div>
 
-          <!-- Quick Fill Demo School Account -->
-          <div class="pt-1">
-            <span class="block text-[10px] uppercase font-black text-white/40 tracking-wider mb-1.5">Pilih Akun Demo Sekolah:</span>
+          <!-- Quick Fill Demo School Account (SD, SMP, SMA Sesuai PRD v1.2) -->
+          <div class="pt-1 space-y-2">
+            <span class="block text-[10px] uppercase font-black text-white/40 tracking-wider">Pilih Akun Demo Guru BK (PRD v1.2):</span>
+            <div class="grid grid-cols-2 gap-2 text-[11px]">
+              <button
+                type="button"
+                @click="loginForm.email = 'bk.sma@edupath.id'; loginForm.password = 'password123'"
+                class="px-2.5 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 font-bold transition-all text-left flex items-center gap-1.5 cursor-pointer truncate"
+              >
+                <span>🏛️</span>
+                <span class="truncate">SMA Unggulan</span>
+              </button>
+              <button
+                type="button"
+                @click="loginForm.email = 'bk.smp@edupath.id'; loginForm.password = 'password123'"
+                class="px-2.5 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 font-bold transition-all text-left flex items-center gap-1.5 cursor-pointer truncate"
+              >
+                <span>🏫</span>
+                <span class="truncate">SMP Cendekia</span>
+              </button>
+              <button
+                type="button"
+                @click="loginForm.email = 'bk.sd@edupath.id'; loginForm.password = 'password123'"
+                class="px-2.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-bold transition-all text-left flex items-center gap-1.5 cursor-pointer truncate"
+              >
+                <span>🎒</span>
+                <span class="truncate">SD Prestasi</span>
+              </button>
+              <button
+                type="button"
+                @click="loginForm.email = 'bk.smansaciamis@edupath.co.id'; loginForm.password = 'EduPathSchool01!2026'"
+                class="px-2.5 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-bold transition-all text-left flex items-center gap-1.5 cursor-pointer truncate"
+              >
+                <span>🏢</span>
+                <span class="truncate">SMANSA Ciamis</span>
+              </button>
+            </div>
+            <!-- Quick Seeder Action -->
             <button
               type="button"
-              @click="loginForm.email = 'bk.smansaciamis@edupath.co.id'; loginForm.password = 'EduPathSchool01!2026'"
-              class="w-full px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-xs font-bold text-emerald-300 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              @click="triggerSeedDummy"
+              class="w-full py-1.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-[10px] text-white/70 hover:text-white font-bold flex items-center justify-center gap-1.5 transition cursor-pointer"
             >
-              <i class="ph-bold ph-chalkboard-teacher"></i>
-              <span>Isi Akun Demo: SMANSA Ciamis</span>
+              <span>🌱</span>
+              <span>Suntik / Refresh Data Dummy PRD v1.2</span>
             </button>
           </div>
 
@@ -2569,6 +2604,25 @@ onMounted(() => {
 });
 
 // ── Actions ──
+async function triggerSeedDummy() {
+  if (!confirm('Suntik data dummy PRD v1.2 ke database (Sekolah SD/SMP/SMA, Siswa, Rapor, CBT, & Konseling)?')) return;
+  authLoading.value = true;
+  try {
+    const res = await api.seedSchoolDummy();
+    if (res?.success) {
+      alert(res.message || 'Data dummy berhasil disuntikkan!');
+      loginForm.value.email = 'bk.sma@edupath.id';
+      loginForm.value.password = 'password123';
+    } else {
+      alert(res?.error || 'Gagal menyuntikkan data dummy.');
+    }
+  } catch (e) {
+    alert('Koneksi seeder: ' + e.message);
+  } finally {
+    authLoading.value = false;
+  }
+}
+
 async function handleLogin() {
   authLoading.value = true;
   authError.value = '';
