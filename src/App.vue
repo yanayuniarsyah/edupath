@@ -3819,8 +3819,8 @@
               <button 
                 type="button"
                 @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
-                title="Tutup Halaman & Kembali"
+                class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0 text-xs"
+                title="Tutup"
                 aria-label="Tutup"
               >
                 <i class="ph-bold ph-x text-sm"></i>
@@ -3893,15 +3893,15 @@
 
         <!-- TAB 7: 2027 AI INTELLIGENCE & PERFORMANCE COCKPIT (Ujian 2027 Simulasi) -->
         <section v-if="currentTab === 'simulator' || currentTab === 'projection2027'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
-          <!-- Top Header Bar Ungu dengan Tombol Mulai Try Out CBT -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900/95 border border-purple-500/30 rounded-2xl p-3.5 sm:p-4 md:p-5 backdrop-blur-xl shadow-xl gap-3 sm:gap-4 bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-950">
+          <!-- Top Header Bar Seragam: Tema Dark Slate Elegan & Tombol Mulai Try Out -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900/90 border border-white/10 rounded-2xl p-3.5 sm:p-4 md:p-5 backdrop-blur-xl shadow-xl gap-3 sm:gap-4 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950">
             <div class="flex items-center gap-3 min-w-0">
-              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/40 flex items-center justify-center text-xl sm:text-2xl font-black shrink-0 shadow-md shadow-purple-500/10">
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/5 text-[#c0ff00] border border-white/10 flex items-center justify-center text-xl sm:text-2xl font-black shrink-0 shadow-md">
                 <i class="ph-bold ph-chart-polar"></i>
               </div>
               <div class="min-w-0">
-                <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-purple-400 truncate">
-                  Tryout UTBK SNBT 2027
+                <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[#c0ff00] truncate">
+                  Tryout &amp; Latihan UTBK SNBT
                 </span>
                 <h2 class="text-base sm:text-lg md:text-xl font-black text-white leading-tight truncate">
                   Tryout UTBK 2027
@@ -3909,41 +3909,42 @@
               </div>
             </div>
 
-            <!-- Action Buttons di Header Ungu -->
+            <!-- Action Buttons di Header: Tombol Mulai Try Out & Icon Close Ramping -->
             <div class="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
               <button
                 type="button"
                 @click="launchCurrentProgramCbt"
-                class="px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#c0ff00]/25 active:scale-95 cursor-pointer whitespace-nowrap"
+                class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#c0ff00]/25 active:scale-95 cursor-pointer whitespace-nowrap"
                 title="Mulai Ujian Simulasi CBT Resmi Full-Screen"
               >
                 <i class="ph-bold ph-play-circle text-base sm:text-lg"></i>
                 <span>{{ currentProgramCbtButtonLabel }}</span>
               </button>
 
+              <!-- Tombol Icon Closed Ramping Sesuai Ukuran Login Form -->
               <button 
                 type="button"
                 @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
-                title="Tutup Halaman &amp; Kembali"
+                class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0 text-xs"
+                title="Tutup"
                 aria-label="Tutup"
               >
-                <i class="ph-bold ph-x text-sm sm:text-base"></i>
+                <i class="ph-bold ph-x text-xs"></i>
               </button>
             </div>
           </div>
 
-          <!-- Mode Latihan Soal Mandiri & Bedah Materi AI dengan Timer Terintegrasi -->
-          <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-slate-900/90 to-slate-950 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <!-- Mode Latihan Soal Mandiri: Panel Seragam Dark Slate + Tombol Hijau Neon Paling Pinggir -->
+          <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-white/10 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
             <!-- Sisi Kiri: Judul & Deskripsi Mode Latihan -->
             <div class="flex items-start sm:items-center gap-3.5 min-w-0">
-              <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/35 flex items-center justify-center text-2xl shrink-0 shadow-md shadow-indigo-500/10">
+              <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/5 text-[#c0ff00] border border-white/10 flex items-center justify-center text-2xl shrink-0 shadow-md">
                 📖
               </div>
               <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                   <h3 class="text-base sm:text-lg font-black text-white">Latihan Soal Mandiri &amp; Bedah Solusi AI</h3>
-                  <span class="text-[9px] font-black uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full border border-indigo-500/30">
+                  <span class="text-[9px] font-black uppercase tracking-wider text-white/70 bg-white/10 px-2 py-0.5 rounded-full border border-white/15">
                     Mode Latihan
                   </span>
                 </div>
@@ -3953,19 +3954,8 @@
               </div>
             </div>
 
-            <!-- Sisi Kanan: Tombol Mulai Latihan & Panel Timer Latihan Terintegrasi -->
+            <!-- Sisi Kanan: Panel Timer Latihan & Tombol Mulai Latihan Hijau Neon di Paling Pinggir -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-              <!-- Tombol Mulai Latihan (Padanan Prominen Tombol Mulai Try Out CBT) -->
-              <button
-                type="button"
-                @click="startPracticeMode"
-                class="px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-sky-500 hover:from-indigo-400 hover:to-sky-400 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 active:scale-95 cursor-pointer whitespace-nowrap"
-                :title="'Mulai Sesi ' + currentProgramPracticeButtonLabel"
-              >
-                <i class="ph-bold ph-pencil-simple text-base sm:text-lg"></i>
-                <span>{{ currentProgramPracticeButtonLabel }}</span>
-              </button>
-
               <!-- Panel Stopwatch Timer Latihan -->
               <div class="bg-black/50 border border-white/10 rounded-2xl px-3 sm:px-4 py-2 flex items-center justify-between sm:justify-end gap-2.5 shrink-0 shadow-inner">
                 <div class="flex items-center gap-2">
@@ -3996,6 +3986,17 @@
                   </button>
                 </div>
               </div>
+
+              <!-- Tombol Mulai Latihan Hijau Neon Samakan Dengan Tombol Mulai Try Out (Paling Pinggir Panel) -->
+              <button
+                type="button"
+                @click="startPracticeMode"
+                class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#c0ff00]/25 active:scale-95 cursor-pointer whitespace-nowrap"
+                :title="'Mulai Sesi ' + currentProgramPracticeButtonLabel"
+              >
+                <i class="ph-bold ph-pencil-simple text-base sm:text-lg"></i>
+                <span>{{ currentProgramPracticeButtonLabel }}</span>
+              </button>
             </div>
           </div>
 
@@ -4285,20 +4286,20 @@
       
         <!-- TAB: SOP BIMBEL OFFLINE KHUSUS PERAN AKTIF (DI ATAS FOOTER) -->
         <section v-if="currentTab === 'offline_sop'" class="space-y-6 animate-fade-in pb-16 w-full max-w-6xl mx-auto">
-          <!-- Top Header Bar -->
-          <div class="flex items-center justify-between bg-slate-900/95 border border-amber-500/35 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl gap-3 bg-gradient-to-r from-amber-950/50 via-slate-900/90 to-slate-950">
+          <!-- Top Header Bar Seragam: Dark Slate Elegan & Icon Close Ramping -->
+          <div class="flex items-center justify-between bg-slate-900/90 border border-white/10 rounded-2xl p-4 sm:p-5 backdrop-blur-xl shadow-xl gap-3 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950">
             <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-2xl sm:text-3xl font-black shrink-0 shadow-md shadow-amber-500/10">
+              <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/5 text-[#c0ff00] border border-white/10 flex items-center justify-center text-2xl font-black shrink-0 shadow-md">
                 🏢
               </div>
               <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/15 px-2.5 py-0.5 rounded-full border border-amber-400/30">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00] bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
                     Standar Operasional Prosedur (SOP)
                   </span>
                   <span class="text-xs text-white/50">Cabang Fisik &amp; Hybrid EduPath</span>
                 </div>
-                <h2 class="text-base sm:text-xl md:text-2xl font-black text-white leading-tight truncate mt-1">
+                <h2 class="text-base sm:text-xl font-black text-white leading-tight truncate mt-1">
                   {{ isAdmin ? 'SOP Manajemen Cabang &amp; Matriks RACI' : (isTeacher ? 'SOP &amp; Tanggung Jawab Pengajar / Tutor' : (isParent ? 'SOP &amp; Panduan Monitoring Orang Tua / Wali' : 'SOP &amp; Panduan Belajar Siswa Bimbel Tatap Muka')) }}
                 </h2>
               </div>
@@ -4306,11 +4307,11 @@
             <button 
               type="button"
               @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-              class="w-9 h-9 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
-              title="Tutup &amp; Kembali"
+              class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/60 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0 text-xs"
+              title="Tutup"
               aria-label="Tutup"
             >
-              <i class="ph-bold ph-x text-sm"></i>
+              <i class="ph-bold ph-x text-xs"></i>
             </button>
           </div>
 
@@ -4409,43 +4410,167 @@
             </div>
           </div>
 
-          <!-- KONTEN 2: KHUSUS GURU / TUTOR -->
+          <!-- KONTEN 2: KHUSUS GURU / TUTOR DENGAN SIMULASI ABSENSI & BAP -->
           <div v-else-if="isTeacher" class="space-y-6">
+            <!-- Banner Portal Guru & Akses Cepat BAP -->
+            <div class="glass-card rounded-2xl p-5 border border-white/10 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
+              <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-white/5 text-[#c0ff00] border border-white/10 flex items-center justify-center text-2xl shrink-0">
+                  👨‍🏫
+                </div>
+                <div>
+                  <h3 class="text-base font-black text-white">Portal Kerja &amp; Manajemen Sesi Tutor</h3>
+                  <p class="text-xs text-slate-300 mt-0.5">
+                    Lakukan absensi peserta secara real-time dan kirim Berita Acara Perkuliahan (BAP) untuk validasi honor mengajar.
+                  </p>
+                </div>
+              </div>
+              <button 
+                type="button"
+                @click="window.location.hash = '#/admin'" 
+                class="px-4 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-slate-950 text-xs font-black transition flex items-center justify-center gap-2 shrink-0 shadow-lg shadow-[#c0ff00]/20 cursor-pointer"
+              >
+                <span>Buka Jadwal &amp; Form BAP Lengkap ➔</span>
+              </button>
+            </div>
+
+            <!-- 4 Pilar Tanggung Jawab Guru -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="glass-card rounded-2xl p-5 border border-purple-500/35 bg-purple-950/20 space-y-2.5">
+              <div class="glass-card rounded-2xl p-5 border border-white/10 bg-slate-900/70 space-y-2.5">
                 <h4 class="font-black text-white text-sm flex items-center gap-2">
-                  <span class="text-purple-400">1.</span> Hadir Tepat Waktu &amp; Materi Siap
+                  <span class="text-[#c0ff00]">1.</span> Hadir Tepat Waktu &amp; Materi Siap
                 </h4>
                 <p class="text-xs text-slate-300 leading-relaxed">
                   Tutor wajib hadir di ruang kelas fisik minimal 10 menit sebelum jam mulai sesi. Menguasai materi silabus standar cabang dan kisi-kisi latihan soal yang akan dibahas bersama siswa.
                 </p>
               </div>
 
-              <div class="glass-card rounded-2xl p-5 border border-emerald-500/35 bg-emerald-950/20 space-y-2.5">
+              <div class="glass-card rounded-2xl p-5 border border-white/10 bg-slate-900/70 space-y-2.5">
                 <h4 class="font-black text-white text-sm flex items-center gap-2">
-                  <span class="text-emerald-400">2.</span> Presensi Kelas Real-Time
+                  <span class="text-[#c0ff00]">2.</span> Presensi Kelas Real-Time
                 </h4>
                 <p class="text-xs text-slate-300 leading-relaxed">
                   Buka tab kelas di Portal Guru saat sesi berlangsung, panggil satu per satu siswa dan tandai status (Hadir, Izin, Sakit, atau Alpa) secara objektif.
                 </p>
               </div>
 
-              <div class="glass-card rounded-2xl p-5 border border-amber-500/35 bg-amber-950/20 space-y-2.5">
+              <div class="glass-card rounded-2xl p-5 border border-white/10 bg-slate-900/70 space-y-2.5">
                 <h4 class="font-black text-white text-sm flex items-center gap-2">
-                  <span class="text-amber-400">3.</span> Pengisian BAP Digital Lengkap
+                  <span class="text-[#c0ff00]">3.</span> Pengisian BAP Digital Lengkap
                 </h4>
                 <p class="text-xs text-slate-300 leading-relaxed">
                   Wajib mengisi Berita Acara Perkuliahan (BAP) digital: topik materi pokok yang diajarkan dan nomor latihan soal yang dibahas. <strong>Pengisian BAP adalah syarat mutlak pencairan honor mengajar bulanan.</strong>
                 </p>
               </div>
 
-              <div class="glass-card rounded-2xl p-5 border border-sky-500/35 bg-sky-950/20 space-y-2.5">
+              <div class="glass-card rounded-2xl p-5 border border-white/10 bg-slate-900/70 space-y-2.5">
                 <h4 class="font-black text-white text-sm flex items-center gap-2">
-                  <span class="text-sky-400">4.</span> Konfirmasi Inval (Guru Pengganti)
+                  <span class="text-[#c0ff00]">4.</span> Konfirmasi Inval (Guru Pengganti)
                 </h4>
                 <p class="text-xs text-slate-300 leading-relaxed">
                   Jika berhalangan mengajar, wajib melapor minimal <strong>H-1 kepada Admin Cabang</strong> agar admin dapat menugaskan guru pengganti (inval). Tutor tidak diperkenankan menunjuk pengganti sendiri tanpa persetujuan Admin Cabang.
                 </p>
+              </div>
+            </div>
+
+            <!-- Interaktif: Simulasi Form BAP & Presensi Kelas Guru (Dummy Data Realistis) -->
+            <div class="glass-card rounded-2xl p-5 sm:p-6 border border-white/10 bg-slate-900/90 shadow-2xl space-y-4 text-left">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/10 gap-2">
+                <div>
+                  <span class="text-[10px] font-mono uppercase tracking-wider text-[#c0ff00] block">Simulasi Lembar Kerja Guru</span>
+                  <h3 class="text-base font-black text-white flex items-center gap-2 mt-0.5">
+                    <i class="ph-bold ph-clipboard-text text-[#c0ff00]"></i>
+                    <span>Berita Acara Pembelajaran (BAP) &amp; Presensi Kelas Offline</span>
+                  </h3>
+                </div>
+                <div class="text-xs font-mono text-white/70 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 shrink-0">
+                  Kelas Intensif UTBK 12-A • Ruang Galileo 201 (14:00 - 16:00 WIB)
+                </div>
+              </div>
+
+              <!-- Topik & Catatan Sesi -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block text-[11px] font-bold text-white/70 mb-1">Materi / Pokok Bahasan yang Diajarkan *</label>
+                  <input type="text" value="Bedah Trik 30 Detik Logika Kuantitatif &amp; Matriks UTBK" class="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white font-medium focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-white/70 mb-1">Catatan Evaluasi / Hambatan Siswa</label>
+                  <input type="text" value="Siswa antusias pada soal nomor 8 &amp; 12. Rekomendasi drill aljabar lanjutan." class="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white font-medium focus:outline-none" />
+                </div>
+              </div>
+
+              <!-- Daftar Presensi Siswa Realistis -->
+              <div class="pt-2">
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <i class="ph-bold ph-users text-[#c0ff00]"></i>
+                    <span>Daftar Presensi Peserta Rombel (12 Siswa)</span>
+                  </h4>
+                  <span class="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                    Rekap: 10 Hadir, 1 Izin, 1 Sakit
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
+                  <div class="p-2.5 rounded-xl bg-black/30 border border-white/5 flex items-center justify-between">
+                    <div>
+                      <div class="font-bold text-white text-[11px]">1. Ahmad Fauzi</div>
+                      <div class="text-[9px] text-white/40">Telegram: @ortu_fauzi</div>
+                    </div>
+                    <span class="text-[9px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">Hadir</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-black/30 border border-white/5 flex items-center justify-between">
+                    <div>
+                      <div class="font-bold text-white text-[11px]">2. Bella Safitri</div>
+                      <div class="text-[9px] text-white/40">Telegram: @ortu_bella</div>
+                    </div>
+                    <span class="text-[9px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">Hadir</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-black/30 border border-white/5 flex items-center justify-between">
+                    <div>
+                      <div class="font-bold text-white text-[11px]">3. Dimas Pratama</div>
+                      <div class="text-[9px] text-white/40">Telegram: @ortu_dimas</div>
+                    </div>
+                    <span class="text-[9px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">Hadir</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-black/30 border border-white/5 flex items-center justify-between">
+                    <div>
+                      <div class="font-bold text-white text-[11px]">4. Farah Nabila</div>
+                      <div class="text-[9px] text-amber-300/80">Izin Lomba Debat</div>
+                    </div>
+                    <span class="text-[9px] px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold">Izin</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-black/30 border border-white/5 flex items-center justify-between">
+                    <div>
+                      <div class="font-bold text-white text-[11px]">5. Gilang Ramadhan</div>
+                      <div class="text-[9px] text-white/40">Terlambat 5m</div>
+                    </div>
+                    <span class="text-[9px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">Hadir</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-black/30 border border-white/5 flex items-center justify-between">
+                    <div>
+                      <div class="font-bold text-white text-[11px]">6. Kevin Sanjaya</div>
+                      <div class="text-[9px] text-rose-300/80">Sakit (Surat Dokter)</div>
+                    </div>
+                    <span class="text-[9px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">Sakit</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Bar BAP -->
+              <div class="pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <span class="text-[11px] text-white/50">
+                  💡 BAP digital otomatis terverifikasi ke Admin Cabang untuk pencairan honor bulanan.
+                </span>
+                <button 
+                  type="button" 
+                  @click="showToast('Simulasi Berhasil: Berita Acara Pembelajaran (BAP) disimpan & notifikasi absensi terkirim ke Telegram orang tua.')"
+                  class="px-4 py-2 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-slate-950 font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-lg shadow-[#c0ff00]/20 cursor-pointer"
+                >
+                  <i class="ph-bold ph-check-circle"></i>
+                  <span>Simpan BAP &amp; Kirim Notifikasi Ortu</span>
+                </button>
               </div>
             </div>
           </div>
@@ -6492,7 +6617,7 @@ export default {
       { id: 'dashboard', label: 'Dashboard', icon: 'ph-gauge' },
       { id: 'diagnostic', label: 'Asesmen', icon: 'ph-brain' },
       { id: 'learning', label: 'Materi', icon: 'ph-books' },
-      { id: 'simulator', label: 'Tryout', icon: 'ph-calculator' },
+      { id: 'simulator', label: 'Tryout & Latihan', icon: 'ph-calculator' },
       { id: 'offline_sop', label: 'SOP Bimbel', icon: 'ph-buildings' },
       { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' },
       { id: 'settings', label: 'Pengaturan', icon: 'ph-user-gear' }
@@ -8589,10 +8714,10 @@ export default {
 
     const currentProgramCbtButtonLabel = computed(() => {
       const prog = (activeAcademicProgram.value || '').toUpperCase();
-      if (prog === 'TKA_SD') return 'Mulai Try Out CBT SD';
-      if (prog === 'TKA_SMP') return 'Mulai Try Out CBT SMP';
-      if (prog === 'TKA_SMA') return 'Mulai Try Out CBT SMA';
-      return 'Mulai Try Out CBT SNBT';
+      if (prog === 'TKA_SD') return 'Mulai Try Out SD';
+      if (prog === 'TKA_SMP') return 'Mulai Try Out SMP';
+      if (prog === 'TKA_SMA') return 'Mulai Try Out SMA';
+      return 'Mulai Try Out SNBT';
     });
 
     const currentProgramPracticeButtonLabel = computed(() => {
@@ -8604,14 +8729,16 @@ export default {
     });
 
     const startPracticeMode = () => {
-      if (!isCbtTimerRunning.value) {
-        startCbtTimer();
+      if (cbtTimerSeconds.value <= 0) {
+        cbtTimerSeconds.value = 5400;
       }
+      startCbtTimer();
+      isCbtTimerRunning.value = true;
       const el = document.getElementById('practice-question-area');
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-      showToast(`Sesi ${currentProgramPracticeButtonLabel.value} aktif.`);
+      showToast(`Sesi ${currentProgramPracticeButtonLabel.value} dimulai! Timer otomatis berjalan.`);
     };
 
     const startCbtExam = (assessmentType, track = '') => {
