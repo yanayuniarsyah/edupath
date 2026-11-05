@@ -8641,7 +8641,7 @@ export default {
     };
 
     const dailyMissions = ref([
-      { title: 'Tonton 1 Micro-Lesson', reward: 20, completed: false },
+      { title: 'Pelajari 1 Modul Materi', reward: 20, completed: false },
       { title: 'Jawab 5 Soal Latihan', reward: 30, completed: false },
       { title: '20 Menit Sesi Fokus Pomodoro', reward: 40, completed: false }
     ]);
