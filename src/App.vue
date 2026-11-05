@@ -4346,6 +4346,199 @@
         </section>
       </div>
 
+      
+        <!-- TAB: SOP BIMBEL OFFLINE KHUSUS PERAN AKTIF (DI ATAS FOOTER) -->
+        <section v-if="currentTab === 'offline_sop'" class="space-y-6 animate-fade-in pb-16 w-full max-w-6xl mx-auto">
+          <!-- Top Header Bar -->
+          <div class="flex items-center justify-between bg-slate-900/95 border border-amber-500/35 rounded-2xl p-4 sm:p-6 backdrop-blur-xl shadow-xl gap-3 bg-gradient-to-r from-amber-950/50 via-slate-900/90 to-slate-950">
+            <div class="flex items-center gap-3.5 min-w-0">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-2xl sm:text-3xl font-black shrink-0 shadow-md shadow-amber-500/10">
+                🏢
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/15 px-2.5 py-0.5 rounded-full border border-amber-400/30">
+                    Standar Operasional Prosedur (SOP)
+                  </span>
+                  <span class="text-xs text-white/50">Cabang Fisik &amp; Hybrid EduPath</span>
+                </div>
+                <h2 class="text-base sm:text-xl md:text-2xl font-black text-white leading-tight truncate mt-1">
+                  {{ isTeacher ? 'SOP &amp; Tanggung Jawab Pengajar / Tutor' : (isParent ? 'SOP &amp; Panduan Monitoring Orang Tua / Wali' : 'SOP &amp; Panduan Belajar Siswa Bimbel Tatap Muka') }}
+                </h2>
+              </div>
+            </div>
+            <button 
+              type="button"
+              @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
+              class="w-9 h-9 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
+              title="Tutup &amp; Kembali"
+              aria-label="Tutup"
+            >
+              <i class="ph-bold ph-x text-sm"></i>
+            </button>
+          </div>
+
+          <!-- KONTEN 1: KHUSUS SISWA (Default & Siswa Aktif) -->
+          <div v-if="!isTeacher && !isParent" class="space-y-6">
+            <!-- 4 Pilar Tanggung Jawab Siswa -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Pilar 1: Kehadiran 75% -->
+              <div class="glass-card rounded-2xl p-5 border border-emerald-500/35 bg-gradient-to-br from-emerald-950/30 to-slate-900/80 space-y-3 shadow-md">
+                <div class="flex items-center gap-3">
+                  <span class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-lg">1</span>
+                  <div>
+                    <h3 class="font-black text-white text-sm">Presensi Kehadiran Minimal 75%</h3>
+                    <span class="text-[10px] uppercase font-bold text-emerald-400">Syarat Mutlak Kelulusan</span>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Siswa wajib menghadiri minimal 75% dari total sesi kelas tatap muka di cabang. Tingkat kehadiran ini merupakan syarat mutlak untuk klaim <strong>Garansi Kelulusan PTN</strong> dan penerbitan sertifikat program.
+                </p>
+                <div class="text-[11px] font-semibold text-emerald-300 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
+                  💡 Presensi dicatat secara real-time oleh Guru Pengampu di ruang kelas.
+                </div>
+              </div>
+
+              <!-- Pilar 2: Pengajuan Make-up Class -->
+              <div class="glass-card rounded-2xl p-5 border border-sky-500/35 bg-gradient-to-br from-sky-950/30 to-slate-900/80 space-y-3 shadow-md">
+                <div class="flex items-center gap-3">
+                  <span class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center font-bold text-lg">2</span>
+                  <div>
+                    <h3 class="font-black text-white text-sm">Alur Izin Sakit &amp; Make-up Class</h3>
+                    <span class="text-[10px] uppercase font-bold text-sky-400">Kelas Pengganti</span>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Jika berhalangan hadir karena sakit atau dinas sekolah resmi, siswa wajib melapor minimal <strong>2 jam sebelum kelas</strong> ke Front Office / Admin Cabang. Admin Cabang akan menjadwalkan sesi make-up pada rombel paralel yang setara.
+                </p>
+                <div class="text-[11px] font-semibold text-sky-300 bg-sky-500/10 px-3 py-1.5 rounded-xl border border-sky-500/20">
+                  💡 Maksimal pengajuan sesi make-up adalah 2 sesi per bulan ajaran.
+                </div>
+              </div>
+
+              <!-- Pilar 3: Try Out CBT Mingguan -->
+              <div class="glass-card rounded-2xl p-5 border border-purple-500/35 bg-gradient-to-br from-purple-950/30 to-slate-900/80 space-y-3 shadow-md">
+                <div class="flex items-center gap-3">
+                  <span class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center font-bold text-lg">3</span>
+                  <div>
+                    <h3 class="font-black text-white text-sm">Mengikuti Try Out CBT Mingguan</h3>
+                    <span class="text-[10px] uppercase font-bold text-purple-400">Evaluasi IRT &amp; Nilai</span>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Setiap peserta bimbel offline wajib mengerjakan paket Try Out CBT berkala yang dibuka setiap akhir pekan di platform EduPath untuk memantau grafik perkembangan skor IRT dan peluang rasionalisasi kampus.
+                </p>
+                <div class="text-[11px] font-semibold text-purple-300 bg-purple-500/10 px-3 py-1.5 rounded-xl border border-purple-500/20">
+                  💡 Nilai tryout dapat langsung diakses melalui menu Tryout &amp; Rapor Evaluasi.
+                </div>
+              </div>
+
+              <!-- Pilar 4: Tata Tertib Ruang Kelas -->
+              <div class="glass-card rounded-2xl p-5 border border-amber-500/35 bg-gradient-to-br from-amber-950/30 to-slate-900/80 space-y-3 shadow-md">
+                <div class="flex items-center gap-3">
+                  <span class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold text-lg">4</span>
+                  <div>
+                    <h3 class="font-black text-white text-sm">Tata Tertib &amp; Etika Belajar di Cabang</h3>
+                    <span class="text-[10px] uppercase font-bold text-amber-400">Disiplin Ruangan</span>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Siswa wajib hadir di gedung cabang <strong>10 menit sebelum kelas dimulai</strong>, membawa buku catatan dan alat tulis, menjaga kebersihan ruang kelas, serta dilarang keras titip absen atau meninggalkan kelas tanpa izin pengampu.
+                </p>
+                <div class="text-[11px] font-semibold text-amber-300 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20">
+                  💡 Siswa yang terlambat &gt;15 menit wajib melapor ke meja resepsionis (Front Office).
+                </div>
+              </div>
+            </div>
+
+            <!-- Checklist Rutinitas Siswa -->
+            <div class="glass-card rounded-2xl p-5 border border-white/10 bg-slate-900/80 space-y-3">
+              <h4 class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                <span>⏱️</span> Checklist Rutinitas Siswa Bimbel Tatap Muka
+              </h4>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div class="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                  <span class="font-bold text-white block">Sebelum Berangkat</span>
+                  <p class="text-slate-400 text-[11px]">Cek jadwal &amp; nomor ruangan di dashboard EduPath. Bawa modul dan alat tulis.</p>
+                </div>
+                <div class="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                  <span class="font-bold text-white block">Saat Tiba di Cabang</span>
+                  <p class="text-slate-400 text-[11px]">Sapa resepsionis Front Office, pastikan kartu absen siap saat guru memanggil absensi.</p>
+                </div>
+                <div class="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                  <span class="font-bold text-white block">Setelah Sesi Kelas</span>
+                  <p class="text-slate-400 text-[11px]">Review rangkuman materi dan kerjakan latihan mandiri di fitur Latihan Soal AI.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KONTEN 2: KHUSUS GURU / TUTOR -->
+          <div v-else-if="isTeacher" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="glass-card rounded-2xl p-5 border border-purple-500/35 bg-purple-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm flex items-center gap-2">
+                  <span class="text-purple-400">1.</span> Hadir Tepat Waktu &amp; Materi Siap
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Tutor wajib hadir di ruang kelas fisik minimal 10 menit sebelum jam mulai sesi. Menguasai materi silabus standar cabang dan kisi-kisi latihan soal yang akan dibahas bersama siswa.
+                </p>
+              </div>
+
+              <div class="glass-card rounded-2xl p-5 border border-emerald-500/35 bg-emerald-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm flex items-center gap-2">
+                  <span class="text-emerald-400">2.</span> Presensi Kelas Real-Time
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Buka tab kelas di Portal Guru saat sesi berlangsung, panggil satu per satu siswa dan tandai status (Hadir, Izin, Sakit, atau Alpa) secara objektif.
+                </p>
+              </div>
+
+              <div class="glass-card rounded-2xl p-5 border border-amber-500/35 bg-amber-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm flex items-center gap-2">
+                  <span class="text-amber-400">3.</span> Pengisian BAP Digital Lengkap
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Wajib mengisi Berita Acara Perkuliahan (BAP) digital: topik materi pokok yang diajarkan dan nomor latihan soal yang dibahas. <strong>Pengisian BAP adalah syarat mutlak pencairan honor mengajar bulanan.</strong>
+                </p>
+              </div>
+
+              <div class="glass-card rounded-2xl p-5 border border-sky-500/35 bg-sky-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm flex items-center gap-2">
+                  <span class="text-sky-400">4.</span> Konfirmasi Inval (Guru Pengganti)
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Jika berhalangan mengajar, wajib melapor minimal <strong>H-1 kepada Admin Cabang</strong> agar admin dapat menugaskan guru pengganti (inval). Tutor tidak diperkenankan menunjuk pengganti sendiri tanpa persetujuan Admin Cabang.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- KONTEN 3: KHUSUS ORANG TUA / WALI -->
+          <div v-else-if="isParent" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="glass-card rounded-2xl p-5 border border-sky-500/35 bg-sky-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm">🤖 Bot Notifikasi Telegram</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Orang tua menerima notifikasi real-time via Telegram saat ananda hadir atau alpa di ruang bimbingan cabang.
+                </p>
+              </div>
+              <div class="glass-card rounded-2xl p-5 border border-amber-500/35 bg-amber-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm">⚠️ Early Warning System (EWS)</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Sistem otomatis mengirimkan pesan evaluasi jika tingkat kehadiran ananda berada di bawah 75% sesi belajar.
+                </p>
+              </div>
+              <div class="glass-card rounded-2xl p-5 border border-emerald-500/35 bg-emerald-950/20 space-y-2.5">
+                <h4 class="font-black text-white text-sm">📊 Rapor Perkembangan Bulanan</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Menerima rekapitulasi skor Try Out CBT mingguan dan grafik proyeksi kelulusan kampus pilihan ananda.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
       <!-- 14. Footer (Hidden during diagnostic test, learning material, and tryout simulator for distraction-free focus) -->
       <footer v-if="!['diagnostic', 'learning', 'simulator'].includes(currentTab)" class="border-t border-white/10 pt-12 pb-8 text-sm text-white/50 font-medium">
         <div class="section-wrapper">
@@ -4459,176 +4652,6 @@
         </div>
         </div><!-- /section-wrapper -->
       </footer>
-
-    
-        <!-- TAB: SOP BIMBEL OFFLINE SISWA & WALI MURID -->
-        <section v-if="currentTab === 'offline_sop'" class="space-y-6 animate-fade-in pb-12 w-full max-w-7xl mx-auto">
-          <!-- Top Header Bar -->
-          <div class="flex items-center justify-between bg-slate-900/95 border border-amber-500/30 rounded-2xl p-4 sm:p-5 backdrop-blur-xl shadow-xl gap-3 bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-950">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-2xl font-black shrink-0 shadow-md shadow-amber-500/10">
-                🏢
-              </div>
-              <div class="min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
-                    Standar Operasional Prosedur (SOP)
-                  </span>
-                  <span class="text-xs text-white/50">Bimbel Offline &amp; Hybrid EduPath</span>
-                </div>
-                <h2 class="text-base sm:text-xl md:text-2xl font-black text-white leading-tight truncate mt-0.5">
-                  Tanggung Jawab Utama Bimbel Offline Lintas Peran
-                </h2>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <button 
-                type="button"
-                @click="showOfflineRoleModal = true"
-                class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition flex items-center gap-1.5 shadow-sm cursor-pointer"
-              >
-                <span>Modal Pop-up</span>
-                <i class="ph-bold ph-arrow-square-out"></i>
-              </button>
-              <button 
-                type="button"
-                @click="currentTab = (isLoggedIn ? 'dashboard' : 'home')" 
-                class="w-9 h-9 rounded-full bg-white/10 hover:bg-rose-500/20 text-white/70 hover:text-rose-300 border border-white/15 hover:border-rose-500/30 flex items-center justify-center transition-all shadow-sm cursor-pointer shrink-0"
-                title="Tutup & Kembali"
-                aria-label="Tutup"
-              >
-                <i class="ph-bold ph-x text-sm"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Highlight Aturan Wajib Siswa Bimbel Offline -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <!-- 1. Presensi 75% -->
-            <div class="glass-card rounded-2xl p-5 border border-emerald-500/30 bg-emerald-950/20 space-y-2.5">
-              <div class="flex items-center gap-2 text-emerald-400 font-bold text-sm">
-                <span class="text-lg">🎯</span>
-                <h4>Wajib Hadir Minimal 75%</h4>
-              </div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                Kehadiran tatap muka di ruang kelas fisik minimal 75% dari total pertemuan adalah syarat wajib kelulusan program dan klaim garansi lolos PTN.
-              </p>
-              <div class="text-[11px] font-semibold text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-                ✓ Presensi dicatat real-time oleh Guru Pengampu
-              </div>
-            </div>
-
-            <!-- 2. Make-up Class -->
-            <div class="glass-card rounded-2xl p-5 border border-sky-500/30 bg-sky-950/20 space-y-2.5">
-              <div class="flex items-center gap-2 text-sky-400 font-bold text-sm">
-                <span class="text-lg">🔄</span>
-                <h4>Alur Izin &amp; Make-up Class</h4>
-              </div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                Siswa yang berhalangan hadir karena sakit atau dinas sekolah berhak mengajukan kelas pengganti melalui Front Office atau dashboard maksimal H+2.
-              </p>
-              <div class="text-[11px] font-semibold text-sky-300 bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20">
-                ✓ Disetujui Admin Cabang pada rombel paralel
-              </div>
-            </div>
-
-            <!-- 3. Bot Telegram Orang Tua -->
-            <div class="glass-card rounded-2xl p-5 border border-rose-500/30 bg-rose-950/20 space-y-2.5">
-              <div class="flex items-center gap-2 text-rose-400 font-bold text-sm">
-                <span class="text-lg">🤖</span>
-                <h4>Monitoring Telegram Wali</h4>
-              </div>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                Setiap kedatangan siswa di gedung cabang dan nilai Try Out CBT mingguan otomatis dikirimkan ke Telegram orang tua melalui Bot EduPath.
-              </p>
-              <div class="text-[11px] font-semibold text-rose-300 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/20">
-                ✓ Sistem peringatan dini (EWS) jika alpa &gt; 2 sesi
-              </div>
-            </div>
-          </div>
-
-          <!-- Matriks RACI 7 Role -->
-          <div class="glass-card rounded-2xl p-5 sm:p-6 border border-white/10 bg-slate-900/90 space-y-4">
-            <div class="flex items-center justify-between border-b border-white/10 pb-3">
-              <h3 class="text-base font-black text-white flex items-center gap-2">
-                <span>📊</span> Matriks RACI Tanggung Jawab Operasional Bimbel Offline
-              </h3>
-              <span class="text-xs text-white/50">EduPath National Standard</span>
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
-              <div class="bg-black/40 p-2.5 rounded-xl border border-white/10"><strong class="text-emerald-400">R (Responsible):</strong> Pelaksana operasional</div>
-              <div class="bg-black/40 p-2.5 rounded-xl border border-white/10"><strong class="text-amber-400">A (Accountable):</strong> Pengambil keputusan</div>
-              <div class="bg-black/40 p-2.5 rounded-xl border border-white/10"><strong class="text-sky-400">C (Consulted):</strong> Masukan &amp; koordinasi</div>
-              <div class="bg-black/40 p-2.5 rounded-xl border border-white/10"><strong class="text-slate-400">I (Informed):</strong> Laporan notifikasi</div>
-            </div>
-
-            <!-- Tabel RACI -->
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-black/40 text-slate-300 font-bold border-b border-white/10">
-                  <tr>
-                    <th class="py-3 px-3">Aktivitas Operasional</th>
-                    <th class="py-3 px-2 text-center text-amber-400">Superadmin</th>
-                    <th class="py-3 px-2 text-center text-emerald-400">Admin Cabang</th>
-                    <th class="py-3 px-2 text-center text-sky-400">Front Office</th>
-                    <th class="py-3 px-2 text-center text-purple-400">Guru/Tutor</th>
-                    <th class="py-3 px-2 text-center text-blue-400">Siswa</th>
-                    <th class="py-3 px-2 text-center text-rose-400">Wali Murid</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-white/5">
-                  <tr class="hover:bg-white/5">
-                    <td class="py-2.5 px-3 font-medium text-white">Check-in Kehadiran Meja Depan</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-amber-400 font-bold">A</td>
-                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">R</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                  </tr>
-                  <tr class="hover:bg-white/5">
-                    <td class="py-2.5 px-3 font-medium text-white">Presensi Kelas &amp; Pengisian BAP Digital</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-amber-400 font-bold">A</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">R</td>
-                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                  </tr>
-                  <tr class="hover:bg-white/5">
-                    <td class="py-2.5 px-3 font-medium text-white">Alert Otomatis Bot Telegram Orang Tua</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-amber-400 font-bold">A</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">R (Penerima)</td>
-                  </tr>
-                  <tr class="hover:bg-white/5">
-                    <td class="py-2.5 px-3 font-medium text-white">Pengajuan &amp; Verifikasi Sesi Make-up</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">A / R</td>
-                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
-                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
-                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">R</td>
-                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
-                  </tr>
-                  <tr class="hover:bg-white/5">
-                    <td class="py-2.5 px-3 font-medium text-white">Simulasi Try Out CBT &amp; Analitik IRT</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-amber-400 font-bold">A</td>
-                    <td class="py-2.5 px-2 text-center text-slate-500">I</td>
-                    <td class="py-2.5 px-2 text-center text-sky-400">C</td>
-                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">R</td>
-                    <td class="py-2.5 px-2 text-center text-emerald-400 font-bold">I (Rapor)</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
     </main>
 
     <!-- Modal: Pilihan Paket Belajar EduPath (Upgrade & Plan Selector Flow) -->
@@ -7319,16 +7342,8 @@ export default {
 
     const handleTabClick = (tabId) => {
       if (tabId === 'offline_sop') {
-        showOfflineRoleModal.value = true;
-
-    // Auto-start timer saat tab simulator dibuka (Dipasang aman setelah inisialisasi currentTab)
-    watch(currentTab, (newTab) => {
-      if (newTab === 'simulator') {
-        startCbtTimer();
-      } else {
-        stopCbtTimer();
-      }
-    });
+        currentTab.value = 'offline_sop';
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
       const adminTarget = adminTabs.find(t => t.id === tabId);
