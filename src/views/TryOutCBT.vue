@@ -589,8 +589,12 @@ export default {
         localStorage.removeItem(`edupath_tryout_${this.attemptId}`);
         localStorage.removeItem(`edupath_tryout_attempt_id_${this.assessmentType}_${this.track}`);
         localStorage.removeItem('edupath_tryout_attempt_id');
-        alert("Ujian selesai. Jawaban Anda telah disimpan.");
-        this.$router.push('/');
+        alert("Ujian selesai! Skor IRT, radar blind-spot, dan rekomendasi jalur belajar Anda telah otomatis diperbarui di Dashboard.");
+        if (this.$router) {
+          this.$router.push('/');
+        } else {
+          window.location.hash = '#/dashboard';
+        }
       } catch (error) {
         this.submitting = false;
         alert(error.message || 'Jawaban belum dapat disimpan.');

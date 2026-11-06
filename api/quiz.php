@@ -735,6 +735,28 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
                     ");
                     $insDiag->execute([$diag_id, $payload->id, (int)$totalScore, $worst_dom, $worst_subm, $lowest_pct, $diagDetails]);
+
+                    // Auto-sync learning_paths from Try Out CBT
+                    $path_id = bin2hex(random_bytes(16));
+                    $path_id = substr($path_id,0,8).'-'.substr($path_id,8,4).'-'.substr($path_id,12,4).'-'.substr($path_id,16,4).'-'.substr($path_id,20,12);
+                    $recJson = json_encode([
+                        "primary_focus" => $worst_subm,
+                        "source" => "tryout_cbt",
+                        "actions" => [
+                            ["type" => "material", "title" => "Pelajari Modul $worst_subm"],
+                            ["type" => "drill", "title" => "Latihan Fokus $worst_subm"]
+                        ]
+                    ]);
+                    try {
+                        $insPath = $pdo->prepare("INSERT INTO learning_paths (id, student_id, diagnostic_result_id, gap_focus, recommended_materials) VALUES (?, ?, ?, ?, ?)");
+                        $insPath->execute([$path_id, $payload->id, $diag_id, $worst_subm, $recJson]);
+                    } catch (\Throwable $eP) {}
+
+                    // Update student's total score
+                    try {
+                        $updSt = $pdo->prepare("UPDATE students SET total_score = GREATEST(COALESCE(total_score, 0), ?) WHERE id = ?");
+                        $updSt->execute([(int)$totalScore, $payload->id]);
+                    } catch (\Throwable $eSt) {}
                 }
             } catch (\Throwable $eDiag) {}
         }
@@ -807,6 +829,28 @@ elseif ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
                     ");
                     $insDiag->execute([$diag_id, $payload->id, (int)$totalScore, $worst_dom, $worst_subm, $lowest_pct, $diagDetails]);
+
+                    // Auto-sync learning_paths from Try Out CBT
+                    $path_id = bin2hex(random_bytes(16));
+                    $path_id = substr($path_id,0,8).'-'.substr($path_id,8,4).'-'.substr($path_id,12,4).'-'.substr($path_id,16,4).'-'.substr($path_id,20,12);
+                    $recJson = json_encode([
+                        "primary_focus" => $worst_subm,
+                        "source" => "tryout_cbt",
+                        "actions" => [
+                            ["type" => "material", "title" => "Pelajari Modul $worst_subm"],
+                            ["type" => "drill", "title" => "Latihan Fokus $worst_subm"]
+                        ]
+                    ]);
+                    try {
+                        $insPath = $pdo->prepare("INSERT INTO learning_paths (id, student_id, diagnostic_result_id, gap_focus, recommended_materials) VALUES (?, ?, ?, ?, ?)");
+                        $insPath->execute([$path_id, $payload->id, $diag_id, $worst_subm, $recJson]);
+                    } catch (\Throwable $eP) {}
+
+                    // Update student's total score
+                    try {
+                        $updSt = $pdo->prepare("UPDATE students SET total_score = GREATEST(COALESCE(total_score, 0), ?) WHERE id = ?");
+                        $updSt->execute([(int)$totalScore, $payload->id]);
+                    } catch (\Throwable $eSt) {}
                 }
             } catch (\Throwable $eDiag) {}
         }

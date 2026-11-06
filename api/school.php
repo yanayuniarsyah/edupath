@@ -1701,6 +1701,7 @@ if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_MET
 
     // 3. Diagnostic & Learning Path
     $diagnosticResult = null;
+    $learningPath = null;
     try {
         $diagStmt = $pdo->prepare("
             SELECT id, total_score, gap_domain, gap_sub_materi, gap_score, details, created_at
@@ -1713,18 +1714,70 @@ if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_MET
         $diagnosticResult = $diagStmt->fetch(PDO::FETCH_ASSOC);
         if ($diagnosticResult) {
             $diagnosticResult['recommended_track'] = !empty($diagnosticResult['gap_domain']) ? $diagnosticResult['gap_domain'] : 'Investigatif & Realistis';
+            if (!empty($diagnosticResult['details'])) {
+                $diagnosticResult['details_parsed'] = json_decode($diagnosticResult['details'], true);
+            }
+        }
+
+        $pathStmt = $pdo->prepare("
+            SELECT id, gap_focus, recommended_materials, created_at
+            FROM learning_paths
+            WHERE student_id = ?
+            ORDER BY created_at DESC
+            LIMIT 1
+        ");
+        $pathStmt->execute([$student_id]);
+        $learningPath = $pathStmt->fetch(PDO::FETCH_ASSOC);
+        if ($learningPath && !empty($learningPath['recommended_materials'])) {
+            $learningPath['actions'] = json_decode($learningPath['recommended_materials'], true);
         }
     } catch (\Throwable $de) {
         $diagnosticResult = null;
+        $learningPath = null;
     }
 
-    // 4. Learning Gap Identification (Mata pelajaran dengan nilai < KKM atau rata-rata terendah)
+    // 4. Learning Gap Identification (Perpaduan Evaluasi Try Out CBT / IRT Diagnostic & Rapor Akademik)
     $learningGaps = [];
+
+    // Prioritas 1: Ambil blind-spot langsung dari Try Out CBT / Diagnostic IRT terkini
+    if ($diagnosticResult && !empty($diagnosticResult['details_parsed']['submateri_stats'])) {
+        $cbtGaps = [];
+        foreach ($diagnosticResult['details_parsed']['submateri_stats'] as $subm => $st) {
+            $tot = max(1, (int)($st['total'] ?? 1));
+            $corr = (int)($st['correct'] ?? 0);
+            $pct = round(($corr / $tot) * 100, 1);
+            if ($pct < 75) {
+                $cbtGaps[] = [
+                    "subject" => $subm,
+                    "domain" => $st['domain'] ?? 'CBT',
+                    "average_score" => $pct,
+                    "gap_severity" => ($pct < 50 ? "TINGGI" : "SEDANG"),
+                    "recommendation" => "Blind-spot terdeteksi dari evaluasi Try Out CBT. Remedial materi $subm."
+                ];
+            }
+        }
+        usort($cbtGaps, function($a, $b) {
+            return $a['average_score'] <=> $b['average_score'];
+        });
+        $learningGaps = array_merge($learningGaps, $cbtGaps);
+    } elseif ($diagnosticResult && !empty($diagnosticResult['gap_sub_materi'])) {
+        $gapScore = (float)($diagnosticResult['gap_score'] ?? 40);
+        $learningGaps[] = [
+            "subject" => $diagnosticResult['gap_sub_materi'],
+            "domain" => $diagnosticResult['gap_domain'] ?? 'IRT',
+            "average_score" => $gapScore,
+            "gap_severity" => ($gapScore < 50 ? "TINGGI" : "SEDANG"),
+            "recommendation" => "Fokus remedial prioritas dari hasil evaluasi IRT."
+        ];
+    }
+
+    // Prioritas 2: Tambahkan kelemahan dari nilai rapor semester
     foreach ($allSubjectScores as $subj => $scores) {
         $avgScore = round(array_sum($scores) / count($scores), 2);
         if ($avgScore < 75) {
             $learningGaps[] = [
                 "subject" => $subj,
+                "domain" => 'Rapor Akademik',
                 "average_score" => $avgScore,
                 "gap_severity" => ($avgScore < 65 ? "TINGGI" : "SEDANG"),
                 "recommendation" => "Perlu bimbingan intensif materi dasar & latihan mandiri pada topik $subj."
@@ -1759,6 +1812,7 @@ if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_MET
         "semester_progression" => $semesterProgression,
         "assessment_history" => $assessmentHistory,
         "diagnostic" => $diagnosticResult,
+        "learning_path" => $learningPath,
         "learning_gaps" => $learningGaps,
         "guidance_records" => $guidanceRecords,
         "admission_tracking" => $admissionTracking

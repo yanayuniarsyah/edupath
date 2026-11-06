@@ -3649,10 +3649,10 @@
                   <div class="p-3 rounded-xl bg-white/95 border border-blue-100 shadow-sm space-y-1">
                     <div class="flex items-center gap-1.5 text-blue-700 font-black text-xs">
                       <span class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-[11px] font-bold">3</span>
-                      <span>Evaluasi Berkala (Tiap 2-4 Minggu)</span>
+                      <span>Evaluasi Berkala Lewat Try Out CBT</span>
                     </div>
                     <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
-                      Ulangi tes diagnostic secara berkala <strong>tiap 2-4 minggu</strong> untuk memantau lonjakan skor IRT dan peluang kelulusan target impian.
+                      Cukup 1x diagnostic di awal. Selanjutnya evaluasi dilakukan berkala lewat <strong>Try Out CBT (misal 2x sebulan)</strong>. Nilai IRT, radar blind-spot, dan jalur belajar AI otomatis diperbarui dari riwayat tryout.
                     </p>
                   </div>
                 </div>
@@ -8742,6 +8742,24 @@ export default {
     });
 
     const learningRecommendations = computed(() => {
+      // Prioritas 1: Jika ada learning_path dari hasil Try Out CBT / Diagnostic IRT
+      const lp = student360Data.value?.learning_path;
+      if (lp && lp.actions && Array.isArray(lp.actions.actions) && lp.actions.actions.length > 0) {
+        return lp.actions.actions.map(act => ({
+          title: act.title,
+          desc: `Rekomendasi remedial terfokus berdasarkan deteksi blind-spot ${lp.gap_focus || 'evaluasi tryout'}.`
+        }));
+      }
+
+      // Prioritas 2: Dari learning_gaps (hasil deteksi Try Out CBT)
+      const gaps = student360Data.value?.learning_gaps;
+      if (gaps && gaps.length > 0) {
+        return gaps.slice(0, 3).map((g) => ({
+          title: `Penguatan: ${g.subject}`,
+          desc: g.recommendation || `Fokus pemantapan konsep dan latihan drill untuk menaikkan skor IRT pada topik ${g.subject}.`
+        }));
+      }
+
       const level = activeStudentLevel.value;
       if (level === 'SD') {
         return [
