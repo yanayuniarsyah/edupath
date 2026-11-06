@@ -53,7 +53,7 @@
           <span style="color: #c0ff00;">Pahami Cara Belajarmu.</span> Siapkan Masa Depanmu.
         </h2>
         <p class="text-sm sm:text-base text-slate-200 max-w-2xl mx-auto font-medium leading-relaxed">
-          Bukan sekadar tes bakat biasa. SPP memetakan 4 dimensi berpikir dan kesiapan belajarmu secara mandiri, gratis, dan terarah untuk menembus PTN impian.
+          Bukan sekadar tes bakat biasa. SPP memetakan 4 dimensi berpikir dan kesiapan belajarmu secara mandiri, gratis, dan terarah untuk meraih prestasi &amp; sekolah/PTN impian.
         </p>
 
         <!-- Feature Badges -->
@@ -68,7 +68,7 @@
             <i class="ph-bold ph-timer text-[#c0ff00]"></i> Estimasi ±15 Menit
           </span>
           <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/90 text-xs sm:text-sm font-semibold">
-            <i class="ph-bold ph-graduation-cap text-[#c0ff00]"></i> Khusus SMA/MA/SMK & Gap Year
+            <i class="ph-bold ph-graduation-cap text-[#c0ff00]"></i> Siswa SD, SMP, SMA &amp; Gap Year
           </span>
         </div>
       </div>
@@ -180,7 +180,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label for="spp_target_univ" class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
-                  Target Kampus PTN <span class="text-[#c0ff00]">*</span>
+                  Target Sekolah / Kampus Impian <span class="text-[#c0ff00]">*</span>
                 </label>
                 <input
                   id="spp_target_univ"
@@ -188,14 +188,14 @@
                   v-model="studentData.targetUniv"
                   type="text"
                   required
-                  placeholder="Contoh: ITB / UI / UGM"
+                  placeholder="Contoh: SMP Favorit / SMA Unggulan / ITB / UI"
                   class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white placeholder-white/30 text-sm focus:border-[#c0ff00] focus:outline-none transition-all"
                 />
               </div>
 
               <div>
                 <label for="spp_target_major" class="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
-                  Jurusan Impian <span class="text-[#c0ff00]">*</span>
+                  Peminatan / Jurusan Impian <span class="text-[#c0ff00]">*</span>
                 </label>
                 <input
                   id="spp_target_major"
@@ -203,7 +203,7 @@
                   v-model="studentData.targetMajor"
                   type="text"
                   required
-                  placeholder="Contoh: Teknik Informatika"
+                  placeholder="Contoh: IPA / IPS / Teknik Informatika"
                   class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white placeholder-white/30 text-sm focus:border-[#c0ff00] focus:outline-none transition-all"
                 />
               </div>
@@ -418,7 +418,7 @@
                     <span>Solusi Habit: WLC Sync</span>
                   </div>
                   <p class="text-[11px] text-white/60 leading-relaxed">
-                    Kunci sukses menembus target {{ studentData.targetUniv || 'PTN Impian' }} bukan belajar sistem kebut semalam, melainkan konsistensi mingguan via <strong>Weekly Learning Check-in (WLC)</strong>.
+                    Kunci sukses menembus target {{ studentData.targetUniv || 'Sekolah / PTN Impian' }} bukan belajar sistem kebut semalam, melainkan konsistensi mingguan via <strong>Weekly Learning Check-in (WLC)</strong>.
                   </p>
                 </div>
               </div>
@@ -484,7 +484,7 @@
                   <div class="text-[10px] uppercase font-mono tracking-widest text-[#c0ff00]">Digital Potential Card</div>
                   <div class="text-xl font-black text-white font-heading">Profil Potensi</div>
                   <div class="text-xs text-white/80 font-bold">{{ studentData.name || 'Siswa Mandiri' }}</div>
-                  <div class="text-[10px] text-white/50">{{ studentData.school || 'SMA Negeri Indonesia' }} • Target: {{ studentData.targetUniv || 'PTN Impian' }}</div>
+                  <div class="text-[10px] text-white/50">{{ studentData.school || 'Sekolah Siswa' }} • Target: {{ studentData.targetUniv || 'Sekolah / PTN Impian' }}</div>
                 </div>
 
                 <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-[10px] text-white/70 italic">
@@ -550,14 +550,14 @@
             <!-- Hook Question Contextualized -->
             <div class="space-y-3 max-w-2xl mx-auto">
               <h3 class="text-2xl sm:text-3xl md:text-4xl font-black text-white font-heading leading-tight">
-                Seberapa Siap Kamu untuk {{ studentData.targetMajor || 'Jurusan Impian' }} di {{ studentData.targetUniv || 'PTN Favoritmu' }}?
+                Seberapa Siap Kamu untuk {{ studentData.targetMajor || 'Peminatan / Jurusan Impian' }} di {{ studentData.targetUniv || 'Sekolah / PTN Favoritmu' }}?
               </h3>
               <p class="text-xs md:text-sm text-white/70 leading-relaxed">
-                Mengetahui potensi adalah titik awal strategis. Saatnya mengukur kesiapan kemampuan akademikmu menggunakan simulasi model IRT adaptif yang terkalibrasi untuk kebutuhan latihan SNBT.
+                Mengetahui potensi adalah titik awal strategis. Saatnya mengukur kesiapan kemampuan akademikmu menggunakan simulasi model IRT adaptif yang terkalibrasi untuk kurikulum TKA SD-SMA &amp; SNBT.
               </p>
             </div>
 
-            <!-- Ecosystem Visual Flow: Potential -> Habit -> Academic -> University -->
+            <!-- Ecosystem Visual Flow: Potential -> Habit -> Academic -> Target -->
             <div class="py-4">
               <div class="flex flex-wrap items-center justify-center gap-2 md:gap-3 text-xs md:text-sm font-bold">
                 <div class="px-3.5 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white flex items-center gap-1.5">
@@ -577,7 +577,7 @@
                 <i class="ph-bold ph-arrow-right text-[#c0ff00]"></i>
                 <div class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center gap-1.5">
                   <i class="ph-bold ph-trophy"></i>
-                  <span>4. {{ studentData.targetUniv || 'PTN Impian' }}</span>
+                  <span>4. {{ studentData.targetUniv || 'Sekolah / PTN Impian' }}</span>
                 </div>
               </div>
             </div>
@@ -588,7 +588,7 @@
                 @click="handleEduPathCTA"
                 class="w-full sm:w-auto px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#c0ff00] text-black font-black text-sm sm:text-base hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_35px_rgba(192,255,0,0.6)] inline-flex items-center justify-center gap-2 group cursor-pointer"
               >
-                <span>Mulai Persiapan Masuk PTN</span>
+                <span>Mulai Persiapan Belajar &amp; Ujian</span>
                 <i class="ph-bold ph-arrow-right text-lg sm:text-xl group-hover:translate-x-1 transition-transform"></i>
               </button>
             </div>
@@ -992,7 +992,7 @@ export default {
 
     const partnerTelegramUrl = computed(() => {
       const text = `Halo Tim Kemitraan EduPath, saya ${partnerBkName.value} dari ${partnerSchoolName.value} (${partnerStudentCount.value}) ingin mengklaim banner QR Code resmi & fasilitasi asesmen SPP untuk sekolah kami.`;
-      return `https://t.me/edupath_support_bot?start=${encodeURIComponent(text)}`;
+      return `https://wa.me/628151880508?text=${encodeURIComponent(text)}`;
     });
 
     // Official Verified Certificate State
@@ -1002,7 +1002,7 @@ export default {
 
     // 30 Canonical Questions
     const questions = [
-      { id: 'EFC_MAST_01', dimension: 'Potential', question: 'Saya yakin mampu memahami konsep materi UTBK yang menurut saya rumit.' },
+      { id: 'EFC_MAST_01', dimension: 'Potential', question: 'Saya yakin mampu memahami konsep materi pelajaran atau ujian yang menurut saya rumit.' },
       { id: 'EFC_MAST_02', dimension: 'Potential', question: 'Saya merasa yakin bisa memecahkan soal ujian mandiri yang paling sulit sekalipun.' },
       { id: 'EFC_CHAL_01', dimension: 'Potential', question: 'Saya merasa sanggup menghadapi format soal ujian yang baru dan belum pernah saya pelajari.' },
       { id: 'EFC_CHAL_02', dimension: 'Potential', question: 'Saya percaya diri mengerjakan paket soal latihan yang melebihi standar sekolah saya.' },
@@ -1340,7 +1340,7 @@ export default {
       <strong>Langkah Siswa:</strong><br>
       1. Buka kamera HP atau Google Lens.<br>
       2. Scan QR Code di atas untuk akses asesmen SPP secara gratis.<br>
-      3. Dapatkan peta gaya belajar dan rekomendasi prodi PTN impian Anda!
+      3. Dapatkan peta gaya belajar dan rekomendasi jalur belajar target impian Anda!
     </div>
     <div class="footer">
       Diterbitkan resmi oleh EduPath • UU Perlindungan Data Pribadi (UU PDP) Certified
@@ -1362,7 +1362,7 @@ export default {
 
     const shareCard = async () => {
       const nameTag = studentData.name ? `${studentData.name} (${studentData.school})` : 'Gue';
-      const shareText = `${nameTag} baru aja cek potensi diri di Student Potential Path (SPP)! Telah menyelesaikan SPP!. Target kampus: ${studentData.targetUniv || 'PTN Impian'}. Coba cek potensimu juga di EduPath secara gratis!`;
+      const shareText = `${nameTag} baru aja cek potensi diri di Student Potential Path (SPP)! Telah menyelesaikan SPP!. Target: ${studentData.targetUniv || 'Sekolah / PTN Impian'}. Coba cek potensimu juga di EduPath secara gratis!`;
       if (navigator.clipboard) {
         try {
           await navigator.clipboard.writeText(shareText + ' ' + window.location.href);

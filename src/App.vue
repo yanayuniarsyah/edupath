@@ -352,7 +352,7 @@
                       </span>
                       <div>
                         <div class="text-xs font-bold text-white leading-tight">Kalkulator AI</div>
-                        <div class="text-[10px] text-white/40">Hitung peluang lolos PTN</div>
+                        <div class="text-[10px] text-white/40">Hitung peluang target kelulusan</div>
                       </div>
                     </button>
 
@@ -447,7 +447,7 @@
                 class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all text-left cursor-pointer"
               >
                 <span class="text-base">🏛️</span>
-                <span>Kalkulator Peluang PTN AI</span>
+                <span>Kalkulator Peluang Kelulusan AI</span>
               </button>
 
               <button 
@@ -655,7 +655,7 @@
                 Belajar Keras<br />Tapi <span style="color: #c0ff00;">Tanpa Arah?</span>
               </h2>
               <p class="text-sm sm:text-lg text-slate-200 font-medium leading-relaxed">
-                Banyak pejuang PTN belajar penuh semangat, tapi tanpa peta yang jelas. Inilah 3 jebakan paling umum.
+                Banyak siswa SD hingga SMA belajar penuh semangat, tapi tanpa peta yang jelas. Inilah 3 jebakan paling umum.
               </p>
             </div>
 
@@ -1062,7 +1062,7 @@
                     </li>
                     <li class="flex items-start gap-2.5">
                       <span class="text-rose-400 font-bold shrink-0 mt-0.5">✕</span>
-                      <span><strong>Hafalan Rumus Cepat:</strong> Rawan panik &amp; blank begitu variasi soal nalar HOTS baru muncul di SNBT.</span>
+                      <span><strong>Hafalan Rumus Cepat:</strong> Rawan panik &amp; blank begitu variasi soal nalar HOTS baru muncul di ujian TKA maupun SNBT.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
                       <span class="text-rose-400 font-bold shrink-0 mt-0.5">✕</span>
@@ -1109,7 +1109,7 @@
                     </li>
                     <li class="flex items-start gap-2.5">
                       <span class="text-sky-400 font-bold shrink-0 mt-0.5">⚠️</span>
-                      <span><strong>Bukan Real-Time Adaptive IRT:</strong> Rekomendasi belajar modul umum, belum memetakan probabilitas lolos PTN per butir soal.</span>
+                      <span><strong>Bukan Real-Time Adaptive IRT:</strong> Rekomendasi belajar modul umum, belum memetakan probabilitas kelulusan target sekolah/PTN per butir soal.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
                       <span class="text-sky-400 font-bold shrink-0 mt-0.5">⚠️</span>
@@ -1128,7 +1128,7 @@
               <!-- Card 3: EduPath.ai Adaptive -->
               <div class="rounded-3xl p-5 sm:p-7 md:p-8 space-y-6 border-2 border-[#c0ff00] bg-[#10160a] shadow-[0_0_50px_rgba(192,255,0,0.18)] relative flex flex-col justify-between lg:scale-105 lg:-translate-y-2 z-10">
                 <span class="absolute top-0 right-0 bg-[#c0ff00] text-black text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider">
-                  Pilihan Cerdas Pejuang PTN ⚡
+                  Pilihan Cerdas Siswa Juara SD - SMA &amp; SNPMB ⚡
                 </span>
 
                 <div class="space-y-5">
@@ -1190,7 +1190,7 @@
                   </p>
                 </div>
                 <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#c0ff00]/10 border border-[#c0ff00]/30 text-[#c0ff00] text-xs font-bold shrink-0">
-                  <span>Standar SNBT 2026/2027</span>
+                  <span>Standar Kurikulum TKA &amp; SNBT Terbaru</span>
                 </div>
               </div>
 
@@ -1322,7 +1322,7 @@
                 <div class="space-y-3">
                   <span class="text-3xl">🎯</span>
                   <h4 class="text-lg md:text-xl font-black text-white">Simulasi Penilaian IRT</h4>
-                  <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">Setiap tryout memberikan konversi persentil kelulusan yang riil sesuai bobot skor SNBT terbaru.</p>
+                  <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">Setiap tryout memberikan konversi persentil kelulusan yang riil sesuai bobot skor ujian dan passing grade target impian.</p>
                 </div>
                 <div class="space-y-3">
                   <span class="text-3xl">🤖</span>
@@ -1332,7 +1332,7 @@
                 <div class="space-y-3">
                   <span class="text-3xl">📈</span>
                   <h4 class="text-lg md:text-xl font-black text-white">Grafik Kenaikan Riil</h4>
-                  <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">Pantau secara riil proyeksi peluang Anda menembus universitas target pilihan secara visual.</p>
+                  <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">Pantau secara riil proyeksi peluang Anda menembus sekolah favorit dan universitas target pilihan secara visual.</p>
                 </div>
               </div>
             </div>
@@ -1454,7 +1454,7 @@
                   <div>
                     <h3 class="text-xl md:text-2xl font-black text-white font-heading">AI Companion 24/7</h3>
                     <p class="text-sm text-slate-300 font-medium leading-relaxed mt-2">
-                      Asisten interaktif cerdas membongkar kerumitan soal UTBK kapan pun kamu buntu.
+                      Asisten interaktif cerdas membongkar kerumitan soal latihan &amp; tryout kapan pun kamu buntu.
                     </p>
                   </div>
                 </div>
@@ -1486,11 +1486,11 @@
               <div class="glass-card rounded-3xl p-6 md:col-span-2 lg:col-span-8 bg-gradient-to-r from-slate-950 to-slate-900 border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="space-y-2">
                   <h3 class="text-2xl md:text-3xl font-black font-heading text-white flex flex-wrap items-center gap-3">
-                    Auto Report Telegram Orang Tua
-                    <span class="bg-emerald-500/15 text-[#c0ff00] px-2.5 py-1 rounded text-[10px] font-bold border border-emerald-500/20 uppercase tracking-widest">Telegram</span>
+                    Auto Report Progres Orang Tua
+                    <span class="bg-emerald-500/15 text-[#c0ff00] px-2.5 py-1 rounded text-[10px] font-bold border border-emerald-500/20 uppercase tracking-widest">Telegram / WA</span>
                   </h3>
                   <p class="text-sm md:text-base text-slate-300 max-w-2xl font-medium leading-relaxed">
-                    Hilangkan kekhawatiran orang tua secara transparan. Sistem otomatis meringkas total waktu belajar, perolehan skor target PTN, dan mengirimkannya langsung ke Telegram orang tua.
+                    Hilangkan kekhawatiran orang tua secara transparan. Sistem otomatis meringkas total waktu belajar, perolehan skor &amp; capaian target belajar jenjang SD-SMA, dan mengirimkannya langsung ke kontak orang tua.
                   </p>
                 </div>
                 <button class="shrink-0 bg-white text-slate-950 hover:bg-slate-200 px-6 py-3.5 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center gap-2" @click="currentTab = 'parent'">
@@ -1576,7 +1576,7 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-[#c0ff00]"></span>
                     <span>Early Tester Feedback</span>
                   </span>
-                  <span class="text-white/30 text-[10px]">UTBK 2026/2027</span>
+                  <span class="text-white/30 text-[10px]">TKA SD-SMA &amp; SNPMB</span>
                 </div>
               </div>
             </div>
@@ -1590,7 +1590,7 @@
             <div class="text-center max-w-xl mx-auto space-y-2 reveal">
               <span class="text-[#c0ff00] text-xs sm:text-sm font-bold uppercase tracking-widest block">// TAMPILAN INTERFACE</span>
               <h2 class="text-2xl sm:text-4xl md:text-5xl font-black font-heading text-white leading-tight">Eksplorasi Dashboard</h2>
-              <p class="text-xs sm:text-sm text-white/50 max-w-md mx-auto">Pantau kesiapan UTBK, grafik probabilitas kelulusan, dan rekomendasi AI dalam satu tampilan presisi.</p>
+              <p class="text-xs sm:text-sm text-white/50 max-w-md mx-auto">Pantau kesiapan akademik SD hingga SMA, grafik probabilitas kelulusan, dan rekomendasi AI dalam satu tampilan presisi.</p>
             </div>
 
             <div class="relative max-w-4xl mx-auto">
@@ -2108,7 +2108,7 @@
                   Raih Komisi <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">20% Pembelian Paket</span> <br class="hidden sm:inline">+ <span class="text-emerald-400">10% Recurring</span> Tiap Perpanjangan
                 </h2>
                 <p class="text-white/70 text-xs sm:text-base leading-relaxed">
-                  Dapatkan penghasilan berkelanjutan dengan merekomendasikan platform belajar adaptif &amp; simulasi UTBK EduPath kepada rekan pejuang PTN dan komunitas belajar. Tracking komisi transparan secara real-time, pencairan terjadwal langsung ke rekening Anda.
+                  Dapatkan penghasilan berkelanjutan dengan merekomendasikan platform belajar adaptif &amp; simulasi ujian EduPath kepada siswa, orang tua, dan komunitas belajar SD hingga SMA &amp; SNPMB. Tracking komisi transparan secara real-time, pencairan terjadwal langsung ke rekening Anda.
                 </p>
                 <div class="flex flex-wrap justify-center gap-3 pt-2">
                   <button v-if="!isLoggedIn || affiliateData?.status === 'not_joined'" @click="showAffiliateRegisterModal = true" class="w-full sm:w-auto min-h-[50px] px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_35px_rgba(245,158,11,0.5)] flex items-center justify-center gap-2 active:scale-98">
@@ -2148,8 +2148,8 @@
                     <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">20% Thn-1 | 10% Rec</span>
                   </div>
                   <div>
-                    <h3 class="font-bold text-white text-sm">Paket Tryout SNBT</h3>
-                    <p class="text-[11px] text-white/50 mt-1">Simulasi ujian SNBT terlengkap yang menggunakan sistem IRT dan evaluasi AI.</p>
+                    <h3 class="font-bold text-white text-sm">Paket Tryout TKA &amp; SNBT</h3>
+                    <p class="text-[11px] text-white/50 mt-1">Simulasi ujian TKA SD, SMP, SMA &amp; SNBT terlengkap yang menggunakan sistem IRT dan evaluasi AI.</p>
                   </div>
                 </div>
                 <div class="p-5 rounded-2xl space-y-3 bg-white/5 border border-white/10">
@@ -2196,10 +2196,10 @@
             </div>
             
             <h2 class="text-3xl sm:text-5xl md:text-6xl font-black font-heading text-white tracking-tighter relative z-10 leading-tight">
-              Siap Tembus<br /><span style="color: #c0ff00;">PTN Impianmu?</span>
+              Siap Raih Prestasi &amp;<br /><span style="color: #c0ff00;">Sekolah / PTN Impianmu?</span>
             </h2>
             <p class="text-base sm:text-lg text-slate-200 max-w-md mx-auto font-medium relative z-10">
-              Daftar sekarang — assessment diagnostic pertamamu gratis, selamanya.
+              Daftar sekarang untuk semua jenjang SD, SMP, SMA &amp; SNPMB — asesmen diagnostik pertamamu gratis, selamanya.
             </p>
             
 
@@ -3652,7 +3652,7 @@
                       <span>Evaluasi Berkala (Tiap 2-4 Minggu)</span>
                     </div>
                     <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
-                      Ulangi tes diagnostic secara berkala <strong>tiap 2-4 minggu</strong> untuk memantau lonjakan skor IRT dan peluang lolos PTN.
+                      Ulangi tes diagnostic secara berkala <strong>tiap 2-4 minggu</strong> untuk memantau lonjakan skor IRT dan peluang kelulusan target impian.
                     </p>
                   </div>
                 </div>
@@ -7744,8 +7744,8 @@ export default {
           id: 2, code: 'UTBK', name: 'Paket Pejuang PTN', academic_program: 'SNPMB/UTBK', delivery_mode: 'online',
           description: 'AI Tutor 24/7, Adaptive IRT tanpa batas, & Rasionalisasi Prodi real-time.',
           plans: [
-            { billing_cycle: 'monthly', price: 480000, discount: 0, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas PTN']) },
-            { billing_cycle: 'yearly',  price: 2304000, discount: 60, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas PTN']) }
+            { billing_cycle: 'monthly', price: 480000, discount: 0, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas Siswa Juara']) },
+            { billing_cycle: 'yearly',  price: 2304000, discount: 60, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas Siswa Juara']) }
           ]
         },
         {
