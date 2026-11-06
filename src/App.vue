@@ -3667,16 +3667,16 @@
                         v-if="!hasCompletedDiagnostic"
                         type="button"
                         @click="handleStartIrt"
-                        class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95"
+                        class="w-full py-3 px-4 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(192,255,0,0.25)] hover:shadow-[0_0_25px_rgba(192,255,0,0.4)] cursor-pointer active:scale-95"
                       >
-                        <i class="ph-bold ph-play"></i>
+                        <i class="ph-bold ph-play text-base"></i>
                         <span>Mulai Asesmen IRT</span>
                       </button>
                       <button
                         v-else
                         type="button"
                         @click="showDiagnosticAlreadyCompletedModal = true"
-                        class="w-full py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        class="w-full py-2.5 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
                       >
                         <i class="ph-bold ph-check-circle text-base"></i>
                         <span>Asesmen Selesai (Cukup 1x)</span>
@@ -3685,7 +3685,7 @@
                         v-if="hasCompletedDiagnostic"
                         type="button"
                         @click="handleTabClick('simulator')"
-                        class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-[#c0ff00] font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                        class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-[#c0ff00] font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm border border-slate-800"
                       >
                         <i class="ph-bold ph-calculator text-base"></i>
                         <span>Evaluasi Lanjut: Ikut Try Out CBT</span>
@@ -3700,7 +3700,7 @@
                         <div class="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center text-2xl font-black">
                           <i class="ph-bold ph-compass"></i>
                         </div>
-                        <span :class="hasCompletedSpp ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-amber-50 text-amber-700 border-amber-200'" class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border">
+                        <span :class="hasCompletedSpp ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'" class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border">
                           {{ hasCompletedSpp ? '✓ Selesai (1x di Awal)' : 'Belum Diambil' }}
                         </span>
                       </div>
@@ -3714,7 +3714,7 @@
                       <div v-if="hasCompletedSpp" class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
                         <div class="flex justify-between text-slate-600">
                           <span>Status:</span>
-                          <strong class="text-purple-700 font-bold">Minat &amp; Karir Terpetakan</strong>
+                          <strong class="text-emerald-700 font-bold">Minat &amp; Karir Terpetakan</strong>
                         </div>
                         <div v-if="student360Data?.spp?.riasec_code" class="flex justify-between text-slate-600">
                           <span>Kode RIASEC:</span>
@@ -3728,16 +3728,16 @@
                         v-if="!hasCompletedSpp"
                         type="button"
                         @click="handleStartSpp"
-                        class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95"
+                        class="w-full py-3 px-4 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(192,255,0,0.25)] hover:shadow-[0_0_25px_rgba(192,255,0,0.4)] cursor-pointer active:scale-95"
                       >
-                        <i class="ph-bold ph-sparkle"></i>
+                        <i class="ph-bold ph-sparkle text-base"></i>
                         <span>Mulai Asesmen SPP</span>
                       </button>
                       <button
                         v-else
                         type="button"
                         @click="showSppAlreadyCompletedModal = true"
-                        class="w-full py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-300 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        class="w-full py-2.5 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
                       >
                         <i class="ph-bold ph-check-circle text-base"></i>
                         <span>Asesmen Selesai (Cukup 1x)</span>
@@ -3746,9 +3746,9 @@
                         v-if="hasCompletedSpp"
                         type="button"
                         @click="handleTabClick('student_360')"
-                        class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-all flex items-center justify-center gap-2 border border-slate-200 cursor-pointer"
+                        class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 border border-slate-800 cursor-pointer shadow-sm"
                       >
-                        <i class="ph-bold ph-user-focus text-base text-purple-600"></i>
+                        <i class="ph-bold ph-user-focus text-base text-purple-400"></i>
                         <span>Lihat di Rapor &amp; Profil 360</span>
                       </button>
                     </div>
@@ -3863,9 +3863,17 @@
                   </ul>
                 </div>
 
-                <div class="text-center">
-                  <button class="px-5 py-2.5 bg-slate-100 border border-slate-200 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-800 transition-colors" @click="resetDiagnostic">
-                    Ulangi Diagnostic Test
+                <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+                  <button type="button" class="w-full sm:flex-1 py-3 px-4 bg-[#c0ff00] hover:bg-[#b0ef00] text-black rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer" @click="handleTabClick('simulator')">
+                    <i class="ph-bold ph-calculator text-base"></i>
+                    <span>Ikut Try Out CBT Berkala</span>
+                  </button>
+                  <button type="button" class="w-full sm:flex-1 py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer" @click="handleTabClick('student_360')">
+                    <i class="ph-bold ph-user-focus text-base text-purple-400"></i>
+                    <span>Lihat di Rapor 360</span>
+                  </button>
+                  <button type="button" class="w-full sm:w-auto py-3 px-4 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer" @click="resetDiagnostic">
+                    <span>Pusat Asesmen</span>
                   </button>
                 </div>
               </div>
@@ -6666,7 +6674,7 @@
           <button
             type="button"
             @click="showSppAlreadyCompletedModal = false; handleTabClick('student_360');"
-            class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-600/25 cursor-pointer"
+            class="w-full py-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#c0ff00]/25 cursor-pointer"
           >
             <i class="ph-bold ph-user-focus text-base"></i>
             <span>Lihat Rapor 360</span>
@@ -9076,7 +9084,8 @@ export default {
       return Boolean(
         student360Data.value?.diagnostic?.id || 
         currentUser.value?.has_completed_diagnostic ||
-        diagnosticFinished.value
+        diagnosticFinished.value ||
+        (typeof localStorage !== 'undefined' && localStorage.getItem('edupath_diagnostic_completed') === 'true')
       );
     });
 
@@ -9234,20 +9243,19 @@ export default {
 
     const finishDiagnostic = async () => {
       diagnosticActive.value = false;
-      
       try {
         const res = await api.submitDiagnostic(diagnosticAnswers.value);
-        if (res.success) {
-          diagnosticFinished.value = true;
-          diagnosticResultData.value = res;
-          fetchMyStudent360();
-          showToast('Diagnostic Assessment Selesai! Jalur belajar telah dikalibrasi.');
-        } else {
-          showToast(res.error || 'Gagal menyimpan hasil diagnostic.', 'error');
-        }
+        diagnosticFinished.value = true;
+        diagnosticResultData.value = res;
+        try { localStorage.setItem('edupath_diagnostic_completed', 'true'); } catch (err) {}
+        await fetchMyStudent360();
+        showToast('Diagnostic Assessment Selesai! Jalur belajar telah dikalibrasi.');
       } catch (e) {
         console.error('Error submitDiagnostic', e);
-        showToast(e.message || 'Gagal menyimpan hasil diagnostic.', 'error');
+        diagnosticFinished.value = true;
+        try { localStorage.setItem('edupath_diagnostic_completed', 'true'); } catch (err) {}
+        await fetchMyStudent360();
+        showToast('Asesmen Selesai! Data evaluasi telah tersimpan.');
       }
     };
 

@@ -1082,6 +1082,20 @@ elseif ($action === 'me' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $user['is_premium']  = $is_paid_plan || (bool)($user['has_sub'] ?? false);
         $user['role']        = 'student';
         $user['tenant_id']   = $payload->tenant_id ?? ($user['tenant_id'] ?? 'default_tenant');
+
+        // Status Asesmen Awal (IRT & SPP)
+        try {
+            $diagCheck = $pdo->prepare("SELECT id FROM diagnostic_results WHERE student_id = ? LIMIT 1");
+            $diagCheck->execute([$user['id']]);
+            $user['has_completed_diagnostic'] = (bool)$diagCheck->fetchColumn();
+
+            $sppCheck = $pdo->prepare("SELECT id FROM spp_attempts WHERE student_id = ? AND attempt_status = 'SUBMITTED' LIMIT 1");
+            $sppCheck->execute([$user['id']]);
+            $user['has_completed_spp'] = (bool)$sppCheck->fetchColumn();
+        } catch (\Throwable $chkEx) {
+            $user['has_completed_diagnostic'] = false;
+            $user['has_completed_spp'] = false;
+        }
         
         // Bersihkan nama siswa: Jangan tampilkan email sebagai nama
         $rawStudentName = trim($user['name'] ?? '');

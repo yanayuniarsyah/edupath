@@ -1702,6 +1702,7 @@ if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_MET
     // 3. Diagnostic & Learning Path
     $diagnosticResult = null;
     $learningPath = null;
+    // 3a. Diagnostic Results
     try {
         $diagStmt = $pdo->prepare("
             SELECT id, total_score, gap_domain, gap_sub_materi, gap_score, details, created_at
@@ -1718,7 +1719,12 @@ if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_MET
                 $diagnosticResult['details_parsed'] = json_decode($diagnosticResult['details'], true);
             }
         }
+    } catch (\Throwable $de) {
+        $diagnosticResult = null;
+    }
 
+    // 3b. Learning Path
+    try {
         $pathStmt = $pdo->prepare("
             SELECT id, gap_focus, recommended_materials, created_at
             FROM learning_paths
@@ -1731,20 +1737,35 @@ if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_MET
         if ($learningPath && !empty($learningPath['recommended_materials'])) {
             $learningPath['actions'] = json_decode($learningPath['recommended_materials'], true);
         }
+    } catch (\Throwable $pe) {
+        $learningPath = null;
+    }
 
-        // 3b. SPP (Student Potential Path - RIASEC Assessment)
+    // 3c. SPP (Student Potential Path - RIASEC Assessment)
+    $sppResult = null;
+    try {
         $sppStmt = $pdo->prepare("
-            SELECT id, attempt_status, scoring_status, riasec_code, created_at, submitted_at
-            FROM spp_attempts
-            WHERE student_id = ? AND attempt_status = 'SUBMITTED'
-            ORDER BY submitted_at DESC
+            SELECT a.id, a.attempt_status, a.scoring_status, a.created_at, a.submitted_at, s.riasec_top3
+            FROM spp_attempts a
+            LEFT JOIN spp_scores s ON s.attempt_id = a.id
+            WHERE a.student_id = ? AND a.attempt_status = 'SUBMITTED'
+            ORDER BY a.submitted_at DESC
             LIMIT 1
         ");
         $sppStmt->execute([$student_id]);
         $sppResult = $sppStmt->fetch(PDO::FETCH_ASSOC);
-    } catch (\Throwable $de) {
-        $diagnosticResult = null;
-        $learningPath = null;
+        if ($sppResult && !empty($sppResult['riasec_top3'])) {
+            $top3 = json_decode($sppResult['riasec_top3'], true);
+            if (is_array($top3)) {
+                $codeArr = [];
+                foreach ($top3 as $item) {
+                    if (isset($item['trait'])) $codeArr[] = $item['trait'];
+                    elseif (is_string($item)) $codeArr[] = substr($item, 0, 1);
+                }
+                $sppResult['riasec_code'] = implode('', $codeArr);
+            }
+        }
+    } catch (\Throwable $se) {
         $sppResult = null;
     }
 
