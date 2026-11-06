@@ -1,10 +1,10 @@
 <template>
-  <div id="spp" class="relative py-16 px-4 md:px-8 max-w-6xl mx-auto scroll-mt-24">
-    <!-- Ambient glow behind section -->
-    <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#c0ff00]/10 blur-[130px] rounded-full pointer-events-none -z-10"></div>
+  <div id="spp" :class="['relative max-w-6xl mx-auto scroll-mt-24', isModal ? 'py-2 px-1' : 'py-16 px-4 md:px-8']">
+    <!-- Ambient glow behind section (Landing mode only) -->
+    <div v-if="!isModal" class="absolute -top-12 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#c0ff00]/10 blur-[130px] rounded-full pointer-events-none -z-10"></div>
 
-    <!-- Mode Switcher: Siswa (Asesmen) vs Sekolah (Insight BK) -->
-    <div class="flex justify-center mb-8 px-2 w-full">
+    <!-- Mode Switcher: Siswa (Asesmen) vs Sekolah (Insight BK) (Landing mode only) -->
+    <div v-if="!isModal" class="flex justify-center mb-8 px-2 w-full">
       <div class="w-full max-w-lg grid grid-cols-2 p-1.5 rounded-2xl bg-white/[0.08] border border-white/10 backdrop-blur-xl shadow-lg gap-1.5">
         <button
           @click="activeMode = 'student'"
@@ -40,10 +40,10 @@
     </div>
 
     <!-- ==================== MODE 1: UNTUK SISWA ==================== -->
-    <div v-if="activeMode === 'student'" class="space-y-10">
+    <div v-if="activeMode === 'student'" :class="isModal ? 'space-y-4' : 'space-y-10'">
       
-      <!-- 1. Header & Positioning -->
-      <div class="text-center max-w-3xl mx-auto space-y-4 px-2">
+      <!-- 1. Header & Positioning (Landing mode only) -->
+      <div v-if="!isModal" class="text-center max-w-3xl mx-auto space-y-4 px-2">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#c0ff00]/40 bg-[#c0ff00]/10 text-[#c0ff00] text-xs sm:text-sm font-black uppercase tracking-widest">
           <i class="ph-bold ph-compass"></i>
           <span>Student Potential Path (SPP)</span>
@@ -74,7 +74,7 @@
       </div>
 
       <!-- 2. ASSESSMENT ENGINE CONTAINER -->
-      <div class="relative rounded-3xl border border-white/15 bg-white/[0.03] backdrop-blur-2xl p-4 sm:p-6 md:p-10 shadow-2xl overflow-hidden">
+      <div :class="['relative rounded-3xl border border-white/15 bg-white/[0.03] backdrop-blur-2xl shadow-2xl', isModal ? 'p-3 sm:p-5' : 'p-4 sm:p-6 md:p-10']">
         
         <!-- STEP A: INTRO / PRE-ASSESSMENT -->
         <div v-if="sppStage === 'intro'" class="space-y-8 max-w-3xl mx-auto text-center py-4">
@@ -247,7 +247,7 @@
               </button>
               <button
                 type="submit"
-                class="px-5 sm:px-7 py-3 rounded-xl sm:rounded-2xl bg-[#c0ff00] text-black font-black text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center gap-2 cursor-pointer"
+                class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center gap-2 cursor-pointer"
               >
                 <span>Masuk ke Soal Asesmen</span>
                 <i class="ph-bold ph-arrow-right text-base"></i>
@@ -469,12 +469,12 @@
           </div>
 
           <!-- DIGITAL POTENTIAL CARD (SHAREABLE TO IG STORY / WA) -->
-          <div class="p-8 rounded-3xl bg-gradient-to-b from-[#0e1626] to-[#080d16] border border-white/20 shadow-2xl relative overflow-hidden">
+          <div class="p-4 sm:p-6 md:p-8 rounded-3xl bg-gradient-to-b from-[#0e1626] to-[#080d16] border border-white/20 shadow-2xl relative overflow-hidden">
             <div class="absolute -right-16 -top-16 w-64 h-64 bg-[#c0ff00]/10 rounded-full blur-3xl pointer-events-none"></div>
             
-            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
               <!-- Card Visual Preview -->
-              <div class="w-full md:w-[320px] shrink-0 bg-gradient-to-br from-slate-900 to-black p-6 rounded-2xl border border-white/25 shadow-2xl space-y-4 relative">
+              <div class="w-full md:w-[320px] max-w-full shrink-0 bg-gradient-to-br from-slate-900 to-black p-5 sm:p-6 rounded-2xl border border-white/25 shadow-2xl space-y-4 relative">
                 <div class="flex items-center justify-between border-b border-white/10 pb-3">
                   <span class="font-black text-xs tracking-tighter text-white">EduPath<span class="text-[#c0ff00]">.SPP</span></span>
                   <span class="text-[9px] font-mono text-white/40">VERIFIED ID: #{{ studentData.school ? studentData.school.slice(0, 3).toUpperCase() : 'SPP' }}-2027</span>
@@ -483,11 +483,11 @@
                 <div class="space-y-1">
                   <div class="text-[10px] uppercase font-mono tracking-widest text-[#c0ff00]">Digital Potential Card</div>
                   <div class="text-xl font-black text-white font-heading">Profil Potensi</div>
-                  <div class="text-xs text-white/80 font-bold">{{ studentData.name || 'Siswa Mandiri' }}</div>
-                  <div class="text-[10px] text-white/50">{{ studentData.school || 'Sekolah Siswa' }} • Target: {{ studentData.targetUniv || 'Sekolah / PTN Impian' }}</div>
+                  <div class="text-xs text-white/80 font-bold truncate">{{ studentData.name || 'Siswa Mandiri' }}</div>
+                  <div class="text-[10px] text-white/50 truncate">{{ studentData.school || 'Sekolah Siswa' }} • Target: {{ studentData.targetUniv || 'Sekolah / PTN Impian' }}</div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-[10px] text-white/70 italic">
+                <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-[10px] text-white/70 italic break-words">
                   "{{ profile.learning.slice(0, 85) }}..."
                 </div>
 
@@ -498,14 +498,14 @@
               </div>
 
               <!-- Share Callout -->
-              <div class="space-y-4 flex-grow text-center md:text-left">
+              <div class="space-y-4 flex-grow text-center md:text-left min-w-0">
                 <span class="px-3 py-1 rounded-full bg-[#c0ff00]/15 text-[#c0ff00] text-xs font-black uppercase tracking-wider">
-                  🔥 Viral / Shareable Feature
+                  🔥 Hasil Eksplorasi Terverifikasi
                 </span>
-                <h3 class="text-2xl md:text-3xl font-black text-white font-heading">
+                <h3 class="text-2xl md:text-3xl font-black text-white font-heading break-words">
                   Bagikan Digital Potential Card Kamu!
                 </h3>
-                <p class="text-xs md:text-sm text-white/60 leading-relaxed max-w-lg">
+                <p class="text-xs md:text-sm text-white/60 leading-relaxed max-w-lg break-words">
                   Tunjukkan profil potensimu ke teman-teman, orang tua, atau guru BK di <strong>{{ studentData.school || 'sekolahmu' }}</strong>. Ajak mereka eksplorasi bareng dan siapkan strategi masuk kampus favorit!
                 </p>
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 pt-2">
@@ -524,8 +524,9 @@
                     <span>{{ copySuccess ? 'Link Tersalin!' : 'Bagikan Hasil' }}</span>
                   </button>
                   <button
+                    v-if="!isModal && !isLoggedIn"
                     @click="retakeAssessment"
-                    class="w-full sm:w-auto px-4 py-2.5 rounded-xl sm:rounded-2xl bg-white/5 border border-white/15 text-white/80 font-bold text-xs sm:text-sm hover:text-white transition-all cursor-pointer"
+                    class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white/80 font-bold text-xs hover:text-white transition-all cursor-pointer"
                   >
                     Ulangi Asesmen
                   </button>
@@ -535,7 +536,7 @@
           </div>
 
           <!-- 4. THE BRIDGE TO EDUPATH (CONTEXTUAL HANDOFF) -->
-          <div class="relative p-8 md:p-12 rounded-3xl bg-gradient-to-r from-indigo-950/60 via-black to-slate-900/80 border-2 border-[#c0ff00]/40 text-center space-y-6 shadow-[0_0_50px_rgba(192,255,0,0.15)]">
+          <div class="relative p-5 sm:p-7 md:p-10 rounded-3xl bg-gradient-to-r from-indigo-950/60 via-black to-slate-900/80 border-2 border-[#c0ff00]/40 text-center space-y-6 shadow-[0_0_50px_rgba(192,255,0,0.15)]">
             
             <!-- Philosophy Hook -->
             <div class="inline-block">
@@ -839,7 +840,7 @@
     </div>
 
     <!-- ===== MODAL SERTIFIKAT RESMI TERVERIFIKASI ===== -->
-    <div v-if="showCertModal" @click.self="showCertModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+    <div v-if="showCertModal" @click.self="showCertModal = false" class="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
       <div class="edupath-modal-card w-full max-w-2xl !border-emerald-500/40 p-6 sm:p-8 !shadow-[0_0_60px_rgba(16,185,129,0.25)] text-white space-y-6 my-auto max-h-[92vh] overflow-y-auto">
         
         <!-- Modal Top Bar -->
@@ -965,12 +966,16 @@ export default {
       type: Boolean,
       default: false
     },
+    isModal: {
+      type: Boolean,
+      default: false
+    },
     student: {
       type: Object,
       default: () => ({})
     }
   },
-  emits: ['take-readiness'],
+  emits: ['take-readiness', 'spp-completed'],
   setup(props, { emit }) {
     const activeMode = ref('student'); // 'student' | 'school'
     const sppStage = ref(props.autoStart ? 'questions' : 'intro'); // 'intro' | 'lead_form' | 'questions' | 'result'
@@ -1238,18 +1243,27 @@ export default {
           profile.learning = localProfile.learning;
           profile.fields = localProfile.fields;
 
-          // Attempt backend submission if not guest
-          if (attemptId.value && !attemptId.value.startsWith('guest-')) {
+          // Submit to backend if student is logged in
+          const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
+          if (token) {
             try {
-              await api.sppSubmitAttempt(attemptId.value, responses, 300);
-              const result = await api.sppGetResult(attemptId.value);
-              if (result && result.score_data) {
-                profile.archetype = result.score_data.archetype || localProfile.archetype;
+              const targetAttemptId = (attemptId.value && !attemptId.value.startsWith('guest-')) ? attemptId.value : '';
+              const submitRes = await api.sppSubmitAttempt(targetAttemptId, responses, 300);
+              if (submitRes && submitRes.attempt_id) {
+                attemptId.value = submitRes.attempt_id;
+              }
+              if (submitRes && submitRes.result && submitRes.result.score_data) {
+                profile.archetype = submitRes.result.score_data.archetype || localProfile.archetype;
               }
             } catch (backendErr) {
               console.warn('[SPP Backend Sync Info]', backendErr);
             }
           }
+
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('edupath_spp_completed', 'true');
+          }
+          emit('spp-completed', profile);
 
           sppStage.value = 'result';
           api.trackEvent('spp_result_view');

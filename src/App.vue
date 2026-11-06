@@ -65,7 +65,7 @@
             </div>
             <button 
               @click="window.location.hash = '#/admin'" 
-              class="px-2 py-1 rounded bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-[9px] shrink-0 transition-all cursor-pointer"
+              class="px-2.5 py-1 rounded-lg bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-[10px] uppercase tracking-wider shrink-0 transition-all cursor-pointer shadow-sm"
               title="Kembali ke Portal Admin/Guru"
             >
               Kembali
@@ -509,7 +509,7 @@
             <div class="pt-4 border-t border-white/10 space-y-3 shrink-0">
               <button 
                 @click="showLoginModal = true; isLoginMode = true; mobileSidebarOpen = false" 
-                class="w-full py-3.5 rounded-2xl border border-white/20 bg-white/10 text-white font-extrabold text-sm flex items-center justify-center gap-2 hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                class="w-full px-5 py-2.5 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer"
               >
                 <i class="ph-bold ph-sign-in text-base"></i>
                 <span>Masuk ke Akun</span>
@@ -517,8 +517,7 @@
 
               <button 
                 @click="showLoginModal = true; isLoginMode = false; mobileSidebarOpen = false" 
-                class="w-full py-3.5 rounded-2xl font-black text-sm text-black flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.3)] active:scale-95 transition-all cursor-pointer"
-                style="background: #c0ff00;"
+                class="w-full px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-black flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(192,255,0,0.3)] bg-[#c0ff00] hover:bg-[#b0ef00] active:scale-95 transition-all cursor-pointer"
               >
                 <span>Daftar Uji Coba Gratis ⚡</span>
               </button>
@@ -900,8 +899,7 @@
 
                 <div class="pt-5 sm:pt-6 relative z-10">
                   <button
-                    class="w-full min-h-[50px] py-3.5 sm:py-4 rounded-2xl font-black text-sm text-black transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(192,255,0,0.3)] cursor-pointer"
-                    style="background: #c0ff00;"
+                    class="w-full px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-black transition-all bg-[#c0ff00] hover:bg-[#b0ef00] active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer"
                     @click="startLearning"
                   >
                     <span>Kunci Target &amp; Buat Jadwal Belajar AI</span>
@@ -1167,8 +1165,7 @@
 
                 <div class="space-y-3 pt-2">
                   <button
-                    class="w-full min-h-[50px] py-3.5 md:py-4 rounded-2xl font-black text-xs md:text-sm text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(192,255,0,0.4)] flex items-center justify-center gap-2 cursor-pointer"
-                    style="background: #c0ff00;"
+                    class="w-full px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-black transition-all bg-[#c0ff00] hover:bg-[#b0ef00] active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center justify-center gap-2 cursor-pointer"
                     @click="startLearning"
                   >
                     <span>Mulai Jalur Belajar Adaptif ⚡</span>
@@ -1729,7 +1726,7 @@
                       :class="[
                         'px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5',
                         selectedDeliveryModeFilter === dm.id
-                          ? 'bg-blue-600 text-white font-black shadow-md'
+                          ? 'bg-[#c0ff00] text-black font-black shadow-[0_0_15px_rgba(192,255,0,0.3)]'
                           : 'text-white/60 hover:text-white'
                       ]"
                     >
@@ -2049,8 +2046,8 @@
                  <div class="pt-6 sm:pt-8" v-if="product.activePlan">
                    <button 
                      :class="[
-                       'w-full min-h-[50px] py-3.5 rounded-2xl text-xs md:text-sm font-black transition-all shadow-[0_8px_32px_rgba(0,0,0,0.3)] active:scale-95 flex items-center justify-center gap-2 cursor-pointer',
-                       idx % 3 === 1 ? 'bg-[#c0ff00] text-black hover:scale-105 hover:shadow-[0_0_35px_rgba(192,255,0,0.6)] py-4' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/20'
+                       'w-full px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer',
+                       idx % 3 === 1 ? 'bg-[#c0ff00] hover:bg-[#b0ef00] text-black shadow-[0_0_20px_rgba(192,255,0,0.3)]' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/20'
                      ]"
                      @click="purchasePlan(product.name, product.activePlan.price)"
                    >
@@ -2449,7 +2446,7 @@
                 <button
                   v-if="isStaff"
                   @click="window.location.hash = '#/admin'"
-                  class="w-full sm:w-auto justify-center px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  class="w-full sm:w-auto justify-center px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <i class="ph-bold ph-chalkboard-teacher text-base" v-if="isTeacher"></i>
                   <i class="ph-bold ph-shield-check text-base" v-else></i>
@@ -2458,7 +2455,7 @@
                 <button
                   v-else-if="isSchoolBk"
                   @click="window.location.hash = '#/school'"
-                  class="w-full sm:w-auto justify-center px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  class="w-full sm:w-auto justify-center px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <i class="ph-bold ph-buildings text-base"></i>
                   <span>Buka Portal Guru BK ➔</span>
@@ -2466,7 +2463,7 @@
                 <button
                   v-else-if="isAffiliate"
                   @click="window.location.hash = '#/admin'"
-                  class="w-full sm:w-auto justify-center px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  class="w-full sm:w-auto justify-center px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <i class="ph-bold ph-handshake text-base"></i>
                   <span>Buka Portal Afiliasi ➔</span>
@@ -2474,7 +2471,7 @@
                 <button
                   v-else
                   @click="openPlanSelector"
-                  class="w-full sm:w-auto justify-center px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  class="w-full sm:w-auto justify-center px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <i class="ph-bold ph-lightning text-base"></i>
                   <span>{{ isPremiumUser ? 'Perpanjang / Ganti Paket' : 'Pilih Paket Belajar ⚡' }}</span>
@@ -2776,7 +2773,7 @@
                 <button
                   type="submit"
                   :disabled="isSavingProfile"
-                  class="px-8 py-3.5 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+                  class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.3)] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
                 >
                   <svg v-if="isSavingProfile" class="animate-spin -ml-1 mr-2 h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -3297,7 +3294,7 @@
               <button 
                 type="button" 
                 @click="currentTab = 'dashboard'" 
-                class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-purple-600/30"
+                class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(192,255,0,0.3)]"
               >
                 <i class="ph-bold ph-gauge"></i>
                 <span>Ke Dashboard</span>
@@ -3600,7 +3597,7 @@
               <button 
                 type="button"
                 @click="showIrtInfo = !showIrtInfo" 
-                class="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-bold transition-all shadow-md cursor-pointer"
+                class="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs font-bold transition-all cursor-pointer"
                 title="Sembunyikan / Tampilkan Kotak IRT"
               >
                 <span>{{ showIrtInfo ? 'Sembunyikan Panel IRT' : 'Tampilkan Panel IRT' }}</span>
@@ -4209,10 +4206,10 @@
                   <button class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5" @click="triggerAIEscalation">
                     Hint AI Petunjuk
                   </button>
-                  <button class="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5" @click="triggerSOSCall">
+                  <button class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer" @click="triggerSOSCall">
                     Bedah Solusi Lengkap
                   </button>
-                  <button class="ml-auto px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_8px_32px_rgba(0,0,0,0.3)]" :disabled="practiceUserAnswer === null" @click="checkPracticeAnswer">
+                  <button class="ml-auto px-5 py-2.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black rounded-xl text-xs font-black uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer" :disabled="practiceUserAnswer === null" @click="checkPracticeAnswer">
                     Kirim Jawaban
                   </button>
                 </div>
@@ -4587,7 +4584,7 @@
 
                   <button 
                     @click="cbtShowAnalysis = !cbtShowAnalysis" 
-                    class="w-full sm:w-auto justify-center px-3.5 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    class="w-full sm:w-auto justify-center px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <i class="ph-bold ph-brain"></i>
                     <span>{{ cbtShowAnalysis ? 'Sembunyikan Bedah AI' : 'Bedah Solusi AI' }}</span>
@@ -4673,7 +4670,7 @@
                       type="button"
                       :class="['px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all border cursor-pointer', 
                         activeSubtest === sub.id 
-                          ? 'bg-indigo-600 text-white border-indigo-400 shadow-md font-black' 
+                          ? 'bg-[#c0ff00] text-black border-[#c0ff00] shadow-[0_0_15px_rgba(192,255,0,0.3)] font-black' 
                           : 'bg-white/5 border-white/10 text-white/70 hover:text-white hover:bg-white/10'
                       ]"
                       @click="setSubtest(sub.id)"
@@ -5079,7 +5076,7 @@
               <button 
                 type="button"
                 @click="window.location.hash = '#/admin'" 
-                class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition flex items-center justify-center gap-2 shrink-0 shadow-lg cursor-pointer"
+                class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shrink-0 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer"
               >
                 <span>Buka Portal Admin Cabang</span>
                 <i class="ph-bold ph-arrow-square-out"></i>
@@ -5322,7 +5319,7 @@
                 :class="[
                   'px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
                   selectedDeliveryModeFilter === dm.id
-                    ? 'bg-blue-600 text-white font-black'
+                    ? 'bg-[#c0ff00] text-black font-black'
                     : 'text-white/60 hover:text-white'
                 ]"
               >
@@ -5627,9 +5624,9 @@
               id="btn-midtrans"
               :disabled="!checkoutTermsAgreed"
               :class="[
-                'w-full py-3.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 cursor-pointer',
+                'w-full px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer',
                 checkoutTermsAgreed
-                  ? 'bg-[#c0ff00] hover:bg-[#b0ef00] text-black hover:scale-[1.02] active:scale-98 shadow-md shadow-[#c0ff00]/25'
+                  ? 'bg-[#c0ff00] hover:bg-[#b0ef00] text-black shadow-md shadow-[#c0ff00]/25'
                   : 'bg-white/10 text-white/40 cursor-not-allowed opacity-60'
               ]"
               @click="confirmCheckout"
@@ -6525,7 +6522,7 @@
             </div>
 
             <div class="pt-2">
-              <button type="submit" :disabled="isRegistering" class="edupath-btn-primary w-full py-3.5 !text-xs sm:!text-sm uppercase tracking-wider">
+              <button type="submit" :disabled="isRegistering" class="edupath-btn-primary w-full !py-2.5 !px-5 !text-xs font-black uppercase tracking-wider">
                 <i v-if="!isRegistering" class="ph-bold ph-paper-plane-right"></i> 
                 {{ isRegistering ? 'Memproses...' : 'Kirim Pendaftaran' }}
               </button>
@@ -6700,13 +6697,32 @@
     </div>
 
     <!-- Modal Dialog: Student Potential Path (SPP) Assessment -->
-    <div v-if="showSppModal" class="fixed inset-0 z-[125] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
-      <div class="relative w-full max-w-5xl bg-slate-950 border border-white/15 rounded-3xl p-4 sm:p-6 shadow-2xl my-8">
-        <button type="button" @click="showSppModal = false; fetchMyStudent360();" class="modal-close-btn absolute top-4 right-4 z-10" title="Tutup">
-          <i class="ph-bold ph-x"></i>
-        </button>
-        <div class="pt-2">
-          <StudentPotentialPath :auto-start="true" :student="currentUser" @take-readiness="showSppModal = false; handleTakeReadinessFromSpp($event); fetchMyStudent360();" />
+    <div v-if="showSppModal" class="fixed inset-0 z-[125] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/90 backdrop-blur-md">
+      <div class="relative w-full max-w-5xl max-h-[92vh] flex flex-col bg-slate-950 border border-white/15 rounded-3xl shadow-2xl overflow-hidden animate-fade-in">
+        <!-- Sticky Modal Header -->
+        <div class="flex items-center justify-between px-5 sm:px-7 py-3.5 sm:py-4 border-b border-white/10 bg-slate-950/95 backdrop-blur-md z-20 shrink-0">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center font-bold">
+              <i class="ph-bold ph-compass text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-black text-sm sm:text-base text-white">Student Potential Path (SPP)</h3>
+              <p class="text-[11px] text-white/50">Pemetaan Minat, Bakat, & Karakter Belajar (1x di Awal)</p>
+            </div>
+          </div>
+          <button type="button" @click="showSppModal = false; fetchMyStudent360();" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer" title="Tutup">
+            <i class="ph-bold ph-x text-base"></i>
+          </button>
+        </div>
+        <!-- Scrollable Modal Body -->
+        <div class="overflow-y-auto p-4 sm:p-6 overscroll-contain flex-grow">
+          <StudentPotentialPath
+            :auto-start="true"
+            :is-modal="true"
+            :student="currentUser"
+            @spp-completed="handleSppCompleted"
+            @take-readiness="showSppModal = false; handleTakeReadinessFromSpp($event); fetchMyStudent360();"
+          />
         </div>
       </div>
     </div>
@@ -9089,13 +9105,33 @@ export default {
       );
     });
 
+    const sppCompletedLocal = ref(typeof localStorage !== 'undefined' && localStorage.getItem('edupath_spp_completed') === 'true');
+
     const hasCompletedSpp = computed(() => {
       return Boolean(
+        sppCompletedLocal.value ||
+        currentUser.value?.has_completed_spp ||
         student360Data.value?.spp?.id ||
-        student360Data.value?.spp?.attempt_status === 'SUBMITTED' ||
-        localStorage.getItem('edupath_spp_completed') === 'true'
+        student360Data.value?.spp?.attempt_status === 'SUBMITTED'
       );
     });
+
+    const handleSppCompleted = (profile) => {
+      sppCompletedLocal.value = true;
+      if (currentUser.value) {
+        currentUser.value.has_completed_spp = true;
+      }
+      if (!student360Data.value) student360Data.value = {};
+      if (!student360Data.value.spp) {
+        student360Data.value.spp = {
+          id: 'spp-submitted',
+          attempt_status: 'SUBMITTED',
+          riasec_code: profile?.fields?.[0]?.type || 'RIA'
+        };
+      }
+      fetchMyStudent360();
+      showToast('Asesmen SPP berhasil diselesaikan! Profil potensi Anda kini aktif.');
+    };
 
     const handleStartIrt = () => {
       if (!isLoggedIn.value) {
@@ -9940,6 +9976,7 @@ export default {
       hasCompletedSpp,
       handleStartIrt,
       handleStartSpp,
+      handleSppCompleted,
       handleHeroStartAssessment,
       diagnosticIdx,
       selectedDiagAnswer,

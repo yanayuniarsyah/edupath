@@ -2165,7 +2165,7 @@
                 <button 
                   v-if="!isEditingAffiliateSettings"
                   @click="isEditingAffiliateSettings = true" 
-                  class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer"
+                  class="px-5 py-2.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center gap-1.5 cursor-pointer"
                 >
                   <i class="ph-bold ph-pencil-simple text-sm"></i>
                   <span>Edit Pengaturan</span>
@@ -2359,7 +2359,7 @@
                 <button 
                   v-if="!isEditingAdminSettings"
                   @click="startEditAdminSettings" 
-                  class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer"
+                  class="px-5 py-2.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center gap-1.5 cursor-pointer"
                 >
                   <i class="ph-bold ph-pencil-simple text-sm"></i>
                   <span>Edit Pengaturan</span>
@@ -3170,7 +3170,7 @@
               <option v-for="s in allStudents" :key="s.id" :value="s.id">{{ s.name || s.username }} ({{ s.email }})</option>
             </select>
             <input v-model="studentAssignForm.joined_at" type="date" title="Tanggal Bergabung" class="px-3 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white focus:outline-none" />
-            <button @click="assignStudentToClass" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shrink-0 transition-all">
+            <button @click="assignStudentToClass" class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider shrink-0 transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
               + Masukkan Siswa
             </button>
           </div>

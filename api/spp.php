@@ -96,10 +96,31 @@ else if (($action === 'submit_attempt' || $action === 'submit') && $_SERVER['REQ
     
     $service = new SPPService($pdo);
     $attempt_id = $_GET['id'] ?? ($input['attempt_id'] ?? ($input['id'] ?? ''));
-    if (!$attempt_id) {
-        $newAtt = $service->createAttempt($payload->id);
-        $attempt_id = $newAtt['id'] ?? null;
+    
+    // Validasi apakah attempt_id valid untuk siswa ini
+    $needsNew = empty($attempt_id) || str_starts_with($attempt_id, 'guest-');
+    if (!$needsNew) {
+        $chk = $pdo->prepare("SELECT id FROM spp_attempts WHERE id = ? AND student_id = ?");
+        $chk->execute([$attempt_id, $payload->id]);
+        if (!$chk->fetchColumn()) {
+            $needsNew = true;
+        }
     }
+    
+    if ($needsNew) {
+        // Cari draft attempt atau buat yang baru
+        $draftChk = $pdo->prepare("SELECT id FROM spp_attempts WHERE student_id = ? AND attempt_status != 'SUBMITTED' ORDER BY created_at DESC LIMIT 1");
+        $draftChk->execute([$payload->id]);
+        $existingDraftId = $draftChk->fetchColumn();
+        
+        if ($existingDraftId) {
+            $attempt_id = $existingDraftId;
+        } else {
+            $newAtt = $service->createAttempt($payload->id);
+            $attempt_id = $newAtt['id'] ?? null;
+        }
+    }
+    
     if (!$attempt_id) { http_response_code(400); echo json_encode(["error" => "Attempt ID required"]); exit; }
     
     $duration = $input['duration_seconds'] ?? ($input['duration'] ?? 180);

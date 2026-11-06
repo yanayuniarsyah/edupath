@@ -1036,7 +1036,7 @@
                 Pencatatan intervensi siswa yang membutuhkan pendampingan khusus, early warning capaian, dan monitoring rencana tindak lanjut.
               </p>
             </div>
-            <button @click="openCreateGuidanceModal(null)" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs flex items-center gap-1.5 transition shadow-lg shadow-purple-600/20 cursor-pointer">
+            <button @click="openCreateGuidanceModal(null)" class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider flex items-center gap-1.5 transition shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
               <i class="ph-bold ph-plus-circle text-base"></i>
               <span>Tambah Catatan Konseling</span>
             </button>
@@ -1187,7 +1187,7 @@
               <button 
                 v-if="!isEditingSchoolSettings"
                 @click="startEditSchoolSettings" 
-                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer"
+                class="px-5 py-2.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center gap-1.5 cursor-pointer"
               >
                 <i class="ph-bold ph-pencil-simple text-sm"></i>
                 <span>Edit Pengaturan</span>
@@ -1706,7 +1706,7 @@
           <button @click="openGuidanceModal = false" class="px-4 py-2 rounded-xl bg-white/10 text-white font-bold text-xs cursor-pointer">
             Batal
           </button>
-          <button @click="saveGuidanceNote" :disabled="savingGuidanceLoading" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs cursor-pointer shadow-lg shadow-purple-600/20">
+          <button @click="saveGuidanceNote" :disabled="savingGuidanceLoading" class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider cursor-pointer shadow-[0_0_20px_rgba(192,255,0,0.3)]">
             Simpan Catatan
           </button>
         </div>
