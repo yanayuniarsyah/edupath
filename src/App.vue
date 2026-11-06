@@ -1136,7 +1136,7 @@
                     <div>
                       <span class="text-[11px] font-black text-[#c0ff00] uppercase tracking-wider block">TEKNOLOGI AI 2026 🚀</span>
                       <h3 class="text-lg sm:text-xl md:text-2xl font-black text-white">EduPath.ai Adaptive</h3>
-                      <p class="text-[11px] text-[#c0ff00]/70 font-medium">Dynamic Learning Path &amp; AI Tutor 24/7</p>
+                      <p class="text-[11px] text-[#c0ff00]/70 font-medium">Dynamic Learning Path &amp; Asisten AI 24/7</p>
                     </div>
                     <div class="text-3xl shrink-0">⚡</div>
                   </div>
@@ -1326,8 +1326,8 @@
                 </div>
                 <div class="space-y-3">
                   <span class="text-3xl">🤖</span>
-                  <h4 class="text-lg md:text-xl font-black text-white">AI Tutor Siaga 24 Jam</h4>
-                  <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">Klinik tugas aktif setiap saat yang menuntun logika berpikir Anda langkah demi langkah.</p>
+                  <h4 class="text-lg md:text-xl font-black text-white">Asisten Belajar AI Siaga 24 Jam</h4>
+                  <p class="text-sm md:text-base text-slate-300 leading-relaxed font-medium">Asisten pemecahan logika &amp; bedah solusi aktif setiap saat yang menuntun langkah demi langkah.</p>
                 </div>
                 <div class="space-y-3">
                   <span class="text-3xl">📈</span>
@@ -1440,7 +1440,7 @@
                 </div>
               </div>
 
-              <!-- Feature 3: AI Tutor -->
+              <!-- Feature 3: Asisten Belajar AI -->
               <div class="glass-card rounded-2xl p-4 lg:col-span-3 flex flex-col justify-start group">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between mb-2">
@@ -1643,11 +1643,11 @@
                     </div>
                   </div>
 
-                  <!-- AI Tutor Coach Box -->
+                  <!-- Asisten Belajar AI Coach Box -->
                   <div class="flex items-start gap-3 bg-white/[0.04] border border-white/10 p-3 sm:p-4 rounded-xl sm:rounded-2xl backdrop-blur-md">
                     <span class="text-xl sm:text-2xl shrink-0">🤖</span>
                     <p class="text-[11px] sm:text-xs text-slate-200 font-normal leading-relaxed">
-                      <strong class="text-white font-bold">AI Tutor:</strong> "Siswa Mandiri telah meningkatkan kemampuan Aljabar Dasar sebesar 15% minggu ini. Pertahankan streak belajar Anda!"
+                      <strong class="text-white font-bold">Asisten Belajar AI:</strong> "Siswa Mandiri telah meningkatkan kemampuan Aljabar Dasar sebesar 15% minggu ini. Pertahankan streak belajar Anda!"
                     </p>
                   </div>
                 </div>
@@ -2925,7 +2925,7 @@
                   <i class="ph-bold ph-book-open text-base text-white/70"></i>
                   <span>Materi</span>
                 </button>
-                <button @click="handleTabClick('practice')" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
+                <button @click="navigateToPracticeMode" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
                   <i class="ph-bold ph-pencil-simple text-base text-white/70"></i>
                   <span>Latihan</span>
                 </button>
@@ -4031,7 +4031,7 @@
               </div>
               <div class="min-w-0">
                 <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-indigo-400 truncate">Latihan Soal Adaptif</span>
-                <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Practice Engine &amp; AI Tutor</h2>
+                <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Practice Engine &amp; Asisten Belajar AI</h2>
               </div>
             </div>
             <button 
@@ -4048,7 +4048,7 @@
             <div class="light-mode-card rounded-2xl p-4 sm:p-6 lg:p-8 flex flex-col justify-between" :class="showAICompanion ? 'lg:col-span-2' : ''">
               <div>
                 <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-6">
-                  <h3 class="text-xl font-black font-heading text-slate-900">Practice Engine &amp; AI Tutor</h3>
+                  <h3 class="text-xl font-black font-heading text-slate-900">Practice Engine &amp; Asisten Belajar AI</h3>
                   <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-xs font-bold text-indigo-600 rounded-md uppercase">Latihan Aktif</span>
                 </div>
 
@@ -4098,11 +4098,11 @@
               </div>
             </div>
 
-            <!-- Interactive AI Tutor Companion Panel -->
+            <!-- Interactive Asisten Belajar AI Panel -->
             <div v-if="showAICompanion" class="light-mode-card rounded-2xl p-6 flex flex-col justify-between min-h-[420px]">
               <div>
                 <div class="flex items-start justify-between gap-3 mb-1">
-                  <h3 class="text-lg font-black font-heading text-slate-900">AI Tutor Companion</h3>
+                  <h3 class="text-lg font-black font-heading text-slate-900">Asisten Belajar AI</h3>
                   <button class="text-xs font-bold text-slate-400 hover:text-slate-700 shrink-0" @click="showAICompanion = false">Tutup</button>
                 </div>
                 <p class="text-xs text-slate-500 mb-4 font-medium">Gunakan tombol petunjuk di bawah untuk bantuan terpandu.</p>
@@ -4226,8 +4226,8 @@
 
         <!-- TAB 7: 2027 AI INTELLIGENCE & PERFORMANCE COCKPIT (Ujian 2027 Simulasi) -->
         <section v-if="currentTab === 'simulator' || currentTab === 'projection2027'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
-          <!-- Top Header Bar Seragam: Tema Dark Slate Elegan & Tombol Mulai Try Out -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900/90 border border-white/10 rounded-2xl p-3.5 sm:p-4 md:p-5 backdrop-blur-xl shadow-xl gap-3 sm:gap-4 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950">
+          <!-- Top Header Bar Seragam: Tema Dark Slate Elegan & Tombol Mulai Try Out (Disembunyikan saat fokus Latihan Soal) -->
+          <div v-if="!isPracticeModeActive" class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900/90 border border-white/10 rounded-2xl p-3.5 sm:p-4 md:p-5 backdrop-blur-xl shadow-xl gap-3 sm:gap-4 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/5 text-[#c0ff00] border border-white/10 flex items-center justify-center text-xl sm:text-2xl font-black shrink-0 shadow-md">
                 <i class="ph-bold ph-chart-polar"></i>
@@ -4262,7 +4262,7 @@
           </div>
 
           <!-- Mode Latihan Soal Mandiri: Panel Seragam Dark Slate + Tombol Hijau Neon Paling Pinggir -->
-          <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-white/10 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div id="practice-mode-section" class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-white/10 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 scroll-mt-20">
             <!-- Sisi Kiri: Judul & Deskripsi Mode Latihan -->
             <div class="flex items-start sm:items-center gap-3.5 min-w-0">
               <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/5 text-[#c0ff00] border border-white/10 flex items-center justify-center text-2xl shrink-0 shadow-md">
@@ -4313,6 +4313,18 @@
                   </button>
                 </div>
               </div>
+
+              <!-- Tombol Tampilkan Menu Tryout jika sedang fokus Latihan -->
+              <button
+                v-if="isPracticeModeActive"
+                type="button"
+                @click="isPracticeModeActive = false"
+                class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-white/15 shadow-sm whitespace-nowrap"
+                title="Tampilkan Kembali Menu &amp; Banner Tryout"
+              >
+                <i class="ph-bold ph-eye text-xs text-[#c0ff00]"></i>
+                <span>Menu Tryout</span>
+              </button>
 
               <!-- Tombol Mulai Latihan Hijau Neon Samakan Dengan Tombol Mulai Try Out (Paling Pinggir Panel) -->
               <button
@@ -6040,7 +6052,7 @@
             <h4 class="text-white font-black text-sm flex items-center gap-2">
               <span class="text-[#c0ff00]">✦</span> Peran AI Sebagai Asisten Belajar
             </h4>
-            <p>AI Tutor dan rekomendasi jalur belajar dirancang sebagai pemandu eksplorasi minat dan asisten pemecahan logika soal. Keputusan akhir pemilihan program studi dan strategi sepenuhnya berada pada pertimbangan siswa, orang tua, dan guru BK.</p>
+            <p>Asisten AI dan rekomendasi jalur belajar dirancang sebagai pemandu eksplorasi minat dan asisten pemecahan logika soal. Keputusan akhir pemilihan program studi dan strategi sepenuhnya berada pada pertimbangan siswa, orang tua, dan guru BK.</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
@@ -6629,6 +6641,7 @@ export default {
     const cbtTimerSeconds = ref(5400);
     const cbtTimerInterval = ref(null);
     const isCbtTimerRunning = ref(true);
+    const isPracticeModeActive = ref(false);
 
     const startCbtTimer = () => {
       if (cbtTimerInterval.value) clearInterval(cbtTimerInterval.value);
@@ -8390,6 +8403,26 @@ export default {
         window.location.hash = '#/admin';
         return;
       }
+      if (tabId === 'practice') {
+        navigateToPracticeMode();
+        return;
+      }
+      if (tabId === 'simulator') {
+        if (!isLoggedIn.value) {
+          showLoginModal.value = true;
+          showToast('Silakan Masuk Akun untuk mengakses modul ini!');
+          return;
+        }
+        if (!isPremiumUser.value && !isStaff.value) {
+          showToast('Fitur ini khusus pengguna Premium. Silakan pilih paket belajar Anda.');
+          openPlanSelector();
+          return;
+        }
+        isPracticeModeActive.value = false;
+        currentTab.value = 'simulator';
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
       if (!isLoggedIn.value) {
         showLoginModal.value = true;
         showToast('Silakan Masuk Akun untuk mengakses modul ini!');
@@ -8975,7 +9008,7 @@ export default {
     const practiceUserAnswer = ref(null);
     const practiceEvaluated = ref(false);
     const aiChatHistory = ref([
-      { sender: 'ai', senderName: 'AI Tutor Companion', text: 'Halo! Saya AI Tutor pendamping belajarmu. Coba pecahkan soal di samping terlebih dahulu. Jika kesulitan, kamu bisa menanyakan Hint ke saya!' }
+      { sender: 'ai', senderName: 'Asisten AI Belajar', text: 'Halo! Saya asisten pendamping belajarmu. Coba pecahkan soal di samping terlebih dahulu. Jika kesulitan, kamu bisa menanyakan Hint ke saya!' }
     ]);
 
     const showAICompanion = ref(false);
@@ -8997,7 +9030,7 @@ export default {
       let responseText = (level === 1) ? `[HINT]: ${activePracticeQuestion.value.hint}` : `[SOLUSI]: ${activePracticeQuestion.value.explanation}`;
       aiChatHistory.value.push({ sender: 'user', senderName: 'Siswa', text: `Bisa bantu level ${level}?` });
       setTimeout(() => {
-        aiChatHistory.value.push({ sender: 'ai', senderName: 'AI Tutor Companion', text: responseText });
+        aiChatHistory.value.push({ sender: 'ai', senderName: 'Asisten AI Belajar', text: responseText });
       }, 500);
     };
 
@@ -9366,17 +9399,41 @@ export default {
       return 'Mulai Latihan SNBT';
     });
 
+    const navigateToPracticeMode = () => {
+      if (!isLoggedIn.value) {
+        showLoginModal.value = true;
+        showToast('Silakan Masuk Akun untuk mengakses Latihan Soal!');
+        return;
+      }
+      if (!isPremiumUser.value && !isStaff.value) {
+        showToast('Fitur Latihan khusus pengguna Premium. Silakan pilih paket belajar Anda.');
+        openPlanSelector();
+        return;
+      }
+      currentTab.value = 'simulator';
+      isPracticeModeActive.value = false;
+      nextTick(() => {
+        const el = document.getElementById('practice-mode-section');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    };
+
     const startPracticeMode = () => {
+      isPracticeModeActive.value = true;
       if (cbtTimerSeconds.value <= 0) {
         cbtTimerSeconds.value = 5400;
       }
       startCbtTimer();
       isCbtTimerRunning.value = true;
-      const el = document.getElementById('practice-question-area');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      showToast(`Sesi ${currentProgramPracticeButtonLabel.value} dimulai! Timer otomatis berjalan.`);
+      nextTick(() => {
+        const el = document.getElementById('practice-question-area');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+      showToast(`Sesi ${currentProgramPracticeButtonLabel.value} dimulai! Panel Tryout disembunyikan agar Anda fokus latihan.`);
     };
 
     const startCbtExam = (assessmentType, track = '') => {
@@ -9406,6 +9463,8 @@ export default {
       currentProgramCbtButtonLabel,
       currentProgramPracticeButtonLabel,
       startPracticeMode,
+      navigateToPracticeMode,
+      isPracticeModeActive,
 
       showIrtInfo,
       hideBabSidebar,
