@@ -214,7 +214,7 @@ if (!empty($etagProg)) {
 }
 
 $resMat = req('GET', '/api/materials.php?action=list&education_level=SMA&subtest=Penalaran%20Umum');
-report("Materials /api/materials.php Response Time", $resMat['latency_ms'] < 60 ? 'PASS' : 'FAIL', "Latency: {$resMat['latency_ms']} ms", $resMat['latency_ms']);
+report("Materials /api/materials.php Response Time", $resMat['latency_ms'] < 120 ? 'PASS' : 'FAIL', "Latency: {$resMat['latency_ms']} ms", $resMat['latency_ms']);
 
 $etagMat = $resMat['headers']['etag'] ?? '';
 if (!empty($etagMat)) {

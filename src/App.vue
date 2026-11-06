@@ -1493,7 +1493,7 @@
                     Hilangkan kekhawatiran orang tua secara transparan. Sistem otomatis meringkas total waktu belajar, perolehan skor &amp; capaian target belajar jenjang SD-SMA, dan mengirimkannya langsung ke kontak orang tua.
                   </p>
                 </div>
-                <button class="shrink-0 bg-white text-slate-950 hover:bg-slate-200 px-6 py-3.5 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center gap-2" @click="currentTab = 'parent'">
+                <button class="shrink-0 bg-[#c0ff00] hover:bg-[#b0ef00] text-black px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md shadow-[#c0ff00]/25 cursor-pointer active:scale-95" @click="currentTab = 'parent'">
                   Uji Coba Portal <i class="ph-bold ph-telegram-logo text-base"></i>
                 </button>
               </div>
@@ -2111,10 +2111,10 @@
                   Dapatkan penghasilan berkelanjutan dengan merekomendasikan platform belajar adaptif &amp; simulasi ujian EduPath kepada siswa, orang tua, dan komunitas belajar SD hingga SMA &amp; SNPMB. Tracking komisi transparan secara real-time, pencairan terjadwal langsung ke rekening Anda.
                 </p>
                 <div class="flex flex-wrap justify-center gap-3 pt-2">
-                  <button v-if="!isLoggedIn || affiliateData?.status === 'not_joined'" @click="showAffiliateRegisterModal = true" class="w-full sm:w-auto min-h-[50px] px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-black text-sm transition-all shadow-[0_0_35px_rgba(245,158,11,0.5)] flex items-center justify-center gap-2 active:scale-98">
+                  <button v-if="!isLoggedIn || affiliateData?.status === 'not_joined'" @click="showAffiliateRegisterModal = true" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center justify-center gap-2 active:scale-95 cursor-pointer">
                     <i class="ph-bold ph-rocket text-base"></i> Daftar Jadi Mitra (Gratis)
                   </button>
-                  <button v-else @click="activeAffiliateTab = 'rujukan'; currentTab = 'affiliate'" class="w-full sm:w-auto min-h-[50px] px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-black text-sm transition-all border border-white/20 flex items-center justify-center gap-2 active:scale-98">
+                  <button v-else @click="activeAffiliateTab = 'rujukan'; currentTab = 'affiliate'" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider transition-all border border-white/20 flex items-center justify-center gap-2 active:scale-95 cursor-pointer">
                     <i class="ph-bold ph-chart-line-up text-base"></i> Lihat Dashboard Afiliasi
                   </button>
                 </div>
@@ -2203,12 +2203,12 @@
             </p>
             
 
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-3.5 pt-4 relative z-10 w-full max-w-md mx-auto px-4 sm:px-0">
-              <button class="w-full sm:w-auto min-h-[50px] px-8 py-3.5 sm:py-4 rounded-2xl font-black text-sm sm:text-base transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(192,255,0,0.4)] flex items-center justify-center gap-2 cursor-pointer" style="background: #c0ff00; color: #000;" @click="startLearning">
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-3 pt-4 relative z-10 w-full max-w-md mx-auto px-4 sm:px-0">
+              <button class="w-full sm:w-auto px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all bg-[#c0ff00] hover:bg-[#b0ef00] text-black shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center justify-center gap-2 cursor-pointer active:scale-95" @click="startLearning">
                 <span>Mulai Uji Coba Gratis</span>
                 <span>⚡</span>
               </button>
-              <button class="w-full sm:w-auto min-h-[50px] px-6 py-3.5 sm:py-4 rounded-2xl font-bold text-sm sm:text-base border border-white/20 bg-white/5 hover:bg-white/10 text-white transition-all flex items-center justify-center cursor-pointer active:scale-95" @click="currentTab = 'diagnostic'">
+              <button class="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider border border-white/20 bg-white/10 hover:bg-white/20 text-white transition-all flex items-center justify-center cursor-pointer active:scale-95" @click="currentTab = 'diagnostic'">
                 <span>Coba Tryout Dulu</span>
               </button>
             </div>
@@ -2254,7 +2254,7 @@
               </div>
             </div>
             <div v-else class="w-full lg:w-auto shrink-0">
-              <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer text-center">
+              <button @click="joinAffiliateProgram" :disabled="isJoiningAffiliate" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider text-xs active:scale-95 transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer text-center">
                 <span v-if="isJoiningAffiliate" class="flex items-center gap-2 justify-center"><i class="ph-bold ph-spinner animate-spin"></i> Memproses...</span>
                 <span v-else>Aktifkan Program Afiliasi 🚀</span>
               </button>
@@ -2995,7 +2995,7 @@
             <button 
               type="button" 
               @click="currentTab = 'student_360'; fetchMyStudent360();" 
-              class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-lg shadow-purple-600/30 active:scale-95"
+              class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-[0_0_20px_rgba(192,255,0,0.3)] active:scale-95"
             >
               <span>Buka Rapor &amp; Profil 360</span>
               <i class="ph-bold ph-arrow-right"></i>
@@ -3835,7 +3835,7 @@
                   <button class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-colors" @click="skipDiagQuestion">
                     Lewati
                   </button>
-                  <button class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_8px_32px_rgba(0,0,0,0.3)]" :disabled="selectedDiagAnswer === null" @click="submitDiagAnswer">
+                  <button class="px-5 py-2.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black uppercase tracking-wider rounded-xl text-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-[#c0ff00]/25 cursor-pointer active:scale-95" :disabled="selectedDiagAnswer === null" @click="submitDiagAnswer">
                     Jawab &amp; Lanjut
                   </button>
                 </div>
@@ -6706,7 +6706,7 @@
           <i class="ph-bold ph-x"></i>
         </button>
         <div class="pt-2">
-          <StudentPotentialPath @take-readiness="showSppModal = false; handleTakeReadinessFromSpp($event); fetchMyStudent360();" />
+          <StudentPotentialPath :auto-start="true" :student="currentUser" @take-readiness="showSppModal = false; handleTakeReadinessFromSpp($event); fetchMyStudent360();" />
         </div>
       </div>
     </div>

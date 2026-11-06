@@ -116,17 +116,17 @@
             <button
               type="button"
               @click.prevent="startSppForm"
-              class="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-[#c0ff00] text-black font-black text-sm sm:text-base hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(192,255,0,0.4)] flex items-center justify-center gap-2 cursor-pointer relative z-10"
+              class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(192,255,0,0.3)] flex items-center justify-center gap-2 cursor-pointer relative z-10"
             >
-              <span>Mulai Asesmen SPP Gratis</span>
-              <i class="ph-bold ph-arrow-right text-lg"></i>
+              <span>Mulai Asesmen SPP</span>
+              <i class="ph-bold ph-arrow-right text-base"></i>
             </button>
             <button
               type="button"
               @click.prevent="loadSampleResult"
-              class="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-white/5 border border-white/20 text-white font-bold text-xs sm:text-sm hover:bg-white/10 transition-all cursor-pointer relative z-10 flex items-center justify-center"
+              class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer relative z-10 flex items-center justify-center"
             >
-              <span>Lihat Contoh Profil Hasil</span>
+              <span>Lihat Contoh Profil</span>
             </button>
           </div>
           <p class="text-xs text-slate-400 italic leading-relaxed pt-2 max-w-xl mx-auto">
@@ -345,10 +345,10 @@
               type="button"
               :disabled="isSubmitting"
               @click="nextQuestion"
-              class="px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-[#c0ff00] text-black font-black text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(192,255,0,0.4)] cursor-pointer"
+              class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer"
             >
               <i v-if="isSubmitting" class="ph-bold ph-spinner animate-spin"></i>
-              <span>{{ isSubmitting ? 'Memproses...' : (currentQuestionIdx === questions.length - 1 ? 'Lihat Potential Profile ↵' : 'Lanjut (Enter ↵)') }}</span>
+              <span>{{ isSubmitting ? 'Memproses...' : (currentQuestionIdx === questions.length - 1 ? 'Lihat Profil ↵' : 'Lanjut ↵') }}</span>
               <i v-if="!isSubmitting" class="ph-bold ph-arrow-right"></i>
             </button>
           </div>
@@ -511,17 +511,17 @@
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 pt-2">
                   <button
                     @click="viewOfficialCertificate"
-                    class="w-full sm:w-auto px-5 py-3 rounded-xl sm:rounded-2xl bg-emerald-500 text-black font-black text-xs sm:text-sm hover:bg-emerald-400 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer"
+                    class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer"
                   >
                     <i class="ph-bold ph-certificate text-base"></i>
                     <span>{{ certLoading ? 'Memuat...' : 'Sertifikat Resmi SPP' }}</span>
                   </button>
                   <button
                     @click="shareCard"
-                    class="w-full sm:w-auto px-5 py-3 rounded-xl sm:rounded-2xl bg-white text-black font-black text-xs sm:text-sm hover:bg-[#c0ff00] active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                    class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 border border-white/15 cursor-pointer"
                   >
                     <i class="ph-bold ph-share-network text-base"></i>
-                    <span>{{ copySuccess ? 'Link Berhasil Disalin!' : 'Bagikan ke Telegram / IG' }}</span>
+                    <span>{{ copySuccess ? 'Link Tersalin!' : 'Bagikan Hasil' }}</span>
                   </button>
                   <button
                     @click="retakeAssessment"
@@ -586,10 +586,10 @@
             <div class="pt-2 flex justify-center w-full px-2">
               <button
                 @click="handleEduPathCTA"
-                class="w-full sm:w-auto px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#c0ff00] text-black font-black text-sm sm:text-base hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_35px_rgba(192,255,0,0.6)] inline-flex items-center justify-center gap-2 group cursor-pointer"
+                class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all duration-300 shadow-[0_0_20px_rgba(192,255,0,0.3)] inline-flex items-center justify-center gap-2 group cursor-pointer"
               >
                 <span>Mulai Persiapan Belajar &amp; Ujian</span>
-                <i class="ph-bold ph-arrow-right text-lg sm:text-xl group-hover:translate-x-1 transition-transform"></i>
+                <i class="ph-bold ph-arrow-right text-base group-hover:translate-x-1 transition-transform"></i>
               </button>
             </div>
             <p class="text-xs text-white/50 pt-1">
@@ -710,7 +710,7 @@
               <button
                 type="button"
                 @click="downloadBannerKit"
-                class="w-full sm:w-auto px-6 py-3.5 rounded-xl sm:rounded-2xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all inline-flex items-center justify-center gap-2 shadow-lg shadow-[#c0ff00]/25 cursor-pointer"
+                class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all inline-flex items-center justify-center gap-2 shadow-md shadow-[#c0ff00]/25 cursor-pointer"
               >
                 <i class="ph-bold ph-download-simple text-base sm:text-lg"></i>
                 <span>Download Kit Banner Cetak (.PDF)</span>
@@ -941,7 +941,7 @@
           </button>
           <button 
             @click="printCert"
-            class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/25"
+            class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md shadow-[#c0ff00]/25 cursor-pointer"
           >
             <i class="ph-bold ph-printer text-base"></i>
             <span>Cetak / Simpan PDF</span>
@@ -960,10 +960,20 @@ import api from '../api';
 
 export default {
   name: 'StudentPotentialPath',
+  props: {
+    autoStart: {
+      type: Boolean,
+      default: false
+    },
+    student: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   emits: ['take-readiness'],
   setup(props, { emit }) {
     const activeMode = ref('student'); // 'student' | 'school'
-    const sppStage = ref('intro'); // 'intro' | 'lead_form' | 'questions' | 'result'
+    const sppStage = ref(props.autoStart ? 'questions' : 'intro'); // 'intro' | 'lead_form' | 'questions' | 'result'
     const currentQuestionIdx = ref(0);
     const copySuccess = ref(false);
     const schoolLinkCopied = ref(false);
@@ -1134,9 +1144,17 @@ export default {
     };
 
     const startSppForm = () => {
-      console.log('[SPP DEBUG] startSppForm called, sppStage before:', sppStage.value);
+      const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
+      if (token || props.autoStart || (props.student && (props.student.name || props.student.id)) || studentData.name) {
+        if (props.student) {
+          studentData.name = studentData.name || props.student.name || props.student.display_name || 'Siswa EduPath';
+          studentData.school = studentData.school || props.student.school || props.student.school_name || '';
+          studentData.targetUniv = studentData.targetUniv || props.student.target_ptn || '';
+        }
+        proceedToQuestions();
+        return;
+      }
       sppStage.value = 'lead_form';
-      console.log('[SPP DEBUG] sppStage after:', sppStage.value);
     };
 
     const proceedToQuestions = async () => {
@@ -1263,6 +1281,17 @@ export default {
 
     onMounted(() => {
       window.addEventListener('keydown', handleKeyDown);
+
+      // Auto start questions immediately if opened by logged-in user
+      if (props.autoStart) {
+        if (props.student) {
+          studentData.name = props.student.name || props.student.display_name || 'Siswa EduPath';
+          studentData.school = props.student.school || props.student.school_name || '';
+          studentData.targetUniv = props.student.target_ptn || '';
+        }
+        proceedToQuestions();
+        return;
+      }
 
       // Tangkap parameter school dari URL (mendukung URL search maupun hash search)
       try {
