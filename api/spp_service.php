@@ -47,6 +47,21 @@ class SPPService {
     }
 
     public function createAttempt($student_id) {
+        // Enforce 1x rule for SPP
+        try {
+            $chk = $this->pdo->prepare("SELECT id, attempt_status, created_at FROM spp_attempts WHERE student_id = ? AND attempt_status = 'SUBMITTED' LIMIT 1");
+            $chk->execute([$student_id]);
+            $existing = $chk->fetch(PDO::FETCH_ASSOC);
+            if ($existing) {
+                return [
+                    "success" => false,
+                    "already_completed" => true,
+                    "id" => $existing['id'],
+                    "message" => "Asesmen SPP cukup diambil 1 kali di awal."
+                ];
+            }
+        } catch (\Throwable $e) {}
+
         $attempt_id = $this->generate_uuid();
         $stmt = $this->pdo->prepare("INSERT INTO spp_attempts (id, student_id, attempt_status, scoring_status) VALUES (?, ?, 'DRAFT', 'PENDING')");
         $stmt->execute([$attempt_id, $student_id]);

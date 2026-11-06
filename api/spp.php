@@ -68,6 +68,27 @@ else if ($action === 'create_attempt' && $_SERVER['REQUEST_METHOD'] === 'POST') 
     $service = new SPPService($pdo);
     echo json_encode($service->createAttempt($payload->id));
 }
+else if (($action === 'my_spp' || $action === 'status') && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    require_once 'spp_service.php';
+    $payload = authenticate();
+    if ($payload->role !== 'student') { http_response_code(403); echo json_encode(["error" => "Forbidden"]); exit; }
+    
+    $stmt = $pdo->prepare("
+        SELECT id, attempt_status, scoring_status, riasec_code, created_at, submitted_at
+        FROM spp_attempts
+        WHERE student_id = ? AND attempt_status = 'SUBMITTED'
+        ORDER BY submitted_at DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$payload->id]);
+    $spp = $stmt->fetch(PDO::FETCH_ASSOC);
+    echo json_encode([
+        "success" => true,
+        "has_completed_spp" => !empty($spp),
+        "spp" => $spp
+    ]);
+    exit;
+}
 else if (($action === 'submit_attempt' || $action === 'submit') && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once 'spp_service.php';
     $payload = authenticate();

@@ -2916,7 +2916,7 @@
 
             <!-- Right: Shortcut Actions & Quick Info -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto shrink-0 pt-1 lg:pt-0">
-              <button @click="handleTabClick('diagnostic')" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
+              <button @click="handleHeroStartAssessment" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
                 <i class="ph-bold ph-exam text-base"></i>
                 <span>Mulai Asesmen</span>
               </button>
@@ -3585,8 +3585,8 @@
                   <i class="ph-bold ph-exam"></i>
                 </div>
                 <div class="min-w-0">
-                  <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-purple-400 truncate">Asesmen Diagnostik Adaptif {{ activeStudentLevel === 'SD' ? 'TKA SD' : (activeStudentLevel === 'SMP' ? 'TKA SMP' : 'UTBK SNBT') }}</span>
-                  <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Asesmen Diagnostik &amp; Pemetaan Kemampuan ({{ activeStudentLevel === 'SD' ? 'TKA SD' : (activeStudentLevel === 'SMP' ? 'TKA SMP' : 'UTBK SNBT') }})</h2>
+                  <span class="block text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[#c0ff00] truncate">Pusat Asesmen Awal Siswa (1x di Awal)</span>
+                  <h2 class="text-sm sm:text-base md:text-lg font-black text-white leading-tight truncate">Asesmen Pemetaan: Diagnostik IRT &amp; Minat Bakat SPP</h2>
                 </div>
               </div>
               <!-- Tutup button visible immediately on top right for mobile -->
@@ -3614,92 +3614,187 @@
 
           <div class="grid grid-cols-1 gap-6" :class="showIrtInfo ? 'lg:grid-cols-3' : ''">
             <div class="light-mode-card rounded-2xl p-4 sm:p-6 lg:p-8" :class="showIrtInfo ? 'lg:col-span-2' : 'w-full'">
-              <h3 class="text-xl font-black font-heading text-slate-900 mb-2">Diagnostic &amp; Adaptive Simulation Test</h3>
-              <p v-if="!diagnosticFocus" class="text-xs text-slate-600 mb-5 font-medium">
-                Sistem simulasi ujian dengan Item Response Theory (IRT). Kesulitan soal dinamis sesuai respons kemampuan Anda.
-              </p>
-
-              <!-- Panduan Komunikatif: Kapan & Berapa Kali Tes Ini Dilakukan? -->
-              <div v-if="!diagnosticActive && !diagnosticFinished" class="mb-6 p-4 md:p-5 rounded-2xl bg-gradient-to-r from-indigo-50/90 via-purple-50/70 to-blue-50/90 border border-indigo-200/80 text-left space-y-3">
-                <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs shrink-0 shadow-sm">
-                    <i class="ph-bold ph-info"></i>
-                  </span>
-                  <h4 class="text-xs md:text-sm font-black text-slate-900 uppercase tracking-wide">Panduan Alur: Kapan &amp; Berapa Kali Tes Ini Dilakukan?</h4>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div class="p-3 rounded-xl bg-white/95 border border-indigo-100 shadow-sm space-y-1">
-                    <div class="flex items-center gap-1.5 text-indigo-700 font-black text-xs">
-                      <span class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-[11px] font-bold">1</span>
-                      <span>Asesmen Awal (1x Saat Gabung)</span>
-                    </div>
-                    <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
-                      Wajib diambil <strong>1 kali di awal</strong> untuk memetakan kekuatan, kelemahan, dan blind-spot materi Anda secara akurat.
-                    </p>
-                  </div>
-                  <div class="p-3 rounded-xl bg-white/95 border border-purple-100 shadow-sm space-y-1">
-                    <div class="flex items-center gap-1.5 text-purple-700 font-black text-xs">
-                      <span class="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-[11px] font-bold">2</span>
-                      <span>Belajar Modul &amp; Drill Soal</span>
-                    </div>
-                    <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
-                      Selesaikan materi &amp; drill latihan terfokus sesuai urutan rekomendasi AI yang otomatis disusun setelah tes awal.
-                    </p>
-                  </div>
-                  <div class="p-3 rounded-xl bg-white/95 border border-blue-100 shadow-sm space-y-1">
-                    <div class="flex items-center gap-1.5 text-blue-700 font-black text-xs">
-                      <span class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-[11px] font-bold">3</span>
-                      <span>Evaluasi Berkala Lewat Try Out CBT</span>
-                    </div>
-                    <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
-                      Cukup 1x diagnostic di awal. Selanjutnya evaluasi dilakukan berkala lewat <strong>Try Out CBT (misal 2x sebulan)</strong>. Nilai IRT, radar blind-spot, dan jalur belajar AI otomatis diperbarui dari riwayat tryout.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Tampilan jika siswa sudah pernah menyelesaikan asesmen diagnostik awal (cukup 1x) -->
-              <div v-if="hasCompletedDiagnostic && !diagnosticActive && !diagnosticFinished" class="text-center py-10 px-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/25 space-y-4">
-                <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-3xl mx-auto shadow-md">
-                  <i class="ph-bold ph-seal-check"></i>
-                </div>
-                <div class="max-w-md mx-auto space-y-1.5">
-                  <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 text-[10px] font-black uppercase tracking-widest">
-                    Asesmen Awal Telah Selesai (1x di Awal)
-                  </span>
-                  <h4 class="text-lg font-black text-slate-900">Asesmen Diagnostik Cukup 1 Kali</h4>
-                  <p class="text-xs text-slate-600 leading-relaxed font-medium">
-                    Anda telah menyelesaikan asesmen diagnostik awal sebagai baseline. Untuk mengukur kenaikan skor berkala, silakan ikuti <strong>Try Out CBT</strong> (misal 2x sebulan). Skor IRT, radar blind-spot, dan jalur belajar AI Anda otomatis diperbarui dari riwayat Try Out.
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3 mb-5">
+                <div>
+                  <h3 class="text-xl font-black font-heading text-slate-900">Pusat Asesmen Pemetaan Awal (SPP &amp; IRT)</h3>
+                  <p class="text-xs text-slate-500 font-medium mt-0.5">
+                    Dua instrumen fundamental untuk memetakan kepribadian minat karir dan kemampuan akademik awal Anda.
                   </p>
                 </div>
-                <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-                  <button @click="handleTabClick('simulator')" class="px-6 py-2.5 rounded-xl bg-slate-900 text-[#c0ff00] hover:bg-slate-800 font-black text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2 cursor-pointer">
-                    <i class="ph-bold ph-calculator text-base"></i>
-                    <span>Ikut Try Out CBT Sekarang</span>
-                  </button>
-                  <button @click="handleTabClick('student_360')" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-xs transition shadow-sm flex items-center gap-2 cursor-pointer">
-                    <i class="ph-bold ph-user-focus text-base text-indigo-600"></i>
-                    <span>Lihat Rapor &amp; Profil 360</span>
-                  </button>
-                </div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[10px] font-black uppercase tracking-wider self-start sm:self-center">
+                  <i class="ph-bold ph-shield-check"></i> Cukup 1x di Awal
+                </span>
               </div>
 
-              <!-- Tampilan jika siswa belum pernah asesmen awal -->
-              <div v-else-if="!diagnosticActive && !diagnosticFinished" class="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
-                <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-2xl mx-auto mb-4 font-black font-mono">
-                  IRT
+              <!-- 2 Cards Hub: IRT Diagnostic & SPP -->
+              <div v-if="!diagnosticActive && !diagnosticFinished" class="space-y-6">
+                
+                <!-- Hub Grid: 2 Asesmen Fundamental -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                  
+                  <!-- KARTU 1: Asesmen Diagnostik IRT (Akademik & Blind Spot) -->
+                  <div class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between space-y-4 hover:border-indigo-300 transition-all">
+                    <div class="space-y-3">
+                      <div class="flex items-center justify-between">
+                        <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center text-2xl font-black">
+                          <i class="ph-bold ph-chart-polar"></i>
+                        </div>
+                        <span :class="hasCompletedDiagnostic ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'" class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border">
+                          {{ hasCompletedDiagnostic ? '✓ Selesai (1x di Awal)' : 'Belum Diambil' }}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 class="text-base sm:text-lg font-black text-slate-900">1. Asesmen Diagnostik IRT</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                          Ukur kemampuan awal dengan pembobotan Item Response Theory (IRT) untuk mendeteksi materi blind-spot akademik awal.
+                        </p>
+                      </div>
+
+                      <div v-if="hasCompletedDiagnostic" class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
+                        <div class="flex justify-between text-slate-600">
+                          <span>Status:</span>
+                          <strong class="text-emerald-700 font-bold">Baseline Terpetakan</strong>
+                        </div>
+                        <div v-if="student360Data?.diagnostic?.gap_sub_materi" class="flex justify-between text-slate-600">
+                          <span>Blind Spot Awal:</span>
+                          <span class="text-indigo-600 font-bold">{{ student360Data.diagnostic.gap_sub_materi }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                      <button
+                        v-if="!hasCompletedDiagnostic"
+                        type="button"
+                        @click="handleStartIrt"
+                        class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95"
+                      >
+                        <i class="ph-bold ph-play"></i>
+                        <span>Mulai Asesmen IRT</span>
+                      </button>
+                      <button
+                        v-else
+                        type="button"
+                        @click="showDiagnosticAlreadyCompletedModal = true"
+                        class="w-full py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <i class="ph-bold ph-check-circle text-base"></i>
+                        <span>Asesmen Selesai (Cukup 1x)</span>
+                      </button>
+                      <button
+                        v-if="hasCompletedDiagnostic"
+                        type="button"
+                        @click="handleTabClick('simulator')"
+                        class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-[#c0ff00] font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                      >
+                        <i class="ph-bold ph-calculator text-base"></i>
+                        <span>Evaluasi Lanjut: Ikut Try Out CBT</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- KARTU 2: Student Potential Path / SPP (Minat Bakat RIASEC) -->
+                  <div class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between space-y-4 hover:border-purple-300 transition-all">
+                    <div class="space-y-3">
+                      <div class="flex items-center justify-between">
+                        <div class="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center text-2xl font-black">
+                          <i class="ph-bold ph-compass"></i>
+                        </div>
+                        <span :class="hasCompletedSpp ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-amber-50 text-amber-700 border-amber-200'" class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border">
+                          {{ hasCompletedSpp ? '✓ Selesai (1x di Awal)' : 'Belum Diambil' }}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 class="text-base sm:text-lg font-black text-slate-900">2. Student Potential Path (SPP)</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                          Pemetaan 4 dimensi pola pikir, gaya belajar ideal, dan profil minat Holland RIASEC untuk rekomendasi jurusan &amp; karir.
+                        </p>
+                      </div>
+
+                      <div v-if="hasCompletedSpp" class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
+                        <div class="flex justify-between text-slate-600">
+                          <span>Status:</span>
+                          <strong class="text-purple-700 font-bold">Minat &amp; Karir Terpetakan</strong>
+                        </div>
+                        <div v-if="student360Data?.spp?.riasec_code" class="flex justify-between text-slate-600">
+                          <span>Kode RIASEC:</span>
+                          <span class="text-purple-600 font-mono font-black">{{ student360Data.spp.riasec_code }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                      <button
+                        v-if="!hasCompletedSpp"
+                        type="button"
+                        @click="handleStartSpp"
+                        class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95"
+                      >
+                        <i class="ph-bold ph-sparkle"></i>
+                        <span>Mulai Asesmen SPP</span>
+                      </button>
+                      <button
+                        v-else
+                        type="button"
+                        @click="showSppAlreadyCompletedModal = true"
+                        class="w-full py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-300 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <i class="ph-bold ph-check-circle text-base"></i>
+                        <span>Asesmen Selesai (Cukup 1x)</span>
+                      </button>
+                      <button
+                        v-if="hasCompletedSpp"
+                        type="button"
+                        @click="handleTabClick('student_360')"
+                        class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-all flex items-center justify-center gap-2 border border-slate-200 cursor-pointer"
+                      >
+                        <i class="ph-bold ph-user-focus text-base text-purple-600"></i>
+                        <span>Lihat di Rapor &amp; Profil 360</span>
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
-                <h4 class="text-lg font-black font-heading text-slate-900 mb-2">Mulai Diagnostic Assessment ({{ activeStudentLevel === 'SD' ? 'TKA SD' : (activeStudentLevel === 'SMP' ? 'TKA SMP' : 'UTBK SNBT') }})</h4>
-                <p class="text-xs text-slate-600 max-w-sm mx-auto mb-6 leading-relaxed font-medium">
-                  {{ activeStudentLevel === 'SD' 
-                    ? 'Ukur kemampuan dasar Berhitung Cepat, Pemahaman Wacana, dan Konsep Sains SD Anda dalam ' + (diagnosticQuestions.length || 6) + ' soal pilihan.'
-                    : activeStudentLevel === 'SMP'
-                    ? 'Ukur penalaran Aljabar, Pemahaman Teks Bahasa, dan Konsep Sains SMP Anda dalam ' + (diagnosticQuestions.length || 6) + ' soal pilihan.'
-                    : 'Ukur kemampuan Aljabar, Geometri, dan Penalaran Logis awal Anda secara presisi dalam ' + (diagnosticQuestions.length || 6) + ' soal terpilih.' }}
-                </p>
-                <button class="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all" @click="startDiagnostic">
-                  Mulai Ujian
-                </button>
+
+                <!-- Panduan Alur: Kapan & Berapa Kali Tes Dilakukan -->
+                <div class="p-4 md:p-5 rounded-2xl bg-gradient-to-r from-indigo-50/90 via-purple-50/70 to-blue-50/90 border border-indigo-200/80 text-left space-y-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs shrink-0 shadow-sm">
+                      <i class="ph-bold ph-info"></i>
+                    </span>
+                    <h4 class="text-xs md:text-sm font-black text-slate-900 uppercase tracking-wide">Panduan Alur: Mengapa Kedua Asesmen Ini Cukup 1 Kali?</h4>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="p-3 rounded-xl bg-white/95 border border-indigo-100 shadow-sm space-y-1">
+                      <div class="flex items-center gap-1.5 text-indigo-700 font-black text-xs">
+                        <span class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-[11px] font-bold">1</span>
+                        <span>Asesmen Awal (1x Saat Gabung)</span>
+                      </div>
+                      <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
+                        Diagnostik IRT &amp; SPP wajib diambil <strong>1 kali di awal</strong> untuk memetakan kekuatan, minat karir, dan blind-spot awal Anda.
+                      </p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white/95 border border-purple-100 shadow-sm space-y-1">
+                      <div class="flex items-center gap-1.5 text-purple-700 font-black text-xs">
+                        <span class="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-[11px] font-bold">2</span>
+                        <span>Belajar Modul &amp; Drill Soal</span>
+                      </div>
+                      <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
+                        Selesaikan materi &amp; drill latihan terfokus sesuai urutan rekomendasi AI yang otomatis disusun setelah tes awal.
+                      </p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white/95 border border-blue-100 shadow-sm space-y-1">
+                      <div class="flex items-center gap-1.5 text-blue-700 font-black text-xs">
+                        <span class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-[11px] font-bold">3</span>
+                        <span>Evaluasi Berkala Lewat Try Out CBT</span>
+                      </div>
+                      <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
+                        Cukup 1x asesmen di awal. Evaluasi selanjutnya dilakukan berkala lewat <strong>Try Out CBT (misal 2x sebulan)</strong> untuk memantau lonjakan skor.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
               <!-- Quiz Play state -->
@@ -6534,6 +6629,80 @@
       </div>
     </div>
 
+    <!-- Modal: Asesmen SPP Cukup 1 Kali di Awal -->
+    <div v-if="showSppAlreadyCompletedModal" @click.self="showSppAlreadyCompletedModal = false" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      <div class="relative w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 text-center">
+        <button type="button" @click="showSppAlreadyCompletedModal = false" class="modal-close-btn absolute top-4 right-4" title="Tutup">
+          <i class="ph-bold ph-x"></i>
+        </button>
+
+        <div class="w-16 h-16 rounded-2xl bg-purple-500/15 text-purple-400 border border-purple-500/30 flex items-center justify-center text-3xl mx-auto shadow-lg shadow-purple-500/20">
+          <i class="ph-bold ph-compass"></i>
+        </div>
+        
+        <div class="space-y-2">
+          <span class="inline-block px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-400 text-[10px] font-black uppercase tracking-widest">
+            Asesmen SPP Telah Selesai
+          </span>
+          <h3 class="text-xl font-black text-white">SPP Cukup 1 Kali di Awal</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+            Anda telah menyelesaikan Student Potential Path (SPP) untuk pemetaan tipe minat karir Holland RIASEC dan gaya belajar ideal. Profil minat &amp; pola pikir dasar bersifat stabil sehingga <strong>cukup diambil 1 kali</strong> di awal.
+          </p>
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-left text-xs text-white/80 space-y-1 mt-3">
+            <p class="font-bold text-purple-300 flex items-center gap-1.5">
+              <i class="ph-bold ph-sparkle"></i> Hasil Profil Terpetakan:
+            </p>
+            <div class="flex items-center justify-between text-[11px] text-slate-300">
+              <span>Kode Minat RIASEC:</span>
+              <strong class="text-[#c0ff00] font-mono">{{ student360Data?.spp?.riasec_code || 'Terpetakan' }}</strong>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed pt-1">
+              Untuk mengasah kesiapan akademik secara berkala, ikuti <strong>Try Out CBT</strong> dan tinjau kemajuan di Rapor 360.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-2">
+          <button
+            type="button"
+            @click="showSppAlreadyCompletedModal = false; handleTabClick('student_360');"
+            class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-600/25 cursor-pointer"
+          >
+            <i class="ph-bold ph-user-focus text-base"></i>
+            <span>Lihat Rapor 360</span>
+          </button>
+          <button
+            type="button"
+            @click="showSppAlreadyCompletedModal = false; handleTabClick('simulator');"
+            class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 border border-white/10 cursor-pointer"
+          >
+            <i class="ph-bold ph-calculator text-base"></i>
+            <span>Ikut Try Out CBT</span>
+          </button>
+        </div>
+        
+        <button 
+          type="button"
+          @click="showSppAlreadyCompletedModal = false"
+          class="text-xs font-bold text-white/40 hover:text-white transition cursor-pointer pt-1"
+        >
+          Tutup
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Dialog: Student Potential Path (SPP) Assessment -->
+    <div v-if="showSppModal" class="fixed inset-0 z-[125] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
+      <div class="relative w-full max-w-5xl bg-slate-950 border border-white/15 rounded-3xl p-4 sm:p-6 shadow-2xl my-8">
+        <button type="button" @click="showSppModal = false; fetchMyStudent360();" class="modal-close-btn absolute top-4 right-4 z-10" title="Tutup">
+          <i class="ph-bold ph-x"></i>
+        </button>
+        <div class="pt-2">
+          <StudentPotentialPath @take-readiness="showSppModal = false; handleTakeReadinessFromSpp($event); fetchMyStudent360();" />
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Panduan & Tanggung Jawab Bimbel Offline Lintas Role -->
     <OfflineRoleResponsibilitiesModal 
       :show="showOfflineRoleModal" 
@@ -8498,10 +8667,12 @@ export default {
           showToast('Silakan Masuk Akun untuk mengakses modul Asesmen!');
           return;
         }
-        if (hasCompletedDiagnostic.value) {
-          showDiagnosticAlreadyCompletedModal.value = true;
-          return;
+        if (hasCompletedDiagnostic.value && hasCompletedSpp.value) {
+          showToast('Asesmen awal (IRT & SPP) telah lengkap (1x di awal). Anda dapat meninjau status atau lanjut Try Out CBT.');
         }
+        currentTab.value = 'diagnostic';
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       }
       if (tabId === 'simulator') {
         if (!isLoggedIn.value) {
@@ -8892,6 +9063,8 @@ export default {
     const diagnosticActive = ref(false);
     const diagnosticFinished = ref(false);
     const showDiagnosticAlreadyCompletedModal = ref(false);
+    const showSppAlreadyCompletedModal = ref(false);
+    const showSppModal = ref(false);
     const diagnosticQuestions = ref([]);
     const diagnosticIdx = ref(0);
     const selectedDiagAnswer = ref(null);
@@ -8906,6 +9079,53 @@ export default {
         diagnosticFinished.value
       );
     });
+
+    const hasCompletedSpp = computed(() => {
+      return Boolean(
+        student360Data.value?.spp?.id ||
+        student360Data.value?.spp?.attempt_status === 'SUBMITTED' ||
+        localStorage.getItem('edupath_spp_completed') === 'true'
+      );
+    });
+
+    const handleStartIrt = () => {
+      if (!isLoggedIn.value) {
+        showLoginModal.value = true;
+        showToast('Silakan Masuk Akun terlebih dahulu.');
+        return;
+      }
+      if (hasCompletedDiagnostic.value) {
+        showDiagnosticAlreadyCompletedModal.value = true;
+        return;
+      }
+      startDiagnostic();
+    };
+
+    const handleStartSpp = () => {
+      if (!isLoggedIn.value) {
+        showLoginModal.value = true;
+        showToast('Silakan Masuk Akun terlebih dahulu.');
+        return;
+      }
+      if (hasCompletedSpp.value) {
+        showSppAlreadyCompletedModal.value = true;
+        return;
+      }
+      showSppModal.value = true;
+    };
+
+    const handleHeroStartAssessment = () => {
+      if (!isLoggedIn.value) {
+        showLoginModal.value = true;
+        showToast('Silakan Masuk Akun untuk mengakses modul Asesmen!');
+        return;
+      }
+      if (hasCompletedDiagnostic.value && hasCompletedSpp.value) {
+        showToast('Asesmen awal (IRT & SPP) telah selesai (1x di awal).');
+      }
+      currentTab.value = 'diagnostic';
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     // Dynamic Student Level Computation based on Plan & Academic Program
     const activeStudentLevel = computed(() => {
@@ -9706,7 +9926,13 @@ export default {
       diagnosticActive,
       diagnosticFinished,
       showDiagnosticAlreadyCompletedModal,
+      showSppAlreadyCompletedModal,
+      showSppModal,
       hasCompletedDiagnostic,
+      hasCompletedSpp,
+      handleStartIrt,
+      handleStartSpp,
+      handleHeroStartAssessment,
       diagnosticIdx,
       selectedDiagAnswer,
       currentDiagQuestion,

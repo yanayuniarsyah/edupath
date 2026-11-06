@@ -1731,9 +1731,21 @@ if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_MET
         if ($learningPath && !empty($learningPath['recommended_materials'])) {
             $learningPath['actions'] = json_decode($learningPath['recommended_materials'], true);
         }
+
+        // 3b. SPP (Student Potential Path - RIASEC Assessment)
+        $sppStmt = $pdo->prepare("
+            SELECT id, attempt_status, scoring_status, riasec_code, created_at, submitted_at
+            FROM spp_attempts
+            WHERE student_id = ? AND attempt_status = 'SUBMITTED'
+            ORDER BY submitted_at DESC
+            LIMIT 1
+        ");
+        $sppStmt->execute([$student_id]);
+        $sppResult = $sppStmt->fetch(PDO::FETCH_ASSOC);
     } catch (\Throwable $de) {
         $diagnosticResult = null;
         $learningPath = null;
+        $sppResult = null;
     }
 
     // 4. Learning Gap Identification (Perpaduan Evaluasi Try Out CBT / IRT Diagnostic & Rapor Akademik)
@@ -1813,6 +1825,7 @@ if (($action === 'student_360' || $action === 'my_360') && $_SERVER['REQUEST_MET
         "assessment_history" => $assessmentHistory,
         "diagnostic" => $diagnosticResult,
         "learning_path" => $learningPath,
+        "spp" => $sppResult,
         "learning_gaps" => $learningGaps,
         "guidance_records" => $guidanceRecords,
         "admission_tracking" => $admissionTracking
