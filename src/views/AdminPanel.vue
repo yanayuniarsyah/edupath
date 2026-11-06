@@ -2640,19 +2640,19 @@
                 <div class="text-[10px] text-white/40 uppercase font-bold">Paket Mandiri</div>
                 <div class="text-sm font-mono font-black text-indigo-400 mt-1">Rp 180.000 / bln</div>
                 <div class="text-[10px] text-indigo-300 font-bold mt-0.5">Rp 1.296.000 / tahun (hemat 40%)</div>
-                <div class="text-[10px] text-white/60 mt-1">500+ Micro-lessons, 50.000+ Soal IRT, 5x TO Nasional</div>
+                <div class="text-[10px] text-white/60 mt-1">Modul Konsep &amp; Formula Praktis, 50.000+ Soal IRT, 5x TO Nasional</div>
               </div>
               <div class="p-3 rounded-lg bg-black/40 border border-[#c0ff00]/30">
                 <div class="text-[10px] text-[#c0ff00] uppercase font-bold">Paket Pejuang PTN (Terpopuler)</div>
                 <div class="text-sm font-mono font-black text-[#c0ff00] mt-1">Rp 480.000 / bln</div>
                 <div class="text-[10px] text-[#c0ff00]/70 font-bold mt-0.5">Rp 2.304.000 / tahun (hemat 60%)</div>
-                <div class="text-[10px] text-white/60 mt-1">AI Companion 24/7, Unlimited IRT, Rasionalisasi Prodi, Telegram Report</div>
+                <div class="text-[10px] text-white/60 mt-1">AI Hint 24/7, Unlimited IRT, Rasionalisasi Prodi, Laporan Orang Tua</div>
               </div>
               <div class="p-3 rounded-lg bg-black/40 border border-amber-500/30">
-                <div class="text-[10px] text-amber-400 uppercase font-bold">Paket Elite Mentoring</div>
+                <div class="text-[10px] text-amber-400 uppercase font-bold">Paket Intensif Prioritas</div>
                 <div class="text-sm font-mono font-black text-amber-400 mt-1">Rp 980.000 / bln</div>
                 <div class="text-[10px] text-amber-300/70 font-bold mt-0.5">Rp 8.232.000 / tahun (hemat 30%)</div>
-                <div class="text-[10px] text-white/60 mt-1">1-on-1 Zoom Mentoring Private, SOS Live Tutor Senior Mentor UI/ITB</div>
+                <div class="text-[10px] text-white/60 mt-1">Audit Portofolio Belajar, Rasionalisasi Prodi Mendalam, Drill HOTS Prioritas</div>
               </div>
             </div>
           </div>

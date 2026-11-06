@@ -39,13 +39,13 @@ function seed_multi_program_catalog(PDO $pdo): array {
             'id' => 'prod-pejuang',
             'code' => 'UTBK',
             'name' => 'Paket Pejuang PTN',
-            'description' => 'AI Tutor Companion 24/7, simulasi IRT adaptif tanpa batas, dan rasionalisasi prodi real-time.'
+            'description' => 'AI Hint 24/7, simulasi IRT adaptif tanpa batas, dan rasionalisasi prodi real-time.'
         ],
         [
             'id' => 'prod-elite',
             'code' => 'VIP',
-            'name' => 'Paket Elite Mentoring',
-            'description' => '1-on-1 Zoom mentoring mingguan dengan Senior Mentor alumni UI/ITB + audit portofolio belajar.'
+            'name' => 'Paket Intensif Prioritas',
+            'description' => 'Pendalaman materi prioritas, audit portofolio belajar & rasionalisasi prodi mendalam.'
         ],
         [
             'id' => 'prod-snpmb-hybrid',
@@ -128,7 +128,7 @@ function seed_multi_program_catalog(PDO $pdo): array {
             'duration' => 30,
             'billing_cycle' => 'monthly',
             'features' => json_encode([
-                '500+ Micro-Lessons Adaptif (TPS & Literasi)',
+                'Modul Konsep & Formula Praktis Lengkap',
                 '50.000+ Bank Soal HOTS dengan Standar Skor IRT',
                 '5x Tryout Nasional / Bulan + Pembahasan Lengkap',
                 'Radar Deteksi Blind-Spot Belajar Instan',
@@ -147,7 +147,7 @@ function seed_multi_program_catalog(PDO $pdo): array {
             'duration' => 365,
             'billing_cycle' => 'yearly',
             'features' => json_encode([
-                '500+ Micro-Lessons Adaptif (TPS & Literasi)',
+                'Modul Konsep & Formula Praktis Lengkap',
                 '50.000+ Bank Soal HOTS dengan Standar Skor IRT',
                 '5x Tryout Nasional / Bulan + Pembahasan Lengkap',
                 'Radar Deteksi Blind-Spot Belajar Instan',
@@ -167,7 +167,7 @@ function seed_multi_program_catalog(PDO $pdo): array {
             'billing_cycle' => 'monthly',
             'features' => json_encode([
                 'Semua Fitur di Paket Mandiri',
-                'AI Tutor Companion 24/7 (Bimbingan logika tanpa batas)',
+                'AI Hint & Panduan Logika Soal 24/7 (Bimbingan langkah demi langkah)',
                 'Unlimited Simulasi IRT Adaptif (Bebas TO tanpa kuota)',
                 'Estimasi Kesiapan & Rasionalisasi Prodi Edukatif',
                 'Laporan Progres Belajar Otomatis via WhatsApp Orang Tua'
@@ -186,7 +186,7 @@ function seed_multi_program_catalog(PDO $pdo): array {
             'billing_cycle' => 'yearly',
             'features' => json_encode([
                 'Semua Fitur di Paket Mandiri',
-                'AI Tutor Companion 24/7 (Bimbingan logika tanpa batas)',
+                'AI Hint & Panduan Logika Soal 24/7 (Bimbingan langkah demi langkah)',
                 'Unlimited Simulasi IRT Adaptif (Bebas TO tanpa kuota)',
                 'Estimasi Kesiapan & Rasionalisasi Prodi Edukatif',
                 'Paling Populer: Hemat 60% Bayar Tahunan'
@@ -198,16 +198,16 @@ function seed_multi_program_catalog(PDO $pdo): array {
             'program_id' => 'prog-snpmb-utbk',
             'academic_program' => 'SNPMB/UTBK',
             'delivery_mode' => 'online',
-            'name' => 'Paket Elite Mentoring (Bulanan)',
+            'name' => 'Paket Intensif Prioritas (Bulanan)',
             'price' => 980000,
             'discount' => 0,
             'duration' => 30,
             'billing_cycle' => 'monthly',
             'features' => json_encode([
                 'Semua Fitur Lengkap di Paket Pejuang PTN',
-                '1-on-1 Zoom Mentoring Mingguan via Zoom (60 Menit)',
-                'Grup WhatsApp VIP Langsung bareng Senior Mentor UI/ITB',
-                'Audit Portofolio Belajar & Siasat Strategi Pilihan Prodi'
+                'Audit Portofolio Belajar & Riwayat Skor Tryout',
+                'Rasionalisasi Pilihan Program Studi Mendalam',
+                'Drill Soal HOTS Prioritas & Analisis Kesalahan'
             ])
         ],
         [
@@ -216,17 +216,17 @@ function seed_multi_program_catalog(PDO $pdo): array {
             'program_id' => 'prog-snpmb-utbk',
             'academic_program' => 'SNPMB/UTBK',
             'delivery_mode' => 'online',
-            'name' => 'Paket Elite Mentoring (Tahunan)',
+            'name' => 'Paket Intensif Prioritas (Tahunan)',
             'price' => 8232000,
             'discount' => 30,
             'duration' => 365,
             'billing_cycle' => 'yearly',
             'features' => json_encode([
                 'Semua Fitur Lengkap di Paket Pejuang PTN',
-                '1-on-1 Zoom Mentoring Mingguan via Zoom (60 Menit)',
-                'Grup WhatsApp VIP Langsung bareng Senior Mentor UI/ITB',
-                'Audit Portofolio Belajar & Siasat Strategi Pilihan Prodi',
-                'Garansi Score Improvement atau Refund'
+                'Audit Portofolio Belajar & Riwayat Skor Tryout',
+                'Rasionalisasi Pilihan Program Studi Mendalam',
+                'Drill Soal HOTS Prioritas & Analisis Kesalahan',
+                'Hemat 30% Akses Penuh Prioritas 1 Tahun Penuh'
             ])
         ],
 

@@ -1148,11 +1148,11 @@
                     </li>
                     <li class="flex items-start gap-2.5">
                       <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">✓</span>
-                      <span><strong>Micro-Lessons 5 Menit:</strong> Belajar padat konsep inti + trik eliminasi instan, efisien tanpa rasa overwhelmed.</span>
+                      <span><strong>Modul Ringkas &amp; Formula Praktis:</strong> Belajar padat konsep inti + drill soal adaptif per bab, efisien tanpa rasa overwhelmed.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
                       <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">✓</span>
-                      <span><strong>AI Tutor Companion 24/7:</strong> Dialog interaktif Sokratik tanpa batas kuota + opsi SOS Tutor ITB/UI.</span>
+                      <span><strong>AI Hint &amp; Panduan Logika 24/7:</strong> Bimbingan petunjuk pengerjaan dan analisis langkah demi langkah untuk setiap butir soal tanpa batasan kuota.</span>
                     </li>
                     <li class="flex items-start gap-2.5">
                       <span class="text-[#c0ff00] font-black shrink-0 mt-0.5">✓</span>
@@ -1215,13 +1215,13 @@
                       <td class="py-3.5 px-4 font-bold text-white">Format &amp; Efisiensi Waktu</td>
                       <td class="py-3.5 px-4 text-white/60">❌ 90–120 mnt/sesi + macet di jalan</td>
                       <td class="py-3.5 px-4 text-white/60">⚠️ Video rekaman panjang 15–30 mnt</td>
-                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">✅ Micro-lessons 5 menit padat trik HOTS</td>
+                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">✅ Modul konsep ringkas &amp; drill soal adaptif per bab</td>
                     </tr>
                     <tr class="hover:bg-white/[0.02] transition-colors">
                       <td class="py-3.5 px-4 font-bold text-white">Bantuan Tanya Soal &amp; PR</td>
                       <td class="py-3.5 px-4 text-white/60">❌ Terbatas jam les &amp; antre pengajar</td>
                       <td class="py-3.5 px-4 text-white/60">⚠️ Terbatas kuota koin &amp; teks template</td>
-                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">✅ AI Tutor 24/7 Tanpa Batas + SOS Mentor UI/ITB</td>
+                      <td class="py-3.5 px-4 font-bold text-[#c0ff00] bg-[#c0ff00]/5">✅ AI Hint &amp; Panduan Logika Soal 24/7 Tanpa Batas</td>
                     </tr>
                     <tr class="hover:bg-white/[0.02] transition-colors">
                       <td class="py-3.5 px-4 font-bold text-white">Akurasi Skoring Tryout</td>
@@ -1407,35 +1407,35 @@
                 </div>
               </div>
 
-              <!-- Feature 2: Micro Lessons -->
+              <!-- Feature 2: Bank Materi & Drill Soal -->
               <div class="glass-card rounded-2xl p-4 lg:col-span-4 flex flex-col justify-start relative overflow-hidden group">
                 <div class="!absolute -top-8 -right-8 w-24 h-24 bg-secondary/15 blur-xl rounded-full pointer-events-none"></div>
                 
                 <div class="space-y-2 z-10">
                   <div class="flex items-center justify-between mb-2">
                     <div class="w-10 h-10 rounded-lg bg-secondary/15 flex items-center justify-center text-[#c0ff00] border border-secondary/30">
-                      <i class="ph-bold ph-video-camera text-xl"></i>
+                      <i class="ph-bold ph-book-open text-xl"></i>
                     </div>
                     <span class="text-[10px] bg-secondary/25 text-[#c0ff00] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border border-secondary/30">
-                      📚 Modul Kilat
+                      📚 Bank Materi
                     </span>
                   </div>
                   <div>
-                    <h3 class="text-xl md:text-2xl font-black font-heading text-white">Micro-Lessons Library</h3>
+                    <h3 class="text-xl md:text-2xl font-black font-heading text-white">Bank Materi &amp; Drill Soal</h3>
                     <p class="text-sm text-slate-300 leading-relaxed font-medium mt-2">
-                      Koleksi video ringkas 3-7 menit yang langsung mengupas trik penyelesaian dan eliminasi opsi jawaban.
+                      Ringkasan konsep fundamental, formula praktis KaTeX, dan drill latihan per bab untuk penguasaan materi secara presisi.
                     </p>
                   </div>
                 </div>
 
                 <div class="bg-black/40 border border-white/10 rounded-xl p-3 mt-4 space-y-2 z-10 flex-1 flex flex-col justify-end">
                   <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 text-xs text-white/80 font-medium">
-                    <span class="flex items-center gap-2"><i class="ph-fill ph-play-circle text-[#c0ff00] text-sm"></i> Trik Eliminasi Aljabar</span>
-                    <span class="text-white/40 font-mono">04:15</span>
+                    <span class="flex items-center gap-2"><i class="ph-fill ph-file-text text-[#c0ff00] text-sm"></i> Konsep &amp; Formula Aljabar</span>
+                    <span class="text-white/40 font-mono">15 Soal</span>
                   </div>
                   <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 text-xs text-white/80 font-medium">
-                    <span class="flex items-center gap-2"><i class="ph-fill ph-play-circle text-[#c0ff00] text-sm"></i> Taktik Analisis Wacana</span>
-                    <span class="text-white/40 font-mono">05:10</span>
+                    <span class="flex items-center gap-2"><i class="ph-fill ph-file-text text-[#c0ff00] text-sm"></i> Taktik Analisis Wacana</span>
+                    <span class="text-white/40 font-mono">20 Soal</span>
                   </div>
                 </div>
               </div>
@@ -3777,7 +3777,7 @@
           </div>
         </section>
 
-        <!-- TAB 3: MATERI UTBK & MICRO-LESSONS -->
+        <!-- TAB 3: MATERI BELAJAR & BANK SOAL ADAPTIF -->
         <section v-if="currentTab === 'learning'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
           <!-- Top Navigation Toolbar (Sleek, Compact, 1-Baris Toolbar) -->
           <div class="bg-slate-900/95 border border-white/15 rounded-2xl p-3 sm:px-4 sm:py-2.5 backdrop-blur-xl shadow-xl flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
@@ -4077,10 +4077,10 @@
               <div class="mt-8 border-t border-slate-200 pt-6 space-y-4">
                 <div class="flex flex-wrap gap-3">
                   <button class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5" @click="triggerAIEscalation">
-                    Tanya AI Tutor
+                    Hint AI Petunjuk
                   </button>
-                  <button class="px-4 py-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5" @click="triggerSOSCall">
-                    SOS Live Tutor
+                  <button class="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5" @click="triggerSOSCall">
+                    Bedah Solusi Lengkap
                   </button>
                   <button class="ml-auto px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_8px_32px_rgba(0,0,0,0.3)]" :disabled="practiceUserAnswer === null" @click="checkPracticeAnswer">
                     Kirim Jawaban
@@ -4092,7 +4092,7 @@
                   <div class="text-rose-600 font-bold text-base">!</div>
                   <div>
                     <h5 class="text-xs font-bold text-slate-900 mb-0.5">Sistem Remedial Terdeteksi</h5>
-                    <p class="text-[11px] text-slate-600 leading-relaxed">Jawaban Anda belum tepat. Sistem merekomendasikan untuk mereview sub-kompetensi prasyarat di tab <strong class="text-indigo-600 cursor-pointer hover:underline" @click="currentTab = 'learning'">Micro Lessons</strong> terlebih dahulu.</p>
+                    <p class="text-[11px] text-slate-600 leading-relaxed">Jawaban Anda belum tepat. Sistem merekomendasikan untuk mereview sub-kompetensi prasyarat di tab <strong class="text-indigo-600 cursor-pointer hover:underline" @click="currentTab = 'learning'">Materi Belajar</strong> terlebih dahulu.</p>
                   </div>
                 </div>
               </div>
@@ -7734,26 +7734,26 @@ export default {
       const FALLBACK_PRODUCTS = [
         {
           id: 1, code: 'STARTER', name: 'Paket Mandiri SNPMB', academic_program: 'SNPMB/UTBK', delivery_mode: 'online',
-          description: 'Mulai belajar adaptif dengan IRT assessment & 50.000+ bank soal.',
+          description: 'Mulai belajar adaptif dengan IRT assessment, rangkuman konsep, & 50.000+ bank soal.',
           plans: [
-            { billing_cycle: 'monthly', price: 180000, discount: 0, features: JSON.stringify(['500+ Micro-lessons & Video Ringkas','50.000+ Soal Bank Soal IRT','5x Tryout Nasional Simulasi SNBT','Diagnostic Assessment Awal','Dashboard Progres Belajar']) },
-            { billing_cycle: 'yearly',  price: 1296000, discount: 40, features: JSON.stringify(['500+ Micro-lessons & Video Ringkas','50.000+ Soal Bank Soal IRT','5x Tryout Nasional Simulasi SNBT','Diagnostic Assessment Awal','Dashboard Progres Belajar']) }
+            { billing_cycle: 'monthly', price: 180000, discount: 0, features: JSON.stringify(['Modul Konsep & Formula Praktis Lengkap','50.000+ Soal Bank Soal Berstandar IRT','5x Tryout Nasional Simulasi SNBT','Diagnostic Assessment & Radar Blind-Spot','Dashboard Progres Belajar']) },
+            { billing_cycle: 'yearly',  price: 1296000, discount: 40, features: JSON.stringify(['Modul Konsep & Formula Praktis Lengkap','50.000+ Soal Bank Soal Berstandar IRT','5x Tryout Nasional Simulasi SNBT','Diagnostic Assessment & Radar Blind-Spot','Hemat 40% Akses Penuh 1 Tahun Ajaran']) }
           ]
         },
         {
           id: 2, code: 'UTBK', name: 'Paket Pejuang PTN', academic_program: 'SNPMB/UTBK', delivery_mode: 'online',
-          description: 'AI Tutor 24/7, Adaptive IRT tanpa batas, & Rasionalisasi Prodi real-time.',
+          description: 'AI Hint 24/7, Adaptive IRT tanpa batas, & Rasionalisasi Prodi real-time.',
           plans: [
-            { billing_cycle: 'monthly', price: 480000, discount: 0, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas Siswa Juara']) },
-            { billing_cycle: 'yearly',  price: 2304000, discount: 60, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Tutor Companion 24/7 Tanpa Batas','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via Telegram','Grup Belajar VIP Komunitas Siswa Juara']) }
+            { billing_cycle: 'monthly', price: 480000, discount: 0, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Hint & Panduan Logika Soal 24/7','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via WhatsApp / Telegram','Grup Belajar VIP Komunitas Siswa Juara']) },
+            { billing_cycle: 'yearly',  price: 2304000, discount: 60, features: JSON.stringify(['Semua fitur Paket Mandiri','AI Hint & Panduan Logika Soal 24/7','Adaptive IRT Unlimited + Remedial Otomatis','Rasionalisasi Prodi & Prediksi Kelulusan','Laporan Progres ke Orang Tua via WhatsApp / Telegram','Grup Belajar VIP Komunitas Siswa Juara']) }
           ]
         },
         {
-          id: 3, code: 'ELITE', name: 'Paket Elite Mentoring', academic_program: 'SNPMB/UTBK', delivery_mode: 'online',
-          description: '1-on-1 Zoom Mentoring dengan Senior Mentor alumni UI/ITB + akses semua fitur.',
+          id: 3, code: 'ELITE', name: 'Paket Intensif Prioritas', academic_program: 'SNPMB/UTBK', delivery_mode: 'online',
+          description: 'Pendalaman materi prioritas, audit portofolio belajar & rasionalisasi prodi mendalam.',
           plans: [
-            { billing_cycle: 'monthly', price: 980000, discount: 0, features: JSON.stringify(['Semua fitur Paket Pejuang PTN','1-on-1 Zoom Mentoring Private (4x/bulan)','SOS Live Tutor Senior Mentor UI/ITB','Analisis Soal UTBK Spesifik per Individu','Garansi Score Improvement atau Refund','Akses Eksklusif Beta Fitur Terbaru']) },
-            { billing_cycle: 'yearly',  price: 8232000, discount: 30, features: JSON.stringify(['Semua fitur Paket Pejuang PTN','1-on-1 Zoom Mentoring Private (4x/bulan)','SOS Live Tutor Senior Mentor UI/ITB','Analisis Soal UTBK Spesifik per Individu','Garansi Score Improvement atau Refund','Akses Eksklusif Beta Fitur Terbaru']) }
+            { billing_cycle: 'monthly', price: 980000, discount: 0, features: JSON.stringify(['Semua fitur Paket Pejuang PTN','Audit Portofolio Belajar & Riwayat Skor Tryout','Rasionalisasi Pilihan Program Studi Mendalam','Drill Soal HOTS Prioritas & Analisis Kesalahan','Akses Eksklusif Fitur & Bank Soal Terbaru']) },
+            { billing_cycle: 'yearly',  price: 8232000, discount: 30, features: JSON.stringify(['Semua fitur Paket Pejuang PTN','Audit Portofolio Belajar & Riwayat Skor Tryout','Rasionalisasi Pilihan Program Studi Mendalam','Drill Soal HOTS Prioritas & Analisis Kesalahan','Akses Eksklusif Fitur & Bank Soal Terbaru']) }
           ]
         },
         {
@@ -9003,8 +9003,8 @@ export default {
 
     const triggerSOSCall = () => {
       showAICompanion.value = true;
-      showToast(' SOS Tutor Terkirim! Tutor manusia akan segera membantu.');
-      aiChatHistory.value.push({ sender: 'system', senderName: 'SISTEM', text: 'SOS diaktifkan.' });
+      askAILevel(2);
+      showToast('Solusi dan bedah logika telah ditampilkan oleh Asisten AI.');
     };
 
     const onlineStudents = ref(1482);

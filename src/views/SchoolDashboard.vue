@@ -364,18 +364,18 @@
                 </div>
                 <h3 class="text-xs font-black text-white uppercase tracking-wider">Paket Mandiri Starter</h3>
                 <div class="text-3xl font-black text-sky-400 my-2">{{ packageBreakdown?.mandiri || 0 }} <span class="text-xs font-medium text-white/60">Siswa</span></div>
-                <p class="text-[11px] text-white/60 leading-tight">Akses video materi lengkap, latihan subtes adaptif, &amp; kunci pembahasan analitis.</p>
+                <p class="text-[11px] text-white/60 leading-tight">Akses modul konsep &amp; formula praktis, latihan subtes adaptif, &amp; kunci pembahasan analitis.</p>
               </div>
 
-              <!-- Paket 3: Elite Mentoring -->
+              <!-- Paket 3: Intensif Prioritas -->
               <div class="p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 via-transparent to-transparent border border-purple-500/30 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2">
                   <span class="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 text-[10px] font-black uppercase tracking-wider">Privat / Intensif</span>
                   <i class="ph-bold ph-crown text-purple-400 text-lg"></i>
                 </div>
-                <h3 class="text-xs font-black text-white uppercase tracking-wider">Paket Elite Mentoring</h3>
+                <h3 class="text-xs font-black text-white uppercase tracking-wider">Paket Intensif Prioritas</h3>
                 <div class="text-3xl font-black text-purple-400 my-2">{{ packageBreakdown?.elite || 0 }} <span class="text-xs font-medium text-white/60">Siswa</span></div>
-                <p class="text-[11px] text-white/60 leading-tight">Mentoring 1-on-1 bersama alumni UI/ITB/UGM, review target rasionalisasi jurusan.</p>
+                <p class="text-[11px] text-white/60 leading-tight">Pendalaman materi prioritas, audit portofolio belajar &amp; rasionalisasi jurusan mendalam.</p>
               </div>
 
               <!-- Paket 4: Free SPP Diagnostic -->
