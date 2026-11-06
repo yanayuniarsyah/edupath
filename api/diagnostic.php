@@ -119,6 +119,25 @@ $action = $_GET["action"] ?? "";
 
 if ($action === "start") {
     $payload = verify_diagnostic_access($pdo);
+    
+    // Asesmen Diagnostik IRT cukup 1 kali di awal. Cek apakah siswa sudah pernah mengambil.
+    if ($payload && $payload->role === 'student') {
+        try {
+            $chkDiag = $pdo->prepare("SELECT id, created_at FROM diagnostic_results WHERE student_id = ? AND (details NOT LIKE '%tryout_cbt%' OR details IS NULL) LIMIT 1");
+            $chkDiag->execute([$payload->id]);
+            $existDiag = $chkDiag->fetch(PDO::FETCH_ASSOC);
+            if ($existDiag) {
+                echo json_encode([
+                    "success" => false,
+                    "already_completed" => true,
+                    "completed_at" => $existDiag['created_at'],
+                    "message" => "Anda telah menyelesaikan Asesmen Diagnostik awal. Asesmen ini cukup diambil 1 kali sebagai baseline pemetaan. Evaluasi selanjutnya dilakukan melalui Try Out CBT."
+                ]);
+                exit;
+            }
+        } catch (\Throwable $eChk) {}
+    }
+    
     try {
         $level = strtolower($_GET['level'] ?? '');
         if (!$level && $payload && $payload->role === 'student') {
@@ -179,6 +198,23 @@ if ($action === "start") {
     }
 } elseif ($action === "submit" && $_SERVER["REQUEST_METHOD"] === "POST") {
     $payload = verify_diagnostic_access($pdo);
+    
+    // Cegah submit ulang jika asesmen diagnostik awal sudah selesai (cukup 1x)
+    if ($payload && $payload->role === 'student') {
+        try {
+            $chkDiag = $pdo->prepare("SELECT id FROM diagnostic_results WHERE student_id = ? AND (details NOT LIKE '%tryout_cbt%' OR details IS NULL) LIMIT 1");
+            $chkDiag->execute([$payload->id]);
+            if ($chkDiag->fetch()) {
+                http_response_code(400);
+                echo json_encode([
+                    "error" => "Anda telah menyelesaikan Asesmen Diagnostik awal. Asesmen ini cukup diambil 1 kali. Evaluasi berkala selanjutnya dilakukan melalui Try Out CBT.",
+                    "already_completed" => true
+                ]);
+                exit;
+            }
+        } catch (\Throwable $eChk) {}
+    }
+
     $input = json_decode(file_get_contents("php://input"), true);
     $answers = $input["answers"] ?? []; // [{ question_id: "...", answer: "A" }]
 

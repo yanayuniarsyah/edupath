@@ -3658,7 +3658,34 @@
                 </div>
               </div>
 
-              <div v-if="!diagnosticActive && !diagnosticFinished" class="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
+              <!-- Tampilan jika siswa sudah pernah menyelesaikan asesmen diagnostik awal (cukup 1x) -->
+              <div v-if="hasCompletedDiagnostic && !diagnosticActive && !diagnosticFinished" class="text-center py-10 px-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/25 space-y-4">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-3xl mx-auto shadow-md">
+                  <i class="ph-bold ph-seal-check"></i>
+                </div>
+                <div class="max-w-md mx-auto space-y-1.5">
+                  <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 text-[10px] font-black uppercase tracking-widest">
+                    Asesmen Awal Telah Selesai (1x di Awal)
+                  </span>
+                  <h4 class="text-lg font-black text-slate-900">Asesmen Diagnostik Cukup 1 Kali</h4>
+                  <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                    Anda telah menyelesaikan asesmen diagnostik awal sebagai baseline. Untuk mengukur kenaikan skor berkala, silakan ikuti <strong>Try Out CBT</strong> (misal 2x sebulan). Skor IRT, radar blind-spot, dan jalur belajar AI Anda otomatis diperbarui dari riwayat Try Out.
+                  </p>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <button @click="handleTabClick('simulator')" class="px-6 py-2.5 rounded-xl bg-slate-900 text-[#c0ff00] hover:bg-slate-800 font-black text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2 cursor-pointer">
+                    <i class="ph-bold ph-calculator text-base"></i>
+                    <span>Ikut Try Out CBT Sekarang</span>
+                  </button>
+                  <button @click="handleTabClick('student_360')" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-xs transition shadow-sm flex items-center gap-2 cursor-pointer">
+                    <i class="ph-bold ph-user-focus text-base text-indigo-600"></i>
+                    <span>Lihat Rapor &amp; Profil 360</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Tampilan jika siswa belum pernah asesmen awal -->
+              <div v-else-if="!diagnosticActive && !diagnosticFinished" class="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
                 <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-2xl mx-auto mb-4 font-black font-mono">
                   IRT
                 </div>
@@ -6449,6 +6476,64 @@
       </div>
     </div>
 
+    <!-- Modal: Asesmen Diagnostik IRT Cukup 1 Kali di Awal -->
+    <div v-if="showDiagnosticAlreadyCompletedModal" @click.self="showDiagnosticAlreadyCompletedModal = false" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      <div class="relative w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 text-center">
+        <button type="button" @click="showDiagnosticAlreadyCompletedModal = false" class="modal-close-btn absolute top-4 right-4" title="Tutup">
+          <i class="ph-bold ph-x"></i>
+        </button>
+
+        <div class="w-16 h-16 rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-3xl mx-auto shadow-lg shadow-emerald-500/20">
+          <i class="ph-bold ph-seal-check"></i>
+        </div>
+        
+        <div class="space-y-2">
+          <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+            Asesmen Awal Telah Selesai
+          </span>
+          <h3 class="text-xl font-black text-white">Asesmen Cukup 1 Kali di Awal</h3>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+            Anda telah menyelesaikan Asesmen Diagnostik IRT awal sebagai <em>baseline</em> pemetaan kemampuan. Sesuai kurikulum terpadu EduPath, asesmen diagnostik <strong>cukup diambil 1 kali</strong> dan tidak perlu diulang.
+          </p>
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-left text-xs text-white/80 space-y-1 mt-3">
+            <p class="font-bold text-[#c0ff00] flex items-center gap-1.5">
+              <i class="ph-bold ph-trend-up"></i> Cara Evaluasi Kenaikan Skor Selanjutnya:
+            </p>
+            <p class="text-[11px] text-slate-300 leading-relaxed">
+              Ikuti <strong>Try Out CBT</strong> berkala (misal 2x sebulan). Skor IRT, radar blind-spot, dan rekomendasi jalur belajar Anda otomatis diperbarui dari hasil Try Out!
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-2">
+          <button
+            type="button"
+            @click="showDiagnosticAlreadyCompletedModal = false; handleTabClick('simulator');"
+            class="w-full py-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-slate-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#c0ff00]/25 cursor-pointer"
+          >
+            <i class="ph-bold ph-calculator text-base"></i>
+            <span>Ikut Try Out CBT</span>
+          </button>
+          <button
+            type="button"
+            @click="showDiagnosticAlreadyCompletedModal = false; handleTabClick('student_360');"
+            class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 border border-white/10 cursor-pointer"
+          >
+            <i class="ph-bold ph-user-focus text-base"></i>
+            <span>Lihat Rapor 360</span>
+          </button>
+        </div>
+        
+        <button 
+          type="button"
+          @click="showDiagnosticAlreadyCompletedModal = false"
+          class="text-xs font-bold text-white/40 hover:text-white transition cursor-pointer pt-1"
+        >
+          Tutup
+        </button>
+      </div>
+    </div>
+
     <!-- Modal Panduan & Tanggung Jawab Bimbel Offline Lintas Role -->
     <OfflineRoleResponsibilitiesModal 
       :show="showOfflineRoleModal" 
@@ -8407,6 +8492,17 @@ export default {
         navigateToPracticeMode();
         return;
       }
+      if (tabId === 'diagnostic') {
+        if (!isLoggedIn.value) {
+          showLoginModal.value = true;
+          showToast('Silakan Masuk Akun untuk mengakses modul Asesmen!');
+          return;
+        }
+        if (hasCompletedDiagnostic.value) {
+          showDiagnosticAlreadyCompletedModal.value = true;
+          return;
+        }
+      }
       if (tabId === 'simulator') {
         if (!isLoggedIn.value) {
           showLoginModal.value = true;
@@ -8795,12 +8891,21 @@ export default {
 
     const diagnosticActive = ref(false);
     const diagnosticFinished = ref(false);
+    const showDiagnosticAlreadyCompletedModal = ref(false);
     const diagnosticQuestions = ref([]);
     const diagnosticIdx = ref(0);
     const selectedDiagAnswer = ref(null);
     const diagnosticScore = ref(0);
     const diagnosticAnswers = ref([]);
     const diagnosticResultData = ref(null);
+
+    const hasCompletedDiagnostic = computed(() => {
+      return Boolean(
+        student360Data.value?.diagnostic?.id || 
+        currentUser.value?.has_completed_diagnostic ||
+        diagnosticFinished.value
+      );
+    });
 
     // Dynamic Student Level Computation based on Plan & Academic Program
     const activeStudentLevel = computed(() => {
@@ -8829,6 +8934,10 @@ export default {
         showToast('Silakan Masuk Akun terlebih dahulu.');
         return;
       }
+      if (hasCompletedDiagnostic.value) {
+        showDiagnosticAlreadyCompletedModal.value = true;
+        return;
+      }
       if (!isPremiumUser.value && !isStaff.value) {
         showToast('Fitur Diagnostic Assessment khusus pengguna Premium. Silakan pilih paket belajar Anda.');
         openPlanSelector();
@@ -8837,6 +8946,10 @@ export default {
       const lvlParam = activeStudentLevel.value.toLowerCase();
       try {
         const res = await api.startDiagnostic(lvlParam);
+        if (res?.already_completed) {
+          showDiagnosticAlreadyCompletedModal.value = true;
+          return;
+        }
         if (res?.data && res.data.length > 0) {
           // Map backend format to frontend format
           diagnosticQuestions.value = res.data.map(q => ({
@@ -8907,6 +9020,7 @@ export default {
         if (res.success) {
           diagnosticFinished.value = true;
           diagnosticResultData.value = res;
+          fetchMyStudent360();
           showToast('Diagnostic Assessment Selesai! Jalur belajar telah dikalibrasi.');
         } else {
           showToast(res.error || 'Gagal menyimpan hasil diagnostic.', 'error');
@@ -9591,6 +9705,8 @@ export default {
       toggleFaq,
       diagnosticActive,
       diagnosticFinished,
+      showDiagnosticAlreadyCompletedModal,
+      hasCompletedDiagnostic,
       diagnosticIdx,
       selectedDiagAnswer,
       currentDiagQuestion,
