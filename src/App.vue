@@ -29,8 +29,8 @@
         (sidebarExpanded || mobileSidebarOpen) ? 'w-72 max-w-[85vw] shadow-[20px_0_60px_rgba(0,0,0,0.5)]' : 'w-[72px]',
         mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       ]"
-      @mouseenter="sidebarExpanded = true"
-      @mouseleave="sidebarExpanded = false"
+      @mouseenter="sidebarExpanded = true; clearProfileFlyoutTimer();"
+      @mouseleave="sidebarExpanded = false; onProfileAreaMouseLeave();"
     >
       <!-- Top: Logo + Nav (scrollable) -->
       <div class="flex flex-col flex-1 min-h-0 overflow-y-auto" :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-4 sm:p-6 pb-2' : 'p-3 pb-2'">
@@ -232,22 +232,29 @@
 
       <!-- Bottom: User Profile Popover & Quick Settings (Always pinned inside viewport, safe-area aware) -->
       <div 
+        id="sidebar-profile-container"
         class="shrink-0 border-t border-white/10 bg-[#060a16]/95 backdrop-blur-xl relative" 
         :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-2.5 sm:p-3' : 'p-2 mb-2 flex flex-col items-center'"
         style="padding-bottom: max(0.875rem, env(safe-area-inset-bottom));"
+        @mouseenter="onProfileAreaMouseEnter"
+        @mouseleave="onProfileAreaMouseLeave"
       >
-        <!-- Click-outside Backdrop for Profile Flyout -->
-        <div 
-          v-if="showProfileFlyout" 
-          @click="showProfileFlyout = false" 
-          class="fixed inset-0 z-40"
-        ></div>
+        <!-- Click-outside Backdrop for Profile Flyout (Teleported to body so it covers full viewport) -->
+        <teleport to="body">
+          <div 
+            v-if="showProfileFlyout" 
+            @click="closeProfileFlyout" 
+            class="fixed inset-0 z-40 bg-transparent"
+          ></div>
+        </teleport>
 
         <!-- Bottom-Up Profile Flyout Menu -->
         <div 
           v-if="showProfileFlyout" 
           class="absolute bottom-full mb-2 z-50 rounded-2xl bg-slate-950/95 backdrop-blur-2xl border border-white/20 shadow-2xl p-2.5 space-y-1.5 animate-fade-in"
           :class="(sidebarExpanded || mobileSidebarOpen) ? 'left-2.5 right-2.5' : 'left-2 w-64'"
+          @mouseenter="onProfileAreaMouseEnter"
+          @mouseleave="onProfileAreaMouseLeave"
         >
           <!-- User info preview header in popover -->
           <div class="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 flex items-center gap-2.5">
@@ -273,7 +280,7 @@
             <!-- Pengaturan Akun -->
             <button
               type="button"
-              @click="currentTab = 'settings'; showProfileFlyout = false; mobileSidebarOpen = false;"
+              @click="currentTab = 'settings'; closeProfileFlyout(); mobileSidebarOpen = false;"
               class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer group"
             >
               <i class="ph-bold ph-gear-six text-base text-[#c0ff00] group-hover:rotate-45 transition-transform"></i>
@@ -283,7 +290,7 @@
             <!-- Ubah Target Pendidikan -->
             <button
               type="button"
-              @click="openQuickTargetModal(); showProfileFlyout = false; mobileSidebarOpen = false;"
+              @click="openQuickTargetModal(); closeProfileFlyout(); mobileSidebarOpen = false;"
               class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer group"
             >
               <i class="ph-bold ph-target text-base text-sky-400"></i>
@@ -293,7 +300,7 @@
             <!-- Pilihan Paket Belajar -->
             <button
               type="button"
-              @click="openPlanSelector(); showProfileFlyout = false; mobileSidebarOpen = false;"
+              @click="openPlanSelector(); closeProfileFlyout(); mobileSidebarOpen = false;"
               class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer group"
             >
               <i class="ph-bold ph-sparkle text-base text-amber-400"></i>
@@ -303,7 +310,7 @@
             <!-- Panduan & SOP Bimbel -->
             <button
               type="button"
-              @click="currentTab = 'offline_sop'; showProfileFlyout = false; mobileSidebarOpen = false;"
+              @click="currentTab = 'offline_sop'; closeProfileFlyout(); mobileSidebarOpen = false;"
               class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer group"
             >
               <i class="ph-bold ph-buildings text-base text-purple-400"></i>
@@ -314,7 +321,7 @@
             <button
               v-if="isTeacher || isAdmin || isSchoolBk || isAffiliate"
               type="button"
-              @click="window.location.hash = isSchoolBk ? '#/school' : '#/admin'; showProfileFlyout = false; mobileSidebarOpen = false;"
+              @click="window.location.hash = isSchoolBk ? '#/school' : '#/admin'; closeProfileFlyout(); mobileSidebarOpen = false;"
               class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-indigo-300 hover:text-indigo-100 hover:bg-indigo-500/15 transition-all cursor-pointer group"
             >
               <i class="ph-bold ph-shield-check text-base text-indigo-400"></i>
@@ -327,7 +334,7 @@
             <!-- Logout Button -->
             <button
               type="button"
-              @click="showProfileFlyout = false; logout();"
+              @click="closeProfileFlyout(); logout();"
               class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-rose-400 hover:text-rose-200 hover:bg-rose-500/15 transition-all cursor-pointer group"
             >
               <i class="ph-bold ph-sign-out text-base text-rose-400 group-hover:translate-x-0.5 transition-transform"></i>
@@ -339,7 +346,7 @@
         <!-- Trigger: Interactive Profile Button -->
         <button
           type="button"
-          @click="showProfileFlyout = !showProfileFlyout"
+          @click="toggleProfileFlyout($event)"
           :title="'Menu Profil: ' + getStudentDisplayName(currentUser)"
           class="w-full flex items-center gap-2.5 sm:gap-3 p-1.5 sm:p-2 rounded-xl hover:bg-white/5 active:bg-white/10 border border-transparent hover:border-white/10 transition-all cursor-pointer group text-left"
           :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center'"
@@ -6774,7 +6781,12 @@ export default {
     const showOfflineRoleModal = ref(false);
     const ambientGlowRef = ref(null);
     const canvasOpacity = ref(0);
-    const handleScroll = (e) => { canvasOpacity.value = e.target.scrollTop > 300 ? 0.35 : 0; };
+    const handleScroll = (e) => { 
+      if (typeof closeProfileFlyout === 'function' && showProfileFlyout?.value) {
+        closeProfileFlyout();
+      }
+      canvasOpacity.value = e.target.scrollTop > 300 ? 0.35 : 0; 
+    };
     const mobileSidebarOpen = ref(false);
     const toggleMobileSidebar = () => { mobileSidebarOpen.value = !mobileSidebarOpen.value; };
 
@@ -7348,6 +7360,63 @@ export default {
     const currentTab = ref(getInitialTab());
     const isStudentPreviewMode = ref(false);
     const showProfileFlyout = ref(false);
+    let profileFlyoutTimer = null;
+
+    const clearProfileFlyoutTimer = () => {
+      if (profileFlyoutTimer) {
+        clearTimeout(profileFlyoutTimer);
+        profileFlyoutTimer = null;
+      }
+    };
+
+    const startProfileFlyoutTimer = (duration = 4500) => {
+      clearProfileFlyoutTimer();
+      profileFlyoutTimer = setTimeout(() => {
+        showProfileFlyout.value = false;
+      }, duration);
+    };
+
+    const toggleProfileFlyout = (e) => {
+      if (e) {
+        e.stopPropagation();
+      }
+      showProfileFlyout.value = !showProfileFlyout.value;
+      if (showProfileFlyout.value) {
+        startProfileFlyoutTimer(4500); // Auto-hide setelah 4.5 detik jika tidak memilih sub-menu
+      } else {
+        clearProfileFlyoutTimer();
+      }
+    };
+
+    const closeProfileFlyout = () => {
+      showProfileFlyout.value = false;
+      clearProfileFlyoutTimer();
+    };
+
+    const onProfileAreaMouseEnter = () => {
+      clearProfileFlyoutTimer();
+    };
+
+    const onProfileAreaMouseLeave = () => {
+      if (showProfileFlyout.value) {
+        startProfileFlyoutTimer(600); // Auto-hide 600ms saat kursor keluar dari profil/menu
+      }
+    };
+
+    const handleGlobalClickOutside = (e) => {
+      if (!showProfileFlyout.value) return;
+      const profileContainer = document.getElementById('sidebar-profile-container');
+      if (profileContainer && !profileContainer.contains(e.target)) {
+        closeProfileFlyout();
+      }
+    };
+
+    const handleGlobalScroll = () => {
+      if (showProfileFlyout.value) {
+        closeProfileFlyout();
+      }
+    };
+
     const studentDashboardTab = ref('activities');
 
     const studentTabs = [
@@ -9782,12 +9851,16 @@ export default {
       if (isLoggedIn.value) {
         fetchAffiliateData();
       }
+      document.addEventListener('click', handleGlobalClickOutside);
+      window.addEventListener('scroll', handleGlobalScroll, true);
     });
 
     onUnmounted(() => {
       if (countdownTimer) clearInterval(countdownTimer);
       if (activityTimer) clearInterval(activityTimer);
-      
+      document.removeEventListener('click', handleGlobalClickOutside);
+      window.removeEventListener('scroll', handleGlobalScroll, true);
+      clearProfileFlyoutTimer();
     });
 
     const launchCurrentProgramCbt = () => {
@@ -9878,6 +9951,11 @@ export default {
       fetchMyStudent360,
       openStudentReportCardDetail,
       showProfileFlyout,
+      toggleProfileFlyout,
+      closeProfileFlyout,
+      clearProfileFlyoutTimer,
+      onProfileAreaMouseEnter,
+      onProfileAreaMouseLeave,
       studentDashboardTab,
 
       startCbtExam,
