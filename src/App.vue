@@ -2810,181 +2810,133 @@
         <!-- TAB 1: DASHBOARD -->
         <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-5 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
 
-          <!-- ✨ UNIFIED STUDENT COCKPIT HEADER (Proporsional, DKV-Standard, Clean & Compact) -->
-          <div class="glass-card rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-b from-slate-900/90 via-slate-900/95 to-slate-950">
-            <!-- Top Banner Visual (Sleek, integrated) -->
-            <div class="relative h-28 sm:h-36 md:h-44 w-full overflow-hidden">
-              <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-full object-cover object-center" />
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
-              
-              <!-- Program & Status Floating Badges on Banner -->
-              <div class="absolute top-3 inset-x-3 sm:top-4 sm:inset-x-5 flex items-center justify-between gap-2 z-10">
+          <!-- ✨ Banner Gambar Dashboard Belajar (Clean & Clear seperti di menu Afiliasi) -->
+          <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
+            <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-32 sm:h-44 md:h-56 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+            <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-90 z-10"></div>
+          </div>
+
+          <!-- ✨ Program Belajar & Multi-Paket Switcher Bar (Terpisah di Bawah Gambar, Dropdown Tidak Terpotong) -->
+          <div class="glass-card p-3.5 sm:p-4 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-slate-950 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 relative z-30">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 border border-[#c0ff00]/30 flex items-center justify-center text-xl shrink-0">
+                {{ activeProgramInfo.icon }}
+              </div>
+              <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/15 text-xs text-white font-bold">
-                    <span>{{ activeProgramInfo.icon }}</span>
-                    <span>{{ activeProgramInfo.name }}</span>
-                  </span>
-                  <span :class="['text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-md border', hasSubscriptionForProgram(activeAcademicProgram) ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/40' : 'bg-amber-500/25 text-amber-300 border-amber-500/40']">
+                  <span class="text-[9px] font-black uppercase tracking-wider text-[#c0ff00]">Ruang Belajar Aktif</span>
+                  <span :class="['text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider', hasSubscriptionForProgram(activeAcademicProgram) ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30']">
                     {{ hasSubscriptionForProgram(activeAcademicProgram) ? (currentUser?.plan_name || 'Langganan Aktif') : 'Akses Trial Gratis' }}
                   </span>
                 </div>
-
-                <!-- Program Switcher Trigger -->
-                <div class="relative">
-                  <button 
-                    type="button"
-                    @click="showProgramSwitcherDropdown = !showProgramSwitcherDropdown" 
-                    class="px-3 py-1.5 rounded-xl bg-slate-950/80 hover:bg-slate-900/90 backdrop-blur-md border border-white/15 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
-                  >
-                    <i class="ph-bold ph-arrows-left-right text-xs text-[#c0ff00]"></i>
-                    <span class="hidden sm:inline">Ganti Program</span>
-                    <i class="ph-bold ph-caret-down text-[10px]"></i>
-                  </button>
-
-                  <!-- Dropdown list -->
-                  <div 
-                    v-if="showProgramSwitcherDropdown" 
-                    class="absolute right-0 top-full mt-2 w-72 edupath-dropdown-menu z-50 animate-fade-in space-y-1"
-                  >
-                    <div class="px-2 pb-1 text-[10px] font-black uppercase tracking-wider text-white/40 flex justify-between items-center">
-                      <span>Pilih Program / Jenjang</span>
-                      <span class="text-[9px] text-[#c0ff00]">5 Program</span>
-                    </div>
-                    <button 
-                      v-for="prog in allAcademicProgramsList" 
-                      :key="prog.code"
-                      type="button"
-                      @click="setActiveProgram(prog.code); showProgramSwitcherDropdown = false;"
-                      :class="[
-                        'w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer text-xs',
-                        activeAcademicProgram === prog.code 
-                          ? 'bg-[#c0ff00]/15 text-[#c0ff00] font-black border border-[#c0ff00]/30 shadow-sm' 
-                          : 'text-white/70 hover:bg-white/5 hover:text-white border border-transparent'
-                      ]"
-                    >
-                      <div class="flex items-center gap-2.5">
-                        <span class="text-base">{{ prog.icon }}</span>
-                        <div>
-                          <div class="font-bold text-white text-xs">{{ prog.name }}</div>
-                          <div class="text-[9px] text-white/40">{{ prog.levelDesc }}</div>
-                        </div>
-                      </div>
-                      <span v-if="hasSubscriptionForProgram(prog.code)" class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">Aktif</span>
-                      <span v-else class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/50 font-bold">Trial</span>
-                    </button>
-                    <div class="pt-2 border-t border-white/10">
-                      <button 
-                        type="button"
-                        @click="showProgramSwitcherDropdown = false; openPlanSelector()" 
-                        class="w-full py-2 px-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider text-center cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#c0ff00]/20"
-                      >
-                        <i class="ph-bold ph-plus-circle text-sm"></i> Beli Multi-Paket Lain
-                      </button>
-                    </div>
-                  </div>
+                <div class="text-sm sm:text-base font-black text-white flex items-center gap-2 truncate">
+                  <span>{{ activeProgramInfo.name }}</span>
+                  <span class="text-xs text-white/40 font-normal">({{ activeProgramInfo.levelDesc }})</span>
                 </div>
               </div>
             </div>
 
-            <!-- Profile Info & Target Summary Bar -->
-            <div class="p-4 sm:p-6 md:p-7 space-y-4 sm:space-y-5">
-              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                
-                <!-- Left: Avatar & Human Greeting -->
-                <div class="flex items-center gap-3.5 min-w-0">
-                  <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#c0ff00]/15 border border-[#c0ff00]/30 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(192,255,0,0.2)]">
-                    <i class="ph-fill ph-user text-2xl text-[#c0ff00]"></i>
-                  </div>
-                  <div class="min-w-0 space-y-0.5">
-                    <div class="flex items-center gap-2">
-                      <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
-                      <span class="text-[10px] font-bold uppercase tracking-wider text-[#c0ff00]">{{ activeProgramInfo.badge }}</span>
-                    </div>
-                    <h2 class="text-lg sm:text-xl md:text-2xl font-black text-white truncate tracking-tight">
-                      Halo, {{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa EduPath') }}!
-                    </h2>
-                    <p class="text-xs text-white/60 truncate">{{ dashboardProgramGreeting }}</p>
-                  </div>
-                </div>
+            <!-- Program Switcher Dropdown Action -->
+            <div class="relative shrink-0 flex items-center gap-2">
+              <button 
+                type="button"
+                @click="showProgramSwitcherDropdown = !showProgramSwitcherDropdown" 
+                class="w-full sm:w-auto px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+              >
+                <i class="ph-bold ph-arrows-left-right text-sm text-[#c0ff00]"></i>
+                <span>Ganti Program Belajar</span>
+                <i class="ph-bold ph-caret-down text-[10px]"></i>
+              </button>
 
-                <!-- Right: Target Impian Pill -->
-                <div class="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/10 shrink-0 self-start md:self-auto">
-                  <div class="w-9 h-9 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center text-lg border border-sky-500/25 shrink-0">
-                    {{ activeProgramTargetIcon }}
+              <!-- Transparent Backdrop to close on click outside -->
+              <div 
+                v-if="showProgramSwitcherDropdown" 
+                @click="showProgramSwitcherDropdown = false" 
+                class="fixed inset-0 z-40"
+              ></div>
+
+              <!-- Dropdown list (Positioned above everything, completely unclipped) -->
+              <div 
+                v-if="showProgramSwitcherDropdown" 
+                class="absolute right-0 top-full mt-2 w-80 max-h-[80vh] overflow-y-auto bg-slate-950/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl z-50 animate-fade-in p-2 space-y-1"
+              >
+                <div class="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white/50 flex justify-between items-center border-b border-white/10">
+                  <span>Pilih Program / Jenjang</span>
+                  <span class="text-[9px] text-[#c0ff00] font-mono">5 Program</span>
+                </div>
+                <button 
+                  v-for="prog in allAcademicProgramsList" 
+                  :key="prog.code"
+                  type="button"
+                  @click="setActiveProgram(prog.code); showProgramSwitcherDropdown = false;"
+                  :class="[
+                    'w-full flex items-center justify-between p-3 rounded-xl text-left transition-all cursor-pointer text-xs',
+                    activeAcademicProgram === prog.code || (activeAcademicProgram === 'SMA' && prog.code === 'TKA_SMA')
+                      ? 'bg-[#c0ff00]/15 text-[#c0ff00] font-black border border-[#c0ff00]/30 shadow-sm' 
+                      : 'text-white/80 hover:bg-white/10 hover:text-white border border-transparent'
+                  ]"
+                >
+                  <div class="flex items-center gap-3">
+                    <span class="text-xl">{{ prog.icon }}</span>
+                    <div>
+                      <div class="font-bold text-white text-xs">{{ prog.name }}</div>
+                      <div class="text-[10px] text-white/50">{{ prog.levelDesc }}</div>
+                    </div>
                   </div>
-                  <div class="min-w-0 pr-1">
-                    <span class="block text-[9px] font-bold uppercase tracking-wider text-white/40">{{ activeProgramTargetTitle }}</span>
-                    <span class="text-xs sm:text-sm font-black text-white truncate block max-w-[200px]">{{ currentStudentTargetDisplay }}</span>
-                  </div>
+                  <span v-if="hasSubscriptionForProgram(prog.code)" class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">Aktif</span>
+                  <span v-else class="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/50 font-bold">Trial</span>
+                </button>
+                <div class="pt-2 border-t border-white/10">
                   <button 
                     type="button"
-                    @click="openQuickTargetModal" 
-                    class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all cursor-pointer" 
-                    title="Ubah Target"
+                    @click="showProgramSwitcherDropdown = false; openPlanSelector()" 
+                    class="w-full py-2.5 px-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider text-center cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#c0ff00]/20"
                   >
-                    <i class="ph-bold ph-pencil-simple text-xs"></i>
+                    <i class="ph-bold ph-plus-circle text-sm"></i> Beli Multi-Paket Lain
                   </button>
                 </div>
-
               </div>
+            </div>
+          </div>
 
-              <!-- Streamlined Action Strip (Buttons Aligned Proportionally) -->
-              <div class="pt-2 border-t border-white/10 flex flex-wrap items-center gap-2 sm:gap-2.5">
-                <button 
-                  type="button"
-                  @click="handleHeroStartAssessment" 
-                  class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(192,255,0,0.25)] flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
-                >
-                  <i class="ph-bold ph-exam text-sm"></i>
-                  <span>Mulai Asesmen</span>
-                </button>
-
-                <button 
-                  type="button"
-                  @click="handleTabClick('learning')" 
-                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
-                >
-                  <i class="ph-bold ph-book-open text-sm text-white/70"></i>
-                  <span>Materi</span>
-                </button>
-
-                <button 
-                  type="button"
-                  @click="navigateToPracticeMode" 
-                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
-                >
-                  <i class="ph-bold ph-pencil-simple text-sm text-white/70"></i>
-                  <span>Latihan Soal</span>
-                </button>
-
-                <button 
-                  type="button"
-                  @click="handleTabClick('simulator')" 
-                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
-                >
-                  <i class="ph-bold ph-laptop text-sm text-white/70"></i>
-                  <span>Try Out CBT</span>
-                </button>
-
-                <button 
-                  type="button"
-                  @click="currentTab = 'student_360'; fetchMyStudent360();" 
-                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 sm:ml-auto"
-                >
-                  <i class="ph-bold ph-chart-line-up text-sm text-[#c0ff00]"></i>
-                  <span>Rapor &amp; Profil 360</span>
-                </button>
-
-                <button 
-                  v-if="isAdmin" 
-                  type="button" 
-                  @click="currentTab = 'offline_sop'" 
-                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-amber-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
-                >
-                  <span>🏢 SOP Bimbel</span>
-                </button>
+          <!-- ✨ Greeting Siswa & Target Impian (Bersih tanpa tombol duplikat sidebar menu) -->
+          <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-7 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
+            <!-- Left: Avatar & Greeting Info -->
+            <div class="flex items-center gap-3.5 sm:gap-4 flex-1 min-w-0">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#c0ff00]/15 border border-[#c0ff00]/30 shadow-[0_0_20px_rgba(192,255,0,0.2)] flex items-center justify-center shrink-0">
+                <i class="ph-fill ph-user text-2xl text-[#c0ff00]"></i>
               </div>
+              <div class="space-y-0.5 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
+                  <p class="text-[#c0ff00] font-black text-[10px] sm:text-xs tracking-wider uppercase">
+                    {{ activeProgramInfo.badge }}
+                  </p>
+                </div>
+                <h2 class="text-lg sm:text-xl md:text-2xl font-black text-white tracking-tight truncate">
+                  Halo, {{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa EduPath') }}!
+                </h2>
+                <p class="text-white/60 text-xs sm:text-sm font-medium truncate">{{ dashboardProgramGreeting }}</p>
+              </div>
+            </div>
 
+            <!-- Right: Target Impian Pill -->
+            <div class="flex items-center gap-3 p-3 sm:p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 shrink-0 self-start md:self-auto">
+              <div class="w-9 h-9 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center text-lg border border-sky-500/25 shrink-0">
+                {{ activeProgramTargetIcon }}
+              </div>
+              <div class="min-w-0 pr-1">
+                <span class="block text-[9px] font-bold uppercase tracking-wider text-white/40">{{ activeProgramTargetTitle }}</span>
+                <span class="text-xs sm:text-sm font-black text-white truncate block max-w-[220px]">{{ currentStudentTargetDisplay }}</span>
+              </div>
+              <button 
+                type="button"
+                @click="openQuickTargetModal" 
+                class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all cursor-pointer" 
+                title="Ubah Target"
+              >
+                <i class="ph-bold ph-pencil-simple text-xs"></i>
+              </button>
             </div>
           </div>
 
@@ -7527,17 +7479,26 @@ export default {
       if (!currentUser.value) return false;
       if (['admin', 'superadmin', 'teacher', 'guru', 'tutor', 'school_bk', 'affiliate'].includes(currentUser.value.role)) return true;
       if (!currentUser.value.is_premium) return false;
+      const userProg = currentUser.value.academic_program || '';
       if (currentUser.value.active_subscriptions && currentUser.value.active_subscriptions.length) {
         return currentUser.value.active_subscriptions.some(s => {
           const p = s.academic_program || '';
-          return p === code || (code === 'SNPMB_UTBK' && p.includes('SNPMB')) || (code === 'TKA_SMA' && p.includes('TKA_SMA'));
+          return p === code || 
+            (code === 'SNPMB_UTBK' && (p.includes('SNPMB') || p.includes('UTBK') || p.includes('SMA'))) || 
+            (code === 'TKA_SMA' && (p.includes('TKA_SMA') || p === 'SMA' || p.includes('SNPMB')));
         });
       }
-      return currentUser.value.academic_program === code;
+      return userProg === code || 
+        (userProg === 'SMA' && (code === 'TKA_SMA' || code === 'SNPMB_UTBK')) ||
+        (code === 'TKA_SMA' && (userProg === 'SNPMB_UTBK' || userProg.includes('SMA')));
     };
 
     const activeProgramInfo = computed(() => {
-      return allAcademicProgramsList.find(p => p.code === activeAcademicProgram.value) || allAcademicProgramsList[3];
+      const code = activeAcademicProgram.value;
+      if (code === 'SMA') {
+        return allAcademicProgramsList.find(p => p.code === 'TKA_SMA') || allAcademicProgramsList[2];
+      }
+      return allAcademicProgramsList.find(p => p.code === code) || allAcademicProgramsList[3];
     });
 
     const dashboardProgramGreeting = computed(() => {
@@ -7547,14 +7508,14 @@ export default {
     const activeProgramTargetIcon = computed(() => {
       if (activeAcademicProgram.value === 'TKA_SD') return '🎒';
       if (activeAcademicProgram.value === 'TKA_SMP') return '🏫';
-      if (activeAcademicProgram.value === 'TKA_SMA') return '🏆';
+      if (activeAcademicProgram.value === 'TKA_SMA' || activeAcademicProgram.value === 'SMA') return '🏆';
       return '🎯';
     });
 
     const activeProgramTargetTitle = computed(() => {
       if (activeAcademicProgram.value === 'TKA_SD') return 'Target SMP Favorit / Unggulan';
       if (activeAcademicProgram.value === 'TKA_SMP') return 'Target SMA / SMK Impian';
-      if (activeAcademicProgram.value === 'TKA_SMA') return 'Target Asesmen Akademik SMA';
+      if (activeAcademicProgram.value === 'TKA_SMA' || activeAcademicProgram.value === 'SMA') return 'Target Asesmen Akademik SMA';
       return 'Target PTN & Jurusan Impian';
     });
 
@@ -7563,18 +7524,20 @@ export default {
       if (goal && String(goal).trim()) return String(goal).trim();
       if (activeAcademicProgram.value === 'TKA_SD') return 'SMP Unggulan Kota (Jalur Prestasi)';
       if (activeAcademicProgram.value === 'TKA_SMP') return 'SMA Taruna Nusantara / SMAN 8';
-      if (activeAcademicProgram.value === 'TKA_SMA') return 'Peringkat 1 Kelas / Prestasi Saintek';
+      if (activeAcademicProgram.value === 'TKA_SMA' || activeAcademicProgram.value === 'SMA') return 'Peringkat 1 Kelas / Prestasi Saintek';
       return 'Universitas Indonesia - Kedokteran';
     });
 
     const setActiveProgram = (code) => {
-      activeAcademicProgram.value = code;
-      localStorage.setItem('ep_active_program', code);
-      if (code === 'TKA_SD') selectedSimLevel.value = 'SD';
-      else if (code === 'TKA_SMP') selectedSimLevel.value = 'SMP';
-      else if (code === 'TKA_SMA') selectedSimLevel.value = 'SMA';
+      let target = code;
+      if (code === 'SMA') target = 'TKA_SMA';
+      activeAcademicProgram.value = target;
+      localStorage.setItem('ep_active_program', target);
+      if (target === 'TKA_SD') selectedSimLevel.value = 'SD';
+      else if (target === 'TKA_SMP') selectedSimLevel.value = 'SMP';
+      else if (target === 'TKA_SMA' || target === 'SMA') selectedSimLevel.value = 'SMA';
       else selectedSimLevel.value = 'SNPMB';
-      showToast(`Beralih ke program ${getProgramDisplayName(code)}`);
+      showToast(`Beralih ke program ${getProgramDisplayName(target)}`);
     };
 
     // Helper: Preset Target Goals per Academic Program / Package
