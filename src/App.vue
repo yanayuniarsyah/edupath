@@ -95,8 +95,16 @@
                 <span class="absolute text-xs font-black opacity-100 text-white">{{ tab.label.charAt(0) }}</span>
                 <i :class="['ph-bold relative z-10', tab.icon, (sidebarExpanded || mobileSidebarOpen) ? 'text-lg' : 'text-xl', currentTab === tab.id ? 'text-[#c0ff00]' : 'text-white/70 group-hover:text-white']"></i>
                 <i v-if="['learning', 'simulator'].includes(tab.id) && isLoggedIn && !isPremiumUser && !isStaff" class="ph-fill ph-lock-key absolute -top-1 -right-1 text-[10px] text-rose-400 bg-slate-900 rounded-full p-[2px] z-20"></i>
+                <!-- Indikator dot merah jika siswa belum mengambil asesmen awal -->
+                <span v-if="tab.id === 'diagnostic' && isLoggedIn && !hasCompletedDiagnostic" class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-slate-900 animate-pulse z-20" title="Wajib Asesmen Awal"></span>
               </div>
-              <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="font-bold tracking-tight whitespace-nowrap" :class="currentTab === tab.id ? 'text-white' : ''">{{ tab.label }}</span>
+              <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="font-bold tracking-tight whitespace-nowrap flex items-center justify-between flex-grow" :class="currentTab === tab.id ? 'text-white' : ''">
+                <span>{{ tab.label }}</span>
+                <!-- Badge notifikasi wajib asesmen saat sidebar terbuka -->
+                <span v-if="tab.id === 'diagnostic' && isLoggedIn && !hasCompletedDiagnostic" class="ml-2 px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/40 animate-pulse">
+                  Wajib Asesmen
+                </span>
+              </span>
             </button>
 
             <!-- Sub Menu Materi di Side Menu (Auto Hide) Sesuai Paket Belajar Siswa -->
@@ -3020,12 +3028,43 @@
             </div>
           </div>
 
+          <!-- Alert Banner: Belum Mengambil Asesmen Diagnostik (Auto-hide setelah selesai asesmen) -->
+          <div 
+            v-if="isLoggedIn && !hasCompletedDiagnostic" 
+            class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-rose-950/70 via-slate-900/95 to-amber-950/50 border border-rose-500/40 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-xl shrink-0 animate-pulse">
+                <i class="ph-bold ph-bell-ringing"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-rose-500/25 text-rose-300 border border-rose-500/40">
+                    Perhatian
+                  </span>
+                  <h4 class="text-xs sm:text-sm font-black text-white">Anda Belum Mengikuti Asesmen Awal Adaptif</h4>
+                </div>
+                <p class="text-[11px] text-white/60 mt-0.5">
+                  Selesaikan Asesmen Diagnostik (1x di awal) untuk memetakan level kemampuan, mendeteksi blind-spot, dan mengaktifkan jalur belajar terarah.
+                </p>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              @click="handleTabClick('diagnostic')" 
+              class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-400 hover:to-rose-500 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 shadow-lg shadow-rose-500/25 active:scale-95"
+            >
+              <i class="ph-bold ph-brain text-sm"></i>
+              <span>Mulai Asesmen Sekarang</span>
+            </button>
+          </div>
+
           <!-- ✨ Executive KPI Strip (4 Kolom Proporsional, Tenang & Elegan) -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
-            <!-- Card 1: Skor IRT Terkini -->
+            <!-- Card 1: Skor IRT / TKA Terkini -->
             <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Skor IRT Terkini</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">{{ currentProgramScoreCardLabel }}</span>
                 <span class="px-2 py-0.5 rounded-md bg-[#c0ff00]/15 text-[#c0ff00] text-[10px] font-black font-mono">TOP 12%</span>
               </div>
               <div class="flex items-baseline gap-1.5 my-1">
@@ -3038,19 +3077,19 @@
               </div>
             </div>
 
-            <!-- Card 2: Target Kampus Impian -->
+            <!-- Card 2: Target Skor (TKA SD / TKA SMP / TKA SMA / SNBT PTN) -->
             <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Target Skor</span>
-                <span class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-300 text-[10px] font-bold">Passing</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">{{ currentProgramTargetCardHeader }}</span>
+                <span class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-300 text-[10px] font-bold">{{ currentProgramTargetCategoryLabel }}</span>
               </div>
               <div class="flex items-baseline gap-1.5 my-1">
-                <span class="text-2xl sm:text-3xl font-black font-mono text-white">{{ selectedUniversity.targetScore }}</span>
+                <span class="text-2xl sm:text-3xl font-black font-mono text-white">{{ currentProgramTargetScore }}</span>
                 <span class="text-xs text-white/40 font-bold">Poin</span>
               </div>
               <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-white/60">
-                <span class="truncate max-w-[130px]">{{ selectedUniversity.name }}</span>
-                <span class="text-sky-400 font-bold shrink-0">Terjangkau</span>
+                <span class="truncate max-w-[130px] text-white font-medium" :title="currentProgramTargetName">{{ currentProgramTargetName }}</span>
+                <span class="text-sky-400 font-bold shrink-0">Standar Lolos</span>
               </div>
             </div>
 
@@ -3086,38 +3125,18 @@
             </div>
           </div>
 
-          <!-- ✨ Segmented Cockpit Switcher: Rencana Belajar vs Buku Rapor & Evaluasi -->
-          <div class="flex items-center justify-center p-1.5 rounded-2xl bg-slate-900/90 border border-white/10 max-w-md mx-auto w-full shadow-lg">
-            <button 
-              type="button" 
-              @click="studentDashboardTab = 'activities'"
-              :class="[
-                'flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer', 
-                studentDashboardTab === 'activities' 
-                  ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/20' 
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
-              ]"
-            >
-              <i class="ph-bold ph-lightning text-sm"></i>
-              <span>Rencana Belajar</span>
-            </button>
-            <button 
-              type="button" 
-              @click="studentDashboardTab = 'rapor'; fetchMyStudent360();"
-              :class="[
-                'flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer', 
-                studentDashboardTab === 'rapor' 
-                  ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/20' 
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
-              ]"
-            >
-              <i class="ph-bold ph-student text-sm"></i>
-              <span>Buku Rapor &amp; Evaluasi</span>
-            </button>
-          </div>
+          <!-- BAGIAN 1: Rencana Belajar & Cockpit Adaptif -->
+          <div class="space-y-4 pt-1">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[#c0ff00]"></span>
+                <h3 class="text-xs sm:text-sm font-black uppercase tracking-wider text-white">
+                  {{ isTkaProgram ? 'Rencana & Fokus Belajar TKA' : 'Rencana & Fokus Belajar UTBK/SNBT' }}
+                </h3>
+              </div>
+              <span class="text-[11px] text-white/40 font-medium">Misi Harian &bull; Penguasaan Konsep &bull; Rekomendasi AI</span>
+            </div>
 
-          <!-- SUB-VIEW 1: Rencana Belajar Aktif (Cockpit Misi, Skill Map, Blind-Spot & Rekomendasi AI) -->
-          <div v-if="studentDashboardTab === 'activities'" class="space-y-5 sm:space-y-6 animate-fade-in">
             <!-- Dual Primary Cockpit (Grid 2 Kolom Seimbang: 7 / 5) -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
             
@@ -3270,27 +3289,27 @@
           </div>
         </div>
 
-        <!-- SUB-VIEW 2: Buku Rapor & Evaluasi Belajar (Integrated) -->
-        <div v-else-if="studentDashboardTab === 'rapor'" class="space-y-5 sm:space-y-6 animate-fade-in">
+        <!-- BAGIAN 2: Buku Rapor & Evaluasi Belajar (Tergabung di Satu Halaman Dashboard) -->
+        <div v-if="showReportCardSectionInDashboard" class="space-y-5 sm:space-y-6 pt-6 border-t border-white/10 animate-fade-in">
           
-          <!-- Top Header Bar -->
+          <!-- Top Header Bar Portofolio & Evaluasi -->
           <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/70 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div class="space-y-1">
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="px-2.5 py-0.5 rounded-full bg-[#c0ff00]/10 text-[#c0ff00] font-bold text-xs border border-[#c0ff00]/25 flex items-center gap-1.5">
                   <i class="ph-bold ph-student"></i>
-                  <span>Portofolio Akademik Siswa</span>
+                  <span>{{ isTkaProgram ? 'Portofolio Akademik Siswa' : 'Portofolio Akademik &amp; Seleksi Kampus' }}</span>
                 </span>
                 <span v-if="student360Data?.student?.school" class="px-2.5 py-0.5 rounded-full bg-white/5 text-white/80 font-medium text-xs border border-white/10">
                   🏛️ {{ student360Data.student.school }}
                 </span>
               </div>
               <h3 class="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
-                <span>Buku Rapor &amp; Evaluasi Berkala</span>
+                <span>{{ isTkaProgram ? 'Buku Rapor Sekolah &amp; Evaluasi TKA' : 'Buku Rapor &amp; Evaluasi Berkala SNBT' }}</span>
                 <span v-if="student360Loading" class="text-xs text-[#c0ff00] font-normal animate-pulse">(Memuat data...)</span>
               </h3>
               <p class="text-xs text-white/60 font-medium">
-                Rekapitulasi capaian nilai rapor sekolah, riwayat simulasi CBT, dan panduan belajar terarah.
+                {{ isTkaProgram ? 'Rekapitulasi capaian nilai rapor sekolah, riwayat latihan TKA, dan arahan belajar terarah.' : 'Rekapitulasi capaian nilai rapor sekolah, riwayat simulasi CBT, dan panduan belajar terarah.' }}
               </p>
             </div>
 
@@ -3303,14 +3322,6 @@
               >
                 <i class="ph-bold ph-arrow-clockwise" :class="{ 'animate-spin': student360Loading }"></i>
                 <span>Segarkan Data</span>
-              </button>
-              <button 
-                type="button" 
-                @click="studentDashboardTab = 'activities'" 
-                class="px-4 py-2 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
-              >
-                <i class="ph-bold ph-lightning"></i>
-                <span>Rencana Belajar</span>
               </button>
             </div>
           </div>
@@ -3362,18 +3373,18 @@
               </div>
             </div>
 
-            <!-- Card 4: Target Seleksi Akademik -->
+            <!-- Card 4: Target Seleksi Akademik / Lanjutan -->
             <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Target Pendidikan</span>
-                <span class="px-2 py-0.5 rounded-md bg-white/10 text-white/80 text-[10px] font-bold">SELEKSI</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">{{ isTkaProgram ? 'Target Sekolah Lanjutan' : 'Target Pendidikan' }}</span>
+                <span class="px-2 py-0.5 rounded-md bg-white/10 text-white/80 text-[10px] font-bold">{{ isTkaProgram ? 'SELEKSI MASUK' : 'SELEKSI PTN' }}</span>
               </div>
-              <div class="text-sm sm:text-base font-black text-white truncate my-1.5" :title="student360Data?.student?.target_ptn || currentStudentTargetDisplay">
-                {{ student360Data?.student?.target_ptn || currentStudentTargetDisplay || 'Pilihan Kampus' }}
+              <div class="text-sm sm:text-base font-black text-white truncate my-1.5" :title="currentStudentTargetDisplay">
+                {{ currentStudentTargetDisplay }}
               </div>
               <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
                 <span>Jalur Peluang</span>
-                <strong class="text-white/80">SNBP / SNBT</strong>
+                <strong class="text-white/80">{{ isTkaProgram ? 'Prestasi &amp; Zonasi' : 'SNBP / SNBT' }}</strong>
               </div>
             </div>
           </div>
@@ -3512,7 +3523,7 @@
                       <i class="ph-bold ph-exam"></i>
                     </span>
                     <div>
-                      <h4 class="text-sm font-black text-white tracking-tight">Riwayat Try Out CBT</h4>
+                      <h4 class="text-sm font-black text-white tracking-tight">{{ isTkaProgram ? 'Riwayat Try Out TKA' : 'Riwayat Try Out CBT' }}</h4>
                       <p class="text-xs text-white/50">Hasil simulasi ujian terkini</p>
                     </div>
                   </div>
@@ -3522,7 +3533,7 @@
                 </div>
 
                 <div v-if="!student360Data?.assessment_history?.length" class="p-4 text-center text-white/40 text-xs bg-white/[0.02] rounded-xl border border-white/5">
-                  Belum ada riwayat tryout CBT yang dikerjakan.
+                  {{ isTkaProgram ? 'Belum ada riwayat tryout TKA yang dikerjakan.' : 'Belum ada riwayat tryout CBT yang dikerjakan.' }}
                 </div>
 
                 <div v-else class="space-y-2">
@@ -5385,16 +5396,22 @@
                   :key="product.id"
                   :class="[
                     'transition-colors',
-                    idx % 3 === 1 ? 'bg-[#c0ff00]/[0.03] hover:bg-[#c0ff00]/[0.06]' : 'hover:bg-white/[0.02]'
+                    isCurrentPlan(product)
+                      ? 'bg-[#c0ff00]/15 hover:bg-[#c0ff00]/25 border-l-4 border-l-[#c0ff00]'
+                      : (idx % 3 === 1 ? 'bg-[#c0ff00]/[0.03] hover:bg-[#c0ff00]/[0.06]' : 'hover:bg-white/[0.02]')
                   ]"
                 >
                   <!-- Col 1: Nama & Program -->
                   <td class="py-3.5 px-4 align-top">
-                    <div class="flex items-center gap-1.5 mb-1">
+                    <div class="flex items-center gap-1.5 mb-1 flex-wrap">
                       <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
                         {{ product.academic_program || 'SNPMB/UTBK' }}
                       </span>
-                      <span v-if="idx % 3 === 1" class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-[#c0ff00] text-black">
+                      <span v-if="isCurrentPlan(product)" class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-[#c0ff00] text-black shadow-md flex items-center gap-1">
+                        <i class="ph-bold ph-check-circle"></i>
+                        <span>Paket Aktif Anda</span>
+                      </span>
+                      <span v-else-if="idx % 3 === 1" class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-[#c0ff00] text-black">
                         👑 Populer
                       </span>
                     </div>
@@ -5447,11 +5464,13 @@
                       type="button"
                       @click="showPlanSelectorModal = false; purchasePlan(product.name, product.activePlan.price)"
                       :class="[
-                        'w-full py-2 px-2.5 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer shadow-md',
-                        idx % 3 === 1 ? 'bg-[#c0ff00] text-black hover:bg-[#b0ef00]' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/20'
+                        'w-full py-2 px-2.5 rounded-xl text-xs font-black uppercase transition-all cursor-pointer shadow-md',
+                        isCurrentPlan(product)
+                          ? 'bg-[#c0ff00] text-black hover:bg-[#b0ef00] ring-2 ring-[#c0ff00]/60'
+                          : (idx % 3 === 1 ? 'bg-[#c0ff00] text-black hover:bg-[#b0ef00]' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/20')
                       ]"
                     >
-                      Pilih
+                      {{ isCurrentPlan(product) ? '✓ Paket Aktif' : 'Pilih' }}
                     </button>
                   </td>
                 </tr>
@@ -5475,11 +5494,17 @@
             :key="product.id"
             :class="[
               'rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 relative border',
-              idx % 3 === 1 ? 'border-2 border-[#c0ff00] bg-gradient-to-b from-[#0e192f] to-[#090f1e] shadow-[0_0_40px_rgba(192,255,0,0.2)] md:-translate-y-2' : 'border-white/10 bg-white/[0.03] hover:border-white/20'
+              isCurrentPlan(product)
+                ? 'border-2 border-[#c0ff00] bg-gradient-to-b from-emerald-950/40 via-[#0a1526] to-[#070c1a] shadow-[0_0_40px_rgba(192,255,0,0.35)] md:-translate-y-2 ring-2 ring-[#c0ff00]/50'
+                : (idx % 3 === 1 ? 'border-2 border-[#c0ff00]/60 bg-gradient-to-b from-[#0e192f] to-[#090f1e] shadow-[0_0_40px_rgba(192,255,0,0.2)] md:-translate-y-2' : 'border-white/10 bg-white/[0.03] hover:border-white/20')
             ]"
           >
-            <!-- Badge for Middle Plan -->
-            <div v-if="idx % 3 === 1" class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#c0ff00] text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
+            <!-- Badge for Active Plan or Middle Popular Plan -->
+            <div v-if="isCurrentPlan(product)" class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#c0ff00] text-black text-[9px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-[0_0_20px_rgba(192,255,0,0.6)] flex items-center gap-1.5 z-20">
+              <i class="ph-bold ph-check-circle text-xs"></i>
+              <span>PAKET AKTIF ANDA</span>
+            </div>
+            <div v-else-if="idx % 3 === 1" class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#c0ff00] text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
               👑 PALING POPULER
             </div>
 
@@ -5552,10 +5577,12 @@
                 @click="showPlanSelectorModal = false; purchasePlan(product.name, product.activePlan.price)"
                 :class="[
                   'w-full py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg active:scale-95',
-                  idx % 3 === 1 ? 'bg-[#c0ff00] hover:bg-[#b0ef00] text-black shadow-[0_0_20px_rgba(192,255,0,0.3)]' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/20'
+                  isCurrentPlan(product)
+                    ? 'bg-[#c0ff00] hover:bg-[#b0ef00] text-black shadow-[0_0_25px_rgba(192,255,0,0.5)] ring-2 ring-[#c0ff00]'
+                    : (idx % 3 === 1 ? 'bg-[#c0ff00] hover:bg-[#b0ef00] text-black shadow-[0_0_20px_rgba(192,255,0,0.3)]' : 'bg-white/10 hover:bg-white hover:text-black text-white border border-white/20')
                 ]"
               >
-                <span>Pilih {{ product.name }}</span>
+                <span>{{ isCurrentPlan(product) ? '✓ Paket Aktif Saat Ini' : ('Pilih ' + product.name) }}</span>
                 <i class="ph-bold ph-arrow-right"></i>
               </button>
             </div>
@@ -7312,19 +7339,6 @@ export default {
       return '#ef4444'; // Red
     };
 
-    const gapScore = computed(() => {
-      const target = selectedUniversity.value ? selectedUniversity.value.targetScore : 720;
-      return Math.max(0, target - currentAbilityScore.value);
-    });
-
-    const progressPercentage = computed(() => {
-      const target = selectedUniversity.value ? selectedUniversity.value.targetScore : 720;
-      const base = 400; 
-      const current = currentAbilityScore.value - base;
-      const total = target - base;
-      return Math.min(100, Math.max(0, Math.round((current / total) * 100)));
-    });
-
     const recalcTargetGap = () => {
       showToast(`Target diperbarui ke ${selectedUniversity.value.name} (Skor: ${selectedUniversity.value.targetScore})`);
     };
@@ -7687,19 +7701,129 @@ export default {
     });
 
     const activeProgramTargetTitle = computed(() => {
-      if (activeAcademicProgram.value === 'TKA_SD') return 'Target SMP Favorit / Unggulan';
-      if (activeAcademicProgram.value === 'TKA_SMP') return 'Target SMA / SMK Impian';
-      if (activeAcademicProgram.value === 'TKA_SMA' || activeAcademicProgram.value === 'SMA') return 'Target Asesmen Akademik SMA';
+      if (activeAcademicProgram.value === 'TKA_SD') return 'Target TKA SD & Masuk SMP Unggulan';
+      if (activeAcademicProgram.value === 'TKA_SMP') return 'Target TKA SMP & Masuk SMA Favorit';
+      if (activeAcademicProgram.value === 'TKA_SMA' || activeAcademicProgram.value === 'SMA') return 'Target TKA SMA & Prestasi Akademik';
       return 'Target PTN & Jurusan Impian';
     });
 
     const currentStudentTargetDisplay = computed(() => {
-      const goal = currentUser.value?.target_goal || currentUser.value?.target_ptn;
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      const goal = (currentUser.value?.target_goal || '').trim();
+      const ptn = (currentUser.value?.target_ptn || '').trim();
+
+      const isUniversityGoal = (text) => {
+        if (!text) return false;
+        const low = text.toLowerCase();
+        return low.includes('universitas') || low.includes('institut') || low.includes('politeknik') || 
+               low.includes('ui') || low.includes('itb') || low.includes('ugm') || low.includes('unpad') || 
+               low.includes('undip') || low.includes('its') || low.includes('unair') || low.includes('kedokteran') || 
+               low.includes('ptn') || low.includes('snbt') || low.includes('snbp') || low.includes('fakultas');
+      };
+
+      if (prog === 'TKA_SD') {
+        const sdTarget = localStorage.getItem('user_target_sd') || currentUser.value?.target_sd;
+        if (sdTarget && String(sdTarget).trim()) return String(sdTarget).trim();
+        if (goal && !isUniversityGoal(goal)) return goal;
+        return 'SMPN 1 Jakarta (Jalur Prestasi)';
+      }
+
+      if (prog === 'TKA_SMP') {
+        const smpTarget = localStorage.getItem('user_target_smp') || currentUser.value?.target_smp;
+        if (smpTarget && String(smpTarget).trim()) return String(smpTarget).trim();
+        if (goal && !isUniversityGoal(goal)) return goal;
+        return 'SMA Taruna Nusantara / SMAN 8';
+      }
+
+      if (prog === 'TKA_SMA' || prog === 'SMA') {
+        const smaTarget = localStorage.getItem('user_target_sma') || currentUser.value?.target_sma;
+        if (smaTarget && String(smaTarget).trim()) return String(smaTarget).trim();
+        if (goal && !isUniversityGoal(goal)) return goal;
+        return 'Peringkat 1 Kelas / Prestasi Saintek';
+      }
+
+      // SNPMB / UTBK
       if (goal && String(goal).trim()) return String(goal).trim();
-      if (activeAcademicProgram.value === 'TKA_SD') return 'SMP Unggulan Kota (Jalur Prestasi)';
-      if (activeAcademicProgram.value === 'TKA_SMP') return 'SMA Taruna Nusantara / SMAN 8';
-      if (activeAcademicProgram.value === 'TKA_SMA' || activeAcademicProgram.value === 'SMA') return 'Peringkat 1 Kelas / Prestasi Saintek';
+      if (ptn && String(ptn).trim()) return String(ptn).trim();
       return 'Universitas Indonesia - Kedokteran';
+    });
+
+    const isTkaProgram = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      return prog === 'TKA_SD' || prog === 'TKA_SMP' || prog === 'TKA_SMA' || prog === 'SMA';
+    });
+
+    const isPtnProgram = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      return prog.includes('SNPMB') || prog.includes('UTBK') || prog.includes('ALUMNI');
+    });
+
+    const isTkaOnlySma = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      return prog === 'TKA_SMA' || prog === 'SMA';
+    });
+
+    const showReportCardSectionInDashboard = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      // Bila SMA hanya paket TKA, maka tidak menampilkan target PTN dan raport
+      if (prog === 'TKA_SMA' || prog === 'SMA') {
+        return false;
+      }
+      return true;
+    });
+
+    const currentProgramTargetCardHeader = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      if (prog === 'TKA_SD') return 'Target Skor TKA SD';
+      if (prog === 'TKA_SMP') return 'Target Skor TKA SMP';
+      if (prog === 'TKA_SMA' || prog === 'SMA') return 'Target Nilai TKA SMA';
+      return 'Target Skor SNBT';
+    });
+
+    const currentProgramTargetCategoryLabel = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      if (prog === 'TKA_SD') return 'TKA SD';
+      if (prog === 'TKA_SMP') return 'TKA SMP';
+      if (prog === 'TKA_SMA' || prog === 'SMA') return 'TKA SMA';
+      return 'Passing PTN';
+    });
+
+    const currentProgramTargetScore = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      if (prog === 'TKA_SD') return 850;
+      if (prog === 'TKA_SMP') return 880;
+      if (prog === 'TKA_SMA' || prog === 'SMA') return 900;
+      return selectedUniversity.value ? selectedUniversity.value.targetScore : 720;
+    });
+
+    const currentProgramTargetName = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      if (prog === 'TKA_SD' || prog === 'TKA_SMP' || prog === 'TKA_SMA' || prog === 'SMA') {
+        return currentStudentTargetDisplay.value;
+      }
+      return selectedUniversity.value ? selectedUniversity.value.name : currentStudentTargetDisplay.value;
+    });
+
+    const currentProgramScoreCardLabel = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      if (prog === 'TKA_SD') return 'Skor TKA SD Terkini';
+      if (prog === 'TKA_SMP') return 'Skor TKA SMP Terkini';
+      if (prog === 'TKA_SMA' || prog === 'SMA') return 'Skor TKA SMA Terkini';
+      return 'Skor IRT Terkini';
+    });
+
+    const gapScore = computed(() => {
+      const target = currentProgramTargetScore.value;
+      return Math.max(0, target - currentAbilityScore.value);
+    });
+
+    const progressPercentage = computed(() => {
+      const target = currentProgramTargetScore.value;
+      const base = 400; 
+      const current = currentAbilityScore.value - base;
+      const total = target - base;
+      if (total <= 0) return 100;
+      return Math.min(100, Math.max(0, Math.round((current / total) * 100)));
     });
 
     const setActiveProgram = (code) => {
@@ -7857,7 +7981,7 @@ export default {
     });
 
     const openQuickTargetModal = () => {
-      const current = (currentUser.value?.target_goal || currentUser.value?.target_ptn || '').trim();
+      const current = currentStudentTargetDisplay.value;
       const list = quickTargetOptions.value;
       if (current && list.includes(current)) {
         quickTargetSelectedPreset.value = current;
@@ -7896,11 +8020,24 @@ export default {
 
       isSavingQuickTarget.value = true;
       try {
+        const prog = (activeAcademicProgram.value || '').toUpperCase();
         if (currentUser.value) {
           currentUser.value.target_goal = finalTarget;
-          currentUser.value.target_ptn = finalTarget;
           profileEditForm.value.target_goal = finalTarget;
-          profileEditForm.value.target_ptn = finalTarget;
+          if (prog === 'TKA_SD') {
+            currentUser.value.target_sd = finalTarget;
+            localStorage.setItem('user_target_sd', finalTarget);
+          } else if (prog === 'TKA_SMP') {
+            currentUser.value.target_smp = finalTarget;
+            localStorage.setItem('user_target_smp', finalTarget);
+          } else if (prog === 'TKA_SMA' || prog === 'SMA') {
+            currentUser.value.target_sma = finalTarget;
+            localStorage.setItem('user_target_sma', finalTarget);
+          } else {
+            currentUser.value.target_ptn = finalTarget;
+            profileEditForm.value.target_ptn = finalTarget;
+            localStorage.setItem('user_target_ptn', finalTarget);
+          }
         }
 
         const token = localStorage.getItem('auth_token') || sessionStorage.getItem('ep_session_token');
@@ -8084,6 +8221,62 @@ export default {
         };
       });
     });
+
+    const isCurrentPlan = (product) => {
+      if (!currentUser.value || !isLoggedIn.value) return false;
+      if (!isPremiumUser.value) return false;
+
+      const userPlan = (currentUser.value?.plan || currentUser.value?.plan_name || currentUser.value?.package_code || currentUser.value?.package_name || currentUser.value?.paket || '').toLowerCase();
+      const prodName = (product?.name || '').toLowerCase();
+      const prodCode = (product?.code || '').toLowerCase();
+      const prodProg = (product?.academic_program || '').toLowerCase();
+      const activeProg = (activeAcademicProgram.value || currentUser.value?.academic_program || '').toLowerCase();
+
+      // Prioritas 1: Langganan aktif tersimpan di profil
+      if (currentUser.value.active_subscriptions && currentUser.value.active_subscriptions.length > 0) {
+        const found = currentUser.value.active_subscriptions.some(s => {
+          const sName = (s.product_name || s.package_name || s.name || s.plan || '').toLowerCase();
+          const sCode = (s.product_code || s.code || '').toLowerCase();
+          return (sName && (prodName.includes(sName) || sName.includes(prodName))) ||
+                 (sCode && sCode === prodCode);
+        });
+        if (found) return true;
+      }
+
+      // Prioritas 2: Kesesuaian kode eksak
+      if (userPlan && prodCode && userPlan === prodCode) return true;
+
+      // Prioritas 3: Kesesuaian jenjang program saat ini
+      if (activeProg.includes('sd')) {
+        return prodProg.includes('sd') || prodName.includes('sd');
+      }
+      if (activeProg.includes('smp')) {
+        return prodProg.includes('smp') || prodName.includes('smp');
+      }
+      if (activeProg === 'tka_sma' || activeProg === 'sma') {
+        return prodProg.includes('tka_sma') || (prodProg.includes('sma') && !prodProg.includes('utbk'));
+      }
+
+      // Pejuang PTN / UTBK / SNBT
+      if ((userPlan.includes('pejuang') || userPlan.includes('utbk') || userPlan.includes('ptn') || userPlan.includes('utama')) &&
+          (prodCode.includes('utbk') || prodCode.includes('utama') || prodName.includes('utbk') || prodName.includes('pejuang'))) {
+        return true;
+      }
+
+      // Mandiri / Starter
+      if ((userPlan.includes('mandiri') || userPlan.includes('starter')) &&
+          (prodCode.includes('mandiri') || prodCode.includes('starter') || prodName.includes('mandiri'))) {
+        return true;
+      }
+
+      // VIP / Elite
+      if ((userPlan.includes('vip') || userPlan.includes('elite')) &&
+          (prodCode.includes('vip') || prodCode.includes('elite') || prodName.includes('vip'))) {
+        return true;
+      }
+
+      return Boolean(userPlan && (prodName.includes(userPlan) || userPlan.includes(prodName)));
+    };
 
     const handleResetPassword = async () => {
       authError.value = '';
@@ -10228,6 +10421,16 @@ export default {
       activeProgramTargetIcon,
       activeProgramTargetTitle,
       currentStudentTargetDisplay,
+      isTkaProgram,
+      isPtnProgram,
+      isTkaOnlySma,
+      showReportCardSectionInDashboard,
+      currentProgramTargetCardHeader,
+      currentProgramTargetCategoryLabel,
+      currentProgramTargetScore,
+      currentProgramTargetName,
+      currentProgramScoreCardLabel,
+      isCurrentPlan,
       setActiveProgram,
       handleProfileProgramChange,
       onRegistrationProgramDropdownChange
