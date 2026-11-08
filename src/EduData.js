@@ -542,7 +542,7 @@ export const SKILL_MAP = {
 };
 
 export const SKILL_MAP_SD = {
-  'MAPEL UTAMA TKA SD': {
+  'MAPEL UTAMA SD': {
     'Matematika SD': ['Operasi Hitung', 'Pecahan & Desimal', 'Geometri Bangun Datar', 'Pengukuran & Skala'],
     'Bahasa Indonesia SD': ['Ide Pokok Paragraf', 'Kosa Kata & Ejaan', 'Struktur Kalimat', 'Menyimpulkan Teks'],
     'IPA SD': ['Rantai Makanan & Ekosistem', 'Wujud & Sifat Benda', 'Gaya & Gerak', 'Energi & Perubahannya']
@@ -554,7 +554,7 @@ export const SKILL_MAP_SD = {
 };
 
 export const SKILL_MAP_SMP = {
-  'MAPEL UTAMA TKA SMP': {
+  'MAPEL UTAMA SMP': {
     'Matematika SMP': ['Aljabar & SPLDV', 'Teorema Pythagoras', 'Persamaan Garis Lurus', 'Statistika & Peluang'],
     'Bahasa Indonesia SMP': ['Teks Eksplanasi & Laporan', 'Teks Narasi & Puisi', 'Kaidah Ejaan & Kalimat Efektif'],
     'Bahasa Inggris SMP': ['Tenses & Grammar', 'Reading Comprehension', 'Short Functional Text']

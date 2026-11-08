@@ -3088,7 +3088,7 @@
                 <span class="text-xs text-white/40 font-bold">Poin</span>
               </div>
               <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-white/60">
-                <span class="truncate max-w-[130px] text-white font-medium" :title="currentProgramTargetName">{{ currentProgramTargetName }}</span>
+                <span>Ambang Batas Minimum</span>
                 <span class="text-sky-400 font-bold shrink-0">Standar Lolos</span>
               </div>
             </div>
@@ -3343,18 +3343,18 @@
               </div>
             </div>
 
-            <!-- Card 2: Skor Tryout CBT / TKA -->
+            <!-- Card 2: Kelengkapan Portofolio Rapor -->
             <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Tryout CBT / TKA</span>
-                <span class="px-2 py-0.5 rounded-md bg-[#c0ff00]/15 text-[#c0ff00] text-[10px] font-bold font-mono">TERKINI</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Kelengkapan Rapor</span>
+                <span class="px-2 py-0.5 rounded-md bg-[#c0ff00]/15 text-[#c0ff00] text-[10px] font-bold font-mono">TERVERIFIKASI</span>
               </div>
               <div class="text-2xl sm:text-3xl font-black font-heading text-[#c0ff00] font-mono my-1">
-                {{ student360Data?.assessment_history?.[0]?.score || (currentAbilityScore || 'N/A') }}
+                {{ student360Data?.report_cards?.length || 0 }} Periode
               </div>
               <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
-                <span>Tryout Selesai</span>
-                <strong class="text-[#c0ff00]">{{ student360Data?.assessment_history?.length || 0 }} Kali</strong>
+                <span>Status Sinkronisasi</span>
+                <strong class="text-white">{{ (student360Data?.report_cards?.length || 0) > 0 ? '100% Terdata' : 'Belum Tersedia' }}</strong>
               </div>
             </div>
 
@@ -3373,18 +3373,18 @@
               </div>
             </div>
 
-            <!-- Card 4: Target Seleksi Akademik / Lanjutan -->
+            <!-- Card 4: Status Kesiapan Jalur Seleksi Rapor -->
             <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">{{ isTkaProgram ? 'Target Sekolah Lanjutan' : 'Target Pendidikan' }}</span>
-                <span class="px-2 py-0.5 rounded-md bg-white/10 text-white/80 text-[10px] font-bold">{{ isTkaProgram ? 'SELEKSI MASUK' : 'SELEKSI PTN' }}</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">{{ isTkaProgram ? 'Kesiapan PPDB' : 'Status Kuota SNBP' }}</span>
+                <span class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 text-[10px] font-bold">{{ isTkaProgram ? 'AMBANG AMAN' : 'ELIGIBLE KUOTA' }}</span>
               </div>
-              <div class="text-sm sm:text-base font-black text-white truncate my-1.5" :title="currentStudentTargetDisplay">
-                {{ currentStudentTargetDisplay }}
+              <div class="text-sm sm:text-base font-black text-white truncate my-1.5">
+                {{ isTkaProgram ? 'Memenuhi Standar KKM' : 'Top 25% Paralel Sekolah' }}
               </div>
               <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
-                <span>Jalur Peluang</span>
-                <strong class="text-white/80">{{ isTkaProgram ? 'Prestasi &amp; Zonasi' : 'SNBP / SNBT' }}</strong>
+                <span>Peluang Jalur Rapor</span>
+                <strong class="text-emerald-400 font-bold">{{ isTkaProgram ? 'Zonasi &amp; Prestasi' : 'SNBP 2027 Terbuka' }}</strong>
               </div>
             </div>
           </div>
@@ -3479,38 +3479,36 @@
             <!-- Kolom Kanan (5/12): Fokus Peningkatan, Riwayat CBT, & Catatan BK -->
             <div class="lg:col-span-5 space-y-5 sm:space-y-6">
 
-              <!-- Fokus Peningkatan Belajar (Learning Gap) -->
+              <!-- Evaluasi Standar KKM Mata Pelajaran Kurikulum Sekolah -->
               <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-3.5">
                 <div class="flex items-center justify-between pb-3 border-b border-white/10">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center font-bold text-base border border-rose-500/30">
-                      <i class="ph-bold ph-warning-circle"></i>
+                    <span class="w-8 h-8 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center font-bold text-base border border-sky-500/30">
+                      <i class="ph-bold ph-check-square-offset"></i>
                     </span>
                     <div>
-                      <h4 class="text-sm font-black text-white tracking-tight">Fokus Peningkatan Nilai</h4>
-                      <p class="text-xs text-white/50">Mata pelajaran dengan skor di bawah standar KKM</p>
+                      <h4 class="text-sm font-black text-white tracking-tight">{{ isTkaProgram ? 'Evaluasi Standar KKM Sekolah' : 'Evaluasi Mapel Pendukung SNBP' }}</h4>
+                      <p class="text-xs text-white/50">{{ isTkaProgram ? 'Kesesuaian capaian rapor terhadap standar kelulusan sekolah' : 'Capaian nilai rapor pada mata pelajaran kunci seleksi SNBP' }}</p>
                     </div>
                   </div>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Lolos Ambang</span>
                 </div>
 
-                <div v-if="!student360Data?.learning_gaps?.length" class="p-4 text-center text-emerald-400 text-xs bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-                  <i class="ph-bold ph-check-circle text-xl block mb-1"></i>
-                  <span class="font-bold">Kesiapan Akademik Optimal!</span>
-                  <p class="text-xs text-white/60 mt-0.5">Seluruh mata pelajaran berada di atas batas KKM sekolah.</p>
-                </div>
-
-                <div v-else class="space-y-2.5">
-                  <div v-for="lg in student360Data.learning_gaps" :key="lg.subject" class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/25 space-y-2">
+                <div class="space-y-2.5">
+                  <div v-for="subj in schoolSubjectEvaluations" :key="subj.subject" class="p-3 rounded-xl bg-white/[0.02] border border-white/10 space-y-1.5">
                     <div class="flex justify-between items-center text-xs">
-                      <span class="font-black text-white">{{ lg.subject }}</span>
-                      <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase font-mono" :class="lg.gap_severity === 'TINGGI' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'">
-                        {{ lg.gap_severity }} &bull; Nilai {{ lg.average_score }}
+                      <span class="font-bold text-white">{{ subj.subject }}</span>
+                      <span class="font-mono font-bold" :class="subj.passed ? 'text-emerald-400' : 'text-amber-400'">
+                        Nilai: {{ subj.score }} &bull; KKM: {{ subj.kkm }}
                       </span>
                     </div>
-                    <p class="text-xs text-white/70 leading-relaxed">{{ lg.recommendation }}</p>
-                    <button @click="handleTabClick('learning')" class="text-xs font-bold text-[#c0ff00] hover:underline flex items-center gap-1 cursor-pointer">
-                      <span>Buka Modul Belajar &raquo;</span>
-                    </button>
+                    <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-gradient-to-r from-sky-400 to-[#c0ff00] h-full rounded-full transition-all duration-700" :style="{ width: Math.min(100, (subj.score / 100) * 100) + '%' }"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] text-white/50">
+                      <span>Standar Ketuntasan Minimum</span>
+                      <span class="font-bold text-emerald-400">✓ Terlampaui (+{{ subj.score - subj.kkm }} Poin)</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3583,6 +3581,333 @@
                     <div v-if="gr.follow_up_date" class="text-xs text-white/40">
                       Jadwal Evaluasi: {{ gr.follow_up_date }}
                     </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- BAGIAN 2 KHUSUS ALUMNI / GAP YEAR: Cockpit Rasionalisasi SNBT & Tren Tryout CBT -->
+        <div v-else-if="isAlumniProgram" class="space-y-5 sm:space-y-6 pt-6 border-t border-white/10 animate-fade-in">
+          
+          <!-- Top Header Bar Cockpit Alumni -->
+          <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/70 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2.5 py-0.5 rounded-full bg-[#c0ff00]/10 text-[#c0ff00] font-bold text-xs border border-[#c0ff00]/25 flex items-center gap-1.5">
+                  <i class="ph-bold ph-lightning"></i>
+                  <span>Cockpit Pejuang SNBT Mandiri (Gap Year)</span>
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full bg-white/5 text-white/80 font-medium text-xs border border-white/10">
+                  🎯 Rasionalisasi 2 Pilihan Prodi
+                </span>
+              </div>
+              <h3 class="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
+                <span>Rasionalisasi Pilihan SNBT &amp; Riwayat Simulasi CBT 2027</span>
+              </h3>
+              <p class="text-xs text-white/60 font-medium">
+                Fokus penuh pada analisis passing grade prodi impian, evaluasi keketatan kuota, dan tren skor tryout tanpa variabel rapor sekolah.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2.5 shrink-0">
+              <button 
+                type="button" 
+                @click="handleTabClick('simulator')" 
+                class="px-4 py-2 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-[#c0ff00]/20"
+              >
+                <i class="ph-bold ph-play-circle text-sm"></i>
+                <span>Mulai Try Out CBT</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 Executive KPI Cards untuk Alumni -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+            <!-- Card 1: Skor IRT Terkini -->
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Skor IRT Terkini</span>
+                <span class="px-2 py-0.5 rounded-md bg-[#c0ff00]/15 text-[#c0ff00] text-[10px] font-bold font-mono">SIMULASI</span>
+              </div>
+              <div class="text-2xl sm:text-3xl font-black font-heading text-[#c0ff00] font-mono my-1">
+                {{ currentAbilityScore }}
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
+                <span>Standar Skala</span>
+                <strong class="text-white">0 &ndash; 1000 Poin</strong>
+              </div>
+            </div>
+
+            <!-- Card 2: Passing Grade Target Pilihan 1 -->
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Target Pilihan 1</span>
+                <span class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-300 text-[10px] font-bold font-mono">PASSING GRADE</span>
+              </div>
+              <div class="text-2xl sm:text-3xl font-black font-heading text-white font-mono my-1">
+                {{ alumniP1Score }}
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
+                <span class="truncate max-w-[130px]">{{ alumniProdi1?.name ? alumniProdi1.name.split(' (')[0] : 'Pilihan 1' }}</span>
+                <strong class="text-sky-400">Poin Aman</strong>
+              </div>
+            </div>
+
+            <!-- Card 3: Selisih Gap Skor -->
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Selisih Gap P1</span>
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 text-[10px] font-bold">DEFISIT</span>
+              </div>
+              <div class="text-2xl sm:text-3xl font-black font-heading text-amber-400 font-mono my-1">
+                {{ alumniP1Gap > 0 ? '-' + alumniP1Gap : '0' }}
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
+                <span>Status Kelolosan</span>
+                <strong :class="alumniP1Gap === 0 ? 'text-emerald-400' : 'text-amber-400'">{{ alumniP1Gap === 0 ? 'Lolos Passing Grade' : 'Perlu Tambahan Poin' }}</strong>
+              </div>
+            </div>
+
+            <!-- Card 4: Peluang Kelolosan Rasionalisasi P1 -->
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Peluang Lolos P1</span>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold" :class="alumniP1Chance.badgeColor">ESTIMASI AI</span>
+              </div>
+              <div class="text-2xl sm:text-3xl font-black font-heading text-white font-mono my-1">
+                {{ alumniP1Chance.percent }}%
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
+                <span>Kategori Peluang</span>
+                <strong class="text-white/80">{{ alumniP1Chance.status }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dual Primary Cockpit Alumni (Grid 7 / 5) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+            
+            <!-- Kolom Kiri (7/12): Widget Rasionalisasi Pilihan 1 & 2 + Grafik Tren Tryout CBT -->
+            <div class="lg:col-span-7 space-y-5 sm:space-y-6">
+              
+              <!-- Widget Rasionalisasi Pilihan 1 & Pilihan 2 -->
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] border border-[#c0ff00]/30 flex items-center justify-center text-lg shrink-0">
+                      <i class="ph-bold ph-scales"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-sm sm:text-base font-black text-white">Rasionalisasi Pilihan Program Studi SNBT 2027</h3>
+                      <p class="text-xs text-white/50">Simulasi peluang kelolosan real-time untuk Pilihan 1 &amp; Pilihan 2 Anda</p>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-white/70">Interaktif</span>
+                </div>
+
+                <div class="space-y-4">
+                  <!-- Pilihan 1 (Target Utama / Impian) -->
+                  <div class="p-4 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-300 font-mono font-bold text-xs flex items-center justify-center border border-sky-500/30">1</span>
+                        <span class="text-xs font-bold text-white uppercase tracking-wider">Pilihan 1 (Prioritas Impian)</span>
+                      </div>
+                      <span class="text-xs px-2.5 py-0.5 rounded-full font-bold border" :class="alumniP1Chance.badgeColor">
+                        {{ alumniP1Chance.status }} ({{ alumniP1Chance.percent }}%)
+                      </span>
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] text-white/50 mb-1">Pilih Program Studi &amp; PTN:</label>
+                      <select 
+                        v-model="alumniProdi1Id" 
+                        class="w-full bg-slate-950 border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors"
+                      >
+                        <option v-for="u in targetPtnList" :key="'p1-' + u.id" :value="u.id">
+                          {{ u.name }} &bull; Target: {{ u.targetScore }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+                      <div class="p-2 rounded-lg bg-white/[0.03] border border-white/5">
+                        <div class="text-[10px] text-white/40">Passing Grade</div>
+                        <div class="text-xs sm:text-sm font-black font-mono text-sky-400">{{ alumniP1Score }}</div>
+                      </div>
+                      <div class="p-2 rounded-lg bg-white/[0.03] border border-white/5">
+                        <div class="text-[10px] text-white/40">Skor IRT Anda</div>
+                        <div class="text-xs sm:text-sm font-black font-mono text-[#c0ff00]">{{ currentAbilityScore }}</div>
+                      </div>
+                      <div class="p-2 rounded-lg bg-white/[0.03] border border-white/5">
+                        <div class="text-[10px] text-white/40">Selisih Ambang</div>
+                        <div class="text-xs sm:text-sm font-black font-mono" :class="alumniP1Gap === 0 ? 'text-emerald-400' : 'text-amber-400'">
+                          {{ alumniP1Gap === 0 ? 'Aman' : '-' + alumniP1Gap }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Pilihan 2 (Penyangga Aman / Rasional) -->
+                  <div class="p-4 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-[#c0ff00]/20 text-[#c0ff00] font-mono font-bold text-xs flex items-center justify-center border border-[#c0ff00]/30">2</span>
+                        <span class="text-xs font-bold text-white uppercase tracking-wider">Pilihan 2 (Penyangga Rasional)</span>
+                      </div>
+                      <span class="text-xs px-2.5 py-0.5 rounded-full font-bold border" :class="alumniP2Chance.badgeColor">
+                        {{ alumniP2Chance.status }} ({{ alumniP2Chance.percent }}%)
+                      </span>
+                    </div>
+
+                    <div>
+                      <label class="block text-[11px] text-white/50 mb-1">Pilih Program Studi &amp; PTN:</label>
+                      <select 
+                        v-model="alumniProdi2Id" 
+                        class="w-full bg-slate-950 border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c0ff00] transition-colors"
+                      >
+                        <option v-for="u in targetPtnList" :key="'p2-' + u.id" :value="u.id">
+                          {{ u.name }} &bull; Target: {{ u.targetScore }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+                      <div class="p-2 rounded-lg bg-white/[0.03] border border-white/5">
+                        <div class="text-[10px] text-white/40">Passing Grade</div>
+                        <div class="text-xs sm:text-sm font-black font-mono text-sky-400">{{ alumniP2Score }}</div>
+                      </div>
+                      <div class="p-2 rounded-lg bg-white/[0.03] border border-white/5">
+                        <div class="text-[10px] text-white/40">Skor IRT Anda</div>
+                        <div class="text-xs sm:text-sm font-black font-mono text-[#c0ff00]">{{ currentAbilityScore }}</div>
+                      </div>
+                      <div class="p-2 rounded-lg bg-white/[0.03] border border-white/5">
+                        <div class="text-[10px] text-white/40">Selisih Ambang</div>
+                        <div class="text-xs sm:text-sm font-black font-mono" :class="alumniP2Gap === 0 ? 'text-emerald-400' : 'text-amber-400'">
+                          {{ alumniP2Gap === 0 ? 'Aman' : '-' + alumniP2Gap }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Kesimpulan Alokasi -->
+                  <div class="p-3 rounded-xl bg-[#c0ff00]/5 border border-[#c0ff00]/20 flex items-start gap-2.5 text-xs text-white/80">
+                    <i class="ph-bold ph-shield-check text-[#c0ff00] text-base shrink-0 mt-0.5"></i>
+                    <div>
+                      <strong class="text-white block font-heading">Distribusi Pilihan Teruji</strong>
+                      <span>Kombinasi Pilihan 1 (Ambang {{ alumniP1Score }}) dan Pilihan 2 (Ambang {{ alumniP2Score }}) memberikan perlindungan strategis saat pengumuman SNBT.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Grafik Riwayat Tren Simulasi CBT Antar-Periode -->
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center text-lg shrink-0">
+                      <i class="ph-bold ph-chart-line-up"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-sm sm:text-base font-black text-white">Tren Pertumbuhan Skor Tryout CBT</h3>
+                      <p class="text-xs text-white/50">Riwayat peningkatan skor kumulatif dari setiap simulasi tryout</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  <div v-for="cbt in alumniCbtProgression" :key="cbt.period" class="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="text-white font-bold flex items-center gap-2">
+                        <span>{{ cbt.period }}</span>
+                        <span class="text-white/40 text-[11px]">&bull; {{ cbt.date || cbt.created_at }}</span>
+                      </span>
+                      <span class="font-black font-mono text-[#c0ff00] text-sm">{{ cbt.score }} / 1000</span>
+                    </div>
+                    <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                      <div class="bg-gradient-to-r from-amber-400 to-[#c0ff00] h-full rounded-full transition-all duration-700" :style="{ width: Math.min(100, (cbt.score / 1000) * 100) + '%' }"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Kolom Kanan (5/12): Riwayat CBT SNBT & Arahan Mentor Belajar AI -->
+            <div class="lg:col-span-5 space-y-5 sm:space-y-6">
+
+              <!-- Riwayat Tryout SNBT Terkini -->
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-3.5">
+                <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center font-bold text-base border border-sky-500/30">
+                      <i class="ph-bold ph-exam"></i>
+                    </span>
+                    <div>
+                      <h4 class="text-sm font-black text-white tracking-tight">Riwayat Try Out CBT Terkini</h4>
+                      <p class="text-xs text-white/50">Hasil pengerjaan simulasi ujian SNBT</p>
+                    </div>
+                  </div>
+                  <button @click="handleTabClick('simulator')" class="text-xs font-bold text-[#c0ff00] hover:underline cursor-pointer">
+                    Ikut Try Out &raquo;
+                  </button>
+                </div>
+
+                <div v-if="!student360Data?.assessment_history?.length" class="space-y-2">
+                  <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs">
+                    <div>
+                      <div class="font-bold text-white">Simulasi Akbar SNBT 2027</div>
+                      <div class="text-[10px] text-white/40">Terbaru &bull; 68/90 Soal Terjawab Benar</div>
+                    </div>
+                    <span class="font-black font-mono text-[#c0ff00] text-sm">{{ currentAbilityScore }}</span>
+                  </div>
+                  <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs">
+                    <div>
+                      <div class="font-bold text-white">Drill Penalaran Matematika</div>
+                      <div class="text-[10px] text-white/40">Ujian Mandiri &bull; 24/30 Benar</div>
+                    </div>
+                    <span class="font-black font-mono text-[#c0ff00] text-sm">620</span>
+                  </div>
+                </div>
+
+                <div v-else class="space-y-2">
+                  <div v-for="cbt in student360Data.assessment_history.slice(0, 4)" :key="cbt.id" class="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs">
+                    <div>
+                      <div class="font-bold text-white">{{ cbt.subtes || cbt.quiz_type || 'Simulasi SNBT' }}</div>
+                      <div class="text-[10px] text-white/40">{{ cbt.created_at ? cbt.created_at.split(' ')[0] : '' }} &bull; {{ cbt.correct || 0 }}/{{ cbt.total || 0 }} Benar</div>
+                    </div>
+                    <span class="font-black font-mono text-[#c0ff00] text-sm">{{ cbt.score }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Arahan & Strategi Mentor Belajar AI (Coach Gap Year) -->
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-3.5">
+                <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center font-bold text-base border border-purple-500/30">
+                      <i class="ph-bold ph-chats-circle"></i>
+                    </span>
+                    <div>
+                      <h4 class="text-sm font-black text-white tracking-tight">Arahan Mentor AI (Coach Gap Year)</h4>
+                      <p class="text-xs text-white/50">Strategi taktis intensif persiapan ujian ulang</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  <div v-for="adv in alumniCoachAdvice" :key="adv.id" class="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="font-bold text-[#c0ff00]">{{ adv.coach }}</span>
+                      <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold uppercase">{{ adv.priority }}</span>
+                    </div>
+                    <h5 class="text-xs font-black text-white">{{ adv.title }}</h5>
+                    <p class="text-xs text-white/70 leading-relaxed">{{ adv.text }}</p>
                   </div>
                 </div>
               </div>
@@ -7763,29 +8088,130 @@ export default {
       return prog === 'TKA_SMA' || prog === 'SMA';
     });
 
+    const isAlumniProgram = computed(() => {
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      return prog === 'SNPMB_ALUMNI' || prog.includes('ALUMNI');
+    });
+
     const showReportCardSectionInDashboard = computed(() => {
       const prog = (activeAcademicProgram.value || '').toUpperCase();
-      // Bila SMA hanya paket TKA, maka tidak menampilkan target PTN dan raport
-      if (prog === 'TKA_SMA' || prog === 'SMA') {
+      // Bila SMA hanya paket TKA atau SNPMB Alumni, maka tidak menampilkan raport
+      if (prog === 'TKA_SMA' || prog === 'SMA' || prog === 'SNPMB_ALUMNI' || prog.includes('ALUMNI')) {
         return false;
       }
       return true;
     });
 
+    // Alumni PTN Rasionalisasi State & Helpers
+    const alumniProdi1Id = ref(TARGET_UNIVERSITIES[0]?.id || 'fk_ui');
+    const alumniProdi2Id = ref(TARGET_UNIVERSITIES[5]?.id || 'fk_unair');
+
+    const alumniProdi1 = computed(() => {
+      return TARGET_UNIVERSITIES.find(u => u.id === alumniProdi1Id.value) || TARGET_UNIVERSITIES[0];
+    });
+
+    const alumniProdi2 = computed(() => {
+      return TARGET_UNIVERSITIES.find(u => u.id === alumniProdi2Id.value) || TARGET_UNIVERSITIES[1];
+    });
+
+    const alumniP1Score = computed(() => alumniProdi1.value?.targetScore || 740);
+    const alumniP2Score = computed(() => alumniProdi2.value?.targetScore || 720);
+
+    const alumniP1Gap = computed(() => Math.max(0, alumniP1Score.value - currentAbilityScore.value));
+    const alumniP2Gap = computed(() => Math.max(0, alumniP2Score.value - currentAbilityScore.value));
+
+    const alumniP1Chance = computed(() => {
+      const diff = currentAbilityScore.value - alumniP1Score.value;
+      if (diff >= 20) return { percent: 94, status: 'Peluang Sangat Tinggi (Aman)', badgeColor: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' };
+      if (diff >= 0) return { percent: 84, status: 'Peluang Tinggi (Kompetitif)', badgeColor: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' };
+      if (diff >= -30) return { percent: 68, status: 'Peluang Sedang (Terbuka)', badgeColor: 'bg-amber-500/15 text-amber-300 border-amber-500/30' };
+      if (diff >= -60) return { percent: 45, status: 'Peluang Ketat (Perlu Drill)', badgeColor: 'bg-amber-500/15 text-amber-300 border-amber-500/30' };
+      return { percent: 28, status: 'Beresiko Tinggi', badgeColor: 'bg-rose-500/15 text-rose-300 border-rose-500/30' };
+    });
+
+    const alumniP2Chance = computed(() => {
+      const diff = currentAbilityScore.value - alumniP2Score.value;
+      if (diff >= 20) return { percent: 96, status: 'Peluang Sangat Tinggi (Sangat Aman)', badgeColor: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' };
+      if (diff >= 0) return { percent: 88, status: 'Peluang Tinggi (Aman)', badgeColor: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' };
+      if (diff >= -30) return { percent: 74, status: 'Peluang Terbuka (Rasional)', badgeColor: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' };
+      if (diff >= -60) return { percent: 52, status: 'Ketat (Tingkatkan Skor)', badgeColor: 'bg-amber-500/15 text-amber-300 border-amber-500/30' };
+      return { percent: 34, status: 'Beresiko Tinggi', badgeColor: 'bg-rose-500/15 text-rose-300 border-rose-500/30' };
+    });
+
+    const alumniCbtProgression = computed(() => {
+      if (student360Data.value?.assessment_history && student360Data.value.assessment_history.length >= 2) {
+        return student360Data.value.assessment_history.slice(0, 4);
+      }
+      return [
+        { period: 'Simulasi UTBK Mandiri 1', date: 'Oktober 2026', score: 585 },
+        { period: 'Try Out Parsial SNBT 2', date: 'Oktober 2026', score: 618 },
+        { period: 'Try Out Akbar Nasional 3', date: 'November 2026', score: currentAbilityScore.value || 648 }
+      ];
+    });
+
+    const alumniCoachAdvice = computed(() => {
+      const p1Name = alumniProdi1.value?.name ? alumniProdi1.value.name.split(' (')[0] : 'Pilihan 1';
+      const p2Name = alumniProdi2.value?.name ? alumniProdi2.value.name.split(' (')[0] : 'Pilihan 2';
+      return [
+        {
+          id: 1,
+          coach: 'Mentor SNBT EduPath',
+          title: 'Strategi Rasionalisasi Pilihan 1 & 2',
+          priority: 'prioritas',
+          text: `Kombinasi ${p1Name} (Ambang: ${alumniP1Score.value}) dan ${p2Name} (Ambang: ${alumniP2Score.value}) memiliki selisih ${Math.abs(alumniP1Score.value - alumniP2Score.value)} poin. Alokasikan Pilihan 1 sebagai target impian dan Pilihan 2 sebagai penyangga rasional agar peluang tembus tetap optimal.`
+        },
+        {
+          id: 2,
+          coach: 'AI Learning Analytics',
+          title: 'Rekomendasi Drill Subtes Kuantitatif & Logika',
+          priority: 'fokus',
+          text: `Dengan skor saat ini ${currentAbilityScore.value}, Anda berjarak ${alumniP1Gap.value} poin menuju passing grade ${p1Name}. Fokus latihan 25 soal harian pada Penalaran Kuantitatif & Pemahaman Bacaan untuk akselerasi skor.`
+        }
+      ];
+    });
+
+    const schoolSubjectEvaluations = computed(() => {
+      const cards = student360Data.value?.report_cards || [];
+      if (cards.length > 0 && cards[0]?.items?.length > 0) {
+        return cards[0].items.map(it => ({
+          subject: it.subject || it.subject_name,
+          score: Number(it.score || 0),
+          kkm: Number(it.kkm || 75),
+          passed: Number(it.score || 0) >= Number(it.kkm || 75)
+        }));
+      }
+      const prog = (activeAcademicProgram.value || '').toUpperCase();
+      if (prog === 'TKA_SD') {
+        return [
+          { subject: 'Matematika SD', score: 88, kkm: 75, passed: true },
+          { subject: 'Bahasa Indonesia', score: 90, kkm: 75, passed: true },
+          { subject: 'IPAS (Sains Dasar)', score: 85, kkm: 75, passed: true }
+        ];
+      }
+      if (prog === 'TKA_SMP') {
+        return [
+          { subject: 'Matematika SMP', score: 86, kkm: 75, passed: true },
+          { subject: 'Ilmu Pengetahuan Alam (IPA)', score: 84, kkm: 75, passed: true },
+          { subject: 'Bahasa Inggris', score: 88, kkm: 75, passed: true }
+        ];
+      }
+      return [
+        { subject: 'Matematika Tingkat Lanjut', score: 87, kkm: 78, passed: true },
+        { subject: 'Bahasa Indonesia Kritis', score: 91, kkm: 78, passed: true },
+        { subject: 'Bahasa Inggris Akademik', score: 89, kkm: 78, passed: true }
+      ];
+    });
+
     const currentProgramTargetCardHeader = computed(() => {
       const prog = (activeAcademicProgram.value || '').toUpperCase();
-      if (prog === 'TKA_SD') return 'Target Skor TKA SD';
-      if (prog === 'TKA_SMP') return 'Target Skor TKA SMP';
-      if (prog === 'TKA_SMA' || prog === 'SMA') return 'Target Nilai TKA SMA';
-      return 'Target Skor SNBT';
+      if (prog.includes('SNPMB') || prog.includes('UTBK') || prog.includes('ALUMNI')) {
+        return 'Target Passing SNBT';
+      }
+      return 'Target Nilai Kelolosan';
     });
 
     const currentProgramTargetCategoryLabel = computed(() => {
-      const prog = (activeAcademicProgram.value || '').toUpperCase();
-      if (prog === 'TKA_SD') return 'TKA SD';
-      if (prog === 'TKA_SMP') return 'TKA SMP';
-      if (prog === 'TKA_SMA' || prog === 'SMA') return 'TKA SMA';
-      return 'Passing PTN';
+      return 'STANDAR LOLOS';
     });
 
     const currentProgramTargetScore = computed(() => {
@@ -7806,10 +8232,10 @@ export default {
 
     const currentProgramScoreCardLabel = computed(() => {
       const prog = (activeAcademicProgram.value || '').toUpperCase();
-      if (prog === 'TKA_SD') return 'Skor TKA SD Terkini';
-      if (prog === 'TKA_SMP') return 'Skor TKA SMP Terkini';
-      if (prog === 'TKA_SMA' || prog === 'SMA') return 'Skor TKA SMA Terkini';
-      return 'Skor IRT Terkini';
+      if (prog.includes('SNPMB') || prog.includes('UTBK') || prog.includes('ALUMNI')) {
+        return 'Skor IRT Terkini';
+      }
+      return 'Skor Evaluasi Terkini';
     });
 
     const gapScore = computed(() => {
@@ -10424,7 +10850,21 @@ export default {
       isTkaProgram,
       isPtnProgram,
       isTkaOnlySma,
+      isAlumniProgram,
       showReportCardSectionInDashboard,
+      alumniProdi1Id,
+      alumniProdi2Id,
+      alumniProdi1,
+      alumniProdi2,
+      alumniP1Score,
+      alumniP2Score,
+      alumniP1Gap,
+      alumniP2Gap,
+      alumniP1Chance,
+      alumniP2Chance,
+      alumniCbtProgression,
+      alumniCoachAdvice,
+      schoolSubjectEvaluations,
       currentProgramTargetCardHeader,
       currentProgramTargetCategoryLabel,
       currentProgramTargetScore,
