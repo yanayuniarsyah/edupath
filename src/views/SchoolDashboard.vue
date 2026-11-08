@@ -72,24 +72,30 @@
 
       <!-- Sidebar Navigation Menu Items -->
       <nav class="flex flex-col gap-1 p-2.5 flex-grow overflow-y-auto no-scrollbar">
-        <button
-          v-for="item in navItems" :key="item.id"
-          @click="selectNavTab(item.id)"
-          :title="item.label"
-          :class="[
-            'flex items-center rounded-xl text-xs font-bold transition-all text-left group relative cursor-pointer',
-            (sidebarExpanded || mobileSidebarOpen) ? 'gap-3 px-3 py-2.5' : 'justify-center px-0 py-2.5',
-            activeTab === item.id
-              ? 'bg-[#c0ff00]/15 border border-[#c0ff00]/40 text-[#c0ff00]'
-              : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
-          ]"
-        >
-          <i :class="['ph-bold text-base shrink-0', item.icon, activeTab === item.id ? 'text-[#c0ff00]' : 'text-white/50 group-hover:text-white']"></i>
-          <span v-show="sidebarExpanded || mobileSidebarOpen" class="truncate flex-1">{{ item.label }}</span>
-          <span v-if="(sidebarExpanded || mobileSidebarOpen) && item.badge" :class="item.badgeClass || 'px-1.5 py-0.5 rounded text-[10px] font-black bg-white/10 text-white/70'">
-            {{ item.badge }}
-          </span>
-        </button>
+        <template v-for="group in navGroups" :key="group.title">
+          <div v-show="sidebarExpanded || mobileSidebarOpen" class="px-3 pt-3 pb-1 text-[10px] font-black uppercase tracking-wider text-white/40">
+            {{ group.title }}
+          </div>
+          <div v-show="!sidebarExpanded && !mobileSidebarOpen" class="w-6 h-px bg-white/10 mx-auto my-1.5 first:hidden"></div>
+          <button
+            v-for="item in group.items" :key="item.id"
+            @click="selectNavTab(item.id)"
+            :title="item.label"
+            :class="[
+              'flex items-center rounded-xl text-xs font-bold transition-all text-left group relative cursor-pointer',
+              (sidebarExpanded || mobileSidebarOpen) ? 'gap-3 px-3 py-2' : 'justify-center px-0 py-2.5',
+              activeTab === item.id
+                ? 'bg-[#c0ff00]/15 border border-[#c0ff00]/40 text-[#c0ff00]'
+                : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
+            ]"
+          >
+            <i :class="['ph-bold text-base shrink-0', item.icon, activeTab === item.id ? 'text-[#c0ff00]' : 'text-white/50 group-hover:text-white']"></i>
+            <span v-show="sidebarExpanded || mobileSidebarOpen" class="truncate flex-1">{{ item.label }}</span>
+            <span v-if="(sidebarExpanded || mobileSidebarOpen) && item.badge" :class="item.badgeClass || 'px-1.5 py-0.5 rounded text-[10px] font-black bg-white/10 text-white/70'">
+              {{ item.badge }}
+            </span>
+          </button>
+        </template>
       </nav>
 
       <!-- Sidebar Bottom Profile & Logout -->
@@ -195,7 +201,7 @@
                   <p class="text-[#c0ff00] font-black text-[10px] sm:text-xs tracking-widest uppercase">Portal Analitik Mitra EduPath</p>
                 </div>
                 <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight">Selamat Datang, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ schoolData?.name || 'Sekolah Mitra' }}</span></h2>
-                <p class="text-white/70 text-xs sm:text-sm font-medium leading-relaxed">Koordinator BK: <strong class="text-white">{{ schoolData?.bk_name || 'Bapak/Ibu Guru BK' }}</strong> · Pantau pemetaan minat bakat Holland RIASEC &amp; kesiapan SNBT siswa secara real-time.</p>
+                <p class="text-white/70 text-xs sm:text-sm font-medium leading-relaxed">Koordinator BK: <strong class="text-white">{{ schoolData?.bk_name || 'Bapak/Ibu Guru BK' }}</strong> &bull; {{ schoolLevel === 'SMA' ? 'Pantau pemetaan minat bakat Holland RIASEC & kesiapan SNBT siswa secara real-time.' : (schoolLevel === 'SMP' ? 'Pantau pemetaan minat bakat Holland RIASEC & kesiapan PPDB SMA/SMK siswa secara real-time.' : 'Pantau pemetaan potensi belajar & kesiapan TKA SD siswa secara real-time.') }}</p>
               </div>
             </div>
 
@@ -218,59 +224,95 @@
 
           <!-- 6 Executive KPI Cards -->
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+            <!-- Card 1: Total Siswa -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
               <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Total Siswa</span>
               <div class="text-2xl font-black text-white mt-1">{{ kpis?.total_students || 0 }}</div>
               <span class="text-[10px] text-emerald-400 flex items-center gap-1 mt-1 font-bold">
-                <i class="ph-bold ph-user-check"></i> Terdata
+                <i class="ph-bold ph-user-check"></i> Terdaftar Resmi
               </span>
             </div>
 
+            <!-- Card 2: Siswa Bimbingan -->
             <div class="p-4 rounded-2xl bg-gradient-to-b from-emerald-500/10 to-transparent border border-emerald-500/30 backdrop-blur-xl">
-              <span class="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Siswa Ikut Bimbel</span>
+              <span class="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Siswa Bimbingan</span>
               <div class="text-2xl font-black text-[#c0ff00] mt-1">{{ kpis?.paid_package_students || 0 }}</div>
               <span class="text-[10px] text-emerald-300 font-semibold mt-1 block">Paket EduPath Aktif</span>
             </div>
 
+            <!-- Card 3: SPP / Diagnostik -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
-              <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Siswa Free SPP</span>
-              <div class="text-2xl font-black text-white mt-1">{{ kpis?.free_diagnostic_students || 0 }}</div>
-              <span class="text-[10px] text-white/40 font-semibold mt-1 block">Diagnostik Mandiri</span>
+              <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Asesmen Mandiri</span>
+              <div class="text-2xl font-black text-white mt-1">{{ kpis?.spp_completed_students || kpis?.free_diagnostic_students || 0 }}</div>
+              <span class="text-[10px] text-white/40 font-semibold mt-1 block">Pemetaan Potensi &amp; Minat</span>
             </div>
 
+            <!-- Card 4: Peserta Asesmen / Tryout -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
               <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Peserta Tryout</span>
               <div class="text-2xl font-black text-sky-400 mt-1">{{ kpis?.tryout_participants || 0 }}</div>
-              <span class="text-[10px] text-sky-300 font-semibold mt-1 block">SNBT &amp; TKA SMA</span>
+              <span class="text-[10px] text-sky-300 font-semibold mt-1 block">
+                {{ schoolLevel === 'SMA' ? 'SNBT & TKA SMA' : (schoolLevel === 'SMP' ? 'Simulasi TKA SMP' : 'Simulasi TKA SD') }}
+              </span>
             </div>
 
+            <!-- Card 5: Rata-Rata Skor (Dynamic by School Level) -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
               <div class="flex items-center justify-between">
-                <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Rata-rata Skor</span>
-                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">SNBT</span>
+                <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Rata-Rata Skor</span>
+                <span v-if="schoolLevel === 'SMA'" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">SNBT</span>
+                <span v-else-if="schoolLevel === 'SMP'" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">TKA SMP</span>
+                <span v-else class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">TKA SD</span>
               </div>
-              <div class="text-2xl font-black text-amber-400 mt-1">{{ kpis?.avg_snbt_score || kpis?.average_tryout_score || 0 }}</div>
-              <span class="text-[10px] text-amber-300 font-semibold mt-1 block">Skala SNBT 0 - 1000</span>
+              <div class="text-2xl font-black text-amber-400 mt-1">
+                {{ schoolLevel === 'SMA' ? (kpis?.avg_snbt_score || kpis?.average_tryout_score || 0) : (kpis?.avg_tka_score || 0) }}
+              </div>
+              <span class="text-[10px] text-amber-300 font-semibold mt-1 block">
+                {{ schoolLevel === 'SMA' ? 'Skala SNBT 200 - 1000 Poin' : 'Skala Standar 0 - 100 Poin' }}
+              </span>
             </div>
 
+            <!-- Card 6: Dynamic Metric (TKA SMA for SMA, Kesiapan PPDB for SMP, KKTP for SD) -->
             <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Skor Rerata TKA</span>
-                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">TKA SMA</span>
-              </div>
-              <div class="text-2xl font-black text-[#c0ff00] mt-1">{{ kpis?.avg_tka_score || 0 }}%</div>
-              <span class="text-[10px] text-white/60 font-semibold mt-1 block">{{ kpis?.tka_tryouts_taken || 0 }} sesi (IPA/IPS)</span>
+              <template v-if="schoolLevel === 'SMA'">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-white/50 block">Rata-Rata Skor</span>
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">TKA SMA</span>
+                </div>
+                <div class="text-2xl font-black text-[#c0ff00] mt-1">{{ kpis?.avg_tka_score || 0 }} Poin</div>
+                <span class="text-[10px] text-white/60 font-semibold mt-1 block">Skala Standar 0 - 100 Poin</span>
+              </template>
+              <template v-else-if="schoolLevel === 'SMP'">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Kesiapan PPDB</span>
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">SMA/SMK</span>
+                </div>
+                <div class="text-2xl font-black text-[#c0ff00] mt-1">{{ kpis?.ppdb_eligible_count || kpis?.total_students || 0 }} Siswa</div>
+                <span class="text-[10px] text-emerald-300/80 font-semibold mt-1 block">Jalur Prestasi Rapor &amp; Zonasi</span>
+              </template>
+              <template v-else>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-purple-400 block">Fondasi Belajar</span>
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300">KKTP SD</span>
+                </div>
+                <div class="text-2xl font-black text-[#c0ff00] mt-1">{{ (kpis?.avg_tka_score || 0) >= 75 ? 'Tuntas' : 'Pendampingan' }}</div>
+                <span class="text-[10px] text-purple-300/80 font-semibold mt-1 block">Ambang Batas KKM: 75.0 Poin</span>
+              </template>
             </div>
           </div>
 
           <!-- Quick Highlight: Package & RIASEC Summary -->
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Left: Top Universities & Majors -->
+            <!-- Left: Top Destinations -->
             <div class="lg:col-span-6 p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-4">
               <div class="flex items-center justify-between">
                 <div>
-                  <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00] block">Pilihan Favorit Siswa</span>
-                  <h3 class="text-base font-black text-white">Top 5 Universitas Impian</h3>
+                  <span class="text-[10px] font-black uppercase tracking-wider text-[#c0ff00] block">
+                    {{ schoolLevel === 'SMA' ? 'Pilihan Favorit Siswa' : 'Target Sekolah Lanjutan' }}
+                  </span>
+                  <h3 class="text-base font-black text-white">
+                    {{ schoolLevel === 'SMA' ? 'Top 5 Universitas Impian (PTN)' : (schoolLevel === 'SMP' ? 'Top 5 SMA / SMK Unggulan Tujuan' : 'Top 5 SMP Favorit Tujuan') }}
+                  </h3>
                 </div>
                 <button @click="activeTab = 'ptn'" class="text-xs text-[#c0ff00] font-bold hover:underline cursor-pointer">
                   Lihat Selengkapnya &rarr;
@@ -282,11 +324,14 @@
                   <div class="flex items-center gap-3">
                     <span class="w-6 h-6 rounded-lg bg-white/5 text-white/60 font-black text-xs flex items-center justify-center">{{ idx + 1 }}</span>
                     <div>
-                      <span class="text-xs font-bold text-white block">{{ univ.name }}</span>
-                      <span class="text-[10px] text-white/50">{{ univ.popular_major || 'Program Studi Pilihan' }}</span>
+                      <span class="text-xs font-bold text-white block">{{ formatTargetDestinationName(univ.name || univ.target_ptn) }}</span>
+                      <span class="text-[10px] text-white/50">{{ univ.popular_major || (schoolLevel === 'SMA' ? 'Program Studi Pilihan' : 'Jalur PPDB Sekolah') }}</span>
                     </div>
                   </div>
-                  <span class="px-2 py-1 rounded-lg bg-[#c0ff00]/10 text-[#c0ff00] text-xs font-black">{{ univ.count }} Siswa</span>
+                  <span class="px-2 py-1 rounded-lg bg-[#c0ff00]/10 text-[#c0ff00] text-xs font-black">{{ univ.count || univ.total || 0 }} Siswa</span>
+                </div>
+                <div v-if="topUniversities.length === 0" class="p-4 text-center text-xs text-white/40">
+                  Belum ada data target sekolah lanjutan yang dimasukkan siswa.
                 </div>
               </div>
             </div>
@@ -553,24 +598,36 @@
         </div>
 
         <!-- ========================================================== -->
-        <!-- VIEW 5: TARGET KAMPUS PTN & PRODI FAVORIT                 -->
+        <!-- VIEW 5: TARGET KAMPUS PTN & SEKOLAH LANJUTAN              -->
         <!-- ========================================================== -->
         <div v-if="activeTab === 'ptn'" class="space-y-6">
           <div class="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-6">
             <div>
-              <span class="text-xs font-black uppercase tracking-wider text-[#c0ff00] block mb-1">Target Pilihan Siswa</span>
-              <h2 class="text-xl font-black text-white">Universitas &amp; Rumpun Jurusan Terfavorit</h2>
-              <p class="text-xs text-white/60 mt-1">Data agregat pilihan kampus impian yang dimasukkan siswa saat pendaftaran &amp; tryout SNBT.</p>
+              <span class="text-xs font-black uppercase tracking-wider text-[#c0ff00] block mb-1">
+                {{ schoolLevel === 'SMA' ? 'Target Pilihan Siswa' : 'Target Sekolah Lanjutan' }}
+              </span>
+              <h2 class="text-xl font-black text-white">
+                {{ schoolLevel === 'SMA' ? 'Universitas & Rumpun Jurusan Terfavorit' : (schoolLevel === 'SMP' ? 'SMA & SMK Unggulan Terfavorit Tujuan Siswa' : 'SMP Favorit Terfavorit Tujuan Siswa') }}
+              </h2>
+              <p class="text-xs text-white/60 mt-1">
+                {{ schoolLevel === 'SMA' ? 'Data agregat pilihan kampus impian yang dimasukkan siswa saat bimbingan & tryout SNBT.' : (schoolLevel === 'SMP' ? 'Data agregat pilihan sekolah lanjutan atas yang dimasukkan siswa saat bimbingan PPDB & TKA SMP.' : 'Data agregat pilihan sekolah menengah pertama yang dimasukkan siswa kelas 6.') }}
+              </p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div v-for="(u, idx) in topUniversities" :key="idx" class="p-5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
                 <div class="flex items-center justify-between">
                   <span class="px-2 py-0.5 rounded-md bg-white/10 text-white font-mono text-[10px] font-black">Rank #{{ idx + 1 }}</span>
-                  <span class="text-xs font-black text-[#c0ff00]">{{ u.count }} Peminat</span>
+                  <span class="text-xs font-black text-[#c0ff00]">{{ u.count || u.total || 0 }} Peminat</span>
                 </div>
-                <h3 class="text-sm font-black text-white">{{ u.name }}</h3>
-                <p class="text-[11px] text-white/60">Prodi Populer: <strong class="text-white/80">{{ u.popular_major || 'Kedokteran / Teknik Informatika' }}</strong></p>
+                <h3 class="text-sm font-black text-white">{{ formatTargetDestinationName(u.name || u.target_ptn) }}</h3>
+                <p class="text-[11px] text-white/60">
+                  {{ schoolLevel === 'SMA' ? 'Prodi Populer:' : 'Jalur Favorit:' }}
+                  <strong class="text-white/80">{{ u.popular_major || (schoolLevel === 'SMA' ? 'Kedokteran / Teknik Informatika' : 'Jalur Prestasi Nilai Rapor') }}</strong>
+                </p>
+              </div>
+              <div v-if="topUniversities.length === 0" class="col-span-full p-8 text-center text-xs text-white/40">
+                Belum ada data target sekolah lanjutan yang dipilih siswa.
               </div>
             </div>
           </div>
@@ -623,7 +680,7 @@
               <div>
                 <span class="text-xs font-black uppercase tracking-wider text-[#c0ff00] block mb-1">Templat Siap Sebar</span>
                 <h3 class="text-lg font-black text-white">Pesan WhatsApp untuk Grup Kelas / Wali Murid</h3>
-                <p class="text-xs text-white/60">Guru BK dapat langsung menyalin teks ini dan menempelkannya ke WhatsApp Group Kelas 12.</p>
+                <p class="text-xs text-white/60">Guru BK dapat langsung menyalin teks ini dan menempelkannya ke WhatsApp Group {{ schoolLevel === 'SMA' ? 'Kelas 12' : (schoolLevel === 'SMP' ? 'Kelas 9 / Wali Murid' : 'Kelas 6 / Wali Murid') }}.</p>
               </div>
 
               <div class="relative">
@@ -763,7 +820,7 @@
                     <th class="p-4">Jenjang &amp; Kelas</th>
                     <th class="p-4">Tahun / Semester</th>
                     <th class="p-4 text-center">Jml Mapel</th>
-                    <th class="p-4 text-center">Rata-rata Nilai</th>
+                    <th class="p-4 text-center">Rata-Rata Nilai</th>
                     <th class="p-4 text-center">Status</th>
                     <th class="p-4 text-right">Aksi</th>
                   </tr>
@@ -892,9 +949,9 @@
           <div v-else class="space-y-6">
             <!-- 4 Quick KPI Summary Cards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <!-- Card 1: Rata-rata Rapor Kumulatif -->
+              <!-- Card 1: Rata-Rata Rapor Kumulatif -->
               <div class="p-4 rounded-2xl bg-[#0e1726]/80 border border-white/10 space-y-1">
-                <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">Rata-rata Rapor</span>
+                <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">Rata-Rata Rapor</span>
                 <div class="text-2xl font-black text-white">
                   {{ computeCumulativeRaporGpa(student360Data.report_cards) }}
                 </div>
@@ -979,7 +1036,7 @@
                         <div class="text-xs font-bold text-white">{{ lg.subject }}</div>
                         <span class="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-black">{{ lg.gap_severity }}</span>
                       </div>
-                      <div class="text-[10px] text-white/50 mt-0.5">Rata-rata: <strong class="text-rose-400">{{ lg.average_score }}</strong> / Target: 75.00</div>
+                      <div class="text-[10px] text-white/50 mt-0.5">Rata-Rata: <strong class="text-rose-400">{{ lg.average_score }}</strong> / Target: 75.00</div>
                       <p class="text-[11px] text-white/70 mt-1 leading-relaxed">{{ lg.recommendation }}</p>
                     </div>
                   </div>
@@ -1093,27 +1150,27 @@
         </div>
 
         <!-- ============================================================== -->
-        <!-- TAB: KESIAPAN SELEKSI SNBP & SNBT (ADMISSION INTELLIGENCE)      -->
+        <!-- TAB: KESIAPAN SELEKSI SNBP & SNBT / PPDB (ADMISSION)           -->
         <!-- ============================================================== -->
         <div v-if="activeTab === 'admission'" class="space-y-6 animate-fade-in">
           <div class="bg-white/5 p-5 rounded-2xl border border-white/10">
             <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
               <i class="ph-bold ph-graduation-cap text-sky-400"></i>
-              <span>Kesiapan Seleksi Masuk PTN (SNBP &amp; SNBT)</span>
+              <span>{{ schoolLevel === 'SMA' ? 'Kesiapan Seleksi Masuk PTN (SNBP &amp; SNBT)' : (schoolLevel === 'SMP' ? 'Kesiapan Seleksi Masuk SMA / SMK (PPDB Jalur Prestasi Rapor &amp; Zonasi)' : 'Kesiapan Seleksi Masuk SMP (PPDB Jalur Prestasi &amp; Zonasi)') }}</span>
             </h2>
             <p class="text-xs text-white/60 mt-0.5">
-              Analisis konsistensi nilai rapor semester untuk pemetaan kuota SNBP serta agregasi performa skor tryout UTBK SNBT siswa.
+              {{ schoolLevel === 'SMA' ? 'Analisis konsistensi nilai rapor semester untuk pemetaan kuota SNBP serta agregasi performa skor tryout UTBK SNBT siswa.' : (schoolLevel === 'SMP' ? 'Analisis nilai rapor kumulatif semester 1–5 untuk pemetaan peluang kelolosan PPDB SMA/SMK serta hasil simulasi TKA SMP.' : 'Analisis nilai rapor kumulatif untuk pemetaan peluang kelolosan PPDB SMP favorit serta hasil simulasi TKA SD.') }}
             </p>
           </div>
 
           <!-- Dual Section: SNBP Ranking & SNBT Tryout Performance -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- SNBP Eligible Candidate Ranking -->
+            <!-- SNBP / PPDB Eligible Candidate Ranking -->
             <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 p-5 space-y-4">
               <div class="flex items-center justify-between border-b border-white/10 pb-3">
                 <h3 class="text-sm font-black text-white flex items-center gap-2">
                   <i class="ph-bold ph-medal text-amber-400"></i>
-                  <span>Top Kandidat Kuota SNBP (Berdasarkan Rapor)</span>
+                  <span>{{ schoolLevel === 'SMA' ? 'Top Kandidat Kuota SNBP (Berdasarkan Rapor)' : (schoolLevel === 'SMP' ? 'Peringkat Jalur Prestasi Rapor PPDB SMA/SMK' : 'Peringkat Jalur Prestasi Rapor PPDB SMP') }}</span>
                 </h3>
                 <span class="text-[10px] text-white/50">Eligible Pool</span>
               </div>
@@ -1122,14 +1179,14 @@
                   <thead>
                     <tr class="text-[10px] text-white/40 uppercase font-bold border-b border-white/5">
                       <th class="pb-2">Siswa</th>
-                      <th class="pb-2">Target PTN</th>
-                      <th class="pb-2 text-right">Rata-rata Rapor</th>
+                      <th class="pb-2">{{ schoolLevel === 'SMA' ? 'Target PTN' : (schoolLevel === 'SMP' ? 'Target SMA/SMK' : 'Target SMP') }}</th>
+                      <th class="pb-2 text-right">Rata-Rata Rapor</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-white/5">
                     <tr v-for="cand in admissionData.snbp_ranking" :key="cand.student_id" class="hover:bg-white/[0.02]">
                       <td class="py-2.5 font-bold text-white">{{ cand.student_name }}</td>
-                      <td class="py-2.5 text-white/60">{{ cand.target_ptn || 'Belum dipilih' }}</td>
+                      <td class="py-2.5 text-white/60">{{ formatTargetDestinationName(cand.target_ptn) }}</td>
                       <td class="py-2.5 text-right font-black text-amber-400">{{ cand.cumulative_gpa }}</td>
                     </tr>
                   </tbody>
@@ -1137,28 +1194,28 @@
               </div>
             </div>
 
-            <!-- SNBT CBT Scores Overview -->
+            <!-- CBT Scores Overview -->
             <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 p-5 space-y-4">
               <div class="flex items-center justify-between border-b border-white/10 pb-3">
                 <h3 class="text-sm font-black text-white flex items-center gap-2">
                   <i class="ph-bold ph-trend-up text-[#c0ff00]"></i>
-                  <span>Distribusi Performa Tryout CBT SNBT</span>
+                  <span>{{ schoolLevel === 'SMA' ? 'Distribusi Performa Tryout CBT SNBT' : (schoolLevel === 'SMP' ? 'Distribusi Performa Simulasi TKA SMP' : 'Distribusi Performa Simulasi TKA SD') }}</span>
                 </h3>
-                <span class="text-[10px] text-white/50">Rata-rata IRT</span>
+                <span class="text-[10px] text-white/50">{{ schoolLevel === 'SMA' ? 'Rata-Rata IRT' : 'Rata-Rata Poin' }}</span>
               </div>
               <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs">
                   <thead>
                     <tr class="text-[10px] text-white/40 uppercase font-bold border-b border-white/5">
                       <th class="pb-2">Siswa</th>
-                      <th class="pb-2">Target PTN</th>
-                      <th class="pb-2 text-right">Skor Rata-rata</th>
+                      <th class="pb-2">{{ schoolLevel === 'SMA' ? 'Target PTN' : (schoolLevel === 'SMP' ? 'Target SMA/SMK' : 'Target SMP') }}</th>
+                      <th class="pb-2 text-right">Rata-Rata Skor</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-white/5">
                     <tr v-for="cand in admissionData.snbt_performance" :key="cand.student_id" class="hover:bg-white/[0.02]">
                       <td class="py-2.5 font-bold text-white">{{ cand.student_name }}</td>
-                      <td class="py-2.5 text-white/60">{{ cand.target_ptn || 'Belum dipilih' }}</td>
+                      <td class="py-2.5 text-white/60">{{ formatTargetDestinationName(cand.target_ptn) }}</td>
                       <td class="py-2.5 text-right font-black text-[#c0ff00]">{{ cand.avg_cbt_score }}</td>
                     </tr>
                   </tbody>
@@ -1168,7 +1225,7 @@
           </div>
         </div>
 
-
+        <!-- ============================================================== -->
         <!-- TAB: PENGATURAN PROFIL SEKOLAH & GURU BK                       -->
         <!-- ============================================================== -->
         <div v-if="activeTab === 'settings'" class="space-y-6 max-w-4xl animate-fade-in">
@@ -1853,6 +1910,20 @@ const copiedLink = ref(false);
 const copiedBroadcast = ref(false);
 const openQrModal = ref(false);
 
+const schoolLevel = computed(() => {
+  const level = schoolData.value?.education_level || kpis.value?.education_level;
+  if (level) return String(level).toUpperCase();
+  const name = String(schoolData.value?.name || '').toUpperCase();
+  if (name.includes('SMP') || name.includes('MTS')) return 'SMP';
+  if (name.includes('SD') || name.includes('MI')) return 'SD';
+  return 'SMA';
+});
+
+const formatTargetDestinationName = (name) => {
+  if (!name) return 'Belum dipilih';
+  return String(name).replace(/^Target\s*(SMA|SMK|SMP):\s*/i, '');
+};
+
 // ── Data Agregat Dashboard ──
 const kpis = ref({
   total_students: 0,
@@ -1886,80 +1957,54 @@ const selectedStudent = ref(null);
 
 let searchTimeout = null;
 
-// ── Computed Navigation Items (Sidebar Layout) ──
-const navItems = computed(() => [
+// ── Computed Clustered Navigation Groups (Sidebar Layout) ──
+const navGroups = computed(() => [
   {
-    id: 'analytics',
-    label: 'Dashboard',
-    icon: 'ph-chart-pie-slice'
+    title: 'Ikhtisar Utama',
+    items: [
+      { id: 'analytics', label: 'Dashboard Utama', icon: 'ph-chart-pie-slice' },
+      { id: 'students', label: 'Roster & Data Siswa', icon: 'ph-users-three', badge: `${kpis.value?.total_students || 0}`, badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-white/10 text-white' },
+      { id: 'packages', label: 'Status Paket Siswa', icon: 'ph-package', badge: `${kpis.value?.paid_package_students || 0} Siswa`, badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-400' }
+    ]
   },
   {
-    id: 'reports',
-    label: 'Manajemen Rapor',
-    icon: 'ph-file-text',
-    badge: 'SD/SMP/SMA',
-    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-500/20 text-amber-400'
+    title: 'Akademik & Rapor',
+    items: [
+      { id: 'reports', label: 'Manajemen Rapor', icon: 'ph-file-text', badge: 'SD/SMP/SMA', badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-500/20 text-amber-400' },
+      { id: 'student_360', label: 'Student 360', icon: 'ph-user-focus', badge: 'Intelligence', badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-300' }
+    ]
   },
   {
-    id: 'student_360',
-    label: 'Student 360',
-    icon: 'ph-user-focus',
-    badge: 'Intelligence',
-    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-300'
+    title: 'Bimbingan & Kelulusan',
+    items: [
+      { id: 'guidance', label: 'Bimbingan Konseling', icon: 'ph-chats-circle', badge: 'Intervensi', badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-purple-500/20 text-purple-300' },
+      { id: 'riasec', label: 'Peminatan RIASEC', icon: 'ph-compass', badge: '6 Tipe', badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-purple-500/20 text-purple-300' },
+      {
+        id: 'admission',
+        label: schoolLevel.value === 'SMA' ? 'Kesiapan Seleksi' : 'Kesiapan PPDB',
+        icon: 'ph-graduation-cap',
+        badge: schoolLevel.value === 'SMA' ? 'SNBP & SNBT' : (schoolLevel.value === 'SMP' ? 'SMA & SMK' : 'SMP Favorit'),
+        badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-sky-500/20 text-sky-300'
+      },
+      {
+        id: 'ptn',
+        label: schoolLevel.value === 'SMA' ? 'Target Kampus PTN' : (schoolLevel.value === 'SMP' ? 'Target SMA / SMK' : 'Target SMP Favorit'),
+        icon: 'ph-buildings',
+        badge: 'Top 5',
+        badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-sky-500/20 text-sky-300'
+      }
+    ]
   },
   {
-    id: 'guidance',
-    label: 'Bimbingan Konseling',
-    icon: 'ph-chats-circle',
-    badge: 'Intervensi',
-    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-purple-500/20 text-purple-300'
-  },
-  {
-    id: 'admission',
-    label: 'Kesiapan Seleksi',
-    icon: 'ph-graduation-cap',
-    badge: 'SNBP & SNBT',
-    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-sky-500/20 text-sky-300'
-  },
-  {
-    id: 'packages',
-    label: 'Monitoring Paket',
-    icon: 'ph-package',
-    badge: `${kpis.value?.paid_package_students || 0} Siswa`,
-    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-400'
-  },
-  {
-    id: 'students',
-    label: 'Roster & Data Siswa',
-    icon: 'ph-users-three',
-    badge: `${kpis.value?.total_students || 0}`,
-    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-white/10 text-white'
-  },
-  {
-    id: 'riasec',
-    label: 'Peminatan RIASEC',
-    icon: 'ph-compass',
-    badge: '6 Tipe',
-    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-purple-500/20 text-purple-300'
-  },
-  {
-    id: 'ptn',
-    label: 'Target Kampus PTN',
-    icon: 'ph-buildings',
-    badge: 'Top 5',
-    badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-sky-500/20 text-sky-300'
-  },
-  {
-    id: 'broadcast',
-    label: 'Sebar Link & QR Code',
-    icon: 'ph-qr-code'
-  },
-  {
-    id: 'settings',
-    label: 'Pengaturan',
-    icon: 'ph-gear'
+    title: 'Sistem & Distribusi',
+    items: [
+      { id: 'broadcast', label: 'Sebar Link & QR Code', icon: 'ph-qr-code' },
+      { id: 'settings', label: 'Pengaturan Sekolah', icon: 'ph-gear' }
+    ]
   }
 ]);
+
+const navItems = computed(() => navGroups.value.flatMap(g => g.items));
 
 const activeTabTitle = computed(() => {
   const item = navItems.value.find(n => n.id === activeTab.value);
@@ -1978,6 +2023,39 @@ const qrCodeUrl = computed(() => {
 const broadcastText = computed(() => {
   const sName = schoolData.value?.name || 'Sekolah';
   const bk = schoolData.value?.bk_name || 'Guru BK';
+  const lvl = schoolLevel.value;
+
+  if (lvl === 'SMP') {
+    return `📢 *PENGUMUMAN RESMI BK ${sName.toUpperCase()}*\n` +
+      `Halo teman-teman siswa & Ayah/Bunda Kelas 9!\n\n` +
+      `Untuk memetakan minat penjurusan SMA/SMK, gaya belajar, dan persiapan PPDB Jalur Prestasi / TKA SMP 2026, Guru BK bekerjasama dengan platform *EduPath.ai* menyelenggarakan *Student Potential Path (SPP) Diagnostic Test* secara GRATIS.\n\n` +
+      `📌 *Cara Mengikuti Tes:*\n` +
+      `1. Klik tautan resmi sekolah kita:\n` +
+      `${shareLink.value}\n` +
+      `2. Isi data diri & tentukan target SMA / SMK favorit\n` +
+      `3. Kerjakan asesmen minat bakat Holland RIASEC & simulasi TKA SMP (±15 menit)\n` +
+      `4. Rapor potensi minat karir & analisis kesiapan PPDB langsung terbit otomatis!\n\n` +
+      `Mohon seluruh siswa kelas 9 menyelesaikan asesmen ini. Rapor hasil akan menjadi acuan bimbingan karir kelulusan bersama Tim BK.\n\n` +
+      `Salam hangat,\n` +
+      `*${bk}*\n` +
+      `Koordinator BK ${sName}`;
+  }
+
+  if (lvl === 'SD') {
+    return `📢 *PENGUMUMAN RESMI ${sName.toUpperCase()}*\n` +
+      `Halo Ayah/Bunda & teman-teman siswa Kelas 6!\n\n` +
+      `Untuk memetakan potensi belajar, kesiapan materi dasar, dan persiapan masuk SMP Unggulan 2026, sekolah bekerjasama dengan platform *EduPath.ai* menyelenggarakan *Asesmen Diagnostik Kemampuan Dasar (TKA SD)* secara GRATIS.\n\n` +
+      `📌 *Cara Mengikuti Tes:*\n` +
+      `1. Klik tautan resmi sekolah kita:\n` +
+      `${shareLink.value}\n` +
+      `2. Isi nama lengkap & pilih target SMP favorit\n` +
+      `3. Kerjakan tes logika & literasi-numerasi dasar (±15 menit)\n` +
+      `4. Rapor capaian kompetensi langsung terbit otomatis!\n\n` +
+      `Salam hangat,\n` +
+      `*${bk}*\n` +
+      `Koordinator Akademik ${sName}`;
+  }
+
   return `📢 *PENGUMUMAN RESMI BK ${sName.toUpperCase()}*\n` +
     `Halo teman-teman siswa kelas 12!\n\n` +
     `Untuk memetakan minat jurusan kuliah, pola belajar, dan persiapan SNBT/UTBK 2026, Guru BK bekerjasama dengan platform adaptif *EduPath.ai* menyelenggarakan *Student Potential Path (SPP) Diagnostic Test* secara GRATIS.\n\n` +

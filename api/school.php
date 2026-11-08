@@ -45,10 +45,14 @@ function ensure_school_schema($pdo) {
     }
 
     try {
-        // Add is_active to schools if not present
+        // Add is_active and education_level to schools if not present
         $cols = $pdo->query("SHOW COLUMNS FROM schools LIKE 'is_active'")->fetchAll();
         if (empty($cols)) {
             $pdo->exec("ALTER TABLE schools ADD COLUMN is_active TINYINT DEFAULT 1");
+        }
+        $elCols = $pdo->query("SHOW COLUMNS FROM schools LIKE 'education_level'")->fetchAll();
+        if (empty($elCols)) {
+            $pdo->exec("ALTER TABLE schools ADD COLUMN education_level ENUM('SD', 'SMP', 'SMA') NOT NULL DEFAULT 'SMA' AFTER name");
         }
         $tCols = $pdo->query("SHOW COLUMNS FROM schools LIKE 'tenant_id'")->fetchAll();
         if (empty($tCols)) {
@@ -71,6 +75,16 @@ function ensure_school_schema($pdo) {
 
     try { $pdo->exec("ALTER TABLE quiz_attempts ADD COLUMN quiz_type VARCHAR(50) DEFAULT 'tryout'"); } catch (\Throwable $e) {}
     try { $pdo->exec("ALTER TABLE quiz_results ADD COLUMN quiz_type VARCHAR(50) DEFAULT 'tryout'"); } catch (\Throwable $e) {}
+    try {
+        $qCols = $pdo->query("SHOW COLUMNS FROM quiz_results LIKE 'assessment_type'")->fetchAll();
+        if (empty($qCols)) {
+            $pdo->exec("ALTER TABLE quiz_results ADD COLUMN assessment_type VARCHAR(50) DEFAULT 'SNBT' AFTER quiz_type");
+        }
+        $trCols = $pdo->query("SHOW COLUMNS FROM quiz_results LIKE 'track'")->fetchAll();
+        if (empty($trCols)) {
+            $pdo->exec("ALTER TABLE quiz_results ADD COLUMN track VARCHAR(50) NULL AFTER assessment_type");
+        }
+    } catch (\Throwable $e) {}
 
     // Phase 15: School Intelligence Tables
     try {
@@ -376,7 +390,7 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $pdo->prepare("
             SELECT u.id as user_id, u.password as user_password, ur.role, ur.reference_id,
-                   s.id as school_id, s.name as school_name, s.slug, s.bk_name, s.bk_email, s.bk_phone, s.city
+                   s.id as school_id, s.name as school_name, s.education_level, s.slug, s.bk_name, s.bk_email, s.bk_phone, s.city
             FROM users u
             JOIN user_roles ur ON u.id = ur.user_id
             LEFT JOIN schools s ON (ur.reference_id = s.id OR u.identity_key = s.bk_email)
@@ -403,6 +417,7 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $school_id = $user['school_id'] ?? $user['reference_id'];
         $school_name = $user['school_name'] ?? 'Sekolah Mitra';
+        $school_level = $user['education_level'] ?? 'SMA';
 
         $token = generate_jwt([
             'user_id' => $user['user_id'],
@@ -410,6 +425,7 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             'role' => $user['role'],
             'school_id' => $school_id,
             'school_name' => $school_name,
+            'education_level' => $school_level,
             'email' => $email
         ]);
 
@@ -421,6 +437,7 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             "school" => [
                 "id" => $school_id,
                 "name" => $school_name,
+                "education_level" => $school_level,
                 "slug" => $user['slug'] ?? '',
                 "bk_name" => $user['bk_name'] ?? 'Koordinator BK',
                 "bk_email" => $email,
@@ -480,23 +497,37 @@ if (in_array($payload->role, ['superadmin', 'admin']) && !empty($_GET['school_na
 }
 
 // If school name still empty, fetch from schools table
-if (empty($current_school_name) && !empty($current_school_id)) {
-    $stmt = $pdo->prepare("SELECT name, bk_name, bk_phone, bk_email, city FROM schools WHERE id = ?");
+$current_school_level = $payload->education_level ?? 'SMA';
+if (!empty($current_school_id)) {
+    $stmt = $pdo->prepare("SELECT name, bk_name, bk_phone, bk_email, city, education_level FROM schools WHERE id = ?");
     $stmt->execute([$current_school_id]);
     $sData = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($sData) {
         $current_school_name = $sData['name'];
+        if (!empty($sData['education_level'])) {
+            $current_school_level = $sData['education_level'];
+        }
+    }
+}
+
+// Fallback detection from school name if not explicitly set
+if (empty($current_school_level) || $current_school_level === 'SMA') {
+    if (stripos($current_school_name, 'SMP') !== false || stripos($current_school_name, 'MTS') !== false) {
+        $current_school_level = 'SMP';
+    } elseif (stripos($current_school_name, 'SD') !== false || stripos($current_school_name, 'MI') !== false) {
+        $current_school_level = 'SD';
     }
 }
 
 // Fallback for Admin/Superadmin if no specific school selected: choose first active school
 if (empty($current_school_name)) {
     try {
-        $stmt_first = $pdo->query("SELECT id, name FROM schools WHERE is_active IS NULL OR is_active != 0 ORDER BY name ASC LIMIT 1");
+        $stmt_first = $pdo->query("SELECT id, name, education_level FROM schools WHERE is_active IS NULL OR is_active != 0 ORDER BY name ASC LIMIT 1");
         $first_sch = $stmt_first->fetch(PDO::FETCH_ASSOC);
         if ($first_sch) {
             $current_school_id = $first_sch['id'];
             $current_school_name = $first_sch['name'];
+            $current_school_level = $first_sch['education_level'] ?? 'SMA';
         }
     } catch (\Throwable $e) {}
 }
@@ -662,19 +693,24 @@ if ($action === 'dashboard' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         ]
     ];
 
+    $isSma = ($current_school_level === 'SMA');
+
     echo json_encode([
         "success" => true,
         "school_name" => $current_school_name,
+        "education_level" => $current_school_level,
         "kpis" => [
+            "education_level" => $current_school_level,
             "total_students" => $total_students,
             "paid_package_students" => $paid_package_total,
             "free_diagnostic_students" => $package_breakdown['free_spp'],
             "tryout_participants" => (int)$tryout_stats['tryout_participants'],
             "average_tryout_score" => round((float)($tryout_stats['avg_tryout_score'] ?? 0), 1),
-            "avg_snbt_score" => round((float)($tryout_stats['avg_snbt_score'] ?? 0), 1),
+            "avg_snbt_score" => $isSma ? round((float)($tryout_stats['avg_snbt_score'] ?? 0), 1) : 0,
             "avg_tka_score" => round((float)($tryout_stats['avg_tka_score'] ?? 0), 1),
             "tka_tryouts_taken" => (int)($tryout_stats['tka_tryouts_taken'] ?? 0),
-            "spp_completed_students" => $sppAggregate['total_canonical_students'] ?? 0
+            "spp_completed_students" => $sppAggregate['total_canonical_students'] ?? 0,
+            "ppdb_eligible_count" => $paid_package_total
         ],
         "package_breakdown" => $package_breakdown,
         "riasec_distribution" => $sppAggregate['riasec_distribution'] ?? [],

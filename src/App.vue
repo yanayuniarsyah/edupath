@@ -3068,11 +3068,13 @@
                 <span class="px-2 py-0.5 rounded-md bg-[#c0ff00]/15 text-[#c0ff00] text-[10px] font-black font-mono">TOP 12%</span>
               </div>
               <div class="flex items-baseline gap-1.5 my-1">
-                <span class="text-2xl sm:text-3xl font-black font-mono text-[#c0ff00]">{{ currentAbilityScore }}</span>
-                <span class="text-xs text-white/40 font-bold">/ 1000</span>
+                <span class="text-2xl sm:text-3xl font-black font-mono text-[#c0ff00]">
+                  {{ isTkaProgram ? (currentAbilityScore > 100 ? Math.round(currentAbilityScore / 10) : currentAbilityScore) : currentAbilityScore }}
+                </span>
+                <span class="text-xs text-white/40 font-bold">/ {{ isTkaProgram ? '100' : '1000' }}</span>
               </div>
               <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-white/60">
-                <span>Status Performa</span>
+                <span>{{ isTkaProgram ? 'Satuan: Poin Standar' : 'Satuan: Poin IRT' }}</span>
                 <span class="text-emerald-400 font-bold">Kompetitif</span>
               </div>
             </div>
@@ -8216,9 +8218,9 @@ export default {
 
     const currentProgramTargetScore = computed(() => {
       const prog = (activeAcademicProgram.value || '').toUpperCase();
-      if (prog === 'TKA_SD') return 850;
-      if (prog === 'TKA_SMP') return 880;
-      if (prog === 'TKA_SMA' || prog === 'SMA') return 900;
+      if (prog === 'TKA_SD') return 85;
+      if (prog === 'TKA_SMP') return 88;
+      if (prog === 'TKA_SMA' || prog === 'SMA') return 90;
       return selectedUniversity.value ? selectedUniversity.value.targetScore : 720;
     });
 
@@ -8235,16 +8237,26 @@ export default {
       if (prog.includes('SNPMB') || prog.includes('UTBK') || prog.includes('ALUMNI')) {
         return 'Skor IRT Terkini';
       }
-      return 'Skor Evaluasi Terkini';
+      return 'Skor TKA Terkini';
     });
 
     const gapScore = computed(() => {
       const target = currentProgramTargetScore.value;
-      return Math.max(0, target - currentAbilityScore.value);
+      const current = isTkaProgram.value
+        ? (currentAbilityScore.value > 100 ? Math.round(currentAbilityScore.value / 10) : currentAbilityScore.value)
+        : currentAbilityScore.value;
+      return Math.max(0, target - current);
     });
 
     const progressPercentage = computed(() => {
       const target = currentProgramTargetScore.value;
+      if (isTkaProgram.value) {
+        const current = (currentAbilityScore.value > 100 ? Math.round(currentAbilityScore.value / 10) : currentAbilityScore.value);
+        const base = 40;
+        const total = target - base;
+        if (total <= 0) return 100;
+        return Math.min(100, Math.max(0, Math.round(((current - base) / total) * 100)));
+      }
       const base = 400; 
       const current = currentAbilityScore.value - base;
       const total = target - base;
