@@ -2808,240 +2808,229 @@
 
 
         <!-- TAB 1: DASHBOARD -->
-        <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
+        <section v-if="currentTab === 'dashboard'" class="animate-fade-in space-y-5 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
 
-          <!-- ✨ Banner Gambar Dashboard Belajar (PALING ATAS - Proporsional di HP & Desktop) -->
-          <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.5)] relative group">
-            <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-32 sm:h-44 md:h-56 lg:h-64 object-cover object-center transition-transform duration-700 group-hover:scale-105" />
-            <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#c0ff00] to-transparent opacity-90 z-10"></div>
-          </div>
-
-          <!-- ✨ Program Belajar & Multi-Paket Switcher Bar -->
-          <div class="glass-card p-3 sm:p-4 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-slate-950 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-10 h-10 rounded-xl bg-[#c0ff00]/15 border border-[#c0ff00]/30 flex items-center justify-center text-xl shrink-0">
-                {{ activeProgramInfo.icon }}
-              </div>
-              <div class="min-w-0">
+          <!-- ✨ UNIFIED STUDENT COCKPIT HEADER (Proporsional, DKV-Standard, Clean & Compact) -->
+          <div class="glass-card rounded-3xl overflow-hidden border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-b from-slate-900/90 via-slate-900/95 to-slate-950">
+            <!-- Top Banner Visual (Sleek, integrated) -->
+            <div class="relative h-28 sm:h-36 md:h-44 w-full overflow-hidden">
+              <img src="/2.jpeg" alt="EduPath Student Banner" class="w-full h-full object-cover object-center" />
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+              
+              <!-- Program & Status Floating Badges on Banner -->
+              <div class="absolute top-3 inset-x-3 sm:top-4 sm:inset-x-5 flex items-center justify-between gap-2 z-10">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-[9px] font-black uppercase tracking-wider text-[#c0ff00]">Ruang Belajar Aktif</span>
-                  <span :class="['text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider', hasSubscriptionForProgram(activeAcademicProgram) ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30']">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/15 text-xs text-white font-bold">
+                    <span>{{ activeProgramInfo.icon }}</span>
+                    <span>{{ activeProgramInfo.name }}</span>
+                  </span>
+                  <span :class="['text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider backdrop-blur-md border', hasSubscriptionForProgram(activeAcademicProgram) ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/40' : 'bg-amber-500/25 text-amber-300 border-amber-500/40']">
                     {{ hasSubscriptionForProgram(activeAcademicProgram) ? (currentUser?.plan_name || 'Langganan Aktif') : 'Akses Trial Gratis' }}
                   </span>
                 </div>
-                <div class="text-sm sm:text-base font-black text-white flex items-center gap-2 truncate">
-                  <span>{{ activeProgramInfo.name }}</span>
-                  <span class="text-xs text-white/40 font-normal">({{ activeProgramInfo.levelDesc }})</span>
-                </div>
-              </div>
-            </div>
 
-            <!-- Program Switcher Dropdown Action -->
-            <div class="relative shrink-0 flex items-center gap-2">
-              <button 
-                type="button"
-                @click="showProgramSwitcherDropdown = !showProgramSwitcherDropdown" 
-                class="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
-              >
-                <i class="ph-bold ph-arrows-left-right text-sm text-[#c0ff00]"></i>
-                <span>Ganti Program Belajar</span>
-                <i class="ph-bold ph-caret-down text-[10px]"></i>
-              </button>
-
-              <!-- Dropdown list -->
-              <div 
-                v-if="showProgramSwitcherDropdown" 
-                class="absolute right-0 top-full mt-2 w-72 edupath-dropdown-menu z-50 animate-fade-in space-y-1"
-              >
-                <div class="px-2 pb-1 text-[10px] font-black uppercase tracking-wider text-white/40 flex justify-between items-center">
-                  <span>Pilih Program / Jenjang</span>
-                  <span class="text-[9px] text-[#c0ff00]">5 Program</span>
-                </div>
-                <button 
-                  v-for="prog in allAcademicProgramsList" 
-                  :key="prog.code"
-                  type="button"
-                  @click="setActiveProgram(prog.code); showProgramSwitcherDropdown = false;"
-                  :class="[
-                    'w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer text-xs',
-                    activeAcademicProgram === prog.code 
-                      ? 'bg-[#c0ff00]/15 text-[#c0ff00] font-black border border-[#c0ff00]/30 shadow-sm' 
-                      : 'text-white/70 hover:bg-white/5 hover:text-white border border-transparent'
-                  ]"
-                >
-                  <div class="flex items-center gap-2.5">
-                    <span class="text-base">{{ prog.icon }}</span>
-                    <div>
-                      <div class="font-bold text-white text-xs">{{ prog.name }}</div>
-                      <div class="text-[9px] text-white/40">{{ prog.levelDesc }}</div>
-                    </div>
-                  </div>
-                  <span v-if="hasSubscriptionForProgram(prog.code)" class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">Aktif</span>
-                  <span v-else class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/50 font-bold">Trial</span>
-                </button>
-                <div class="pt-2 border-t border-white/10">
+                <!-- Program Switcher Trigger -->
+                <div class="relative">
                   <button 
                     type="button"
-                    @click="showProgramSwitcherDropdown = false; openPlanSelector()" 
-                    class="w-full py-2 px-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider text-center cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#c0ff00]/20"
+                    @click="showProgramSwitcherDropdown = !showProgramSwitcherDropdown" 
+                    class="px-3 py-1.5 rounded-xl bg-slate-950/80 hover:bg-slate-900/90 backdrop-blur-md border border-white/15 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
                   >
-                    <i class="ph-bold ph-plus-circle text-sm"></i> Beli Multi-Paket Lain
+                    <i class="ph-bold ph-arrows-left-right text-xs text-[#c0ff00]"></i>
+                    <span class="hidden sm:inline">Ganti Program</span>
+                    <i class="ph-bold ph-caret-down text-[10px]"></i>
                   </button>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <!-- ✨ Text & Tombol Greeting (DI LETAKAN DI BAWAH GAMBAR) -->
-          <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/85 to-slate-950 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
-            <!-- Left: Avatar & Greeting Info -->
-            <div class="flex items-start md:items-center gap-3 sm:gap-4 flex-1 min-w-0">
-              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#c0ff00]/25 via-emerald-500/15 to-transparent border border-[#c0ff00]/40 shadow-[0_0_25px_rgba(192,255,0,0.3)] flex items-center justify-center shrink-0 backdrop-blur-md">
-                <i class="ph-fill ph-user text-xl sm:text-2xl text-[#c0ff00]"></i>
-              </div>
-              <div class="space-y-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
-                  <p class="text-[#c0ff00] font-black text-[10px] sm:text-xs tracking-widest uppercase">
-                    {{ activeProgramInfo.badge }}
-                  </p>
-                </div>
-                <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">Halo, <span class="bg-gradient-to-r from-white via-slate-100 to-white/70 bg-clip-text text-transparent">{{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa EduPath') }}!</span></h2>
-                <p class="text-white/70 text-xs md:text-sm font-medium leading-relaxed">{{ dashboardProgramGreeting }}</p>
-              </div>
-            </div>
-
-            <!-- Right: Shortcut Actions & Quick Info -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto shrink-0 pt-1 lg:pt-0">
-              <button @click="handleHeroStartAssessment" class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(192,255,0,0.3)] cursor-pointer">
-                <i class="ph-bold ph-exam text-base"></i>
-                <span>Mulai Asesmen</span>
-              </button>
-              <div class="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center">
-                <button @click="handleTabClick('learning')" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
-                  <i class="ph-bold ph-book-open text-base text-white/70"></i>
-                  <span>Materi</span>
-                </button>
-                <button @click="navigateToPracticeMode" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md">
-                  <i class="ph-bold ph-pencil-simple text-base text-white/70"></i>
-                  <span>Latihan</span>
-                </button>
-              </div>
-              <button v-if="isAdmin" type="button" @click="currentTab = 'offline_sop'" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all active:scale-95 cursor-pointer backdrop-blur-md shadow-sm"
-              >
-                <span class="text-sm">🏢</span>
-                <span>SOP &amp; Tanggung Jawab Bimbel</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- ✨ Target Goal Selection & Status (Dinamis: SMP Impian, SMA Unggulan, atau PTN) -->
-          <div class="glass-card p-4 md:p-5 rounded-2xl border border-sky-500/30 relative overflow-hidden bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-950 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <!-- Left: Target Selector -->
-              <div class="flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400 text-lg shrink-0 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
-                  {{ activeProgramTargetIcon }}
-                </div>
-                <div class="space-y-0.5 min-w-0">
-                  <span class="block text-[9px] font-black uppercase tracking-widest text-sky-400">{{ activeProgramTargetTitle }}</span>
-                  <div class="flex items-center gap-2">
-                    <span class="text-sm md:text-base font-black text-white truncate">{{ currentStudentTargetDisplay }}</span>
-                    <button @click="openQuickTargetModal" class="text-[10px] px-2.5 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white font-bold border border-sky-500/35 transition-all cursor-pointer flex items-center gap-1 shadow-sm">
-                      <i class="ph-bold ph-pencil-simple text-xs"></i>
-                      <span>Ubah Target</span>
+                  <!-- Dropdown list -->
+                  <div 
+                    v-if="showProgramSwitcherDropdown" 
+                    class="absolute right-0 top-full mt-2 w-72 edupath-dropdown-menu z-50 animate-fade-in space-y-1"
+                  >
+                    <div class="px-2 pb-1 text-[10px] font-black uppercase tracking-wider text-white/40 flex justify-between items-center">
+                      <span>Pilih Program / Jenjang</span>
+                      <span class="text-[9px] text-[#c0ff00]">5 Program</span>
+                    </div>
+                    <button 
+                      v-for="prog in allAcademicProgramsList" 
+                      :key="prog.code"
+                      type="button"
+                      @click="setActiveProgram(prog.code); showProgramSwitcherDropdown = false;"
+                      :class="[
+                        'w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer text-xs',
+                        activeAcademicProgram === prog.code 
+                          ? 'bg-[#c0ff00]/15 text-[#c0ff00] font-black border border-[#c0ff00]/30 shadow-sm' 
+                          : 'text-white/70 hover:bg-white/5 hover:text-white border border-transparent'
+                      ]"
+                    >
+                      <div class="flex items-center gap-2.5">
+                        <span class="text-base">{{ prog.icon }}</span>
+                        <div>
+                          <div class="font-bold text-white text-xs">{{ prog.name }}</div>
+                          <div class="text-[9px] text-white/40">{{ prog.levelDesc }}</div>
+                        </div>
+                      </div>
+                      <span v-if="hasSubscriptionForProgram(prog.code)" class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">Aktif</span>
+                      <span v-else class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/50 font-bold">Trial</span>
                     </button>
+                    <div class="pt-2 border-t border-white/10">
+                      <button 
+                        type="button"
+                        @click="showProgramSwitcherDropdown = false; openPlanSelector()" 
+                        class="w-full py-2 px-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider text-center cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#c0ff00]/20"
+                      >
+                        <i class="ph-bold ph-plus-circle text-sm"></i> Beli Multi-Paket Lain
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Right: Target Status Badge -->
-              <div class="flex items-center gap-2">
-                <span class="px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/25 text-sky-300 text-xs font-bold flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
-                  <span>Jenjang: <strong class="text-white">{{ activeProgramInfo.name }}</strong></span>
-                </span>
-                <button @click="handleTabClick('diagnostic')" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
-                  <span>Asesmen Diagnostik</span>
-                  <i class="ph-bold ph-arrow-clockwise"></i>
+            <!-- Profile Info & Target Summary Bar -->
+            <div class="p-4 sm:p-6 md:p-7 space-y-4 sm:space-y-5">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                
+                <!-- Left: Avatar & Human Greeting -->
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#c0ff00]/15 border border-[#c0ff00]/30 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(192,255,0,0.2)]">
+                    <i class="ph-fill ph-user text-2xl text-[#c0ff00]"></i>
+                  </div>
+                  <div class="min-w-0 space-y-0.5">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-[#c0ff00] animate-pulse"></span>
+                      <span class="text-[10px] font-bold uppercase tracking-wider text-[#c0ff00]">{{ activeProgramInfo.badge }}</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl md:text-2xl font-black text-white truncate tracking-tight">
+                      Halo, {{ currentUser?.name || (isSchoolBk ? (currentUser?.school_name || 'Guru BK') : 'Siswa EduPath') }}!
+                    </h2>
+                    <p class="text-xs text-white/60 truncate">{{ dashboardProgramGreeting }}</p>
+                  </div>
+                </div>
+
+                <!-- Right: Target Impian Pill -->
+                <div class="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/10 shrink-0 self-start md:self-auto">
+                  <div class="w-9 h-9 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center text-lg border border-sky-500/25 shrink-0">
+                    {{ activeProgramTargetIcon }}
+                  </div>
+                  <div class="min-w-0 pr-1">
+                    <span class="block text-[9px] font-bold uppercase tracking-wider text-white/40">{{ activeProgramTargetTitle }}</span>
+                    <span class="text-xs sm:text-sm font-black text-white truncate block max-w-[200px]">{{ currentStudentTargetDisplay }}</span>
+                  </div>
+                  <button 
+                    type="button"
+                    @click="openQuickTargetModal" 
+                    class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all cursor-pointer" 
+                    title="Ubah Target"
+                  >
+                    <i class="ph-bold ph-pencil-simple text-xs"></i>
+                  </button>
+                </div>
+
+              </div>
+
+              <!-- Streamlined Action Strip (Buttons Aligned Proportionally) -->
+              <div class="pt-2 border-t border-white/10 flex flex-wrap items-center gap-2 sm:gap-2.5">
+                <button 
+                  type="button"
+                  @click="handleHeroStartAssessment" 
+                  class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(192,255,0,0.25)] flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+                >
+                  <i class="ph-bold ph-exam text-sm"></i>
+                  <span>Mulai Asesmen</span>
+                </button>
+
+                <button 
+                  type="button"
+                  @click="handleTabClick('learning')" 
+                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <i class="ph-bold ph-book-open text-sm text-white/70"></i>
+                  <span>Materi</span>
+                </button>
+
+                <button 
+                  type="button"
+                  @click="navigateToPracticeMode" 
+                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <i class="ph-bold ph-pencil-simple text-sm text-white/70"></i>
+                  <span>Latihan Soal</span>
+                </button>
+
+                <button 
+                  type="button"
+                  @click="handleTabClick('simulator')" 
+                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <i class="ph-bold ph-laptop text-sm text-white/70"></i>
+                  <span>Try Out CBT</span>
+                </button>
+
+                <button 
+                  type="button"
+                  @click="currentTab = 'student_360'; fetchMyStudent360();" 
+                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 sm:ml-auto"
+                >
+                  <i class="ph-bold ph-chart-line-up text-sm text-[#c0ff00]"></i>
+                  <span>Rapor &amp; Profil 360</span>
+                </button>
+
+                <button 
+                  v-if="isAdmin" 
+                  type="button" 
+                  @click="currentTab = 'offline_sop'" 
+                  class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-amber-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <span>🏢 SOP Bimbel</span>
                 </button>
               </div>
+
             </div>
           </div>
 
-          <!-- ✨ Widget Rapor & Profil Holistik Siswa (PRD v1.2 School Intelligence) -->
-          <div class="glass-card p-4 sm:p-5 rounded-2xl border border-purple-500/35 bg-gradient-to-r from-purple-950/30 via-slate-900/90 to-indigo-950/30 shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-11 h-11 rounded-2xl bg-purple-500/20 border border-purple-500/35 flex items-center justify-center text-purple-300 text-xl shrink-0 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
-                <i class="ph-bold ph-chart-line-up"></i>
-              </div>
-              <div class="space-y-0.5 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-[9px] font-black uppercase tracking-widest text-purple-400">School Intelligence PRD v1.2</span>
-                  <span v-if="student360Data?.report_cards?.length" class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
-                    {{ student360Data.report_cards.length }} Semester Terverifikasi
-                  </span>
-                  <span v-if="student360Data?.student?.school" class="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white/70 font-medium">
-                    🏛️ {{ student360Data.student.school }}
-                  </span>
-                </div>
-                <h3 class="text-sm sm:text-base font-black text-white truncate">Agregasi Holistik Rapor &amp; Profil Siswa</h3>
-                <p class="text-xs text-white/60 truncate">Grafik nilai rapor multi-semester, hasil tryout CBT, diagnostik RIASEC &amp; catatan pendampingan Guru BK.</p>
-              </div>
-            </div>
-            <button 
-              type="button" 
-              @click="currentTab = 'student_360'; fetchMyStudent360();" 
-              class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-[0_0_20px_rgba(192,255,0,0.3)] active:scale-95"
-            >
-              <span>Buka Rapor &amp; Profil 360</span>
-              <i class="ph-bold ph-arrow-right"></i>
-            </button>
-          </div>
-
-          <!-- ✨ Executive KPI Strip (4 Kolom Proporsional & Presisi) -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- ✨ Executive KPI Strip (4 Kolom Proporsional, Tenang & Elegan) -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
             <!-- Card 1: Skor IRT Terkini -->
-            <div class="glass-card p-4 md:p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/20 via-slate-900/80 to-slate-950 flex flex-col justify-between">
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Skor IRT Terkini</span>
-                <span class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 text-[10px] font-bold font-mono">TOP 12%</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Skor IRT Terkini</span>
+                <span class="px-2 py-0.5 rounded-md bg-[#c0ff00]/15 text-[#c0ff00] text-[10px] font-black font-mono">TOP 12%</span>
               </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-3xl md:text-4xl font-black font-heading text-emerald-400 font-mono drop-shadow-[0_0_12px_rgba(52,211,153,0.3)]">{{ currentAbilityScore }}</span>
-                <span class="text-xs text-white/50 font-bold">/ 1000</span>
+              <div class="flex items-baseline gap-1.5 my-1">
+                <span class="text-2xl sm:text-3xl font-black font-mono text-[#c0ff00]">{{ currentAbilityScore }}</span>
+                <span class="text-xs text-white/40 font-bold">/ 1000</span>
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-white/60">
-                <span>Status Kemampuan</span>
+              <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-white/60">
+                <span>Status Performa</span>
                 <span class="text-emerald-400 font-bold">Kompetitif</span>
               </div>
             </div>
 
             <!-- Card 2: Target Kampus Impian -->
-            <div class="glass-card p-4 md:p-5 rounded-2xl border border-sky-500/30 bg-gradient-to-br from-sky-950/20 via-slate-900/80 to-slate-950 flex flex-col justify-between">
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase tracking-widest text-sky-400">Target Skor PTN</span>
-                <span class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-300 text-[10px] font-bold">SNBT 2027</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Target Skor</span>
+                <span class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-300 text-[10px] font-bold">Passing</span>
               </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-3xl md:text-4xl font-black font-heading text-sky-400 font-mono drop-shadow-[0_0_12px_rgba(56,189,248,0.3)]">{{ selectedUniversity.targetScore }}</span>
-                <span class="text-xs text-white/50 font-medium truncate max-w-[120px]">{{ selectedUniversity.name }}</span>
+              <div class="flex items-baseline gap-1.5 my-1">
+                <span class="text-2xl sm:text-3xl font-black font-mono text-white">{{ selectedUniversity.targetScore }}</span>
+                <span class="text-xs text-white/40 font-bold">Poin</span>
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-white/60">
-                <span>Peluang Masuk</span>
-                <span class="text-sky-400 font-bold">Terjangkau</span>
+              <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-white/60">
+                <span class="truncate max-w-[130px]">{{ selectedUniversity.name }}</span>
+                <span class="text-sky-400 font-bold shrink-0">Terjangkau</span>
               </div>
             </div>
 
             <!-- Card 3: Gap & Progres Capaian -->
-            <div class="glass-card p-4 md:p-5 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-slate-900/80 to-slate-950 flex flex-col justify-between">
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase tracking-widest text-amber-400">Selisih Gap Target</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Selisih Gap</span>
                 <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 text-[10px] font-mono font-bold">{{ progressPercentage }}%</span>
               </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-3xl md:text-4xl font-black font-heading text-rose-400 font-mono">{{ gapScore }}</span>
-                <span class="text-xs text-white/50 font-bold">Poin tersisa</span>
+              <div class="flex items-baseline gap-1.5 my-1">
+                <span class="text-2xl sm:text-3xl font-black font-mono text-amber-400">{{ gapScore }}</span>
+                <span class="text-xs text-white/40 font-bold">Poin lagi</span>
               </div>
               <div class="w-full bg-white/10 h-1.5 rounded-full mt-2 overflow-hidden">
                 <div class="bg-gradient-to-r from-amber-400 to-[#c0ff00] h-full rounded-full transition-all duration-700" :style="{ width: progressPercentage + '%' }"></div>
@@ -3049,56 +3038,79 @@
             </div>
 
             <!-- Card 4: Streak Belajar Konsisten -->
-            <div class="glass-card p-4 md:p-5 rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/20 via-slate-900/80 to-slate-950 flex flex-col justify-between">
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400">Streak Konsistensi</span>
-                <span class="px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 text-[10px] font-bold">AKTIF</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Streak Belajar</span>
+                <span class="px-2 py-0.5 rounded-md bg-[#c0ff00]/15 text-[#c0ff00] text-[10px] font-bold">AKTIF</span>
               </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-3xl md:text-4xl font-black font-heading text-indigo-400 font-mono">🔥 {{ streakCount }}</span>
-                <span class="text-xs text-white/50 font-bold">Hari Berturut</span>
+              <div class="flex items-baseline gap-1.5 my-1">
+                <span class="text-2xl sm:text-3xl font-black font-mono text-white">🔥 {{ streakCount }}</span>
+                <span class="text-xs text-white/40 font-bold">Hari Berturut</span>
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-white/60">
-                <span>Kebiasaan Belajar</span>
-                <span class="text-[#c0ff00] font-bold">Pertahankan</span>
+              <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-white/60">
+                <span>Rutinitas Belajar</span>
+                <span class="text-[#c0ff00] font-bold">Konsisten</span>
               </div>
             </div>
           </div>
 
           <!-- ✨ Dual Primary Cockpit (Grid 2 Kolom Seimbang: 7 / 5) -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
             
-            <!-- Kolom Kiri (7/12): Skill Map Scanner & Misi Harian -->
-            <div class="lg:col-span-7 space-y-6">
-              
+            <!-- Kolom Kiri (7/12): Misi Harian & Skill Map Scanner -->
+            <div class="lg:col-span-7 space-y-5 sm:space-y-6">
+
+              <!-- Misi Harian Belajar Card -->
+              <div class="glass-card p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-4">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center font-bold text-base border border-amber-500/30">
+                      <i class="ph-fill ph-sword"></i>
+                    </span>
+                    <div>
+                      <h3 class="text-sm sm:text-base font-black font-heading text-white tracking-tight">Misi Harian Belajar</h3>
+                      <p class="text-[11px] text-white/50">Selesaikan target harian untuk menjaga konsistensi persiapan.</p>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-xs font-black">+{{ dailyMissions.reduce((acc, m) => acc + (m.completed ? m.reward : 0), 0) }} XP</span>
+                </div>
+                <ul class="space-y-2">
+                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-3 p-3 rounded-xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/25' : 'bg-white/[0.02] border-white/10 hover:border-white/20']">
+                    <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-white text-emerald-400 focus:ring-emerald-500 focus:ring-offset-0 w-4 h-4 cursor-pointer appearance-none checked:bg-emerald-500 checked:border-emerald-500 relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-[10px] checked:after:font-black checked:after:left-[3px] checked:after:top-[0px]" @change="checkMissionReward(m)">
+                    <span :class="['text-xs font-bold flex-grow text-white transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
+                    <span class="text-xs font-black font-mono shrink-0 text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">+{{ m.reward }} XP</span>
+                  </li>
+                </ul>
+              </div>
+
               <!-- Skill Map Scanner -->
-              <div class="glass-card p-5 md:p-6 rounded-2xl border border-white/10">
-                <div class="flex items-center justify-between mb-2">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center border border-sky-500/30 shadow-sm">
-                      <i class="ph-bold ph-radar text-xl"></i>
+              <div class="glass-card p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-4">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center border border-sky-500/30">
+                      <i class="ph-bold ph-radar text-lg"></i>
                     </div>
                     <div>
-                      <h3 class="text-lg font-black font-heading text-white tracking-tight">Skill Map Scanner</h3>
-                      <p class="text-xs text-white/60 font-medium">Pemetaan kekuatan &amp; kelemahan per domain UTBK berbasis AI.</p>
+                      <h3 class="text-sm sm:text-base font-black font-heading text-white tracking-tight">Skill Map Penguasaan Materi</h3>
+                      <p class="text-[11px] text-white/50">Tingkat penguasaan konsep per domain materi ujian.</p>
                     </div>
                   </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
-                  <div v-for="(skills, category) in skillMap" :key="category" class="bg-white/5 border border-white/10 p-4 rounded-2xl">
-                    <h4 class="text-xs font-black text-white mb-3.5 border-b border-white/10 pb-2 flex items-center gap-2 uppercase tracking-widest">
-                      <span class="w-2 h-2 bg-[#0ea5e9] rounded-full shadow-[0_0_8px_rgba(14,165,233,0.8)]"></span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
+                  <div v-for="(skills, category) in skillMap" :key="category" class="bg-white/[0.02] border border-white/10 p-3.5 rounded-xl space-y-3">
+                    <h4 class="text-[11px] font-black text-white border-b border-white/10 pb-1.5 flex items-center gap-2 uppercase tracking-wider">
+                      <span class="w-1.5 h-1.5 bg-[#0ea5e9] rounded-full shadow-[0_0_8px_rgba(14,165,233,0.8)]"></span>
                       {{ category }}
                     </h4>
-                    <div class="space-y-3">
-                      <div v-for="(subskills, subtest) in skills" :key="subtest" class="space-y-1.5">
+                    <div class="space-y-2.5">
+                      <div v-for="(subskills, subtest) in skills" :key="subtest" class="space-y-1">
                         <div class="flex justify-between text-[11px] font-bold">
-                          <span class="text-white/80">{{ subtest }}</span>
+                          <span class="text-white/80 truncate max-w-[170px]">{{ subtest }}</span>
                           <span class="font-mono font-black" :style="{ color: getSkillColor(getSkillMastery(subtest)) }">{{ getSkillMastery(subtest) }}%</span>
                         </div>
                         <div class="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
-                          <div class="h-full rounded-full transition-all duration-700 ease-out" :style="{ width: getSkillMastery(subtest) + '%', backgroundColor: getSkillColor(getSkillMastery(subtest)), boxShadow: `0 0 10px ${getSkillColor(getSkillMastery(subtest))}` }"></div>
+                          <div class="h-full rounded-full transition-all duration-700 ease-out" :style="{ width: getSkillMastery(subtest) + '%', backgroundColor: getSkillColor(getSkillMastery(subtest)) }"></div>
                         </div>
                       </div>
                     </div>
@@ -3106,50 +3118,27 @@
                 </div>
               </div>
 
-              <!-- Misi Harian Card -->
-              <div class="glass-card p-5 md:p-6 rounded-2xl border border-amber-500/20">
-                <div class="flex items-center justify-between mb-4">
-                  <div class="flex items-center gap-3">
-                    <span class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg border border-amber-500/30">
-                      <i class="ph-fill ph-sword"></i>
-                    </span>
-                    <div>
-                      <h3 class="text-base font-black font-heading text-white tracking-tight">Misi Harian Belajar</h3>
-                      <p class="text-[11px] text-white/50">Selesaikan misi untuk mendapatkan XP dan menaikkan level persiapan.</p>
-                    </div>
-                  </div>
-                  <span class="px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-xs font-black">+{{ dailyMissions.reduce((acc, m) => acc + (m.completed ? m.reward : 0), 0) }} XP</span>
-                </div>
-                <ul class="space-y-2.5">
-                  <li v-for="(m, index) in dailyMissions" :key="index" :class="['flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300', m.completed ? 'bg-emerald-500/10 border-emerald-500/25' : 'bg-white/5 border-white/10 hover:border-white/20']">
-                    <input type="checkbox" v-model="m.completed" class="rounded-md border-white/20 bg-white text-emerald-400 focus:ring-emerald-500 focus:ring-offset-0 w-4 h-4 cursor-pointer appearance-none checked:bg-emerald-500/100 checked:border-emerald-500 relative checked:after:content-['✓'] checked:after:absolute checked:after:text-black checked:after:text-[10px] checked:after:font-black checked:after:left-[3px] checked:after:top-[0px]" @change="checkMissionReward(m)">
-                    <span :class="['text-xs font-bold flex-grow text-white transition-all', { 'line-through opacity-40': m.completed }]">{{ m.title }}</span>
-                    <span class="text-xs font-black font-mono shrink-0 text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">+{{ m.reward }} XP</span>
-                  </li>
-                </ul>
-              </div>
-
             </div>
 
-            <!-- Kolom Kanan (5/12): Radar Blind-Spot, Jalur AI & Peringkat Streak -->
-            <div class="lg:col-span-5 space-y-6">
+            <!-- Kolom Kanan (5/12): Radar Blind-Spot & Rekomendasi Jalur AI -->
+            <div class="lg:col-span-5 space-y-5 sm:space-y-6">
 
-              <!-- Radar Blind-Spot & Kelemahan Card -->
-              <div class="glass-card p-5 md:p-6 rounded-2xl border border-rose-500/25 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-rose-950/20">
-                <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+              <!-- Radar Blind-Spot AI -->
+              <div class="glass-card p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-3.5">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-base border border-rose-500/30">
-                      <i class="ph-bold ph-radar"></i>
+                    <span class="w-8 h-8 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center font-bold text-base border border-rose-500/30">
+                      <i class="ph-bold ph-warning-circle"></i>
                     </span>
                     <div>
-                      <h4 class="text-sm font-black text-white tracking-tight uppercase">Radar Blind-Spot AI</h4>
+                      <h4 class="text-sm font-black text-white tracking-tight">Radar Blind-Spot AI</h4>
                       <p class="text-[10px] text-white/50">Prioritas materi yang perlu diperbaiki segera</p>
                     </div>
                   </div>
-                  <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">1 Kritis</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30">Fokus Remedial</span>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-2.5">
                   <div 
                     v-for="blind in radarBlindSpots" 
                     :key="blind.title" 
@@ -3176,8 +3165,7 @@
                       <button 
                         v-if="blind.color !== 'emerald'"
                         @click="handleTabClick('learning')" 
-                        :class="['font-black hover:underline cursor-pointer', 
-                          blind.color === 'rose' ? 'text-[#c0ff00]' : 'text-amber-300']"
+                        class="font-black text-[#c0ff00] hover:underline cursor-pointer"
                       >
                         Drill Materi &raquo;
                       </button>
@@ -3188,68 +3176,29 @@
               </div>
 
               <!-- Jalur AI Rekomendasi Belajar -->
-              <div class="glass-card p-5 md:p-6 rounded-2xl border border-purple-500/25 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-purple-950/20">
-                <div class="flex items-center gap-2.5 mb-3 pb-2 border-b border-white/10">
-                  <i class="ph-bold ph-lightning text-xl text-[#8b5cf6]"></i>
+              <div class="glass-card p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-3.5">
+                <div class="flex items-center gap-2.5 pb-3 border-b border-white/10">
+                  <div class="w-8 h-8 rounded-xl bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center font-bold text-base border border-[#c0ff00]/30">
+                    <i class="ph-bold ph-lightning"></i>
+                  </div>
                   <div>
-                    <h3 class="text-base font-black font-heading text-white tracking-tight">Jalur AI Personal</h3>
-                    <p class="text-[10px] text-white/50">Rekomendasi belajar adaptif otomatis</p>
+                    <h3 class="text-sm font-black font-heading text-white tracking-tight">Rekomendasi Jalur AI</h3>
+                    <p class="text-[10px] text-white/50">Urutan langkah belajar adaptif berikutnya</p>
                   </div>
                 </div>
                 
-                <div class="space-y-4 pt-1">
+                <div class="space-y-3 pt-1">
                   <div v-for="(rec, i) in learningRecommendations" :key="i" class="flex gap-3 relative group">
-                    <div v-if="i < learningRecommendations.length - 1" class="absolute left-3.5 top-8 bottom-0 w-[2px] bg-white/10 group-hover:bg-[#8b5cf6]/50 transition-colors"></div>
-                    <div class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-black font-mono text-xs text-[#8b5cf6] shrink-0 z-10 group-hover:bg-[#8b5cf6] group-hover:text-white transition-all">
+                    <div v-if="i < learningRecommendations.length - 1" class="absolute left-3.5 top-7 bottom-0 w-[1px] bg-white/10"></div>
+                    <div class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-black font-mono text-xs text-[#c0ff00] shrink-0 z-10">
                       {{ i + 1 }}
                     </div>
-                    <div class="pt-0.5">
-                      <h5 class="text-xs font-black text-white leading-tight mb-1">{{ rec.title }}</h5>
+                    <div class="pt-0.5 min-w-0">
+                      <h5 class="text-xs font-black text-white leading-tight mb-0.5 truncate">{{ rec.title }}</h5>
                       <p class="text-[11px] text-white/50 font-medium leading-relaxed">{{ rec.desc }}</p>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <!-- Peringkat Streak Belajar Card -->
-              <div class="glass-card p-5 md:p-6 rounded-2xl border border-indigo-500/25">
-                <div class="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
-                  <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-base border border-indigo-500/30">
-                      <i class="ph-bold ph-fire"></i>
-                    </span>
-                    <div>
-                      <h3 class="text-sm font-black font-heading text-white tracking-tight">Peringkat Streak Belajar</h3>
-                      <p class="text-[10px] text-white/50">Konsistensi harian kunci kelulusan PTN</p>
-                    </div>
-                  </div>
-                  <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-black font-mono">🔥 {{ streakCount }} Hari</span>
-                </div>
-                <ul class="space-y-2">
-                  <li class="flex items-center gap-2.5 p-2 rounded-xl bg-gradient-to-r from-indigo-500/20 to-purple-500/10 border border-indigo-500/30">
-                    <span class="w-6 h-6 rounded-full bg-[#c0ff00] text-black flex items-center justify-center font-mono font-black text-xs">1</span>
-                    <div class="flex-grow min-w-0">
-                      <div class="text-xs font-bold text-white truncate">{{ currentUser?.name || 'Anda (Siswa Mandiri)' }}</div>
-                      <div class="text-[10px] text-[#c0ff00] font-semibold">Streak Aktif</div>
-                    </div>
-                    <span class="text-xs text-[#c0ff00] font-black font-mono shrink-0">{{ streakCount }} Hari</span>
-                  </li>
-                  <li class="flex items-center gap-2.5 p-2 rounded-xl bg-white/5 border border-white/5">
-                    <span class="w-6 h-6 rounded-full bg-white/10 text-white/70 flex items-center justify-center font-mono font-bold text-xs">2</span>
-                    <span class="text-xs font-medium text-white/80 flex-grow truncate">Budi Santoso</span>
-                    <span class="text-xs text-white/50 font-mono shrink-0">6 Hari</span>
-                  </li>
-                  <li class="flex items-center gap-2.5 p-2 rounded-xl bg-white/5 border border-white/5">
-                    <span class="w-6 h-6 rounded-full bg-white/10 text-white/70 flex items-center justify-center font-mono font-bold text-xs">3</span>
-                    <span class="text-xs font-medium text-white/80 flex-grow truncate">Citra Lestari</span>
-                    <span class="text-xs text-white/50 font-mono shrink-0">5 Hari</span>
-                  </li>
-                  <li class="flex items-center gap-2.5 p-2 rounded-xl bg-white/5 border border-white/5">
-                    <span class="w-6 h-6 rounded-full bg-white/10 text-white/70 flex items-center justify-center font-mono font-bold text-xs">4</span>
-                    <span class="text-xs font-medium text-white/80 flex-grow truncate">Dewi Setyowati</span>
-                    <span class="text-xs text-white/50 font-mono shrink-0">5 Hari</span>
-                  </li>
-                </ul>
               </div>
 
             </div>
@@ -3257,27 +3206,27 @@
           </div>
         </section>
 
-        <!-- TAB: STUDENT 360 HOLISTIC PROFILE (EDUPATH SCHOOL INTELLIGENCE PRD v1.2) -->
-        <section v-if="currentTab === 'student_360'" class="animate-fade-in space-y-6 w-full max-w-7xl mx-auto pb-16">
+        <!-- TAB: STUDENT 360 HOLISTIC PROFILE (Rapor & Evaluasi Belajar Siswa) -->
+        <section v-if="currentTab === 'student_360'" class="animate-fade-in space-y-5 sm:space-y-6 w-full max-w-7xl mx-auto pb-16">
           
           <!-- Top Header Bar -->
-          <div class="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 bg-gradient-to-r from-slate-900/95 via-purple-950/40 to-slate-900/95 shadow-[0_16px_50px_rgba(0,0,0,0.5)] flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="space-y-1">
+          <div class="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 bg-gradient-to-b from-slate-900/90 via-slate-900/95 to-slate-950 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1.5">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-black text-[10px] uppercase tracking-wider border border-purple-500/30 flex items-center gap-1.5">
+                <span class="px-2.5 py-1 rounded-full bg-[#c0ff00]/10 text-[#c0ff00] font-bold text-[11px] border border-[#c0ff00]/25 flex items-center gap-1.5">
                   <i class="ph-bold ph-student"></i>
-                  <span>PRD v1.2 School Intelligence</span>
+                  <span>Portofolio Akademik Siswa</span>
                 </span>
-                <span v-if="student360Data?.student?.school" class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-bold text-[10px] border border-emerald-500/25">
+                <span v-if="student360Data?.student?.school" class="px-2.5 py-1 rounded-full bg-white/5 text-white/80 font-medium text-[11px] border border-white/10">
                   🏛️ {{ student360Data.student.school }}
                 </span>
               </div>
               <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                <span>Rapor &amp; Profil Holistik Siswa</span>
-                <span v-if="student360Loading" class="text-xs text-purple-400 font-normal animate-pulse">(Memuat data...)</span>
+                <span>Rapor &amp; Evaluasi Belajar Siswa</span>
+                <span v-if="student360Loading" class="text-xs text-[#c0ff00] font-normal animate-pulse">(Memuat data...)</span>
               </h2>
-              <p class="text-xs sm:text-sm text-white/60 font-medium">
-                Agregasi resmi nilai rapor semester terverifikasi sekolah, performa tryout CBT/TKA, asesmen diagnostik minat bakat, early warning gap kompetensi, dan catatan pendampingan Guru BK.
+              <p class="text-xs sm:text-sm text-white/60 font-medium max-w-2xl">
+                Rekapitulasi capaian nilai rapor sekolah, riwayat simulasi CBT, dan panduan belajar terarah.
               </p>
             </div>
 
@@ -3289,12 +3238,12 @@
                 :disabled="student360Loading"
               >
                 <i class="ph-bold ph-arrow-clockwise" :class="{ 'animate-spin': student360Loading }"></i>
-                <span>Segarkan Data 360</span>
+                <span>Segarkan Data</span>
               </button>
               <button 
                 type="button" 
                 @click="currentTab = 'dashboard'" 
-                class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(192,255,0,0.3)]"
+                class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(192,255,0,0.25)]"
               >
                 <i class="ph-bold ph-gauge"></i>
                 <span>Ke Dashboard</span>
@@ -3302,151 +3251,149 @@
             </div>
           </div>
 
-          <!-- 4 Executive KPI Cards -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- 4 Executive KPI Cards (Sistem Grid Seimbang & Tenang) -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
             <!-- Card 1: Rata-Rata Rapor Kumulatif -->
-            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-slate-900/80 to-slate-950">
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase tracking-widest text-amber-400">Rata-Rata Rapor</span>
-                <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 text-[10px] font-bold">KUMULATIF</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Rata-Rata Rapor</span>
+                <span class="px-2 py-0.5 rounded-md bg-white/10 text-white/80 text-[10px] font-bold">KUMULATIF</span>
               </div>
-              <div class="text-3xl font-black font-heading text-amber-400 font-mono">
+              <div class="text-2xl sm:text-3xl font-black font-heading text-white font-mono my-1">
                 {{ computeCumulativeRaporGpa(student360Data?.report_cards) }}
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/60 flex justify-between">
+              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/50 flex justify-between">
                 <span>Semester Terdata</span>
                 <strong class="text-white">{{ student360Data?.report_cards?.length || 0 }} Periode</strong>
               </div>
             </div>
 
             <!-- Card 2: Skor Tryout CBT / TKA -->
-            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/20 via-slate-900/80 to-slate-950">
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Tryout CBT / TKA</span>
-                <span class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 text-[10px] font-bold">TERKINI</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Tryout CBT / TKA</span>
+                <span class="px-2 py-0.5 rounded-md bg-[#c0ff00]/15 text-[#c0ff00] text-[10px] font-bold font-mono">TERKINI</span>
               </div>
-              <div class="text-3xl font-black font-heading text-[#c0ff00] font-mono">
+              <div class="text-2xl sm:text-3xl font-black font-heading text-[#c0ff00] font-mono my-1">
                 {{ student360Data?.assessment_history?.[0]?.score || (currentAbilityScore || 'N/A') }}
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/60 flex justify-between">
+              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/50 flex justify-between">
                 <span>Tryout Selesai</span>
-                <strong class="text-emerald-300">{{ student360Data?.assessment_history?.length || 0 }} Kali</strong>
+                <strong class="text-[#c0ff00]">{{ student360Data?.assessment_history?.length || 0 }} Kali</strong>
               </div>
             </div>
 
-            <!-- Card 3: Minat Dominan Holland RIASEC -->
-            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-950/20 via-slate-900/80 to-slate-950">
+            <!-- Card 3: Minat Dominan RIASEC / SPP -->
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase tracking-widest text-purple-400">Minat Bakat (RIASEC)</span>
-                <span class="px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-300 text-[10px] font-bold">DIAGNOSTIK</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Minat &amp; Tipologi</span>
+                <span class="px-2 py-0.5 rounded-md bg-white/10 text-white/80 text-[10px] font-bold">DIAGNOSTIK</span>
               </div>
-              <div class="text-base sm:text-lg font-black text-purple-300 truncate mt-1">
+              <div class="text-sm sm:text-base font-black text-white truncate my-1.5" :title="student360Data?.diagnostic?.recommended_track">
                 {{ student360Data?.diagnostic?.recommended_track || 'Penalaran Matematika' }}
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/60 flex justify-between">
+              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/50 flex justify-between">
                 <span>Kecenderungan</span>
-                <strong class="text-purple-300">Investigatif</strong>
+                <strong class="text-white/80">Investigatif</strong>
               </div>
             </div>
 
             <!-- Card 4: Target Seleksi Akademik -->
-            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-sky-500/30 bg-gradient-to-br from-sky-950/20 via-slate-900/80 to-slate-950">
+            <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-[10px] font-black uppercase tracking-widest text-sky-400">Target Pendidikan</span>
-                <span class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-300 text-[10px] font-bold">SELEKSI</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-white/50">Target Pendidikan</span>
+                <span class="px-2 py-0.5 rounded-md bg-white/10 text-white/80 text-[10px] font-bold">SELEKSI</span>
               </div>
-              <div class="text-xs sm:text-sm font-black text-sky-300 truncate mt-1">
+              <div class="text-sm sm:text-base font-black text-white truncate my-1.5" :title="student360Data?.student?.target_ptn || currentStudentTargetDisplay">
                 {{ student360Data?.student?.target_ptn || currentStudentTargetDisplay || 'Pilihan Kampus' }}
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/60 flex justify-between">
+              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/50 flex justify-between">
                 <span>Jalur Peluang</span>
-                <strong class="text-sky-300">SNBP / SNBT</strong>
+                <strong class="text-white/80">SNBP / SNBT</strong>
               </div>
             </div>
           </div>
 
-          <!-- Grid: Grafik Progres Rapor & Early Warning Gap -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Grid: Grafik Progres Rapor & Evaluasi Belajar (Proporsi 7 / 5) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
             
-            <!-- Kolom Kiri (7/12): Grafik Nilai Rapor Antar-Semester & Rekap Rapor -->
-            <div class="lg:col-span-7 space-y-6">
+            <!-- Kolom Kiri (7/12): Grafik Nilai Rapor & Buku Rapor -->
+            <div class="lg:col-span-7 space-y-5 sm:space-y-6">
               
               <!-- Grafik Progres Rapor Antar-Semester -->
-              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 space-y-4">
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-4">
                 <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl shrink-0">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center text-lg shrink-0">
                       <i class="ph-bold ph-chart-line-up"></i>
                     </div>
                     <div>
-                      <h3 class="text-base font-black text-white">Grafik Nilai Rapor per Semester</h3>
-                      <p class="text-xs text-white/50">Tren stabilitas &amp; peningkatan nilai akademik rapor kurikulum resmi</p>
+                      <h3 class="text-sm sm:text-base font-black text-white">Progres Nilai Rapor Semester</h3>
+                      <p class="text-[11px] text-white/50">Tren stabilitas dan peningkatan nilai rapor kurikulum sekolah</p>
                     </div>
                   </div>
-                  <span class="px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase">
-                    Kurikulum Merdeka
-                  </span>
                 </div>
 
-                <div v-if="!student360Data?.semester_progression?.length" class="p-8 text-center text-white/40 text-xs bg-white/[0.02] rounded-xl border border-white/5">
-                  <i class="ph-bold ph-book-open text-3xl block mb-2 opacity-50"></i>
+                <div v-if="!student360Data?.semester_progression?.length" class="p-6 text-center text-white/40 text-xs bg-white/[0.02] rounded-xl border border-white/5">
+                  <i class="ph-bold ph-book-open text-2xl block mb-2 opacity-40"></i>
                   <span>Belum ada data rapor semester yang disinkronkan oleh pihak sekolah.</span>
                 </div>
 
-                <div v-else class="space-y-3.5">
+                <div v-else class="space-y-3">
                   <div v-for="sp in student360Data.semester_progression" :key="sp.period" class="space-y-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/5">
                     <div class="flex justify-between items-center text-xs">
                       <span class="text-white font-bold flex items-center gap-2">
                         <span>{{ sp.period }}</span>
                         <span class="text-white/40 text-[11px] font-normal">&bull; {{ sp.class_level }}</span>
                       </span>
-                      <span class="font-black font-mono text-amber-400 text-sm">{{ sp.average }}</span>
+                      <span class="font-black font-mono text-[#c0ff00] text-sm">{{ sp.average }}</span>
                     </div>
-                    <div class="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
-                      <div class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(245,158,11,0.5)]" :style="{ width: Math.min(100, (sp.average / 100) * 100) + '%' }"></div>
+                    <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                      <div class="bg-gradient-to-r from-amber-400 to-[#c0ff00] h-full rounded-full transition-all duration-700" :style="{ width: Math.min(100, (sp.average / 100) * 100) + '%' }"></div>
                     </div>
                   </div>
                 </div>
               </div>
 
               <!-- Tabel Rekap Buku Rapor Semester Terverifikasi -->
-              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 space-y-4">
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-4">
                 <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl shrink-0">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-lg shrink-0">
                       <i class="ph-bold ph-certificate"></i>
                     </div>
                     <div>
-                      <h3 class="text-base font-black text-white">Buku Nilai Rapor Sekolah</h3>
-                      <p class="text-xs text-white/50">Daftar buku rapor yang telah diinput &amp; diverifikasi Guru BK/Sekolah</p>
+                      <h3 class="text-sm sm:text-base font-black text-white">Buku Rapor Sekolah</h3>
+                      <p class="text-[11px] text-white/50">Daftar nilai rapor yang tercatat dan terverifikasi di sekolah</p>
                     </div>
                   </div>
                 </div>
 
-                <div v-if="!student360Data?.report_cards?.length" class="p-8 text-center text-white/40 text-xs">
-                  Tidak ada riwayat rapor.
+                <div v-if="!student360Data?.report_cards?.length" class="p-6 text-center text-white/40 text-xs bg-white/[0.02] rounded-xl border border-white/5">
+                  <i class="ph-bold ph-folder-open text-2xl block mb-2 opacity-40"></i>
+                  <span>Tidak ada riwayat rapor.</span>
                 </div>
 
-                <div v-else class="space-y-3">
-                  <div v-for="rc in student360Data.report_cards" :key="rc.id" class="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-emerald-500/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div v-else class="space-y-2.5">
+                  <div v-for="rc in student360Data.report_cards" :key="rc.id" class="p-3.5 sm:p-4 rounded-xl bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="space-y-1">
                       <div class="flex items-center gap-2">
-                        <span class="text-sm font-black text-white">T.A. {{ rc.academic_year }} &bull; Semester {{ rc.semester ? rc.semester.toUpperCase() : '' }}</span>
+                        <span class="text-xs sm:text-sm font-black text-white">T.A. {{ rc.academic_year }} &bull; Semester {{ rc.semester ? rc.semester.toUpperCase() : '' }}</span>
                         <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase" :class="rc.status === 'verified' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'">
-                          {{ rc.status === 'verified' ? '✓ Terverifikasi Sekolah' : 'Draft' }}
+                          {{ rc.status === 'verified' ? '✓ Terverifikasi' : 'Draft' }}
                         </span>
                       </div>
                       <div class="text-xs text-white/60">
-                        {{ rc.class_level }} &bull; {{ rc.class_name || 'Reguler' }} &bull; {{ rc.curriculum || 'Kurikulum Merdeka' }} &bull; Rata-rata: <strong class="text-amber-400 font-mono">{{ rc.average_score }}</strong>
+                        {{ rc.class_level }} &bull; {{ rc.class_name || 'Reguler' }} &bull; Rata-rata: <strong class="text-[#c0ff00] font-mono">{{ rc.average_score }}</strong>
                       </div>
                     </div>
                     <button 
                       type="button" 
                       @click="openStudentReportCardDetail(rc)" 
-                      class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-emerald-500/20 hover:text-emerald-300 hover:border-emerald-500/40 border border-white/15 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                      class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-[#c0ff00] hover:text-black hover:border-[#c0ff00] border border-white/15 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
                     >
                       <i class="ph-bold ph-eye text-sm"></i>
-                      <span>Lihat Rincian Mapel</span>
+                      <span>Rincian Mapel</span>
                     </button>
                   </div>
                 </div>
@@ -3454,63 +3401,63 @@
 
             </div>
 
-            <!-- Kolom Kanan (5/12): Learning Gap, Riwayat CBT, & Catatan BK -->
-            <div class="lg:col-span-5 space-y-6">
+            <!-- Kolom Kanan (5/12): Fokus Peningkatan, Riwayat CBT, & Catatan BK -->
+            <div class="lg:col-span-5 space-y-5 sm:space-y-6">
 
-              <!-- Early Warning & Learning Gap -->
-              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-rose-500/25 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-rose-950/20 space-y-3">
+              <!-- Fokus Peningkatan Belajar (Learning Gap) -->
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-3.5">
                 <div class="flex items-center justify-between pb-3 border-b border-white/10">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-base border border-rose-500/30">
+                    <span class="w-8 h-8 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center font-bold text-base border border-rose-500/30">
                       <i class="ph-bold ph-warning-circle"></i>
                     </span>
                     <div>
-                      <h4 class="text-sm font-black text-white tracking-tight uppercase">Early Warning &amp; Learning Gap</h4>
-                      <p class="text-[10px] text-white/50">Mata pelajaran dengan skor &lt; KKM yang perlu ditingkatkan</p>
+                      <h4 class="text-sm font-black text-white tracking-tight">Fokus Peningkatan Nilai</h4>
+                      <p class="text-[10px] text-white/50">Mata pelajaran dengan skor di bawah standar KKM</p>
                     </div>
                   </div>
                 </div>
 
-                <div v-if="!student360Data?.learning_gaps?.length" class="p-5 text-center text-emerald-400 text-xs bg-emerald-500/10 rounded-xl border border-emerald-500/25">
-                  <i class="ph-bold ph-check-circle text-2xl block mb-1"></i>
-                  <span class="font-bold">Kesiapan Akademik Prima!</span>
-                  <p class="text-[11px] text-white/70 mt-0.5">Seluruh mata pelajaran rapor di atas ambang batas minimum KKM sekolah.</p>
+                <div v-if="!student360Data?.learning_gaps?.length" class="p-4 text-center text-emerald-400 text-xs bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                  <i class="ph-bold ph-check-circle text-xl block mb-1"></i>
+                  <span class="font-bold">Kesiapan Akademik Optimal!</span>
+                  <p class="text-[11px] text-white/60 mt-0.5">Seluruh mata pelajaran berada di atas batas KKM sekolah.</p>
                 </div>
 
                 <div v-else class="space-y-2.5">
-                  <div v-for="lg in student360Data.learning_gaps" :key="lg.subject" class="p-3.5 rounded-xl bg-white/[0.02] border border-rose-500/30 space-y-2">
+                  <div v-for="lg in student360Data.learning_gaps" :key="lg.subject" class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/25 space-y-2">
                     <div class="flex justify-between items-center text-xs">
                       <span class="font-black text-white">{{ lg.subject }}</span>
                       <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase font-mono" :class="lg.gap_severity === 'TINGGI' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'">
-                        {{ lg.gap_severity }} &bull; Skor {{ lg.average_score }}
+                        {{ lg.gap_severity }} &bull; Nilai {{ lg.average_score }}
                       </span>
                     </div>
-                    <p class="text-[11px] text-white/60 leading-relaxed">{{ lg.recommendation }}</p>
-                    <button @click="handleTabClick('learning')" class="text-[10px] font-black text-[#c0ff00] hover:underline flex items-center gap-1 cursor-pointer">
-                      <span>Buka Modul Penguatan {{ lg.subject }} &raquo;</span>
+                    <p class="text-[11px] text-white/70 leading-relaxed">{{ lg.recommendation }}</p>
+                    <button @click="handleTabClick('learning')" class="text-[11px] font-bold text-[#c0ff00] hover:underline flex items-center gap-1 cursor-pointer">
+                      <span>Buka Modul Belajar &raquo;</span>
                     </button>
                   </div>
                 </div>
               </div>
 
               <!-- Riwayat Tryout CBT / SNBT -->
-              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-sky-500/25 space-y-3">
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-3.5">
                 <div class="flex items-center justify-between pb-3 border-b border-white/10">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-base border border-sky-500/30">
+                    <span class="w-8 h-8 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center font-bold text-base border border-sky-500/30">
                       <i class="ph-bold ph-exam"></i>
                     </span>
                     <div>
-                      <h4 class="text-sm font-black text-white tracking-tight uppercase">Riwayat Tryout CBT</h4>
-                      <p class="text-[10px] text-white/50">Hasil pengerjaan simulasi ujian terkini</p>
+                      <h4 class="text-sm font-black text-white tracking-tight">Riwayat Try Out CBT</h4>
+                      <p class="text-[10px] text-white/50">Hasil simulasi ujian terkini</p>
                     </div>
                   </div>
-                  <button @click="handleTabClick('simulator')" class="text-[10px] font-bold text-sky-400 hover:underline cursor-pointer">
-                    Ikut Tryout &raquo;
+                  <button @click="handleTabClick('simulator')" class="text-[10px] font-bold text-[#c0ff00] hover:underline cursor-pointer">
+                    Ikut Try Out &raquo;
                   </button>
                 </div>
 
-                <div v-if="!student360Data?.assessment_history?.length" class="p-5 text-center text-white/40 text-xs">
+                <div v-if="!student360Data?.assessment_history?.length" class="p-4 text-center text-white/40 text-xs bg-white/[0.02] rounded-xl border border-white/5">
                   Belum ada riwayat tryout CBT yang dikerjakan.
                 </div>
 
@@ -3526,28 +3473,28 @@
               </div>
 
               <!-- Catatan Konseling & Pendampingan Guru BK -->
-              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-purple-500/25 space-y-3">
+              <div class="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/70 space-y-3.5">
                 <div class="flex items-center justify-between pb-3 border-b border-white/10">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-base border border-purple-500/30">
+                    <span class="w-8 h-8 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center font-bold text-base border border-purple-500/30">
                       <i class="ph-bold ph-chats-circle"></i>
                     </span>
                     <div>
-                      <h4 class="text-sm font-black text-white tracking-tight uppercase">Pendampingan Guru BK</h4>
-                      <p class="text-[10px] text-white/50">Catatan arahan &amp; intervensi dari Koordinator BK</p>
+                      <h4 class="text-sm font-black text-white tracking-tight">Catatan Guru BK</h4>
+                      <p class="text-[10px] text-white/50">Arahan dan saran dari pembimbing sekolah</p>
                     </div>
                   </div>
                 </div>
 
-                <div v-if="!student360Data?.guidance_records?.length" class="p-5 text-center text-white/40 text-xs">
+                <div v-if="!student360Data?.guidance_records?.length" class="p-4 text-center text-white/40 text-xs bg-white/[0.02] rounded-xl border border-white/5">
                   Belum ada catatan konseling khusus dari Guru BK sekolah.
                 </div>
 
-                <div v-else class="space-y-3">
+                <div v-else class="space-y-2.5">
                   <div v-for="gr in student360Data.guidance_records" :key="gr.id" class="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
                     <div class="flex justify-between items-start">
                       <div>
-                        <span class="text-[10px] px-2 py-0.5 rounded font-black uppercase mr-2" :class="gr.priority === 'kritis' ? 'bg-rose-500/20 text-rose-300' : (gr.priority === 'tinggi' ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-500/20 text-slate-300')">
+                        <span class="text-[10px] px-2 py-0.5 rounded font-black uppercase mr-2" :class="gr.priority === 'kritis' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : (gr.priority === 'tinggi' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-500/20 text-slate-300 border border-slate-500/30')">
                           {{ gr.priority }}
                         </span>
                         <span class="text-xs font-bold text-white">{{ gr.counselor_name || 'Guru BK' }}</span>
@@ -3555,8 +3502,8 @@
                       <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-white/10 text-white/70 uppercase">{{ gr.status }}</span>
                     </div>
                     <p class="text-xs text-white/80 leading-relaxed">{{ gr.issue_summary }}</p>
-                    <div v-if="gr.action_plan" class="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-[11px] text-purple-200">
-                      <strong>Rencana Tindak Lanjut:</strong> {{ gr.action_plan }}
+                    <div v-if="gr.action_plan" class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10 text-[11px] text-white/70">
+                      <strong class="text-white">Rencana Tindak Lanjut:</strong> {{ gr.action_plan }}
                     </div>
                     <div v-if="gr.follow_up_date" class="text-[10px] text-white/40">
                       Jadwal Evaluasi: {{ gr.follow_up_date }}
