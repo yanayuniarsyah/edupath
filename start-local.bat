@@ -1,2 +1,2 @@
 @echo off
-call "%~dp0run_all.bat"
+call "%~dp0START_LOKAL.bat"

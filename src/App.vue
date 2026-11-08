@@ -6709,7 +6709,8 @@ const OfflineRoleResponsibilitiesModal = defineAsyncComponent(() => import('./co
 export default {
   name: 'App',
   components: {
-    StudentPotentialPath
+    StudentPotentialPath,
+    OfflineRoleResponsibilitiesModal
   },
   setup() {
     const showOfflineRoleModal = ref(false);
@@ -9808,6 +9809,7 @@ export default {
       startPracticeMode,
       navigateToPracticeMode,
       isPracticeModeActive,
+      showOfflineRoleModal,
 
       showIrtInfo,
       hideBabSidebar,
