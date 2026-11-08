@@ -230,61 +230,134 @@
         </nav>
       </div>
 
-      <!-- Bottom: User + Logout (Always pinned inside viewport, safe-area aware) -->
+      <!-- Bottom: User Profile Popover & Quick Settings (Always pinned inside viewport, safe-area aware) -->
       <div 
-        class="shrink-0 border-t border-white/10 bg-[#060a16]/95 backdrop-blur-xl" 
-        :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-3 sm:p-4' : 'p-2 mb-2'"
+        class="shrink-0 border-t border-white/10 bg-[#060a16]/95 backdrop-blur-xl relative" 
+        :class="(sidebarExpanded || mobileSidebarOpen) ? 'p-2.5 sm:p-3' : 'p-2 mb-2 flex flex-col items-center'"
         style="padding-bottom: max(0.875rem, env(safe-area-inset-bottom));"
       >
-        <div class="flex items-center gap-2.5 sm:gap-3 mb-2.5" :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center'">
-          <div class="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-[#c0ff00] to-emerald-400 text-black flex items-center justify-center font-black text-xs border border-[#c0ff00]/40 shadow-[0_0_12px_rgba(192,255,0,0.3)]">
+        <!-- Click-outside Backdrop for Profile Flyout -->
+        <div 
+          v-if="showProfileFlyout" 
+          @click="showProfileFlyout = false" 
+          class="fixed inset-0 z-40"
+        ></div>
+
+        <!-- Bottom-Up Profile Flyout Menu -->
+        <div 
+          v-if="showProfileFlyout" 
+          class="absolute bottom-full mb-2 z-50 rounded-2xl bg-slate-950/95 backdrop-blur-2xl border border-white/20 shadow-2xl p-2.5 space-y-1.5 animate-fade-in"
+          :class="(sidebarExpanded || mobileSidebarOpen) ? 'left-2.5 right-2.5' : 'left-2 w-64'"
+        >
+          <!-- User info preview header in popover -->
+          <div class="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 flex items-center gap-2.5">
+            <div class="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-[#c0ff00] to-emerald-400 text-black flex items-center justify-center font-black text-sm border border-[#c0ff00]/40 shadow-sm">
+              <i class="ph-bold ph-user text-base text-black"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h5 class="text-xs font-black text-white truncate">{{ getStudentDisplayName(currentUser) }}</h5>
+              <p class="text-[10px] text-white/50 truncate">{{ currentUser?.email || 'Akun EduPath' }}</p>
+              <div class="mt-1 flex items-center gap-1.5">
+                <span class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#c0ff00]/15 text-[#c0ff00] border border-[#c0ff00]/30">
+                  {{ isPremiumUser ? (currentUser?.plan_name || 'Premium') : 'Trial' }}
+                </span>
+                <span v-if="currentUser?.grade_level" class="text-[9px] text-white/40 truncate">
+                  {{ currentUser.grade_level }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Navigation Actions in Popover -->
+          <div class="py-1 space-y-0.5">
+            <!-- Pengaturan Akun -->
+            <button
+              type="button"
+              @click="currentTab = 'settings'; showProfileFlyout = false; mobileSidebarOpen = false;"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer group"
+            >
+              <i class="ph-bold ph-gear-six text-base text-[#c0ff00] group-hover:rotate-45 transition-transform"></i>
+              <span>Pengaturan Akun</span>
+            </button>
+
+            <!-- Ubah Target Pendidikan -->
+            <button
+              type="button"
+              @click="openQuickTargetModal(); showProfileFlyout = false; mobileSidebarOpen = false;"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer group"
+            >
+              <i class="ph-bold ph-target text-base text-sky-400"></i>
+              <span>Ubah Target Sekolah / PTN</span>
+            </button>
+
+            <!-- Pilihan Paket Belajar -->
+            <button
+              type="button"
+              @click="openPlanSelector(); showProfileFlyout = false; mobileSidebarOpen = false;"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer group"
+            >
+              <i class="ph-bold ph-sparkle text-base text-amber-400"></i>
+              <span>Pilihan Paket &amp; Langganan</span>
+            </button>
+
+            <!-- Panduan & SOP Bimbel -->
+            <button
+              type="button"
+              @click="currentTab = 'offline_sop'; showProfileFlyout = false; mobileSidebarOpen = false;"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer group"
+            >
+              <i class="ph-bold ph-buildings text-base text-purple-400"></i>
+              <span>SOP Bimbel &amp; Tata Tertib</span>
+            </button>
+
+            <!-- Back to Staff/Admin/Guru portal if relevant -->
+            <button
+              v-if="isTeacher || isAdmin || isSchoolBk || isAffiliate"
+              type="button"
+              @click="window.location.hash = isSchoolBk ? '#/school' : '#/admin'; showProfileFlyout = false; mobileSidebarOpen = false;"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-indigo-300 hover:text-indigo-100 hover:bg-indigo-500/15 transition-all cursor-pointer group"
+            >
+              <i class="ph-bold ph-shield-check text-base text-indigo-400"></i>
+              <span>{{ isTeacher ? 'Portal Guru & Bank Soal' : (isSchoolBk ? 'Portal Guru BK / Sekolah' : (isAffiliate ? 'Portal Mitra Afiliasi' : 'Panel Administrator')) }}</span>
+            </button>
+          </div>
+
+          <!-- Divider -->
+          <div class="border-t border-white/10 pt-1">
+            <!-- Logout Button -->
+            <button
+              type="button"
+              @click="showProfileFlyout = false; logout();"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold text-rose-400 hover:text-rose-200 hover:bg-rose-500/15 transition-all cursor-pointer group"
+            >
+              <i class="ph-bold ph-sign-out text-base text-rose-400 group-hover:translate-x-0.5 transition-transform"></i>
+              <span>Keluar Akun</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Trigger: Interactive Profile Button -->
+        <button
+          type="button"
+          @click="showProfileFlyout = !showProfileFlyout"
+          :title="'Menu Profil: ' + getStudentDisplayName(currentUser)"
+          class="w-full flex items-center gap-2.5 sm:gap-3 p-1.5 sm:p-2 rounded-xl hover:bg-white/5 active:bg-white/10 border border-transparent hover:border-white/10 transition-all cursor-pointer group text-left"
+          :class="(sidebarExpanded || mobileSidebarOpen) ? '' : 'justify-center'"
+        >
+          <div class="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-[#c0ff00] to-emerald-400 text-black flex items-center justify-center font-black text-xs border border-[#c0ff00]/40 shadow-[0_0_12px_rgba(192,255,0,0.3)] group-hover:scale-105 transition-transform">
             <i class="ph-bold ph-user text-base text-black"></i>
           </div>
           <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="flex-grow min-w-0">
             <h4 class="text-xs font-black text-white whitespace-nowrap truncate">{{ getStudentDisplayName(currentUser) }}</h4>
-            <div v-if="isTeacher" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Guru & Bank Soal">
-              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-emerald-400">
-                Pendidik / Tutor
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="text-[10px] font-bold text-[#c0ff00] truncate">
+                {{ isPremiumUser ? (currentUser?.plan_name || 'Premium') : 'Trial' }}
               </span>
-              <span class="text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-emerald-400 group-hover:text-black transition-all">Portal Guru ➔</span>
-            </div>
-            <div v-else-if="isAdmin" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Admin Panel">
-              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-indigo-400">
-                {{ currentUser?.role === 'superadmin' ? 'Super Admin' : 'Administrator' }}
-              </span>
-              <span class="text-[9px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-indigo-400 group-hover:text-black transition-all">Panel ➔</span>
-            </div>
-            <div v-else-if="isSchoolBk" @click="window.location.hash = '#/school'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Sekolah / Guru BK">
-              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-amber-400">
-                Guru BK / Mitra
-              </span>
-              <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Portal BK ➔</span>
-            </div>
-            <div v-else-if="isAffiliate" @click="window.location.hash = '#/admin'" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Buka Portal Afiliasi">
-              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-amber-400">
-                Mitra Afiliasi
-              </span>
-              <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-amber-400 group-hover:text-black transition-all">Portal Afiliasi ➔</span>
-            </div>
-            <div v-else @click="openPlanSelector" class="cursor-pointer group flex items-center gap-1 mt-0.5" title="Klik untuk Lihat Pilihan Paket">
-              <span class="text-[10px] font-black uppercase tracking-wider whitespace-nowrap text-[#c0ff00]">
-                Status: {{ isPremiumUser ? (currentUser?.plan_name || 'Premium') : 'Trial' }}
-              </span>
-              <span v-if="!isPremiumUser" class="text-[9px] bg-[#c0ff00]/20 text-[#c0ff00] border border-[#c0ff00]/40 px-1 py-0.2 rounded font-extrabold group-hover:bg-[#c0ff00] group-hover:text-black transition-all">Pilih Paket ⚡</span>
             </div>
           </div>
-        </div>
-        <!-- Tombol Logout -->
-        <button
-          @click="logout"
-          :title="'Keluar Akun'"
-          :class="[
-            'bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/35 text-rose-300 hover:text-rose-200 rounded-xl font-bold transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 shrink-0 cursor-pointer shadow-sm', 
-            (sidebarExpanded || mobileSidebarOpen) ? 'w-full py-2.5 text-xs' : 'w-9 h-9 text-sm'
-          ]"
-        >
-          <i class="ph-bold ph-sign-out shrink-0 text-base text-rose-400"></i>
-          <span v-show="(sidebarExpanded || mobileSidebarOpen)" class="whitespace-nowrap font-bold">Keluar Akun</span>
+          <div v-show="(sidebarExpanded || mobileSidebarOpen)" class="shrink-0 text-white/40 group-hover:text-white transition-colors">
+            <i class="ph-bold ph-caret-up text-xs transition-transform" :class="{ 'rotate-180': showProfileFlyout }"></i>
+          </div>
         </button>
       </div>
     </aside>
@@ -3006,8 +3079,40 @@
             </div>
           </div>
 
-          <!-- ✨ Dual Primary Cockpit (Grid 2 Kolom Seimbang: 7 / 5) -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+          <!-- ✨ Segmented Cockpit Switcher: Rencana Belajar vs Buku Rapor & Evaluasi -->
+          <div class="flex items-center justify-center p-1.5 rounded-2xl bg-slate-900/90 border border-white/10 max-w-md mx-auto w-full shadow-lg">
+            <button 
+              type="button" 
+              @click="studentDashboardTab = 'activities'"
+              :class="[
+                'flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer', 
+                studentDashboardTab === 'activities' 
+                  ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/20' 
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              ]"
+            >
+              <i class="ph-bold ph-lightning text-sm"></i>
+              <span>Rencana Belajar</span>
+            </button>
+            <button 
+              type="button" 
+              @click="studentDashboardTab = 'rapor'; fetchMyStudent360();"
+              :class="[
+                'flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer', 
+                studentDashboardTab === 'rapor' 
+                  ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/20' 
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              ]"
+            >
+              <i class="ph-bold ph-student text-sm"></i>
+              <span>Buku Rapor &amp; Evaluasi</span>
+            </button>
+          </div>
+
+          <!-- SUB-VIEW 1: Rencana Belajar Aktif (Cockpit Misi, Skill Map, Blind-Spot & Rekomendasi AI) -->
+          <div v-if="studentDashboardTab === 'activities'" class="space-y-5 sm:space-y-6 animate-fade-in">
+            <!-- Dual Primary Cockpit (Grid 2 Kolom Seimbang: 7 / 5) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
             
             <!-- Kolom Kiri (7/12): Misi Harian & Skill Map Scanner -->
             <div class="lg:col-span-7 space-y-5 sm:space-y-6">
@@ -3156,28 +3261,28 @@
             </div>
 
           </div>
-        </section>
+        </div>
 
-        <!-- TAB: STUDENT 360 HOLISTIC PROFILE (Rapor & Evaluasi Belajar Siswa) -->
-        <section v-if="currentTab === 'student_360'" class="animate-fade-in space-y-5 sm:space-y-6 w-full max-w-7xl mx-auto pb-16">
+        <!-- SUB-VIEW 2: Buku Rapor & Evaluasi Belajar (Integrated) -->
+        <div v-else-if="studentDashboardTab === 'rapor'" class="space-y-5 sm:space-y-6 animate-fade-in">
           
           <!-- Top Header Bar -->
-          <div class="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 bg-gradient-to-b from-slate-900/90 via-slate-900/95 to-slate-950 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="space-y-1.5">
+          <div class="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-slate-900/70 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="space-y-1">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="px-2.5 py-1 rounded-full bg-[#c0ff00]/10 text-[#c0ff00] font-bold text-[11px] border border-[#c0ff00]/25 flex items-center gap-1.5">
+                <span class="px-2.5 py-0.5 rounded-full bg-[#c0ff00]/10 text-[#c0ff00] font-bold text-xs border border-[#c0ff00]/25 flex items-center gap-1.5">
                   <i class="ph-bold ph-student"></i>
                   <span>Portofolio Akademik Siswa</span>
                 </span>
-                <span v-if="student360Data?.student?.school" class="px-2.5 py-1 rounded-full bg-white/5 text-white/80 font-medium text-[11px] border border-white/10">
+                <span v-if="student360Data?.student?.school" class="px-2.5 py-0.5 rounded-full bg-white/5 text-white/80 font-medium text-xs border border-white/10">
                   🏛️ {{ student360Data.student.school }}
                 </span>
               </div>
-              <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                <span>Rapor &amp; Evaluasi Belajar Siswa</span>
+              <h3 class="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
+                <span>Buku Rapor &amp; Evaluasi Berkala</span>
                 <span v-if="student360Loading" class="text-xs text-[#c0ff00] font-normal animate-pulse">(Memuat data...)</span>
-              </h2>
-              <p class="text-xs sm:text-sm text-white/60 font-medium max-w-2xl">
+              </h3>
+              <p class="text-xs text-white/60 font-medium">
                 Rekapitulasi capaian nilai rapor sekolah, riwayat simulasi CBT, dan panduan belajar terarah.
               </p>
             </div>
@@ -3186,7 +3291,7 @@
               <button 
                 type="button" 
                 @click="fetchMyStudent360" 
-                class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer backdrop-blur-md"
+                class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer"
                 :disabled="student360Loading"
               >
                 <i class="ph-bold ph-arrow-clockwise" :class="{ 'animate-spin': student360Loading }"></i>
@@ -3194,11 +3299,11 @@
               </button>
               <button 
                 type="button" 
-                @click="currentTab = 'dashboard'" 
-                class="px-5 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(192,255,0,0.25)]"
+                @click="studentDashboardTab = 'activities'" 
+                class="px-4 py-2 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
               >
-                <i class="ph-bold ph-gauge"></i>
-                <span>Ke Dashboard</span>
+                <i class="ph-bold ph-lightning"></i>
+                <span>Rencana Belajar</span>
               </button>
             </div>
           </div>
@@ -3214,7 +3319,7 @@
               <div class="text-2xl sm:text-3xl font-black font-heading text-white font-mono my-1">
                 {{ computeCumulativeRaporGpa(student360Data?.report_cards) }}
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/50 flex justify-between">
+              <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
                 <span>Semester Terdata</span>
                 <strong class="text-white">{{ student360Data?.report_cards?.length || 0 }} Periode</strong>
               </div>
@@ -3229,7 +3334,7 @@
               <div class="text-2xl sm:text-3xl font-black font-heading text-[#c0ff00] font-mono my-1">
                 {{ student360Data?.assessment_history?.[0]?.score || (currentAbilityScore || 'N/A') }}
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/50 flex justify-between">
+              <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
                 <span>Tryout Selesai</span>
                 <strong class="text-[#c0ff00]">{{ student360Data?.assessment_history?.length || 0 }} Kali</strong>
               </div>
@@ -3244,7 +3349,7 @@
               <div class="text-sm sm:text-base font-black text-white truncate my-1.5" :title="student360Data?.diagnostic?.recommended_track">
                 {{ student360Data?.diagnostic?.recommended_track || 'Penalaran Matematika' }}
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/50 flex justify-between">
+              <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
                 <span>Kecenderungan</span>
                 <strong class="text-white/80">Investigatif</strong>
               </div>
@@ -3259,7 +3364,7 @@
               <div class="text-sm sm:text-base font-black text-white truncate my-1.5" :title="student360Data?.student?.target_ptn || currentStudentTargetDisplay">
                 {{ student360Data?.student?.target_ptn || currentStudentTargetDisplay || 'Pilihan Kampus' }}
               </div>
-              <div class="mt-2 pt-2 border-t border-white/5 text-[11px] text-white/50 flex justify-between">
+              <div class="mt-2 pt-2 border-t border-white/5 text-xs text-white/50 flex justify-between">
                 <span>Jalur Peluang</span>
                 <strong class="text-white/80">SNBP / SNBT</strong>
               </div>
@@ -3281,7 +3386,7 @@
                     </div>
                     <div>
                       <h3 class="text-sm sm:text-base font-black text-white">Progres Nilai Rapor Semester</h3>
-                      <p class="text-[11px] text-white/50">Tren stabilitas dan peningkatan nilai rapor kurikulum sekolah</p>
+                      <p class="text-xs text-white/50">Tren stabilitas dan peningkatan nilai rapor kurikulum sekolah</p>
                     </div>
                   </div>
                 </div>
@@ -3296,7 +3401,7 @@
                     <div class="flex justify-between items-center text-xs">
                       <span class="text-white font-bold flex items-center gap-2">
                         <span>{{ sp.period }}</span>
-                        <span class="text-white/40 text-[11px] font-normal">&bull; {{ sp.class_level }}</span>
+                        <span class="text-white/40 text-xs font-normal">&bull; {{ sp.class_level }}</span>
                       </span>
                       <span class="font-black font-mono text-[#c0ff00] text-sm">{{ sp.average }}</span>
                     </div>
@@ -3316,7 +3421,7 @@
                     </div>
                     <div>
                       <h3 class="text-sm sm:text-base font-black text-white">Buku Rapor Sekolah</h3>
-                      <p class="text-[11px] text-white/50">Daftar nilai rapor yang tercatat dan terverifikasi di sekolah</p>
+                      <p class="text-xs text-white/50">Daftar nilai rapor yang tercatat dan terverifikasi di sekolah</p>
                     </div>
                   </div>
                 </div>
@@ -3365,7 +3470,7 @@
                     </span>
                     <div>
                       <h4 class="text-sm font-black text-white tracking-tight">Fokus Peningkatan Nilai</h4>
-                      <p class="text-[10px] text-white/50">Mata pelajaran dengan skor di bawah standar KKM</p>
+                      <p class="text-xs text-white/50">Mata pelajaran dengan skor di bawah standar KKM</p>
                     </div>
                   </div>
                 </div>
@@ -3373,7 +3478,7 @@
                 <div v-if="!student360Data?.learning_gaps?.length" class="p-4 text-center text-emerald-400 text-xs bg-emerald-500/10 rounded-xl border border-emerald-500/20">
                   <i class="ph-bold ph-check-circle text-xl block mb-1"></i>
                   <span class="font-bold">Kesiapan Akademik Optimal!</span>
-                  <p class="text-[11px] text-white/60 mt-0.5">Seluruh mata pelajaran berada di atas batas KKM sekolah.</p>
+                  <p class="text-xs text-white/60 mt-0.5">Seluruh mata pelajaran berada di atas batas KKM sekolah.</p>
                 </div>
 
                 <div v-else class="space-y-2.5">
@@ -3384,8 +3489,8 @@
                         {{ lg.gap_severity }} &bull; Nilai {{ lg.average_score }}
                       </span>
                     </div>
-                    <p class="text-[11px] text-white/70 leading-relaxed">{{ lg.recommendation }}</p>
-                    <button @click="handleTabClick('learning')" class="text-[11px] font-bold text-[#c0ff00] hover:underline flex items-center gap-1 cursor-pointer">
+                    <p class="text-xs text-white/70 leading-relaxed">{{ lg.recommendation }}</p>
+                    <button @click="handleTabClick('learning')" class="text-xs font-bold text-[#c0ff00] hover:underline flex items-center gap-1 cursor-pointer">
                       <span>Buka Modul Belajar &raquo;</span>
                     </button>
                   </div>
@@ -3401,10 +3506,10 @@
                     </span>
                     <div>
                       <h4 class="text-sm font-black text-white tracking-tight">Riwayat Try Out CBT</h4>
-                      <p class="text-[10px] text-white/50">Hasil simulasi ujian terkini</p>
+                      <p class="text-xs text-white/50">Hasil simulasi ujian terkini</p>
                     </div>
                   </div>
-                  <button @click="handleTabClick('simulator')" class="text-[10px] font-bold text-[#c0ff00] hover:underline cursor-pointer">
+                  <button @click="handleTabClick('simulator')" class="text-xs font-bold text-[#c0ff00] hover:underline cursor-pointer">
                     Ikut Try Out &raquo;
                   </button>
                 </div>
@@ -3433,7 +3538,7 @@
                     </span>
                     <div>
                       <h4 class="text-sm font-black text-white tracking-tight">Catatan Guru BK</h4>
-                      <p class="text-[10px] text-white/50">Arahan dan saran dari pembimbing sekolah</p>
+                      <p class="text-xs text-white/50">Arahan dan saran dari pembimbing sekolah</p>
                     </div>
                   </div>
                 </div>
@@ -3454,10 +3559,10 @@
                       <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-white/10 text-white/70 uppercase">{{ gr.status }}</span>
                     </div>
                     <p class="text-xs text-white/80 leading-relaxed">{{ gr.issue_summary }}</p>
-                    <div v-if="gr.action_plan" class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10 text-[11px] text-white/70">
+                    <div v-if="gr.action_plan" class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10 text-xs text-white/70">
                       <strong class="text-white">Rencana Tindak Lanjut:</strong> {{ gr.action_plan }}
                     </div>
-                    <div v-if="gr.follow_up_date" class="text-[10px] text-white/40">
+                    <div v-if="gr.follow_up_date" class="text-xs text-white/40">
                       Jadwal Evaluasi: {{ gr.follow_up_date }}
                     </div>
                   </div>
@@ -3468,7 +3573,8 @@
 
           </div>
 
-        </section>
+        </div>
+      </section>
 
         <!-- TAB 2: DIAGNOSTIC & TRY OUT -->
         <section v-if="currentTab === 'diagnostic'" class="animate-fade-in space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto pb-10">
@@ -7241,17 +7347,16 @@ export default {
 
     const currentTab = ref(getInitialTab());
     const isStudentPreviewMode = ref(false);
+    const showProfileFlyout = ref(false);
+    const studentDashboardTab = ref('activities');
 
     const studentTabs = [
       { id: 'home', label: 'Home', icon: 'ph-house' },
       { id: 'dashboard', label: 'Dashboard', icon: 'ph-gauge' },
-      { id: 'student_360', label: 'Rapor & Profil 360', icon: 'ph-user-focus' },
       { id: 'diagnostic', label: 'Asesmen', icon: 'ph-brain' },
       { id: 'learning', label: 'Materi', icon: 'ph-books' },
       { id: 'simulator', label: 'Tryout & Latihan', icon: 'ph-calculator' },
-      { id: 'offline_sop', label: 'SOP Bimbel', icon: 'ph-buildings' },
-      { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' },
-      { id: 'settings', label: 'Pengaturan', icon: 'ph-user-gear' }
+      { id: 'affiliate', label: 'Afiliasi', icon: 'ph-hand-coins' }
     ];
 
     const adminTabs = [
@@ -8635,13 +8740,21 @@ export default {
         openPlanSelector();
         return;
       }
+      if (tabId === 'dashboard') {
+        currentTab.value = 'dashboard';
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      if (tabId === 'student_360') {
+        currentTab.value = 'dashboard';
+        studentDashboardTab.value = 'rapor';
+        fetchMyStudent360();
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
       currentTab.value = tabId;
       if (tabId === 'affiliate' || tabId === 'settings') {
         fetchAffiliateData();
-      }
-      if (tabId === 'student_360') {
-        fetchMyStudent360();
-        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     };
 
@@ -9764,6 +9877,8 @@ export default {
       computeCumulativeRaporGpa,
       fetchMyStudent360,
       openStudentReportCardDetail,
+      showProfileFlyout,
+      studentDashboardTab,
 
       startCbtExam,
       launchCurrentProgramCbt,
