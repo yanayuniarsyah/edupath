@@ -273,9 +273,9 @@
 
             <!-- Card 3: Rata-Rata Rapor Kumulatif (Semester 1-5) -->
             <div 
-              @click="selectNavTab('reports')"
+              @click="navigateToStudents({ view: 'reports' })"
               class="p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-amber-400/40 backdrop-blur-xl transition-all cursor-pointer group shadow-lg"
-              title="Klik untuk membuka manajemen buku rapor & evaluasi"
+              title="Klik untuk membuka buku rapor siswa & evaluasi"
             >
               <div class="flex items-center justify-between">
                 <span class="text-[11px] font-black uppercase tracking-wider text-white/50 group-hover:text-white transition-colors">Rata-Rata Rapor</span>
@@ -523,10 +523,80 @@
         </div>
 
         <!-- ========================================================== -->
-        <!-- VIEW 3: ROSTER DATA SISWA & REKAP INTERAKTIF              -->
+        <!-- VIEW 3: DIREKTORI SISWA & BUKU RAPOR TERPADU (UNIFIED)     -->
         <!-- ========================================================== -->
-        <div v-if="activeTab === 'students'" class="space-y-6">
-          <div class="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-4">
+        <div v-if="activeTab === 'students'" class="space-y-5 animate-fade-in">
+          <!-- Top Sub-Tab Switcher & Unified Action Controls -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3 sm:p-4 rounded-2xl bg-[#0e1726]/90 border border-white/10 backdrop-blur-xl shadow-lg">
+            <!-- Segmented Control Buttons -->
+            <div class="flex items-center gap-1.5 p-1 bg-black/40 rounded-xl border border-white/10">
+              <button
+                @click="studentSubTab = 'roster'"
+                :class="[
+                  'px-3.5 py-2 rounded-lg text-xs font-black transition-all flex items-center gap-2 cursor-pointer',
+                  studentSubTab === 'roster'
+                    ? 'bg-[#c0ff00] text-black shadow-md shadow-[#c0ff00]/25'
+                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                ]"
+              >
+                <i class="ph-bold ph-users text-sm"></i>
+                <span>Direktori &amp; Roster Terpadu</span>
+                <span :class="['px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold', studentSubTab === 'roster' ? 'bg-black/20 text-black' : 'bg-white/10 text-white/70']">
+                  {{ studentTotal || students.length || 0 }}
+                </span>
+              </button>
+
+              <button
+                @click="studentSubTab = 'reports'; fetchReportCards();"
+                :class="[
+                  'px-3.5 py-2 rounded-lg text-xs font-black transition-all flex items-center gap-2 cursor-pointer',
+                  studentSubTab === 'reports'
+                    ? 'bg-amber-400 text-black shadow-md shadow-amber-400/25'
+                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                ]"
+              >
+                <i class="ph-bold ph-file-text text-sm"></i>
+                <span>Buku Rapor Semesteran</span>
+                <span :class="['px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold', studentSubTab === 'reports' ? 'bg-black/20 text-black' : 'bg-white/10 text-white/70']">
+                  {{ reportsTotal || reportCards.length || 0 }}
+                </span>
+              </button>
+            </div>
+
+            <!-- Quick Academic Actions: Excel, Template, Input Nilai Rapor -->
+            <div class="flex flex-wrap items-center gap-2">
+              <button 
+                @click="openImportReportModal = true; resetImportState();" 
+                class="px-3 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Import Nilai Rapor dari file Excel"
+              >
+                <i class="ph-bold ph-file-arrow-up text-sm"></i>
+                <span>Import Excel Rapor</span>
+              </button>
+
+              <button 
+                @click="downloadReportTemplate(filterReportLevel !== 'ALL' ? filterReportLevel : schoolLevel)" 
+                class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Unduh Format Template Excel Rapor"
+              >
+                <i class="ph-bold ph-download-simple text-sm"></i>
+                <span class="hidden sm:inline">Template Rapor</span>
+              </button>
+
+              <button 
+                @click="openCreateReportModal" 
+                class="px-3.5 py-2 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs flex items-center gap-1.5 transition-all shadow-md shadow-[#c0ff00]/15 cursor-pointer"
+                title="Input Nilai Rapor Siswa Baru"
+              >
+                <i class="ph-bold ph-plus-circle text-sm"></i>
+                <span>Input Nilai Rapor</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SUB-VIEW 1: ROSTER SISWA TERPADU (TKA, RAPOR, SNBT) -->
+          <div v-if="studentSubTab === 'roster'" class="space-y-6">
+            <div class="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-4">
             <!-- Header Controls: Search & Package Filters -->
             <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
               <!-- Search & Filter Controls -->
@@ -681,7 +751,17 @@
                       </span>
                     </td>
                     <td class="p-3.5 font-mono font-bold text-amber-400">
-                      {{ stu.latest_report_score ? stu.latest_report_score : '-' }}
+                      <div class="flex items-center gap-1.5">
+                        <span>{{ stu.latest_report_score ? stu.latest_report_score : '-' }}</span>
+                        <button
+                          v-if="stu.latest_report_score"
+                          @click.stop="viewStudentReport(stu)"
+                          class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition-all cursor-pointer font-sans"
+                          title="Buka Buku Rapor Siswa Ini"
+                        >
+                          Rapor &rarr;
+                        </button>
+                      </div>
                     </td>
                     <td class="p-3.5 font-mono font-bold text-cyan-400">
                       <span>{{ stu.latest_tka_score !== null ? stu.latest_tka_score : '-' }}</span>
@@ -733,6 +813,170 @@
                 >
                   Selanjutnya &rarr;
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          <!-- SUB-VIEW 2: BUKU RAPOR SEMESTERAN (PER MAPEL & VERIFIKASI) -->
+          <div v-else-if="studentSubTab === 'reports'" class="space-y-6">
+            <!-- Filter & Search Toolbar -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 bg-[#0e1726]/80 p-3.5 rounded-2xl border border-white/10 text-xs">
+              <!-- Jenjang -->
+              <div>
+                <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Jenjang</label>
+                <select v-model="filterReportLevel" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                  <option value="ALL">Semua Jenjang</option>
+                  <option value="SD">SD (Kelas 1-6)</option>
+                  <option value="SMP">SMP (Kelas 7-9)</option>
+                  <option value="SMA">SMA (Kelas 10-12)</option>
+                </select>
+              </div>
+              <!-- Tahun Ajaran -->
+              <div>
+                <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tahun Ajaran</label>
+                <select v-model="filterReportYear" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                  <option value="">Semua Tahun</option>
+                  <option value="2026/2027">2026/2027</option>
+                  <option value="2025/2026">2025/2026</option>
+                  <option value="2024/2025">2024/2025</option>
+                </select>
+              </div>
+              <!-- Semester -->
+              <div>
+                <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Semester</label>
+                <select v-model="filterReportSemester" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                  <option value="">Semua Semester</option>
+                  <option value="ganjil">Ganjil</option>
+                  <option value="genap">Genap</option>
+                </select>
+              </div>
+              <!-- Status Rapor -->
+              <div>
+                <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Data</label>
+                <select v-model="filterReportStatus" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
+                  <option value="">Semua Status</option>
+                  <option value="draft">Draft (Belum Diverifikasi)</option>
+                  <option value="submitted">Submitted (Menunggu Verifikasi)</option>
+                  <option value="verified">Verified (Terverifikasi)</option>
+                  <option value="locked">Locked (Terkunci)</option>
+                </select>
+              </div>
+              <!-- Pencarian Siswa -->
+              <div class="col-span-2">
+                <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cari Siswa / Kelas</label>
+                <div class="relative">
+                  <i class="ph-bold ph-magnifying-glass absolute left-3 top-2.5 text-white/40"></i>
+                  <input 
+                    v-model="searchReportQuery" 
+                    @input="debounceFetchReportCards" 
+                    type="text" 
+                    placeholder="Ketik nama siswa atau kelas..." 
+                    class="w-full pl-9 pr-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white placeholder-white/30 outline-none focus:border-[#c0ff00]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Roster Nilai Rapor Table -->
+            <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead>
+                    <tr class="border-b border-white/10 bg-white/[0.02] text-white/60 uppercase font-black tracking-wider text-[10px]">
+                      <th class="p-4">Siswa</th>
+                      <th class="p-4">Jenjang &amp; Kelas</th>
+                      <th class="p-4">Tahun / Semester</th>
+                      <th class="p-4 text-center">Jml Mapel</th>
+                      <th class="p-4 text-center">Rata-Rata Nilai</th>
+                      <th class="p-4 text-center">Status</th>
+                      <th class="p-4 text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                    <tr v-if="reportsLoading">
+                      <td colspan="7" class="p-8 text-center text-white/50">
+                        <div class="flex items-center justify-center gap-2">
+                          <i class="ph-bold ph-spinner animate-spin text-lg text-[#c0ff00]"></i>
+                          <span>Memuat data rapor siswa...</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr v-else-if="reportCards.length === 0">
+                      <td colspan="7" class="p-8 text-center text-white/50">
+                        <i class="ph-bold ph-folder-open text-2xl text-white/30 block mb-2"></i>
+                        <span>Belum ada rekaman nilai rapor siswa pada filter ini. Klik <strong>Input Nilai Rapor</strong> atau <strong>Import Excel</strong>.</span>
+                      </td>
+                    </tr>
+                    <tr v-else v-for="rc in reportCards" :key="rc.id" class="hover:bg-white/[0.03] transition-colors">
+                      <td class="p-4">
+                        <div class="font-bold text-white">{{ rc.student_name }}</div>
+                        <div class="text-[10px] text-white/40">{{ rc.student_email }}</div>
+                      </td>
+                      <td class="p-4">
+                        <div class="flex items-center gap-1.5">
+                          <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase" :class="rc.education_level === 'SD' ? 'bg-amber-500/20 text-amber-300' : (rc.education_level === 'SMP' ? 'bg-sky-500/20 text-sky-300' : 'bg-purple-500/20 text-purple-300')">
+                            {{ rc.education_level }}
+                          </span>
+                          <span class="text-white font-medium">{{ rc.class_level }}</span>
+                          <span v-if="rc.class_name" class="text-white/50 text-[10px]">({{ rc.class_name }})</span>
+                        </div>
+                      </td>
+                      <td class="p-4 text-white">
+                        <div>{{ rc.academic_year }}</div>
+                        <div class="text-[10px] text-white/50 capitalize">Sem. {{ rc.semester }}</div>
+                      </td>
+                      <td class="p-4 text-center text-white font-bold">
+                        {{ rc.total_subjects }} Mapel
+                      </td>
+                      <td class="p-4 text-center">
+                        <span class="px-2.5 py-1 rounded-lg font-black text-xs" :class="rc.average_score >= 85 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : (rc.average_score >= 75 ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30')">
+                          {{ rc.average_score }}
+                        </span>
+                      </td>
+                      <td class="p-4 text-center">
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider" :class="{
+                          'bg-slate-500/20 text-slate-300 border border-slate-500/30': rc.status === 'draft',
+                          'bg-amber-500/20 text-amber-300 border border-amber-500/30': rc.status === 'submitted',
+                          'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30': rc.status === 'verified',
+                          'bg-sky-500/20 text-sky-300 border border-sky-500/30': rc.status === 'locked',
+                          'bg-rose-500/20 text-rose-300 border border-rose-500/30': rc.status === 'rejected'
+                        }">
+                          {{ rc.status }}
+                        </span>
+                      </td>
+                      <td class="p-4 text-right">
+                        <div class="flex items-center justify-end gap-1.5">
+                          <button 
+                            @click="openReportDetail(rc.id)" 
+                            class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
+                            title="Lihat Detail Nilai"
+                          >
+                            <i class="ph-bold ph-eye"></i>
+                            <span>Detail</span>
+                          </button>
+                          <button 
+                            @click="openStudent360(rc.student_id)" 
+                            class="px-2.5 py-1 rounded-lg bg-[#c0ff00]/15 hover:bg-[#c0ff00]/25 text-[#c0ff00] border border-[#c0ff00]/30 font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
+                            title="Buka Profil Student 360"
+                          >
+                            <i class="ph-bold ph-user-focus"></i>
+                            <span>360</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Bar -->
+              <div v-if="reportsTotal > reportsLimit" class="p-4 border-t border-white/10 flex items-center justify-between text-xs text-white/60">
+                <div>Menampilkan {{ (reportsPage - 1) * reportsLimit + 1 }} - {{ Math.min(reportsPage * reportsLimit, reportsTotal) }} dari {{ reportsTotal }} rapor</div>
+                <div class="flex gap-2">
+                  <button :disabled="reportsPage <= 1" @click="reportsPage--; fetchReportCards();" class="px-3 py-1 bg-white/10 hover:bg-white/15 disabled:opacity-30 rounded-lg text-white font-bold cursor-pointer">Sebelumnya</button>
+                  <button :disabled="reportsPage * reportsLimit >= reportsTotal" @click="reportsPage++; fetchReportCards();" class="px-3 py-1 bg-white/10 hover:bg-white/15 disabled:opacity-30 rounded-lg text-white font-bold cursor-pointer">Berikutnya</button>
+                </div>
               </div>
             </div>
           </div>
@@ -876,210 +1120,6 @@
                 <div>
                   <strong>Tips Bimbingan:</strong> Sebar link ini pada jam wali kelas atau bimbingan karir sekolah. Rapor potensi dan minat langsung terbit otomatis begitu siswa selesai mengisi!
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ============================================================== -->
-        
-        <!-- ============================================================== -->
-        <!-- TAB: MANAJEMEN NILAI RAPOR SISWA (PRD v1.2)                    -->
-        <!-- ============================================================== -->
-        <div v-if="activeTab === 'reports'" class="space-y-6 animate-fade-in">
-          <!-- Top Action Bar -->
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/5 p-4 sm:p-5 rounded-2xl border border-white/10">
-            <div>
-              <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                <i class="ph-bold ph-file-text text-amber-400"></i>
-                <span>Manajemen Nilai Rapor Siswa</span>
-              </h2>
-              <p class="text-xs text-white/60 mt-0.5">
-                Kelola nilai rapor semesteran siswa jenjang SD, SMP, dan SMA. Tersedia input manual, verifikasi kelayakan, dan import Excel.
-              </p>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <button 
-                @click="openImportReportModal = true; resetImportState();" 
-                class="px-3.5 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
-              >
-                <i class="ph-bold ph-file-arrow-up text-base"></i>
-                <span>Import Excel</span>
-              </button>
-              <button 
-                @click="downloadReportTemplate(filterReportLevel !== 'ALL' ? filterReportLevel : 'SMA')" 
-                class="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
-                title="Unduh Format Template Excel Rapor"
-              >
-                <i class="ph-bold ph-download-simple text-base"></i>
-                <span>Unduh Template</span>
-              </button>
-              <button 
-                @click="openCreateReportModal" 
-                class="px-4 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs flex items-center gap-1.5 transition-all shadow-lg shadow-[#c0ff00]/20 cursor-pointer"
-              >
-                <i class="ph-bold ph-plus-circle text-base"></i>
-                <span>Input Nilai Rapor</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Filter & Search Toolbar -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 bg-[#0e1726]/80 p-3.5 rounded-2xl border border-white/10 text-xs">
-            <!-- Jenjang -->
-            <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Jenjang</label>
-              <select v-model="filterReportLevel" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
-                <option value="ALL">Semua Jenjang</option>
-                <option value="SD">SD (Kelas 1-6)</option>
-                <option value="SMP">SMP (Kelas 7-9)</option>
-                <option value="SMA">SMA (Kelas 10-12)</option>
-              </select>
-            </div>
-            <!-- Tahun Ajaran -->
-            <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Tahun Ajaran</label>
-              <select v-model="filterReportYear" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
-                <option value="">Semua Tahun</option>
-                <option value="2026/2027">2026/2027</option>
-                <option value="2025/2026">2025/2026</option>
-                <option value="2024/2025">2024/2025</option>
-              </select>
-            </div>
-            <!-- Semester -->
-            <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Semester</label>
-              <select v-model="filterReportSemester" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
-                <option value="">Semua Semester</option>
-                <option value="ganjil">Ganjil</option>
-                <option value="genap">Genap</option>
-              </select>
-            </div>
-            <!-- Status Rapor -->
-            <div>
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Status Data</label>
-              <select v-model="filterReportStatus" @change="fetchReportCards" class="w-full p-2 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-[#c0ff00]">
-                <option value="">Semua Status</option>
-                <option value="draft">Draft (Belum Diverifikasi)</option>
-                <option value="submitted">Submitted (Menunggu Verifikasi)</option>
-                <option value="verified">Verified (Terverifikasi)</option>
-                <option value="locked">Locked (Terkunci)</option>
-              </select>
-            </div>
-            <!-- Pencarian Siswa -->
-            <div class="col-span-2">
-              <label class="block text-[10px] font-bold text-white/50 mb-1 uppercase tracking-wider">Cari Siswa / Kelas</label>
-              <div class="relative">
-                <i class="ph-bold ph-magnifying-glass absolute left-3 top-2.5 text-white/40"></i>
-                <input 
-                  v-model="searchReportQuery" 
-                  @input="debounceFetchReportCards" 
-                  type="text" 
-                  placeholder="Ketik nama siswa atau kelas..." 
-                  class="w-full pl-9 pr-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white placeholder-white/30 outline-none focus:border-[#c0ff00]"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Roster Nilai Rapor Table -->
-          <div class="bg-[#0e1726]/80 rounded-2xl border border-white/10 overflow-hidden shadow-xl">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead>
-                  <tr class="border-b border-white/10 bg-white/[0.02] text-white/60 uppercase font-black tracking-wider text-[10px]">
-                    <th class="p-4">Siswa</th>
-                    <th class="p-4">Jenjang &amp; Kelas</th>
-                    <th class="p-4">Tahun / Semester</th>
-                    <th class="p-4 text-center">Jml Mapel</th>
-                    <th class="p-4 text-center">Rata-Rata Nilai</th>
-                    <th class="p-4 text-center">Status</th>
-                    <th class="p-4 text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-white/5">
-                  <tr v-if="reportsLoading">
-                    <td colspan="7" class="p-8 text-center text-white/50">
-                      <div class="flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-spinner animate-spin text-lg text-[#c0ff00]"></i>
-                        <span>Memuat data rapor siswa...</span>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr v-else-if="reportCards.length === 0">
-                    <td colspan="7" class="p-8 text-center text-white/50">
-                      <i class="ph-bold ph-folder-open text-2xl text-white/30 block mb-2"></i>
-                      <span>Belum ada rekaman nilai rapor siswa pada filter ini. Klik <strong>Input Nilai Rapor</strong> atau <strong>Import Excel</strong>.</span>
-                    </td>
-                  </tr>
-                  <tr v-else v-for="rc in reportCards" :key="rc.id" class="hover:bg-white/[0.03] transition-colors">
-                    <td class="p-4">
-                      <div class="font-bold text-white">{{ rc.student_name }}</div>
-                      <div class="text-[10px] text-white/40">{{ rc.student_email }}</div>
-                    </td>
-                    <td class="p-4">
-                      <div class="flex items-center gap-1.5">
-                        <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase" :class="rc.education_level === 'SD' ? 'bg-amber-500/20 text-amber-300' : (rc.education_level === 'SMP' ? 'bg-sky-500/20 text-sky-300' : 'bg-purple-500/20 text-purple-300')">
-                          {{ rc.education_level }}
-                        </span>
-                        <span class="text-white font-medium">{{ rc.class_level }}</span>
-                        <span v-if="rc.class_name" class="text-white/50 text-[10px]">({{ rc.class_name }})</span>
-                      </div>
-                    </td>
-                    <td class="p-4 text-white">
-                      <div>{{ rc.academic_year }}</div>
-                      <div class="text-[10px] text-white/50 capitalize">Sem. {{ rc.semester }}</div>
-                    </td>
-                    <td class="p-4 text-center text-white font-bold">
-                      {{ rc.total_subjects }} Mapel
-                    </td>
-                    <td class="p-4 text-center">
-                      <span class="px-2.5 py-1 rounded-lg font-black text-xs" :class="rc.average_score >= 85 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : (rc.average_score >= 75 ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30')">
-                        {{ rc.average_score }}
-                      </span>
-                    </td>
-                    <td class="p-4 text-center">
-                      <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider" :class="{
-                        'bg-slate-500/20 text-slate-300 border border-slate-500/30': rc.status === 'draft',
-                        'bg-amber-500/20 text-amber-300 border border-amber-500/30': rc.status === 'submitted',
-                        'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30': rc.status === 'verified',
-                        'bg-sky-500/20 text-sky-300 border border-sky-500/30': rc.status === 'locked',
-                        'bg-rose-500/20 text-rose-300 border border-rose-500/30': rc.status === 'rejected'
-                      }">
-                        {{ rc.status }}
-                      </span>
-                    </td>
-                    <td class="p-4 text-right">
-                      <div class="flex items-center justify-end gap-1.5">
-                        <button 
-                          @click="openReportDetail(rc.id)" 
-                          class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
-                          title="Lihat Detail Nilai"
-                        >
-                          <i class="ph-bold ph-eye"></i>
-                          <span>Detail</span>
-                        </button>
-                        <button 
-                          @click="openStudent360(rc.student_id)" 
-                          class="px-2.5 py-1 rounded-lg bg-[#c0ff00]/15 hover:bg-[#c0ff00]/25 text-[#c0ff00] border border-[#c0ff00]/30 font-bold text-[11px] transition cursor-pointer flex items-center gap-1"
-                          title="Buka Profil Student 360"
-                        >
-                          <i class="ph-bold ph-user-focus"></i>
-                          <span>360</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Pagination Bar -->
-            <div v-if="reportsTotal > reportsLimit" class="p-4 border-t border-white/10 flex items-center justify-between text-xs text-white/60">
-              <div>Menampilkan {{ (reportsPage - 1) * reportsLimit + 1 }} - {{ Math.min(reportsPage * reportsLimit, reportsTotal) }} dari {{ reportsTotal }} rapor</div>
-              <div class="flex gap-2">
-                <button :disabled="reportsPage <= 1" @click="reportsPage--; fetchReportCards();" class="px-3 py-1 bg-white/10 hover:bg-white/15 disabled:opacity-30 rounded-lg text-white font-bold cursor-pointer">Sebelumnya</button>
-                <button :disabled="reportsPage * reportsLimit >= reportsTotal" @click="reportsPage++; fetchReportCards();" class="px-3 py-1 bg-white/10 hover:bg-white/15 disabled:opacity-30 rounded-lg text-white font-bold cursor-pointer">Berikutnya</button>
               </div>
             </div>
           </div>
@@ -2081,10 +2121,17 @@ const loginForm = ref({
 // ── State Layout & Sidebar (Auto-Hide on Desktop, Matching Student Sidebar) ──
 const sidebarExpanded = ref(false);
 const mobileSidebarOpen = ref(false);
-const activeTab = ref('analytics'); // 'analytics' | 'packages' | 'students' | 'riasec' | 'ptn' | 'broadcast'
+const activeTab = ref('analytics'); // 'analytics' | 'packages' | 'students' | 'guidance' | 'broadcast' | 'settings'
+const studentSubTab = ref('roster'); // 'roster' | 'reports'
 
 const selectNavTab = (tabId) => {
-  activeTab.value = tabId;
+  if (tabId === 'reports') {
+    activeTab.value = 'students';
+    studentSubTab.value = 'reports';
+    fetchReportCards();
+  } else {
+    activeTab.value = tabId;
+  }
   mobileSidebarOpen.value = false;
 };
 
@@ -2155,6 +2202,14 @@ function sortByColumn(col) {
 
 function navigateToStudents(options = {}) {
   activeTab.value = 'students';
+  if (options.view) {
+    studentSubTab.value = options.view;
+    if (options.view === 'reports') {
+      fetchReportCards();
+    }
+  } else {
+    studentSubTab.value = 'roster';
+  }
   if (options.status) {
     filterStatus.value = options.status;
   }
@@ -2163,6 +2218,13 @@ function navigateToStudents(options = {}) {
     if (options.order) sortOrder.value = options.order;
   }
   fetchStudents(1);
+}
+
+function viewStudentReport(stu) {
+  activeTab.value = 'students';
+  studentSubTab.value = 'reports';
+  searchReportQuery.value = stu.name || '';
+  fetchReportCards();
 }
 
 const sortedStudents = computed(() => {
@@ -2191,20 +2253,26 @@ const sortedStudents = computed(() => {
 
 let searchTimeout = null;
 
-// ── Computed Clustered Navigation Groups (Sidebar Layout Efisien & Ramping) ──
+// ── Computed Clustered Navigation Groups (Sidebar Layout Efisien & Ramping Bebas Redundansi) ──
 const navGroups = computed(() => [
   {
-    title: 'Pusat Kontrol & Direktori',
+    title: 'Pusat Kontrol & Akademik',
     items: [
       { id: 'analytics', label: 'Dashboard Utama', icon: 'ph-chart-pie-slice' },
-      { id: 'students', label: 'Direktori & Roster Siswa', icon: 'ph-users-three', badge: `${kpis.value?.total_students || 0}`, badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-white/10 text-white' },
-      { id: 'packages', label: 'Status Paket Siswa', icon: 'ph-package', badge: `${kpis.value?.paid_package_students || 0} Siswa`, badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-400' }
-    ]
-  },
-  {
-    title: 'Akademik & Bimbingan Terpadu',
-    items: [
-      { id: 'reports', label: 'Buku Rapor Sekolah', icon: 'ph-file-text', badge: 'SD/SMP/SMA', badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-500/20 text-amber-400' },
+      { 
+        id: 'students', 
+        label: 'Direktori Siswa & Buku Rapor', 
+        icon: 'ph-users-three', 
+        badge: `${kpis.value?.total_students || 0}`, 
+        badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-white/10 text-white' 
+      },
+      { 
+        id: 'packages', 
+        label: 'Status Paket Siswa', 
+        icon: 'ph-package', 
+        badge: `${kpis.value?.paid_package_students || 0} Siswa`, 
+        badgeClass: 'px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-400' 
+      },
       { 
         id: 'guidance', 
         label: schoolLevel.value === 'SMA' ? 'Bimbingan BK & SNPMB' : 'Bimbingan BK & PPDB', 
@@ -2226,6 +2294,9 @@ const navGroups = computed(() => [
 const navItems = computed(() => navGroups.value.flatMap(g => g.items));
 
 const activeTabTitle = computed(() => {
+  if (activeTab.value === 'students') {
+    return studentSubTab.value === 'reports' ? 'Buku Rapor Semesteran Siswa' : 'Direktori Siswa & Roster Terpadu';
+  }
   const item = navItems.value.find(n => n.id === activeTab.value);
   return item ? item.label : 'Dashboard Sekolah';
 });

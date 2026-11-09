@@ -1280,8 +1280,10 @@ if ($action === 'report_cards' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $params[":status"] = $status;
     }
     if (!empty($search)) {
-        $where[] = "(st.name LIKE :search OR st.email LIKE :search OR rc.class_name LIKE :search)";
-        $params[":search"] = "%$search%";
+        $where[] = "(st.name LIKE :search_name OR st.email LIKE :search_email OR rc.class_name LIKE :search_class)";
+        $params[":search_name"] = "%$search%";
+        $params[":search_email"] = "%$search%";
+        $params[":search_class"] = "%$search%";
     }
 
     $whereSql = implode(" AND ", $where);
