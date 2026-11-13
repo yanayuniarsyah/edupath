@@ -479,6 +479,16 @@
               Testimoni
             </button>
 
+            <!-- 4b. Katalog Produk -->
+            <button 
+              @click="currentTab = 'catalog'" 
+              :class="['hover:text-[#c0ff00] transition-colors py-1 whitespace-nowrap flex items-center gap-1.5 font-bold cursor-pointer', currentTab === 'catalog' ? 'text-[#c0ff00]' : 'text-white/75']"
+            >
+              <i class="ph-bold ph-shopping-bag text-sm"></i>
+              <span>Katalog</span>
+              <span class="text-[9px] bg-[#c0ff00] text-black px-1.5 py-0.5 rounded-full font-black uppercase">Baru</span>
+            </button>
+
             <!-- 5. Harga -->
             <button @click="scrollToSection('pricing')" class="hover:text-[#c0ff00] transition-colors py-1 whitespace-nowrap">
               Harga
@@ -518,6 +528,17 @@
             <!-- Navigation Links -->
             <div class="py-5 space-y-2 flex-grow">
               <div class="text-[10px] uppercase tracking-wider font-extrabold text-white/40 px-2 pb-1">Navigasi Utama</div>
+              
+              <button 
+                @click="currentTab = 'catalog'; mobileSidebarOpen = false" 
+                class="w-full flex items-center justify-between p-3 rounded-2xl bg-[#c0ff00]/15 border border-[#c0ff00]/40 text-[#c0ff00] font-black text-xs hover:bg-[#c0ff00]/25 transition-all text-left cursor-pointer shadow-md"
+              >
+                <span class="flex items-center gap-2.5">
+                  <i class="ph-bold ph-shopping-bag text-base"></i>
+                  <span>Katalog Produk (Barang &amp; Jasa)</span>
+                </span>
+                <span class="text-[9px] bg-[#c0ff00] text-black px-1.5 py-0.5 rounded-full uppercase font-black">Baru</span>
+              </button>
               
               <button 
                 @click="scrollToSection('spp'); mobileSidebarOpen = false" 
@@ -5378,6 +5399,345 @@
           </div>
         </section>
 
+        <!-- TAB: KATALOG PRODUK LENGKAP (BARANG & JASA) -->
+        <section v-if="currentTab === 'catalog'" class="space-y-8 animate-fade-in pb-16 w-full max-w-7xl mx-auto">
+          <!-- Top Hero Banner Katalog -->
+          <div class="glass-card rounded-3xl p-6 sm:p-10 border border-[#c0ff00]/30 shadow-[0_16px_50px_rgba(0,0,0,0.5)] bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-950 relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-[#c0ff00]/10 blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+              <div class="space-y-3 max-w-2xl">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#c0ff00]/15 border border-[#c0ff00]/35 text-[#c0ff00] text-xs font-black uppercase tracking-wider shadow-sm">
+                  <i class="ph-bold ph-sparkle text-sm"></i>
+                  <span>Katalog Resmi EduPath 2026/2027</span>
+                </div>
+                <h1 class="text-2xl sm:text-4xl font-black font-heading text-white tracking-tight leading-tight">
+                  Katalog Produk Barang, Jasa &amp; Paket Belajar Terpadu
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  Temukan seluruh pilihan program bimbingan adaptif online, kelas tatap muka cabang hybrid, buku modul cetak Kitab SNBT, serta simulasi CBT IRT resmi dalam satu katalog lengkap bergaransi resmi.
+                </p>
+                <div class="flex flex-wrap items-center gap-4 pt-1 text-xs text-white/70">
+                  <span class="flex items-center gap-1.5"><i class="ph-bold ph-shield-check text-[#c0ff00]"></i> Pembayaran Resmi Midtrans</span>
+                  <span class="flex items-center gap-1.5"><i class="ph-bold ph-truck text-sky-400"></i> Pengiriman Fisik Seluruh Indonesia</span>
+                  <span class="flex items-center gap-1.5"><i class="ph-bold ph-lightning text-amber-400"></i> Aktivasi Digital Instan</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3 w-full lg:w-auto shrink-0">
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center">
+                  <div class="text-2xl font-black text-[#c0ff00]">{{ catalogItems.length }}+</div>
+                  <div class="text-[11px] font-bold text-white/60">Pilihan Produk</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center">
+                  <div class="text-2xl font-black text-sky-400">100%</div>
+                  <div class="text-[11px] font-bold text-white/60">Jaminan Mutu</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-center col-span-2 sm:col-span-1 lg:col-span-2">
+                  <div class="text-xs font-bold text-emerald-400 flex items-center justify-center gap-1">
+                    <i class="ph-bold ph-check-circle"></i> Berizin &amp; Terpercaya
+                  </div>
+                  <div class="text-[10px] text-white/50 mt-0.5">PT Kreasi Hasanah Indonesia</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls: Search & Category Tabs -->
+          <div class="space-y-4">
+            <!-- Search & Quick Metrics -->
+            <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+              <!-- Search Bar -->
+              <div class="relative flex-grow max-w-xl">
+                <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/40 text-base"></i>
+                <input 
+                  type="text" 
+                  v-model="catalogSearchQuery" 
+                  placeholder="Cari buku, paket bimbel, jenjang SD/SMP/SMA, atau simulasi CBT..." 
+                  class="w-full pl-11 pr-10 py-3 rounded-2xl bg-slate-900/90 border border-white/15 text-white placeholder-white/40 text-xs sm:text-sm focus:outline-none focus:border-[#c0ff00] focus:ring-1 focus:ring-[#c0ff00] transition-all"
+                />
+                <button 
+                  v-if="catalogSearchQuery" 
+                  @click="catalogSearchQuery = ''" 
+                  class="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1"
+                >
+                  <i class="ph-bold ph-x text-xs"></i>
+                </button>
+              </div>
+
+              <!-- Program Filter Dropdown on Mobile / Pills on Desktop -->
+              <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                <span class="text-xs font-bold text-white/50 shrink-0 hidden sm:inline">Jenjang:</span>
+                <button 
+                  v-for="prog in catalogProgramFilters" 
+                  :key="prog.id" 
+                  type="button" 
+                  @click="catalogProgramFilter = prog.id"
+                  :class="[
+                    'px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0',
+                    catalogProgramFilter === prog.id 
+                      ? 'bg-white text-black font-black shadow-md' 
+                      : 'bg-white/5 text-white/70 hover:text-white border border-white/10'
+                  ]"
+                >
+                  {{ prog.label }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Category Filter Strip -->
+            <div class="flex flex-wrap items-center gap-2 border-b border-white/10 pb-3">
+              <button 
+                v-for="cat in catalogCategories" 
+                :key="cat.id" 
+                type="button" 
+                @click="catalogCategoryFilter = cat.id"
+                :class="[
+                  'px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer shadow-sm',
+                  catalogCategoryFilter === cat.id 
+                    ? 'bg-[#c0ff00] text-black shadow-[#c0ff00]/25' 
+                    : 'bg-slate-900/80 text-white/70 hover:text-white border border-white/10 hover:border-white/20'
+                ]"
+              >
+                <i :class="['ph-bold', cat.icon, 'text-sm']"></i>
+                <span>{{ cat.label }}</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full" :class="catalogCategoryFilter === cat.id ? 'bg-black/20 text-black' : 'bg-white/10 text-white/60'">
+                  {{ getCatalogCategoryCount(cat.id) }}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Grid -->
+          <div v-if="filteredCatalogItems.length === 0" class="py-16 text-center rounded-3xl border border-white/10 bg-white/[0.02]">
+            <i class="ph-bold ph-package text-4xl text-white/30 mb-3 block"></i>
+            <h3 class="text-base font-bold text-white">Tidak ada produk yang cocok</h3>
+            <p class="text-xs text-white/50 mt-1 max-w-md mx-auto">Coba ubah kata kunci pencarian atau reset filter kategori untuk melihat seluruh produk yang tersedia.</p>
+            <button 
+              @click="catalogSearchQuery = ''; catalogCategoryFilter = 'ALL'; catalogProgramFilter = 'ALL'" 
+              class="mt-4 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-all cursor-pointer"
+            >
+              Reset Semua Filter
+            </button>
+          </div>
+
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div 
+              v-for="item in filteredCatalogItems" 
+              :key="item.id" 
+              class="glass-card rounded-3xl p-6 border transition-all duration-300 flex flex-col justify-between group hover:border-[#c0ff00]/50 hover:shadow-[0_12px_40px_rgba(192,255,0,0.15)] relative"
+              :class="item.featured ? 'border-[#c0ff00]/40 bg-gradient-to-b from-slate-900 via-slate-900/90 to-slate-950' : 'border-white/10 bg-slate-900/80'"
+            >
+              <!-- Featured Pill -->
+              <div v-if="item.featured" class="absolute -top-3 left-6 z-10 px-3 py-0.5 rounded-full bg-[#c0ff00] text-black text-[10px] font-black uppercase tracking-wider shadow-md shadow-[#c0ff00]/30 flex items-center gap-1">
+                <i class="ph-bold ph-crown"></i>
+                <span>Rekomendasi Utama</span>
+              </div>
+
+              <!-- Top Content -->
+              <div class="space-y-4">
+                <!-- Badges Row -->
+                <div class="flex items-center justify-between gap-2 flex-wrap pt-1">
+                  <span 
+                    class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border flex items-center gap-1.5"
+                    :class="getCatalogTypeBadgeStyle(item.type)"
+                  >
+                    <i :class="['ph-bold', getCatalogTypeIcon(item.type)]"></i>
+                    <span>{{ getCatalogTypeLabel(item.type) }}</span>
+                  </span>
+
+                  <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-white/70 border border-white/10">
+                    {{ item.level }}
+                  </span>
+                </div>
+
+                <!-- Product Title & Visual Icon -->
+                <div class="flex items-start gap-3.5">
+                  <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-2xl shadow-inner border" :class="item.iconBg">
+                    {{ item.icon }}
+                  </div>
+                  <div>
+                    <h3 class="text-base font-extrabold text-white group-hover:text-[#c0ff00] transition-colors leading-snug">
+                      {{ item.name }}
+                    </h3>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-amber-400 text-xs flex items-center gap-0.5 font-bold">
+                        ★ {{ item.rating || '4.9' }}
+                      </span>
+                      <span class="text-[11px] text-white/40">({{ item.soldCount || '1.2k+' }} peminat)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <p class="text-xs text-white/70 leading-relaxed line-clamp-3">
+                  {{ item.description }}
+                </p>
+
+                <!-- Key Highlights Checklist -->
+                <ul class="space-y-2 pt-2 border-t border-white/10 text-xs text-white/80">
+                  <li v-for="(feat, fIdx) in item.features.slice(0, 3)" :key="fIdx" class="flex items-start gap-2">
+                    <i class="ph-bold ph-check text-[#c0ff00] mt-0.5 text-xs shrink-0"></i>
+                    <span class="line-clamp-1">{{ feat }}</span>
+                  </li>
+                </ul>
+
+                <!-- Logistics / Delivery Note -->
+                <div class="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 flex items-center gap-2 text-[11px]">
+                  <i :class="['ph-bold', item.type === 'physical' ? 'ph-truck text-sky-400' : 'ph-lightning text-[#c0ff00]', 'text-base shrink-0']"></i>
+                  <span class="text-white/70 font-medium">
+                    {{ item.type === 'physical' ? 'Pengiriman fisik via JNE/J&T/SiCepat' : (item.type === 'hybrid' ? 'Sesi cabang fisik + Akses CBT online' : 'Akses instan di web & aplikasi') }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Bottom Pricing & Action Buttons -->
+              <div class="pt-5 mt-5 border-t border-white/10 space-y-3">
+                <!-- Price Display -->
+                <div class="flex items-baseline justify-between">
+                  <div>
+                    <div v-if="item.originalPrice" class="text-[11px] text-white/40 line-through font-mono">
+                      Rp {{ Number(item.originalPrice).toLocaleString('id-ID') }}
+                    </div>
+                    <div class="text-xl sm:text-2xl font-black text-[#c0ff00]">
+                      Rp {{ Number(item.price).toLocaleString('id-ID') }}
+                      <span v-if="item.billingUnit" class="text-xs font-normal text-white/50">/{{ item.billingUnit }}</span>
+                    </div>
+                  </div>
+                  <span v-if="item.discountPercent" class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                    Hemat {{ item.discountPercent }}%
+                  </span>
+                </div>
+
+                <!-- Action Button Group -->
+                <div class="grid grid-cols-2 gap-2">
+                  <button 
+                    type="button" 
+                    @click="openCatalogDetail(item)"
+                    class="w-full py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-white/15"
+                  >
+                    <i class="ph-bold ph-info text-sm"></i>
+                    <span>Detail</span>
+                  </button>
+
+                  <button 
+                    type="button" 
+                    @click="buyCatalogItem(item)"
+                    class="w-full py-2.5 px-3 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-[#c0ff00]/25 active:scale-95"
+                  >
+                    <i class="ph-bold ph-shopping-cart text-sm"></i>
+                    <span>Pesan</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- MODAL: DETAIL PRODUK KATALOG -->
+        <div v-if="showCatalogDetailModal && selectedCatalogItem" @click.self="closeCatalogDetail" class="fixed inset-0 z-[96] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in cursor-default overflow-y-auto">
+          <div class="edupath-modal-card w-full max-w-2xl p-6 sm:p-8 animate-fade-in relative my-auto max-h-[92vh] overflow-y-auto">
+            <button 
+              type="button" 
+              @click.stop="closeCatalogDetail" 
+              class="modal-close-btn absolute top-5 right-5 z-20"
+              title="Tutup"
+              aria-label="Tutup"
+            >
+              <i class="ph-bold ph-x"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="flex items-start gap-4 pb-5 border-b border-white/10 pr-8">
+              <div class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 text-3xl shadow-inner border" :class="selectedCatalogItem.iconBg">
+                {{ selectedCatalogItem.icon }}
+              </div>
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border" :class="getCatalogTypeBadgeStyle(selectedCatalogItem.type)">
+                    {{ getCatalogTypeLabel(selectedCatalogItem.type) }}
+                  </span>
+                  <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                    Jenjang {{ selectedCatalogItem.level }}
+                  </span>
+                  <span v-if="selectedCatalogItem.discountPercent" class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                    Diskon {{ selectedCatalogItem.discountPercent }}%
+                  </span>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-white leading-tight">
+                  {{ selectedCatalogItem.name }}
+                </h2>
+              </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="py-5 space-y-5 text-xs sm:text-sm">
+              <!-- Deskripsi Lengkap -->
+              <div>
+                <h4 class="text-xs font-black uppercase tracking-wider text-white/50 mb-1.5">Deskripsi Produk</h4>
+                <p class="text-slate-300 leading-relaxed">{{ selectedCatalogItem.fullDescription || selectedCatalogItem.description }}</p>
+              </div>
+
+              <!-- Rincian Fitur / Daftar Isi -->
+              <div>
+                <h4 class="text-xs font-black uppercase tracking-wider text-white/50 mb-2">Fasilitas &amp; Spesifikasi Lengkap</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div v-for="(feat, idx) in selectedCatalogItem.features" :key="idx" class="p-3 rounded-xl bg-white/[0.03] border border-white/10 flex items-start gap-2.5 text-xs text-white/85">
+                    <i class="ph-bold ph-check-circle text-[#c0ff00] text-base mt-0.5 shrink-0"></i>
+                    <span>{{ feat }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panduan Pemesanan & Pengiriman -->
+              <div class="p-4 rounded-2xl bg-white/[0.04] border border-white/10 space-y-2">
+                <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <i :class="['ph-bold', selectedCatalogItem.type === 'physical' ? 'ph-truck text-sky-400' : 'ph-sparkle text-[#c0ff00]']"></i>
+                  <span>{{ selectedCatalogItem.type === 'physical' ? 'Informasi Pengiriman Barang Fisik' : 'Mekanisme Akses Layanan' }}</span>
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  {{ selectedCatalogItem.type === 'physical' 
+                    ? 'Buku fisik akan dikemas rapi dengan bubble wrap tebal dan dikirimkan maksimal 1x24 jam hari kerja setelah konfirmasi pembayaran Midtrans. Nomor resi otomatis diinfokan melalui WhatsApp/Email terdaftar.'
+                    : 'Hak akses digital dan/atau jadwal sesi bimbingan cabang akan langsung otomatis aktif di dashboard akun siswa begitu proses pembayaran Midtrans terverifikasi oleh sistem.'
+                  }}
+                </p>
+              </div>
+
+              <!-- Kebijakan Transaksi -->
+              <div class="text-[11px] text-white/50 space-y-1">
+                <div>• Pembayaran diproses secara aman melalui gerbang resmi Midtrans (QRIS, VA Bank, E-Wallet).</div>
+                <div>• Harga sudah transparan dan tertera pada invoice resmi saat checkout.</div>
+              </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <div class="text-[10px] text-white/50 uppercase font-black tracking-wider">Total Investasi</div>
+                <div class="text-2xl font-black text-[#c0ff00]">
+                  Rp {{ Number(selectedCatalogItem.price).toLocaleString('id-ID') }}
+                </div>
+              </div>
+              <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                <button 
+                  type="button" 
+                  @click="closeCatalogDetail" 
+                  class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs transition-all cursor-pointer"
+                >
+                  Tutup
+                </button>
+                <button 
+                  type="button" 
+                  @click="closeCatalogDetail(); buyCatalogItem(selectedCatalogItem)" 
+                  class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#c0ff00] hover:bg-[#b0ef00] text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#c0ff00]/30 active:scale-95"
+                >
+                  <i class="ph-bold ph-credit-card text-base"></i>
+                  <span>Lanjutkan Pemesanan</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
       <!-- 14. Footer (Hidden during diagnostic test, learning material, and tryout simulator for distraction-free focus) -->
       <footer v-if="!['diagnostic', 'learning', 'simulator'].includes(currentTab)" class="border-t border-white/10 pt-12 pb-8 text-sm text-white/50 font-medium">
         <div class="section-wrapper">
@@ -7667,6 +8027,7 @@ export default {
 
     const studentTabs = [
       { id: 'home', label: 'Home', icon: 'ph-house' },
+      { id: 'catalog', label: 'Katalog Produk', icon: 'ph-shopping-bag' },
       { id: 'dashboard', label: 'Dashboard', icon: 'ph-gauge' },
       { id: 'diagnostic', label: 'Asesmen', icon: 'ph-brain' },
       { id: 'learning', label: 'Materi', icon: 'ph-books' },
@@ -9432,6 +9793,369 @@ export default {
     const pendingPurchaseAmount = ref(null);
     const pendingPurchaseName = ref(null);
 
+    // ── Katalog Produk State & Methods ──
+    const catalogSearchQuery = ref('');
+    const catalogCategoryFilter = ref('ALL');
+    const catalogProgramFilter = ref('ALL');
+    const selectedCatalogItem = ref(null);
+    const showCatalogDetailModal = ref(false);
+
+    const catalogCategories = [
+      { id: 'ALL', label: 'Semua Produk', icon: 'ph-squares-four' },
+      { id: 'DIGITAL', label: 'Paket Belajar Digital', icon: 'ph-laptop' },
+      { id: 'HYBRID', label: 'Bimbel Hybrid Cabang', icon: 'ph-buildings' },
+      { id: 'PHYSICAL', label: 'Buku & Modul Fisik', icon: 'ph-book-bookmark' },
+      { id: 'SERVICE', label: 'Simulasi & Konsultasi', icon: 'ph-chart-line-up' }
+    ];
+
+    const catalogProgramFilters = [
+      { id: 'ALL', label: 'Semua Jenjang' },
+      { id: 'SD', label: 'TKA SD' },
+      { id: 'SMP', label: 'TKA SMP' },
+      { id: 'SMA', label: 'TKA SMA' },
+      { id: 'SNPMB', label: 'SNPMB / UTBK' },
+      { id: 'ALUMNI', label: 'Alumni / Gap Year' }
+    ];
+
+    const catalogItems = ref([
+      // 1. Barang Fisik: Buku Kitab SNBT
+      {
+        id: 'cat-book-kitab-snbt',
+        planId: 'plan-buku-kitab-snbt',
+        name: 'Buku Kitab SNBT Edisi Lengkap 2026/2027 Cetak',
+        category: 'PHYSICAL',
+        type: 'physical',
+        level: 'SNPMB',
+        icon: '📚',
+        iconBg: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+        rating: 4.9,
+        soldCount: '3.8k+',
+        featured: true,
+        price: 185000,
+        originalPrice: 275000,
+        discountPercent: 32,
+        billingUnit: 'buku fisik',
+        description: 'Buku babon fisik 750+ halaman memuat kompilasi 7 Subtes Resmi SNPMB, ringkasan konsep kilat, trik eliminasi jawaban, dan 1.200+ soal pembahasan tuntas.',
+        fullDescription: 'Buku Kitab SNBT merupakan panduan komprehensif standar nasional yang disusun oleh Tim Ahli Litbang EduPath. Mengupas tuntas 7 subtes resmi: Penalaran Umum (PU), Pengetahuan & Pemahaman Umum (PPU), Pemahaman Bacaan & Menulis (PBM), Pengetahuan Kuantitatif (PK), Literasi Bahasa Indonesia, Literasi Bahasa Inggris, dan Penalaran Matematika. Dilengkapi ribuan latihan soal bertingkat dari LOTS, MOTS hingga HOTS serta bonus voucher gratis akses platform CBT digital 30 hari.',
+        features: [
+          'Buku Fisik Tebal 750+ Halaman Bookpaper Anti-Lelah',
+          'Kupas Tuntas 7 Subtes Resmi SNPMB / UTBK Terbaru',
+          '1.200+ Soal Prediksi HOTS & Pembahasan Konsep Tuntas',
+          'Ringkasan Rumus Cepat & Mindmap Logika Berpikir',
+          'Bonus Voucher Akses Tryout CBT EduPath 30 Hari',
+          'Pengiriman Aman Bubble Wrap ke Seluruh Indonesia'
+        ]
+      },
+      // 2. Barang Fisik: Buku HOTS SMA
+      {
+        id: 'cat-book-hots-sma',
+        planId: 'plan-buku-hots-sma',
+        name: 'Buku Bank Soal HOTS TKA Saintek & Soshum Cetak',
+        category: 'PHYSICAL',
+        type: 'physical',
+        level: 'SMA',
+        icon: '📖',
+        iconBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+        rating: 4.8,
+        soldCount: '1.4k+',
+        featured: false,
+        price: 165000,
+        originalPrice: 240000,
+        discountPercent: 30,
+        billingUnit: 'buku fisik',
+        description: 'Buku kumpulan latihan soal penalaran tingkat tinggi (HOTS) Kurikulum Merdeka & Nasional untuk persiapan asesmen akademik SMA serta seleksi PTN unggulan.',
+        fullDescription: 'Dirancang khusus bagi siswa SMA kelas 10–12 yang ingin mendalami mata pelajaran eksakta (Matematika Lanjut, Fisika, Kimia, Biologi) maupun rumpun soshum (Ekonomi, Sosiologi, Geografi). Soal disusun terstruktur dari level analisis hingga evaluasi kritis.',
+        features: [
+          '500+ Soal HOTS Teruji dengan Kunci Jawaban Lengkap',
+          'Panduan Trik Cepat Pemecahan Soal Cerita Rumit',
+          'Sesuai Kurikulum Merdeka & Standar Asesmen Nasional',
+          'Kertas Bookpaper Nyaman Dibaca & Layout Luwes',
+          'Pengiriman Ekspedisi Resmi ke Seluruh Kota/Kabupaten'
+        ]
+      },
+      // 3. Paket Belajar Digital: Pejuang PTN
+      {
+        id: 'cat-plan-pejuang-ptn',
+        planId: 'plan-p2-monthly',
+        name: 'Paket Pejuang PTN (Online Prioritas)',
+        category: 'DIGITAL',
+        type: 'digital',
+        level: 'SNPMB',
+        icon: '⚡',
+        iconBg: 'bg-[#c0ff00]/20 text-[#c0ff00] border-[#c0ff00]/40',
+        rating: 4.9,
+        soldCount: '8.5k+',
+        featured: true,
+        price: 250000,
+        originalPrice: 350000,
+        discountPercent: 28,
+        billingUnit: 'bulan',
+        description: 'Akses penuh seluruh bank soal HOTS 50.000+, AI Hint 24/7, simulator IRT adaptif, dan rasionalisasi peluang lolos PTN real-time.',
+        fullDescription: 'Pilihan terpopuler siswa pejuang UTBK. Memberikan pendampingan AI adaptif yang merekomendasikan topik materi prioritas berdasarkan kelemahan saat pengerjaan soal. Dilengkapi rasionalisasi peluang masuk 50 PTN favorit.',
+        features: [
+          'Bank Soal 50.000+ Butir Terstandar IRT Nasional',
+          'AI Companion Hint & Solusi Instan 24 Jam Nonstop',
+          'Tryout CBT Adaptif Tanpa Batas dengan Analisis Skor',
+          'Fitur Rasionalisasi Prodi & Kampus Impian Real-time',
+          'Akses Modul Kitab Digital Lengkap 7 Subtes'
+        ]
+      },
+      // 4. Paket Belajar Digital: Mandiri SNPMB
+      {
+        id: 'cat-plan-mandiri-snbt',
+        planId: 'plan-p1-monthly',
+        name: 'Paket Mandiri SNPMB (Belajar Adaptif)',
+        category: 'DIGITAL',
+        type: 'digital',
+        level: 'SNPMB',
+        icon: '🎯',
+        iconBg: 'bg-sky-500/20 text-sky-300 border-sky-500/40',
+        rating: 4.8,
+        soldCount: '4.2k+',
+        featured: false,
+        price: 150000,
+        originalPrice: 200000,
+        discountPercent: 25,
+        billingUnit: 'bulan',
+        description: 'Akses belajar mandiri terstruktur dengan IRT assessment, latihan soal harian, dan modul ringkasan konsep materi SNBT.',
+        fullDescription: 'Dirancang bagi siswa mandiri yang ingin melatih kecepatan dan ketepatan menjawab soal secara fleksibel kapan pun dan di mana pun.',
+        features: [
+          'Akses Bank Soal Terstandar HOTS',
+          'Asesmen Diagnostik Awal & Peta Kelemahan',
+          'Modul Digital Interaktif 7 Subtes',
+          'Kunci & Penjelasan Step-by-Step'
+        ]
+      },
+      // 5. Paket Bimbel Hybrid: SNPMB Terpadu Cabang
+      {
+        id: 'cat-plan-snbt-hybrid',
+        planId: 'plan-snbt-hybrid-monthly',
+        name: 'Paket SNPMB Hybrid Terpadu Cabang',
+        category: 'HYBRID',
+        type: 'hybrid',
+        level: 'SNPMB',
+        icon: '🏫',
+        iconBg: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
+        rating: 5.0,
+        soldCount: '950+',
+        featured: true,
+        price: 750000,
+        originalPrice: 950000,
+        discountPercent: 21,
+        billingUnit: 'bulan',
+        description: 'Kombinasi bimbingan kelas tatap muka offline 3x seminggu di cabang mitra EduPath + platform online 24 jam & modul fisik eksklusif.',
+        fullDescription: 'Metode terpadu yang memadukan kedisiplinan belajar di kelas fisik bersama tutor ahli bersertifikat dan fleksibilitas platform CBT digital di rumah. Termasuk konseling pilihan jurusan tatap muka langsung.',
+        features: [
+          'Pertemuan Tatap Muka Offline 3x Seminggu di Sentra Bimbel',
+          'Kelas Kecil Interaktif (Maksimal 12–15 Siswa per Kelas)',
+          'Modul Cetak Eksklusif & Buku Panduan Masuk PTN',
+          'Akses Penuh Seluruh Fitur Platform Digital & CBT IRT',
+          'Konseling Minat Bakat & Pilihan Jurusan bersama Guru Ahli'
+        ]
+      },
+      // 6. Paket Bimbel Hybrid: TKA SMA Terpadu
+      {
+        id: 'cat-plan-tka-sma-hybrid',
+        planId: 'plan-tka-sma-hybrid-monthly',
+        name: 'Paket TKA SMA Terpadu Cabang',
+        category: 'HYBRID',
+        type: 'hybrid',
+        level: 'SMA',
+        icon: '🔬',
+        iconBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+        rating: 4.9,
+        soldCount: '620+',
+        featured: false,
+        price: 650000,
+        originalPrice: 800000,
+        discountPercent: 18,
+        billingUnit: 'bulan',
+        description: 'Bimbingan tatap muka 2x seminggu untuk mapel eksakta/sosial SMA di sentra cabang mitra + drill soal harian.',
+        fullDescription: 'Membantu siswa kelas 10–12 meraih peringkat rapor terbaik dan menguasai konsep dasar sains dan matematika tingkat lanjut untuk persiapan SNBP dan SNBT.',
+        features: [
+          'Tatap Muka 2x Seminggu bersama Guru Spesialis Mapel',
+          'Bedah Tuntas PR Sekolah & Persiapan Ujian Semester',
+          'Buku Lembar Kerja & Modul Rumus Cepat SMA',
+          'Akses Bank Soal Digital & Latihan Mandiri'
+        ]
+      },
+      // 7. Paket Bimbel Hybrid: TKA SMP Terpadu
+      {
+        id: 'cat-plan-tka-smp-hybrid',
+        planId: 'plan-tka-smp-hybrid-monthly',
+        name: 'Paket TKA SMP Terpadu Cabang',
+        category: 'HYBRID',
+        type: 'hybrid',
+        level: 'SMP',
+        icon: '📘',
+        iconBg: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
+        rating: 4.8,
+        soldCount: '780+',
+        featured: false,
+        price: 550000,
+        originalPrice: 700000,
+        discountPercent: 21,
+        billingUnit: 'bulan',
+        description: 'Kelas belajar tatap muka menyenangkan untuk penguatan matematika nalar, sains, & literasi persiapan SMA unggulan.',
+        fullDescription: 'Fokus pada pembangunan fondasi berpikir kritis dan penalaran kuantitatif agar siswa siap bersaing masuk SMA favorit seperti Taruna Nusantara, Pradita Dirgantara, dan SMA Negeri Unggulan.',
+        features: [
+          'Tatap Muka 2x Seminggu di Sentra Bimbel Mitra',
+          'Pendampingan PR Matematika & IPA Terpadu',
+          'Modul Belajar Cetak Terstruktur & Ceria',
+          'Tryout Asesmen SMP Berkala & Evaluasi Rapor'
+        ]
+      },
+      // 8. Paket Bimbel Hybrid: TKA SD Terpadu
+      {
+        id: 'cat-plan-tka-sd-hybrid',
+        planId: 'plan-tka-sd-hybrid-monthly',
+        name: 'Paket TKA SD Terpadu Cabang',
+        category: 'HYBRID',
+        type: 'hybrid',
+        level: 'SD',
+        icon: '🎒',
+        iconBg: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+        rating: 4.9,
+        soldCount: '510+',
+        featured: false,
+        price: 450000,
+        originalPrice: 600000,
+        discountPercent: 25,
+        billingUnit: 'bulan',
+        description: 'Bimbingan tatap muka ramah anak untuk penguatan membaca cepat, berhitung nalar, dan persiapan masuk SMP favorit.',
+        fullDescription: 'Pendekatan belajar ceria dan personal untuk menumbuhkan rasa percaya diri anak dalam belajar berhitung, membaca pemahaman, dan sains dasar.',
+        features: [
+          'Pendampingan Belajar 2x Seminggu di Cabang',
+          'Tutor Ramah, Sabar & Tersertifikasi EduPath',
+          'Buku Aktivitas Belajar Bergambar & Lembar Kerja',
+          'Laporan Perkembangan Mingguan untuk Orang Tua'
+        ]
+      },
+      // 9. Layanan Tambahan: Bundling Tryout 10x
+      {
+        id: 'cat-service-tryout-10x',
+        planId: 'plan-tryout-10x',
+        name: 'Bundling 10x Tryout IRT CBT Mandiri',
+        category: 'SERVICE',
+        type: 'service',
+        level: 'SNPMB',
+        icon: '📊',
+        iconBg: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+        rating: 4.9,
+        soldCount: '5.6k+',
+        featured: false,
+        price: 99000,
+        originalPrice: 199000,
+        discountPercent: 50,
+        billingUnit: 'paket 10 sesi',
+        description: 'Paket 10 sesi ujian Try Out CBT dengan sistem penilaian Item Response Theory (IRT) resmi SNPMB & pembahasan instan.',
+        fullDescription: 'Sangat cocok untuk latihan intensif sebelum hari-H ujian. Setiap sesi tryout memiliki waktu mundur realistis dan menghasilkan grafik evaluasi per subtes.',
+        features: [
+          '10 Kuota Ujian Tryout CBT Berstandar BPPP',
+          'Sistem Penilaian IRT 3 Parameter Presisi',
+          'Kunci Jawaban & Pembahasan Detil Tiap Soal',
+          'Ranking & Peringkat Nasional Real-time',
+          'Masa Aktif Fleksibel Selama 90 Hari'
+        ]
+      },
+      // 10. Layanan Tambahan: Rasionalisasi 1-on-1
+      {
+        id: 'cat-service-rasionalisasi',
+        planId: 'plan-rasionalisasi-1on1',
+        name: 'Konsultasi & Rasionalisasi Jurusan PTN 1-on-1',
+        category: 'SERVICE',
+        type: 'service',
+        level: 'SNPMB',
+        icon: '🎓',
+        iconBg: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',
+        rating: 5.0,
+        soldCount: '890+',
+        featured: false,
+        price: 200000,
+        originalPrice: 200000,
+        discountPercent: 0,
+        billingUnit: 'sesi 45 menit',
+        description: 'Sesi konsultasi privat 1-on-1 virtual 45 menit bersama Konsultan Akademik Senior untuk bedah peluang lolos SNBP/SNBT.',
+        fullDescription: 'Dapatkan rekomendasi pemilihan program studi dan kampus pilihan 1 & 2 yang paling rasional berdasarkan rekam jejak nilai rapor, histori skor tryout, dan kuota daya tampung terbaru.',
+        features: [
+          'Sesi Tatap Muka Online Private 45 Menit (Google Meet/Zoom)',
+          'Audit Komprehensif Portofolio Nilai Rapor & Tryout',
+          'Analisis Daya Tampung & Ketetatan 50 PTN Top',
+          'Rekomendasi Pemilihan Jurusan Strategis (Pilihan 1 & 2)',
+          'Dokumen Rekomendasi Resmi PDF Pasca Konsultasi'
+        ]
+      }
+    ]);
+
+    const filteredCatalogItems = computed(() => {
+      let list = catalogItems.value;
+      
+      // Filter Kategori
+      if (catalogCategoryFilter.value !== 'ALL') {
+        list = list.filter(item => item.category === catalogCategoryFilter.value);
+      }
+
+      // Filter Jenjang Program
+      if (catalogProgramFilter.value !== 'ALL') {
+        list = list.filter(item => item.level === catalogProgramFilter.value);
+      }
+
+      // Search Query
+      if (catalogSearchQuery.value.trim()) {
+        const q = catalogSearchQuery.value.toLowerCase().trim();
+        list = list.filter(item => 
+          item.name.toLowerCase().includes(q) ||
+          item.description.toLowerCase().includes(q) ||
+          (item.level && item.level.toLowerCase().includes(q)) ||
+          item.features.some(f => f.toLowerCase().includes(q))
+        );
+      }
+
+      return list;
+    });
+
+    const getCatalogCategoryCount = (catId) => {
+      if (catId === 'ALL') return catalogItems.value.length;
+      return catalogItems.value.filter(item => item.category === catId).length;
+    };
+
+    const getCatalogTypeLabel = (type) => {
+      if (type === 'physical') return 'Barang Fisik';
+      if (type === 'hybrid') return 'Bimbel Hybrid';
+      if (type === 'service') return 'Layanan Jasa';
+      return 'Digital Akses';
+    };
+
+    const getCatalogTypeIcon = (type) => {
+      if (type === 'physical') return 'ph-package';
+      if (type === 'hybrid') return 'ph-buildings';
+      if (type === 'service') return 'ph-chart-line-up';
+      return 'ph-laptop';
+    };
+
+    const getCatalogTypeBadgeStyle = (type) => {
+      if (type === 'physical') return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+      if (type === 'hybrid') return 'bg-purple-500/20 text-purple-300 border-purple-500/40';
+      if (type === 'service') return 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+      return 'bg-[#c0ff00]/15 text-[#c0ff00] border-[#c0ff00]/30';
+    };
+
+    const openCatalogDetail = (item) => {
+      selectedCatalogItem.value = item;
+      showCatalogDetailModal.value = true;
+    };
+
+    const closeCatalogDetail = () => {
+      showCatalogDetailModal.value = false;
+      selectedCatalogItem.value = null;
+    };
+
+    const buyCatalogItem = (item) => {
+      // Panggil purchasePlan yang sudah terintegrasi dengan checkout Midtrans
+      purchasePlan(item.planId || item.name, item.price);
+    };
+
+
     const purchasePlan = (planNameFallback, fallbackAmount) => {
       checkoutTermsAgreed.value = false;
       let amount = fallbackAmount;
@@ -10497,6 +11221,24 @@ export default {
     };
 
     return {
+      // Katalog Produk Exports
+      catalogSearchQuery,
+      catalogCategoryFilter,
+      catalogProgramFilter,
+      selectedCatalogItem,
+      showCatalogDetailModal,
+      catalogCategories,
+      catalogProgramFilters,
+      catalogItems,
+      filteredCatalogItems,
+      getCatalogCategoryCount,
+      getCatalogTypeLabel,
+      getCatalogTypeIcon,
+      getCatalogTypeBadgeStyle,
+      openCatalogDetail,
+      closeCatalogDetail,
+      buyCatalogItem,
+
       student360Data,
       student360Loading,
       selectedReportCardDetail,
