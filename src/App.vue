@@ -9036,6 +9036,22 @@ export default {
     };
 
     onMounted(async () => {
+      // Automatic visitor tracking (non-blocking, once per session)
+      try {
+        if (!sessionStorage.getItem('edupath_v_tracked')) {
+          fetch('/api/track_visitor.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              page: window.location.pathname + window.location.hash,
+              referrer: document.referrer || ''
+            })
+          }).then(() => {
+            sessionStorage.setItem('edupath_v_tracked', '1');
+          }).catch(() => {});
+        }
+      } catch (_) {}
+
       // Capture affiliate referral code
       const params = new URLSearchParams(window.location.search);
       const refCode = params.get('ref');

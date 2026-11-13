@@ -583,6 +583,11 @@ export const api = {
   updateAdminTenant(id, payload) { return apiFetch('/admin.php?action=tenants', { method: 'PUT', body: JSON.stringify({ id, ...payload }) }); },
   deleteAdminTenant(id) { return apiFetch(`/admin.php?action=tenants&id=${id}`, { method: 'DELETE' }); },
 
+  // ── Visitor & IP Traffic Tracking (Superadmin Only) ──
+  getAdminVisitors(page = 1, search = '', city = '') {
+    return apiFetch(`/admin.php?action=visitors&page=${page}&search=${encodeURIComponent(search)}&city=${encodeURIComponent(city)}`);
+  },
+
   // ── School & BK Management (Superadmin & Public) ──
   getAdminSchools(search = '') { return apiFetch(`/admin.php?action=schools&search=${encodeURIComponent(search)}`); },
   createAdminSchool(data)      { return apiFetch('/admin.php?action=schools', { method: 'POST', body: JSON.stringify(data) }); },

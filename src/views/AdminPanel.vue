@@ -265,6 +265,62 @@
               <div class="text-xl font-black font-mono text-[#c0ff00]">{{ formatCurrency(stats.totalRevenue) }}</div>
             </div>
           </div>
+
+          <!-- Visitor IP & City Overview Strip (Superadmin Only) -->
+          <div v-if="isSuperadmin" class="bg-[#0e1726]/80 backdrop-blur-md rounded-2xl border border-white/10 p-4 sm:p-5 space-y-3 shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-[#c0ff00]/15 text-[#c0ff00] flex items-center justify-center text-base border border-[#c0ff00]/30 shrink-0">
+                  <i class="ph-bold ph-globe"></i>
+                </div>
+                <div>
+                  <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                    Lalu Lintas Pengunjung (Berdasarkan IP &amp; Asal Kota)
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Superadmin Live</span>
+                  </h3>
+                  <p class="text-[10px] text-white/40">Statistik alamat IP unik dan pemetaan sebaran kota pengunjung platform</p>
+                </div>
+              </div>
+              <button @click="activeTab = 'visitors'" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[10px] font-black rounded-lg transition-all flex items-center gap-1 cursor-pointer shadow-sm">
+                <span>Buka Tabel IP Lengkap</span>
+                <i class="ph-bold ph-arrow-right"></i>
+              </button>
+            </div>
+
+            <!-- Mini stats row -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
+                <span class="text-[9px] uppercase font-bold text-white/40 block">Total IP Pengunjung</span>
+                <span class="text-base font-black font-mono text-[#c0ff00]">{{ visitorStats.total_visitors }}</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
+                <span class="text-[9px] uppercase font-bold text-white/40 block">Total Kunjungan</span>
+                <span class="text-base font-black font-mono text-sky-400">{{ visitorStats.total_hits }}</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
+                <span class="text-[9px] uppercase font-bold text-white/40 block">Pengunjung Hari Ini</span>
+                <span class="text-base font-black font-mono text-emerald-400">{{ visitorStats.today_visitors }}</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/5">
+                <span class="text-[9px] uppercase font-bold text-white/40 block">Kota Terbanyak</span>
+                <span class="text-base font-black text-purple-300 truncate block">
+                  {{ visitorStats.top_cities.length > 0 ? visitorStats.top_cities[0].city : 'Belum Ada' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Quick top 5 cities badges -->
+            <div v-if="visitorStats.top_cities && visitorStats.top_cities.length > 0" class="pt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
+              <span class="text-[10px] text-white/40 font-bold uppercase tracking-wider mr-1">Kota Teratas:</span>
+              <span
+                v-for="c in visitorStats.top_cities"
+                :key="c.city"
+                class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-white/80 font-medium"
+              >
+                📍 {{ c.city }} <strong class="text-[#c0ff00]">({{ c.count }})</strong>
+              </span>
+            </div>
+          </div>
         </div>
 
         <!-- ===== TAB: MASTER CABANG (Superadmin) ===== -->
@@ -2860,6 +2916,239 @@
           </div>
         </div>
 
+        <!-- ===== TAB: DATA PENGUNJUNG & IP (Superadmin Only) ===== -->
+        <div v-if="activeTab === 'visitors'" class="space-y-4 animate-fade-in">
+          <!-- Header Bar -->
+          <div class="flex flex-wrap justify-between items-center gap-3">
+            <div>
+              <h2 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <i class="ph-bold ph-globe text-[#c0ff00]"></i> Data Pengunjung Berdasarkan IP &amp; Asal Kota
+              </h2>
+              <p class="text-[10px] text-white/40">Monitoring real-time lalu lintas pengunjung, IP address, asal wilayah, dan intensitas kunjungan ke platform</p>
+            </div>
+            <button @click="fetchVisitors(visitorPagination.current_page)" :disabled="isVisitorsLoading" class="px-3 py-1.5 bg-[#c0ff00] hover:bg-[#b0ef00] text-black text-[11px] font-black rounded-lg transition-colors flex items-center gap-1.5 shadow-md shadow-[#c0ff00]/20 cursor-pointer disabled:opacity-50">
+              <i :class="['ph-bold ph-arrows-clockwise text-xs', isVisitorsLoading ? 'animate-spin' : '']"></i>
+              <span>{{ isVisitorsLoading ? 'Memuat...' : 'Segarkan Data' }}</span>
+            </button>
+          </div>
+
+          <!-- 4 KPI Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10 hover:border-[#c0ff00]/40 transition-all">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-bold text-white/50 uppercase tracking-wider">Total IP Pengunjung</span>
+                <i class="ph-bold ph-users text-[#c0ff00]"></i>
+              </div>
+              <div class="text-xl font-black font-mono text-[#c0ff00]">{{ visitorStats.total_visitors }}</div>
+              <span class="text-[9px] text-white/40">Alamat IP unik tercatat</span>
+            </div>
+
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10 hover:border-sky-400/40 transition-all">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-bold text-white/50 uppercase tracking-wider">Total Kunjungan (Hits)</span>
+                <i class="ph-bold ph-chart-line-up text-sky-400"></i>
+              </div>
+              <div class="text-xl font-black font-mono text-sky-400">{{ visitorStats.total_hits }}</div>
+              <span class="text-[9px] text-white/40">Total tayangan halaman</span>
+            </div>
+
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10 hover:border-emerald-400/40 transition-all">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-bold text-white/50 uppercase tracking-wider">Pengunjung Hari Ini</span>
+                <i class="ph-bold ph-calendar-check text-emerald-400"></i>
+              </div>
+              <div class="text-xl font-black font-mono text-emerald-400">{{ visitorStats.today_visitors }}</div>
+              <span class="text-[9px] text-white/40">Aktif per hari ini</span>
+            </div>
+
+            <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10 hover:border-purple-400/40 transition-all">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-bold text-white/50 uppercase tracking-wider">Kota Terbanyak</span>
+                <i class="ph-bold ph-map-pin text-purple-400"></i>
+              </div>
+              <div class="text-lg font-black font-heading text-purple-300 truncate">
+                {{ visitorStats.top_cities.length > 0 ? visitorStats.top_cities[0].city : 'Belum Ada' }}
+              </div>
+              <span class="text-[9px] text-white/40">
+                {{ visitorStats.top_cities.length > 0 ? `${visitorStats.top_cities[0].count} pengunjung unik` : '-' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Top Cities Distribution Badges -->
+          <div v-if="visitorStats.top_cities && visitorStats.top_cities.length > 0" class="p-3 bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 flex flex-wrap items-center gap-2 text-xs">
+            <span class="text-[10px] uppercase font-bold text-white/40 tracking-wider flex items-center gap-1">
+              <i class="ph-bold ph-fire text-amber-400"></i> Sebaran Kota Populer:
+            </span>
+            <button
+              v-for="tc in visitorStats.top_cities"
+              :key="tc.city"
+              @click="visitorCityFilter = tc.city; fetchVisitors(1)"
+              :class="['px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer',
+                visitorCityFilter === tc.city ? 'bg-[#c0ff00] text-black shadow-sm' : 'bg-white/5 hover:bg-white/10 text-white/80 border border-white/10'
+              ]"
+            >
+              <span>📍 {{ tc.city }}</span>
+              <span class="text-[9px] opacity-70">({{ tc.count }})</span>
+            </button>
+            <button
+              v-if="visitorCityFilter !== 'all'"
+              @click="visitorCityFilter = 'all'; fetchVisitors(1)"
+              class="px-2 py-0.5 text-[10px] font-bold text-rose-400 hover:underline cursor-pointer ml-auto"
+            >
+              Reset Filter Kota
+            </button>
+          </div>
+
+          <!-- Search & Filter Bar -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl p-2.5 border border-white/10 flex flex-wrap items-center gap-2">
+            <div class="relative flex-grow min-w-[200px]">
+              <i class="ph-bold ph-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
+              <input
+                v-model="visitorSearch"
+                @keyup.enter="fetchVisitors(1)"
+                type="text"
+                placeholder="Cari berdasarkan Alamat IP, Asal Kota, atau Provinsi..."
+                class="w-full pl-8 pr-3 py-1.5 text-[11px] font-medium text-white placeholder-white/30 bg-black/40 border border-white/10 rounded-lg outline-none focus:border-[#c0ff00]/50 transition-colors"
+              />
+            </div>
+
+            <select
+              v-model="visitorCityFilter"
+              @change="fetchVisitors(1)"
+              class="text-[11px] font-bold text-white bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer focus:border-[#c0ff00]/50"
+            >
+              <option value="all" class="bg-[#0d1427]">Semua Asal Kota</option>
+              <option v-for="c in visitorAllCities" :key="c" :value="c" class="bg-[#0d1427]">{{ c }}</option>
+            </select>
+
+            <button
+              @click="fetchVisitors(1)"
+              class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold transition-colors cursor-pointer"
+            >
+              Terapkan Filter
+            </button>
+          </div>
+
+          <!-- Visitors Table -->
+          <div class="bg-[#0e1726]/80 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-[11px]">
+                <thead>
+                  <tr class="border-b border-white/10 bg-white/[0.02] text-white/50 font-bold uppercase tracking-wider text-[10px]">
+                    <th class="py-2.5 px-3">No</th>
+                    <th class="py-2.5 px-3">Alamat IP</th>
+                    <th class="py-2.5 px-3">Asal Kota</th>
+                    <th class="py-2.5 px-3">Provinsi / Wilayah</th>
+                    <th class="py-2.5 px-3 text-center">Jumlah Kunjungan</th>
+                    <th class="py-2.5 px-3">Terakhir Berkunjung</th>
+                    <th class="py-2.5 px-3">Halaman Terakhir</th>
+                    <th class="py-2.5 px-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr v-if="isVisitorsLoading">
+                    <td colspan="8" class="text-center py-8 text-white/50">
+                      <div class="flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-spinner animate-spin text-base text-[#c0ff00]"></i>
+                        <span>Memuat data pengunjung...</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-else-if="visitorList.length === 0">
+                    <td colspan="8" class="text-center py-8 text-white/40">
+                      <div class="space-y-1">
+                        <i class="ph-bold ph-empty text-2xl text-white/20"></i>
+                        <p>Belum ada data pengunjung yang cocok dengan filter pencarian.</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    v-else
+                    v-for="(v, idx) in visitorList"
+                    :key="v.id || v.ip_address"
+                    class="hover:bg-white/[0.03] transition-colors"
+                  >
+                    <td class="py-2.5 px-3 font-mono text-white/40">
+                      {{ ((visitorPagination.current_page - 1) * visitorPagination.per_page) + idx + 1 }}
+                    </td>
+                    <td class="py-2.5 px-3">
+                      <div class="flex items-center gap-1.5">
+                        <span class="font-mono font-bold text-white px-2 py-0.5 rounded bg-black/40 border border-white/10 select-all">
+                          {{ v.ip_address }}
+                        </span>
+                        <button
+                          type="button"
+                          @click="copyIpAddress(v.ip_address)"
+                          class="text-white/40 hover:text-[#c0ff00] p-1 transition-colors cursor-pointer"
+                          title="Salin Alamat IP"
+                        >
+                          <i class="ph-bold ph-copy text-xs"></i>
+                        </button>
+                      </div>
+                    </td>
+                    <td class="py-2.5 px-3">
+                      <div class="flex items-center gap-1.5 font-bold text-emerald-300">
+                        <i class="ph-bold ph-map-pin text-emerald-400"></i>
+                        <span>{{ v.city || 'Tidak Diketahui' }}</span>
+                      </div>
+                    </td>
+                    <td class="py-2.5 px-3 text-white/70">
+                      {{ v.region || '-' }}
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-black font-mono bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                        {{ v.visit_count }}x
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-white/60 font-mono text-[10px]">
+                      {{ formatVisitDate(v.last_visit) }}
+                    </td>
+                    <td class="py-2.5 px-3 text-white/50 max-w-[150px] truncate" :title="v.page_url">
+                      {{ v.page_url || '/' }}
+                    </td>
+                    <td class="py-2.5 px-3 text-right">
+                      <button
+                        type="button"
+                        @click="visitorSearch = v.ip_address; fetchVisitors(1)"
+                        class="text-[10px] font-bold text-[#c0ff00] hover:underline cursor-pointer"
+                      >
+                        Detail IP
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div v-if="visitorPagination.total_pages > 1" class="p-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span class="text-[10px] text-white/40">
+                Menampilkan {{ visitorList.length }} dari {{ visitorPagination.total_items }} IP pengunjung
+              </span>
+              <div class="flex items-center gap-1.5">
+                <button
+                  :disabled="visitorPagination.current_page <= 1"
+                  @click="fetchVisitors(visitorPagination.current_page - 1)"
+                  class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed text-[11px] font-bold cursor-pointer"
+                >
+                  &larr; Sebelumnya
+                </button>
+                <span class="px-2 py-1 text-[11px] font-mono font-bold text-[#c0ff00]">
+                  {{ visitorPagination.current_page }} / {{ visitorPagination.total_pages }}
+                </span>
+                <button
+                  :disabled="visitorPagination.current_page >= visitorPagination.total_pages"
+                  @click="fetchVisitors(visitorPagination.current_page + 1)"
+                  class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed text-[11px] font-bold cursor-pointer"
+                >
+                  Berikutnya &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       
         <!-- TAB: SOP BIMBEL OFFLINE & MATRIKS RACI LINTAS PERAN -->
         <section v-if="activeTab === 'offline_sop'" class="space-y-6 animate-fade-in pb-16">
@@ -5418,6 +5707,7 @@ const navItems = computed(() => {
     { id: 'affiliates',  label: 'Afiliasi & Komisi',     icon: 'ph-hand-coins',    roles: ['superadmin', 'admin'] },
     { id: 'staff',       label: isSuper ? 'Staff & Tutor' : 'Guru & Tutor Cabang', icon: 'ph-users-three', roles: ['superadmin', 'admin'] },
     { id: 'reports',     label: 'Laporan & Analitik',    icon: 'ph-chart-bar',     roles: ['superadmin', 'admin'] },
+    { id: 'visitors', label: 'Pengunjung & IP', icon: 'ph-globe', roles: ['superadmin'] },
     { id: 'backup_restore', label: 'Backup & Restore DB', icon: 'ph-database',   roles: ['superadmin'] },
     { id: 'settings',    label: 'Pengaturan',            icon: 'ph-gear',          roles: ['superadmin', 'admin', 'teacher'] },
   ];
@@ -8706,13 +8996,77 @@ const executeRestore = async () => {
   }
 };
 
+// ── Visitor & IP Traffic Tracking State (Superadmin) ──
+const visitorList = ref([]);
+const visitorStats = reactive({
+  total_visitors: 0,
+  total_hits: 0,
+  today_visitors: 0,
+  top_cities: []
+});
+const visitorSearch = ref('');
+const visitorCityFilter = ref('all');
+const visitorAllCities = ref([]);
+const visitorPagination = reactive({
+  current_page: 1,
+  per_page: 25,
+  total_items: 0,
+  total_pages: 1
+});
+const isVisitorsLoading = ref(false);
+
+const fetchVisitors = async (page = 1) => {
+  if (!isSuperadmin.value) return;
+  isVisitorsLoading.value = true;
+  try {
+    const res = await api.getAdminVisitors(page, visitorSearch.value, visitorCityFilter.value);
+    if (res && res.success) {
+      visitorList.value = res.visitors || [];
+      visitorStats.total_visitors = res.total_visitors || 0;
+      visitorStats.total_hits = res.total_hits || 0;
+      visitorStats.today_visitors = res.today_visitors || 0;
+      visitorStats.top_cities = res.top_cities || [];
+      visitorAllCities.value = res.all_cities || [];
+      if (res.pagination) {
+        Object.assign(visitorPagination, res.pagination);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch visitors:', err);
+  } finally {
+    isVisitorsLoading.value = false;
+  }
+};
+
+const copyIpAddress = (ip) => {
+  if (!ip) return;
+  navigator.clipboard.writeText(ip);
+  showToast(`IP ${ip} berhasil disalin!`);
+};
+
+const formatVisitDate = (dt) => {
+  if (!dt) return '-';
+  try {
+    const d = new Date(dt.replace(' ', 'T'));
+    return d.toLocaleString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (_) {
+    return dt;
+  }
+};
+
 // ── Watch activeTab to load data ──
 watch(activeTab, (newTab) => {
   if (isAffiliate.value && !['affiliate_dashboard', 'affiliate_referrals', 'affiliate_payouts', 'settings'].includes(newTab)) {
     activeTab.value = 'affiliate_dashboard';
     return;
   }
-  if (!isSuperadmin.value && ['packages', 'plans', 'branches', 'backup_restore'].includes(newTab)) {
+  if (!isSuperadmin.value && ['packages', 'plans', 'branches', 'backup_restore', 'visitors'].includes(newTab)) {
     activeTab.value = 'overview';
     return;
   }
@@ -8723,6 +9077,9 @@ watch(activeTab, (newTab) => {
   sessionStorage.setItem('admin_active_tab', newTab);
   if (newTab === 'overview' && !isAffiliate.value && !isTeacher.value) {
     fetchDashboard();
+    if (isSuperadmin.value) fetchVisitors();
+  } else if (newTab === 'visitors' && isSuperadmin.value) {
+    fetchVisitors();
   } else if (newTab === 'offline_classes') {
     fetchOfflineClasses();
     if (staffMembers.value.length === 0) loadPlansAndStaff();

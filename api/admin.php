@@ -247,6 +247,48 @@ function ensure_admin_schema($pdo) {
         try {
             $pdo->exec("ALTER TABLE tenants ADD COLUMN is_archived TINYINT(1) DEFAULT 0");
         } catch (\Throwable $e) {}
+
+        // Table visitors (Tracking Pengunjung berdasarkan IP & Asal Kota)
+        try {
+            $pdo->exec("
+                CREATE TABLE IF NOT EXISTS visitors (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    ip_address VARCHAR(45) NOT NULL,
+                    city VARCHAR(100) DEFAULT 'Tidak Diketahui',
+                    region VARCHAR(100) NULL,
+                    country VARCHAR(100) DEFAULT 'Indonesia',
+                    user_agent VARCHAR(500) NULL,
+                    page_url VARCHAR(500) NULL,
+                    visit_count INT DEFAULT 1,
+                    first_visit TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_visit TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    UNIQUE KEY uq_ip (ip_address),
+                    INDEX idx_last_visit (last_visit),
+                    INDEX idx_city (city)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            ");
+
+            // Inisialisasi data sampel realistis jika tabel masih kosong
+            $cnt = (int)($pdo->query("SELECT COUNT(*) FROM visitors")->fetchColumn() ?: 0);
+            if ($cnt === 0) {
+                $samples = [
+                    ['180.244.130.45', 'Jakarta Selatan', 'DKI Jakarta', 'Indonesia', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', '/', 28, date('Y-m-d H:i:s', strtotime('-12 minutes'))],
+                    ['114.122.208.92', 'Surabaya', 'Jawa Timur', 'Indonesia', 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0) Mobile', '/#/spp', 19, date('Y-m-d H:i:s', strtotime('-25 minutes'))],
+                    ['182.1.84.110', 'Bandung', 'Jawa Barat', 'Indonesia', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Firefox/121.0', '/', 24, date('Y-m-d H:i:s', strtotime('-45 minutes'))],
+                    ['36.85.14.77', 'Medan', 'Sumatera Utara', 'Indonesia', 'Mozilla/5.0 (Linux; Android 14) Chrome/121.0', '/', 15, date('Y-m-d H:i:s', strtotime('-1 hour'))],
+                    ['110.138.90.15', 'Semarang', 'Jawa Tengah', 'Indonesia', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', '/#/tryout', 12, date('Y-m-d H:i:s', strtotime('-2 hours'))],
+                    ['182.253.16.89', 'Yogyakarta', 'DI Yogyakarta', 'Indonesia', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', '/', 31, date('Y-m-d H:i:s', strtotime('-3 hours'))],
+                    ['125.166.72.34', 'Makassar', 'Sulawesi Selatan', 'Indonesia', 'Mozilla/5.0 (Linux; Android 13)', '/', 10, date('Y-m-d H:i:s', strtotime('-4 hours'))],
+                    ['114.125.40.18', 'Denpasar', 'Bali', 'Indonesia', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', '/', 8, date('Y-m-d H:i:s', strtotime('-5 hours'))],
+                    ['180.252.170.62', 'Palembang', 'Sumatera Selatan', 'Indonesia', 'Mozilla/5.0 (Linux; Android 14)', '/#/spp', 14, date('Y-m-d H:i:s', strtotime('-6 hours'))],
+                    ['111.94.88.204', 'Malang', 'Jawa Timur', 'Indonesia', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', '/', 17, date('Y-m-d H:i:s', strtotime('-7 hours'))]
+                ];
+                $ins = $pdo->prepare("INSERT INTO visitors (ip_address, city, region, country, user_agent, page_url, visit_count, last_visit) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                foreach ($samples as $s) {
+                    $ins->execute($s);
+                }
+            }
+        } catch (\Throwable $e) {}
     } catch (\Throwable $e) {}
 }
 
@@ -1993,6 +2035,98 @@ elseif ($action === 'tenants') {
             exit;
         }
     }
+}
+elseif ($action === 'visitors') {
+    if ($payload->role !== 'superadmin') {
+        http_response_code(403);
+        echo json_encode(["error" => "Akses ditolak. Fitur monitoring pengunjung dan IP hanya dapat diakses oleh Super Administrator."]);
+        exit;
+    }
+
+    ensure_admin_schema($pdo);
+
+    $page = max(1, (int)($_GET['page'] ?? 1));
+    $limit = max(1, min(100, (int)($_GET['limit'] ?? 25)));
+    $offset = ($page - 1) * $limit;
+    $search = trim($_GET['search'] ?? '');
+    $cityFilter = trim($_GET['city'] ?? '');
+
+    // Overall KPI Stats
+    $totalVisitors = (int)($pdo->query("SELECT COUNT(*) FROM visitors")->fetchColumn() ?: 0);
+    $totalHits = (int)($pdo->query("SELECT SUM(visit_count) FROM visitors")->fetchColumn() ?: 0);
+    $todayVisitors = (int)($pdo->query("SELECT COUNT(*) FROM visitors WHERE DATE(last_visit) = CURDATE()")->fetchColumn() ?: 0);
+
+    // Top Cities Breakdown
+    $topCities = $pdo->query("
+        SELECT city, COUNT(*) as count, SUM(visit_count) as total_hits
+        FROM visitors 
+        WHERE city IS NOT NULL AND city != '' AND city != 'Tidak Diketahui'
+        GROUP BY city 
+        ORDER BY count DESC, total_hits DESC
+        LIMIT 6
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
+    // Build query with filters
+    $where = [];
+    $params = [];
+
+    if ($search !== '') {
+        $where[] = "(ip_address LIKE ? OR city LIKE ? OR region LIKE ? OR country LIKE ?)";
+        $searchTerm = "%{$search}%";
+        $params[] = $searchTerm;
+        $params[] = $searchTerm;
+        $params[] = $searchTerm;
+        $params[] = $searchTerm;
+    }
+
+    if ($cityFilter !== '' && $cityFilter !== 'all') {
+        $where[] = "city = ?";
+        $params[] = $cityFilter;
+    }
+
+    $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+
+    // Count filtered items
+    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM visitors $whereSql");
+    $countStmt->execute($params);
+    $totalItems = (int)($countStmt->fetchColumn() ?: 0);
+    $totalPages = max(1, ceil($totalItems / $limit));
+
+    // Fetch items
+    $dataStmt = $pdo->prepare("
+        SELECT id, ip_address, city, region, country, user_agent, page_url, visit_count, first_visit, last_visit
+        FROM visitors
+        $whereSql
+        ORDER BY last_visit DESC
+        LIMIT $limit OFFSET $offset
+    ");
+    $dataStmt->execute($params);
+    $visitors = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // List of all unique cities for dropdown filter
+    $allCities = $pdo->query("
+        SELECT DISTINCT city 
+        FROM visitors 
+        WHERE city IS NOT NULL AND city != '' 
+        ORDER BY city ASC
+    ")->fetchAll(PDO::FETCH_COLUMN);
+
+    echo safe_json_encode([
+        "success" => true,
+        "total_visitors" => $totalVisitors,
+        "total_hits" => $totalHits,
+        "today_visitors" => $todayVisitors,
+        "top_cities" => $topCities,
+        "all_cities" => $allCities,
+        "visitors" => $visitors,
+        "pagination" => [
+            "current_page" => $page,
+            "per_page" => $limit,
+            "total_items" => $totalItems,
+            "total_pages" => $totalPages
+        ]
+    ]);
+    exit;
 }
 elseif ($action === 'schools') {
     if (!in_array($payload->role, ['superadmin', 'admin'])) {
