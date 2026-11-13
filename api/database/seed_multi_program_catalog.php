@@ -100,30 +100,6 @@ function seed_multi_program_catalog(PDO $pdo): array {
             'code' => 'ALUMNI_HYBRID',
             'name' => 'Paket Alumni Supercamp Karantina',
             'description' => 'Program karantina intensif hybrid tatap muka harian, bedah soal 12 jam/hari, & mentoring mental juara PTN.'
-        ],
-        [
-            'id' => 'prod-kitab-snbt',
-            'code' => 'BOOK_KITAB_SNBT',
-            'name' => 'Buku Kitab SNBT 2026/2027 Edisi Master Cetak',
-            'description' => 'Buku cetak babon 750+ halaman memuat 7 subtes resmi SNPMB, ringkasan teori praktis, rumus cepat, dan 1.200+ soal pembahasan tuntas. Termasuk bonus voucher akses CBT 30 hari.'
-        ],
-        [
-            'id' => 'prod-buku-hots-sma',
-            'code' => 'BOOK_HOTS_SMA',
-            'name' => 'Buku Bank Soal HOTS TKA Saintek & Soshum Cetak',
-            'description' => 'Buku cetak kumpulan soal HOTS tingkat lanjut Kurikulum Merdeka & Nasional untuk persiapan asesmen akademik SMA & seleksi PTN favorit.'
-        ],
-        [
-            'id' => 'prod-tryout-bundle',
-            'code' => 'SERVICE_TO_BUNDLE',
-            'name' => 'Bundling 10x Tryout IRT CBT Mandiri',
-            'description' => 'Paket 10 sesi simulasi ujian CBT dengan algoritma penilaian IRT resmi SNPMB, grafik analisis kemampuan per subtes, dan kunci pembahasan lengkap.'
-        ],
-        [
-            'id' => 'prod-rasionalisasi-prodi',
-            'code' => 'SERVICE_RASIONALISASI',
-            'name' => 'Konsultasi & Rasionalisasi Jurusan PTN 1-on-1',
-            'description' => 'Sesi bimbingan 1-on-1 tatap muka virtual 45 menit bersama konsultan senior EduPath untuk bedah peluang lolos SNBP/SNBT berdasarkan nilai rapor & skor tryout.'
         ]
     ];
 
@@ -587,82 +563,6 @@ function seed_multi_program_catalog(PDO $pdo): array {
                 'Bedah Soal dan Diskusi 10 Jam per Hari bersama Master Tutor',
                 'Akomodasi & Konsumsi Belajar Terpadu (Opsional Cabang)',
                 'Hemat 40% Garansi Pendampingan Intensif sampai Lolos PTN'
-            ])
-        ],
-
-        // Produk Barang Fisik: Buku Modul Cetak
-        [
-            'id' => 'plan-buku-kitab-snbt',
-            'product_id' => 'prod-kitab-snbt',
-            'program_id' => 'prog-snpmb-utbk',
-            'academic_program' => 'SNPMB/UTBK',
-            'delivery_mode' => 'physical',
-            'name' => 'Buku Kitab SNBT Edisi Lengkap 2026/2027 Cetak',
-            'price' => 185000,
-            'discount' => 32,
-            'duration' => 365,
-            'billing_cycle' => 'one-time',
-            'features' => json_encode([
-                'Buku Fisik 750+ Halaman Bookpaper Berkualitas',
-                '7 Subtes Resmi Lengkap (TPS, Literasi ID/EN, Penalaran Matematika)',
-                '1.200+ Soal Latihan & Pembahasan Konsep Tuntas',
-                'Gratis Ongkir Pulau Jawa & Bonus Voucher CBT EduPath 30 Hari'
-            ])
-        ],
-        [
-            'id' => 'plan-buku-hots-sma',
-            'product_id' => 'prod-buku-hots-sma',
-            'program_id' => 'prog-tka-sma',
-            'academic_program' => 'TKA SMA',
-            'delivery_mode' => 'physical',
-            'name' => 'Buku Bank Soal HOTS TKA Saintek & Soshum Cetak',
-            'price' => 165000,
-            'discount' => 30,
-            'duration' => 365,
-            'billing_cycle' => 'one-time',
-            'features' => json_encode([
-                'Buku Fisik Kumpulan Bank Soal HOTS Teruji SMA',
-                'Pembahasan Rumus Cepat & Trik Eliminasi Opsi',
-                'Matematika Lanjut, Fisika, Kimia, Biologi & Soshum',
-                'Pengiriman Ekspedisi Resmi ke Seluruh Indonesia'
-            ])
-        ],
-
-        // Produk Layanan Khusus & Simulasi
-        [
-            'id' => 'plan-tryout-10x',
-            'product_id' => 'prod-tryout-bundle',
-            'program_id' => 'prog-snpmb-utbk',
-            'academic_program' => 'SNPMB/UTBK',
-            'delivery_mode' => 'online',
-            'name' => 'Bundling 10x Tryout IRT CBT Mandiri',
-            'price' => 99000,
-            'discount' => 50,
-            'duration' => 90,
-            'billing_cycle' => 'one-time',
-            'features' => json_encode([
-                '10 Tiket Simulasi Ujian Tryout CBT Resmi',
-                'Sistem Scoring Item Response Theory (IRT) Presisi',
-                'Kunci Jawaban, Pembahasan Lengkap & Ranking Nasional',
-                'Masa Aktif 90 Hari Akses Fleksibel Kapan Saja'
-            ])
-        ],
-        [
-            'id' => 'plan-rasionalisasi-1on1',
-            'product_id' => 'prod-rasionalisasi-prodi',
-            'program_id' => 'prog-snpmb-utbk',
-            'academic_program' => 'SNPMB/UTBK',
-            'delivery_mode' => 'online',
-            'name' => 'Konsultasi & Rasionalisasi Jurusan PTN 1-on-1',
-            'price' => 200000,
-            'discount' => 0,
-            'duration' => 30,
-            'billing_cycle' => 'one-time',
-            'features' => json_encode([
-                'Sesi 1-on-1 Live Video 45 Menit bersama Konsultan Senior',
-                'Audit Nilai Rapor & Hasil Tryout Portofolio Siswa',
-                'Rekomendasi Pemilihan Jurusan & Kampus Pilihan 1 & 2',
-                'Laporan Dokumen Rasionalisasi Resmi PDF Dikirim ke Email'
             ])
         ]
     ];
