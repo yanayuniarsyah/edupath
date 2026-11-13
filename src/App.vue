@@ -6117,8 +6117,8 @@
                 </div>
               </div>
 
-              <!-- Demo Quick Fill Accounts (PRD v1.2: Siswa SD/SMP/SMA, Guru BK Sekolah, Guru/Tutor Bimbel) -->
-              <div v-if="isLoginMode" class="pt-2 pb-1 space-y-2 border-t border-slate-800">
+              <!-- Demo Quick Fill Accounts (PRD v1.2: Siswa SD/SMP/SMA, Guru BK Sekolah, Guru/Tutor Bimbel - Hanya Tampil di Localhost) -->
+              <div v-if="isLoginMode && isLocalhost" class="pt-2 pb-1 space-y-2 border-t border-slate-800">
                 <div class="flex items-center justify-between">
                   <span class="text-[9px] uppercase font-black text-slate-400 tracking-wider">⚡ Pilih Cepat Akun Demo (PRD v1.2):</span>
                   <button type="button" @click="triggerSeedDummyApp" :disabled="isSeedingDummy" class="text-[9px] text-[#c0ff00] hover:underline font-bold flex items-center gap-1 cursor-pointer">
@@ -7793,6 +7793,11 @@ export default {
       return res;
     });
     const isLoginMode = ref(true);
+    const isLocalhost = computed(() => {
+      if (typeof window === 'undefined') return false;
+      const host = window.location.hostname;
+      return host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local') || host === '0.0.0.0' || Boolean(import.meta.env?.DEV);
+    });
     
     const initScrollReveal = () => {
       if ('IntersectionObserver' in window) {
@@ -10511,6 +10516,7 @@ export default {
       currentUser,
       showLoginModal,
       isLoginMode,
+      isLocalhost,
       authForm,
       showPassword,
       authLoading,

@@ -87,8 +87,8 @@
             </div>
           </div>
 
-          <!-- Quick Fill Demo Accounts -->
-          <div class="pt-1">
+          <!-- Quick Fill Demo Accounts (Hanya Tampil di Localhost) -->
+          <div v-if="isLocalhost" class="pt-1">
             <span class="block text-[10px] uppercase font-black text-white/40 tracking-wider mb-1.5">Pilih Akun Demo UAT:</span>
             <div class="grid grid-cols-2 gap-2">
               <button
@@ -5516,6 +5516,11 @@ const showPassword = ref(false);
 const loginForm = ref({ username: '', password: '' });
 const loginError = ref('');
 const loginLoading = ref(false);
+const isLocalhost = computed(() => {
+  if (typeof window === 'undefined') return false;
+  const host = window.location.hostname;
+  return host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local') || host === '0.0.0.0' || Boolean(import.meta.env?.DEV);
+});
 
 const fillCredentials = (user, pass) => {
   loginForm.value.username = user;
