@@ -6117,6 +6117,34 @@
                 </div>
               </div>
 
+              <!-- Baris 5: Input Manual Kode Referral / Voucher Afiliasi (Opsional) -->
+              <div v-if="!isLoginMode" class="space-y-1 pt-0.5">
+                <div class="flex justify-between items-center">
+                  <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="ph-bold ph-ticket text-xs text-amber-400"></i>
+                    <span>Kode Referral / Voucher (Opsional)</span>
+                  </label>
+                  <span v-if="authForm.referral_code" class="text-[9px] font-bold text-emerald-400 flex items-center gap-1">
+                    <i class="ph-bold ph-check-circle"></i> Terpasang
+                  </span>
+                </div>
+                <div class="relative">
+                  <input 
+                    v-model="authForm.referral_code" 
+                    type="text" 
+                    placeholder="Cth: YANA7X9B (kosongkan bila tidak ada)" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white uppercase outline-none focus:border-amber-400 font-mono tracking-wider pr-8"
+                    @input="authForm.referral_code = authForm.referral_code.toUpperCase().trim()"
+                  >
+                  <div v-if="authForm.referral_code" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <button type="button" @click="authForm.referral_code = ''" class="text-white/40 hover:text-white cursor-pointer" title="Hapus kode referral">
+                      <i class="ph-bold ph-x text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+                <p class="text-[10px] text-slate-500">Mendaftar lewat rekomendasi teman/mitra bimbel? Masukkan kode di sini agar terhubung.</p>
+              </div>
+
               <!-- Demo Quick Fill Accounts (PRD v1.2: Siswa SD/SMP/SMA, Guru BK Sekolah, Guru/Tutor Bimbel - Hanya Tampil di Localhost) -->
               <div v-if="isLoginMode && isLocalhost" class="pt-2 pb-1 space-y-2 border-t border-slate-800">
                 <div class="flex items-center justify-between">
@@ -7843,7 +7871,8 @@ export default {
       target_level: 'SMA',
       grade_level: 'Kelas 12 Pejuang PTN',
       target_goal: '',
-      target_ptn: ''
+      target_ptn: '',
+      referral_code: ''
     });
 
     const availableRegistrationPrograms = [
@@ -9066,6 +9095,9 @@ export default {
       if (refCode) {
         localStorage.setItem('affiliate_ref', refCode);
       }
+      if (localStorage.getItem('affiliate_ref')) {
+        authForm.value.referral_code = localStorage.getItem('affiliate_ref');
+      }
       // Capture school referral
       const refSchool = params.get('school');
       const refSchoolId = params.get('school_id');
@@ -9133,7 +9165,7 @@ export default {
             target_ptn: authForm.value.target_ptn || authForm.value.target_goal || '',
             school: authForm.value.school || localStorage.getItem('student_ref_school') || '',
             school_id: authForm.value.school_id || localStorage.getItem('student_ref_school_id') || '',
-            referral_code: localStorage.getItem('affiliate_ref') || ''
+            referral_code: (authForm.value.referral_code || localStorage.getItem('affiliate_ref') || '').trim().toUpperCase()
           };
           res = await api.register(payload);
         }
