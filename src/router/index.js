@@ -14,6 +14,12 @@ try {
       window.location.replace('/#/school' + window.location.search);
     } else if (currentPath === 'spp') {
       window.location.replace('/#/spp' + window.location.search);
+    } else if (currentPath.startsWith('ref/')) {
+      const refCode = currentPath.split('/')[1];
+      if (refCode) {
+        try { localStorage.setItem('affiliate_ref', refCode); } catch(e) {}
+        window.location.replace('/?ref=' + encodeURIComponent(refCode));
+      }
     }
   }
 } catch (e) {}

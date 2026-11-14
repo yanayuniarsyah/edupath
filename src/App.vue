@@ -9052,9 +9052,17 @@ export default {
         }
       } catch (_) {}
 
-      // Capture affiliate referral code
+      // Capture affiliate referral code (supports ?ref=CODE, /ref/CODE, and #/ref/CODE)
       const params = new URLSearchParams(window.location.search);
-      const refCode = params.get('ref');
+      let refCode = params.get('ref');
+      if (!refCode) {
+        const pathMatch = window.location.pathname.match(/\/ref\/([a-zA-Z0-9]+)/i);
+        if (pathMatch) refCode = pathMatch[1];
+      }
+      if (!refCode) {
+        const hashMatch = window.location.hash.match(/ref=([a-zA-Z0-9]+)/i) || window.location.hash.match(/\/ref\/([a-zA-Z0-9]+)/i);
+        if (hashMatch) refCode = hashMatch[1];
+      }
       if (refCode) {
         localStorage.setItem('affiliate_ref', refCode);
       }
